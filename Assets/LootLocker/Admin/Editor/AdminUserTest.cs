@@ -1,0 +1,26 @@
+﻿using LootLockerAdminRequests;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AdminUserTest : MonoBehaviour
+{
+
+    [ContextMenu("Setup Two-Factor Authentication")]
+    public void SetupTwoFactorAuthentication()
+    {
+        LootLockerSDKAdminManager.SetupTwoFactorAuthentication((response) =>
+        {
+            if (response.success)
+            {
+                Debug.LogError("Successful setup two factor authentication: " + response.text);
+            }
+            else
+            {
+                Debug.LogError("failed to set two factor authentication: " + response.Error);
+            }
+        });
+    }
+
+}
+

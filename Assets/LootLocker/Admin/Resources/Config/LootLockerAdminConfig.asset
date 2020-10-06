@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75613fe9958190f4cb55f5fec9b4ee04, type: 3}
+  m_Name: LootLockerAdminConfig
+  m_EditorClassIdentifier: 
+  gameName: Cradaptive Demo Game
+  apiKey: 2ccbcc7848efba11539a0c9e17a66c837a098625
+  token: 
+  gameID: 0
+  game_version: 1.0.0.0
+  deviceID: 
+  email: 
+  password: 
+  platform: 0
+  environment: 0
+  url: https://api.lootlocker.io/admin

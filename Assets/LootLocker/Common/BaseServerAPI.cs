@@ -1,0 +1,325 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using Newtonsoft.Json;
+using System;
+using System.Text;
+using UnityEngine.SceneManagement;
+using UnityEngine.Events;
+using System.Net;
+
+namespace LootLocker
+{
+    public abstract class BaseServerAPI
+    {
+        public static BaseServerAPI I;
+        public static void Init(BaseServerAPI childType)
+        {
+            I = childType;
+        }
+
+        protected Func<IEnumerator, System.Object> StartCoroutine;
+
+        /// <summary>
+        /// This would be something like "www.mydomain.com" or "api.mydomain.com". But you could also directly supply the IPv4 address of the server to speed the calls up a little bit by bypassing DNS Lookup
+        /// </summary>
+        //public static string SERVER_URL = "http://localhost:5051/api";
+        public static LootLockerGenericConfig activeConfig;
+        public static string SERVER_URL;
+
+        enum CallerRole { User, Admin };
+        static CallerRole callerRole = CallerRole.User;
+
+        public void SwitchURL(bool adminCall)
+        {
+            SERVER_URL = adminCall ? activeConfig.adminUrl : activeConfig.userUrl;
+            callerRole = adminCall ? CallerRole.Admin : CallerRole.User;
+        }
+
+        public void SendRequest(ServerRequest request, System.Action<LootLockerResponse> OnServerResponse = null)
+        {
+            StartCoroutine(coroutine());
+            IEnumerator coroutine()
+            {
+                //Always wait 1 frame before starting any request to the server to make sure the requesters code has exited the main thread.
+                yield return null;
+
+                //Build the URL that we will hit based on the specified endpoint, query params, etc
+                string url = BuildURL(request.endpoint, request.queryParams);
+
+                Debug.Log("ServerRequest URL: " + url);
+
+                using (UnityWebRequest webRequest = CreateWebRequest(url, request))
+                {
+                    webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+                    float startTime = Time.time;
+                    float maxTimeOut = 5f;
+
+                    yield return webRequest.SendWebRequest();
+                    while (!webRequest.isDone)
+                    {
+                        yield return null;
+                        if (Time.time - startTime >= maxTimeOut)
+                        {
+                            Debug.LogError("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
+                            yield break;
+                        }
+                    }
+
+                    if (!webRequest.isDone)
+                    {
+                        OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
+                        yield break;
+                    }
+
+                    try
+                    {
+                        Debug.Log("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+                    }
+                    catch
+                    {
+                        Debug.LogError(request);
+                        Debug.LogError(request.httpMethod);
+                        Debug.LogError(request.endpoint);
+                        Debug.LogError(webRequest);
+                        Debug.LogError(webRequest.downloadHandler);
+                        Debug.LogError(webRequest.downloadHandler.text);
+                    }
+
+                    LootLockerResponse response = new LootLockerResponse();
+                    response.statusCode = (int)webRequest.responseCode;
+                    if (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error))
+                    {
+                        switch (webRequest.responseCode)
+                        {
+                            case 200:
+                                response.Error = "";
+                                break;
+                            case 400:
+                                response.Error = "Bad Request -- Your request has an error";
+                                break;
+                            case 402:
+                                response.Error = "Payment Required -- Payment failed. Insufficient funds, etc.";
+                                break;
+                            case 401:
+                                response.Error = "Unauthroized -- Your session_token is invalid";
+                                break;
+                            case 403:
+                                response.Error = "Forbidden -- You do not have access";
+                                break;
+                            case 404:
+                                response.Error = "Not Found";
+                                break;
+                            case 405:
+                                response.Error = "Method Not Allowed";
+                                break;
+                            case 406:
+                                response.Error = "Not Acceptable -- Purchasing is disabled";
+                                break;
+                            case 409:
+                                response.Error = "Conflict -- Your state is most likely not aligned with the servers.";
+                                break;
+                            case 429:
+                                response.Error = "Too Many Requests -- You're being limited for sending too many requests too quickly.";
+                                break;
+                            case 500:
+                                response.Error = "Internal Server Error -- We had a problem with our server. Try again later.";
+                                break;
+                            case 503:
+                                response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
+                                break;
+                        }
+
+                        Debug.Log("Response code: " + webRequest.responseCode);
+
+                        if (webRequest.responseCode != 401)
+                        {
+                            response.Error += " " + webRequest.downloadHandler.text;
+                            response.text = webRequest.downloadHandler.text;
+                        }
+                        else
+                        {
+                            RefreshTokenAndCompleteCall(request, OnServerResponse);
+                        }
+
+                        response.status = false;
+                        response.hasError = true;
+                        response.text = webRequest.downloadHandler.text;
+                        OnServerResponse?.Invoke(response);
+
+                    }
+                    else
+                    {
+                        response.status = true;
+                        response.hasError = false;
+                        response.text = webRequest.downloadHandler.text;
+                        OnServerResponse?.Invoke(response);
+                    }
+                }
+            }
+        }
+
+        protected static Dictionary<string, string> baseHeaders = new Dictionary<string, string>() {
+
+            { "Accept", "application/json; charset=UTF-8" },
+            { "Content-Type", "application/json; charset=UTF-8" },
+            { "Access-Control-Allow-Credentials", "true" },
+            { "Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time" },
+            { "Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS, HEAD" },
+            { "Access-Control-Allow-Origin", "*" }
+        };
+
+        protected event System.Action<ServerError> OnError;
+
+        protected struct ServerError
+        {
+            public HttpStatusCode status;
+            public string text;
+        }
+
+        protected void BroadcastError(ServerError error)
+        {
+            OnError?.Invoke(error);
+        }
+
+        protected abstract void RefreshTokenAndCompleteCall(ServerRequest cacheServerRequest, System.Action<LootLockerResponse> OnServerResponse);
+
+        protected void DownloadTexture2D(string url, System.Action<Texture2D> OnComplete = null)
+        {
+            StartCoroutine(DoDownloadTexture2D(url, OnComplete));
+        }
+
+        protected IEnumerator DoDownloadTexture2D(string url, System.Action<Texture2D> OnComplete = null)
+        {
+            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+            {
+
+                www.SetRequestHeader("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time");
+                www.SetRequestHeader("Access-Control-Allow-Credentials", "true");
+                www.SetRequestHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS, HEAD");
+                www.SetRequestHeader("Access-Control-Allow-Origin", "*");
+
+                yield return www.SendWebRequest();
+
+                Texture2D texture = DownloadHandlerTexture.GetContent(www);
+
+                if (texture == null)
+                {
+                    Debug.LogError("Texture download failed for: " + url);
+                }
+
+                OnComplete?.Invoke(texture);
+            }
+        }
+
+        UnityWebRequest CreateWebRequest(string url, ServerRequest request)
+        {
+            UnityWebRequest webRequest;
+            switch (request.httpMethod)
+            {
+                case HTTPMethod.UPLOAD:
+                    webRequest = UnityWebRequest.Post(url, request.form);
+                    break;
+                case HTTPMethod.POST:
+                case HTTPMethod.PATCH:
+                // Defaults are fine for PUT
+                case HTTPMethod.PUT:
+
+                    if (request.payload == null && request.upload != null)
+                    {
+                        List<IMultipartFormSection> form = new List<IMultipartFormSection>
+                        {
+                            new MultipartFormFileSection("uploadedFile", request.upload, "testImage.png", "image/png")
+                        };
+
+                        // generate a boundary then convert the form to byte[]
+                        byte[] boundary = UnityWebRequest.GenerateBoundary();
+                        byte[] formSections = UnityWebRequest.SerializeFormSections(form, boundary);
+                        // Set the content type - NO QUOTES around the boundary
+                        string contentType = String.Concat("multipart/form-data; boundary=--", Encoding.UTF8.GetString(boundary));
+                        // Make my request object and add the raw body. Set anything else you need here
+                        webRequest = new UnityWebRequest();
+                        webRequest.uri = new Uri(url);
+                        Debug.Log(url);//the url is wrong in some cases
+                        webRequest.uploadHandler = new UploadHandlerRaw(formSections);
+                        webRequest.uploadHandler.contentType = contentType;
+                        webRequest.useHttpContinue = false;
+                        // webRequest.method = "POST";
+                        webRequest.method = UnityWebRequest.kHttpVerbPOST;
+                    }
+                    else
+                    {
+                        string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
+                        Debug.Log("REQUEST BODY = " + json);
+                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
+                        webRequest = UnityWebRequest.Put(url, bytes);
+                        webRequest.method = request.httpMethod.ToString();
+                    }
+
+                    break;
+
+                case HTTPMethod.OPTIONS:
+                case HTTPMethod.HEAD:
+                case HTTPMethod.GET:
+                    // Defaults are fine for GET
+                    webRequest = UnityWebRequest.Get(url);
+                    webRequest.method = request.httpMethod.ToString();
+                    break;
+
+                case HTTPMethod.DELETE:
+                    // Defaults are fine for DELETE
+                    webRequest = UnityWebRequest.Delete(url);
+                    break;
+                default:
+                    throw new System.Exception("Invalid HTTP Method");
+            }
+
+            if (baseHeaders != null)
+            {
+                foreach (KeyValuePair<string, string> pair in baseHeaders)
+                {
+                    if (pair.Key == "Content-Type" && request.upload != null) continue;
+
+                    webRequest.SetRequestHeader(pair.Key, pair.Value);
+                }
+            }
+
+            if (request.extraHeaders != null)
+            {
+                foreach (KeyValuePair<string, string> pair in request.extraHeaders)
+                {
+                    webRequest.SetRequestHeader(pair.Key, pair.Value);
+                }
+            }
+
+            return webRequest;
+        }
+
+        string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)
+        {
+            string ep = endpoint.StartsWith("/") ? endpoint.Trim() : "/" + endpoint.Trim();
+
+            return (SERVER_URL + ep + GetQueryStringFromDictionary(queryParams)).Trim();
+        }
+
+        string GetQueryStringFromDictionary(Dictionary<string, string> queryDict)
+        {
+            if (queryDict == null || queryDict.Count == 0) return string.Empty;
+
+            string query = "?";
+
+            foreach (KeyValuePair<string, string> pair in queryDict)
+            {
+                if (query.Length > 1)
+                    query += "&";
+
+                query += pair.Key + "=" + pair.Value;
+            }
+
+            return query;
+        }
+    }
+}
+
