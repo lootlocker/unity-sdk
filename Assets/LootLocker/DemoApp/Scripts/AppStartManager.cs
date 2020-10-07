@@ -23,10 +23,6 @@ public class AppStartManager : MonoBehaviour, IStageOwner
 
     private void Awake()
     {
-#if UNITY_EDITOR
-        usernameField.text = "emmanuel@cradaptive.com";
-        passwordField.text = "Ihatefacebuk101!";
-#endif
 #if !UNITY_EDITOR
         usernameField.text = PlayerPrefs.GetString("AdminUserName","");
         passwordField.text = PlayerPrefs.GetString("AdminPassword","");
