@@ -251,7 +251,9 @@ namespace LootLocker
         /// </summary>
         public void Send(System.Action<LootLockerResponse> OnServerResponse)
         {
+#if UNITY_EDITOR
             Debug.Log("Sending Request: " + httpMethod.ToString() + " " + endpoint + " -- queryParams: " + queryParams?.Count);
+#endif
             BaseServerAPI.I.SendRequest(this, (response) =>
             {
                 OnServerResponse?.Invoke(response);

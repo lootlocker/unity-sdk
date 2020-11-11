@@ -96,7 +96,9 @@ namespace LootLocker
 
                     try
                     {
+#if UNITY_EDITOR
                         Debug.Log("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+#endif
                     }
                     catch
                     {

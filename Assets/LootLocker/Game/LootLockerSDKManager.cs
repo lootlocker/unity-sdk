@@ -50,7 +50,6 @@ namespace LootLockerRequests
         {
             if (!initialized)
             {
-                DebugMessage("Please initialize before calling sdk functions");
                 return Init();
             }
 
@@ -81,6 +80,13 @@ namespace LootLockerRequests
         #endregion
 
         #region Authentication
+        public static void VerifySteamID(string steamSessionTicket, Action<VerifyResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            VerifyRequest verifyRequest = new VerifyRequest(steamSessionTicket);
+            LootLockerAPIManager.Verify(verifyRequest, onComplete);
+        }
+
         public static void VerifyID(string deviceId, Action<VerifyResponse> onComplete)
         {
             if (!CheckInitialized()) return;
@@ -92,6 +98,12 @@ namespace LootLockerRequests
         {
             if (!CheckInitialized()) return;
             SessionRequest sessionRequest = new SessionRequest(deviceId);
+            LootLockerAPIManager.Session(sessionRequest, onComplete);
+        }
+        public static void StartSteamSession(string steamId64, Action<SessionResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            SessionRequest sessionRequest = new SessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
 
