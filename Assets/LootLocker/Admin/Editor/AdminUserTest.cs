@@ -13,11 +13,11 @@ public class AdminUserTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.LogError("Successful setup two factor authentication: " + response.text);
+                LootLockerSDKAdminManager.DebugMessage("Successful setup two factor authentication: " + response.text);
             }
             else
             {
-                Debug.LogError("failed to set two factor authentication: " + response.Error);
+                LootLockerSDKAdminManager.DebugMessage("failed to set two factor authentication: " + response.Error, true);
             }
         });
     }

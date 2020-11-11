@@ -38,8 +38,6 @@ namespace LootLockerRequests
         public string value { get; set; }
         public int order { get; set; }
     }
-
-
 }
 
 namespace LootLocker

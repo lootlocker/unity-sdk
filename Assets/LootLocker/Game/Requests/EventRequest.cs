@@ -101,10 +101,10 @@ namespace LootLockerRequests
     {
         public string finish_time { get; set; }
         public string finish_score { get; set; }
-        public Checkpoint_Times[] checkpoint_times { get; set; }
+        public CheckpointTimes[] checkpoint_times { get; set; }
     }
     [System.Serializable]
-    public class Checkpoint_Times
+    public class CheckpointTimes
     {
         public int index;
         public int time;

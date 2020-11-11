@@ -9,6 +9,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 
+namespace enums
+{
+    public enum CallerRole { User, Admin, Player };
+}
+
 namespace LootLocker
 {
     public abstract class BaseServerAPI
@@ -28,13 +33,27 @@ namespace LootLocker
         public static LootLockerGenericConfig activeConfig;
         public static string SERVER_URL;
 
-        enum CallerRole { User, Admin };
-        static CallerRole callerRole = CallerRole.User;
 
-        public void SwitchURL(bool adminCall)
+        static enums.CallerRole callerRole = enums.CallerRole.User;
+
+        public void SwitchURL(enums.CallerRole mainCallerRole)
         {
-            SERVER_URL = adminCall ? activeConfig.adminUrl : activeConfig.userUrl;
-            callerRole = adminCall ? CallerRole.Admin : CallerRole.User;
+            switch (mainCallerRole)
+            {
+                case enums.CallerRole.Admin:
+                    SERVER_URL = activeConfig.adminUrl;
+                    break;
+                case enums.CallerRole.User:
+                    SERVER_URL = activeConfig.userUrl;
+                    break;
+                case enums.CallerRole.Player:
+                    SERVER_URL = activeConfig.playerUrl;
+                    break;
+                default:
+                    SERVER_URL = activeConfig.url;
+                    break;
+            }
+            callerRole = mainCallerRole;
         }
 
         public void SendRequest(ServerRequest request, System.Action<LootLockerResponse> OnServerResponse = null)
@@ -47,8 +66,9 @@ namespace LootLocker
 
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildURL(request.endpoint, request.queryParams);
-
+#if UNITY_EDIROR
                 Debug.Log("ServerRequest URL: " + url);
+#endif
 
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
                 {
@@ -131,9 +151,9 @@ namespace LootLocker
                                 response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
                                 break;
                         }
-
+#if UNITY_EDIROR
                         Debug.Log("Response code: " + webRequest.responseCode);
-
+#endif
                         if (webRequest.responseCode != 401)
                         {
                             response.Error += " " + webRequest.downloadHandler.text;
@@ -231,7 +251,7 @@ namespace LootLocker
                     {
                         List<IMultipartFormSection> form = new List<IMultipartFormSection>
                         {
-                            new MultipartFormFileSection("uploadedFile", request.upload, "testImage.png", "image/png")
+                            new MultipartFormFileSection(request.uploadName, request.upload, System.DateTime.Now.ToString(), request.uploadType)
                         };
 
                         // generate a boundary then convert the form to byte[]
@@ -239,20 +259,26 @@ namespace LootLocker
                         byte[] formSections = UnityWebRequest.SerializeFormSections(form, boundary);
                         // Set the content type - NO QUOTES around the boundary
                         string contentType = String.Concat("multipart/form-data; boundary=--", Encoding.UTF8.GetString(boundary));
+                    
+                        //Debug.LogError("Content type Set: " + contentType);
                         // Make my request object and add the raw body. Set anything else you need here
                         webRequest = new UnityWebRequest();
-                        webRequest.uri = new Uri(url);
+                        webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
+                        webRequest.uri = new Uri(url);  
                         Debug.Log(url);//the url is wrong in some cases
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
+                        
                         // webRequest.method = "POST";
                         webRequest.method = UnityWebRequest.kHttpVerbPOST;
                     }
                     else
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
+#if UNITY_EDIROR
                         Debug.Log("REQUEST BODY = " + json);
+#endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
                         webRequest.method = request.httpMethod.ToString();

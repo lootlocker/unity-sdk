@@ -88,7 +88,12 @@ namespace LootLockerAdmin
             }
 
             var eventId = Guid.NewGuid().ToString();
-            ServerRequest.UploadFile(endPoint.endPoint, endPoint.httpMethod, System.IO.File.ReadAllBytes(filePath), formData, (serverResponse) =>
+
+            string[] splitFilePath = filePath.Split(new char[] { '\\', '/' });
+            string defaultFileName = splitFilePath[splitFilePath.Length - 1];
+
+            ServerRequest.UploadFile(endPoint.endPoint, endPoint.httpMethod, System.IO.File.ReadAllBytes(filePath), defaultFileName,
+                body: formData, onComplete: (serverResponse) =>
             {
                 UploadAFileResponse response = new UploadAFileResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -105,7 +110,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
 
             return eventId;
         }
@@ -134,7 +139,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
         public static void DeleteFile(string fileId, Action<DeleteFileResponse> onComplete)
@@ -158,7 +163,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
         public static void UpdateFile(string fileId, UpdateFileRequest request, Action<UpdateFileResponse> onComplete)
@@ -183,7 +188,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
 

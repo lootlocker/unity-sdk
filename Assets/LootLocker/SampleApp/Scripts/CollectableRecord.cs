@@ -61,7 +61,7 @@ namespace AppDemoLootLockerRequests
         public string url { get; set; }
         public Image preview { get; set; }
         public int downloadAttempts { get; set; }
-        public File[] files { get; set; }
+        public LootLocker.File[] files { get; set; }
         public Sprite texture2D;
 
         public void SaveTexture(Sprite texture2D)

@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: LootLockerAdminConfig
   m_EditorClassIdentifier: 
   gameName: Cradaptive Demo Game
-  apiKey: 2ccbcc7848efba11539a0c9e17a66c837a098625
+  apiKey: dc5706f8acc171261ccb72c44ee3d89e395c6a69
   token: 
   gameID: 0
-  game_version: 1.0.0.0
+  game_version: 1.0
   deviceID: 
   email: 
   password: 
+  playerName: 
+  playerClass: 
   platform: 0
   environment: 0
   url: https://api.lootlocker.io/admin
+  adminUrl: https://api.lootlocker.io/admin
+  userUrl: https://api.lootlocker.io/game

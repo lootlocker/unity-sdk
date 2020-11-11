@@ -21,6 +21,7 @@ public class LootLockerEndPoints : ScriptableObject
     public EndPointClass initialAuthenticationRequest;
     public EndPointClass twoFactorAuthenticationCodeVerification;
     public EndPointClass subsequentRequests;
+
     //Player
     [Header("Player Endpoints")]
     public EndPointClass getPlayerInfo;
@@ -82,12 +83,28 @@ public class LootLockerEndPoints : ScriptableObject
     public EndPointClass inspectALootBox;
     public EndPointClass openALootBox;
 
+    //UGC
+    [Header("UGC")]
+    public EndPointClass creatingAnAssetCandidate;
+    public EndPointClass updatingAnAssetCandidate;
+    public EndPointClass deletingAnAssetCandidate;
+    public EndPointClass listingAssetCandidates;
+    public EndPointClass addingFilesToAssetCandidates;
+    public EndPointClass removingFilesFromAssetCandidates;
+
     //Events
     [Header("Events")]
     public EndPointClass gettingAllEvents;
     public EndPointClass gettingASingleEvent;
     public EndPointClass startingEvent;
     public EndPointClass finishingEvent;
+
+    //UGC
+    [Header("Missions")]
+    public EndPointClass gettingAllMissions;
+    public EndPointClass gettingASingleMission;
+    public EndPointClass startingMission;
+    public EndPointClass finishingMission;
 
     //Maps
     [Header("Maps")]

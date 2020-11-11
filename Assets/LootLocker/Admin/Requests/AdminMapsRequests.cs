@@ -117,7 +117,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
 
         }
 
@@ -153,7 +153,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
         public static void UpdatingMaps(LootLockerGetRequest lootLockerGetRequest, CreatingMapsRequest data, Action<CreatingMapsResponse> onComplete)
@@ -184,7 +184,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
 

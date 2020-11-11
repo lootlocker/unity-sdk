@@ -270,7 +270,6 @@ public partial class LootlockerAdminPanel : EditorWindow
         }
         else
         {
-
             EditorGUILayout.LabelField("File name: " + Path.GetFileName(filePath),
                 new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft },
                 GUILayout.MaxWidth(1000), GUILayout.Height(25));

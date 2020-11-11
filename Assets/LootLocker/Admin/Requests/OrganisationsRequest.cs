@@ -57,7 +57,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, true);
+            }, true, callerRole: enums.CallerRole.Admin);
         }
 
     }

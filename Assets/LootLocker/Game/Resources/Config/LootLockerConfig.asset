@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2d020b95eaef8d4e8f093a26decba27, type: 3}
   m_Name: LootLockerConfig
   m_EditorClassIdentifier: 
-  gameName: 
-  apiKey: 
-  token: 
-  gameID: 0
-  game_version: 
-  deviceID: 
+  gameName: LootLocker Demo Game
+  apiKey: 280eec0a84e48b19de43ae3997597019585f7e1d
+  token: 597627c523878909d33fd7b542bccdccd733fc9d
+  gameID: 230
+  game_version: 1.0.0.0
+  deviceID: gddfgmhfgmfhghg
   email: emmanuel@cradaptive.com
   password: Ihatefacebuk101!
-  playerName: 
+  playerName: fbbrtebtr
   playerClass: 
   platform: 0
   environment: 0
   url: https://api.lootlocker.io/game
   adminUrl: https://api.lootlocker.io/admin
+  playerUrl: https://api.lootlocker.io/player
   userUrl: https://api.lootlocker.io/game

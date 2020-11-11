@@ -24,9 +24,11 @@ public class LootLockerGenericConfig : ScriptableObject
     public enum platformType { android, ios, Steam, Windows }
     public bool developmentMode => environment == environmentType.Development ? true : false;
     [HideInInspector]
-    public string url = "https://api.lootlocker.io/game/v1/";
+    public string url = "https://api.lootlocker.io/game/v1";
     [HideInInspector]
     public string adminUrl = "https://api.lootlocker.io/admin";
+    [HideInInspector]
+    public string playerUrl = "https://api.lootlocker.io/player";
     [HideInInspector]
     public string userUrl = "https://api.lootlocker.io/game";
 

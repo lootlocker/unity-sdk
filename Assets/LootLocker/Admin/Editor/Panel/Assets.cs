@@ -20,7 +20,7 @@ public partial class LootlockerAdminPanel : EditorWindow
 
     void PopulateAssets(string search = null)
     {
-        Debug.Log("Getting assets..");
+        LootLockerSDKAdminManager.DebugMessage("Getting assets..");
 
         currentView = View.Loading;
 
@@ -32,11 +32,11 @@ public partial class LootlockerAdminPanel : EditorWindow
                 {
                     Contexts = contextResponse.Contexts;
                     ContextNames = Contexts.Select(x => x.name).ToArray();
-                    Debug.Log("Successful got all contexts: " + contextResponse.text);
+                    LootLockerSDKAdminManager.DebugMessage("Successful got all contexts: " + contextResponse.text);
                 }
                 else
                 {
-                    Debug.LogError("failed to get all contexts: " + contextResponse.Error);
+                    LootLockerSDKAdminManager.DebugMessage("failed to get all contexts: " + contextResponse.Error, true);
                 }
 
                 if (response.success)
@@ -44,11 +44,11 @@ public partial class LootlockerAdminPanel : EditorWindow
                     assetsResponse = response;
                     currentView = View.Assets;
                     Repaint();
-                    Debug.Log("Successful got all assets: " + response.text);
+                    LootLockerSDKAdminManager.DebugMessage("Successful got all assets: " + response.text);
                 }
                 else
                 {
-                    Debug.LogError("failed to get all assets: " + response.Error);
+                    LootLockerSDKAdminManager.DebugMessage("failed to get all assets: " + response.Error, true);
                 }
 
             });

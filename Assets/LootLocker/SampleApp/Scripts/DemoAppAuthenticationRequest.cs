@@ -46,7 +46,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, isAdminCall: true);
+            }, useAuthToken: false, callerRole: enums.CallerRole.Admin);
         }
 
         public static void TwoFactorAuthVerification(TwoFactorAuthVerficationRequest data, Action<AuthResponse> onComplete)
@@ -75,7 +75,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, isAdminCall: true);
+            }, useAuthToken: false, callerRole: enums.CallerRole.Admin);
         }
 
         public static void SubsequentRequests(Action<SubsequentRequestsResponse> onComplete)
@@ -98,7 +98,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
         public static void CreatingAGame(CreatingAGameRequest data, Action<CreatingAGameResponse> onComplete)
@@ -124,7 +124,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
         //Both this and the previous call share the same response
@@ -149,7 +149,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
 
         }
 
@@ -179,7 +179,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
 
         }
 
@@ -212,7 +212,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
 
         }
 

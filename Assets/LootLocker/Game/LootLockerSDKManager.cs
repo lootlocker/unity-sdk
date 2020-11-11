@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using LootLockerRequests;
 using LootLocker;
+using System.Security.Cryptography;
+using System.Text;
+using Newtonsoft.Json;
+using enums;
 
 namespace LootLockerRequests
 {
@@ -14,7 +18,7 @@ namespace LootLockerRequests
         static bool initialized;
         public static bool Init()
         {
-            DebugMessage("SDK Intialised" + initialized);
+            DebugMessage("SDK is Intializing");
             ServerManager.CheckInit();
             return LoadConfig();
         }
@@ -30,7 +34,7 @@ namespace LootLockerRequests
             initialized = true;
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                Debug.LogError("Key has not been set, Please login to sdk manager or set key manually");
+                DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again");
                 initialized = false;
                 return false;
             }
@@ -38,6 +42,10 @@ namespace LootLockerRequests
             return initialized;
         }
 
+        /// <summary>
+        /// Utility function to check if the sdk has been initiazed
+        /// </summary>
+        /// <returns></returns>
         public static bool CheckInitialized()
         {
             if (!initialized)
@@ -53,16 +61,21 @@ namespace LootLockerRequests
             catch (Exception ex)
             {
 
-                Debug.LogWarning("Couldn't change activeConfig on ServerAPI to User config. " + ex);
+                DebugMessage("Couldn't change activeConfig on ServerAPI to User config. " + ex, true);
 
             }
 
             return true;
         }
 
-        public static void DebugMessage(string message)
+        public static void DebugMessage(string message, bool IsError = false)
         {
-            Debug.Log("Response: " + message);
+#if     UNITY_EDITOR
+            if (IsError)
+                Debug.LogError(message);
+            else
+                Debug.Log(message);
+#endif
         }
 
         #endregion
@@ -286,7 +299,7 @@ namespace LootLockerRequests
             LootLockerAPIManager.GetSingleKeyPersistentStorage(onComplete);
         }
 
-        public static void UpdateOrCreateKeyValue(string key, string value,Action<GetPersistentStoragResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(string key, string value, Action<GetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             GetPersistentStoragRequest data = new GetPersistentStoragRequest();
@@ -465,6 +478,140 @@ namespace LootLockerRequests
         }
         #endregion
 
+        #region UserGeneratedContent
+        private static void ConvertAssetDictionaries(Dictionary<string, string> kv_storage, Dictionary<string, string> filters,
+            Dictionary<string, string> data_entities, out List<AssetKVPair> temp_kv, out List<AssetKVPair> temp_filters, out List<DataEntity> temp_data)
+        {
+            temp_kv = new List<AssetKVPair>();
+            if (kv_storage != null)
+            {
+                foreach (var d in kv_storage)
+                {
+                    temp_kv.Add(new AssetKVPair { key = d.Key, value = d.Value });
+                }
+            }
+
+            temp_filters = new List<AssetKVPair>();
+            if (filters != null)
+            {
+                foreach (var d in filters)
+                {
+                    temp_filters.Add(new AssetKVPair { key = d.Key, value = d.Value });
+                }
+            }
+
+            temp_data = new List<DataEntity>();
+            if (data_entities != null)
+            {
+                foreach (var d in data_entities)
+                {
+                    temp_data.Add(new DataEntity { name = d.Key, data = d.Value });
+                }
+            }
+        }
+
+        public static void CreatingAnAssetCandidate(string name, Action<UserGenerateContentResponse> onComplete,
+            Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
+            Dictionary<string, string> data_entities = null, int context_id = -1)
+        {
+            if (!CheckInitialized()) return;
+
+            ConvertAssetDictionaries(kv_storage, filters, data_entities,
+                out List<AssetKVPair> temp_kv, out List<AssetKVPair> temp_filters, out List<DataEntity> temp_data);
+
+            AssetData assetData = new AssetData
+            {
+                name = name,
+                kv_storage = temp_kv.ToArray(),
+                filters = temp_filters.ToArray(),
+                data_entities = temp_data.ToArray(),
+                context_id = context_id,
+            };
+
+            CreatingOrUpdatingAnAssetCandidateRequest data = new CreatingOrUpdatingAnAssetCandidateRequest
+            {
+                data = assetData,
+            };
+
+            LootLockerAPIManager.CreatingAnAssetCandidate(data, onComplete);
+        }
+
+        public static void UpdatingAnAssetCandidate(int assetId, bool isCompleted, Action<UserGenerateContentResponse> onComplete,
+            string name = null, Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
+            Dictionary<string, string> data_entities = null, int context_id = -1)
+        {
+            if (!CheckInitialized()) return;
+
+            ConvertAssetDictionaries(kv_storage, filters, data_entities,
+                out List<AssetKVPair> temp_kv, out List<AssetKVPair> temp_filters, out List<DataEntity> temp_data);
+
+            AssetData assetData = new AssetData
+            {
+                name = name,
+                kv_storage = temp_kv.ToArray(),
+                filters = temp_filters.ToArray(),
+                data_entities = temp_data.ToArray(),
+                context_id = context_id,
+            };
+
+            CreatingOrUpdatingAnAssetCandidateRequest data = new CreatingOrUpdatingAnAssetCandidateRequest
+            {
+                data = assetData,
+                completed = isCompleted,
+            };
+
+            LootLockerGetRequest getRequest = new LootLockerGetRequest();
+            getRequest.getRequests.Add(assetId.ToString());
+
+            LootLockerAPIManager.UpdatingAnAssetCandidate(data, getRequest, onComplete);
+        }
+
+        public static void DeletingAnAssetCandidate(int assetId, Action<UserGenerateContentResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetId.ToString());
+            LootLockerAPIManager.DeletingAnAssetCandidate(data, onComplete);
+        }
+
+        public static void ListingAssetCandidates(Action<ListingAssetCandidatesResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerAPIManager.ListingAssetCandidates(onComplete);
+        }
+
+        public static void AddingFilesToAssetCandidates(int assetId, string filePath, string fileName,
+            FilePurpose filePurpose, Action<UserGenerateContentResponse> onComplete, string fileContentType = null)
+        {
+            if (!CheckInitialized()) return;
+
+            AddingFilesToAssetCandidatesRequest data = new AddingFilesToAssetCandidatesRequest()
+            {
+                filePath = filePath,
+                fileName = fileName,
+                fileContentType = fileContentType,
+                filePurpose = filePurpose.ToString()
+            };
+
+            LootLockerGetRequest getRequest = new LootLockerGetRequest();
+
+            getRequest.getRequests.Add(assetId.ToString());
+
+            LootLockerAPIManager.AddingFilesToAssetCandidates(data, getRequest, onComplete);
+        }
+
+        public static void RemovingFilesFromAssetCandidates(int assetId, int fileId, Action<UserGenerateContentResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(fileId.ToString());
+
+            LootLockerAPIManager.RemovingFilesFromAssetCandidates(data, onComplete);
+        }
+        #endregion
+
         #region Events
         public static void GettingAllEvents(Action<EventResponse> onComplete)
         {
@@ -488,7 +635,7 @@ namespace LootLockerRequests
             LootLockerAPIManager.StartingEvent(data, onComplete);
         }
 
-        public static void FinishingEvent(int missionId, string signature, string finishTime, string finishScore, Checkpoint_Times[] checkpointsScores, Action<FinishEventResponse> onComplete)
+        public static void FinishingEvent(int missionId, string signature, string finishTime, string finishScore, CheckpointTimes[] checkpointsScores, Action<FinishEventResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             EventPayload payload = new EventPayload { finish_score = finishScore, finish_time = finishTime };
@@ -499,6 +646,53 @@ namespace LootLockerRequests
             LootLockerAPIManager.FinishingEvent(lootLockerGetRequest, data, onComplete);
         }
 
+        #endregion
+
+        #region Missions
+        public static void GettingAllMissions(Action<GettingAllMissionsResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerAPIManager.GettingAllMissions(onComplete);
+        }
+
+        public static void GettingASingleMission(int missionId, Action<GettingASingleMissionResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.GettingASingleMission(data, onComplete);
+        }
+
+        public static void StartingAMission(int missionId, Action<StartingAMissionResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.StartingAMission(data, onComplete);
+        }
+
+        public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
+            FinishingPayload finishingPayload, Action<FinishingAMissionResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+
+            string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
+            string hash;
+            using (SHA1 sha1Hash = SHA1.Create())
+            {
+                byte[] sourceBytes = Encoding.UTF8.GetBytes(source);
+                byte[] hashBytes = sha1Hash.ComputeHash(sourceBytes);
+                hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
+            }
+
+            FinishingAMissionRequest data = new FinishingAMissionRequest()
+            {
+                signature = hash,
+                payload = finishingPayload
+            };
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.FinishingAMission(data, onComplete);
+        }
         #endregion
 
         #region Maps
@@ -601,6 +795,21 @@ namespace LootLockerRequests
 
         #endregion
 
+        #region Crashes
+        public static void SubmittingACrashLog(string logFIlePath, string game_version, string type_identifier, string local_crash_time,
+            Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            SubmittingACrashLogRequest data = new SubmittingACrashLogRequest()
+            {
+                logFilePath = logFIlePath,
+                game_version = game_version,
+                type_identifier = type_identifier,
+                local_crash_time = local_crash_time,
+            };
+            LootLockerAPIManager.SubmittingACrashLog(data, onComplete);
+        }
+        #endregion
     }
 
     public class ResponseError

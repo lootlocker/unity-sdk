@@ -30,6 +30,8 @@ namespace LootLockerRequests
 namespace LootLocker
 {
 
+ 
+
     public partial class LootLockerAPIManager
     {
         public static void Verify(VerifyRequest data, Action<VerifyResponse> onComplete)

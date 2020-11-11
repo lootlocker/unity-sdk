@@ -43,7 +43,7 @@ public class AdminServerAPI : BaseServerAPI
                 }
                 else
                 {
-                    Debug.LogError("Admin token refresh failed");
+                    LootLockerSDKAdminManager.DebugMessage("Admin token refresh failed");
                     LootLockerResponse res = new LootLockerResponse();
                     res.statusCode = 401;
                     res.Error = "Admin token Expired";
@@ -53,7 +53,7 @@ public class AdminServerAPI : BaseServerAPI
             }
             else
             {
-                Debug.LogError("Admin token refresh failed");
+                LootLockerSDKAdminManager.DebugMessage("Admin token refresh failed",true);
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Admin token Expired";

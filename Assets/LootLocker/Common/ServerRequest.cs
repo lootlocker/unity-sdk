@@ -2,6 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Newtonsoft.Json;
+using enums;
+
+// using LootLockerAdmin;
+// using LootLockerAdminRequests;
 
 //this is common between user and admin
 namespace LootLocker
@@ -42,11 +46,31 @@ namespace LootLocker
         public bool status;
         public string message;
         /// <summary>
-        /// Any error that comes from the server
+        /// A hashtable version of the server response, null if errors or unable to convert
         /// </summary>
+        public Dictionary<string, object> data
+        {
+            get
+            {
+                if (this.hasError) return new Dictionary<string, object>();
+                try
+                {
+                    return JsonConvert.DeserializeObject<Dictionary<string, object>>(this.text);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(ex);
+                    return new Dictionary<string, object>();
+                }
+            }
+        }
         public string Error;
         /// <summary>
-        /// inheritdoc added this because unity main thread excuting style cut the calling stack and make the event orphant see also calling multiple events 
+        /// A texture downloaded in the webrequest, if applicable, otherwise this will be null.
+        /// </summary>
+        public Texture2D texture;
+        /// <summary>
+        /// inheritdoc added this because unity main thread excuting style cut the calling stack and make the event orphant seealso calling multiple events 
         /// of the same type makes use unable to identify each one
         /// </summary>
         public string EventId;
@@ -64,7 +88,9 @@ namespace LootLocker
         public Dictionary<string, object> payload;
         public string jsonPayload;
         public byte[] upload;
-        public bool adminCall;
+        public string uploadName;
+        public string uploadType;
+        public enums.CallerRole adminCall;
         public WWWForm form;
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -85,27 +111,28 @@ namespace LootLocker
                  onComplete?.Invoke(response);
              });
         }
-        public static void CallAPI(string endPoint, HTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, bool isAdminCall = false)
+        public static void CallAPI(string endPoint, HTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
-
-            Debug.Log("AdminCall: " + isAdminCall);
+#if UNITY_EDITOR
+            Debug.Log("Caller Type: " + callerRole.ToString());
+#endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                headers.Add(isAdminCall ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
+                headers.Add(callerRole == enums.CallerRole.Admin ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
             }
 
-            BaseServerAPI.I.SwitchURL(isAdminCall);
+            BaseServerAPI.I.SwitchURL(callerRole);
 
-            new ServerRequest(endPoint, httpMethod, body, headers, isAdminCall: isAdminCall).Send((response) =>
-            {
-                onComplete?.Invoke(response);
-            });
+            new ServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) =>
+             {
+                 onComplete?.Invoke(response);
+             });
         }
-        public static void UploadFile(string endPoint, HTTPMethod httpMethod, byte[] file, Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, bool isAdminCall = false)
+        public static void UploadFile(string endPoint, HTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -113,31 +140,33 @@ namespace LootLocker
             {
                 headers = new Dictionary<string, string>();
 
-                headers.Add(isAdminCall ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
+                headers.Add(callerRole == CallerRole.Admin ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
 
             }
 
-            BaseServerAPI.I.SwitchURL(isAdminCall);
+            BaseServerAPI.I.SwitchURL(callerRole);
 
-            new ServerRequest(endPoint, httpMethod, file, body, headers, isAdminCall: true).Send((response) =>
-              {
-                  onComplete?.Invoke(response);
-              });
+            new ServerRequest(endPoint, httpMethod, file, fileName, fileContentType, body, headers, callerRole: callerRole).Send((response) =>
+               {
+                   onComplete?.Invoke(response);
+               });
         }
-        #endregion
+#endregion
 
-        #region ServerRequest constructor
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, Dictionary<string, string> body = null, Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, bool isAdminCall = false, bool isFileUpload = true)
+#region ServerRequest constructor
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null, Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User, bool isFileUpload = true)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
             this.payload = null;
             this.upload = upload;
+            this.uploadName = uploadName;
+            this.uploadType = uploadType;
             this.jsonPayload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = null;
-            this.adminCall = isAdminCall;
+            this.adminCall = callerRole;
             this.form = new WWWForm();
 
             foreach (var kvp in body)
@@ -154,17 +183,19 @@ namespace LootLocker
                 Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, bool isAdminCall = false)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
             this.payload = null;
             this.upload = upload;
+            this.uploadName = uploadName;
+            this.uploadType = uploadType;
             this.jsonPayload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = isAdminCall;
+            this.adminCall = callerRole;
             this.form = null;
             bool isNonPayloadMethod = (this.httpMethod == HTTPMethod.GET || this.httpMethod == HTTPMethod.HEAD || this.httpMethod == HTTPMethod.OPTIONS);
 
@@ -173,17 +204,19 @@ namespace LootLocker
                 Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, bool isAdminCall = false)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
             this.payload = payload != null && payload.Count == 0 ? null : payload; //Force payload to null if an empty dictionary was supplied
             this.upload = null;
+            this.uploadName = null;
+            this.uploadType = null;
             this.jsonPayload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = isAdminCall;
+            this.adminCall = callerRole;
             bool isNonPayloadMethod = (this.httpMethod == HTTPMethod.GET || this.httpMethod == HTTPMethod.HEAD || this.httpMethod == HTTPMethod.OPTIONS);
             this.form = null;
             if (this.payload != null && isNonPayloadMethod)
@@ -191,25 +224,27 @@ namespace LootLocker
                 Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, bool isAdminCall = false)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
-            this.jsonPayload = payload; //Force payload to null if an empty dictionary was supplied
+            this.jsonPayload = payload;
             this.upload = null;
+            this.uploadName = null;
+            this.uploadType = null;
             this.payload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = isAdminCall;
+            this.adminCall = callerRole;
             bool isNonPayloadMethod = (this.httpMethod == HTTPMethod.GET || this.httpMethod == HTTPMethod.HEAD || this.httpMethod == HTTPMethod.OPTIONS);
             this.form = null;
-            if (string.IsNullOrEmpty(jsonPayload))
+            if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
             {
                 Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// just debug and call ServerAPI.SendRequest which takes the current ServerRequest and pass this response

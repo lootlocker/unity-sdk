@@ -53,7 +53,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, isAdminCall: true);
+            }, useAuthToken: false, callerRole: enums.CallerRole.Admin);
         }
 
         public static void TwoFactorAuthVerification(TwoFactorAuthVerficationRequest data, Action<AuthResponse> onComplete)
@@ -82,7 +82,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, isAdminCall: true);
+            }, useAuthToken: false, callerRole: enums.CallerRole.Admin);
         }
 
         public static void SubsequentRequests(Action<SubsequentRequestsResponse> onComplete)
@@ -105,7 +105,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
     }

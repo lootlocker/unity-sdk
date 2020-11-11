@@ -69,7 +69,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
         public static void VerifyTwoFactorAuthenticationSetup(VerifyTwoFactorAuthenticationRequest data, Action<VerifyTwoFactorAuthenticationResponse> onComplete)
         {
@@ -97,7 +97,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
         public static void RemoveTwoFactorAuthentication(VerifyTwoFactorAuthenticationRequest data, Action<RemoveTwoFactorAuthenticationResponse> onComplete)
         {
@@ -127,7 +127,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, isAdminCall: true);
+            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
         }
 
     }

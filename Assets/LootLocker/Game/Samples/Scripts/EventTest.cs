@@ -11,7 +11,7 @@ public class EventTest : MonoBehaviour
     public string signature;
     public string finishTime;
     public string finishScore;
-    public List<Checkpoint_Times> checkpointScores;
+    public List<CheckpointTimes> checkpointScores;
     public string labelText;
     Vector2 scrollPosition, scrollPosition2;
 
@@ -67,7 +67,7 @@ public class EventTest : MonoBehaviour
         GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("New Checkpoint", GUILayout.ExpandWidth(true)))
-            checkpointScores.Add(new Checkpoint_Times { index = 0, score = 0, time = 0 });
+            checkpointScores.Add(new CheckpointTimes { index = 0, score = 0, time = 0 });
 
         GUILayout.EndHorizontal();
 
@@ -75,7 +75,7 @@ public class EventTest : MonoBehaviour
 
         scrollPosition2 = GUILayout.BeginScrollView(scrollPosition2);
 
-        List<Checkpoint_Times> checkpointsToDelete = new List<Checkpoint_Times>();
+        List<CheckpointTimes> checkpointsToDelete = new List<CheckpointTimes>();
 
         for (int i = 0; i < checkpointScores.Count; i++)
         {

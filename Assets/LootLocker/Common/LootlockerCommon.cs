@@ -89,7 +89,6 @@ namespace LootLocker
         public string[] tags { get; set; }
     }
 
-
     public class Default_Loadouts
     {
         public bool Default { get; set; }

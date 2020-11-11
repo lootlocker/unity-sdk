@@ -26,7 +26,7 @@ namespace LootLockerAdminRequests
 
         static bool LoadConfig()
         {
-            Debug.LogWarning("Loading admin config..");
+            LootLockerSDKAdminManager.DebugMessage("Loading admin config..");
 
             if (LootLockerAdminConfig.current == null)
                 LootLockerAdminConfig.current = Resources.Load("Config/LootLockerAdminConfig") as LootLockerAdminConfig;
@@ -40,9 +40,14 @@ namespace LootLockerAdminRequests
 
         }
 
-        public static void DebugMessage(string message)
+        public static void DebugMessage(string message, bool IsError = false)
         {
-            Debug.Log("Response: " + message);
+#if UNITY_EDITOR
+            if (IsError)
+                Debug.LogError(message);
+            else
+                Debug.Log(message);
+#endif
         }
 
         public static bool CheckInitialized()
@@ -50,7 +55,6 @@ namespace LootLockerAdminRequests
             if (!initialized)
             {
                 Init();
-                //DebugMessage("Please initialize before calling sdk functions");
                 return true;
             }
 
@@ -61,7 +65,7 @@ namespace LootLockerAdminRequests
             catch (Exception ex)
             {
 
-                Debug.LogWarning("Couldn't change activeConfig on ServerAPI to Admin config. " + ex);
+                LootLockerSDKAdminManager.DebugMessage("Couldn't change activeConfig on ServerAPI to Admin config. " + ex, true);
 
             }
 
