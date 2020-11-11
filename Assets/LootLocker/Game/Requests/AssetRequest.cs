@@ -157,6 +157,38 @@ namespace LootLocker
             }, true);
         }
 
+        public static void GetAssetsById(LootLockerGetRequest data, Action<AssetResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.current.getAssetsById;
+
+            string builtAssets = data.getRequests.First();
+
+            if (data.getRequests.Count > 0)
+                for (int i = 1; i < data.getRequests.Count; i++)
+                    builtAssets += "," + data.getRequests[i];
+
+
+            string getVariable = string.Format(endPoint.endPoint, builtAssets);
+
+            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            {
+                AssetResponse response = new AssetResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    LootLockerSDKManager.DebugMessage(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<AssetResponse>(serverResponse.text);
+                    response.text = serverResponse.text;
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true);
+        }
+
         public void ResetAssetCalls()
         {
             AssetRequest.lastId = 0;

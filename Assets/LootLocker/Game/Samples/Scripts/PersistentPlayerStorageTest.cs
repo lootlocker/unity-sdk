@@ -28,6 +28,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
     public string keyToDelete;
     public string labelText;
     Vector2 scrollPosition, scrollPosition2;
+    public string otherPlayerId;
 
     private void OnGUI()
     {
@@ -231,6 +232,22 @@ public class PersistentPlayerStorageTest : MonoBehaviour
                 labelText = "Failed\n" + getPersistentStoragResponse.text;
             }
 
+        });
+    }
+
+    [ContextMenu("DeleteKeyValue")]
+    public void GetOtherPlayersPublicKeyValuePairs()
+    {
+        LootLockerSDKManager.GetOtherPlayersPublicKeyValuePairs(otherPlayerId, (getPersistentStoragResponse) =>
+        {
+            if (getPersistentStoragResponse.success)
+            {
+                labelText = "Success\n" + getPersistentStoragResponse.text;
+            }
+            else
+            {
+                labelText = "Failed\n" + getPersistentStoragResponse.text;
+            }
         });
     }
 }

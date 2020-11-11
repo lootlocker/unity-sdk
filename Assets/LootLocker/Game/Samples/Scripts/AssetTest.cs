@@ -12,6 +12,7 @@ public class AssetTest : MonoBehaviour
     public string assetId;
     public string labelText;
     Vector2 scrollPosition;
+    public string[] assetsToRequest = new string[] { "23", "2342", "32152" };
 
     private void OnGUI()
     {
@@ -203,6 +204,22 @@ public class AssetTest : MonoBehaviour
     public void RemoveFavouriteAsset()
     {
         LootLockerSDKManager.RemoveFavouriteAsset(assetId, (response) =>
+        {
+            if (response.success)
+            {
+                labelText = "Success\n" + response.text;
+            }
+            else
+            {
+                labelText = "Failed\n" + response.text;
+            }
+        });
+    }
+
+    [ContextMenu("RemoveFavouriteAsset")]
+    public void GetAssetsByIds()
+    {
+        LootLockerSDKManager.GetAssetsById(assetsToRequest, (response) =>
         {
             if (response.success)
             {

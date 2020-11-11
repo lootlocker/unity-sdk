@@ -143,5 +143,30 @@ namespace LootLocker
             }, true);
         }
 
+        public static void GetOtherPlayersPublicKeyValuePairs(LootLockerGetRequest data, Action<GetPersistentStoragResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.current.getOtherPlayersPublicKeyValuePairs;
+
+            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+
+            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            {
+                GetPersistentStoragResponse response = new GetPersistentStoragResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<GetPersistentStoragResponse>(serverResponse.text);
+                    response.text = serverResponse.text;
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.text = serverResponse.text;
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true);
+        }
+
     }
 }

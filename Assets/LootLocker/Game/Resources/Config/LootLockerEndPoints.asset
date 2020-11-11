@@ -126,6 +126,9 @@ MonoBehaviour:
   deleteKeyValue:
     endPoint: v1/player/storage?key={0}
     httpMethod: 2
+  getOtherPlayersPublicKeyValuePairs:
+    endPoint: v1/player/{0}/storage
+    httpMethod: 0
   gettingContexts:
     endPoint: v1/contexts
     httpMethod: 0
@@ -134,6 +137,9 @@ MonoBehaviour:
     httpMethod: 0
   gettingAssetListWithAfterAndCount:
     endPoint: v1/assets/list?after={0}&count={1}
+    httpMethod: 0
+  getAssetsById:
+    endPoint: 
     httpMethod: 0
   gettingAllAssets:
     endPoint: v1/assets

@@ -332,6 +332,15 @@ namespace LootLockerRequests
             data.getRequests.Add(keyToDelete);
             LootLockerAPIManager.DeleteKeyValue(data, onComplete);
         }
+
+        public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<GetPersistentStoragResponse> onComplete)
+        {
+
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(otherPlayerId);
+            LootLockerAPIManager.GetOtherPlayersPublicKeyValuePairs(data, onComplete);
+        }
         #endregion
 
         #region Assets
@@ -400,6 +409,16 @@ namespace LootLockerRequests
             LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
         }
 
+        public static void GetAssetsById(string[] assetIdsToRetrieve, Action<AssetResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+
+            for (int i = 0; i < assetIdsToRetrieve.Length; i++) 
+            data.getRequests.Add(assetIdsToRetrieve[i]);
+
+            LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
+        }
 
         #endregion
 

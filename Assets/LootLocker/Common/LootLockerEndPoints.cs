@@ -58,12 +58,14 @@ public class LootLockerEndPoints : ScriptableObject
     public EndPointClass getSingleKeyFromPersitenctStorage;
     public EndPointClass updateOrCreateKeyValue;
     public EndPointClass deleteKeyValue;
+    public EndPointClass getOtherPlayersPublicKeyValuePairs;
 
     //Asset storage 
     [Header("Assets")]
     public EndPointClass gettingContexts;
     public EndPointClass gettingAssetListWithCount;
     public EndPointClass gettingAssetListWithAfterAndCount;
+    public EndPointClass getAssetsById;
     public EndPointClass gettingAllAssets;
     public EndPointClass gettingAssetInformationForOneorMoreAssets;
     public EndPointClass gettingAssetBoneInformation;
