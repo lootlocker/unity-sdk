@@ -247,7 +247,7 @@ namespace LootLocker
 
         public static void AddFavouriteAsset(LootLockerGetRequest data, Action<AssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetInformationForOneorMoreAssets;
+            EndPointClass endPoint = LootLockerEndPoints.current.addingFavouriteAssets;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -272,7 +272,7 @@ namespace LootLocker
 
         public static void RemoveFavouriteAsset(LootLockerGetRequest data, Action<AssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetInformationForOneorMoreAssets;
+            EndPointClass endPoint = LootLockerEndPoints.current.removingFavouriteAssets;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 

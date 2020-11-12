@@ -417,7 +417,7 @@ namespace LootLockerRequests
             for (int i = 0; i < assetIdsToRetrieve.Length; i++) 
             data.getRequests.Add(assetIdsToRetrieve[i]);
 
-            LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
+            LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
 
         #endregion

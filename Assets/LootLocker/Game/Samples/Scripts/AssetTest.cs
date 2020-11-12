@@ -216,7 +216,7 @@ public class AssetTest : MonoBehaviour
         });
     }
 
-    [ContextMenu("RemoveFavouriteAsset")]
+    [ContextMenu("GetAssetsByiD")]
     public void GetAssetsByIds()
     {
         LootLockerSDKManager.GetAssetsById(assetsToRequest, (response) =>

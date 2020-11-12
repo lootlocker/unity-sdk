@@ -139,7 +139,7 @@ MonoBehaviour:
     endPoint: v1/assets/list?after={0}&count={1}
     httpMethod: 0
   getAssetsById:
-    endPoint: 
+    endPoint: v1/assets/by/id?asset_ids={0}
     httpMethod: 0
   gettingAllAssets:
     endPoint: v1/assets
