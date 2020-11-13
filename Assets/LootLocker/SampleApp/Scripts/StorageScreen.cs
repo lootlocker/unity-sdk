@@ -34,6 +34,10 @@ public class StorageScreen : MonoBehaviour, IStageOwner
 
     public void UpdateScreen(Payload[] payload)
     {
+        foreach (Transform tr in content.transform)
+        {
+            Destroy(tr.gameObject);
+        }
         for (int i = 0; i < payload.Length; i++)
         {
             GameObject go = Instantiate(keyValueElement, content.transform);

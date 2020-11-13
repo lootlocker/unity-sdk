@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameName: LootLocker Demo Game
   apiKey: 280eec0a84e48b19de43ae3997597019585f7e1d
-  token: 597627c523878909d33fd7b542bccdccd733fc9d
+  token: d591157e17073e51ad417e58bc05aac3ef0a784c
   gameID: 230
   game_version: 1.0.0.0
-  deviceID: gddfgmhfgmfhghg
+  deviceID: eba81300-cf2f-42dc-b798-0d09613eb74e
   email: emmanuel@cradaptive.com
   password: Ihatefacebuk101!
   playerName: fbbrtebtr

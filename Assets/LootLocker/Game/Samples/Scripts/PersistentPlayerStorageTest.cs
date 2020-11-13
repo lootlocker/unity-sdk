@@ -2,33 +2,25 @@
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-
-[System.Serializable]
-public class TestDataToSave
-{
-    public string key;
-    public string value;
-    public int order;
-    public TestSubDataToSave testSubDataToSave;
-}
-[System.Serializable]
-public class TestSubDataToSave
-{
-    public string secondTest;
-    public string roomWaterCount;
-}
 
 public class PersistentPlayerStorageTest : MonoBehaviour
 {
     [Header("Save Data")]
-    public List<TestDataToSave> dataToSave;
+    public List<Payload> dataToSave;
     [Header("Delete Data")]
     public string keyToDelete;
     public string labelText;
     Vector2 scrollPosition, scrollPosition2;
     public string otherPlayerId;
+    bool started;
+
+    private void Awake()
+    {
+        GetEntirePersistentStorage();
+    }
 
     private void OnGUI()
     {
@@ -61,7 +53,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
         GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("New Data", GUILayout.ExpandWidth(true)))
-            dataToSave.Add(new TestDataToSave { key = "", value = "1", order = 1, testSubDataToSave = new TestSubDataToSave { roomWaterCount = "1", secondTest = "test" } });
+            dataToSave.Add(new Payload { key = "", value = "1", order = 1 });
 
         GUILayout.EndHorizontal();
 
@@ -69,7 +61,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
 
         scrollPosition2 = GUILayout.BeginScrollView(scrollPosition2);
 
-        List<TestDataToSave> dataToDelete = new List<TestDataToSave>();
+        List<Payload> dataToDelete = new List<Payload>();
 
         for (int i = 0; i < dataToSave.Count; i++)
         {
@@ -96,25 +88,26 @@ public class PersistentPlayerStorageTest : MonoBehaviour
 
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label("Order");
 
-            string o = GUILayout.TextField(dataToSave[i].order.ToString(), GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000));
-            o = Regex.Replace(o, @"[^0-9 ]", "");
-            dataToSave[i].order = int.Parse(o);
+           bool isPublic = GUILayout.Toggle(dataToSave[i].is_public,"Make Public", GUILayout.MaxWidth(1000));
+           dataToSave[i].is_public = isPublic;
+
 
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("Delete Data #" + i.ToString(), GUILayout.ExpandWidth(true)))
-                dataToDelete.Add(dataToSave[i]);
+                DeleteKeyValue(dataToSave[i].key);
+            //if (GUILayout.Button("Update #" + i.ToString(), GUILayout.ExpandWidth(true)))
+            //    DeleteKeyValue(dataToSave[i].key);
 
             GUILayout.EndHorizontal();
 
         }
 
-        for (int i = 0; i < dataToDelete.Count; i++)
-            dataToSave.Remove(dataToDelete[i]);
+        //for (int i = 0; i < dataToDelete.Count; i++)
+        //    dataToSave.Remove(dataToDelete[i]);
 
         GUILayout.EndScrollView();
 
@@ -170,6 +163,20 @@ public class PersistentPlayerStorageTest : MonoBehaviour
             if (getPersistentStoragResponse.success)
             {
                 labelText = "Success\n" + getPersistentStoragResponse.text;
+                dataToSave.Clear();
+                for (int i = 0; i < getPersistentStoragResponse.payload.Length; i++) 
+                {
+                    dataToSave.Add(getPersistentStoragResponse.payload[i]);
+                }
+                dataToSave = getPersistentStoragResponse.payload.ToList();
+                if (!started)
+                {
+                    started = true;
+                    if (dataToSave.Count > 0)
+                    {
+                        keyToDelete = dataToSave[0].key;
+                    }
+                }
             }
             else
             {
@@ -186,6 +193,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
             if (getPersistentStoragResponse.success)
             {
                 labelText = "Success\n" + getPersistentStoragResponse.text;
+                // dataToSave = getPersistentStoragResponse.payload;
             }
             else
             {
@@ -198,11 +206,12 @@ public class PersistentPlayerStorageTest : MonoBehaviour
     [ContextMenu("UpdateOrCreateKeyValue")]
     public void UpdateOrCreateKeyValue()
     {
-        string json = JsonConvert.SerializeObject(dataToSave);
+
         GetPersistentStoragRequest data = new GetPersistentStoragRequest();
+
         for (int i = 0; i < dataToSave.Count; i++)
         {
-            data.AddToPayload(new Payload { key = dataToSave[i].key, value = dataToSave[i].value });
+            data.AddToPayload(dataToSave[i]);
         }
 
         LootLockerSDKManager.UpdateOrCreateKeyValue(data, (getPersistentStoragResponse) =>
@@ -210,6 +219,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
             if (getPersistentStoragResponse.success)
             {
                 labelText = "Success\n" + getPersistentStoragResponse.text;
+                dataToSave = getPersistentStoragResponse.payload.ToList();
             }
             else
             {
@@ -226,6 +236,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
             if (getPersistentStoragResponse.success)
             {
                 labelText = "Success\n" + getPersistentStoragResponse.text;
+                dataToSave = getPersistentStoragResponse.payload.ToList();
             }
             else
             {
@@ -235,7 +246,24 @@ public class PersistentPlayerStorageTest : MonoBehaviour
         });
     }
 
-    [ContextMenu("DeleteKeyValue")]
+    public void DeleteKeyValue(string key)
+    {
+        LootLockerSDKManager.DeleteKeyValue(key, (getPersistentStoragResponse) =>
+        {
+            if (getPersistentStoragResponse.success)
+            {
+                labelText = "Success\n" + getPersistentStoragResponse.text;
+                dataToSave = getPersistentStoragResponse.payload.ToList();
+            }
+            else
+            {
+                labelText = "Failed\n" + getPersistentStoragResponse.text;
+            }
+
+        });
+    }
+
+    [ContextMenu("GetOtherPlayerKeyValue")]
     public void GetOtherPlayersPublicKeyValuePairs()
     {
         LootLockerSDKManager.GetOtherPlayersPublicKeyValuePairs(otherPlayerId, (getPersistentStoragResponse) =>
@@ -243,6 +271,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
             if (getPersistentStoragResponse.success)
             {
                 labelText = "Success\n" + getPersistentStoragResponse.text;
+                dataToSave = getPersistentStoragResponse.payload.ToList();
             }
             else
             {

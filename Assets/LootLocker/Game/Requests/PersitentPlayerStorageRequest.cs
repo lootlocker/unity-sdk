@@ -29,14 +29,15 @@ namespace LootLockerRequests
 
     {
         public bool success { get; set; }
-        public string payload { get; set; }
+        public Payload payload { get; set; }
     }
-
+    [Serializable]
     public class Payload
     {
-        public string key { get; set; }
-        public string value { get; set; }
-        public int order { get; set; }
+        public string key;
+        public string value;
+        public int order;
+        public bool is_public;
     }
 }
 
@@ -76,9 +77,9 @@ namespace LootLocker
                 GetPersistentSingle response = new GetPersistentSingle();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
+                    response = JsonConvert.DeserializeObject<GetPersistentSingle>(serverResponse.text);
                     response.text = serverResponse.text;
                     response.success = true;
-                    response.payload = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
                 else

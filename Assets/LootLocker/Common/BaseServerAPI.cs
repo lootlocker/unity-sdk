@@ -66,7 +66,7 @@ namespace LootLocker
 
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildURL(request.endpoint, request.queryParams);
-#if UNITY_EDIROR
+#if UNITY_EDITOR
                 Debug.Log("ServerRequest URL: " + url);
 #endif
 

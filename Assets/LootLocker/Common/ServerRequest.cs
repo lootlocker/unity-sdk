@@ -252,7 +252,7 @@ namespace LootLocker
         public void Send(System.Action<LootLockerResponse> OnServerResponse)
         {
 #if UNITY_EDITOR
-            Debug.Log("Sending Request: " + httpMethod.ToString() + " " + endpoint + " -- queryParams: " + queryParams?.Count);
+            Debug.Log("Sending Request: " + httpMethod.ToString() + " " + endpoint + " -- queryParams: " + jsonPayload);
 #endif
             BaseServerAPI.I.SendRequest(this, (response) =>
             {
