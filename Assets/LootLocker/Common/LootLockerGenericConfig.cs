@@ -6,11 +6,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Config", menuName = "ScriptableObjects/Config", order = 1)]
 public class LootLockerGenericConfig : ScriptableObject
 {
+    [HideInInspector]
     public string gameName;
     public string apiKey;
+    [HideInInspector]
     public string token;
+    [HideInInspector]
     public int gameID;
     public string game_version = "1.0";
+    [HideInInspector]
     public string deviceID;
     [HideInInspector]
     public string email, password;

@@ -149,7 +149,7 @@ public class AssetTest : MonoBehaviour
     [ContextMenu("ResetAssetCalls")]
     public void ResetAssetCalls()
     {
-        AssetRequest.lastId = 0;
+        AssetRequest.ResetAssetCalls();
     }
 
     [ContextMenu("GetAssetInformation")]

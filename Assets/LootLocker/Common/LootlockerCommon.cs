@@ -33,6 +33,10 @@ namespace LootLocker
     {
         public int count;
         public static int lastId;
+        public static void ResetAssetCalls()
+        {
+            lastId = 0;
+        }
     }
 
     public class AssetResponse : LootLockerResponse
