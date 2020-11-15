@@ -11,11 +11,46 @@ public class StorageScreen : MonoBehaviour, IStageOwner
     public Button addKey;
     public InputPopup inputPopup;
     public Button refresh;
+    [Header("Easy Prefab Setup")]
+    public GameObject backButton;
+    public bool isEasyPrefab;
 
     public void Awake()
     {
         addKey.onClick.AddListener(OpenKeysWindow);
         refresh.onClick.AddListener(Refresh);
+        StartEasyPrefab();
+    }
+
+    public void StartEasyPrefab()
+    {
+        if (isEasyPrefab)
+        {
+            backButton?.SetActive(false);
+            SetUpEasyPrefab();
+            Refresh();
+        }
+    }
+
+    public void SetUpEasyPrefab()
+    {
+        if (TexturesSaver.Instance == null)
+        {
+            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+            Instantiate(saver);
+        }
+
+        if (LoadingManager.Instance == null)
+        {
+            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+            Instantiate(loading);
+        }
+
+        if (PopupSystem.Instance == null)
+        {
+            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+            Instantiate(popup);
+        }
     }
 
     public void Refresh()

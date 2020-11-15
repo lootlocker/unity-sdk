@@ -25,13 +25,15 @@ public class PlayerProfile : MonoBehaviour
         className.text = LootLockerConfig.current.playerClass;
         credits.text = sessionResponse.account_balance.ToString();
         level.text = sessionResponse.level.ToString();
-        message.text = "";
+        if (message != null)
+            message.text = "";
         LootLockerSDKManager.GetMessages((response) =>
         {
             LoadingManager.HideLoadingScreen();
             if (response.success)
             {
-                message.text = response.messages.Length > 0 ? response.messages.First().title : "";
+                if (message != null)
+                    message.text = response.messages.Length > 0 ? response.messages.First().title : "";
             }
             else
             {
@@ -55,20 +57,20 @@ public class PlayerProfile : MonoBehaviour
                 {
                     //if (response.check_grant_notifications)
                     //{
-                        LootLockerSDKManager.GetAssetNotification((res) =>
+                    LootLockerSDKManager.GetAssetNotification((res) =>
+                    {
+                        if (res.success)
                         {
-                            if (res.success)
+                            for (int i = 0; i < res.objects.Length; i++)
                             {
-                                for (int i = 0; i < res.objects.Length; i++)
+                                if (res.objects[i].acquisition_source == "reward_level_up")
                                 {
-                                    if (res.objects[i].acquisition_source == "reward_level_up")
-                                    {
-                                        rewardObjects.Add(res.objects[i]);
-                                    }
+                                    rewardObjects.Add(res.objects[i]);
                                 }
                             }
-                        });
-                 //   }
+                        }
+                    });
+                    //   }
                     SelectPlayer(Grant.XP, rewardObjects);
                 }
                 else

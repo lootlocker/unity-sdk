@@ -97,6 +97,7 @@ namespace LootLockerRequests
         public static void StartSession(string deviceId, Action<SessionResponse> onComplete)
         {
             if (!CheckInitialized()) return;
+            LootLockerConfig.current.deviceID = deviceId;
             SessionRequest sessionRequest = new SessionRequest(deviceId);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }

@@ -10,7 +10,16 @@ public class LoadingManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            Debug.LogError("Found Another" + gameObject.name);
+            Destroy(this.transform.parent.gameObject);
+        }
     }
 
     public static void ShowLoadingScreen()

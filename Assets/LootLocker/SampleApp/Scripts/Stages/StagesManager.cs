@@ -14,10 +14,8 @@ public class StagesManager : MonoBehaviour
     [Serializable]
     public struct Stage
     {
-
         public GameObject stageObject;
         public StageID stageID;
-
     }
 
     public List<Stage> stages;

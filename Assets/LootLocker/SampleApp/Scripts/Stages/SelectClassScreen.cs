@@ -20,6 +20,75 @@ public class SelectClassScreen : MonoBehaviour, IStageOwner
     public Button button;
     Action failResponse;
 
+    [Header("Easy Prefab Setup")]
+    public bool isEasyPrefab;
+
+    private void Awake()
+    {
+        StartEasyPrefab();
+    }
+
+    public void StartEasyPrefab()
+    {
+        if (isEasyPrefab)
+        {
+            SetUpEasyPrefab();
+            ListAllCharacterClasses();
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() =>
+            {
+                UpdateDefaultCharacterClass(() =>
+                {
+                    Debug.Log("Updated the default class for the current player");
+                });
+            });
+        }
+    }
+
+    public void ListAllCharacterClasses()
+    {
+        //Loadouts are the default items that are associated with each character class. This is why we can use this to list all character classes and then display to user
+
+        LootLockerSDKManager.GetCharacterLoadout((response) =>
+        {
+            if (response.success)
+            {
+                foreach (Loadout loadout in response.loadouts)
+                {
+                    GameObject selectionButton = Instantiate(characterClassPrefab, parent);
+                    selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);
+                }
+            }
+            else
+            {
+
+            }
+            LoadingManager.HideLoadingScreen();
+        });
+    }
+
+    public void SetUpEasyPrefab()
+    {
+        if (TexturesSaver.Instance == null)
+        {
+            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+            Instantiate(saver);
+        }
+
+        if (LoadingManager.Instance == null)
+        {
+            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+            Instantiate(loading);
+        }
+
+        if (PopupSystem.Instance == null)
+        {
+            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+            Instantiate(popup);
+        }
+    }
+
+
     public void UpdateScreenData(IStageData stageData)
     {
         if (stageData != null)
@@ -47,7 +116,7 @@ public class SelectClassScreen : MonoBehaviour, IStageOwner
                     }
                     else
                     {
-                        StagesManager.instance.GoToStage(StagesManager.StageID.CreatePlayer, null); 
+                        StagesManager.instance.GoToStage(StagesManager.StageID.CreatePlayer, null);
                     }
                     LoadingManager.HideLoadingScreen();
                 });
@@ -58,14 +127,21 @@ public class SelectClassScreen : MonoBehaviour, IStageOwner
             {
                 UpdateDefaultCharacterClass(() =>
                 {
-                    LocalPlayer localPlayer = new LocalPlayer { playerName = createPlayerRequest.playerName, uniqueID = guid.ToString(), characterClass = loadout?.character };
-                    List<LocalPlayer> localPlayers = JsonConvert.DeserializeObject<List<LocalPlayer>>(PlayerPrefs.GetString("localplayers"));
-                    localPlayers.Add(localPlayer);
-                    PlayerPrefs.SetString("localplayers", JsonConvert.SerializeObject(localPlayers));
-                    LootLockerConfig.current.deviceID = localPlayer.uniqueID;
-                    LootLockerConfig.current.playerClass = loadout.character.type.ToString();
-                    //Character has been set, we can now load the home page
-                    StagesManager.instance.GoToStage(StagesManager.StageID.Home, sessionResponse);
+                    if (!isEasyPrefab)
+                    {
+                        LocalPlayer localPlayer = new LocalPlayer { playerName = createPlayerRequest.playerName, uniqueID = guid.ToString(), characterClass = loadout?.character };
+                        List<LocalPlayer> localPlayers = JsonConvert.DeserializeObject<List<LocalPlayer>>(PlayerPrefs.GetString("localplayers"));
+                        localPlayers.Add(localPlayer);
+                        PlayerPrefs.SetString("localplayers", JsonConvert.SerializeObject(localPlayers));
+                        LootLockerConfig.current.deviceID = localPlayer.uniqueID;
+                        LootLockerConfig.current.playerClass = loadout.character.type.ToString();
+                        //Character has been set, we can now load the home page
+                        StagesManager.instance.GoToStage(StagesManager.StageID.Home, sessionResponse);
+                    }
+                    else
+                    {
+                        Debug.Log("Updated the default class for the current player");
+                    }
                 });
             });
         }

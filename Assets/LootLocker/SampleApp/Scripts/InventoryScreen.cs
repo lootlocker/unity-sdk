@@ -19,12 +19,40 @@ public class InventoryScreen : MonoBehaviour, IStageOwner
     public GameObject contextsPrefab;
     List<ContextController> contextControllers = new List<ContextController>();
     public Text className;
+    public bool isEasyPrefab;
 
     private void Awake()
     {
         currentAsset = new InventoryAssetPair();
         selectBtn.onClick.AddListener(ButtonClicked);
 
+        if (isEasyPrefab)
+        {
+            SetUpEasyPrefab();
+            ViewInventory();
+        }
+    }
+
+
+    public void SetUpEasyPrefab()
+    {
+        if (TexturesSaver.Instance == null)
+        {
+            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+            Instantiate(saver);
+        }
+
+        if (LoadingManager.Instance == null)
+        {
+            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+            Instantiate(loading);
+        }
+
+        if (PopupSystem.Instance == null)
+        {
+            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+            Instantiate(popup);
+        }
     }
 
     public void ViewInventory()

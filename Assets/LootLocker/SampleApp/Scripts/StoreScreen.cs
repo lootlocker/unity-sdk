@@ -18,10 +18,39 @@ public class StoreScreen : MonoBehaviour, IStageOwner
     public Button selectBtn;
     public Text selectText;
     public Text creditsAmount;
+    public bool isEasyPrefab;
+
 
     private void Awake()
     {
         selectBtn.onClick.AddListener(ButtonClicked);
+        if (isEasyPrefab)
+        {
+            SetUpEasyPrefab();
+            ViewStore();
+        }
+    }
+
+
+    public void SetUpEasyPrefab()
+    {
+        if (TexturesSaver.Instance == null)
+        {
+            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+            Instantiate(saver);
+        }
+
+        if (LoadingManager.Instance == null)
+        {
+            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+            Instantiate(loading);
+        }
+
+        if (PopupSystem.Instance == null)
+        {
+            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+            Instantiate(popup);
+        }
     }
 
     public void ViewStore()
@@ -46,7 +75,7 @@ public class StoreScreen : MonoBehaviour, IStageOwner
                     Debug.Log("Successful got Assets: " + response.text);
                     LoadingManager.HideLoadingScreen();
 
-                    InventoryAssetResponse.AssetResponse mainResponse = JsonConvert.DeserializeObject <InventoryAssetResponse.AssetResponse> (response.text);
+                    InventoryAssetResponse.AssetResponse mainResponse = JsonConvert.DeserializeObject<InventoryAssetResponse.AssetResponse>(response.text);
 
                     if (mainResponse.success)
                     {
@@ -93,7 +122,7 @@ public class StoreScreen : MonoBehaviour, IStageOwner
     public void ButtonClicked()
     {
         string header = "Buy Item";
-        string btnText = "Buy" ;
+        string btnText = "Buy";
         Dictionary<string, string> data = new Dictionary<string, string>();
         data.Add("Asset Name", currentAsset.name);
         data.Add("Asset Context", currentAsset.context);
@@ -131,7 +160,7 @@ public class StoreScreen : MonoBehaviour, IStageOwner
                     data.Add("1", purchaseErrorResponse.messages[0]);
                     PopupSystem.ShowApprovalFailPopUp(header, data, currentAsset.url, true);
                 }
-        
+
             });
         }, currentAsset.url);
     }

@@ -7,11 +7,51 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MessagesScreen : MonoBehaviour,IStageOwner
+public class MessagesScreen : MonoBehaviour, IStageOwner
 {
     [Header("Messages")]
     public Transform messagesParent;
     public GameObject messagesObject, readMessageObject, messagePrefab;
+    public GameObject backButton;
+    [Header("Easy Prefab Setup")]
+    public GameObject readMessages;
+    public bool isEasyPrefab;
+
+    private void Awake()
+    {
+        StartEasyPrefab();
+    }
+
+    public void StartEasyPrefab()
+    {
+        if (isEasyPrefab)
+        {
+            backButton?.SetActive(false);
+            SetUpEasyPrefab();
+            ListMessages();
+        }
+    }
+
+    public void SetUpEasyPrefab()
+    {
+        if (TexturesSaver.Instance == null)
+        {
+            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+            Instantiate(saver);
+        }
+
+        if (LoadingManager.Instance == null)
+        {
+            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+            Instantiate(loading);
+        }
+
+        if (PopupSystem.Instance == null)
+        {
+            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+            Instantiate(popup);
+        }
+    }
 
     void ListMessages()
     {
@@ -43,7 +83,10 @@ public class MessagesScreen : MonoBehaviour,IStageOwner
     }
     public void SelectMessage(GMMessage selectedMessage)
     {
-        StagesManager.instance.GoToStage(StagesManager.StageID.ReadMessages, selectedMessage);
+        if (!readMessages)
+            StagesManager.instance.GoToStage(StagesManager.StageID.ReadMessages, selectedMessage);
+        else
+            readMessages?.GetComponent<ReadMessageScreen>()?.StartEasyPrefab(selectedMessage);
     }
 
     public void UpdateScreenData(IStageData stageData)

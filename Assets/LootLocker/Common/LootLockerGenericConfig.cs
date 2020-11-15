@@ -15,7 +15,7 @@ public class LootLockerGenericConfig : ScriptableObject
     public int gameID;
     public string game_version = "1.0";
     [HideInInspector]
-    public string deviceID;
+    public string deviceID = "defaultPlayerId";
     [HideInInspector]
     public string email, password;
     [HideInInspector]

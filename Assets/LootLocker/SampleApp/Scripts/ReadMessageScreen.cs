@@ -10,6 +10,16 @@ public class ReadMessageScreen : MonoBehaviour, IStageOwner
 {
     public Image messageImage;
     public Text messageTitle, messageSummary, messageBody;
+    [Header("Easy Prefab Setup")]
+    public bool isEasyPrefab;
+    public GameObject messageScreen;
+
+    public void StartEasyPrefab(IStageData stageData)
+    {
+        GetComponent<ScreenOpener>()?.Open();
+        UpdateScreenData(stageData);
+    }
+
 
     public void UpdateScreenData(IStageData stageData)
     {
@@ -55,7 +65,13 @@ public class ReadMessageScreen : MonoBehaviour, IStageOwner
 
     public void Back()
     {
-        StagesManager.instance.GoToStage(StagesManager.StageID.Messages, null);
+        if (!isEasyPrefab)
+            StagesManager.instance.GoToStage(StagesManager.StageID.Messages, null);
+        else
+        {
+            GetComponent<ScreenCloser>()?.Close();
+            messageScreen?.GetComponent<MessagesScreen>()?.StartEasyPrefab();
+        }
     }
 
     public async Task<Texture2D> GetRemoteTexture(string url, Image targetImage)
