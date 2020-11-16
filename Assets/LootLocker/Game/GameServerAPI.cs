@@ -26,6 +26,17 @@ public class GameServerAPI : BaseServerAPI
 
     protected override void RefreshTokenAndCompleteCall(ServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse)
     {
+        if (activeConfig != null && activeConfig.platform == LootLockerGenericConfig.platformType.Steam)
+        {
+            Debug.LogError("Token has expired, And token refresh not supported in Steam calls");
+            LootLockerResponse res = new LootLockerResponse();
+            res.statusCode = 401;
+            res.Error = "Token Expired";
+            res.hasError = true;
+            OnServerResponse?.Invoke(res);
+            return;
+        }
+
         var sessionRequest = new SessionRequest(activeConfig.deviceID);
 
         LootLockerAPIManager.Session(sessionRequest, (response) =>
