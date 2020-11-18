@@ -70,10 +70,23 @@ namespace LootLockerRequests
         public static void DebugMessage(string message, bool IsError = false)
         {
 #if     UNITY_EDITOR
-            if (IsError)
-                Debug.LogError(message);
-            else
-                Debug.Log(message);
+            if(LootLockerConfig.current!=null && LootLockerConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.All)
+            {
+                if (IsError)
+                    Debug.LogError(message);
+                else
+                    Debug.Log(message);
+            }
+            else if (LootLockerConfig.current != null && LootLockerConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.ErrorOnly)
+            {
+                if (IsError)
+                    Debug.LogError(message);
+            }
+            else if (LootLockerConfig.current != null && LootLockerConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.NormalOnly)
+            {
+                if (!IsError)
+                    Debug.LogError(message);
+            }
 #endif
         }
 
@@ -380,7 +393,7 @@ namespace LootLockerRequests
             AssetRequest.lastId = 0;
         }
 
-        public static void GetAssetInformation(string assetId, Action<AssetInformationResponse> onComplete)
+        public static void GetAssetInformation(string assetId, Action<Asset> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -604,6 +617,14 @@ namespace LootLockerRequests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.DeletingAnAssetCandidate(data, onComplete);
+        }
+
+        public static void GettingASingleAssetCandidate(int assetId, Action<UserGenerateContentResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetId.ToString());
+            LootLockerAPIManager.GettingASingleAssetCandidate(data, onComplete);
         }
 
         public static void ListingAssetCandidates(Action<ListingAssetCandidatesResponse> onComplete)

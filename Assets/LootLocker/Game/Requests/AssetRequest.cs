@@ -25,39 +25,6 @@ namespace LootLockerRequests
         public object dependent_asset_id { get; set; }
     }
 
-    public class AssetInformationResponse : LootLockerResponse
-    {
-        public int id { get; set; }
-        public string name { get; set; }
-        public bool active { get; set; }
-        public bool purchasable { get; set; }
-        public string type { get; set; }
-        public int price { get; set; }
-        public object sales_price { get; set; }
-        public object display_price { get; set; }
-        public string context { get; set; }
-        public object unlocks_context { get; set; }
-        public bool detachable { get; set; }
-        public string updated { get; set; }
-        public object marked_new { get; set; }
-        public int default_variation_id { get; set; }
-        public Default_Loadouts_Info default_loadouts { get; set; }
-        public string description { get; set; }
-        public object links { get; set; }
-        public object[] storage { get; set; }
-        public object rarity { get; set; }
-        public bool popular { get; set; }
-        public int popularity_score { get; set; }
-        public object package_contents { get; set; }
-        public bool unique_instance { get; set; }
-        public object external_identifiers { get; set; }
-        public object rental_options { get; set; }
-        public object[] filters { get; set; }
-        public Variation_Info[] variations { get; set; }
-        public bool featured { get; set; }
-        public bool success { get; set; }
-    }
-
     public class FavouritesListResponse : LootLockerResponse
     {
         public bool success { get; set; }
@@ -194,7 +161,7 @@ namespace LootLocker
             AssetRequest.lastId = 0;
         }
 
-        public static void GetAssetInformation(LootLockerGetRequest data, Action<AssetInformationResponse> onComplete)
+        public static void GetAssetInformation(LootLockerGetRequest data, Action<Asset> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetInformationForOneorMoreAssets;
 
@@ -202,12 +169,12 @@ namespace LootLocker
 
             ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                AssetInformationResponse response = new AssetInformationResponse();
+                Asset response = new Asset();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
                     //we get info for one or more assets so the passed asset info should be for only one of them and the whole json is not parsed correctly
-                    response = JsonConvert.DeserializeObject<AssetInformationResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<Asset>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

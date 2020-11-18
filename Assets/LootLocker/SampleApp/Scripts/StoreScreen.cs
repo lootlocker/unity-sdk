@@ -14,7 +14,7 @@ public class StoreScreen : MonoBehaviour, IStageOwner
     public GameObject contextPrefab;
     public Text normalText, headerText;
     public ToggleGroup inventoryToggles;
-    public InventoryAssetResponse.Asset currentAsset;
+    public InventoryAssetResponse.DemoAppAsset currentAsset;
     public Button selectBtn;
     public Text selectText;
     public Text creditsAmount;
@@ -80,14 +80,14 @@ public class StoreScreen : MonoBehaviour, IStageOwner
                     if (mainResponse.success)
                     {
                         string[] contexts = contextResponse.contexts.Select(x => x.name).ToArray();
-                        InventoryAssetResponse.Asset[] assets = mainResponse.assets?.Where(x => x.purchasable && x.price > 0)?.ToArray();
+                        InventoryAssetResponse.DemoAppAsset[] assets = mainResponse.assets?.Where(x => x.purchasable && x.price > 0)?.ToArray();
                         for (int i = 0; i < contexts.Length; i++)
                         {
                             GameObject contextObject = Instantiate(contextPrefab, parent);
                             ContextController contextController = contextObject.GetComponent<ContextController>();
                             contextController.Init(contexts[i], assets.FirstOrDefault(x => x.context == contexts[i])?.id.ToString());
 
-                            InventoryAssetResponse.Asset[] assetsForContextController = assets.Where(x => x.context == contextController.context)?.ToArray();
+                            InventoryAssetResponse.DemoAppAsset[] assetsForContextController = assets.Where(x => x.context == contextController.context)?.ToArray();
                             contextController.Populate(assetsForContextController);
                         }
 

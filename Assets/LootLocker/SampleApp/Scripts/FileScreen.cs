@@ -32,7 +32,7 @@ public class FileScreen : MonoBehaviour, IStageOwner
     public Image image;
     public Button downloadFileBtn;
     public Button bckBtn;
-    InventoryAssetResponse.Asset asset;
+    InventoryAssetResponse.DemoAppAsset asset;
     string[] imageExtenstions = new string[] { "jpg", "jpeg", "png", "PNG", "JPG", "JPEG" };
     string[] assetBundle = new string[] { "unity3d" };
     string[] scene = new string[] { "unity" };
@@ -46,7 +46,7 @@ public class FileScreen : MonoBehaviour, IStageOwner
 
     public void UpdateScreenData(IStageData stageData)
     {
-        asset = stageData as InventoryAssetResponse.Asset;
+        asset = stageData as InventoryAssetResponse.DemoAppAsset;
         if (asset != null)
         {
             if (asset.files != null && asset.files.Length > 0)

@@ -30,7 +30,7 @@ namespace AppDemoLootLockerRequests
 
     public class Reward : IPopupData
     {
-        public InventoryAssetResponse.Asset asset { get; set; }
+        public InventoryAssetResponse.DemoAppAsset asset { get; set; }
         public int asset_variation_id { get; set; }
         public object asset_rental_option_id { get; set; }
         public string header => "You got a reward";

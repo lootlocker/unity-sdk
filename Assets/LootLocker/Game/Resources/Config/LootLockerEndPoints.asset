@@ -192,6 +192,9 @@ MonoBehaviour:
   updatingAnAssetCandidate:
     endPoint: v1/player/assets/candidates/{0}
     httpMethod: 3
+  gettingASingleAssetCandidate:
+    endPoint: v1/player/assets/candidates/{0}
+    httpMethod: 0
   deletingAnAssetCandidate:
     endPoint: v1/player/assets/candidates/{0}
     httpMethod: 2

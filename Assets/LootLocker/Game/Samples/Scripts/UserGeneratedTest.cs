@@ -1,4 +1,5 @@
 ﻿using enums;
+using LootLocker;
 using LootLockerRequests;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,11 +24,11 @@ public class UserGeneratedTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         }, context_id: sendContextId ? 21 : -1);
     }
@@ -40,11 +41,11 @@ public class UserGeneratedTest : MonoBehaviour
          {
              if (response.success)
              {
-                 Debug.Log("Successful");
+                 LootLockerSDKManager.DebugMessage("Successful");
              }
              else
              {
-                 Debug.Log("failed: " + response.Error);
+                 LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
              }
          }, name: assetName);
     }
@@ -57,11 +58,28 @@ public class UserGeneratedTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
+            }
+        });//GettingASingleAssetCandidate
+    }
+
+    [ContextMenu("GettingAAssetCandidate")]
+    public void GettingASingleAssetCandidate()
+    {
+
+        LootLockerSDKManager.GettingASingleAssetCandidate(assetId, (response) =>
+        {
+            if (response.success)
+            {
+                LootLockerSDKManager.DebugMessage("Successful" + response.asset_candidate.asset_id);
+            }
+            else
+            {
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
             }
         });
     }
@@ -74,11 +92,11 @@ public class UserGeneratedTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }
@@ -91,11 +109,11 @@ public class UserGeneratedTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }
@@ -108,11 +126,11 @@ public class UserGeneratedTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }

@@ -11,7 +11,7 @@ using Enums;
 public class InventoryAssetPair
 {
     public InventoryAssetResponse.Inventory inventory;
-    public InventoryAssetResponse.Asset asset;
+    public InventoryAssetResponse.DemoAppAsset asset;
     public bool isDefault;
 }
 namespace InventoryAssetResponse
@@ -46,7 +46,7 @@ namespace InventoryAssetResponse
     public class AssetResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Asset[] assets { get; set; }
+        public DemoAppAsset[] assets { get; set; }
     }
 
     public class Rental_Options
@@ -59,40 +59,13 @@ namespace InventoryAssetResponse
         public object links { get; set; }
     }
 
-    public class Asset : ItemData, IScreenShotOwner, IStageData
+    public class DemoAppAsset : LootLocker.Asset, ItemData, IScreenShotOwner, IStageData
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public bool active { get; set; }
-        public bool purchasable { get; set; }
-        public string type { get; set; }
-        public int price { get; set; }
-        public string sales_price { get; set; }
-        public string display_price { get; set; }
-        public string context { get; set; }
-        public string unlocks_context { get; set; }
-        public bool detachable { get; set; }
-        public string updated { get; set; }
-        public string marked_new { get; set; }
-        public int default_variation_id { get; set; }
-        public string description { get; set; }
-        public Links links { get; set; }
-        public string[] storage { get; set; }
-        public string rarity { get; set; }
-        public bool popular { get; set; }
-        public int popularity_score { get; set; }
-        public bool unique_instance { get; set; }
         public string external_identifiers { get; set; }
-        public Rental_Options[] rental_options { get; set; }
-        public string[] filters { get; set; }
-        public Variation[] variations { get; set; }
-        public bool featured { get; set; }
-        public bool context_locked { get; set; }
-        public bool initially_purchasable { get; set; }
         public string url => links?.thumbnail;
         public Image preview { get; set; }
         public int downloadAttempts { get; set; }
-        public File[] files { get; set; }
+     
         public Sprite texture2D;
 
         public void SaveTexture(Sprite texture2D)
@@ -150,7 +123,7 @@ namespace InventoryAssetResponse
         public int? variation_id { get; set; }
         public string rental_option_id { get; set; }
         public string acquisition_source { get; set; }
-        public Asset asset { get; set; }
+        public DemoAppAsset asset { get; set; }
         public Rental rental { get; set; }
 
 
@@ -233,14 +206,14 @@ public class ContextController : MonoBehaviour
         //}
     }
 
-    public void Populate(InventoryAssetResponse.Asset[] inventories)
+    public void Populate(InventoryAssetResponse.DemoAppAsset[] inventories)
     {
         foreach (Transform tr in inventoryParent)
         {
             Destroy(tr.gameObject);
         }
         elements.Clear();
-        foreach (InventoryAssetResponse.Asset asset in inventories)
+        foreach (InventoryAssetResponse.DemoAppAsset asset in inventories)
         {
             GameObject inventoryObject = Instantiate(inventoryPrefab, inventoryParent);
             Dictionary<string, string> data = new Dictionary<string, string>();

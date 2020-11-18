@@ -20,11 +20,11 @@ public class MissionsTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }
@@ -37,11 +37,11 @@ public class MissionsTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }
@@ -54,11 +54,11 @@ public class MissionsTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }
@@ -76,11 +76,11 @@ public class MissionsTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }

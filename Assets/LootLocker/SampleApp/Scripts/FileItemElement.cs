@@ -10,7 +10,7 @@ public class FileItemElement : MonoBehaviour
     public Text text;
     //private Asset asset;
 
-    public void Init(InventoryAssetResponse.Asset asset)
+    public void Init(InventoryAssetResponse.DemoAppAsset asset)
     {
         //this.asset = asset;
         if (asset != null)

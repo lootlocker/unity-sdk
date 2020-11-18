@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
+using LootLockerRequests;
 
 namespace enums
 {
@@ -67,7 +68,7 @@ namespace LootLocker
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildURL(request.endpoint, request.queryParams);
 #if UNITY_EDITOR
-                Debug.Log("ServerRequest URL: " + url);
+                LootLockerSDKManager.DebugMessage("ServerRequest URL: " + url);
 #endif
 
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
@@ -83,7 +84,7 @@ namespace LootLocker
                         yield return null;
                         if (Time.time - startTime >= maxTimeOut)
                         {
-                            Debug.LogError("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
+                            LootLockerSDKManager.DebugMessage("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
                             yield break;
                         }
                     }
@@ -97,17 +98,14 @@ namespace LootLocker
                     try
                     {
 #if UNITY_EDITOR
-                        Debug.Log("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+                        LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
 #endif
                     }
                     catch
                     {
-                        Debug.LogError(request);
-                        Debug.LogError(request.httpMethod);
-                        Debug.LogError(request.endpoint);
-                        Debug.LogError(webRequest);
-                        Debug.LogError(webRequest.downloadHandler);
-                        Debug.LogError(webRequest.downloadHandler.text);
+                        LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(),true);
+                        LootLockerSDKManager.DebugMessage(request.endpoint,true);
+                        LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text,true);
                     }
 
                     LootLockerResponse response = new LootLockerResponse();
@@ -153,8 +151,8 @@ namespace LootLocker
                                 response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
                                 break;
                         }
-#if UNITY_EDIROR
-                        Debug.Log("Response code: " + webRequest.responseCode);
+#if UNITY_EDITOR
+                        LootLockerSDKManager.DebugMessage("Response code: " + webRequest.responseCode);
 #endif
                         if (webRequest.responseCode != 401)
                         {
@@ -229,7 +227,7 @@ namespace LootLocker
 
                 if (texture == null)
                 {
-                    Debug.LogError("Texture download failed for: " + url);
+                    LootLockerSDKManager.DebugMessage("Texture download failed for: " + url,true);
                 }
 
                 OnComplete?.Invoke(texture);
@@ -278,8 +276,8 @@ namespace LootLocker
                     else
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
-#if UNITY_EDIROR
-                        Debug.Log("REQUEST BODY = " + json);
+#if UNITY_EDITOR
+                         LootLockerSDKManager.DebugMessage("REQUEST BODY = " + json);
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);

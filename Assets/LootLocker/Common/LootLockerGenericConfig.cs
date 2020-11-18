@@ -36,6 +36,11 @@ public class LootLockerGenericConfig : ScriptableObject
     [HideInInspector]
     public string userUrl = "https://api.lootlocker.io/game";
 
+    public enum DebugLevel { All, ErrorOnly, NormalOnly, Off}
+
+    public DebugLevel currentDebugLevel;
+
+
     public void UpdateToken(string token, string deviceid)
     {
         this.deviceID = deviceid;

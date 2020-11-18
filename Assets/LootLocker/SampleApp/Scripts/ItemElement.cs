@@ -14,7 +14,7 @@ public class ItemElement : MonoBehaviour
     ItemData data;
     public GameObject activeBorder;
     Image preview;
-    public InventoryAssetResponse.Asset asset;
+    public InventoryAssetResponse.DemoAppAsset asset;
     public Color activeColor;
     public Color selectedColor;
     public Color inActiveColor;
@@ -49,7 +49,7 @@ public class ItemElement : MonoBehaviour
     public void Init(ItemData data)
     {
         this.data = data;
-        asset = data as InventoryAssetResponse.Asset;
+        asset = data as InventoryAssetResponse.DemoAppAsset;
         InventoryAssetResponse.Inventory inventory = data as InventoryAssetResponse.Inventory;
         if (asset == null && inventory != null)
             asset = inventory.asset;

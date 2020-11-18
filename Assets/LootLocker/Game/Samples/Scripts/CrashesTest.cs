@@ -18,11 +18,11 @@ public class CrashesTest : MonoBehaviour
         {
             if (!response.hasError)
             {
-                Debug.Log("Successful");
+                LootLockerSDKManager.DebugMessage("Successful");
             }
             else
             {
-                Debug.Log("failed: " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
             }
         });
     }

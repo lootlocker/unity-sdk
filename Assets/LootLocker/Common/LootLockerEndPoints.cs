@@ -89,6 +89,7 @@ public class LootLockerEndPoints : ScriptableObject
     [Header("UGC")]
     public EndPointClass creatingAnAssetCandidate;
     public EndPointClass updatingAnAssetCandidate;
+    public EndPointClass gettingASingleAssetCandidate;
     public EndPointClass deletingAnAssetCandidate;
     public EndPointClass listingAssetCandidates;
     public EndPointClass addingFilesToAssetCandidates;

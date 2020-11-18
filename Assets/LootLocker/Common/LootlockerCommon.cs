@@ -75,8 +75,9 @@ namespace LootLocker
     }
 
 
-    public class Asset
+    public class Asset: LootLockerResponse
     {
+        public bool success;
         public int id { get; set; }
         public string name { get; set; }
         public bool active { get; set; }
@@ -99,13 +100,13 @@ namespace LootLocker
         public bool popular { get; set; }
         public int popularity_score { get; set; }
         public bool unique_instance { get; set; }
-        //public string external_identifiers { get; set; }
         public Rental_Options[] rental_options { get; set; }
         public Filter[] filters { get; set; }
         public Variation[] variations { get; set; }
         public bool featured { get; set; }
         public bool context_locked { get; set; }
         public bool initially_purchasable { get; set; }
+        public File[] files { get; set; }
     }
 
     public class File

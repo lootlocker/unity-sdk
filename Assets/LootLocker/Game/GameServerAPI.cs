@@ -28,7 +28,7 @@ public class GameServerAPI : BaseServerAPI
     {
         if (activeConfig != null && activeConfig.platform == LootLockerGenericConfig.platformType.Steam)
         {
-            Debug.LogError("Token has expired, And token refresh not supported in Steam calls");
+            LootLockerSDKManager.DebugMessage("Token has expired, And token refresh not supported in Steam calls", true);
             LootLockerResponse res = new LootLockerResponse();
             res.statusCode = 401;
             res.Error = "Token Expired";
@@ -53,7 +53,7 @@ public class GameServerAPI : BaseServerAPI
                 }
                 else
                 {
-                    Debug.LogError("Session refresh failed");
+                    LootLockerSDKManager.DebugMessage("Session refresh failed",true);
                     LootLockerResponse res = new LootLockerResponse();
                     res.statusCode = 401;
                     res.Error = "Token Expired";
@@ -63,7 +63,7 @@ public class GameServerAPI : BaseServerAPI
             }
             else
             {
-                Debug.LogError("Session refresh failed");
+                LootLockerSDKManager.DebugMessage("Session refresh failed",true);
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";

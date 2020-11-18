@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameName: LootLocker Demo Game
   apiKey: 280eec0a84e48b19de43ae3997597019585f7e1d
-  token: d591157e17073e51ad417e58bc05aac3ef0a784c
+  token: 1f546a61409c3af63ba2072a7bfc41732ba7ebc6
   gameID: 230
   game_version: 1.0.0.0
-  deviceID: eba81300-cf2f-42dc-b798-0d09613eb74e
+  deviceID: 57541626-7567-4f94-be72-cb21df8feb15
   email: emmanuel@cradaptive.com
   password: Ihatefacebuk101!
-  playerName: fbbrtebtr
-  playerClass: 
+  playerName: ertgetrhtr
+  playerClass: Light Vehicle
   platform: 0
   environment: 0
   url: https://api.lootlocker.io/game
   adminUrl: https://api.lootlocker.io/admin
   playerUrl: https://api.lootlocker.io/player
   userUrl: https://api.lootlocker.io/game
+  currentDebugLevel: 0

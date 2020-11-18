@@ -123,6 +123,7 @@ namespace LootLockerRequests
     {
         public bool success { get; set; }
         public int asset_candidate_id { get; set; }
+        public Asset_Candidates asset_candidate { get; set; }
     }
 
     public class ListingAssetCandidatesResponse : LootLockerResponse
@@ -161,7 +162,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, false, enums.CallerRole.User);
+            }, true, enums.CallerRole.User);
         }
 
         public static void UpdatingAnAssetCandidate(CreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
@@ -188,7 +189,31 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, false, enums.CallerRole.User);
+            }, true, enums.CallerRole.User);
+        }
+
+        public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
+        {
+            EndPointClass requestEndPoint = LootLockerEndPoints.current.gettingASingleAssetCandidate;
+
+            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
+
+            ServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) =>
+            {
+                UserGenerateContentResponse response = new UserGenerateContentResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    LootLockerSDKManager.DebugMessage(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<UserGenerateContentResponse>(serverResponse.text);
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true, enums.CallerRole.User);
         }
 
         public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<UserGenerateContentResponse> onComplete)
@@ -212,7 +237,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: enums.CallerRole.User);
         }
 
         public static void ListingAssetCandidates(Action<ListingAssetCandidatesResponse> onComplete)
@@ -234,7 +259,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: enums.CallerRole.User);
         }
 
         public static void AddingFilesToAssetCandidates(AddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
@@ -301,7 +326,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: enums.CallerRole.User);
         }
     }
 }

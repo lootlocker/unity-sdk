@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using Newtonsoft.Json;
 using enums;
+using LootLockerRequests;
 
 // using LootLockerAdmin;
 // using LootLockerAdminRequests;
@@ -30,6 +31,7 @@ namespace LootLocker
     [System.Serializable]
     public class LootLockerResponse
     {
+     
         /// <summary>
         /// TRUE if http error OR server returns an error status
         /// </summary>
@@ -114,7 +116,7 @@ namespace LootLocker
         public static void CallAPI(string endPoint, HTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
         {
 #if UNITY_EDITOR
-            Debug.Log("Caller Type: " + callerRole.ToString());
+            LootLockerSDKManager.DebugMessage("Caller Type: " + callerRole.ToString());
 #endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -180,7 +182,7 @@ namespace LootLocker
 
             if (this.payload != null && isNonPayloadMethod)
             {
-                Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
         public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
@@ -201,7 +203,7 @@ namespace LootLocker
 
             if (this.payload != null && isNonPayloadMethod)
             {
-                Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
         public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
@@ -221,7 +223,7 @@ namespace LootLocker
             this.form = null;
             if (this.payload != null && isNonPayloadMethod)
             {
-                Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
         public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
@@ -241,7 +243,7 @@ namespace LootLocker
             this.form = null;
             if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
             {
-                Debug.LogWarning("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
 #endregion
@@ -251,9 +253,6 @@ namespace LootLocker
         /// </summary>
         public void Send(System.Action<LootLockerResponse> OnServerResponse)
         {
-#if UNITY_EDITOR
-            Debug.Log("Sending Request: " + httpMethod.ToString() + " " + endpoint + " -- queryParams: " + jsonPayload);
-#endif
             BaseServerAPI.I.SendRequest(this, (response) =>
             {
                 OnServerResponse?.Invoke(response);

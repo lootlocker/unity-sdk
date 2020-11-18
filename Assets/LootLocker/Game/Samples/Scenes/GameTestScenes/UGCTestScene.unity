@@ -226,6 +226,7 @@ MonoBehaviour:
   fileName: 
   filePurpose: 0
   fileId: 0
+  markAssetAsComplete: 1
 --- !u!1001 &306553389762793163
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241,7 +242,7 @@ PrefabInstance:
     - target: {fileID: 306553389821347474, guid: a42dc3ea489da0a40b1a046cc0cfd54c,
         type: 3}
       propertyPath: assetId
-      value: 11
+      value: 24
       objectReference: {fileID: 0}
     - target: {fileID: 306553389821347474, guid: a42dc3ea489da0a40b1a046cc0cfd54c,
         type: 3}

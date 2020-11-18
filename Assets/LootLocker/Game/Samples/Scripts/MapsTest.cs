@@ -11,11 +11,11 @@ public class MapsTest : MonoBehaviour
         {
             if (response.success)
             {
-                Debug.LogError("Successful got assets" + response.text);
+                LootLockerSDKManager.DebugMessage("Successful got assets" + response.text);
             }
             else
             {
-                Debug.LogError("failed to get assets : " + response.Error);
+                LootLockerSDKManager.DebugMessage("failed to get assets : " + response.Error,true);
             }
         });
     }

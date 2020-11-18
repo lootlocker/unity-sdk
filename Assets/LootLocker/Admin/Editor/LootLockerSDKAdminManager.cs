@@ -43,10 +43,26 @@ namespace LootLockerAdminRequests
         public static void DebugMessage(string message, bool IsError = false)
         {
 #if UNITY_EDITOR
-            if (IsError)
-                Debug.LogError(message);
-            else
-                Debug.Log(message);
+#if UNITY_EDITOR
+            if (LootLockerAdminConfig.current != null && LootLockerAdminConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.All)
+            {
+                if (IsError)
+                    Debug.LogError(message);
+                else
+                    Debug.Log(message);
+            }
+            else if (LootLockerAdminConfig.current != null && LootLockerAdminConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.ErrorOnly)
+            {
+                if (IsError)
+                    Debug.LogError(message);
+            }
+            else if (LootLockerAdminConfig.current != null && LootLockerAdminConfig.current.currentDebugLevel == LootLockerGenericConfig.DebugLevel.NormalOnly)
+            {
+                if (!IsError)
+                    Debug.LogError(message);
+            }
+#endif
+
 #endif
         }
 

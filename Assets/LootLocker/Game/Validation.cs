@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LootLockerRequests;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -44,13 +45,13 @@ public class Validation
         catch (RegexMatchTimeoutException e)
         {
             error = "An error has occurred. Please try again.";
-            Debug.LogWarning("Regex exception: " + e);
+            LootLockerSDKManager.DebugMessage("Regex exception: " + e,true);
             return false;
         }
         catch (ArgumentException e)
         {
             error = "An error has occurred. Please try again.";
-            Debug.LogWarning("Argument exception: " + e);
+            LootLockerSDKManager.DebugMessage("Argument exception: " + e);
             return false;
         }
 
@@ -69,7 +70,7 @@ public class Validation
         catch (RegexMatchTimeoutException e)
         {
             error = "The email you entered was invalid.";
-            Debug.LogWarning("Regex exception: " + e);
+            LootLockerSDKManager.DebugMessage("Regex exception: " + e,true);
             return false;
         }
     }
