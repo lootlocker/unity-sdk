@@ -10,6 +10,9 @@ public class AssetTest : MonoBehaviour
 {
     public string assetCountToDownload = "20";
     public string assetId;
+    public int lastAssetId;
+    public bool sendNullLastId;
+    public Enums.AssetFilter filter;
     public string labelText;
     Vector2 scrollPosition;
     public string[] assetsToRequest = new string[] { "23", "2342", "32152" };
@@ -112,12 +115,34 @@ public class AssetTest : MonoBehaviour
 
     }
 
+    [ContextMenu("Get Asset Original")]
+    public void GetAssetListOriginal()
+    {
+        int? valToSend = null;
+        if(!sendNullLastId)
+        {
+            valToSend = lastAssetId;
+        }
+        LootLockerSDKManager.GetAssetsOriginal(int.Parse(assetCountToDownload), (response) =>
+         {
+             if (response.success)
+             {
+                 labelText = "Success\n" + response.text;
+             }
+             else
+             {
+                 labelText = "Failed\n" + response.text;
+             }
+
+         }, valToSend, filter);
+    }
+
     [ContextMenu("Get Asset List")]
     public void GetAssetListWithCount()
     {
         LootLockerSDKManager.GetAssetListWithCount(int.Parse(assetCountToDownload), (response) =>
          {
-
+             //GetAssetsOriginal
              if (response.success)
              {
                  labelText = "Success\n" + response.text;

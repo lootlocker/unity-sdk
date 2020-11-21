@@ -47,13 +47,69 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    Debug.Log("Server Response Text: " + serverResponse.text);
                     response = JsonConvert.DeserializeObject<ContextResponse>(serverResponse.text);
-                    //you are checking the wrong response. that is null because you have not assigned anything to it 
-                    //data you are looking for is in serverResponse.text
-                    //if you want the response.text to have the value you need, you need to assign it here 
                     response.text = serverResponse.text;
-                    Debug.Log("Response is: " + serverResponse.text);
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true);
+        }
+
+        public static void GetAssetsOriginal(Action<AssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, Enums.AssetFilter filter = Enums.AssetFilter.none)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetListWithCount;
+            string getVariable = string.Format(endPoint.endPoint, assetCount);
+
+            if (idOfLastAsset != null && assetCount > 0) 
+            {
+                endPoint = LootLockerEndPoints.current.gettingAssetListWithAfterAndCount;
+                getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString());
+            }
+            else if (idOfLastAsset != null && assetCount > 0 && filter!= Enums.AssetFilter.none)
+            {
+                endPoint = LootLockerEndPoints.current.gettingAssetListOriginal;
+                string filterString = "";
+                switch(filter)
+                {
+                    case Enums.AssetFilter.purchasable:
+                        filterString = Enums.AssetFilter.purchasable.ToString();
+                        break;
+                    case Enums.AssetFilter.nonpurchasable:
+                        filterString = "!purchasable";
+                        break;
+                    case Enums.AssetFilter.rentable:
+                        filterString = Enums.AssetFilter.rentable.ToString();
+                        break;
+                    case Enums.AssetFilter.nonrentable:
+                        filterString = "!rentable";
+                        break;
+                    case Enums.AssetFilter.popular:
+                        filterString = Enums.AssetFilter.popular.ToString();
+                        break;
+                    case Enums.AssetFilter.nonpopular:
+                        filterString = "!popular";
+                        break;
+                }
+                getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString(), filterString);
+            }
+
+            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            {
+                AssetResponse response = new AssetResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    LootLockerSDKManager.DebugMessage(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<AssetResponse>(serverResponse.text);
+                    response.text = serverResponse.text;
+                    if (response != null)
+                    {
+                        AssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+                    }
                     onComplete?.Invoke(response);
                 }
                 else
@@ -77,13 +133,8 @@ namespace LootLocker
                    if (string.IsNullOrEmpty(serverResponse.Error))
                    {
                        LootLockerSDKManager.DebugMessage(serverResponse.text);
-                       Debug.Log("Server Response Text: " + serverResponse.text);
                        response = JsonConvert.DeserializeObject<AssetResponse>(serverResponse.text);
-                       //you are checking the wrong response. that is null because you have not assigned anything to it 
-                       //data you are looking for is in serverResponse.text
-                       //if you want the response.text to have the value you need, you need to assign it here 
                        response.text = serverResponse.text;
-                       Debug.Log("Response is: " + serverResponse.text);
                        if (response != null)
                        {
                            AssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
@@ -173,7 +224,6 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    //we get info for one or more assets so the passed asset info should be for only one of them and the whole json is not parsed correctly
                     response = JsonConvert.DeserializeObject<Asset>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);

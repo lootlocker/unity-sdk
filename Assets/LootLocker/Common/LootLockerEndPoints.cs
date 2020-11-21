@@ -64,6 +64,7 @@ public class LootLockerEndPoints : ScriptableObject
     [Header("Assets")]
     public EndPointClass gettingContexts;
     public EndPointClass gettingAssetListWithCount;
+    public EndPointClass gettingAssetListOriginal;
     public EndPointClass gettingAssetListWithAfterAndCount;
     public EndPointClass getAssetsById;
     public EndPointClass gettingAllAssets;

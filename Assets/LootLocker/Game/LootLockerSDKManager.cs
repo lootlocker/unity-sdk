@@ -364,12 +364,18 @@ namespace LootLockerRequests
             LootLockerAPIManager.GetContext(onComplete);
         }
 
+        public static void GetAssetsOriginal(int assetCount, Action<AssetResponse> onComplete, int? idOfLastAsset = null, Enums.AssetFilter filter =  Enums.AssetFilter.none)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter);
+        }
+
         public static void GetAssetListWithCount(int assetCount, Action<AssetResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetCount.ToString());
-            LootLockerAPIManager.GetAssetListWithCount(data, onComplete);// GetContext(LootLockerGetRequest data, Action<ContextResponse> onComplete)
+            LootLockerAPIManager.GetAssetListWithCount(data, onComplete);
         }
 
         public static void GetAssetNextList(int assetCount, Action<AssetResponse> onComplete)

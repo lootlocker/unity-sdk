@@ -282,7 +282,7 @@ PrefabInstance:
     - target: {fileID: 2770848158039835156, guid: cee2985c86b19c245847700449017d5e,
         type: 3}
       propertyPath: assetCountToDownload
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2770848158039835156, guid: cee2985c86b19c245847700449017d5e,
         type: 3}
@@ -293,6 +293,16 @@ PrefabInstance:
         type: 3}
       propertyPath: assetsToRequest.Array.data[1]
       value: 6509
+      objectReference: {fileID: 0}
+    - target: {fileID: 2770848158039835156, guid: cee2985c86b19c245847700449017d5e,
+        type: 3}
+      propertyPath: filter
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2770848158039835156, guid: cee2985c86b19c245847700449017d5e,
+        type: 3}
+      propertyPath: sendNullLastId
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2770848158039835157, guid: cee2985c86b19c245847700449017d5e,
         type: 3}

@@ -7,6 +7,11 @@ using LootLocker;
 using System.Linq;
 using UnityEngine.UI;
 
+namespace Enums
+{
+    public enum AssetFilter { purchasable , nonpurchasable , rentable, nonrentable, popular , nonpopular, none }
+}
+
 namespace LootLocker
 {
     public class Links
@@ -94,7 +99,6 @@ namespace LootLocker
         public int default_variation_id { get; set; }
         public string description { get; set; }
         public Links links { get; set; }
-
         public LootLockerStorage[] storage { get; set; }
         public Rarity rarity { get; set; }
         public bool popular { get; set; }
@@ -107,6 +111,13 @@ namespace LootLocker
         public bool context_locked { get; set; }
         public bool initially_purchasable { get; set; }
         public File[] files { get; set; }
+        public LootLockerAssetCandidate asset_candidate { get; set; }
+    }
+
+    public class LootLockerAssetCandidate
+    {
+        public int created_by_player_id;
+        public string created_by_player_uid;
     }
 
     public class File

@@ -135,6 +135,9 @@ MonoBehaviour:
   gettingAssetListWithCount:
     endPoint: v1/assets/list?count={0}
     httpMethod: 0
+  gettingAssetListOriginal:
+    endPoint: v1/assets/list?after={0}&count={1}&filter={2}
+    httpMethod: 0
   gettingAssetListWithAfterAndCount:
     endPoint: v1/assets/list?after={0}&count={1}
     httpMethod: 0
