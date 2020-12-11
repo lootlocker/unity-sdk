@@ -176,7 +176,7 @@ namespace LootLocker
                 this.form.AddField(kvp.Key, kvp.Value);
             }
 
-            this.form.AddBinaryData("file", upload, "file");
+            this.form.AddBinaryData("file", upload, uploadName);
 
             bool isNonPayloadMethod = (this.httpMethod == HTTPMethod.GET || this.httpMethod == HTTPMethod.HEAD || this.httpMethod == HTTPMethod.OPTIONS);
 

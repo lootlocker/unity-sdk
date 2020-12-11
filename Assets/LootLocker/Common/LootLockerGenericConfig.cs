@@ -40,6 +40,7 @@ public class LootLockerGenericConfig : ScriptableObject
 
     public DebugLevel currentDebugLevel;
 
+    public bool allowTokenRefresh = true;
 
     public void UpdateToken(string token, string deviceid)
     {

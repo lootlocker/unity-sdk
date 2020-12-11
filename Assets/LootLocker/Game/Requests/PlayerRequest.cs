@@ -12,9 +12,9 @@ namespace LootLockerRequests
     public class GetPlayerInfoResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public int account_balance { get; set; }
-        public int xp { get; set; }
-        public int level { get; set; }
+        public int? account_balance { get; set; }
+        public int? xp { get; set; }
+        public int? level { get; set; }
         public Level_Thresholds level_thresholds { get; set; }
     }
 
@@ -50,7 +50,7 @@ namespace LootLockerRequests
     public class BalanceResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public int balance { get; set; }
+        public int? balance { get; set; }
     }
 
     [System.Serializable]
@@ -66,20 +66,20 @@ namespace LootLockerRequests
     public class XpResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public int xp { get; set; }
-        public int level { get; set; }
+        public int? xp { get; set; }
+        public int? level { get; set; }
     }
     [System.Serializable]
     public class Xp
     {
-        public int previous { get; set; }
-        public int current { get; set; }
+        public int? previous { get; set; }
+        public int? current { get; set; }
     }
     [System.Serializable]
     public class Level
     {
-        public int level { get; set; }
-        public int xp_threshold { get; set; }
+        public int? level { get; set; }
+        public int? xp_threshold { get; set; }
     }
 
     [System.Serializable]
@@ -120,7 +120,7 @@ namespace LootLockerRequests
     [System.Serializable]
     public class XpSubmitRequest
     {
-        public int points;
+        public int? points;
 
         public XpSubmitRequest(int points)
         {

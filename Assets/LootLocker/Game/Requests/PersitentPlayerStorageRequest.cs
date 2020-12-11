@@ -68,9 +68,11 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetSingleKeyPersistentStorage(Action<GetPersistentSingle> onComplete)
+        public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<GetPersistentSingle> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getSingleKeyFromPersitenctStorage;
+
+            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
             ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {

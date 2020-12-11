@@ -12,6 +12,8 @@ public class PersistentPlayerStorageTest : MonoBehaviour
     public List<Payload> dataToSave;
     [Header("Delete Data")]
     public string keyToDelete;
+    [Header("single key Data")]
+    public string keyToGet;
     public string labelText;
     Vector2 scrollPosition, scrollPosition2;
     public string otherPlayerId;
@@ -188,7 +190,7 @@ public class PersistentPlayerStorageTest : MonoBehaviour
     [ContextMenu("GetSingleKeyPersistentStorage")]
     public void GetSingleKeyPersistentStorage()
     {
-        LootLockerSDKManager.GetSingleKeyPersistentStorage((getPersistentStoragResponse) =>
+        LootLockerSDKManager.GetSingleKeyPersistentStorage(keyToGet,(getPersistentStoragResponse) =>
         {
             if (getPersistentStoragResponse.success)
             {

@@ -154,7 +154,7 @@ namespace LootLocker
 #if UNITY_EDITOR
                         LootLockerSDKManager.DebugMessage("Response code: " + webRequest.responseCode);
 #endif
-                        if (webRequest.responseCode != 401)
+                        if (webRequest.responseCode != 401 || !activeConfig.allowTokenRefresh)
                         {
                             response.Error += " " + webRequest.downloadHandler.text;
                             response.text = webRequest.downloadHandler.text;

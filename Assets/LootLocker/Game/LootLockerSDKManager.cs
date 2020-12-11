@@ -319,10 +319,12 @@ namespace LootLockerRequests
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
         }
 
-        public static void GetSingleKeyPersistentStorage(Action<GetPersistentSingle> onComplete)
+        public static void GetSingleKeyPersistentStorage(string key, Action<GetPersistentSingle> onComplete)
         {
             if (!CheckInitialized()) return;
-            LootLockerAPIManager.GetSingleKeyPersistentStorage(onComplete);
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(key);
+            LootLockerAPIManager.GetSingleKeyPersistentStorage(data,onComplete);
         }
 
         public static void UpdateOrCreateKeyValue(string key, string value, Action<GetPersistentStoragResponse> onComplete)
