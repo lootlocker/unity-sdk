@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LootLocker;
 
-public class GameSystemScreen : MonoBehaviour,IStageOwner
+namespace LootLockerDemoApp
 {
-    void ListMessages()
+    public class GameSystemScreen : MonoBehaviour, IStageOwner
     {
-    }
+        void ListMessages()
+        {
+        }
 
 
-    public void UpdateScreenData(IStageData stageData)
-    {
-    
+        public void UpdateScreenData(IStageData stageData)
+        {
+
+        }
     }
 }

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public class LootLockerGetRequest
+namespace LootLockerRequests
 {
-    public List<string> getRequests = new List<string>();
-
-    public bool ShouldSerializegetRequests()
+    public class LootLockerGetRequest
     {
-        // don't serialize the getRequests property.
-        return false;
+        public List<string> getRequests = new List<string>();
+
+        public bool ShouldSerializegetRequests()
+        {
+            // don't serialize the getRequests property.
+            return false;
+        }
     }
 }
-

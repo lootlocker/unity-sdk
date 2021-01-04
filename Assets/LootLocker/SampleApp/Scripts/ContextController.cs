@@ -6,13 +6,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using Enums;
+using LootLockerEnums;
+using LootLockerDemoApp;
 
-public class InventoryAssetPair
+namespace LootLockerDemoApp
 {
-    public InventoryAssetResponse.Inventory inventory;
-    public InventoryAssetResponse.DemoAppAsset asset;
-    public bool isDefault;
+    public class InventoryAssetPair
+    {
+        public InventoryAssetResponse.Inventory inventory;
+        public InventoryAssetResponse.DemoAppAsset asset;
+        public bool isDefault;
+    }
 }
 namespace InventoryAssetResponse
 {
@@ -77,7 +81,7 @@ namespace InventoryAssetResponse
             }
             this.texture2D = texture2D;
         }
-        public Enums.DownloadState downloadState;
+        public LootLockerEnums.DownloadState downloadState;
         public void SetState(DownloadState downloadState)
         {
             this.downloadState = downloadState;

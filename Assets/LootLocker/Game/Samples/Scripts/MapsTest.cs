@@ -3,20 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapsTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public void GettingAllMaps()
+    public class MapsTest : MonoBehaviour
     {
-        LootLockerSDKManager.GettingAllMaps((response) =>
+        public void GettingAllMaps()
         {
-            if (response.success)
+            LootLockerSDKManager.GettingAllMaps((response) =>
             {
-                LootLockerSDKManager.DebugMessage("Successful got assets" + response.text);
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed to get assets : " + response.Error,true);
-            }
-        });
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful got assets" + response.text);
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed to get assets : " + response.Error, true);
+                }
+            });
+        }
     }
 }

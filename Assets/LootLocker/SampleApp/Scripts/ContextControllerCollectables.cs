@@ -6,29 +6,32 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ContextControllerCollectables : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public string context;
-    public Transform inventoryParent;
-    public GameObject inventoryPrefab;
-    public Text header;
-    List<InventoryItemElement> elements = new List<InventoryItemElement>();
-    string defaultAssetId;
-    public Color inActiveColor;
-
-    public void Init(AppDemoLootLockerRequests.Group[] groups, string name, CollectableImage[] images)
+    public class ContextControllerCollectables : MonoBehaviour
     {
-        header.text = name;
-        for (int j = 0; j < groups.Length; j++)
+        public string context;
+        public Transform inventoryParent;
+        public GameObject inventoryPrefab;
+        public Text header;
+        List<InventoryItemElement> elements = new List<InventoryItemElement>();
+        string defaultAssetId;
+        public Color inActiveColor;
+
+        public void Init(AppDemoLootLockerRequests.Group[] groups, string name, CollectableImage[] images)
         {
-            for (int k = 0; k < groups[j].items.Length; k++)
+            header.text = name;
+            for (int j = 0; j < groups.Length; j++)
             {
-                GameObject newCollectableObject = Instantiate(inventoryPrefab, inventoryParent);
-                string nameOfCollectableObject = name + "." + groups[j].name + "." + groups[j].items[k].name;
-                CollectableRecord collectableRecord = newCollectableObject.GetComponent<CollectableRecord>();
-                newCollectableObject.GetComponent<CollectableRecord>().Init(nameOfCollectableObject, groups[j].items[k]);
+                for (int k = 0; k < groups[j].items.Length; k++)
+                {
+                    GameObject newCollectableObject = Instantiate(inventoryPrefab, inventoryParent);
+                    string nameOfCollectableObject = name + "." + groups[j].name + "." + groups[j].items[k].name;
+                    CollectableRecord collectableRecord = newCollectableObject.GetComponent<CollectableRecord>();
+                    newCollectableObject.GetComponent<CollectableRecord>().Init(nameOfCollectableObject, groups[j].items[k]);
+                }
             }
         }
-    }
 
+    }
 }

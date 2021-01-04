@@ -3,85 +3,88 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MissionsTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public int missionId;
-    public string finishTime;
-    public string finishScore;
-    public List<CheckpointTimes> checkpointTimes;
-    public string startingMissionSignature;
-    public string playerId;
-
-    [ContextMenu("GettingAllMissions")]
-    public void GettingAllMissions()
+    public class MissionsTest : MonoBehaviour
     {
+        public int missionId;
+        public string finishTime;
+        public string finishScore;
+        public List<CheckpointTimes> checkpointTimes;
+        public string startingMissionSignature;
+        public string playerId;
 
-        LootLockerSDKManager.GettingAllMissions((response) =>
+        [ContextMenu("GettingAllMissions")]
+        public void GettingAllMissions()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
-    }
 
-    [ContextMenu("GettingASingleMission")]
-    public void GettingASingleMission()
-    {
+            LootLockerSDKManager.GettingAllMissions((response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
 
-        LootLockerSDKManager.GettingASingleMission(missionId, (response) =>
+        [ContextMenu("GettingASingleMission")]
+        public void GettingASingleMission()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
-    }
 
-    [ContextMenu("StartingAMission")]
-    public void StartingAMission()
-    {
+            LootLockerSDKManager.GettingASingleMission(missionId, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
 
-        LootLockerSDKManager.StartingAMission(missionId, (response) =>
+        [ContextMenu("StartingAMission")]
+        public void StartingAMission()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
-    }
 
-    [ContextMenu("FinishingAMission")]
-    public void FinishingAMission()
-    {
-        FinishingPayload finishingPayload = new FinishingPayload()
-        {
-            finish_score = finishScore,
-            finish_time = finishTime,
-            checkpoint_times = checkpointTimes.ToArray()
-        };
-        LootLockerSDKManager.FinishingAMission(missionId, startingMissionSignature, playerId, finishingPayload, (response) =>
-        {
-            if (response.success)
+            LootLockerSDKManager.StartingAMission(missionId, (response) =>
             {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
+
+        [ContextMenu("FinishingAMission")]
+        public void FinishingAMission()
+        {
+            FinishingPayload finishingPayload = new FinishingPayload()
             {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
+                finish_score = finishScore,
+                finish_time = finishTime,
+                checkpoint_times = checkpointTimes.ToArray()
+            };
+            LootLockerSDKManager.FinishingAMission(missionId, startingMissionSignature, playerId, finishingPayload, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
     }
 }

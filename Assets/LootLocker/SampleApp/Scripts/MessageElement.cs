@@ -5,61 +5,64 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ElementSprites
+namespace LootLockerDemoApp
 {
-    public string spriteName;
-    public Sprite sprite;
-}
-
-public class MessageElement : MonoBehaviour
-{
-    public Image messageIconState;
-    public Text messageSummaryText;
-    public Sprite closedMessageSprite, openedMessageSprite;
-    public ElementSprites[] elementSprites;
-    public enum MessageState { Unread, Read };
-
-    public void InitMessage(GMMessage message)
+    public class ElementSprites
     {
-
-        Fill(message._new ? MessageState.Unread : MessageState.Read, message.summary);
-
+        public string spriteName;
+        public Sprite sprite;
     }
 
-    void Fill(MessageState messageState, string content)
+    public class MessageElement : MonoBehaviour
     {
+        public Image messageIconState;
+        public Text messageSummaryText;
+        public Sprite closedMessageSprite, openedMessageSprite;
+        public ElementSprites[] elementSprites;
+        public enum MessageState { Unread, Read };
 
-        try
-        { 
+        public void InitMessage(GMMessage message)
+        {
 
-            switch(messageState)
+            Fill(message._new ? MessageState.Unread : MessageState.Read, message.summary);
+
+        }
+
+        void Fill(MessageState messageState, string content)
+        {
+
+            try
             {
 
-                case MessageState.Unread:
+                switch (messageState)
+                {
 
-                    messageIconState.sprite = closedMessageSprite;
+                    case MessageState.Unread:
 
-                    break;
+                        messageIconState.sprite = closedMessageSprite;
 
-                case MessageState.Read:
+                        break;
 
-                    messageIconState.sprite = openedMessageSprite;
+                    case MessageState.Read:
 
-                    break;
+                        messageIconState.sprite = openedMessageSprite;
+
+                        break;
+
+                }
+
+                messageSummaryText.text = content;
 
             }
 
-            messageSummaryText.text = content;
+            catch (Exception ex)
+            {
 
-        }
+                Debug.LogWarning("Message init error: " + ex);
 
-        catch(Exception ex)
-        {
-
-            Debug.LogWarning("Message init error: " + ex);
+            }
 
         }
 
     }
-    
 }

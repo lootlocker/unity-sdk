@@ -11,55 +11,57 @@ using System.Text.RegularExpressions;
 using System.IO;
 using Newtonsoft.Json;
 
-public partial class LootlockerAdminPanel : EditorWindow
+namespace LootLockerAdmin
 {
-
-    void PopulateFiles()
+    public partial class LootlockerAdminPanel : EditorWindow
     {
-        Debug.Log("Getting files..");
-        LootLockerSDKAdminManager.GetFiles(LootLockerAdminRequests.FileFilterType.none, (response) =>
+
+        void PopulateFiles()
         {
-            Debug.Log("files on complete");
-            if (response.success)
+            Debug.Log("Getting files..");
+            LootLockerSDKAdminManager.GetFiles(LootLockerAdminRequests.FileFilterType.none, (response) =>
             {
-
-                LootLockerSDKAdminManager.GetAssets((assetssResponse) =>
+                Debug.Log("files on complete");
+                if (response.success)
                 {
-                    LootLockerSDKAdminManager.GetContexts((contextResponse) =>
+
+                    LootLockerSDKAdminManager.GetAssets((assetssResponse) =>
                     {
-                        if (contextResponse.success)
+                        LootLockerSDKAdminManager.GetContexts((contextResponse) =>
                         {
-                            Contexts = contextResponse.Contexts;
-                            ContextNames = Contexts.Select(x => x.name).ToArray();
-                            Debug.Log("Successful got all contexts: " + contextResponse.text);
-                        }
-                        else
-                        {
-                            Debug.LogError("failed to get all contexts: " + contextResponse.Error);
-                        }
+                            if (contextResponse.success)
+                            {
+                                Contexts = contextResponse.Contexts;
+                                ContextNames = Contexts.Select(x => x.name).ToArray();
+                                Debug.Log("Successful got all contexts: " + contextResponse.text);
+                            }
+                            else
+                            {
+                                Debug.LogError("failed to get all contexts: " + contextResponse.Error);
+                            }
 
-                        if (assetssResponse.success)
-                        {
-                            assetsResponse = assetssResponse;
-                            Debug.Log("Successful got all assets: " + response.text);
-                        }
-                        else
-                        {
-                            Debug.LogError("failed to get all assets: " + response.Error);
-                        }
+                            if (assetssResponse.success)
+                            {
+                                assetsResponse = assetssResponse;
+                                Debug.Log("Successful got all assets: " + response.text);
+                            }
+                            else
+                            {
+                                Debug.LogError("failed to get all assets: " + response.Error);
+                            }
 
+                        });
                     });
-                });
 
-                getFilesResponse = response;
-                currentView = View.Files;
-                Repaint();
-                Debug.Log("Successful got all files: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to get all files: " + response.Error);
-            }
+                    getFilesResponse = response;
+                    currentView = View.Files;
+                    Repaint();
+                    Debug.Log("Successful got all files: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to get all files: " + response.Error);
+                }
 
             // getFilesResponse = new GetFilesResponse()
             // {
@@ -103,176 +105,145 @@ public partial class LootlockerAdminPanel : EditorWindow
             // ServerAPI.ResetManager();
             // Debug.Log("Successful got all files: " + response.text);
         });
-    }
-
-    string FileTags;
-    LootLockerAdminRequests.File activeFile;
-
-    void DrawFilesView()
-    {
-        style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
-
-        GUILayout.BeginArea(ContentSection);
-
-        if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Menu;
-        EditorGUILayout.Separator();
-
-        EditorGUILayout.LabelField("Files", style);
-        EditorGUILayout.Separator();
-
-        EditorGUILayout.Space();
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Upload New File", GUILayout.Height(40)))
-        {
-            CreateFile();
         }
-        EditorGUILayout.EndHorizontal();
 
-        if (getFilesResponse != null && getFilesResponse.files != null)
+        string FileTags;
+        LootLockerAdminRequests.File activeFile;
+
+        void DrawFilesView()
         {
-            filesViewScrollPos = EditorGUILayout.BeginScrollView(filesViewScrollPos);
-            var style = new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft, fontSize = 20 };
+            style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
 
-            for (int i = 0; i < getFilesResponse.files.Length; i++)
+            GUILayout.BeginArea(ContentSection);
+
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Menu;
+            EditorGUILayout.Separator();
+
+            EditorGUILayout.LabelField("Files", style);
+            EditorGUILayout.Separator();
+
+            EditorGUILayout.Space();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Upload New File", GUILayout.Height(40)))
             {
-                if (GUILayout.Button(new GUIContent($"  {getFilesResponse.files[i].name}     Id({getFilesResponse.files[i].id})", FileTexture), style, GUILayout.Height(40)))
+                CreateFile();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (getFilesResponse != null && getFilesResponse.files != null)
+            {
+                filesViewScrollPos = EditorGUILayout.BeginScrollView(filesViewScrollPos);
+                var style = new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft, fontSize = 20 };
+
+                for (int i = 0; i < getFilesResponse.files.Length; i++)
                 {
-                    SelectFile(i);
+                    if (GUILayout.Button(new GUIContent($"  {getFilesResponse.files[i].name}     Id({getFilesResponse.files[i].id})", FileTexture), style, GUILayout.Height(40)))
+                    {
+                        SelectFile(i);
+                    }
+                    var tags = String.Empty;
                 }
-                var tags = String.Empty;
+
+                EditorGUILayout.EndScrollView();
             }
 
-            EditorGUILayout.EndScrollView();
+            GUILayout.EndArea();
+
         }
 
-        GUILayout.EndArea();
-
-    }
-
-    void DrawFileView()
-    {
-        GUILayout.BeginArea(ContentSection);
-
-        EditorGUILayout.LabelField("Tags");
-        EditorGUILayout.LabelField("saperated by comma", new GUIStyle(GUI.skin.label) { fontSize = 10 });
-        FileTags = EditorGUILayout.TextField(FileTags);
-
-        if (GUILayout.Button("Update", GUILayout.Height(50)))
+        void DrawFileView()
         {
-            LootLockerSDKAdminManager.UpdateFile(activeFile.id.ToString(), new UpdateFileRequest() { tags = FileTags.Split(',') }, (updateResponse) =>
+            GUILayout.BeginArea(ContentSection);
+
+            EditorGUILayout.LabelField("Tags");
+            EditorGUILayout.LabelField("saperated by comma", new GUIStyle(GUI.skin.label) { fontSize = 10 });
+            FileTags = EditorGUILayout.TextField(FileTags);
+
+            if (GUILayout.Button("Update", GUILayout.Height(50)))
             {
-                if (updateResponse.success)
+                LootLockerSDKAdminManager.UpdateFile(activeFile.id.ToString(), new UpdateFileRequest() { tags = FileTags.Split(',') }, (updateResponse) =>
                 {
-                    ButtomMessage = "Update Succeeded";
-                    Debug.Log("Successful update file: " + updateResponse.text);
-                }
-                else
-                {
-                    Debug.LogError("failed to update file: " + updateResponse.Error);
-                }
-            });
-        }
+                    if (updateResponse.success)
+                    {
+                        ButtomMessage = "Update Succeeded";
+                        Debug.Log("Successful update file: " + updateResponse.text);
+                    }
+                    else
+                    {
+                        Debug.LogError("failed to update file: " + updateResponse.Error);
+                    }
+                });
+            }
 
-        if (GUILayout.Button("Delete", GUILayout.Height(50)))
-        {
-            LootLockerSDKAdminManager.DeleteFile(activeFile.id.ToString(), (response) =>
+            if (GUILayout.Button("Delete", GUILayout.Height(50)))
             {
-                if (response.success)
+                LootLockerSDKAdminManager.DeleteFile(activeFile.id.ToString(), (response) =>
                 {
-                    ButtomMessage = "Delete Succeeded";
-                    PopulateFiles();
-                    Debug.Log("Successful deleted file: " + response.text);
-                }
-                else
-                {
-                    Debug.LogError("failed to delete file: " + response.Error);
-                }
-            });
+                    if (response.success)
+                    {
+                        ButtomMessage = "Delete Succeeded";
+                        PopulateFiles();
+                        Debug.Log("Successful deleted file: " + response.text);
+                    }
+                    else
+                    {
+                        Debug.LogError("failed to delete file: " + response.Error);
+                    }
+                });
+            }
+
+            if (GUILayout.Button("Back", GUILayout.Height(20))) PopulateFiles();
+
+            GUILayout.EndArea();
         }
 
-        if (GUILayout.Button("Back", GUILayout.Height(20))) PopulateFiles();
+        //attach to some asset
+        int FileAssociatedAssetIndex;
+        Asset AllAssets;
+        string[] AssetsNames;
 
-        GUILayout.EndArea();
-    }
+        int assetContextID;
 
-    //attach to some asset
-    int FileAssociatedAssetIndex;
-    Asset AllAssets;
-    string[] AssetsNames;
+        string assetName,
+            filePath;
 
-    int assetContextID;
-
-    string assetName,
-        filePath;
-
-    void DrawCreateFileView()
-    {
-        GUILayout.BeginArea(ContentSection);
-
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField("Asset name: ");
-        assetName = EditorGUILayout.TextField(assetName);
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField("Asset Context ID: ");
-
-        activeAsset = assetsResponse.assets[0];
-
-        AssetContextIndex = EditorGUILayout.Popup(AssetContextIndex, ContextNames);
-        activeAsset.context = Contexts[AssetContextIndex].name;
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Separator();
-
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField("Tags");
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("saperated by comma", new GUIStyle(GUI.skin.label) { fontSize = 10 });
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-
-        FileTags = EditorGUILayout.TextField(FileTags);
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Separator();
-        EditorGUILayout.Separator();
-
-        EditorGUILayout.BeginHorizontal();
-
-        if (GUILayout.Button(string.IsNullOrEmpty(filePath) ? "Attach File" : "Choose a different file", GUILayout.Height(30), GUILayout.MaxWidth(200)))
+        void DrawCreateFileView()
         {
+            GUILayout.BeginArea(ContentSection);
 
-            filePath = EditorUtility.OpenFilePanel("Choose a file", "", "");
+            EditorGUILayout.BeginHorizontal();
 
-        }
+            EditorGUILayout.LabelField("Asset name: ");
+            assetName = EditorGUILayout.TextField(assetName);
 
-        if (string.IsNullOrEmpty(filePath))
-        {
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField("Asset Context ID: ");
+
+            activeAsset = assetsResponse.assets[0];
+
+            AssetContextIndex = EditorGUILayout.Popup(AssetContextIndex, ContextNames);
+            activeAsset.context = Contexts[AssetContextIndex].name;
+
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Separator();
-            EditorGUILayout.Separator();
 
-            EditorGUILayout.LabelField("You must attach a file to be able to upload",
-                new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft },
-                GUILayout.MaxWidth(1000), GUILayout.Height(25));
+            EditorGUILayout.BeginHorizontal();
 
-        }
-        else
-        {
-            EditorGUILayout.LabelField("File name: " + Path.GetFileName(filePath),
-                new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft },
-                GUILayout.MaxWidth(1000), GUILayout.Height(25));
+            EditorGUILayout.LabelField("Tags");
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("saperated by comma", new GUIStyle(GUI.skin.label) { fontSize = 10 });
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            FileTags = EditorGUILayout.TextField(FileTags);
 
             EditorGUILayout.EndHorizontal();
 
@@ -281,113 +252,145 @@ public partial class LootlockerAdminPanel : EditorWindow
 
             EditorGUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Upload", GUILayout.Height(30)))
+            if (GUILayout.Button(string.IsNullOrEmpty(filePath) ? "Attach File" : "Choose a different file", GUILayout.Height(30), GUILayout.MaxWidth(200)))
             {
 
-                currentView = View.Loading;
-
-                var request = new CreateAssetRequest() { name = assetName, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
-
-                LootLockerSDKAdminManager.CreateAsset(request, (response) =>
-                {
-                    if (response.success)
-                    {
-
-                        Debug.LogError("Asset created successfully. Uploading file..");
-
-                        LootLockerSDKAdminManager.GetAssets((getAssetsResponse) =>
-                        {
-                            if (getAssetsResponse.success)
-                            {
-                                Debug.Log("Successfully got uploaded asset: " + getAssetsResponse.text);
-
-                                Asset uploadedAsset = getAssetsResponse.assets[0];
-
-                                LootLockerSDKAdminManager.UploadAFile(filePath, uploadedAsset.id.ToString(), LootLockerAdminConfig.current.gameID, (uploadResponse) =>
-                                {
-                                    if (uploadResponse.success)
-                                    {
-                                        Debug.Log("Successfully uploaded file: " + uploadResponse.text);
-                                        PopulateFiles();
-                                    }
-                                    else
-                                    {
-                                        Debug.LogError("Failed to upload file: " + uploadResponse.Error);
-                                        currentView = View.CreateFile;
-                                    }
-                                }, tags: FileTags.Split(','));
-
-                            }
-                            else
-                            {
-                                Debug.LogError("Failed to get assets: " + getAssetsResponse.Error);
-                                currentView = View.CreateFile;
-                            }
-                        });
-
-                    }
-                    else
-                    {
-                        Debug.LogError("failed to get create/update asset: " + response.Error);
-                        currentView = View.CreateFile;
-                    }
-                });
-
+                filePath = EditorUtility.OpenFilePanel("Choose a file", "", "");
 
             }
 
+            if (string.IsNullOrEmpty(filePath))
+            {
+
+                EditorGUILayout.Separator();
+                EditorGUILayout.Separator();
+
+                EditorGUILayout.LabelField("You must attach a file to be able to upload",
+                    new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft },
+                    GUILayout.MaxWidth(1000), GUILayout.Height(25));
+
+            }
+            else
+            {
+                EditorGUILayout.LabelField("File name: " + Path.GetFileName(filePath),
+                    new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft },
+                    GUILayout.MaxWidth(1000), GUILayout.Height(25));
+
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.Separator();
+                EditorGUILayout.Separator();
+
+                EditorGUILayout.BeginHorizontal();
+
+                if (GUILayout.Button("Upload", GUILayout.Height(30)))
+                {
+
+                    currentView = View.Loading;
+
+                    var request = new CreateAssetRequest() { name = assetName, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
+
+                    LootLockerSDKAdminManager.CreateAsset(request, (response) =>
+                    {
+                        if (response.success)
+                        {
+
+                            Debug.LogError("Asset created successfully. Uploading file..");
+
+                            LootLockerSDKAdminManager.GetAssets((getAssetsResponse) =>
+                            {
+                                if (getAssetsResponse.success)
+                                {
+                                    Debug.Log("Successfully got uploaded asset: " + getAssetsResponse.text);
+
+                                    Asset uploadedAsset = getAssetsResponse.assets[0];
+
+                                    LootLockerSDKAdminManager.UploadAFile(filePath, uploadedAsset.id.ToString(), LootLockerAdminConfig.current.gameID, (uploadResponse) =>
+                                    {
+                                        if (uploadResponse.success)
+                                        {
+                                            Debug.Log("Successfully uploaded file: " + uploadResponse.text);
+                                            PopulateFiles();
+                                        }
+                                        else
+                                        {
+                                            Debug.LogError("Failed to upload file: " + uploadResponse.Error);
+                                            currentView = View.CreateFile;
+                                        }
+                                    }, tags: FileTags.Split(','));
+
+                                }
+                                else
+                                {
+                                    Debug.LogError("Failed to get assets: " + getAssetsResponse.Error);
+                                    currentView = View.CreateFile;
+                                }
+                            });
+
+                        }
+                        else
+                        {
+                            Debug.LogError("failed to get create/update asset: " + response.Error);
+                            currentView = View.CreateFile;
+                        }
+                    });
+
+
+                }
+
+            }
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
+            if (GUILayout.Button("Back", GUILayout.Height(20))) PopulateFiles();
+
+            GUILayout.EndArea();
         }
 
-        EditorGUILayout.EndHorizontal();
+        void CreateFile()
+        {
 
-        EditorGUILayout.Separator();
-        EditorGUILayout.Separator();
-        EditorGUILayout.Separator();
-        EditorGUILayout.Separator();
+            filePath = "";
+            currentView = View.CreateFile;
 
-        if (GUILayout.Button("Back", GUILayout.Height(20))) PopulateFiles();
+            //LootLockerSDKAdminManager.GetAssets((response) =>
+            //{
+            //    if (response.success)
+            //    {
+            //        assetsResponse = response;
+            //        filePath = "";
+            //        currentView = View.CreateFile;
+            //        Repaint();
+            //        Debug.Log("Successful got all assets: " + response.text);
 
-        GUILayout.EndArea();
-    }
+            //        AssetsNames = new string[assetsResponse.assets.Length];
+            //        for (int i = 0; i < AssetsNames.Length; i++)
+            //        {
+            //            AssetsNames[i] = assetsResponse.assets[i].name;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Debug.LogError("failed to get all assets: " + response.Error);
+            //    }
+            //});
+        }
 
-    void CreateFile()
-    {
+        void SelectFile(int index)
+        {
+            activeFile = getFilesResponse.files[index];
+            currentView = View.File;
 
-        filePath = "";
-        currentView = View.CreateFile;
+            FileTags = String.Empty;
+            if (activeFile.tags == null) return;
 
-        //LootLockerSDKAdminManager.GetAssets((response) =>
-        //{
-        //    if (response.success)
-        //    {
-        //        assetsResponse = response;
-        //        filePath = "";
-        //        currentView = View.CreateFile;
-        //        Repaint();
-        //        Debug.Log("Successful got all assets: " + response.text);
-
-        //        AssetsNames = new string[assetsResponse.assets.Length];
-        //        for (int i = 0; i < AssetsNames.Length; i++)
-        //        {
-        //            AssetsNames[i] = assetsResponse.assets[i].name;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError("failed to get all assets: " + response.Error);
-        //    }
-        //});
-    }
-
-    void SelectFile(int index)
-    {
-        activeFile = getFilesResponse.files[index];
-        currentView = View.File;
-
-        FileTags = String.Empty;
-        if (activeFile.tags == null) return;
-
-        foreach (var item in activeFile.tags) FileTags += item + ',';
-        FileTags.Remove(FileTags.Length - 1);
+            foreach (var item in activeFile.tags) FileTags += item + ',';
+            FileTags.Remove(FileTags.Length - 1);
+        }
     }
 }

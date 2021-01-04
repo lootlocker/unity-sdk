@@ -3,83 +3,86 @@ using System.Collections.Generic;
 using UnityEngine;
 using LootLockerRequests;
 
-public class SessionTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public string deviceId;
-    string labelText = "";
-
-    private void OnGUI()
+    public class SessionTest : MonoBehaviour
     {
+        public string deviceId;
+        string labelText = "";
 
-        GUIStyle centeredTextStyle = new GUIStyle();
-        centeredTextStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUILayout.BeginVertical();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
-            UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
-
-        GUILayout.EndHorizontal();
-
-        deviceId = GUILayout.TextField(deviceId, GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000));
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Check Session", GUILayout.ExpandWidth(true)))
+        private void OnGUI()
         {
-            Session();
+
+            GUIStyle centeredTextStyle = new GUIStyle();
+            centeredTextStyle.alignment = TextAnchor.MiddleCenter;
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
+                UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
+
+            GUILayout.EndHorizontal();
+
+            deviceId = GUILayout.TextField(deviceId, GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000));
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Check Session", GUILayout.ExpandWidth(true)))
+            {
+                Session();
+            }
+
+            if (GUILayout.Button("End Session", GUILayout.ExpandWidth(true)))
+            {
+                EndSession();
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label(labelText);
+
+            GUILayout.EndVertical();
+
         }
 
-        if (GUILayout.Button("End Session", GUILayout.ExpandWidth(true)))
+        [ContextMenu("Check Session")]
+        public void Session()
         {
-            EndSession();
+
+            LootLockerSDKManager.StartSession(deviceId, (response) =>
+            {
+                if (response.success)
+                {
+                    labelText = "Successful";
+                }
+                else
+                {
+                    labelText = "failed: " + response.Error;
+                }
+
+            });
+
         }
 
-        GUILayout.EndHorizontal();
-
-        GUILayout.Label(labelText);
-
-        GUILayout.EndVertical();
-
-    }
-
-    [ContextMenu("Check Session")]
-    public void Session()
-    {
-
-        LootLockerSDKManager.StartSession(deviceId, (response) =>
+        [ContextMenu("End Session")]
+        public void EndSession()
         {
-            if (response.success)
+
+            LootLockerSDKManager.EndSession(deviceId, (response) =>
             {
-                labelText = "Successful";
-            }
-            else
-            {
-                labelText = "failed: " + response.Error;
-            }
+                if (response.success)
+                {
+                    labelText = "Successful";
+                }
+                else
+                {
+                    labelText = "failed: " + response.Error;
+                }
 
-        });
+            });
 
-    }
-
-    [ContextMenu("End Session")]
-    public void EndSession()
-    {
-
-        LootLockerSDKManager.EndSession(deviceId, (response) =>
-        {
-            if (response.success)
-            {
-                labelText = "Successful";
-            }
-            else
-            {
-                labelText = "failed: " + response.Error;
-            }
-
-        });
-
+        }
     }
 }

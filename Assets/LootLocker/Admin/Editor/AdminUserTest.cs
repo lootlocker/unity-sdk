@@ -3,24 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AdminUserTest : MonoBehaviour
+namespace LootLockerAdmin
 {
-
-    [ContextMenu("Setup Two-Factor Authentication")]
-    public void SetupTwoFactorAuthentication()
+    public class AdminUserTest : MonoBehaviour
     {
-        LootLockerSDKAdminManager.SetupTwoFactorAuthentication((response) =>
-        {
-            if (response.success)
-            {
-                LootLockerSDKAdminManager.DebugMessage("Successful setup two factor authentication: " + response.text);
-            }
-            else
-            {
-                LootLockerSDKAdminManager.DebugMessage("failed to set two factor authentication: " + response.Error, true);
-            }
-        });
-    }
 
+        [ContextMenu("Setup Two-Factor Authentication")]
+        public void SetupTwoFactorAuthentication()
+        {
+            LootLockerSDKAdminManager.SetupTwoFactorAuthentication((response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKAdminManager.DebugMessage("Successful setup two factor authentication: " + response.text);
+                }
+                else
+                {
+                    LootLockerSDKAdminManager.DebugMessage("failed to set two factor authentication: " + response.Error, true);
+                }
+            });
+        }
+
+    }
 }
 

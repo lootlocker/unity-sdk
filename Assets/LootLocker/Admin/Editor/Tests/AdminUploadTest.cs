@@ -9,55 +9,58 @@ using System;
 using UnityEngine.Networking;
 using LootLocker;
 
-public class AdminUploadTest : MonoBehaviour
+namespace LootLockerAdmin
 {
-    [Header("Asset Info")]
-    public string sendAssetID;
-
-    public List<string> uploadPaths = new List<string>();
-    public string[] splitFiles;
-    public string[] lastSplit2;
-    public string[] lastSplit;
-
-
-    [ContextMenu("Upload Test")]
-    public void UploadFile()
+    public class AdminUploadTest : MonoBehaviour
     {
-        string path = EditorUtility.OpenFolderPanel("Select folder to upload", "", "");
-        string[] files = Directory.GetFiles(path);
-        if (files != null && files.Length > 0)
+        [Header("Asset Info")]
+        public string sendAssetID;
+
+        public List<string> uploadPaths = new List<string>();
+        public string[] splitFiles;
+        public string[] lastSplit2;
+        public string[] lastSplit;
+
+
+        [ContextMenu("Upload Test")]
+        public void UploadFile()
         {
-            foreach (string file in files)
+            string path = EditorUtility.OpenFolderPanel("Select folder to upload", "", "");
+            string[] files = Directory.GetFiles(path);
+            if (files != null && files.Length > 0)
             {
-                Debug.Log(GetIdFromFile(file));
-                if (!file.EndsWith(".meta"))
-                    LootLockerSDKAdminManager.UploadAFile(file, sendAssetID, LootLockerAdminConfig.current.gameID, (response) =>
-                    {
-                        if (response.success)
+                foreach (string file in files)
+                {
+                    Debug.Log(GetIdFromFile(file));
+                    if (!file.EndsWith(".meta"))
+                        LootLockerSDKAdminManager.UploadAFile(file, sendAssetID, LootLockerAdminConfig.current.gameID, (response) =>
                         {
-                            Debug.LogError("Successful created event: " + response.text);
-                        }
-                        else
-                        {
-                            Debug.LogError("failed to create event: " + response.Error);
-                        }
-                    });
+                            if (response.success)
+                            {
+                                Debug.LogError("Successful created event: " + response.text);
+                            }
+                            else
+                            {
+                                Debug.LogError("failed to create event: " + response.Error);
+                            }
+                        });
+                }
             }
+            //  EditorUtility.DisplayDialog("Select Texture", "You must select a texture first!", "OK");
         }
-        //  EditorUtility.DisplayDialog("Select Texture", "You must select a texture first!", "OK");
-    }
 
-    string GetIdFromFile(string file)
-    {
-        splitFiles = file.Split('/');
-        lastSplit2 = splitFiles.Last().Split('\\');
-        lastSplit = lastSplit2.Last().Split('.');
-        return lastSplit.First();
-    }
+        string GetIdFromFile(string file)
+        {
+            splitFiles = file.Split('/');
+            lastSplit2 = splitFiles.Last().Split('\\');
+            lastSplit = lastSplit2.Last().Split('.');
+            return lastSplit.First();
+        }
 
-    [ContextMenu("LogCurrentToken")]
-    public void LogCurrentToken()
-    {
-        Debug.Log(LootLocker.BaseServerAPI.activeConfig.token);
+        [ContextMenu("LogCurrentToken")]
+        public void LogCurrentToken()
+        {
+            Debug.Log(LootLocker.BaseServerAPI.activeConfig.token);
+        }
     }
 }

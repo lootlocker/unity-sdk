@@ -96,7 +96,7 @@ namespace LootLockerAdmin
                      response.Error = serverResponse.Error;
                      onComplete?.Invoke(response);
                  }
-             }, useAuthToken: true, callerRole: enums.CallerRole.Admin); 
+             }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin); 
         }
 
         public static void CreateAsset(CreateAssetRequest request, Action<CreateAssetResponse> onComplete)
@@ -131,7 +131,7 @@ namespace LootLockerAdmin
                      response.Error = serverResponse.Error;
                      onComplete?.Invoke(response);
                  }
-             }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+             }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
 
         }
 
@@ -156,7 +156,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
     }

@@ -3,58 +3,61 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AdminAuthTest : MonoBehaviour
+namespace LootLockerAdmin
 {
-    public string email, password, mfa_key, secret;
-
-    [ContextMenu("Initial Authentication Request")]
-    public void InitialAuthenticationRequest()
+    public class AdminAuthTest : MonoBehaviour
     {
-        LootLockerSDKAdminManager.InitialAuthRequest(email, password, (response) =>
-        {
-            if (response.success)
-            {
-                Debug.LogError("Successful got admin auth response: " + response.text);
-                mfa_key = response.mfa_key;
-            }
-            else
-            {
-                Debug.LogError("failed to get admin auth response: " + response.Error);
-            }
-        });
-    }
+        public string email, password, mfa_key, secret;
 
-    [ContextMenu("Two-Factor Authentication Code Verification")]
-    public void TwoFactorAuthenticationCodeVerification()
-    {
-        LootLockerSDKAdminManager.TwoFactorAuthVerification(mfa_key, secret, (response) =>
+        [ContextMenu("Initial Authentication Request")]
+        public void InitialAuthenticationRequest()
         {
-            if (response.success)
+            LootLockerSDKAdminManager.InitialAuthRequest(email, password, (response) =>
             {
-                Debug.Log("Successful got two-factor authentication code: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to get two-factor authentication code: " + response.Error);
-            }
-        });
-    }
+                if (response.success)
+                {
+                    Debug.LogError("Successful got admin auth response: " + response.text);
+                    mfa_key = response.mfa_key;
+                }
+                else
+                {
+                    Debug.LogError("failed to get admin auth response: " + response.Error);
+                }
+            });
+        }
 
-    [ContextMenu("Subsequent requests")]
-    public void SubsequentRequests()
-    {
-        LootLockerSDKAdminManager.SubsequentRequestsRequest((response) =>
+        [ContextMenu("Two-Factor Authentication Code Verification")]
+        public void TwoFactorAuthenticationCodeVerification()
         {
-            if (response.success)
+            LootLockerSDKAdminManager.TwoFactorAuthVerification(mfa_key, secret, (response) =>
             {
-                Debug.LogError("Successful got Subsequent requests: " + response.text);
-            }
-            else
+                if (response.success)
+                {
+                    Debug.Log("Successful got two-factor authentication code: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to get two-factor authentication code: " + response.Error);
+                }
+            });
+        }
+
+        [ContextMenu("Subsequent requests")]
+        public void SubsequentRequests()
+        {
+            LootLockerSDKAdminManager.SubsequentRequestsRequest((response) =>
             {
-                Debug.LogError("failed to get Subsequent requests: " + response.Error);
-            }
-        });
+                if (response.success)
+                {
+                    Debug.LogError("Successful got Subsequent requests: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to get Subsequent requests: " + response.Error);
+                }
+            });
+        }
+
     }
 
 }
-

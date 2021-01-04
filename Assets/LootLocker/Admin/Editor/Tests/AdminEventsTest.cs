@@ -3,85 +3,88 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AdminEventsTest : MonoBehaviour
+namespace LootLockerAdmin
 {
-    [Header("Creating Event")]
-    public bool sendAssetID;
-    public bool sendPosterPath, sendRounds, sendRoundLength, sendCompletionBonus,
-        sendDifficultyName, sendDifficultyMultiplier, sendTimeScoreMultiplier,sendGoals,
-        sendCheckpoints, sendFilters;
-
-    public CreatingEventRequest eventToCreate;
-
-    [Header("Updating Event")]
-    [Header("---------------------------")]
-    public int eventID;
-    public bool protectName, sendAssetID_U, sendPosterPath_U, sendRounds_U, sendRoundLength_U, sendCompletionBonus_U,
-    sendDifficultyName_U, sendDifficultyMultiplier_U, sendTimeScoreMultiplier_U, sendGoals_U,
-    sendCheckpoints_U, sendFilters_U;
-
-    public CreatingEventRequest UpdatedEventData;
-
-    [Header("Getting All Events")]
-    [Header("---------------------------")]
-    public int gameID;
-
-    [ContextMenu("CreatingEvent")]
-    public void CreatingEvent()
+    public class AdminEventsTest : MonoBehaviour
     {
-        LootLockerSDKAdminManager.CreatingEvent(eventToCreate.GetCreatingEventRequestDictionary(sendAssetID, sendPosterPath, sendRounds, sendRoundLength, sendCompletionBonus,
-        sendDifficultyName, sendDifficultyMultiplier, sendTimeScoreMultiplier, sendGoals,
-        sendCheckpoints, sendFilters),
-            
-        (response) =>
-        {
-            if (response.success)
-            {
-                Debug.LogError("Successful created event: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to create event: " + response.Error);
-            }
-        });
-    }
+        [Header("Creating Event")]
+        public bool sendAssetID;
+        public bool sendPosterPath, sendRounds, sendRoundLength, sendCompletionBonus,
+            sendDifficultyName, sendDifficultyMultiplier, sendTimeScoreMultiplier, sendGoals,
+            sendCheckpoints, sendFilters;
 
-    [ContextMenu("UpdatingEvent")]
-    public void UpdatingEvent()
-    {
-        LootLockerSDKAdminManager.UpdatingEvent(eventID, UpdatedEventData.GetUpdatingEventRequestDictionary(protectName, sendAssetID_U, sendPosterPath_U, sendRounds_U, sendRoundLength_U, sendCompletionBonus_U,
+        public CreatingEventRequest eventToCreate;
+
+        [Header("Updating Event")]
+        [Header("---------------------------")]
+        public int eventID;
+        public bool protectName, sendAssetID_U, sendPosterPath_U, sendRounds_U, sendRoundLength_U, sendCompletionBonus_U,
         sendDifficultyName_U, sendDifficultyMultiplier_U, sendTimeScoreMultiplier_U, sendGoals_U,
-        sendCheckpoints_U, sendFilters_U),
+        sendCheckpoints_U, sendFilters_U;
 
-        (response) =>
+        public CreatingEventRequest UpdatedEventData;
+
+        [Header("Getting All Events")]
+        [Header("---------------------------")]
+        public int gameID;
+
+        [ContextMenu("CreatingEvent")]
+        public void CreatingEvent()
         {
-            if (response.success)
-            {
-                Debug.LogError("Successful updated event: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to update event: " + response.Error);
-            }
-        });
-    }
+            LootLockerSDKAdminManager.CreatingEvent(eventToCreate.GetCreatingEventRequestDictionary(sendAssetID, sendPosterPath, sendRounds, sendRoundLength, sendCompletionBonus,
+            sendDifficultyName, sendDifficultyMultiplier, sendTimeScoreMultiplier, sendGoals,
+            sendCheckpoints, sendFilters),
 
-    [ContextMenu("GettingAllEvents")]
-    public void GettingAllEvents()
-    {
-        LootLockerSDKAdminManager.GettingAllEvents(gameID,
+            (response) =>
+            {
+                if (response.success)
+                {
+                    Debug.LogError("Successful created event: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to create event: " + response.Error);
+                }
+            });
+        }
 
-        (response) =>
+        [ContextMenu("UpdatingEvent")]
+        public void UpdatingEvent()
         {
-            if (response.success)
-            {
-                Debug.LogError("Successful got events: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to get events: " + response.Error);
-            }
-        });
-    }
+            LootLockerSDKAdminManager.UpdatingEvent(eventID, UpdatedEventData.GetUpdatingEventRequestDictionary(protectName, sendAssetID_U, sendPosterPath_U, sendRounds_U, sendRoundLength_U, sendCompletionBonus_U,
+            sendDifficultyName_U, sendDifficultyMultiplier_U, sendTimeScoreMultiplier_U, sendGoals_U,
+            sendCheckpoints_U, sendFilters_U),
 
+            (response) =>
+            {
+                if (response.success)
+                {
+                    Debug.LogError("Successful updated event: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to update event: " + response.Error);
+                }
+            });
+        }
+
+        [ContextMenu("GettingAllEvents")]
+        public void GettingAllEvents()
+        {
+            LootLockerSDKAdminManager.GettingAllEvents(gameID,
+
+            (response) =>
+            {
+                if (response.success)
+                {
+                    Debug.LogError("Successful got events: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to get events: " + response.Error);
+                }
+            });
+        }
+
+    }
 }

@@ -5,105 +5,111 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System;
-using Enums;
+using LootLockerEnums;
 
-public class TempImageClass : IScreenShotOwner
-{
-    public Action OnDownloadCompleted;
-    public string url { get; set; }
-    public void SaveTexture(Sprite texture2D)
-    {
-        preview.sprite = texture2D;
-        OnDownloadCompleted?.Invoke();
-    }
-    public Image preview { get; set; }
-    public int downloadAttempts { get; set; }
-    public Action onScreenShotDownloaded { get ; set; }
-}
 
-namespace Enums
+namespace LootLockerEnums
 {
     public enum TypeOfFile { Image, Scene, AssetBundle, None }
 }
 
-public class FileScreen : MonoBehaviour, IStageOwner
+namespace LootLockerDemoApp
 {
-    public Text typeOfFile;
-    public Image image;
-    public Button downloadFileBtn;
-    public Button bckBtn;
-    InventoryAssetResponse.DemoAppAsset asset;
-    string[] imageExtenstions = new string[] { "jpg", "jpeg", "png", "PNG", "JPG", "JPEG" };
-    string[] assetBundle = new string[] { "unity3d" };
-    string[] scene = new string[] { "unity" };
-    string url = "";
-
-    private void Awake()
+    public class TempImageClass : IScreenShotOwner
     {
-        downloadFileBtn.onClick.RemoveAllListeners();
-        bckBtn.onClick.AddListener(ViewInventory);
+        public Action OnDownloadCompleted;
+        public string url { get; set; }
+        public void SaveTexture(Sprite texture2D)
+        {
+            preview.sprite = texture2D;
+            OnDownloadCompleted?.Invoke();
+        }
+        public Image preview { get; set; }
+        public int downloadAttempts { get; set; }
+        public Action onScreenShotDownloaded { get; set; }
     }
 
-    public void UpdateScreenData(IStageData stageData)
+
+
+    public class FileScreen : MonoBehaviour, IStageOwner
     {
-        asset = stageData as InventoryAssetResponse.DemoAppAsset;
-        if (asset != null)
+        public Text typeOfFile;
+        public Image image;
+        public Button downloadFileBtn;
+        public Button bckBtn;
+        InventoryAssetResponse.DemoAppAsset asset;
+        string[] imageExtenstions = new string[] { "jpg", "jpeg", "png", "PNG", "JPG", "JPEG" };
+        string[] assetBundle = new string[] { "unity3d" };
+        string[] scene = new string[] { "unity" };
+        string url = "";
+
+        private void Awake()
         {
-            if (asset.files != null && asset.files.Length > 0)
+            downloadFileBtn.onClick.RemoveAllListeners();
+            bckBtn.onClick.AddListener(ViewInventory);
+        }
+
+        public void UpdateScreenData(IStageData stageData)
+        {
+            asset = stageData as InventoryAssetResponse.DemoAppAsset;
+            if (asset != null)
             {
-                url = asset.files.Last().url;
-                TypeOfFile filetype = GetFileType(url);
-                downloadFileBtn.onClick.AddListener(() =>
+                if (asset.files != null && asset.files.Length > 0)
                 {
-                    LoadingManager.ShowLoadingScreen();
-                    DownloadFile(filetype);
-                });
+                    url = asset.files.Last().url;
+                    TypeOfFile filetype = GetFileType(url);
+                    downloadFileBtn.onClick.AddListener(() =>
+                    {
+                        LoadingManager.ShowLoadingScreen();
+                        DownloadFile(filetype);
+                    });
+                }
             }
         }
-    }
 
-    public void ViewInventory()
-    {
-        LoadingManager.ShowLoadingScreen();
-        StagesManager.instance.GoToStage(StagesManager.StageID.Inventory, null);
-        image.sprite = null;
-    }
+        public void ViewInventory()
+        {
+            LoadingManager.ShowLoadingScreen();
+            StagesManager.instance.GoToStage(StagesManager.StageID.Inventory, null);
+            image.sprite = null;
+        }
 
-    public TypeOfFile GetFileType(string fileLink)
-    {
-        string[] filesArray = fileLink.Split('.');
-        string ext = filesArray.Last();
-        TypeOfFile fileType = TypeOfFile.Image;
-        if (imageExtenstions.Contains(ext))
+        public TypeOfFile GetFileType(string fileLink)
         {
-            typeOfFile.text = "Avatar Image";
-            fileType = TypeOfFile.Image;
+            string[] filesArray = fileLink.Split('.');
+            string ext = filesArray.Last();
+            TypeOfFile fileType = TypeOfFile.Image;
+            if (imageExtenstions.Contains(ext))
+            {
+                typeOfFile.text = "Avatar Image";
+                fileType = TypeOfFile.Image;
+            }
+            else if (assetBundle.Contains(ext))
+            {
+                typeOfFile.text = "Asset Bundle";
+                fileType = TypeOfFile.AssetBundle;
+            }
+            else if (scene.Contains(ext))
+            {
+                typeOfFile.text = "Scene File";
+                fileType = TypeOfFile.AssetBundle;
+            }
+            return fileType;
         }
-        else if (assetBundle.Contains(ext))
-        {
-            typeOfFile.text = "Asset Bundle";
-            fileType = TypeOfFile.AssetBundle;
-        }
-        else if (scene.Contains(ext))
-        {
-            typeOfFile.text = "Scene File";
-            fileType = TypeOfFile.AssetBundle;
-        }
-        return fileType;
-    }
 
-    public void DownloadFile(TypeOfFile typeOfFile)
-    {
-        switch (typeOfFile)
+        public void DownloadFile(TypeOfFile typeOfFile)
         {
-            case TypeOfFile.Image:
-                TempImageClass tempImageClass = new TempImageClass();
-                tempImageClass.url = url;
-                tempImageClass.preview = image;
-                tempImageClass.OnDownloadCompleted = () => { LoadingManager.HideLoadingScreen(); };
-                TexturesSaver.QueueForDownload(tempImageClass);
-                break;
+            switch (typeOfFile)
+            {
+                case TypeOfFile.Image:
+                    TempImageClass tempImageClass = new TempImageClass();
+                    tempImageClass.url = url;
+                    tempImageClass.preview = image;
+                    tempImageClass.OnDownloadCompleted = () => { LoadingManager.HideLoadingScreen(); };
+                    TexturesSaver.QueueForDownload(tempImageClass);
+                    break;
+            }
         }
-    }
 
+    }
 }

@@ -3,27 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrashesTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public string logFilePath;
-    public string game_version;
-    public string type_identifier;
-    public string local_crash_time;
-
-    [ContextMenu("SubmittingACrashLog")]
-    public void SubmittingACrashLog()
+    public class CrashesTest : MonoBehaviour
     {
+        public string logFilePath;
+        public string game_version;
+        public string type_identifier;
+        public string local_crash_time;
 
-        LootLockerSDKManager.SubmittingACrashLog(logFilePath, game_version, type_identifier, local_crash_time, (response) =>
+        [ContextMenu("SubmittingACrashLog")]
+        public void SubmittingACrashLog()
         {
-            if (!response.hasError)
+
+            LootLockerSDKManager.SubmittingACrashLog(logFilePath, game_version, type_identifier, local_crash_time, (response) =>
             {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
+                if (!response.hasError)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
     }
 }

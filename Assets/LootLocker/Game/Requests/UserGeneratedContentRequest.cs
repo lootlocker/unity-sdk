@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
 using LootLockerRequests;
-using enums;
+using LootLockerEnums;
 
-namespace enums
+namespace LootLockerEnums
 {
     public enum FilePurpose { primary_thumbnail, thumbnail, file }
 }
@@ -15,19 +15,6 @@ namespace enums
 
 namespace LootLockerRequests
 {
-    //public class FilePurpose
-    //{
-    //    public string purpose { get; private set; }
-
-    //    private FilePurpose(string purpose)
-    //    {
-    //        this.purpose = purpose;
-    //    }
-
-    //    public static FilePurpose PRIMARY_THUMBNAIL = new FilePurpose("PRIMARY_THUMBNAIL");
-    //    public static FilePurpose THUMBNAIL = new FilePurpose("THUMBNAIL");
-    //    public static FilePurpose FILE = new FilePurpose("FILE");
-    //}
 
     #region Asset Candidate Properties
     public class AssetKVPair
@@ -162,7 +149,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, enums.CallerRole.User);
+            }, true, LootLockerEnums.CallerRole.User);
         }
 
         public static void UpdatingAnAssetCandidate(CreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
@@ -189,7 +176,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, enums.CallerRole.User);
+            }, true, LootLockerEnums.CallerRole.User);
         }
 
         public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
@@ -213,7 +200,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, enums.CallerRole.User);
+            }, true, LootLockerEnums.CallerRole.User);
         }
 
         public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<UserGenerateContentResponse> onComplete)
@@ -237,7 +224,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.User);
         }
 
         public static void ListingAssetCandidates(Action<ListingAssetCandidatesResponse> onComplete)
@@ -259,7 +246,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.User);
         }
 
         public static void AddingFilesToAssetCandidates(AddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<UserGenerateContentResponse> onComplete)
@@ -302,7 +289,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.User);
         }
 
         public static void RemovingFilesFromAssetCandidates(LootLockerGetRequest data, Action<UserGenerateContentResponse> onComplete)
@@ -326,7 +313,7 @@ namespace LootLocker
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.User);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.User);
         }
     }
 }

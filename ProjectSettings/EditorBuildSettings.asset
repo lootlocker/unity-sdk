@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/LootLocker/DemoApp/Scenes/AppScene.unity
+    path: Assets/LootLocker/SampleApp/Scenes/AppScene.unity
     guid: 49a3868c93e9d4c86beb0f20c709ff2d
   - enabled: 1
     path: Assets/LootLocker/Game/Samples/Scenes/NavigationScene.unity

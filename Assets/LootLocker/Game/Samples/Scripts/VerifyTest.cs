@@ -4,59 +4,62 @@ using UnityEngine;
 using LootLocker;
 using LootLockerRequests;
 
-public class VerifyTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public string deviceId;
-    string labelText = "";
-
-    private void OnGUI()
+    public class VerifyTest : MonoBehaviour
     {
+        public string deviceId;
+        string labelText = "";
 
-        GUIStyle centeredTextStyle = new GUIStyle();
-        centeredTextStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUILayout.BeginVertical();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
-            UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
-
-        GUILayout.EndHorizontal();
-
-        deviceId = GUILayout.TextField(deviceId, GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000));
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Verify", GUILayout.ExpandWidth(true)))
+        private void OnGUI()
         {
-            Verify();
+
+            GUIStyle centeredTextStyle = new GUIStyle();
+            centeredTextStyle.alignment = TextAnchor.MiddleCenter;
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
+                UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
+
+            GUILayout.EndHorizontal();
+
+            deviceId = GUILayout.TextField(deviceId, GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000));
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Verify", GUILayout.ExpandWidth(true)))
+            {
+                Verify();
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label(labelText);
+
+            GUILayout.EndVertical();
+
         }
 
-        GUILayout.EndHorizontal();
-
-        GUILayout.Label(labelText);
-
-        GUILayout.EndVertical();
-
-    }
-
-    [ContextMenu("Verify")]
-    public void Verify()
-    {
-
-        LootLockerSDKManager.VerifyID(deviceId, (response) =>
+        [ContextMenu("Verify")]
+        public void Verify()
         {
-            if (response.success)
-            {
-                labelText = "Successful";
-            }
-            else
-            {
-                labelText = "failed: " + response.Error;
-            }
 
-        });
+            LootLockerSDKManager.VerifyID(deviceId, (response) =>
+            {
+                if (response.success)
+                {
+                    labelText = "Successful";
+                }
+                else
+                {
+                    labelText = "failed: " + response.Error;
+                }
 
+            });
+
+        }
     }
 }

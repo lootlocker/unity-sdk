@@ -3,40 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingsScreen : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public ScreenCloser bottomNavigator;
-    public ButtonExtention buttonExtentionEvent;
-    public Button changeClass;
-
-    private void Awake()
+    public class SettingsScreen : MonoBehaviour
     {
-        changeClass.onClick.AddListener(ViewClassSelectScreen);
-    }
+        public ScreenCloser bottomNavigator;
+        public ButtonExtention buttonExtentionEvent;
+        public Button changeClass;
 
-    public void RefreshGameData()
-    {
-        StagesManager.instance.GoToStage(StagesManager.StageID.Home, null);
-        ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
-    }
+        private void Awake()
+        {
+            changeClass.onClick.AddListener(ViewClassSelectScreen);
+        }
 
-    public void ChangePlayer()
-    {
-        StagesManager.instance.GoToStage(StagesManager.StageID.Player, null);
-        ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
-        bottomNavigator?.Close();
+        public void RefreshGameData()
+        {
+            StagesManager.instance.GoToStage(StagesManager.StageID.Home, null);
+            ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
+        }
 
-    }
+        public void ChangePlayer()
+        {
+            StagesManager.instance.GoToStage(StagesManager.StageID.Player, null);
+            ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
+            bottomNavigator?.Close();
 
-    public void Logout()
-    {
-        StagesManager.instance.GoToStage(StagesManager.StageID.App, null);
-        ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
-        bottomNavigator?.Close();
-    }
+        }
 
-    public void ViewClassSelectScreen()
-    {
-        StagesManager.instance.GoToStage(StagesManager.StageID.SwapClass, null);
+        public void Logout()
+        {
+            StagesManager.instance.GoToStage(StagesManager.StageID.App, null);
+            ButtonExtention.buttonClicked?.Invoke(buttonExtentionEvent);
+            bottomNavigator?.Close();
+        }
+
+        public void ViewClassSelectScreen()
+        {
+            StagesManager.instance.GoToStage(StagesManager.StageID.SwapClass, null);
+        }
     }
 }

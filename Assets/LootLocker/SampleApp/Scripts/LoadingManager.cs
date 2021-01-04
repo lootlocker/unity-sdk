@@ -2,38 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LoadingManager : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public static LoadingManager Instance;
-    public Transform spinner;
-    public float spinnerRotateSpeed = 300;
-
-    private void Awake()
+    public class LoadingManager : MonoBehaviour
     {
-        if (Instance == null)
+        public static LoadingManager Instance;
+        public Transform spinner;
+        public float spinnerRotateSpeed = 300;
+
+        private void Awake()
         {
-            Instance = this;
-            DontDestroyOnLoad(this);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(this);
+            }
+            else
+            {
+                Debug.LogError("Found Another" + gameObject.name);
+                Destroy(this.transform.parent.gameObject);
+            }
         }
-        else
+
+        public static void ShowLoadingScreen()
         {
-            Debug.LogError("Found Another" + gameObject.name);
-            Destroy(this.transform.parent.gameObject);
+            Instance.GetComponent<ScreenOpener>()?.Open();
         }
-    }
 
-    public static void ShowLoadingScreen()
-    {
-        Instance.GetComponent<ScreenOpener>()?.Open();
-    }
+        public static void HideLoadingScreen()
+        {
+            Instance.GetComponent<ScreenCloser>()?.Close();
+        }
 
-    public static void HideLoadingScreen()
-    {
-        Instance.GetComponent<ScreenCloser>()?.Close();
-    }
-
-    private void Update()
-    {
-        spinner.Rotate(0, 0, -spinnerRotateSpeed * Time.deltaTime);
+        private void Update()
+        {
+            spinner.Rotate(0, 0, -spinnerRotateSpeed * Time.deltaTime);
+        }
     }
 }

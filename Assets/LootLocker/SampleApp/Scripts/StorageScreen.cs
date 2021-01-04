@@ -3,116 +3,111 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using LootLocker;
 
-public class StorageScreen : MonoBehaviour, IStageOwner
+namespace LootLockerDemoApp
 {
-    public GameObject keyValueElement;
-    public GameObject content;
-    public Button addKey;
-    public InputPopup inputPopup;
-    public Button refresh;
-    [Header("Easy Prefab Setup")]
-    public GameObject backButton;
-    public bool isEasyPrefab;
-
-    public void Awake()
+    public class StorageScreen : MonoBehaviour, IStageOwner
     {
-        addKey.onClick.AddListener(OpenKeysWindow);
-        refresh.onClick.AddListener(Refresh);
-        StartEasyPrefab();
-    }
+        public GameObject keyValueElement;
+        public GameObject content;
+        public Button addKey;
+        public InputPopup inputPopup;
+        public Button refresh;
+        [Header("Easy Prefab Setup")]
+        public GameObject backButton;
+        public bool isEasyPrefab;
 
-    public void StartEasyPrefab()
-    {
-        if (isEasyPrefab)
+        public void Awake()
         {
-            backButton?.SetActive(false);
-            SetUpEasyPrefab();
-            Refresh();
-        }
-    }
-
-    public void SetUpEasyPrefab()
-    {
-        if (TexturesSaver.Instance == null)
-        {
-            GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
-            Instantiate(saver);
+            addKey.onClick.AddListener(OpenKeysWindow);
+            refresh.onClick.AddListener(Refresh);
+            StartEasyPrefab();
         }
 
-        if (LoadingManager.Instance == null)
+        public void StartEasyPrefab()
         {
-            GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
-            Instantiate(loading);
-        }
-
-        if (PopupSystem.Instance == null)
-        {
-            GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
-            Instantiate(popup);
-        }
-    }
-
-    public void Refresh()
-    {
-        LoadingManager.ShowLoadingScreen();
-        foreach (Transform tr in content.transform)
-        {
-            Destroy(tr.gameObject);
-        }
-        LootLockerSDKManager.GetEntirePersistentStorage((response) =>
-        {
-            LoadingManager.HideLoadingScreen();
-            UpdateScreen(response.payload);
-        });
-    }
-
-    public void UpdateScreen(Payload[] payload)
-    {
-        foreach (Transform tr in content.transform)
-        {
-            Destroy(tr.gameObject);
-        }
-        for (int i = 0; i < payload.Length; i++)
-        {
-            GameObject go = Instantiate(keyValueElement, content.transform);
-            KeyValueElements keyValueElements = go?.GetComponent<KeyValueElements>();
-            if (keyValueElements != null)
+            if (isEasyPrefab)
             {
-                keyValueElements.Init(payload[i]);
+                backButton?.SetActive(false);
+                SetUpEasyPrefab();
+                Refresh();
             }
         }
-    }
 
-    public void OpenKeysWindow()
-    {
-        inputPopup.Init(new string[] { "Save" });
-    }
-
-    public void OpenKeyWindow(string key, string value, string[] btns)
-    {
-        inputPopup.Init(key, value, btns);
-    }
-
-    public void UpdateScreenData(IStageData stageData)
-    {
-        GetPersistentStoragResponse response = stageData as GetPersistentStoragResponse;
-        if(response!=null)
+        public void SetUpEasyPrefab()
         {
-            UpdateScreen(response.payload);
-            LoadingManager.HideLoadingScreen();
+            if (TexturesSaver.Instance == null)
+            {
+                GameObject saver = Resources.Load("EasyPrefabsResources/TextureSaver") as GameObject;
+                Instantiate(saver);
+            }
+
+            if (LoadingManager.Instance == null)
+            {
+                GameObject loading = Resources.Load("EasyPrefabsResources/LoadingPrefab") as GameObject;
+                Instantiate(loading);
+            }
+
+            if (PopupSystem.Instance == null)
+            {
+                GameObject popup = Resources.Load("EasyPrefabsResources/PopupPrefab") as GameObject;
+                Instantiate(popup);
+            }
         }
-        else
-        Refresh();
-    }
 
-    void Start()
-    {
+        public void Refresh()
+        {
+            LoadingManager.ShowLoadingScreen();
+            foreach (Transform tr in content.transform)
+            {
+                Destroy(tr.gameObject);
+            }
+            LootLockerSDKManager.GetEntirePersistentStorage((response) =>
+            {
+                LoadingManager.HideLoadingScreen();
+                UpdateScreen(response.payload);
+            });
+        }
 
-    }
+        public void UpdateScreen(Payload[] payload)
+        {
+            foreach (Transform tr in content.transform)
+            {
+                Destroy(tr.gameObject);
+            }
+            for (int i = 0; i < payload.Length; i++)
+            {
+                GameObject go = Instantiate(keyValueElement, content.transform);
+                KeyValueElements keyValueElements = go?.GetComponent<KeyValueElements>();
+                if (keyValueElements != null)
+                {
+                    keyValueElements.Init(payload[i]);
+                }
+            }
+        }
 
-    void Update()
-    {
+        public void OpenKeysWindow()
+        {
+            inputPopup.Init(new string[] { "Save" });
+        }
+
+        public void OpenKeyWindow(string key, string value, string[] btns)
+        {
+            inputPopup.Init(key, value, btns);
+        }
+
+        public void UpdateScreenData(IStageData stageData)
+        {
+            GetPersistentStoragResponse response = stageData as GetPersistentStoragResponse;
+            if (response != null)
+            {
+                UpdateScreen(response.payload);
+                LoadingManager.HideLoadingScreen();
+            }
+            else
+                Refresh();
+        }
 
     }
 }

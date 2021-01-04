@@ -110,7 +110,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
 
             return eventId;
         }
@@ -139,7 +139,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
         public static void DeleteFile(string fileId, Action<DeleteFileResponse> onComplete)
@@ -163,7 +163,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
         public static void UpdateFile(string fileId, UpdateFileRequest request, Action<UpdateFileResponse> onComplete)
@@ -188,7 +188,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
 

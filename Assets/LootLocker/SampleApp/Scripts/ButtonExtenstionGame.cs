@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonExtenstionGame : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public GameObject activeButton;
-    public GameObject inActiveButton;
-
-    public void ToggleButtonState(bool active)
+    public class ButtonExtenstionGame : MonoBehaviour
     {
-        activeButton.SetActive(active);
-        inActiveButton.SetActive(!active);
+        public GameObject activeButton;
+        public GameObject inActiveButton;
+
+        public void ToggleButtonState(bool active)
+        {
+            activeButton.SetActive(active);
+            inActiveButton.SetActive(!active);
+        }
     }
 }

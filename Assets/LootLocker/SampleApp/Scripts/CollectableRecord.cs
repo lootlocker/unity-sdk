@@ -106,123 +106,127 @@ namespace AppDemoLootLockerRequests
 
 }
 
-public class CollectableRecord : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    string itemToCollect;
-    Button button;
-    CollectableImage collectableImage;
-    public Image image;
-    string groupName;
-    string collectableName;
-    string itemName;
-    AppDemoLootLockerRequests.Item item;
-    string url;
 
-    private void Awake()
+    public class CollectableRecord : MonoBehaviour
     {
-        button = GetComponent<Button>();
-        button?.onClick.AddListener(() => OnElementClicked());
-    }
+        string itemToCollect;
+        Button button;
+        CollectableImage collectableImage;
+        public Image image;
+        string groupName;
+        string collectableName;
+        string itemName;
+        AppDemoLootLockerRequests.Item item;
+        string url;
 
-    public void OnElementClicked()
-    {
-        string[] names = itemToCollect.Split('.');
-        Dictionary<string, string> data = new Dictionary<string, string>();
-        data.Add("Collectable", names[0]);
-        data.Add("Group Name", names[1]);
-        data.Add("Item Name", names[2]);
-        string header = "";
-
-        item.url = groupName + "_Active";
-
-        PopupSystem.ShowPopup("Collectable", data, "Collect", () =>
+        private void Awake()
         {
-            LoadingManager.ShowLoadingScreen();
-            LootLockerSDKManager.CollectingAnItem(itemToCollect, (response) =>
+            button = GetComponent<Button>();
+            button?.onClick.AddListener(() => OnElementClicked());
+        }
+
+        public void OnElementClicked()
+        {
+            string[] names = itemToCollect.Split('.');
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("Collectable", names[0]);
+            data.Add("Group Name", names[1]);
+            data.Add("Item Name", names[2]);
+            string header = "";
+
+            item.url = groupName + "_Active";
+
+            PopupSystem.ShowPopup("Collectable", data, "Collect", () =>
             {
-                LoadingManager.HideLoadingScreen();
-                if (response.success)
+                LoadingManager.ShowLoadingScreen();
+                LootLockerSDKManager.CollectingAnItem(itemToCollect, (response) =>
                 {
-                    Debug.Log("Success\n" + response.text);
-                    header = "Success";
-                    data.Clear();
-                    AppDemoLootLockerRequests.CollectingAnItemResponse mainResponse = JsonConvert.DeserializeObject<AppDemoLootLockerRequests.CollectingAnItemResponse>(response.text);
+                    LoadingManager.HideLoadingScreen();
+                    if (response.success)
+                    {
+                        Debug.Log("Success\n" + response.text);
+                        header = "Success";
+                        data.Clear();
+                        AppDemoLootLockerRequests.CollectingAnItemResponse mainResponse = JsonConvert.DeserializeObject<AppDemoLootLockerRequests.CollectingAnItemResponse>(response.text);
 
-                    string[] collectableStrings = itemToCollect.Split('.');
+                        string[] collectableStrings = itemToCollect.Split('.');
 
-                    string collectable = collectableStrings[0];
-                    string group = collectableStrings[1];
-                    string tempItem = collectableStrings[2];
+                        string collectable = collectableStrings[0];
+                        string group = collectableStrings[1];
+                        string tempItem = collectableStrings[2];
 
-                    mainResponse.mainCollectable = mainResponse.collectables?.FirstOrDefault(x => x.name == collectable);
+                        mainResponse.mainCollectable = mainResponse.collectables?.FirstOrDefault(x => x.name == collectable);
 
-                    mainResponse.mainGroup = mainResponse.mainCollectable?.groups?.FirstOrDefault(x => x.name == group);
+                        mainResponse.mainGroup = mainResponse.mainCollectable?.groups?.FirstOrDefault(x => x.name == group);
 
-                    mainResponse.mainItem = mainResponse.mainGroup?.items?.FirstOrDefault(x => x.name == tempItem);
+                        mainResponse.mainItem = mainResponse.mainGroup?.items?.FirstOrDefault(x => x.name == tempItem);
                     //Preparing data to display or error messages we have
                     data.Add("1", "You successfully collected: " + itemToCollect);
-                    PopupSystem.ShowApprovalFailPopUp(header, data, item.url, false, onComplete: () =>
-                     {
-                         ShowRewards(mainResponse.mainItem, mainResponse.mainGroup, mainResponse.mainCollectable);
-                     });
-                    UpdateButtonAppearance(mainResponse.mainItem);
-                }
-                else
-                {
-                    header = "Collection Failed";
-                    data.Clear();
+                        PopupSystem.ShowApprovalFailPopUp(header, data, item.url, false, onComplete: () =>
+                         {
+                             ShowRewards(mainResponse.mainItem, mainResponse.mainGroup, mainResponse.mainCollectable);
+                         });
+                        UpdateButtonAppearance(mainResponse.mainItem);
+                    }
+                    else
+                    {
+                        header = "Collection Failed";
+                        data.Clear();
                     //Preparing data to display or error messages we have
                     data.Add("1", "Collection of item failed");
-                    PopupSystem.ShowApprovalFailPopUp(header, data, item.url, true);
-                    Debug.Log("Failed\n" + response.text);
+                        PopupSystem.ShowApprovalFailPopUp(header, data, item.url, true);
+                        Debug.Log("Failed\n" + response.text);
+                    }
+                });
+            }, groupName + "_Active");
+        }
+
+        public void Init(string collectableName, AppDemoLootLockerRequests.Item item)
+        {
+            itemToCollect = collectableName;
+            string[] names = itemToCollect.Split('.');
+            groupName = names[1];
+            itemName = names[2];
+            UpdateButtonAppearance(item);
+        }
+
+        private void UpdateButtonAppearance(AppDemoLootLockerRequests.Item item)
+        {
+            this.item = item;
+            string sub = item.collected ? "_Active" : "_Inactive";
+            item.url = groupName + sub;
+            item.preview = image;
+            TexturesSaver.QueueForDownload(item);
+            button.interactable = !item.collected;
+        }
+
+        public void ShowRewards(AppDemoLootLockerRequests.Item item, AppDemoLootLockerRequests.Group group, AppDemoLootLockerRequests.Collectable collectable)
+        {
+            if (item.collected)
+            {
+                for (int i = 0; i < item.rewards.Length; i++)
+                {
+                    PopupSystem.ShowScheduledPopup(item.rewards[i]);
                 }
-            });
-        }, groupName + "_Active");
-    }
 
-    public void Init(string collectableName, AppDemoLootLockerRequests.Item item)
-    {
-        itemToCollect = collectableName;
-        string[] names = itemToCollect.Split('.');
-        groupName =  names[1];
-        itemName =  names[2];
-        UpdateButtonAppearance(item);
-    }
-
-    private void UpdateButtonAppearance(AppDemoLootLockerRequests.Item item)
-    {
-        this.item = item;
-        string sub = item.collected ? "_Active" : "_Inactive";
-        item.url = groupName + sub;
-        item.preview = image;
-        TexturesSaver.QueueForDownload(item);
-        button.interactable = !item.collected;
-    }
-
-    public void ShowRewards(AppDemoLootLockerRequests.Item item, AppDemoLootLockerRequests.Group group, AppDemoLootLockerRequests.Collectable collectable)
-    {
-        if (item.collected)
-        {
-            for (int i = 0; i < item.rewards.Length; i++)
-            {
-                PopupSystem.ShowScheduledPopup(item.rewards[i]);
             }
 
-        }
-
-        if (group.completion_percentage >= 100)
-        {
-            for (int i = 0; i < group.rewards.Length; i++)
+            if (group.completion_percentage >= 100)
             {
-                PopupSystem.ShowScheduledPopup(group.rewards[i]);
+                for (int i = 0; i < group.rewards.Length; i++)
+                {
+                    PopupSystem.ShowScheduledPopup(group.rewards[i]);
+                }
             }
-        }
 
-        if (collectable.completion_percentage >= 100)
-        {
-            for (int i = 0; i < collectable.rewards.Length; i++)
+            if (collectable.completion_percentage >= 100)
             {
-                PopupSystem.ShowScheduledPopup(collectable.rewards[i]);
+                for (int i = 0; i < collectable.rewards.Length; i++)
+                {
+                    PopupSystem.ShowScheduledPopup(collectable.rewards[i]);
+                }
             }
         }
     }

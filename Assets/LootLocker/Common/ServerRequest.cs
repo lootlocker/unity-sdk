@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Newtonsoft.Json;
-using enums;
+using LootLockerEnums;
 using LootLockerRequests;
+
 
 // using LootLockerAdmin;
 // using LootLockerAdminRequests;
@@ -92,7 +93,7 @@ namespace LootLocker
         public byte[] upload;
         public string uploadName;
         public string uploadType;
-        public enums.CallerRole adminCall;
+        public LootLockerEnums.CallerRole adminCall;
         public WWWForm form;
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -113,7 +114,7 @@ namespace LootLocker
                  onComplete?.Invoke(response);
              });
         }
-        public static void CallAPI(string endPoint, HTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
+        public static void CallAPI(string endPoint, HTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User)
         {
 #if UNITY_EDITOR
             LootLockerSDKManager.DebugMessage("Caller Type: " + callerRole.ToString());
@@ -124,7 +125,7 @@ namespace LootLocker
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                headers.Add(callerRole == enums.CallerRole.Admin ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
+                headers.Add(callerRole == LootLockerEnums.CallerRole.Admin ? "x-auth-token" : "x-session-token", BaseServerAPI.activeConfig.token);
             }
 
             BaseServerAPI.I.SwitchURL(callerRole);
@@ -134,7 +135,7 @@ namespace LootLocker
                  onComplete?.Invoke(response);
              });
         }
-        public static void UploadFile(string endPoint, HTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
+        public static void UploadFile(string endPoint, HTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -156,7 +157,7 @@ namespace LootLocker
 #endregion
 
 #region ServerRequest constructor
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null, Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User, bool isFileUpload = true)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null, Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User, bool isFileUpload = true)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
@@ -185,7 +186,7 @@ namespace LootLocker
                 LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
@@ -206,7 +207,7 @@ namespace LootLocker
                 LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;
@@ -226,7 +227,7 @@ namespace LootLocker
                 LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, enums.CallerRole callerRole = enums.CallerRole.User)
+        public ServerRequest(string endpoint, HTTPMethod httpMethod = HTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User)
         {
             this.retryCount = 0;
             this.endpoint = endpoint;

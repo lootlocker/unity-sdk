@@ -6,109 +6,114 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System;
-public class ReadMessageScreen : MonoBehaviour, IStageOwner
+using LootLocker;
+
+namespace LootLockerDemoApp
 {
-    public Image messageImage;
-    public Text messageTitle, messageSummary, messageBody;
-    [Header("Easy Prefab Setup")]
-    public bool isEasyPrefab;
-    public GameObject messageScreen;
-
-    public void StartEasyPrefab(IStageData stageData)
+    public class ReadMessageScreen : MonoBehaviour, IStageOwner
     {
-        GetComponent<ScreenOpener>()?.Open();
-        UpdateScreenData(stageData);
-    }
+        public Image messageImage;
+        public Text messageTitle, messageSummary, messageBody;
+        [Header("Easy Prefab Setup")]
+        public bool isEasyPrefab;
+        public GameObject messageScreen;
 
-
-    public void UpdateScreenData(IStageData stageData)
-    {
-        LoadingManager.ShowLoadingScreen();
-        GMMessage selectedMessage = stageData as GMMessage;
-        if (!string.IsNullOrEmpty(selectedMessage.image))
+        public void StartEasyPrefab(IStageData stageData)
         {
-            messageImage.gameObject.SetActive(true);
-            _ = DownloadImage(selectedMessage.image, messageImage);
+            GetComponent<ScreenOpener>()?.Open();
+            UpdateScreenData(stageData);
         }
-        else
+
+
+        public void UpdateScreenData(IStageData stageData)
         {
-            messageImage.gameObject.SetActive(false);
-            LoadingManager.HideLoadingScreen();
-        }
-        messageSummary.text = selectedMessage.summary ?? "";
-        messageBody.text = selectedMessage.body ?? "";
-        messageTitle.text = selectedMessage.title ?? "";
-    }
-
-    #region Image Download Handling
-
-    public async Task<bool> DownloadImage(string MediaUrl, Image targetImage)
-    {
-
-        targetImage.sprite = null;
-
-        try
-        {
-            Texture2D downloadedTexture = await GetRemoteTexture(MediaUrl, targetImage);
-            targetImage.sprite = Sprite.Create(downloadedTexture, new Rect(0, 0, downloadedTexture.width, downloadedTexture.height), Vector2.zero);
-            LoadingManager.HideLoadingScreen();
-            return true;
-        }
-        catch (Exception ex)
-        {
-
-            Debug.LogError("Couldn't download image. " + ex);
-            LoadingManager.HideLoadingScreen();
-            return false;
-        }
-    }
-
-    public void Back()
-    {
-        if (!isEasyPrefab)
-            StagesManager.instance.GoToStage(StagesManager.StageID.Messages, null);
-        else
-        {
-            GetComponent<ScreenCloser>()?.Close();
-            messageScreen?.GetComponent<MessagesScreen>()?.StartEasyPrefab();
-        }
-    }
-
-    public async Task<Texture2D> GetRemoteTexture(string url, Image targetImage)
-    {
-
-        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
-        {
-            //begin request:
-            var asyncOp = www.SendWebRequest();
-
-            //await until it's done: 
-            while (asyncOp.isDone == false)
+            LoadingManager.ShowLoadingScreen();
+            GMMessage selectedMessage = stageData as GMMessage;
+            if (!string.IsNullOrEmpty(selectedMessage.image))
             {
-                await Task.Delay(1000 / 30);//30 hertz
-            }
-
-            //read results:
-            if (www.isNetworkError || www.isHttpError)
-            {
-                //log error:
-#if DEBUG
-                Debug.Log($"{ www.error }, URL:{ www.url }");
-#endif
-
-                //nothing to return on error:
-                return null;
+                messageImage.gameObject.SetActive(true);
+                _ = DownloadImage(selectedMessage.image, messageImage);
             }
             else
             {
-                //return valid results:
-                return DownloadHandlerTexture.GetContent(www);
+                messageImage.gameObject.SetActive(false);
+                LoadingManager.HideLoadingScreen();
+            }
+            messageSummary.text = selectedMessage.summary ?? "";
+            messageBody.text = selectedMessage.body ?? "";
+            messageTitle.text = selectedMessage.title ?? "";
+        }
+
+        #region Image Download Handling
+
+        public async Task<bool> DownloadImage(string MediaUrl, Image targetImage)
+        {
+
+            targetImage.sprite = null;
+
+            try
+            {
+                Texture2D downloadedTexture = await GetRemoteTexture(MediaUrl, targetImage);
+                targetImage.sprite = Sprite.Create(downloadedTexture, new Rect(0, 0, downloadedTexture.width, downloadedTexture.height), Vector2.zero);
+                LoadingManager.HideLoadingScreen();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                Debug.LogError("Couldn't download image. " + ex);
+                LoadingManager.HideLoadingScreen();
+                return false;
             }
         }
 
+        public void Back()
+        {
+            if (!isEasyPrefab)
+                StagesManager.instance.GoToStage(StagesManager.StageID.Messages, null);
+            else
+            {
+                GetComponent<ScreenCloser>()?.Close();
+                messageScreen?.GetComponent<MessagesScreen>()?.StartEasyPrefab();
+            }
+        }
+
+        public async Task<Texture2D> GetRemoteTexture(string url, Image targetImage)
+        {
+
+            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+            {
+                //begin request:
+                var asyncOp = www.SendWebRequest();
+
+                //await until it's done: 
+                while (asyncOp.isDone == false)
+                {
+                    await Task.Delay(1000 / 30);//30 hertz
+                }
+
+                //read results:
+                if (www.isNetworkError || www.isHttpError)
+                {
+                    //log error:
+#if DEBUG
+                    Debug.Log($"{ www.error }, URL:{ www.url }");
+#endif
+
+                    //nothing to return on error:
+                    return null;
+                }
+                else
+                {
+                    //return valid results:
+                    return DownloadHandlerTexture.GetContent(www);
+                }
+            }
+
+        }
+
+
+        #endregion
+
     }
-
-
-    #endregion
-
 }

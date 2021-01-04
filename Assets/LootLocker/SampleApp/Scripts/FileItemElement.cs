@@ -4,21 +4,24 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using LootLocker;
 
-public class FileItemElement : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public Image preview;
-    public Text text;
-    //private Asset asset;
-
-    public void Init(InventoryAssetResponse.DemoAppAsset asset)
+    public class FileItemElement : MonoBehaviour
     {
-        //this.asset = asset;
-        if (asset != null)
-        {
-            text.text = asset.name;
-            asset.preview = preview;
+        public Image preview;
+        public Text text;
+        //private Asset asset;
 
+        public void Init(InventoryAssetResponse.DemoAppAsset asset)
+        {
+            //this.asset = asset;
+            if (asset != null)
+            {
+                text.text = asset.name;
+                asset.preview = preview;
+
+            }
+            TexturesSaver.QueueForDownload(asset);
         }
-        TexturesSaver.QueueForDownload(asset);
     }
 }

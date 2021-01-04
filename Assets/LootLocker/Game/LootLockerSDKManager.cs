@@ -7,7 +7,7 @@ using LootLocker;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
-using enums;
+using LootLockerEnums;
 
 namespace LootLockerRequests
 {
@@ -366,7 +366,7 @@ namespace LootLockerRequests
             LootLockerAPIManager.GetContext(onComplete);
         }
 
-        public static void GetAssetsOriginal(int assetCount, Action<AssetResponse> onComplete, int? idOfLastAsset = null, Enums.AssetFilter filter =  Enums.AssetFilter.none)
+        public static void GetAssetsOriginal(int assetCount, Action<AssetResponse> onComplete, int? idOfLastAsset = null, LootLockerEnums.AssetFilter filter =  LootLockerEnums.AssetFilter.none)
         {
             if (!CheckInitialized()) return;
             LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter);

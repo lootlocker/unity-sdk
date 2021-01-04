@@ -3,55 +3,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MessagesTest : MonoBehaviour
+namespace LootLockerExample
 {
-
-    public string labelText;
-    private void OnGUI()
+    public class MessagesTest : MonoBehaviour
     {
 
-        GUIStyle centeredTextStyle = new GUIStyle();
-        centeredTextStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUILayout.BeginVertical();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
-            UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
-
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Get Messages", GUILayout.ExpandWidth(true)))
-            GetMessages();
-
-        GUILayout.EndHorizontal();
-
-        GUILayout.Label(labelText);
-
-        GUILayout.EndVertical();
-
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    [ContextMenu("Get Messages")]
-    public void GetMessages()
-    {
-        LootLockerSDKManager.GetMessages((response) =>
+        public string labelText;
+        private void OnGUI()
         {
-            if (response.success)
+
+            GUIStyle centeredTextStyle = new GUIStyle();
+            centeredTextStyle.alignment = TextAnchor.MiddleCenter;
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Back", GUILayout.ExpandWidth(true), GUILayout.MaxWidth(1000)))
+                UnityEngine.SceneManagement.SceneManager.LoadScene("NavigationScene");
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Get Messages", GUILayout.ExpandWidth(true)))
+                GetMessages();
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label(labelText);
+
+            GUILayout.EndVertical();
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        [ContextMenu("Get Messages")]
+        public void GetMessages()
+        {
+            LootLockerSDKManager.GetMessages((response) =>
             {
-                labelText = "Successfully got messages:\n" + response.text;
-            }
-            else
-            {
-                labelText = "failed to get messages :\n" + response.Error;
-            }
-        });
+                if (response.success)
+                {
+                    labelText = "Successfully got messages:\n" + response.text;
+                }
+                else
+                {
+                    labelText = "failed to get messages :\n" + response.Error;
+                }
+            });
+        }
+
     }
 
 }
-

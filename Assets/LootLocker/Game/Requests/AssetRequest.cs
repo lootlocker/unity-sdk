@@ -60,7 +60,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAssetsOriginal(Action<AssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, Enums.AssetFilter filter = Enums.AssetFilter.none)
+        public static void GetAssetsOriginal(Action<AssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, LootLockerEnums.AssetFilter filter = LootLockerEnums.AssetFilter.none)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetListWithCount;
             string getVariable = string.Format(endPoint.endPoint, assetCount);
@@ -70,28 +70,28 @@ namespace LootLocker
                 endPoint = LootLockerEndPoints.current.gettingAssetListWithAfterAndCount;
                 getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString());
             }
-            else if (idOfLastAsset != null && assetCount > 0 && filter!= Enums.AssetFilter.none)
+            else if (idOfLastAsset != null && assetCount > 0 && filter!= LootLockerEnums.AssetFilter.none)
             {
                 endPoint = LootLockerEndPoints.current.gettingAssetListOriginal;
                 string filterString = "";
                 switch(filter)
                 {
-                    case Enums.AssetFilter.purchasable:
-                        filterString = Enums.AssetFilter.purchasable.ToString();
+                    case LootLockerEnums.AssetFilter.purchasable:
+                        filterString = LootLockerEnums.AssetFilter.purchasable.ToString();
                         break;
-                    case Enums.AssetFilter.nonpurchasable:
+                    case LootLockerEnums.AssetFilter.nonpurchasable:
                         filterString = "!purchasable";
                         break;
-                    case Enums.AssetFilter.rentable:
-                        filterString = Enums.AssetFilter.rentable.ToString();
+                    case LootLockerEnums.AssetFilter.rentable:
+                        filterString = LootLockerEnums.AssetFilter.rentable.ToString();
                         break;
-                    case Enums.AssetFilter.nonrentable:
+                    case LootLockerEnums.AssetFilter.nonrentable:
                         filterString = "!rentable";
                         break;
-                    case Enums.AssetFilter.popular:
-                        filterString = Enums.AssetFilter.popular.ToString();
+                    case LootLockerEnums.AssetFilter.popular:
+                        filterString = LootLockerEnums.AssetFilter.popular.ToString();
                         break;
-                    case Enums.AssetFilter.nonpopular:
+                    case LootLockerEnums.AssetFilter.nonpopular:
                         filterString = "!popular";
                         break;
                 }

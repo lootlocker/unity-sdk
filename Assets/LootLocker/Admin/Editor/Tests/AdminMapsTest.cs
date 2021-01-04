@@ -5,75 +5,78 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class AdminMapsTest : MonoBehaviour
+namespace LootLockerAdmin
 {
-
-    [Header("Getting All Maps To A Game")]
-    public int gameIDToGetMaps;
-
-
-    [Header("Creating Maps")]
-    [Header("---------------------------")]
-
-    [SerializeField]
-    public CreatingMapsRequest map;
-
-    public bool includeAssetID, includeSpawnPoints;
-
-    [Header("Updating Maps")]
-    [Header("---------------------------")]
-    public int mapID;
-    public CreatingMapsRequest updatedMap;
-
-    [ContextMenu("GettingAllMapsToAGame")]
-    public void GettingAllMapsToAGAme()
-    {
-        LootLockerSDKAdminManager.GettingAllMapsToAGame(gameIDToGetMaps, (response) =>
-        {
-            if (response.success)
-            {
-                Debug.LogError("Successful got all maps: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to get all maps: " + response.Error);
-            }
-        });
-    }
-
-    [ContextMenu("CreatingMaps")]
-    public void CreatingMaps()
+    public class AdminMapsTest : MonoBehaviour
     {
 
-        LootLockerSDKAdminManager.CreatingMaps(map, includeAssetID, includeSpawnPoints, (response) =>
-        {
-            if (response.success)
-            {
-                Debug.LogError("Successful created map: " + response.text);
-            }
-            else
-            {
-                Debug.LogError("failed to create map: " + response.Error);
-            }
-        });
-    }
+        [Header("Getting All Maps To A Game")]
+        public int gameIDToGetMaps;
 
-    [ContextMenu("UpdatingMaps")]
-    public void UpdatingMaps()
-    {
 
-        LootLockerSDKAdminManager.UpdatingMaps(updatedMap, mapID, (response) =>
+        [Header("Creating Maps")]
+        [Header("---------------------------")]
+
+        [SerializeField]
+        public CreatingMapsRequest map;
+
+        public bool includeAssetID, includeSpawnPoints;
+
+        [Header("Updating Maps")]
+        [Header("---------------------------")]
+        public int mapID;
+        public CreatingMapsRequest updatedMap;
+
+        [ContextMenu("GettingAllMapsToAGame")]
+        public void GettingAllMapsToAGAme()
         {
-            if (response.success)
+            LootLockerSDKAdminManager.GettingAllMapsToAGame(gameIDToGetMaps, (response) =>
             {
-                Debug.LogError("Successful updated map: " + response.text);
-            }
-            else
+                if (response.success)
+                {
+                    Debug.LogError("Successful got all maps: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to get all maps: " + response.Error);
+                }
+            });
+        }
+
+        [ContextMenu("CreatingMaps")]
+        public void CreatingMaps()
+        {
+
+            LootLockerSDKAdminManager.CreatingMaps(map, includeAssetID, includeSpawnPoints, (response) =>
             {
-                Debug.LogError("failed to update map: " + response.Error);
-            }
-        });
+                if (response.success)
+                {
+                    Debug.LogError("Successful created map: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to create map: " + response.Error);
+                }
+            });
+        }
+
+        [ContextMenu("UpdatingMaps")]
+        public void UpdatingMaps()
+        {
+
+            LootLockerSDKAdminManager.UpdatingMaps(updatedMap, mapID, (response) =>
+            {
+                if (response.success)
+                {
+                    Debug.LogError("Successful updated map: " + response.text);
+                }
+                else
+                {
+                    Debug.LogError("failed to update map: " + response.Error);
+                }
+            });
+        }
+
     }
 
 }
-

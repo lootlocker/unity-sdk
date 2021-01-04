@@ -1,10 +1,10 @@
 ﻿using LootLockerAdmin;
-using LootLockerAdminRequests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using LootLocker;
+using LootLockerDemoApp;
 
 namespace LootLockerRequests
 {

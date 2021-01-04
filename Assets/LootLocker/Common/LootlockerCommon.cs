@@ -7,7 +7,7 @@ using LootLocker;
 using System.Linq;
 using UnityEngine.UI;
 
-namespace Enums
+namespace LootLockerEnums
 {
     public enum AssetFilter { purchasable , nonpurchasable , rentable, nonrentable, popular , nonpopular, none }
 }

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AppManager : MonoBehaviour
+namespace LootLockerDemoApp
 {
+    public class AppManager : MonoBehaviour
+    {
 
-    public static int activeOrganisationID, activeGameID;
+        public static int activeOrganisationID, activeGameID;
 
+    }
 }

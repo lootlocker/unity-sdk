@@ -7,68 +7,71 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class OnItemClickedEvent : UnityEvent<ItemElement> { }
-public class ItemElement : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public static OnItemClickedEvent onElementClicked = new OnItemClickedEvent();
-    ItemData data;
-    public GameObject activeBorder;
-    Image preview;
-    public InventoryAssetResponse.DemoAppAsset asset;
-    public Color activeColor;
-    public Color selectedColor;
-    public Color inActiveColor;
-
-    private void Awake()
+    public class OnItemClickedEvent : UnityEvent<ItemElement> { }
+    public class ItemElement : MonoBehaviour
     {
-        preview = GetComponent<Image>();
-        onElementClicked.AddListener(OnElementClicked);
-        GetComponent<Button>()?.onClick.AddListener(Select);
-    }
+        public static OnItemClickedEvent onElementClicked = new OnItemClickedEvent();
+        ItemData data;
+        public GameObject activeBorder;
+        Image preview;
+        public InventoryAssetResponse.DemoAppAsset asset;
+        public Color activeColor;
+        public Color selectedColor;
+        public Color inActiveColor;
 
-    public void OnElementClicked(ItemElement itemElement)
-    {
-        if (itemElement == this)
+        private void Awake()
         {
-            GetComponentInParent<StoreScreen>().currentAsset = asset;
-            GetComponentInParent<StoreScreen>()?.SelectItem();
-            activeBorder.GetComponent<Image>().color = selectedColor;
+            preview = GetComponent<Image>();
+            onElementClicked.AddListener(OnElementClicked);
+            GetComponent<Button>()?.onClick.AddListener(Select);
         }
-        else
+
+        public void OnElementClicked(ItemElement itemElement)
         {
+            if (itemElement == this)
+            {
+                GetComponentInParent<StoreScreen>().currentAsset = asset;
+                GetComponentInParent<StoreScreen>()?.SelectItem();
+                activeBorder.GetComponent<Image>().color = selectedColor;
+            }
+            else
+            {
+                activeBorder.GetComponent<Image>().color = inActiveColor;
+                //Inventory inventory = data as Inventory;
+                //if (inventory != null)
+                //{
+                //    activeBorder.GetComponent<Image>().color = Color.blue;
+                //    activeBorder.SetActive((bool)inventory.rental.is_active);
+                //}
+            }
+        }
+
+        public void Init(ItemData data)
+        {
+            this.data = data;
+            asset = data as InventoryAssetResponse.DemoAppAsset;
+            InventoryAssetResponse.Inventory inventory = data as InventoryAssetResponse.Inventory;
+            if (asset == null && inventory != null)
+                asset = inventory.asset;
+
+            if (asset != null)
+                asset.preview = preview;
+
+            TexturesSaver.QueueForDownload(asset);
             activeBorder.GetComponent<Image>().color = inActiveColor;
-            //Inventory inventory = data as Inventory;
             //if (inventory != null)
             //{
-            //    activeBorder.GetComponent<Image>().color = Color.blue;
             //    activeBorder.SetActive((bool)inventory.rental.is_active);
             //}
+
         }
-    }
 
-    public void Init(ItemData data)
-    {
-        this.data = data;
-        asset = data as InventoryAssetResponse.DemoAppAsset;
-        InventoryAssetResponse.Inventory inventory = data as InventoryAssetResponse.Inventory;
-        if (asset == null && inventory != null)
-            asset = inventory.asset;
-
-        if (asset != null)
-            asset.preview = preview;
-
-        TexturesSaver.QueueForDownload(asset);
-         activeBorder.GetComponent<Image>().color = inActiveColor;
-        //if (inventory != null)
-        //{
-        //    activeBorder.SetActive((bool)inventory.rental.is_active);
-        //}
+        public void Select()
+        {
+            onElementClicked?.Invoke(this);
+        }
 
     }
-
-    public void Select()
-    {
-        onElementClicked?.Invoke(this);
-    }
-
 }

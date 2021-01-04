@@ -1,137 +1,140 @@
-﻿using enums;
+﻿using LootLockerEnums;
 using LootLocker;
 using LootLockerRequests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UserGeneratedTest : MonoBehaviour
+namespace LootLockerExample
 {
-    public string assetName = "fgehgbrfg";
-    public int assetId;
-    public bool sendContextId;
-    public string filePath;
-    public string fileName;
-    public enums.FilePurpose filePurpose;
-    public int fileId;
-    public bool markAssetAsComplete = true;
-
-    [ContextMenu("CreatingAnAssetCandidate")]
-    public void CreatingAnAssetCandidate()
+    public class UserGeneratedTest : MonoBehaviour
     {
+        public string assetName = "fgehgbrfg";
+        public int assetId;
+        public bool sendContextId;
+        public string filePath;
+        public string fileName;
+        public LootLockerEnums.FilePurpose filePurpose;
+        public int fileId;
+        public bool markAssetAsComplete = true;
 
-        LootLockerSDKManager.CreatingAnAssetCandidate(assetName, (response) =>
+        [ContextMenu("CreatingAnAssetCandidate")]
+        public void CreatingAnAssetCandidate()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        }, context_id: sendContextId ? 21 : -1);
-    }
 
-    [ContextMenu("UpdatingAnAssetCandidate")]
-    public void UpdatingAnAssetCandidate()
-    {
+            LootLockerSDKManager.CreatingAnAssetCandidate(assetName, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            }, context_id: sendContextId ? 21 : -1);
+        }
 
-        LootLockerSDKManager.UpdatingAnAssetCandidate(assetId, markAssetAsComplete, (response) =>
-         {
-             if (response.success)
+        [ContextMenu("UpdatingAnAssetCandidate")]
+        public void UpdatingAnAssetCandidate()
+        {
+
+            LootLockerSDKManager.UpdatingAnAssetCandidate(assetId, markAssetAsComplete, (response) =>
              {
-                 LootLockerSDKManager.DebugMessage("Successful");
-             }
-             else
-             {
-                 LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-             }
-         }, name: assetName);
-    }
+                 if (response.success)
+                 {
+                     LootLockerSDKManager.DebugMessage("Successful");
+                 }
+                 else
+                 {
+                     LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                 }
+             }, name: assetName);
+        }
 
-    [ContextMenu("DeletingAnAssetCandidate")]
-    public void DeletingAnAssetCandidate()
-    {
-
-        LootLockerSDKManager.DeletingAnAssetCandidate(assetId, (response) =>
+        [ContextMenu("DeletingAnAssetCandidate")]
+        public void DeletingAnAssetCandidate()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });//GettingASingleAssetCandidate
-    }
 
-    [ContextMenu("GettingAAssetCandidate")]
-    public void GettingASingleAssetCandidate()
-    {
+            LootLockerSDKManager.DeletingAnAssetCandidate(assetId, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });//GettingASingleAssetCandidate
+        }
 
-        LootLockerSDKManager.GettingASingleAssetCandidate(assetId, (response) =>
+        [ContextMenu("GettingAAssetCandidate")]
+        public void GettingASingleAssetCandidate()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful" + response.asset_candidate.asset_id);
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
-            }
-        });
-    }
 
-    [ContextMenu("ListingAssetCandidates")]
-    public void ListingAssetCandidates()
-    {
+            LootLockerSDKManager.GettingASingleAssetCandidate(assetId, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful" + response.asset_candidate.asset_id);
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
 
-        LootLockerSDKManager.ListingAssetCandidates((response) =>
+        [ContextMenu("ListingAssetCandidates")]
+        public void ListingAssetCandidates()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
-    }
 
-    [ContextMenu("AddingFilesToAssetCandidates")]
-    public void AddingFilesToAssetCandidates()
-    {
+            LootLockerSDKManager.ListingAssetCandidates((response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
 
-        LootLockerSDKManager.AddingFilesToAssetCandidates(assetId, filePath, fileName, filePurpose, (response) =>
+        [ContextMenu("AddingFilesToAssetCandidates")]
+        public void AddingFilesToAssetCandidates()
         {
-            if (response.success)
-            {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
-    }
 
-    [ContextMenu("RemovingFilesFromAssetCandidates")]
-    public void RemovingFilesFromAssetCandidates()
-    {
+            LootLockerSDKManager.AddingFilesToAssetCandidates(assetId, filePath, fileName, filePurpose, (response) =>
+            {
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
 
-        LootLockerSDKManager.RemovingFilesFromAssetCandidates(assetId, fileId, (response) =>
+        [ContextMenu("RemovingFilesFromAssetCandidates")]
+        public void RemovingFilesFromAssetCandidates()
         {
-            if (response.success)
+
+            LootLockerSDKManager.RemovingFilesFromAssetCandidates(assetId, fileId, (response) =>
             {
-                LootLockerSDKManager.DebugMessage("Successful");
-            }
-            else
-            {
-                LootLockerSDKManager.DebugMessage("failed: " + response.Error,true);
-            }
-        });
+                if (response.success)
+                {
+                    LootLockerSDKManager.DebugMessage("Successful");
+                }
+                else
+                {
+                    LootLockerSDKManager.DebugMessage("failed: " + response.Error, true);
+                }
+            });
+        }
     }
 }

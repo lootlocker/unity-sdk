@@ -4,25 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class KeyValueElements : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    public InputField key;
-    public InputField value;
-    public Button editBtn;
-
-    void Awake()
+    public class KeyValueElements : MonoBehaviour
     {
-        editBtn?.onClick.AddListener(Edit);
-    }
+        public InputField key;
+        public InputField value;
+        public Button editBtn;
 
-    public void Init(Payload payload)
-    {
-        this.key.text = payload.key;
-        this.value.text = payload.value;
-    }
+        void Awake()
+        {
+            editBtn?.onClick.AddListener(Edit);
+        }
 
-    public void Edit()
-    {
-        GetComponentInParent<StorageScreen>()?.OpenKeyWindow(this.key.text, this.value.text, new string[] { "Edit", "Delete" });
+        public void Init(Payload payload)
+        {
+            this.key.text = payload.key;
+            this.value.text = payload.value;
+        }
+
+        public void Edit()
+        {
+            GetComponentInParent<StorageScreen>()?.OpenKeyWindow(this.key.text, this.value.text, new string[] { "Edit", "Delete" });
+        }
     }
 }

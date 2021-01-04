@@ -5,6 +5,7 @@ using LootLocker;
 using LootLockerAdminRequests;
 using Newtonsoft.Json;
 using System;
+using LootLockerRequests;
 
 namespace LootLockerAdminRequests
 {
@@ -57,7 +58,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, callerRole: enums.CallerRole.Admin);
+            }, true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
     }

@@ -3,28 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
-public class ScreenOpener : MonoBehaviour
+namespace LootLockerDemoApp
 {
-    private CanvasGroup canvasGroup;
-    private void Awake()
+    public class ScreenOpener : MonoBehaviour
     {
-        canvasGroup = GetComponent<CanvasGroup>();
-    }
-
-    [ContextMenu("TestOpenMenu")]
-    public void Open()
-    {
-        Open(null);
-    }
-    public void Open(Action onOpen = null)
-    {
-        if (canvasGroup == null)
+        private CanvasGroup canvasGroup;
+        private void Awake()
+        {
             canvasGroup = GetComponent<CanvasGroup>();
+        }
 
-        canvasGroup.alpha = 1;
-        onOpen?.Invoke();
-        canvasGroup.interactable = canvasGroup.blocksRaycasts = true;
+        [ContextMenu("TestOpenMenu")]
+        public void Open()
+        {
+            Open(null);
+        }
+        public void Open(Action onOpen = null)
+        {
+            if (canvasGroup == null)
+                canvasGroup = GetComponent<CanvasGroup>();
+
+            canvasGroup.alpha = 1;
+            onOpen?.Invoke();
+            canvasGroup.interactable = canvasGroup.blocksRaycasts = true;
+        }
+
     }
-
 }

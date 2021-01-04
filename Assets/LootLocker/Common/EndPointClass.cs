@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class EndPointClass
+namespace LootLocker
 {
-    public string endPoint;
-    public HTTPMethod httpMethod;
+    [System.Serializable]
+    public class EndPointClass
+    {
+        public string endPoint;
+        public HTTPMethod httpMethod;
+    }
 }

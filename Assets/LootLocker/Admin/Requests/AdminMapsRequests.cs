@@ -7,6 +7,7 @@ using LootLockerAdminRequests;
 using Newtonsoft.Json;
 using System;
 using Newtonsoft.Json.Linq;
+using LootLockerRequests;
 
 namespace LootLockerAdminRequests
 {
@@ -117,7 +118,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
 
         }
 
@@ -153,7 +154,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
         public static void UpdatingMaps(LootLockerGetRequest lootLockerGetRequest, CreatingMapsRequest data, Action<CreatingMapsResponse> onComplete)
@@ -184,7 +185,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: enums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
         }
 
 

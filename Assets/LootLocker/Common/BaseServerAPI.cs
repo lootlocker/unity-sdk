@@ -10,7 +10,7 @@ using UnityEngine.Events;
 using System.Net;
 using LootLockerRequests;
 
-namespace enums
+namespace LootLockerEnums
 {
     public enum CallerRole { User, Admin, Player };
 }
@@ -35,19 +35,19 @@ namespace LootLocker
         public static string SERVER_URL;
 
 
-        static enums.CallerRole callerRole = enums.CallerRole.User;
+        static LootLockerEnums.CallerRole callerRole = LootLockerEnums.CallerRole.User;
 
-        public void SwitchURL(enums.CallerRole mainCallerRole)
+        public void SwitchURL(LootLockerEnums.CallerRole mainCallerRole)
         {
             switch (mainCallerRole)
             {
-                case enums.CallerRole.Admin:
+                case LootLockerEnums.CallerRole.Admin:
                     SERVER_URL = activeConfig.adminUrl;
                     break;
-                case enums.CallerRole.User:
+                case LootLockerEnums.CallerRole.User:
                     SERVER_URL = activeConfig.userUrl;
                     break;
-                case enums.CallerRole.Player:
+                case LootLockerEnums.CallerRole.Player:
                     SERVER_URL = activeConfig.playerUrl;
                     break;
                 default:
