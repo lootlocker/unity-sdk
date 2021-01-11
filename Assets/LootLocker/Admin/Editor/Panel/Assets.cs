@@ -2,18 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {
-        LootLockerAdminRequests.Context[] Contexts;
+        LootLocker.Admin.Requests.LootLockerContext[] Contexts;
         string[] ContextNames;
         int AssetContextIndex;
 
@@ -131,7 +131,7 @@ namespace LootLockerAdmin
 
         void StartCreateAsset()
         {
-            activeAsset = new Asset() { name = "untitleted", context = ContextNames[0] };
+            activeAsset = new LootLockerCommonAsset() { name = "untitleted", context = ContextNames[0] };
             currentView = View.CreateAsset;
             SelectAssetBase();
         }
@@ -429,7 +429,7 @@ namespace LootLockerAdmin
 
                 if (GUILayout.Button(create ? "Create" : "Update", GUILayout.Height(50)))
                 {
-                    var request = new CreateAssetRequest() { name = activeAsset.name, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
+                    var request = new LootLockerCreateAssetRequest() { name = activeAsset.name, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
 
                     LootLockerSDKAdminManager.CreateAsset(request, (response) =>
                     {

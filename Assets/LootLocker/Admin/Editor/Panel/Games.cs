@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {
@@ -249,7 +249,7 @@ namespace LootLockerAdmin
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Create", GUILayout.Height(40)))
             {
-                CreatingAGameRequest cagr = new CreatingAGameRequest
+                LootLockerCreatingAGameRequest cagr = new LootLockerCreatingAGameRequest
                 {
                     name = CreateGame_gameName,
                     sandbox_mode = CreateGame_sandboxMode,
@@ -270,7 +270,7 @@ namespace LootLockerAdmin
 
         }
 
-        public void CreateGame(CreatingAGameRequest gameToCreate)
+        public void CreateGame(LootLockerCreatingAGameRequest gameToCreate)
         {
 
             LootLockerSDKAdminManager.CreatingAGame(gameToCreate.name, gameToCreate.steam_app_id, gameToCreate.sandbox_mode, gameToCreate.organisation_id, gameToCreate.demo, (response) =>

@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace LootLockerDemoApp
         public ElementSprites[] elementSprites;
         public enum MessageState { Unread, Read };
 
-        public void InitMessage(GMMessage message)
+        public void InitMessage(LootLockerGMMessage message)
         {
 
             Fill(message._new ? MessageState.Unread : MessageState.Read, message.summary);

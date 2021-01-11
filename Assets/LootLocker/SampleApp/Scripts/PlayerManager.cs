@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class CreatePlayerRequest : IStageData
+    public class CreatePlayerRequest : ILootLockerStageData
     {
         public string playerName;
     }
 
-    public class PlayerManager : MonoBehaviour, IStageOwner
+    public class PlayerManager : MonoBehaviour, ILootLockerStageOwner
     {
 
         [Header("Screens")]
@@ -70,7 +70,7 @@ namespace LootLockerDemoApp
             }
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             ListPlayers();
         }
@@ -208,7 +208,7 @@ namespace LootLockerDemoApp
     public class LocalPlayer
     {
         public string playerName, uniqueID;
-        public Character characterClass;
+        public LootLockerCharacter characterClass;
 
     }
 }

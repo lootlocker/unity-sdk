@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
 
     #region GetMessages
 
-    public class GetMessagesResponse : LootLockerResponse
+    public class LootLockerGetMessagesResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public GMMessage[] messages { get; set; }
+        public LootLockerGMMessage[] messages { get; set; }
     }
 
-    public class GMMessage:IStageData
+    public class LootLockerGMMessage:ILootLockerStageData
     {
         public string title { get; set; }
         public string published_at { get; set; }
@@ -40,16 +40,16 @@ namespace LootLocker
     public partial class LootLockerAPIManager
     {
 
-        public static void GetMessages(Action<GetMessagesResponse> onComplete)
+        public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getMessages;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
             {
-                GetMessagesResponse response = new GetMessagesResponse();
+                LootLockerGetMessagesResponse response = new LootLockerGetMessagesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetMessagesResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetMessagesResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

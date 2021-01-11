@@ -1,5 +1,5 @@
 ﻿using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

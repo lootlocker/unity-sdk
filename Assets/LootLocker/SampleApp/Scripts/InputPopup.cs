@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -9,9 +9,9 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class DemoAppGetPersistentStoragResponse : GetPersistentStoragResponse, IStageData
+    public class DemoAppGetPersistentStoragResponse : LootLockerGetPersistentStoragResponse, ILootLockerStageData
     {
-        public override Payload[] payload { get; set; }
+        public override LootLockerPayload[] payload { get; set; }
     }
 
     public class InputPopup : MonoBehaviour

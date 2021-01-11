@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using LootLockerRequests;
+using LootLocker.Requests;
 using LootLocker;
 using System.Linq;
 using Newtonsoft.Json;
 
 namespace LootLockerDemoApp
 {
-    public class StoreScreen : MonoBehaviour, IStageOwner
+    public class StoreScreen : MonoBehaviour, ILootLockerStageOwner
     {
         [Header("Store")]
         public Transform parent;
@@ -167,7 +167,7 @@ namespace LootLockerDemoApp
             }, currentAsset.url);
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             ViewStore();
         }

@@ -6,21 +6,21 @@ using UnityEngine.UI;
 
 namespace LootLocker
 {
-    public interface IStageOwner
+    public interface ILootLockerStageOwner
     {
-        void UpdateScreenData(IStageData stageData);
+        void UpdateScreenData(ILootLockerStageData stageData);
     }
 
-    public interface IStageData
+    public interface ILootLockerStageData
     {
 
     }
 
-    public interface ItemData
+    public interface ILootLockertemData
     {
     }
 
-    public interface IScreenShotOwner
+    public interface ILootLockerScreenShotOwner
     {
         string url { get; }
         void SaveTexture(Sprite texture2D);
@@ -29,7 +29,7 @@ namespace LootLocker
 
     }
 
-    public interface IPopupData
+    public interface ILootLockerPopupData
     {
         string header { get; }
         Dictionary<string, string> normalText { get; }
@@ -42,9 +42,9 @@ namespace LootLocker
     }
 }
 
-namespace LootLockerEnums
+namespace LootLocker.LootLockerEnums
 {
-    public enum DownloadState
+    public enum LootLockerDownloadState
     {
         Downloading, Downloaded, Failed
     }

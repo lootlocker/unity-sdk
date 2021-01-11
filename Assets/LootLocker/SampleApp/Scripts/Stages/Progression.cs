@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace LootLockerDemoApp
         public Image xpProgress;
         public Image[] rewards;
 
-        public void UpdateScreen(SessionResponse sessionResponse)
+        public void UpdateScreen(LootLockerSessionResponse sessionResponse)
         {
             firstLevel.text = sessionResponse.level.ToString();
             secondLevel.text = (sessionResponse.level + 1).ToString();

@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {

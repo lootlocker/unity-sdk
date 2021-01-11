@@ -1,11 +1,11 @@
-﻿using LootLockerAdminRequests;
+﻿using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public class AdminMapsTest : MonoBehaviour
     {
@@ -18,14 +18,14 @@ namespace LootLockerAdmin
         [Header("---------------------------")]
 
         [SerializeField]
-        public CreatingMapsRequest map;
+        public LootLockerCreatingMapsRequest map;
 
         public bool includeAssetID, includeSpawnPoints;
 
         [Header("Updating Maps")]
         [Header("---------------------------")]
         public int mapID;
-        public CreatingMapsRequest updatedMap;
+        public LootLockerCreatingMapsRequest updatedMap;
 
         [ContextMenu("GettingAllMapsToAGame")]
         public void GettingAllMapsToAGAme()

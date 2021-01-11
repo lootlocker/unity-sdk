@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using LootLockerRequests;
+using LootLocker.Requests;
 using LootLocker;
 using System.Linq;
 using Newtonsoft.Json;
 
 namespace LootLockerDemoApp
 {
-    public class InventoryScreen : MonoBehaviour, IStageOwner
+    public class InventoryScreen : MonoBehaviour, ILootLockerStageOwner
     {
         [Header("Inventory")]
         public Transform inventoryParent;
@@ -76,7 +76,7 @@ namespace LootLockerDemoApp
                        if (contextResponse.success)
                        {
                            string[] contexts = contextResponse.contexts.Select(x => x.name).ToArray();
-                           Asset[] assets = response.GetAssets();
+                           LootLockerCommonAsset[] assets = response.GetAssets();
                            for (int i = 0; i < contexts.Length; i++)
                            {
                                GameObject contextObject = Instantiate(contextsPrefab, inventoryParent);
@@ -195,7 +195,7 @@ namespace LootLockerDemoApp
         }
 
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             ViewInventory();
         }

@@ -1,5 +1,5 @@
 ﻿using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace AppDemoLootLockerRequests
         public Reward[] rewards { get; set; }
     }
 
-    public class Reward : IPopupData
+    public class Reward : ILootLockerPopupData
     {
         public InventoryAssetResponse.DemoAppAsset asset { get; set; }
         public int asset_variation_id { get; set; }
@@ -52,7 +52,7 @@ namespace AppDemoLootLockerRequests
         public Reward[] rewards { get; set; }
     }
 
-    public class Item : IScreenShotOwner
+    public class Item : ILootLockerScreenShotOwner
     {
         public string name { get; set; }
         public bool collected { get; set; }
@@ -61,7 +61,7 @@ namespace AppDemoLootLockerRequests
         public string url { get; set; }
         public Image preview { get; set; }
         public int downloadAttempts { get; set; }
-        public LootLocker.File[] files { get; set; }
+        public LootLocker.LootLockerFile[] files { get; set; }
         public Sprite texture2D;
 
         public void SaveTexture(Sprite texture2D)

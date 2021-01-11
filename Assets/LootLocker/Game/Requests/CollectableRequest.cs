@@ -2,57 +2,57 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 using UnityEngine.UI;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
 
     #region GettingCollectable
 
-    public class GettingCollectablesResponse : LootLockerResponse
+    public class LootLockerGettingCollectablesResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Collectable[] collectables { get; set; }
+        public LootLockerCollectable[] collectables { get; set; }
     }
 
-    public class Collectable
+    public class LootLockerCollectable
     {
         public string name { get; set; }
-        public Group[] groups { get; set; }
+        public LootLockerGroup[] groups { get; set; }
         public int completion_percentage { get; set; }
-        public Reward[] rewards { get; set; }
+        public LootLockerReward[] rewards { get; set; }
     }
 
-    public class Reward 
+    public class LootLockerReward 
     {
-        public Asset asset { get; set; }
+        public LootLockerCommonAsset asset { get; set; }
         public int asset_variation_id { get; set; }
         public object asset_rental_option_id { get; set; }
     }
 
-    public class Group
+    public class LootLockerGroup
     {
         public string name { get; set; }
         public int completion_percentage { get; set; }
-        public Item[] items { get; set; }
+        public LootLockerItem[] items { get; set; }
         public bool grants_all_rewards { get; set; }
-        public Reward[] rewards { get; set; }
+        public LootLockerReward[] rewards { get; set; }
     }
 
-    public class Item 
+    public class LootLockerItem 
     {
         public string name { get; set; }
         public bool collected { get; set; }
         public bool grants_all_rewards { get; set; }
-        public Reward[] rewards { get; set; }
+        public LootLockerReward[] rewards { get; set; }
         public string url { get; set; }
         public Image preview { get; set; }
         public int downloadAttempts { get; set; }
-        public File[] files { get; set; }
+        public LootLockerFile[] files { get; set; }
 
 
     }
@@ -61,22 +61,22 @@ namespace LootLockerRequests
 
     #region CollectingAnItem
 
-    public class CollectingAnItemRequest
+    public class LootLockerCollectingAnItemRequest
     {
         public string slug { get; set; }
 
     }
 
-    public class CollectingAnItemResponse : LootLockerResponse
+    public class LootLockerCollectingAnItemResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Collectable[] collectables { get; set; }
+        public LootLockerCollectable[] collectables { get; set; }
 
-        public Collectable mainCollectable;
+        public LootLockerCollectable mainCollectable;
 
-        public Group mainGroup;
+        public LootLockerGroup mainGroup;
 
-        public Item mainItem;
+        public LootLockerItem mainItem;
     }
 
 
@@ -91,16 +91,16 @@ namespace LootLocker
     public partial class LootLockerAPIManager
     {
 
-        public static void GettingCollectables(Action<GettingCollectablesResponse> onComplete)
+        public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingCollectables;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
-                GettingCollectablesResponse response = new GettingCollectablesResponse();
+                LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GettingCollectablesResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -114,7 +114,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void CollectingAnItem(CollectingAnItemRequest data, Action<CollectingAnItemResponse> onComplete)
+        public static void CollectingAnItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectingAnItemResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -122,12 +122,12 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.current.collectingAnItem;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                CollectingAnItemResponse response = new CollectingAnItemResponse();
+                LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CollectingAnItemResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
 
                     string[] collectableStrings = data.slug.Split('.');
 

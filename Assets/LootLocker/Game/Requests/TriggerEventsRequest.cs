@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class TriggerAnEventRequest
+    public class LootLockerTriggerAnEventRequest
     {
         public string name { get; set; }
     }
 
-    public class TriggerAnEventResponse : LootLockerResponse
+    public class LootLockerTriggerAnEventResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public bool check_grant_notifications { get; set; }
-        public Xp xp { get; set; }
-        public Level[] levels { get; set; }
+        public LootLockerXp xp { get; set; }
+        public LootLockerLevel[] levels { get; set; }
     }
 
 
-    public class ListingAllTriggersResponse : LootLockerResponse
+    public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public string[] triggers { get; set; }
@@ -39,7 +39,7 @@ namespace LootLocker
         public EndPointClass triggeringAnEvent;
         public EndPointClass listingTriggeredTriggerEvents;
 
-        public static void TriggeringAnEvent(TriggerAnEventRequest data, Action<TriggerAnEventResponse> onComplete)
+        public static void TriggeringAnEvent(LootLockerTriggerAnEventRequest data, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -47,12 +47,12 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.current.triggeringAnEvent;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                TriggerAnEventResponse response = new TriggerAnEventResponse();
+                LootLockerTriggerAnEventResponse response = new LootLockerTriggerAnEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<TriggerAnEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerTriggerAnEventResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -65,17 +65,17 @@ namespace LootLocker
             }, true);
         }
 
-        public static void ListingTriggeredTriggerEvents(Action<ListingAllTriggersResponse> onComplete)
+        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPoints.current.listingTriggeredTriggerEvents;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
-                ListingAllTriggersResponse response = new ListingAllTriggersResponse();
+                LootLockerListingAllTriggersResponse response = new LootLockerListingAllTriggersResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<ListingAllTriggersResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerListingAllTriggersResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

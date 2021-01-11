@@ -29,7 +29,7 @@ namespace LootLockerDemoApp
             instance = this;
         }
 
-        public void GoToStage(GameObject newStageObject, IStageData stageData)
+        public void GoToStage(GameObject newStageObject, ILootLockerStageData stageData)
         {
 
             Stage stage = stages.Find(s => s.stageObject == newStageObject);
@@ -40,7 +40,7 @@ namespace LootLockerDemoApp
                 loopStage.stageObject?.GetComponent<ScreenCloser>()?.Close();
 
             //update the screen with data
-            stage.stageObject.GetComponent<IStageOwner>()?.UpdateScreenData(stageData);
+            stage.stageObject.GetComponent<ILootLockerStageOwner>()?.UpdateScreenData(stageData);
 
             stage.stageObject?.GetComponent<ScreenOpener>()?.Open();
 
@@ -56,12 +56,12 @@ namespace LootLockerDemoApp
             foreach (Stage loopStage in stages)
                 loopStage.stageObject?.GetComponent<ScreenCloser>()?.Close();
             //update the screen with data
-            stage.stageObject.GetComponent<IStageOwner>()?.UpdateScreenData(null);
+            stage.stageObject.GetComponent<ILootLockerStageOwner>()?.UpdateScreenData(null);
             stage.stageObject?.GetComponent<ScreenOpener>()?.Open();
 
         }
 
-        public void GoToStage(StageID newStageID, IStageData stageData)
+        public void GoToStage(StageID newStageID, ILootLockerStageData stageData)
         {
             Stage stage = stages.Find(s => s.stageID == newStageID);
 
@@ -70,7 +70,7 @@ namespace LootLockerDemoApp
             foreach (Stage loopStage in stages)
                 loopStage.stageObject?.GetComponent<ScreenCloser>()?.Close();
             //update the screen with data
-            stage.stageObject?.GetComponent<IStageOwner>()?.UpdateScreenData(stageData);
+            stage.stageObject?.GetComponent<ILootLockerStageOwner>()?.UpdateScreenData(stageData);
             stage.stageObject?.GetComponent<ScreenOpener>()?.Open();
 
         }

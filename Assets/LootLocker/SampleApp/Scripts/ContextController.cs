@@ -1,12 +1,12 @@
 ﻿using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using LootLockerEnums;
+using LootLocker.LootLockerEnums;
 using LootLockerDemoApp;
 
 namespace LootLockerDemoApp
@@ -63,7 +63,7 @@ namespace InventoryAssetResponse
         public object links { get; set; }
     }
 
-    public class DemoAppAsset : LootLocker.Asset, ItemData, IScreenShotOwner, IStageData
+    public class DemoAppAsset : LootLocker.LootLockerCommonAsset, ILootLockertemData, ILootLockerScreenShotOwner, ILootLockerStageData
     {
         public string external_identifiers { get; set; }
         public string url => links?.thumbnail;
@@ -81,8 +81,8 @@ namespace InventoryAssetResponse
             }
             this.texture2D = texture2D;
         }
-        public LootLockerEnums.DownloadState downloadState;
-        public void SetState(DownloadState downloadState)
+        public LootLocker.LootLockerEnums.LootLockerDownloadState downloadState;
+        public void SetState(LootLocker.LootLockerEnums.LootLockerDownloadState downloadState)
         {
             this.downloadState = downloadState;
         }
@@ -121,7 +121,7 @@ namespace InventoryAssetResponse
         public Inventory[] inventory;
 
     }
-    public class Inventory : ItemData
+    public class Inventory : ILootLockertemData
     {
         public int instance_id { get; set; }
         public int? variation_id { get; set; }

@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {
@@ -60,8 +60,8 @@ namespace LootLockerAdmin
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Create New Map", GUILayout.Height(20)))
             {
-                activeMap = new Map();
-                activeMap.spawn_points = new Spawnpoint[0];
+                activeMap = new LootLockerMap();
+                activeMap.spawn_points = new LootLockerSpawnpoint[0];
                 currentView = View.CreateMap;
             }
             EditorGUILayout.EndHorizontal();
@@ -158,7 +158,7 @@ namespace LootLockerAdmin
 
                 if (GUILayout.Button(topButtonText, GUILayout.Height(30)))
                 {
-                    CreatingMapsRequest map = new CreatingMapsRequest();
+                    LootLockerCreatingMapsRequest map = new LootLockerCreatingMapsRequest();
                     map.asset_id = activeMap.asset_id;
                     map.game_id = activeGameID;
                     map.name = mapName;
@@ -244,12 +244,12 @@ namespace LootLockerAdmin
 
                 if (GUILayout.Button("Create new Spawn Point", GUILayout.Height(20)))
                 {
-                    Spawnpoint spawnpoint = new Spawnpoint();
+                    LootLockerSpawnpoint spawnpoint = new LootLockerSpawnpoint();
                     spawnpoint.asset_id = 0;
                     spawnpoint.id = 0;
                     spawnpoint.position = "";
                     spawnpoint.rotation = "";
-                    List<Spawnpoint> sps = activeMap.spawn_points.ToList();
+                    List<LootLockerSpawnpoint> sps = activeMap.spawn_points.ToList();
                     sps.Add(spawnpoint);
                     activeMap.spawn_points = sps.ToArray();
                 }
@@ -267,7 +267,7 @@ namespace LootLockerAdmin
 
                         spawnPointsScrollPos = EditorGUILayout.BeginScrollView(spawnPointsScrollPos, false, true, GUILayout.Height(200));
 
-                        foreach (Spawnpoint sp in activeMap.spawn_points)
+                        foreach (LootLockerSpawnpoint sp in activeMap.spawn_points)
                         {
 
                             if (sp == null)
@@ -321,14 +321,14 @@ namespace LootLockerAdmin
 
                             if (GUILayout.Button("Create new camera", GUILayout.Height(20)))
                             {
-                                AdminCamera cam = new AdminCamera();
+                                LootLockerAdminCamera cam = new LootLockerAdminCamera();
                                 cam.position = "";
                                 cam.rotation = "";
 
                                 if (sp.cameras == null)
-                                    sp.cameras = new AdminCamera[0];
+                                    sp.cameras = new LootLockerAdminCamera[0];
 
-                                List<AdminCamera> acs = sp.cameras.ToList();
+                                List<LootLockerAdminCamera> acs = sp.cameras.ToList();
                                 acs.Add(cam);
                                 sp.cameras = acs.ToArray();
                             }
@@ -381,7 +381,7 @@ namespace LootLockerAdmin
 
                             if (GUILayout.Button("Delete Spawnpoint"))
                             {
-                                List<Spawnpoint> sps = activeMap.spawn_points.ToList();
+                                List<LootLockerSpawnpoint> sps = activeMap.spawn_points.ToList();
                                 sps.Remove(sp);
                                 activeMap.spawn_points = sps.ToArray();
                             }
@@ -406,7 +406,7 @@ namespace LootLockerAdmin
 
         }
 
-        public void UpdateMap(CreatingMapsRequest updatedMap)
+        public void UpdateMap(LootLockerCreatingMapsRequest updatedMap)
         {
 
             LootLockerSDKAdminManager.UpdatingMaps(updatedMap, activeMap.map_id, (response) =>
@@ -422,7 +422,7 @@ namespace LootLockerAdmin
             });
         }
 
-        public void CreateMap(CreatingMapsRequest mapToCreate, bool includeAssetID, bool includeSpawnPoints)
+        public void CreateMap(LootLockerCreatingMapsRequest mapToCreate, bool includeAssetID, bool includeSpawnPoints)
         {
 
             LootLockerSDKAdminManager.CreatingMaps(mapToCreate, includeAssetID, includeSpawnPoints, (response) =>

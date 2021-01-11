@@ -2,33 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
 using Newtonsoft.Json.Linq;
-using LootLockerRequests;
+using LootLocker.Requests;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
     #region GettingAllMaps
-    public class GettingAllMapsToAGameResponse : LootLockerResponse
+    public class LootLockerGettingAllMapsToAGameResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Map[] maps { get; set; }
+        public LootLockerMap[] maps { get; set; }
     }
 
     [System.Serializable]
-    public class Map
+    public class LootLockerMap
     {
         public int map_id;
         public int asset_id;
-        public Spawnpoint[] spawn_points;
+        public LootLockerSpawnpoint[] spawn_points;
     }
 
     [System.Serializable]
-    public class Spawnpoint
+    public class LootLockerSpawnpoint
     {
         public string guid;
         public int id;
@@ -36,7 +36,7 @@ namespace LootLockerAdminRequests
         public string position;
         public string rotation;
         public string name;
-        public AdminCamera[] cameras;
+        public LootLockerAdminCamera[] cameras;
     }
 
     #endregion
@@ -44,7 +44,7 @@ namespace LootLockerAdminRequests
     #region CreatingMaps
 
     [Serializable]
-    public class AdminCamera
+    public class LootLockerAdminCamera
     {
         public string position;
         public string rotation;
@@ -52,28 +52,28 @@ namespace LootLockerAdminRequests
     }
 
     [Serializable]
-    public class CreatingMapsRequest
+    public class LootLockerCreatingMapsRequest
     {
         public string name;
         public int game_id;
         public int asset_id;
-        public Spawnpoint[] spawn_points;
+        public LootLockerSpawnpoint[] spawn_points;
 
     }
 
     [Serializable]
-    public class Spawn_Points
+    public class LootLockerSpawn_Points
     {
 
         public string guid;
         public string position;
         public string rotation;
         public string name;
-        public AdminCamera[] cameras;
+        public LootLockerAdminCamera[] cameras;
         //public bool include_guid, include_cameras;
     }
 
-    public class CreatingMapsResponse : LootLockerResponse
+    public class LootLockerCreatingMapsResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public string error { get; set; }
@@ -90,25 +90,25 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void GettingAllMapsToAGame(LootLockerGetRequest lootLockerGetRequest, Action<GettingAllMapsToAGameResponse> onComplete)
+        public static void GettingAllMapsToAGame(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerGettingAllMapsToAGameResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.gettingAllMapsToAGame;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                GettingAllMapsToAGameResponse response = new GettingAllMapsToAGameResponse();
+                LootLockerGettingAllMapsToAGameResponse response = new LootLockerGettingAllMapsToAGameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GettingAllMapsToAGameResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGettingAllMapsToAGameResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -118,11 +118,11 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void CreatingMaps(CreatingMapsRequest data, bool sendAssetID, bool sendSpawnPoints, Action<CreatingMapsResponse> onComplete)
+        public static void CreatingMaps(LootLockerCreatingMapsRequest data, bool sendAssetID, bool sendSpawnPoints, Action<LootLockerCreatingMapsResponse> onComplete)
         {
 
             string json = "";
@@ -139,12 +139,12 @@ namespace LootLockerAdmin
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.creatingMaps;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, o.ToString(), (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, o.ToString(), (serverResponse) =>
             {
-                CreatingMapsResponse response = new CreatingMapsResponse();
+                LootLockerCreatingMapsResponse response = new LootLockerCreatingMapsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CreatingMapsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingMapsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -154,10 +154,10 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
-        public static void UpdatingMaps(LootLockerGetRequest lootLockerGetRequest, CreatingMapsRequest data, Action<CreatingMapsResponse> onComplete)
+        public static void UpdatingMaps(LootLockerGetRequest lootLockerGetRequest, LootLockerCreatingMapsRequest data, Action<LootLockerCreatingMapsResponse> onComplete)
         {
 
             string json = "";
@@ -170,12 +170,12 @@ namespace LootLockerAdmin
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, o.ToString(), (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, o.ToString(), (serverResponse) =>
             {
-                CreatingMapsResponse response = new CreatingMapsResponse();
+                LootLockerCreatingMapsResponse response = new LootLockerCreatingMapsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CreatingMapsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingMapsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -185,7 +185,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
 

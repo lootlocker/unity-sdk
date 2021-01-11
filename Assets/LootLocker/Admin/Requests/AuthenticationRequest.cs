@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
     
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void InitialAuthenticationRequest(InitialAuthRequest data, Action<AuthResponse> onComplete)
+        public static void InitialAuthenticationRequest(LootLockerInitialAuthRequest data, Action<LootLockerAuthResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -27,12 +27,12 @@ namespace LootLockerAdmin
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.initialAuthenticationRequest;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = new AuthResponse();
+                var response = new LootLockerAuthResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<AuthResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAuthResponse>(serverResponse.text);
 
                     if (response.mfa_key == null)
                     {
@@ -53,10 +53,10 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: false, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
-        public static void TwoFactorAuthVerification(TwoFactorAuthVerficationRequest data, Action<AuthResponse> onComplete)
+        public static void TwoFactorAuthVerification(LootLockerTwoFactorAuthVerficationRequest data, Action<LootLockerAuthResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -64,12 +64,12 @@ namespace LootLockerAdmin
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.twoFactorAuthenticationCodeVerification;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = new AuthResponse();
+                var response = new LootLockerAuthResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<AuthResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAuthResponse>(serverResponse.text);
                     response.text = serverResponse.text;
 
                     LootLockerAdminConfig.current.UpdateToken(response.auth_token, "");
@@ -82,20 +82,20 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: false, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: false, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
-        public static void SubsequentRequests(Action<SubsequentRequestsResponse> onComplete)
+        public static void SubsequentRequests(Action<LootLockerSubsequentRequestsResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.subsequentRequests;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
             {
-                SubsequentRequestsResponse response = new SubsequentRequestsResponse();
+                LootLockerSubsequentRequestsResponse response = new LootLockerSubsequentRequestsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<SubsequentRequestsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerSubsequentRequestsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -105,7 +105,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
     }

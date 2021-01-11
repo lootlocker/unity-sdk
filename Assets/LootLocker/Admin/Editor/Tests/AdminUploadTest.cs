@@ -1,4 +1,4 @@
-﻿using LootLockerAdminRequests;
+﻿using LootLocker.Admin.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ using System;
 using UnityEngine.Networking;
 using LootLocker;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public class AdminUploadTest : MonoBehaviour
     {
@@ -60,7 +60,7 @@ namespace LootLockerAdmin
         [ContextMenu("LogCurrentToken")]
         public void LogCurrentToken()
         {
-            Debug.Log(LootLocker.BaseServerAPI.activeConfig.token);
+            Debug.Log(LootLocker.LootLockerBaseServerAPI.activeConfig.token);
         }
     }
 }

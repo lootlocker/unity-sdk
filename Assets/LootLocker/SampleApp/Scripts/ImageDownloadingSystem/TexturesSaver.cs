@@ -15,7 +15,7 @@ namespace LootLockerDemoApp
         public string url;
         public Sprite sprite;
         public List<Action<Sprite>> actions;
-        public IScreenShotOwner owner;
+        public ILootLockerScreenShotOwner owner;
     }
     [System.Serializable]
     public class TextureSaveClassDictionary
@@ -28,7 +28,7 @@ namespace LootLockerDemoApp
                 return true;
             return false;
         }
-        public bool Contains(IScreenShotOwner url)
+        public bool Contains(ILootLockerScreenShotOwner url)
         {
             TextureSaveClass textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.owner == url);
             if (textureSaveClass != null)
@@ -46,7 +46,7 @@ namespace LootLockerDemoApp
             if (Contains(textureSaveClass.url))
                 textureSaveClasses.Remove(textureSaveClass);
         }
-        public void Remove(IScreenShotOwner url)
+        public void Remove(ILootLockerScreenShotOwner url)
         {
             TextureSaveClass[] textureSaveClass = textureSaveClasses.Where(x => x.owner == url).ToArray();
 
@@ -72,7 +72,7 @@ namespace LootLockerDemoApp
                 return textureSaveClass;
             return null;
         }
-        public TextureSaveClass GetTextureSaveClass(IScreenShotOwner url)
+        public TextureSaveClass GetTextureSaveClass(ILootLockerScreenShotOwner url)
         {
             TextureSaveClass textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.owner == url);
             if (textureSaveClass != null)
@@ -98,8 +98,8 @@ namespace LootLockerDemoApp
         public TextureSaveClassDictionary screenShotDownloadQueue;
         public TextureSaveClassDictionary downloadedTextures = new TextureSaveClassDictionary();
         public Texture2D defaultTexture;
-        private static List<IScreenShotOwner> previewImageDownloadQueue = new List<IScreenShotOwner>();
-        public List<IScreenShotOwner> previewImageDownloadQueueAll
+        private static List<ILootLockerScreenShotOwner> previewImageDownloadQueue = new List<ILootLockerScreenShotOwner>();
+        public List<ILootLockerScreenShotOwner> previewImageDownloadQueueAll
         {
             get
             {
@@ -120,7 +120,7 @@ namespace LootLockerDemoApp
         {
             Instance = this;
         }
-        public static void QueueForDownload(IScreenShotOwner previewOwner)
+        public static void QueueForDownload(ILootLockerScreenShotOwner previewOwner)
         {
             if (string.IsNullOrEmpty(previewOwner?.url)) return;
             if (Instance.downloadedTextures.Contains(previewOwner.url))
@@ -166,7 +166,7 @@ namespace LootLockerDemoApp
         {
             if (previewImageDownloadQueue.Count > 0)
             {
-                IScreenShotOwner processingObject;
+                ILootLockerScreenShotOwner processingObject;
                 lock (previewImageDownloadQueue)
                 {
                     processingObject = previewImageDownloadQueue[0];

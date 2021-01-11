@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class PopupData : IPopupData, IScreenShotOwner
+    public class PopupData : ILootLockerPopupData, ILootLockerScreenShotOwner
     {
         public string header { get; set; }
         public Dictionary<string, string> normalText { get; set; }
@@ -135,7 +135,7 @@ namespace LootLockerDemoApp
             }
         }
 
-        public static void ShowScheduledPopup(IPopupData data)
+        public static void ShowScheduledPopup(ILootLockerPopupData data)
         {
             PopupData message = new PopupData();
             message.btnAction = data.btnAction;

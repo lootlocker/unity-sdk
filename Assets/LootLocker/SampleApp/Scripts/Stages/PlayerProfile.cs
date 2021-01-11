@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +20,7 @@ namespace LootLockerDemoApp
         public string xpSprite = "Xp";
         public Text message;
 
-        public void UpdateScreen(SessionResponse sessionResponse)
+        public void UpdateScreen(LootLockerSessionResponse sessionResponse)
         {
             if (sessionResponse == null) return;
             username.text = LootLockerConfig.current.playerName;
@@ -47,7 +47,7 @@ namespace LootLockerDemoApp
 
         public void Grant250XP()
         {
-            List<RewardObject> rewardObjects = new List<RewardObject>();
+            List<LootLockerRewardObject> rewardObjects = new List<LootLockerRewardObject>();
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("XP", "250");
             PopupSystem.ShowPopup("XP Reward", data, "Continue", () =>
@@ -84,7 +84,7 @@ namespace LootLockerDemoApp
             }, url: xpSprite);
         }
 
-        private void SelectPlayer(Grant grant, List<RewardObject> rewardObjects = null)
+        private void SelectPlayer(Grant grant, List<LootLockerRewardObject> rewardObjects = null)
         {
             string header = "";
             string normalTextMessage = "";

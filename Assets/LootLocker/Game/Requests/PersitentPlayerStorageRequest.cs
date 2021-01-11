@@ -2,37 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class GetPersistentStoragResponse : LootLockerResponse, IStageData
+    public class LootLockerGetPersistentStoragResponse : LootLockerResponse, ILootLockerStageData
     {
         public bool success { get; set; }
-        public virtual Payload[] payload { get; set; }
+        public virtual LootLockerPayload[] payload { get; set; }
     }
 
-    public class GetPersistentStoragRequest
+    public class LootLockerGetPersistentStoragRequest
     {
-        public List<Payload> payload = new List<Payload>();
+        public List<LootLockerPayload> payload = new List<LootLockerPayload>();
 
-        public void AddToPayload(Payload newPayload)
+        public void AddToPayload(LootLockerPayload newPayload)
         {
             newPayload.order = payload.Count + 1;
             payload.Add(newPayload);
         }
     }
 
-    public class GetPersistentSingle : LootLockerResponse
+    public class LootLockerGetPersistentSingle : LootLockerResponse
 
     {
         public bool success { get; set; }
-        public Payload payload { get; set; }
+        public LootLockerPayload payload { get; set; }
     }
     [Serializable]
-    public class Payload
+    public class LootLockerPayload
     {
         public string key;
         public string value;
@@ -45,16 +45,16 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetEntirePersistentStorage(Action<GetPersistentStoragResponse> onComplete)
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getEntirePersistentStorage;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                GetPersistentStoragResponse response = new GetPersistentStoragResponse();
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetPersistentStoragResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetPersistentStoragResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -68,18 +68,18 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<GetPersistentSingle> onComplete)
+        public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<LootLockerGetPersistentSingle> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getSingleKeyFromPersitenctStorage;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                GetPersistentSingle response = new GetPersistentSingle();
+                LootLockerGetPersistentSingle response = new LootLockerGetPersistentSingle();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetPersistentSingle>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetPersistentSingle>(serverResponse.text);
                     response.text = serverResponse.text;
                     response.success = true;
                     onComplete?.Invoke(response);
@@ -94,7 +94,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void UpdateOrCreateKeyValue(GetPersistentStoragRequest data, Action<GetPersistentStoragResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStoragRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -102,12 +102,12 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.current.updateOrCreateKeyValue;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                GetPersistentStoragResponse response = new GetPersistentStoragResponse();
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetPersistentStoragResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetPersistentStoragResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -121,18 +121,18 @@ namespace LootLocker
             }, true);
         }
 
-        public static void DeleteKeyValue(LootLockerGetRequest data, Action<GetPersistentStoragResponse> onComplete)
+        public static void DeleteKeyValue(LootLockerGetRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValue;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                GetPersistentStoragResponse response = new GetPersistentStoragResponse();
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetPersistentStoragResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetPersistentStoragResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -146,18 +146,18 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetOtherPlayersPublicKeyValuePairs(LootLockerGetRequest data, Action<GetPersistentStoragResponse> onComplete)
+        public static void GetOtherPlayersPublicKeyValuePairs(LootLockerGetRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getOtherPlayersPublicKeyValuePairs;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                GetPersistentStoragResponse response = new GetPersistentStoragResponse();
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetPersistentStoragResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetPersistentStoragResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

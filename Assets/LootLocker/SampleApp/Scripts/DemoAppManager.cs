@@ -1,4 +1,4 @@
-﻿using LootLockerAdmin;
+﻿using LootLocker.Admin;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using UnityEngine;
 using LootLocker;
 using LootLockerDemoApp;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
     public partial class LootLockerSDKManager
     {
@@ -19,10 +19,10 @@ namespace LootLockerRequests
         /// <param name="password"></param>
         /// <param name="onComplete"></param>
 
-        public static void InitialAuthRequest(string email, string password, Action<AuthResponse> onComplete)
+        public static void InitialAuthRequest(string email, string password, Action<LootLockerAuthResponse> onComplete)
         {
             if (!CheckInitialized()) return;
-            var data = new InitialAuthRequest();
+            var data = new LootLockerInitialAuthRequest();
             data.email = email;
             data.password = password;
             DemoAppAdminRequests.InitialAuthenticationRequest(data, onComplete);
@@ -33,18 +33,18 @@ namespace LootLockerRequests
         /// <param name="mfa_key"></param>
         /// <param name="secret"></param>
         /// <param name="onComplete"></param>
-        public static void TwoFactorAuthVerification(string mfa_key, string secret, Action<AuthResponse> onComplete)
+        public static void TwoFactorAuthVerification(string mfa_key, string secret, Action<LootLockerAuthResponse> onComplete)
         {
 
             if (!CheckInitialized()) return;
-            var data = new TwoFactorAuthVerficationRequest();
+            var data = new LootLockerTwoFactorAuthVerficationRequest();
             data.mfa_key = mfa_key;
             data.secret = secret;
             DemoAppAdminRequests.TwoFactorAuthVerification(data, onComplete);
 
         }
 
-        public static void SubsequentRequestsRequest(Action<SubsequentRequestsResponse> onComplete)
+        public static void SubsequentRequestsRequest(Action<LootLockerSubsequentRequestsResponse> onComplete)
         {
 
             if (!CheckInitialized()) return;
@@ -62,12 +62,12 @@ namespace LootLockerRequests
         /// <param name="organisation_id"></param>
         /// <param name="demo"></param>
         /// <param name="onComplete"></param>
-        public static void CreatingAGame(string name, string steam_app_id, bool sandbox_mode, int organisation_id, bool demo, Action<CreatingAGameResponse> onComplete)
+        public static void CreatingAGame(string name, string steam_app_id, bool sandbox_mode, int organisation_id, bool demo, Action<LootLockerCreatingAGameResponse> onComplete)
         {
 
             if (!CheckInitialized()) return;
 
-            CreatingAGameRequest data = new CreatingAGameRequest
+            LootLockerCreatingAGameRequest data = new LootLockerCreatingAGameRequest
             {
 
                 name = name,
@@ -82,7 +82,7 @@ namespace LootLockerRequests
 
         }
 
-        public static void GetDetailedInformationAboutAGame(string id, Action<CreatingAGameResponse> onComplete)
+        public static void GetDetailedInformationAboutAGame(string id, Action<LootLockerCreatingAGameResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
@@ -90,7 +90,7 @@ namespace LootLockerRequests
             DemoAppAdminRequests.GetDetailedInformationAboutAGame(lootLockerGetRequest, onComplete);
         }
 
-        public static void ListTriggers(int game_id, Action<ListTriggersResponse> onComplete)
+        public static void ListTriggers(int game_id, Action<LootLockerListTriggersResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -98,7 +98,7 @@ namespace LootLockerRequests
             DemoAppAdminRequests.ListTriggers(data, onComplete);
         }
 
-        public static void CreateTriggers(CreateTriggersRequest requestData, int game_id, Action<ListTriggersResponse> onComplete)
+        public static void CreateTriggers(LootLockerCreateTriggersRequest requestData, int game_id, Action<LootLockerListTriggersResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();

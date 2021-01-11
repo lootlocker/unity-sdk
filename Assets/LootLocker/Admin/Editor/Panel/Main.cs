@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
 using Unity.EditorCoroutines.Editor;
 using System.Threading.Tasks;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {
@@ -57,16 +57,16 @@ namespace LootLockerAdmin
         bool mfaState;
         string verify2FARecovery;
 
-        static GetAllGamesToTheCurrentUserResponse gamesResponse;
-        static GettingAllMapsToAGameResponse mapsResponse;
-        static GetAssetsResponse assetsResponse;
-        static GetFilesResponse getFilesResponse;
+        static LootLockerGetAllGamesToTheCurrentUserResponse gamesResponse;
+        static LootLockerGettingAllMapsToAGameResponse mapsResponse;
+        static LootLockerGetAssetsResponse assetsResponse;
+        static LootLockerGetFilesResponse getFilesResponse;
 
         public static Action repaint;
 
         private int activeGameID;
-        private Map activeMap;
-        private Asset activeAsset;
+        private LootLockerMap activeMap;
+        private LootLockerCommonAsset activeAsset;
         string CreateGame_gameName;
         bool CreateMap_includeAssetID, CreateMap_includeSpawnPoints, CreateGame_sandboxMode;
         private string mapName;
@@ -634,7 +634,7 @@ namespace LootLockerAdmin
             GUILayout.EndArea();
         }
 
-        void FinalAuth(AuthResponse response)
+        void FinalAuth(LootLockerAuthResponse response)
         {
             if (TwoFATockenTimoutCo != null)
             {
@@ -658,7 +658,7 @@ namespace LootLockerAdmin
 
 }
 
-namespace ViewType
+namespace Lootlocker.Admin.LootLockerViewType
 {
     public enum View
     {

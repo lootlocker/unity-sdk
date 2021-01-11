@@ -71,7 +71,7 @@ namespace LootLocker
         }
         public LootLockerGenericConfig()
         {
-            BaseServerAPI.activeConfig = this;
+            LootLockerBaseServerAPI.activeConfig = this;
         }
 
     }

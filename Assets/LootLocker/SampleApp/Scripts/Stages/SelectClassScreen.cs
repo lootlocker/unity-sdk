@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class SelectClassScreen : MonoBehaviour, IStageOwner
+    public class SelectClassScreen : MonoBehaviour, ILootLockerStageOwner
     {
         public Transform parent;
         public GameObject characterClassPrefab;
         CreatePlayerRequest createPlayerRequest;
-        public Loadout loadout;
-        SessionResponse sessionResponse;
+        public LootLockerLootLockerLoadout loadout;
+        LootLockerSessionResponse sessionResponse;
         Guid guid;
         public Button button;
         Action failResponse;
@@ -54,7 +54,7 @@ namespace LootLockerDemoApp
             {
                 if (response.success)
                 {
-                    foreach (Loadout loadout in response.loadouts)
+                    foreach (LootLockerLootLockerLoadout loadout in response.loadouts)
                     {
                         GameObject selectionButton = Instantiate(characterClassPrefab, parent);
                         selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);
@@ -90,7 +90,7 @@ namespace LootLockerDemoApp
         }
 
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             if (stageData != null)
             {
@@ -109,7 +109,7 @@ namespace LootLockerDemoApp
                     {
                         if (response.success)
                         {
-                            foreach (Loadout loadout in response.loadouts)
+                            foreach (LootLockerLootLockerLoadout loadout in response.loadouts)
                             {
                                 GameObject selectionButton = Instantiate(characterClassPrefab, parent);
                                 selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);
@@ -157,7 +157,7 @@ namespace LootLockerDemoApp
                 {
                     if (response.success)
                     {
-                        foreach (Loadout loadout in response.loadouts)
+                        foreach (LootLockerLootLockerLoadout loadout in response.loadouts)
                         {
                             GameObject selectionButton = Instantiate(characterClassPrefab, parent);
                             selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);

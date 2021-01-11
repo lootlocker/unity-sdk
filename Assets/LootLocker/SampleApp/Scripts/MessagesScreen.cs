@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class MessagesScreen : MonoBehaviour, IStageOwner
+    public class MessagesScreen : MonoBehaviour, ILootLockerStageOwner
     {
         [Header("Messages")]
         public Transform messagesParent;
@@ -67,7 +67,7 @@ namespace LootLockerDemoApp
                     Debug.Log("Successful got all messages: " + response.text);
                     for (int i = 0; i < messagesParent.childCount; i++)
                         Destroy(messagesParent.GetChild(i).gameObject);
-                    foreach (GMMessage message in response.messages)
+                    foreach (LootLockerGMMessage message in response.messages)
                     {
                         GameObject messageObject = Instantiate(messagePrefab, messagesParent);
                         messageObject.GetComponent<MessageElement>().InitMessage(message);
@@ -84,7 +84,7 @@ namespace LootLockerDemoApp
         {
             ListMessages();
         }
-        public void SelectMessage(GMMessage selectedMessage)
+        public void SelectMessage(LootLockerGMMessage selectedMessage)
         {
             if (!readMessages)
                 StagesManager.instance.GoToStage(StagesManager.StageID.ReadMessages, selectedMessage);
@@ -92,7 +92,7 @@ namespace LootLockerDemoApp
                 readMessages?.GetComponent<ReadMessageScreen>()?.StartEasyPrefab(selectedMessage);
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             ViewMessages();
         }

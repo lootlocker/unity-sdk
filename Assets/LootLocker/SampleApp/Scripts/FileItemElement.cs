@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;

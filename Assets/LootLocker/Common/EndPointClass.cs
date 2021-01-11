@@ -9,6 +9,6 @@ namespace LootLocker
     public class EndPointClass
     {
         public string endPoint;
-        public HTTPMethod httpMethod;
+        public LootLockerHTTPMethod httpMethod;
     }
 }

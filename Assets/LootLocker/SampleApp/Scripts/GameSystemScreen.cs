@@ -5,14 +5,14 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class GameSystemScreen : MonoBehaviour, IStageOwner
+    public class GameSystemScreen : MonoBehaviour, ILootLockerStageOwner
     {
         void ListMessages()
         {
         }
 
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
 
         }

@@ -4,12 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class SubmittingACrashLogRequest
+    public class LootLockerSubmittingACrashLogRequest
     {
         public string logFileName { get; set; }
         public string logFilePath { get; set; }
@@ -23,7 +23,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void SubmittingACrashLog(SubmittingACrashLogRequest data, Action<LootLockerResponse> onComplete)
+        public static void SubmittingACrashLog(LootLockerSubmittingACrashLogRequest data, Action<LootLockerResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.current.submittingACrashLog;
 
@@ -40,7 +40,7 @@ namespace LootLocker
                 data.logFileName = defaultFileName;
             }
 
-            ServerRequest.UploadFile(requestEndPoint.endPoint, requestEndPoint.httpMethod, System.IO.File.ReadAllBytes(data.logFilePath), 
+            LootLockerServerRequest.UploadFile(requestEndPoint.endPoint, requestEndPoint.httpMethod, System.IO.File.ReadAllBytes(data.logFilePath), 
                 data.logFileName, "application/zip", formData, onComplete: (serverResponse) =>
             {
                 LootLockerResponse response = new LootLockerResponse();

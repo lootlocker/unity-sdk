@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,12 +23,12 @@ namespace LootLockerDemoApp
         public SpriteName[] classesIcon;
         public GameObject SelectedButton;
         public GameObject UnselectedButton;
-        Loadout loadout;
+        LootLockerLootLockerLoadout loadout;
         Button button;
         public Image[] spriteOwner;
         public Text[] characterName;
 
-        public void Init(Loadout loadout)
+        public void Init(LootLockerLootLockerLoadout loadout)
         {
             this.loadout = loadout;
             Sprite spr = classesIcon.FirstOrDefault(x => x.name == loadout.character.type)?.sprite;

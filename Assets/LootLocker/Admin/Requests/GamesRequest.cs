@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
-using LootLockerRequests;
+using LootLocker.Requests;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
     #region GetAllGamesToTheCurrentUser
 
-    public class GetAllGamesToTheCurrentUserResponse : LootLockerResponse
+    public class LootLockerGetAllGamesToTheCurrentUserResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Game[] games { get; set; }
+        public LootLockerGame[] games { get; set; }
     }
 
     #endregion
@@ -36,7 +36,7 @@ namespace LootLockerAdminRequests
 
     //Exact same response as previous 2 requests " Creating A Game " & " Get Detailed Information About A Game "
 
-    public class UpdatingInformationAboutAGameRequest
+    public class LootLockerUpdatingInformationAboutAGameRequest
     {
 
         public string name, game_key, steam_api_key;
@@ -49,7 +49,7 @@ namespace LootLockerAdminRequests
 
     #region DeletingGames
 
-    public class DeletingGamesResponse : LootLockerResponse
+    public class LootLockerDeletingGamesResponse : LootLockerResponse
     {
 
         public bool success;
@@ -60,23 +60,23 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void GetAllGamesToTheCurrentUser(Action<GetAllGamesToTheCurrentUserResponse> onComplete)
+        public static void GetAllGamesToTheCurrentUser(Action<LootLockerGetAllGamesToTheCurrentUserResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getAllGamesToTheCurrentUser;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
-                GetAllGamesToTheCurrentUserResponse response = new GetAllGamesToTheCurrentUserResponse();
+                LootLockerGetAllGamesToTheCurrentUserResponse response = new LootLockerGetAllGamesToTheCurrentUserResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetAllGamesToTheCurrentUserResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetAllGamesToTheCurrentUserResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -86,11 +86,11 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void CreatingAGame(CreatingAGameRequest data, Action<CreatingAGameResponse> onComplete)
+        public static void CreatingAGame(LootLockerCreatingAGameRequest data, Action<LootLockerCreatingAGameResponse> onComplete)
         {
 
             string json = "";
@@ -99,12 +99,12 @@ namespace LootLockerAdmin
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.creatingAGame;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                CreatingAGameResponse response = new CreatingAGameResponse();
+                LootLockerCreatingAGameResponse response = new LootLockerCreatingAGameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CreatingAGameResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingAGameResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -114,22 +114,22 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
         //Both this and the previous call share the same response
-        public static void GetDetailedInformationAboutAGame(LootLockerGetRequest lootLockerGetRequest, Action<CreatingAGameResponse> onComplete)
+        public static void GetDetailedInformationAboutAGame(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCreatingAGameResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getDetailedInformationAboutAGame;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                CreatingAGameResponse response = new CreatingAGameResponse();
+                LootLockerCreatingAGameResponse response = new LootLockerCreatingAGameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CreatingAGameResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingAGameResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -139,12 +139,12 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
         //Both this and the previous 2 calls share the same response
-        public static void UpdatingInformationAboutAGame(LootLockerGetRequest lootLockerGetRequest, Dictionary<string, object> data, Action<CreatingAGameResponse> onComplete)
+        public static void UpdatingInformationAboutAGame(LootLockerGetRequest lootLockerGetRequest, Dictionary<string, object> data, Action<LootLockerCreatingAGameResponse> onComplete)
         {
 
             string json = "";
@@ -155,12 +155,12 @@ namespace LootLockerAdmin
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
             {
-                CreatingAGameResponse response = new CreatingAGameResponse();
+                LootLockerCreatingAGameResponse response = new LootLockerCreatingAGameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<CreatingAGameResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingAGameResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -170,23 +170,23 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void DeletingGames(LootLockerGetRequest lootLockerGetRequest, Action<DeletingGamesResponse> onComplete)
+        public static void DeletingGames(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerDeletingGamesResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.deletingGames;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                DeletingGamesResponse response = new DeletingGamesResponse();
+                LootLockerDeletingGamesResponse response = new LootLockerDeletingGamesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<DeletingGamesResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerDeletingGamesResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -196,7 +196,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 

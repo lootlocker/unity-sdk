@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class PurchaseRequests
+    public class LootLockerPurchaseRequests
     {
 
     }
 
-    public class NormalPurchaseRequest
+    public class LootLockerNormalPurchaseRequest
     {
         public int asset_id { get; set; }
         public int variation_id { get; set; }
     }
 
-    public class RentalPurchaseRequest
+    public class LootLockerRentalPurchaseRequest
     {
         public int asset_id { get; set; }
         public int variation_id { get; set; }
@@ -27,19 +27,19 @@ namespace LootLockerRequests
     }
 
 
-    public class PurchaseResponse : LootLockerResponse
+    public class LootLockerPurchaseResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public bool overlay { get; set; }
         public int order_id { get; set; }
     }
 
-    public class IosPurchaseVerificationRequest
+    public class LootLockerIosPurchaseVerificationRequest
     {
         public string receipt_data { get; set; }
     }
 
-    public class AndroidPurchaseVerificationRequest
+    public class LootLockerAndroidPurchaseVerificationRequest
     {
         public int asset_id { get; set; }
         public string purchase_token { get; set; }
@@ -51,7 +51,7 @@ namespace LootLocker
  
         public partial class LootLockerAPIManager
         {
-            public static void NormalPurchaseCall(NormalPurchaseRequest[] data, Action<PurchaseResponse> onComplete)
+            public static void NormalPurchaseCall(LootLockerNormalPurchaseRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
             {
                 string json = "";
                 if (data == null) return;
@@ -59,12 +59,12 @@ namespace LootLocker
 
                 EndPointClass endPoint = LootLockerEndPoints.current.normalPurchaseCall;
 
-                ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
-                    PurchaseResponse response = new PurchaseResponse();
+                    LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<PurchaseResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerPurchaseResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }
@@ -77,7 +77,7 @@ namespace LootLocker
                 }, true);
             }
 
-            public static void RentalPurchaseCall(RentalPurchaseRequest data, Action<PurchaseResponse> onComplete)
+            public static void RentalPurchaseCall(LootLockerRentalPurchaseRequest data, Action<LootLockerPurchaseResponse> onComplete)
             {
                 string json = "";
                 if (data == null) return;
@@ -85,12 +85,12 @@ namespace LootLocker
 
                 EndPointClass endPoint = LootLockerEndPoints.current.rentalPurchaseCall;
 
-                ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod,json, (serverResponse) =>
+                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod,json, (serverResponse) =>
                 {
-                    PurchaseResponse response = new PurchaseResponse();
+                    LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<PurchaseResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerPurchaseResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }
@@ -103,7 +103,7 @@ namespace LootLocker
                 }, true);
             }
 
-            public static void IosPurchaseVerification(IosPurchaseVerificationRequest[] data, Action<PurchaseResponse> onComplete)
+            public static void IosPurchaseVerification(LootLockerIosPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
             {
                 string json = "";
                 if (data == null) return;
@@ -111,12 +111,12 @@ namespace LootLocker
 
                 EndPointClass endPoint = LootLockerEndPoints.current.iosPurchaseVerification;
 
-                ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
-                    PurchaseResponse response = new PurchaseResponse();
+                    LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<PurchaseResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerPurchaseResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }
@@ -129,7 +129,7 @@ namespace LootLocker
                 }, true);
             }
 
-            public static void AndroidPurchaseVerification(AndroidPurchaseVerificationRequest[] data, Action<PurchaseResponse> onComplete)
+            public static void AndroidPurchaseVerification(LootLockerAndroidPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
             {
                 string json = "";
                 if (data == null) return;
@@ -137,12 +137,12 @@ namespace LootLocker
 
                 EndPointClass endPoint = LootLockerEndPoints.current.androidPurchaseVerification;
 
-                ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
-                    PurchaseResponse response = new PurchaseResponse();
+                    LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<PurchaseResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerPurchaseResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }
@@ -155,18 +155,18 @@ namespace LootLocker
                 }, true);
             }
 
-            public static void PollingOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<CharacterLoadoutResponse> onComplete)
+            public static void PollingOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
             {
                 EndPointClass endPoint = LootLockerEndPoints.current.pollingOrderStatus;
 
                 string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-                ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+                LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
                 {
-                    CharacterLoadoutResponse response = new CharacterLoadoutResponse();
+                    LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<CharacterLoadoutResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerCharacterLoadoutResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }
@@ -179,18 +179,18 @@ namespace LootLocker
                 }, true);
             }
 
-            public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<CharacterLoadoutResponse> onComplete)
+            public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
             {
                 EndPointClass endPoint = LootLockerEndPoints.current.activatingARentalAsset;
 
                 string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-                ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+                LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
                 {
-                    CharacterLoadoutResponse response = new CharacterLoadoutResponse();
+                    LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                     if (string.IsNullOrEmpty(serverResponse.Error))
                     {
-                        response = JsonConvert.DeserializeObject<CharacterLoadoutResponse>(serverResponse.text);
+                        response = JsonConvert.DeserializeObject<LootLockerCharacterLoadoutResponse>(serverResponse.text);
                         response.text = serverResponse.text;
                         onComplete?.Invoke(response);
                     }

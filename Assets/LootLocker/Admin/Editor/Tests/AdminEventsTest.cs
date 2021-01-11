@@ -1,9 +1,9 @@
-﻿using LootLockerAdminRequests;
+﻿using LootLocker.Admin.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public class AdminEventsTest : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace LootLockerAdmin
             sendDifficultyName, sendDifficultyMultiplier, sendTimeScoreMultiplier, sendGoals,
             sendCheckpoints, sendFilters;
 
-        public CreatingEventRequest eventToCreate;
+        public LootLockerCreatingEventRequest eventToCreate;
 
         [Header("Updating Event")]
         [Header("---------------------------")]
@@ -22,7 +22,7 @@ namespace LootLockerAdmin
         sendDifficultyName_U, sendDifficultyMultiplier_U, sendTimeScoreMultiplier_U, sendGoals_U,
         sendCheckpoints_U, sendFilters_U;
 
-        public CreatingEventRequest UpdatedEventData;
+        public LootLockerCreatingEventRequest UpdatedEventData;
 
         [Header("Getting All Events")]
         [Header("---------------------------")]

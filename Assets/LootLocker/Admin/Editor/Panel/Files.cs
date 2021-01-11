@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using LootLockerAdminRequests;
-using ViewType;
+using LootLocker.Admin.Requests;
+using Lootlocker.Admin.LootLockerViewType;
 using System;
 using LootLocker;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootlockerAdminPanel : EditorWindow
     {
@@ -19,7 +19,7 @@ namespace LootLockerAdmin
         void PopulateFiles()
         {
             Debug.Log("Getting files..");
-            LootLockerSDKAdminManager.GetFiles(LootLockerAdminRequests.FileFilterType.none, (response) =>
+            LootLockerSDKAdminManager.GetFiles(LootLocker.Admin.Requests.LootLockerFileFilterType.none, (response) =>
             {
                 Debug.Log("files on complete");
                 if (response.success)
@@ -108,7 +108,7 @@ namespace LootLockerAdmin
         }
 
         string FileTags;
-        LootLockerAdminRequests.File activeFile;
+        LootLocker.Admin.Requests.LootLockerFile activeFile;
 
         void DrawFilesView()
         {
@@ -161,7 +161,7 @@ namespace LootLockerAdmin
 
             if (GUILayout.Button("Update", GUILayout.Height(50)))
             {
-                LootLockerSDKAdminManager.UpdateFile(activeFile.id.ToString(), new UpdateFileRequest() { tags = FileTags.Split(',') }, (updateResponse) =>
+                LootLockerSDKAdminManager.UpdateFile(activeFile.id.ToString(), new LootLockerUpdateFileRequest() { tags = FileTags.Split(',') }, (updateResponse) =>
                 {
                     if (updateResponse.success)
                     {
@@ -199,7 +199,7 @@ namespace LootLockerAdmin
 
         //attach to some asset
         int FileAssociatedAssetIndex;
-        Asset AllAssets;
+        LootLockerCommonAsset AllAssets;
         string[] AssetsNames;
 
         int assetContextID;
@@ -288,7 +288,7 @@ namespace LootLockerAdmin
 
                     currentView = View.Loading;
 
-                    var request = new CreateAssetRequest() { name = assetName, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
+                    var request = new LootLockerCreateAssetRequest() { name = assetName, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
 
                     LootLockerSDKAdminManager.CreateAsset(request, (response) =>
                     {
@@ -303,7 +303,7 @@ namespace LootLockerAdmin
                                 {
                                     Debug.Log("Successfully got uploaded asset: " + getAssetsResponse.text);
 
-                                    Asset uploadedAsset = getAssetsResponse.assets[0];
+                                    LootLockerCommonAsset uploadedAsset = getAssetsResponse.assets[0];
 
                                     LootLockerSDKAdminManager.UploadAFile(filePath, uploadedAsset.id.ToString(), LootLockerAdminConfig.current.gameID, (uploadResponse) =>
                                     {

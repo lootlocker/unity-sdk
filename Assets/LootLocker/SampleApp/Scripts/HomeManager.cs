@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,11 +10,11 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class HomeManager : MonoBehaviour, IStageOwner
+    public class HomeManager : MonoBehaviour, ILootLockerStageOwner
     {
         public ScreenOpener bottomOpener;
 
-        SessionResponse sessionResponse;
+        LootLockerSessionResponse sessionResponse;
 
         [Header("Easy Prefab Setup")]
         public bool isEasyPrefab;
@@ -74,9 +74,9 @@ namespace LootLockerDemoApp
                 Instantiate(popup);
             }
         }
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
-            SessionResponse sessionResponse = stageData != null ? stageData as SessionResponse : this.sessionResponse;
+            LootLockerSessionResponse sessionResponse = stageData != null ? stageData as LootLockerSessionResponse : this.sessionResponse;
             this.sessionResponse = sessionResponse;
             GetComponentInChildren<PlayerProfile>()?.UpdateScreen(sessionResponse);
             GetComponentInChildren<Progression>()?.UpdateScreen(sessionResponse);

@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +17,7 @@ namespace LootLockerDemoApp
             editBtn?.onClick.AddListener(Edit);
         }
 
-        public void Init(Payload payload)
+        public void Init(LootLockerPayload payload)
         {
             this.key.text = payload.key;
             this.value.text = payload.value;

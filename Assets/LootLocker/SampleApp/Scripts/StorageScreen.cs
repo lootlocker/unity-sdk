@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +7,7 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class StorageScreen : MonoBehaviour, IStageOwner
+    public class StorageScreen : MonoBehaviour, ILootLockerStageOwner
     {
         public GameObject keyValueElement;
         public GameObject content;
@@ -70,7 +70,7 @@ namespace LootLockerDemoApp
             });
         }
 
-        public void UpdateScreen(Payload[] payload)
+        public void UpdateScreen(LootLockerPayload[] payload)
         {
             foreach (Transform tr in content.transform)
             {
@@ -97,9 +97,9 @@ namespace LootLockerDemoApp
             inputPopup.Init(key, value, btns);
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
-            GetPersistentStoragResponse response = stageData as GetPersistentStoragResponse;
+            LootLockerGetPersistentStoragResponse response = stageData as LootLockerGetPersistentStoragResponse;
             if (response != null)
             {
                 UpdateScreen(response.payload);

@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
 using System;
-using LootLockerAdminRequests;
-using LootLockerAdmin;
+using LootLocker.Admin.Requests;
+using LootLocker.Admin;
 using Unity.EditorCoroutines.Editor;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     /// <summary>
     /// made for admin, relay on editing coroutines
     /// </summary>
-    public class AdminServerAPI : BaseServerAPI
+    public class AdminServerAPI : LootLockerBaseServerAPI
     {
         public new static AdminServerAPI I;
 
@@ -20,14 +20,14 @@ namespace LootLockerAdmin
         {
             I = new AdminServerAPI();
 
-            BaseServerAPI.Init(I);
+            LootLockerBaseServerAPI.Init(I);
 
             I.StartCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless;
         }
 
-        protected override void RefreshTokenAndCompleteCall(ServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse)
+        protected override void RefreshTokenAndCompleteCall(LootLockerServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse)
         {
-            var authRequest = new InitialAuthRequest();
+            var authRequest = new LootLockerInitialAuthRequest();
             authRequest.email = activeConfig.email;
             authRequest.password = activeConfig.password;
 

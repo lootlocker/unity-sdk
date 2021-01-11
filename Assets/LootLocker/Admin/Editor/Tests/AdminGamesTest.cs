@@ -1,11 +1,11 @@
-﻿using LootLockerAdminRequests;
+﻿using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public class AdminGamesTest : MonoBehaviour
     {

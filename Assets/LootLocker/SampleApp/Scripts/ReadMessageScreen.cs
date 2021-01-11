@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using LootLocker;
 
 namespace LootLockerDemoApp
 {
-    public class ReadMessageScreen : MonoBehaviour, IStageOwner
+    public class ReadMessageScreen : MonoBehaviour, ILootLockerStageOwner
     {
         public Image messageImage;
         public Text messageTitle, messageSummary, messageBody;
@@ -18,17 +18,17 @@ namespace LootLockerDemoApp
         public bool isEasyPrefab;
         public GameObject messageScreen;
 
-        public void StartEasyPrefab(IStageData stageData)
+        public void StartEasyPrefab(ILootLockerStageData stageData)
         {
             GetComponent<ScreenOpener>()?.Open();
             UpdateScreenData(stageData);
         }
 
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             LoadingManager.ShowLoadingScreen();
-            GMMessage selectedMessage = stageData as GMMessage;
+            LootLockerGMMessage selectedMessage = stageData as LootLockerGMMessage;
             if (!string.IsNullOrEmpty(selectedMessage.image))
             {
                 messageImage.gameObject.SetActive(true);

@@ -4,12 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class Mission
+    public class LootLockerMission
     {
         public int mission_id { get; set; }
         public int asset_id { get; set; }
@@ -19,46 +19,46 @@ namespace LootLockerRequests
         public object difficulty_multiplier { get; set; }
         public string difficulty_color { get; set; }
         public int difficulty_id { get; set; }
-        public Goals goals { get; set; }
-        public Checkpoint[] checkpoints { get; set; }
+        public LootLockerGoals goals { get; set; }
+        public LootLockerCheckpoint[] checkpoints { get; set; }
         public bool player_access { get; set; }
         public string best_goal { get; set; }
     }
 
-    public class FinishingPayload
+    public class LootLockerFinishingPayload
     {
         public string finish_time { get; set; }
         public string finish_score { get; set; }
-        public CheckpointTimes[] checkpoint_times { get; set; }
+        public LootLockerCheckpointTimes[] checkpoint_times { get; set; }
     }
 
-    public class FinishingAMissionRequest : LootLockerGetRequest
+    public class LootLockerFinishingAMissionRequest : LootLockerGetRequest
     {
         public string signature { get; set; }
-        public FinishingPayload payload { get; set; }
+        public LootLockerFinishingPayload payload { get; set; }
     }
 
-    public class GettingAllMissionsResponse : LootLockerResponse
+    public class LootLockerGettingAllMissionsResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Mission[] missions { get; set; }
+        public LootLockerMission[] missions { get; set; }
     }
 
-    public class GettingASingleMissionResponse : LootLockerResponse
+    public class LootLockerGettingASingleMissionResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Mission mission { get; set; }
+        public LootLockerMission mission { get; set; }
     }
 
 
-    public class StartingAMissionResponse : LootLockerResponse
+    public class LootLockerStartingAMissionResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public string signature { get; set; }
     }
 
 
-    public class FinishingAMissionResponse : LootLockerResponse
+    public class LootLockerFinishingAMissionResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public int score { get; set; }
@@ -70,16 +70,16 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GettingAllMissions(Action<GettingAllMissionsResponse> onComplete)
+        public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingAllMissions;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) =>
             {
-                GettingAllMissionsResponse response = new GettingAllMissionsResponse();
+                LootLockerGettingAllMissionsResponse response = new LootLockerGettingAllMissionsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GettingAllMissionsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGettingAllMissionsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -92,18 +92,18 @@ namespace LootLocker
             }, useAuthToken: false);
         }
 
-        public static void GettingASingleMission(LootLockerGetRequest data, Action<GettingASingleMissionResponse> onComplete)
+        public static void GettingASingleMission(LootLockerGetRequest data, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.current.gettingASingleMission;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
             {
-                GettingASingleMissionResponse response = new GettingASingleMissionResponse();
+                LootLockerGettingASingleMissionResponse response = new LootLockerGettingASingleMissionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GettingASingleMissionResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGettingASingleMissionResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -116,18 +116,18 @@ namespace LootLocker
             }, useAuthToken: false);
         }
 
-        public static void StartingAMission(LootLockerGetRequest data, Action<StartingAMissionResponse> onComplete)
+        public static void StartingAMission(LootLockerGetRequest data, Action<LootLockerStartingAMissionResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.current.startingMission;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
             {
-                StartingAMissionResponse response = new StartingAMissionResponse();
+                LootLockerStartingAMissionResponse response = new LootLockerStartingAMissionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<StartingAMissionResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerStartingAMissionResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -140,7 +140,7 @@ namespace LootLocker
             }, useAuthToken: false);
         }
 
-        public static void FinishingAMission(FinishingAMissionRequest data, Action<FinishingAMissionResponse> onComplete)
+        public static void FinishingAMission(LootLockerFinishingAMissionRequest data, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -150,12 +150,12 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                FinishingAMissionResponse response = new FinishingAMissionResponse();
+                LootLockerFinishingAMissionResponse response = new LootLockerFinishingAMissionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<FinishingAMissionResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerFinishingAMissionResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

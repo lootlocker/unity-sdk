@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
 using Newtonsoft.Json.Linq;
-using LootLockerRequests;
+using LootLocker.Requests;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
     #region CreatingEvent
 
     [Serializable]
-    public class CreatingEventRequest
+    public class LootLockerCreatingEventRequest
     {
 
         //Do NOT send CreatingEventRequest class the way it is. Send a dictionary using GetCreatingEventRequestDictionary
@@ -35,14 +35,14 @@ namespace LootLockerAdminRequests
         public decimal difficulty_multiplier;
         public int time_score_multiplier;
         [Serializable]
-        public struct GoalStruct
+        public struct LootLockerGoalStruct
         {
             public string goalName;
-            public Goal goal;
+            public LootLockerGoal goal;
         }
-        public List<GoalStruct> goals;
-        public Checkpoint[] checkpoints;
-        public Filter[] filters;
+        public List<LootLockerGoalStruct> goals;
+        public LootLockerCheckpoint[] checkpoints;
+        public LootLockerFilter[] filters;
 
         public Dictionary<string, object> GetCreatingEventRequestDictionary(bool sendAssetID, bool sendPosterPath, bool sendRounds, bool sendRoundLength,
             bool sendCompletionBonus, bool sendDifficultyName, bool sendDifficultyMultiplier, bool sendTimeScoreMultiplier,
@@ -77,7 +77,7 @@ namespace LootLockerAdminRequests
 
                 Dictionary<string, Dictionary<string, object>> goalsDict = new Dictionary<string, Dictionary<string, object>>();
 
-                foreach (GoalStruct goal in goals)
+                foreach (LootLockerGoalStruct goal in goals)
                     goalsDict.Add(goal.goalName, goal.goal.GetGoalDict());
 
                 dictToConvertToJson.Add("goals", goalsDict);
@@ -89,7 +89,7 @@ namespace LootLockerAdminRequests
 
                 List<Dictionary<string, object>> checkpointsToSend = new List<Dictionary<string, object>>();
 
-                foreach (Checkpoint checkpoint in checkpoints)
+                foreach (LootLockerCheckpoint checkpoint in checkpoints)
                     checkpointsToSend.Add(checkpoint.GetCheckpointDict());
 
                 dictToConvertToJson.Add("checkpoints", checkpointsToSend);
@@ -131,7 +131,7 @@ namespace LootLockerAdminRequests
 
     }
 
-    public class CreatingEventResponse : LootLockerResponse
+    public class LootLockerCreatingEventResponse : LootLockerResponse
     {
 
         public bool success { get; set; }
@@ -143,12 +143,12 @@ namespace LootLockerAdminRequests
 
     #region GettingAllEvents
 
-    public class GettingAllEventsResponse : LootLockerResponse
+    public class LootLockerGettingAllEventsResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Event[] events { get; set; }
+        public LootLockerEvent[] events { get; set; }
     }
-    public class Event
+    public class LootLockerEvent
     {
         public int event_id { get; set; }
         public int asset_id { get; set; }
@@ -157,9 +157,9 @@ namespace LootLockerAdminRequests
         public object difficulty_name { get; set; }
         public object difficulty_multiplier { get; set; }
         public Dictionary<string, Dictionary<string, object>> goals { get; set; }
-        public CheckpointGAE[] checkpoints { get; set; }
+        public LootLockerCheckpointGAE[] checkpoints { get; set; }
     }
-    public class CheckpointGAE
+    public class LootLockerCheckpointGAE
     {
         public string guid { get; set; }
         public int index { get; set; }
@@ -173,7 +173,7 @@ namespace LootLockerAdminRequests
     #region CommonClasses
 
     [Serializable]
-    public class Checkpoint
+    public class LootLockerCheckpoint
     {
 
         public int index;
@@ -208,7 +208,7 @@ namespace LootLockerAdminRequests
     }
 
     [Serializable]
-    public class Filter
+    public class LootLockerFilter
     {
 
         public string name, value;
@@ -216,7 +216,7 @@ namespace LootLockerAdminRequests
     }
 
     [Serializable]
-    public class Goal
+    public class LootLockerGoal
     {
 
         //Required
@@ -225,7 +225,7 @@ namespace LootLockerAdminRequests
         public bool includeAssets;
 
         //Not required
-        public EventAsset[] assets;
+        public LootLockerEventAsset[] assets;
 
         public Dictionary<string, object> GetGoalDict()
         {
@@ -250,7 +250,7 @@ namespace LootLockerAdminRequests
 
     }
     [Serializable]
-    public class EventAsset
+    public class LootLockerEventAsset
     {
         public int asset_id;
         public int asset_variation_id;
@@ -261,13 +261,13 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void CreatingEvent(Dictionary<string, object> requestData, Action<CreatingEventResponse> onComplete)
+        public static void CreatingEvent(Dictionary<string, object> requestData, Action<LootLockerCreatingEventResponse> onComplete)
         {
 
             string json = "";
@@ -276,14 +276,14 @@ namespace LootLockerAdmin
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.creatingEvent;
 
-            ServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                CreatingEventResponse response = new CreatingEventResponse();
+                LootLockerCreatingEventResponse response = new LootLockerCreatingEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     Debug.Log("Server response for creating event: " + serverResponse.text);
                     Debug.Log("Server response code: " + serverResponse.statusCode);
-                    response = JsonConvert.DeserializeObject<CreatingEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingEventResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -293,11 +293,11 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void UpdatingEvent(LootLockerGetRequest lootLockerGetRequest, Dictionary<string, object> requestData, Action<CreatingEventResponse> onComplete)
+        public static void UpdatingEvent(LootLockerGetRequest lootLockerGetRequest, Dictionary<string, object> requestData, Action<LootLockerCreatingEventResponse> onComplete)
         {
 
             string json = "";
@@ -308,14 +308,14 @@ namespace LootLockerAdmin
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
             {
-                CreatingEventResponse response = new CreatingEventResponse();
+                LootLockerCreatingEventResponse response = new LootLockerCreatingEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     Debug.Log("Server response for updating event: " + serverResponse.text);
                     Debug.Log("Server response code: " + serverResponse.statusCode);
-                    response = JsonConvert.DeserializeObject<CreatingEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCreatingEventResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -325,23 +325,23 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void GettingAllEvents(LootLockerGetRequest lootLockerGetRequest, Action<GettingAllEventsResponse> onComplete)
+        public static void GettingAllEvents(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerGettingAllEventsResponse> onComplete)
         {
 
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.gettingAllEvents;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                GettingAllEventsResponse response = new GettingAllEventsResponse();
+                LootLockerGettingAllEventsResponse response = new LootLockerGettingAllEventsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GettingAllEventsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGettingAllEventsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -351,7 +351,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 

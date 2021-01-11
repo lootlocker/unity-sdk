@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdminRequests;
-using LootLockerAdmin;
-using LootLockerRequests;
+using LootLocker.Admin.Requests;
+using LootLocker.Admin;
+using LootLocker.Requests;
 
 
-    namespace LootLockerAdminRequests
+    namespace LootLocker.Admin.Requests
     {
         public class LootLockerSDKAdminManager
         {
@@ -36,7 +36,7 @@ using LootLockerRequests;
                 if (LootLockerEndPointsAdmin.current == null)
                     LootLockerEndPointsAdmin.current = Resources.Load("Config/LootLockerEndPointsAdmin") as LootLockerEndPointsAdmin;
 
-                BaseServerAPI.activeConfig = LootLockerAdminConfig.current;
+                LootLockerBaseServerAPI.activeConfig = LootLockerAdminConfig.current;
 
                 return LootLockerEndPointsAdmin.current != null;
 
@@ -78,7 +78,7 @@ using LootLockerRequests;
 
                 try
                 {
-                    BaseServerAPI.activeConfig = LootLockerAdminConfig.current;
+                    LootLockerBaseServerAPI.activeConfig = LootLockerAdminConfig.current;
                 }
                 catch (Exception ex)
                 {
@@ -96,27 +96,27 @@ using LootLockerRequests;
 
             #region Authentication
 
-            public static void InitialAuthRequest(string email, string password, Action<AuthResponse> onComplete)
+            public static void InitialAuthRequest(string email, string password, Action<LootLockerAuthResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
-                var data = new InitialAuthRequest();
+                var data = new LootLockerInitialAuthRequest();
                 data.email = email;
                 data.password = password;
                 LootLockerAPIManagerAdmin.InitialAuthenticationRequest(data, onComplete);
             }
 
-            public static void TwoFactorAuthVerification(string mfa_key, string secret, Action<AuthResponse> onComplete)
+            public static void TwoFactorAuthVerification(string mfa_key, string secret, Action<LootLockerAuthResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
-                var data = new TwoFactorAuthVerficationRequest();
+                var data = new LootLockerTwoFactorAuthVerficationRequest();
                 data.mfa_key = mfa_key;
                 data.secret = secret;
                 LootLockerAPIManagerAdmin.TwoFactorAuthVerification(data, onComplete);
 
             }
 
-            public static void SubsequentRequestsRequest(Action<SubsequentRequestsResponse> onComplete)
+            public static void SubsequentRequestsRequest(Action<LootLockerSubsequentRequestsResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -128,7 +128,7 @@ using LootLockerRequests;
 
             #region Games
 
-            public static void GetAllGamesToTheCurrentUser(Action<GetAllGamesToTheCurrentUserResponse> onComplete)
+            public static void GetAllGamesToTheCurrentUser(Action<LootLockerGetAllGamesToTheCurrentUserResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -136,12 +136,12 @@ using LootLockerRequests;
 
             }
 
-            public static void CreatingAGame(string name, string steam_app_id, bool sandbox_mode, int organisation_id, bool demo, Action<CreatingAGameResponse> onComplete)
+            public static void CreatingAGame(string name, string steam_app_id, bool sandbox_mode, int organisation_id, bool demo, Action<LootLockerCreatingAGameResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
 
-                CreatingAGameRequest data = new CreatingAGameRequest
+                LootLockerCreatingAGameRequest data = new LootLockerCreatingAGameRequest
                 {
 
                     name = name,
@@ -156,7 +156,7 @@ using LootLockerRequests;
 
             }
 
-            public static void GetDetailedInformationAboutAGame(string id, Action<CreatingAGameResponse> onComplete)
+            public static void GetDetailedInformationAboutAGame(string id, Action<LootLockerCreatingAGameResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
@@ -164,7 +164,7 @@ using LootLockerRequests;
                 LootLockerAPIManagerAdmin.GetDetailedInformationAboutAGame(lootLockerGetRequest, onComplete);
             }
 
-            public static void UpdatingInformationAboutAGame(int gameIDToUpdateInfo, Dictionary<string, object> requestData, Action<CreatingAGameResponse> onComplete)
+            public static void UpdatingInformationAboutAGame(int gameIDToUpdateInfo, Dictionary<string, object> requestData, Action<LootLockerCreatingAGameResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
@@ -175,7 +175,7 @@ using LootLockerRequests;
                 LootLockerAPIManagerAdmin.UpdatingInformationAboutAGame(lootLockerGetRequest, requestData, onComplete);
             }
 
-            public static void DeletingGames(int gameIDToDelete, Action<DeletingGamesResponse> onComplete)
+            public static void DeletingGames(int gameIDToDelete, Action<LootLockerDeletingGamesResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
@@ -189,7 +189,7 @@ using LootLockerRequests;
 
             #region Players
 
-            public static void SearchingForPlayers(int game_id, Action<SearchingForPlayersResponse> onComplete)
+            public static void SearchingForPlayers(int game_id, Action<LootLockerSearchingForPlayersResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -203,7 +203,7 @@ using LootLockerRequests;
 
             #region Maps
 
-            public static void GettingAllMapsToAGame(int gameID, Action<GettingAllMapsToAGameResponse> onComplete)
+            public static void GettingAllMapsToAGame(int gameID, Action<LootLockerGettingAllMapsToAGameResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -213,7 +213,7 @@ using LootLockerRequests;
 
             }
 
-            public static void CreatingMaps(CreatingMapsRequest request, bool sendAssetID, bool sendSpawnPoints, Action<CreatingMapsResponse> onComplete)
+            public static void CreatingMaps(LootLockerCreatingMapsRequest request, bool sendAssetID, bool sendSpawnPoints, Action<LootLockerCreatingMapsResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -221,7 +221,7 @@ using LootLockerRequests;
 
             }
 
-            public static void UpdatingMaps(CreatingMapsRequest request, int mapID, Action<CreatingMapsResponse> onComplete)
+            public static void UpdatingMaps(LootLockerCreatingMapsRequest request, int mapID, Action<LootLockerCreatingMapsResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -236,7 +236,7 @@ using LootLockerRequests;
 
             #region Events
 
-            public static void CreatingEvent(Dictionary<string, object> requestData, Action<CreatingEventResponse> onComplete)
+            public static void CreatingEvent(Dictionary<string, object> requestData, Action<LootLockerCreatingEventResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -244,7 +244,7 @@ using LootLockerRequests;
 
             }
 
-            public static void UpdatingEvent(int eventID, Dictionary<string, object> requestData, Action<CreatingEventResponse> onComplete)
+            public static void UpdatingEvent(int eventID, Dictionary<string, object> requestData, Action<LootLockerCreatingEventResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -254,7 +254,7 @@ using LootLockerRequests;
 
             }
 
-            public static void GettingAllEvents(int gameID, Action<GettingAllEventsResponse> onComplete)
+            public static void GettingAllEvents(int gameID, Action<LootLockerGettingAllEventsResponse> onComplete)
             {
 
                 if (!CheckInitialized()) return;
@@ -267,7 +267,7 @@ using LootLockerRequests;
             #endregion
 
             #region Upload
-            public static string UploadAFile(string filePath, string assetId, int gameId, Action<UploadAFileResponse> onComplete, string[] tags = null)
+            public static string UploadAFile(string filePath, string assetId, int gameId, Action<LootLockerUploadAFileResponse> onComplete, string[] tags = null)
             {
                 if (!CheckInitialized()) throw new Exception("please initialize sdk first");
                 return LootLockerAPIManagerAdmin.UploadAFile(filePath, assetId, gameId, onComplete, tags);
@@ -276,21 +276,21 @@ using LootLockerRequests;
 
             #region Assets
 
-            public static void GetAssets(Action<GetAssetsResponse> onComplete, string search = null)
+            public static void GetAssets(Action<LootLockerGetAssetsResponse> onComplete, string search = null)
             {
                 if (!CheckInitialized()) return;
 
                 LootLockerAPIManagerAdmin.GetAssets(onComplete, search);
             }
 
-            public static void CreateAsset(CreateAssetRequest request, Action<CreateAssetResponse> onComplete)
+            public static void CreateAsset(LootLockerCreateAssetRequest request, Action<LootLockerCreateAssetResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
                 LootLockerAPIManagerAdmin.CreateAsset(request, onComplete);
             }
 
-            public static void GetContexts(Action<GetContextsResponse> onComplete)
+            public static void GetContexts(Action<LootLockerGetContextsResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
@@ -301,7 +301,7 @@ using LootLockerRequests;
 
             #region Triggers
 
-            public static void ListTriggers(int game_id, Action<ListTriggersResponse> onComplete)
+            public static void ListTriggers(int game_id, Action<LootLockerListTriggersResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerGetRequest data = new LootLockerGetRequest();
@@ -309,7 +309,7 @@ using LootLockerRequests;
                 LootLockerAPIManagerAdmin.ListTriggers(data, onComplete);
             }
 
-            public static void CreateTriggers(CreateTriggersRequest requestData, int game_id, Action<ListTriggersResponse> onComplete)
+            public static void CreateTriggers(LootLockerCreateTriggersRequest requestData, int game_id, Action<LootLockerListTriggersResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerGetRequest data = new LootLockerGetRequest();
@@ -320,20 +320,20 @@ using LootLockerRequests;
             #endregion
 
             #region Files
-            public static void GetFiles(LootLockerAdminRequests.FileFilterType filter, Action<GetFilesResponse> onComplete)
+            public static void GetFiles(LootLocker.Admin.Requests.LootLockerFileFilterType filter, Action<LootLockerGetFilesResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
                 LootLockerAPIManagerAdmin.GetFiles(filter, onComplete);
             }
 
-            public static void DeleteFile(string fileId, Action<DeleteFileResponse> onComplete)
+            public static void DeleteFile(string fileId, Action<LootLockerDeleteFileResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
                 LootLockerAPIManagerAdmin.DeleteFile(fileId, onComplete);
             }
-            public static void UpdateFile(string fileId, UpdateFileRequest request, Action<UpdateFileResponse> onComplete)
+            public static void UpdateFile(string fileId, LootLockerUpdateFileRequest request, Action<LootLockerUpdateFileResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
 
@@ -344,7 +344,7 @@ using LootLockerRequests;
 
             #region Organisations
 
-            public static void GetUsersToAnOrganisation(int organisation_id, Action<GetUsersToAnOrganisationResponse> onComplete)
+            public static void GetUsersToAnOrganisation(int organisation_id, Action<LootLockerGetUsersToAnOrganisationResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerGetRequest data = new LootLockerGetRequest();
@@ -356,23 +356,23 @@ using LootLockerRequests;
 
             #region User
 
-            public static void SetupTwoFactorAuthentication(Action<SetupTwoFactorAuthenticationResponse> onComplete)
+            public static void SetupTwoFactorAuthentication(Action<LootLockerSetupTwoFactorAuthenticationResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
                 LootLockerAPIManagerAdmin.SetupTwoFactorAuthentication(onComplete);
             }
 
-            public static void VerifyTwoFactorAuthenticationSetup(int verify2FASecret, Action<VerifyTwoFactorAuthenticationResponse> onComplete)
+            public static void VerifyTwoFactorAuthenticationSetup(int verify2FASecret, Action<LootLockerVerifyTwoFactorAuthenticationResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
-                VerifyTwoFactorAuthenticationRequest request = new VerifyTwoFactorAuthenticationRequest { secret = verify2FASecret };
+                LootLockerVerifyTwoFactorAuthenticationRequest request = new LootLockerVerifyTwoFactorAuthenticationRequest { secret = verify2FASecret };
                 LootLockerAPIManagerAdmin.VerifyTwoFactorAuthenticationSetup(request, onComplete);
             }
 
-            public static void RemoveTwoFactorAuthentication(int remove2FASecret, Action<RemoveTwoFactorAuthenticationResponse> onComplete)
+            public static void RemoveTwoFactorAuthentication(int remove2FASecret, Action<LootLockerRemoveTwoFactorAuthenticationResponse> onComplete)
             {
                 if (!CheckInitialized()) return;
-                VerifyTwoFactorAuthenticationRequest request = new VerifyTwoFactorAuthenticationRequest { secret = remove2FASecret };
+                LootLockerVerifyTwoFactorAuthenticationRequest request = new LootLockerVerifyTwoFactorAuthenticationRequest { secret = remove2FASecret };
                 LootLockerAPIManagerAdmin.RemoveTwoFactorAuthentication(request, onComplete);
             }
 

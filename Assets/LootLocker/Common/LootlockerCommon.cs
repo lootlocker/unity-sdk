@@ -7,24 +7,24 @@ using LootLocker;
 using System.Linq;
 using UnityEngine.UI;
 
-namespace LootLockerEnums
+namespace LootLocker.LootLockerEnums
 {
     public enum AssetFilter { purchasable , nonpurchasable , rentable, nonrentable, popular , nonpopular, none }
 }
 
 namespace LootLocker
 {
-    public class Links
+    public class LootLockerLinks
     {
         public string thumbnail { get; set; }
     }
 
-    public class Default_Loadouts_Info
+    public class LootLockerDefault_Loadouts_Info
     {
         public bool Default { get; set; }
     }
 
-    public class Variation_Info
+    public class LootLockerVariation_Info
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -34,7 +34,7 @@ namespace LootLocker
     }
 
     [System.Serializable]
-    public class AssetRequest : LootLockerResponse
+    public class LootLockerAssetRequest : LootLockerResponse
     {
         public int count;
         public static int lastId;
@@ -44,13 +44,13 @@ namespace LootLocker
         }
     }
 
-    public class AssetResponse : LootLockerResponse
+    public class LootLockerAssetResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Asset[] assets { get; set; }
+        public LootLockerCommonAsset[] assets { get; set; }
     }
 
-    public class Rental_Options
+    public class LootLockerRental_Options
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -66,21 +66,21 @@ namespace LootLocker
         public string value;
     }
 
-    public class Rarity
+    public class LootLockerRarity
     {
         public string name { get; set; }
         public string short_name { get; set; }
         public string color { get; set; }
     }
 
-    public class Filter
+    public class LootLockerFilter
     {
         public string value { get; set; }
         public string name { get; set; }
     }
 
 
-    public class Asset: LootLockerResponse
+    public class LootLockerCommonAsset: LootLockerResponse
     {
         public bool success;
         public int id { get; set; }
@@ -98,19 +98,19 @@ namespace LootLocker
         public string marked_new { get; set; }
         public int default_variation_id { get; set; }
         public string description { get; set; }
-        public Links links { get; set; }
+        public LootLockerLinks links { get; set; }
         public LootLockerStorage[] storage { get; set; }
-        public Rarity rarity { get; set; }
+        public LootLockerRarity rarity { get; set; }
         public bool popular { get; set; }
         public int popularity_score { get; set; }
         public bool unique_instance { get; set; }
-        public Rental_Options[] rental_options { get; set; }
-        public Filter[] filters { get; set; }
-        public Variation[] variations { get; set; }
+        public LootLockerRental_Options[] rental_options { get; set; }
+        public LootLockerFilter[] filters { get; set; }
+        public LootLockerVariation[] variations { get; set; }
         public bool featured { get; set; }
         public bool context_locked { get; set; }
         public bool initially_purchasable { get; set; }
-        public File[] files { get; set; }
+        public LootLockerFile[] files { get; set; }
         public LootLockerAssetCandidate asset_candidate { get; set; }
     }
 
@@ -120,18 +120,18 @@ namespace LootLocker
         public string created_by_player_uid;
     }
 
-    public class File
+    public class LootLockerFile
     {
         public string url { get; set; }
         public string[] tags { get; set; }
     }
 
-    public class Default_Loadouts
+    public class LootLockerDefault_Loadouts
     {
         public bool Default { get; set; }
     }
 
-    public class Variation
+    public class LootLockerVariation
     {
         public int id { get; set; }
         public string name { get; set; }

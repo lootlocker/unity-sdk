@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdminRequests;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
-using LootLockerRequests;
+using LootLocker.Requests;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
     #region GetUsersToAnOrganisation
 
-    public class GetUsersToAnOrganisationResponse : LootLockerResponse
+    public class LootLockerGetUsersToAnOrganisationResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public OrganisationUser[] users { get; set; }
+        public LootLockerOrganisationUser[] users { get; set; }
     }
 
-    public class OrganisationUser
+    public class LootLockerOrganisationUser
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -31,24 +31,24 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void GetUsersToAnOrganisation(LootLockerGetRequest data, Action<GetUsersToAnOrganisationResponse> onComplete)
+        public static void GetUsersToAnOrganisation(LootLockerGetRequest data, Action<LootLockerGetUsersToAnOrganisationResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getUsersToAnOrganisation;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
             {
-                GetUsersToAnOrganisationResponse response = new GetUsersToAnOrganisationResponse();
+                LootLockerGetUsersToAnOrganisationResponse response = new LootLockerGetUsersToAnOrganisationResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetUsersToAnOrganisationResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetUsersToAnOrganisationResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -58,7 +58,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
     }

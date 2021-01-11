@@ -2,26 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
-using LootLockerRequests;
+using LootLocker.Requests;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
 
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
 
-        public static void ListTriggers(LootLockerGetRequest data, Action<ListTriggersResponse> onComplete)
+        public static void ListTriggers(LootLockerGetRequest data, Action<LootLockerListTriggersResponse> onComplete)
         {
             string json = "";
 
@@ -29,12 +29,12 @@ namespace LootLockerAdmin
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = new ListTriggersResponse();
+                var response = new LootLockerListTriggersResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<ListTriggersResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerListTriggersResponse>(serverResponse.text);
 
                     response.text = serverResponse.text;
 
@@ -47,11 +47,11 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void CreateTriggers(CreateTriggersRequest requestData, LootLockerGetRequest data, Action<ListTriggersResponse> onComplete)
+        public static void CreateTriggers(LootLockerCreateTriggersRequest requestData, LootLockerGetRequest data, Action<LootLockerListTriggersResponse> onComplete)
         {
 
             string json = "";
@@ -62,12 +62,12 @@ namespace LootLockerAdmin
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = new ListTriggersResponse();
+                var response = new LootLockerListTriggersResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<ListTriggersResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerListTriggersResponse>(serverResponse.text);
 
                     response.text = serverResponse.text;
 
@@ -80,7 +80,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 

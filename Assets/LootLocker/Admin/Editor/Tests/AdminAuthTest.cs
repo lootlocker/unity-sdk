@@ -1,9 +1,9 @@
-﻿using LootLockerAdminRequests;
+﻿using LootLocker.Admin.Requests;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public class AdminAuthTest : MonoBehaviour
     {

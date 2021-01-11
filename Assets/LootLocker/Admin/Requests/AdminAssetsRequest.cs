@@ -2,26 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
-    public class GetAssetsResponse : LootLockerResponse
+    public class LootLockerGetAssetsResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Asset[] assets { get; set; }
+        public LootLockerCommonAsset[] assets { get; set; }
     }
 
-    public class CreateAssetRequest
+    public class LootLockerCreateAssetRequest
     {
         public string name;
         public int context_id;
     }
 
-    public class CreateAssetResponse : LootLockerResponse
+    public class LootLockerCreateAssetResponse : LootLockerResponse
     {
 
         public bool success { get; set; }
@@ -48,15 +48,15 @@ namespace LootLockerAdminRequests
 
     }
 
-    public class GetContextsResponse : LootLockerResponse
+    public class LootLockerGetContextsResponse : LootLockerResponse
     {
 
         public bool success { get; set; }
-        public Context[] Contexts { get; set; }
+        public LootLockerContext[] Contexts { get; set; }
 
     }
 
-    public class Context
+    public class LootLockerContext
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -69,24 +69,24 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
     public partial class LootLockerAPIManagerAdmin
     {
-        public static void GetAssets(Action<GetAssetsResponse> onComplete, string search = null)
+        public static void GetAssets(Action<LootLockerGetAssetsResponse> onComplete, string search = null)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getAllAssets;
-            string getVariable = string.Format(endPoint.endPoint, BaseServerAPI.activeConfig.gameID);
+            string getVariable = string.Format(endPoint.endPoint, LootLockerBaseServerAPI.activeConfig.gameID);
 
             if (!string.IsNullOrEmpty(search))
                 getVariable += "?search=" + search;
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
              {
-                 var response = new GetAssetsResponse();
+                 var response = new LootLockerGetAssetsResponse();
                  if (string.IsNullOrEmpty(serverResponse.Error))
                  {
-                     response = JsonConvert.DeserializeObject<GetAssetsResponse>(serverResponse.text);
+                     response = JsonConvert.DeserializeObject<LootLockerGetAssetsResponse>(serverResponse.text);
                      response.text = serverResponse.text;
                      onComplete?.Invoke(response);
                  }
@@ -96,26 +96,26 @@ namespace LootLockerAdmin
                      response.Error = serverResponse.Error;
                      onComplete?.Invoke(response);
                  }
-             }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin); 
+             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin); 
         }
 
-        public static void CreateAsset(CreateAssetRequest request, Action<CreateAssetResponse> onComplete)
+        public static void CreateAsset(LootLockerCreateAssetRequest request, Action<LootLockerCreateAssetResponse> onComplete)
         {
             var json = JsonConvert.SerializeObject(request);
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.createAsset;
 
             string getVariable = string.Format(endPoint.endPoint, LootLockerAdminConfig.current.gameID);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
              {
                  Debug.Log("--------------------");
                  Debug.Log(serverResponse.text);
-                 var response = new CreateAssetResponse();
+                 var response = new LootLockerCreateAssetResponse();
                  if (string.IsNullOrEmpty(serverResponse.Error))
                  {
                      try
                      {
-                         response = JsonConvert.DeserializeObject<CreateAssetResponse>(serverResponse.text);
+                         response = JsonConvert.DeserializeObject<LootLockerCreateAssetResponse>(serverResponse.text);
                      }
                      catch (System.InvalidCastException)
                      {
@@ -131,22 +131,22 @@ namespace LootLockerAdmin
                      response.Error = serverResponse.Error;
                      onComplete?.Invoke(response);
                  }
-             }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
         }
 
-        public static void GetContexts(Action<GetContextsResponse> onComplete)
+        public static void GetContexts(Action<LootLockerGetContextsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getContexts;
             string getVariable = string.Format(endPoint.endPoint, LootLockerAdminConfig.current.gameID);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                var response = new GetContextsResponse();
+                var response = new LootLockerGetContextsResponse();
 
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetContextsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetContextsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -156,7 +156,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
     }

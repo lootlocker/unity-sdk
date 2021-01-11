@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
-    public class GetAllKeyValuePairsResponse : LootLockerResponse
+    public class LootLockerGetAllKeyValuePairsResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public int streamedObjectCount = 0;
-        public InstanceStoragePair[] keypairs;
+        public LootLockerInstanceStoragePair[] keypairs;
     }
 
-    public class InstanceStoragePair
+    public class LootLockerInstanceStoragePair
     {
         public int instance_id { get; set; }
-        public Storage storage { get; set; }
+        public LootLockerStorage storage { get; set; }
     }
 
-    public class Storage
+    public class LootLockerStorage
     {
         public int id { get; set; }
         public string key { get; set; }
@@ -30,32 +30,32 @@ namespace LootLockerRequests
     }
 
 
-    public class AssetDefaultResponse : LootLockerResponse
+    public class LootLockerAssetDefaultResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Storage[] storage { get; set; }
+        public LootLockerStorage[] storage { get; set; }
     }
 
 
-    public class CreateKeyValuePairRequest
+    public class LootLockerCreateKeyValuePairRequest
     {
         public string key { get; set; }
         public string value { get; set; }
     }
 
-    public class UpdateOneOrMoreKeyValuePairRequest
+    public class LootLockerUpdateOneOrMoreKeyValuePairRequest
     {
-        public CreateKeyValuePairRequest[] storage { get; set; }
+        public LootLockerCreateKeyValuePairRequest[] storage { get; set; }
     }
 
 
-    public class InspectALootBoxResponse : LootLockerResponse
+    public class LootLockerInspectALootBoxResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Content[] contents { get; set; }
+        public LootLockerContent[] contents { get; set; }
     }
 
-    public class Content
+    public class LootLockerContent
     {
         public int asset_id { get; set; }
         public int? asset_variation_id { get; set; }
@@ -63,7 +63,7 @@ namespace LootLockerRequests
         public int weight { get; set; }
     }
 
-    public class OpenLootBoxResponse : LootLockerResponse
+    public class LootLockerOpenLootBoxResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public bool check_grant_notifications { get; set; }
@@ -75,19 +75,19 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetAllKeyValuePairs(Action<GetAllKeyValuePairsResponse> onComplete)
+        public static void GetAllKeyValuePairs(Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getAllKeyValuePairs;
 
             string getVariable = endPoint.endPoint;
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                GetAllKeyValuePairsResponse response = new GetAllKeyValuePairsResponse();
+                LootLockerGetAllKeyValuePairsResponse response = new LootLockerGetAllKeyValuePairsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<GetAllKeyValuePairsResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetAllKeyValuePairsResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -101,19 +101,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAllKeyValuePairsToAnInstance(LootLockerGetRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void GetAllKeyValuePairsToAnInstance(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getAllKeyValuePairsToAnInstance;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -127,7 +127,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.getAKeyValuePairById;
             string json = "";
@@ -136,13 +136,13 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -156,7 +156,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void CreateKeyValuePair(LootLockerGetRequest lootLockerGetRequest, CreateKeyValuePairRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void CreateKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.createKeyValuePair;
             string json = "";
@@ -165,13 +165,13 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -185,7 +185,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void UpdateOneOrMoreKeyValuePair(LootLockerGetRequest lootLockerGetRequest, UpdateOneOrMoreKeyValuePairRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void UpdateOneOrMoreKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateOneOrMoreKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.updateOneOrMoreKeyValuePair;
             string json = "";
@@ -194,13 +194,13 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -214,7 +214,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void UpdateKeyValuePairById(LootLockerGetRequest lootLockerGetRequest, CreateKeyValuePairRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void UpdateKeyValuePairById(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.updateKeyValuePairById;
             string json = "";
@@ -223,13 +223,13 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -243,19 +243,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void DeleteKeyValuePair(LootLockerGetRequest data, Action<AssetDefaultResponse> onComplete)
+        public static void DeleteKeyValuePair(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                AssetDefaultResponse response = new AssetDefaultResponse();
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<AssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -269,19 +269,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void InspectALootBox(LootLockerGetRequest data, Action<InspectALootBoxResponse> onComplete)
+        public static void InspectALootBox(LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                InspectALootBoxResponse response = new InspectALootBoxResponse();
+                LootLockerInspectALootBoxResponse response = new LootLockerInspectALootBoxResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<InspectALootBoxResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerInspectALootBoxResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -295,19 +295,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void OpenALootBox(LootLockerGetRequest data, Action<OpenLootBoxResponse> onComplete)
+        public static void OpenALootBox(LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                OpenLootBoxResponse response = new OpenLootBoxResponse();
+                LootLockerOpenLootBoxResponse response = new LootLockerOpenLootBoxResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<OpenLootBoxResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerOpenLootBoxResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

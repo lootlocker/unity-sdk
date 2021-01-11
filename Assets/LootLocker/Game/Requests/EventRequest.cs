@@ -1,4 +1,4 @@
-﻿using LootLockerRequests;
+﻿using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,24 +6,24 @@ using UnityEngine;
 using LootLocker;
 using Newtonsoft.Json;
 
-namespace LootLockerRequests
+namespace LootLocker.Requests
 {
 
     [System.Serializable]
-    public class EventResponse : LootLockerResponse
+    public class LootLockerEventResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Event[] events { get; set; }
+        public LootLockerEvent[] events { get; set; }
     }
     [System.Serializable]
-    public class SingleEventResponse : LootLockerResponse
+    public class LootLockerSingleEventResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public Event events { get; set; }
+        public LootLockerEvent events { get; set; }
     }
 
     [System.Serializable]
-    public class FinishEventResponse : LootLockerResponse
+    public class LootLockerFinishEventResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public int score { get; set; }
@@ -31,14 +31,14 @@ namespace LootLockerRequests
     }
 
     [System.Serializable]
-    public class StartinEventResponse : LootLockerResponse
+    public class LootLockerStartinEventResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public string signature { get; set; }
     }
 
     [System.Serializable]
-    public class Event
+    public class LootLockerEvent
     {
         public int event_id { get; set; }
         public int asset_id { get; set; }
@@ -48,41 +48,41 @@ namespace LootLockerRequests
         public object difficulty_multiplier { get; set; }
         public string difficulty_color { get; set; }
         public int difficulty_id { get; set; }
-        public Goals goals { get; set; }
-        public Checkpoint[] checkpoints { get; set; }
+        public LootLockerGoals goals { get; set; }
+        public LootLockerCheckpoint[] checkpoints { get; set; }
         public bool player_access { get; set; }
         public string best_goal { get; set; }
     }
     [System.Serializable]
-    public class Goals
+    public class LootLockerGoals
     {
-        public Gold gold { get; set; }
-        public Silver silver { get; set; }
-        public Bronze bronze { get; set; }
+        public LootLockerGold gold { get; set; }
+        public LootLockerSilver silver { get; set; }
+        public LootLockerBronze bronze { get; set; }
     }
     [System.Serializable]
-    public class Gold
-    {
-        public string goal { get; set; }
-        public string points { get; set; }
-        public Asset[] assets { get; set; }
-    }
-    [System.Serializable]
-    public class Silver
+    public class LootLockerGold
     {
         public string goal { get; set; }
         public string points { get; set; }
-        public object[] assets { get; set; }
+        public LootLockerCommonAsset[] assets { get; set; }
     }
     [System.Serializable]
-    public class Bronze
+    public class LootLockerSilver
     {
         public string goal { get; set; }
         public string points { get; set; }
         public object[] assets { get; set; }
     }
     [System.Serializable]
-    public class Checkpoint
+    public class LootLockerBronze
+    {
+        public string goal { get; set; }
+        public string points { get; set; }
+        public object[] assets { get; set; }
+    }
+    [System.Serializable]
+    public class LootLockerCheckpoint
     {
         public int index { get; set; }
         public int time { get; set; }
@@ -94,17 +94,17 @@ namespace LootLockerRequests
     public class FinishEventRequest
     {
         public string signature { get; set; }
-        public EventPayload payload { get; set; }
+        public LootLockerEventPayload payload { get; set; }
     }
     [System.Serializable]
-    public class EventPayload
+    public class LootLockerEventPayload
     {
         public string finish_time { get; set; }
         public string finish_score { get; set; }
-        public CheckpointTimes[] checkpoint_times { get; set; }
+        public LootLockerCheckpointTimes[] checkpoint_times { get; set; }
     }
     [System.Serializable]
-    public class CheckpointTimes
+    public class LootLockerCheckpointTimes
     {
         public int index;
         public int time;
@@ -118,19 +118,19 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GettingAllEvents(Action<EventResponse> onComplete)
+        public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingAllEvents;
 
             string getVariable = endPoint.endPoint;
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                EventResponse response = new EventResponse();
+                LootLockerEventResponse response = new LootLockerEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<EventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerEventResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -144,19 +144,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GettingASingleEvent(LootLockerGetRequest data, Action<SingleEventResponse> onComplete)
+        public static void GettingASingleEvent(LootLockerGetRequest data, Action<LootLockerSingleEventResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.gettingASingleEvent;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                SingleEventResponse response = new SingleEventResponse();
+                LootLockerSingleEventResponse response = new LootLockerSingleEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<SingleEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerSingleEventResponse>(serverResponse.text);
                     onComplete?.Invoke(response);
                 }
                 else
@@ -168,19 +168,19 @@ namespace LootLocker
             }, true);
         }
 
-        public static void StartingEvent(LootLockerGetRequest data, Action<StartinEventResponse> onComplete)
+        public static void StartingEvent(LootLockerGetRequest data, Action<LootLockerStartinEventResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.startingEvent;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                StartinEventResponse response = new StartinEventResponse();
+                LootLockerStartinEventResponse response = new LootLockerStartinEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<StartinEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerStartinEventResponse>(serverResponse.text);
                     onComplete?.Invoke(response);
                 }
                 else
@@ -191,7 +191,7 @@ namespace LootLocker
                 }
             }, true);
         }
-        public static void FinishingEvent(LootLockerGetRequest lootLockerGetRequest, FinishEventRequest data, Action<FinishEventResponse> onComplete)
+        public static void FinishingEvent(LootLockerGetRequest lootLockerGetRequest, FinishEventRequest data, Action<LootLockerFinishEventResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -201,12 +201,12 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
             {
-                FinishEventResponse response = new FinishEventResponse();
+                LootLockerFinishEventResponse response = new LootLockerFinishEventResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<FinishEventResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerFinishEventResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }

@@ -2,31 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
-using LootLockerAdmin;
-using LootLockerAdminRequests;
+using LootLocker.Admin;
+using LootLocker.Admin.Requests;
 using Newtonsoft.Json;
 using System;
 using UnityEngine.Networking;
 using System.IO;
 using System.Net.Http;
 
-namespace LootLockerAdminRequests
+namespace LootLocker.Admin.Requests
 {
 
-    public enum FileFilterType { none, asset, item, player }
-    public class GetFilesResponse : LootLockerResponse
+    public enum LootLockerFileFilterType { none, asset, item, player }
+    public class LootLockerGetFilesResponse : LootLockerResponse
     {
 
         public bool success { get; set; }
-        public File[] files;
+        public LootLockerFile[] files;
 
     }
 
-    public class UploadAFileRequest
+    public class LootLockerUploadAFileRequest
     {
         public string asset_id;
     }
-    public class UploadAFileResponse : LootLockerResponse
+    public class LootLockerUploadAFileResponse : LootLockerResponse
     {
         public bool success { get; set; }
         public string url { get; set; }
@@ -36,24 +36,24 @@ namespace LootLockerAdminRequests
         public string updated_at { get; set; }
     }
 
-    public class DeleteFileResponse : LootLockerResponse
+    public class LootLockerDeleteFileResponse : LootLockerResponse
     {
 
         public bool success { get; set; }
 
     }
 
-    public class UpdateFileRequest
+    public class LootLockerUpdateFileRequest
     {
         public string[] tags;
     }
-    public class UpdateFileResponse : LootLockerResponse
+    public class LootLockerUpdateFileResponse : LootLockerResponse
     {
         public bool success { get; set; }
-        public File file;
+        public LootLockerFile file;
     }
 
-    public class File
+    public class LootLockerFile
     {
         public string url { get; set; }
         public int id { get; set; }
@@ -67,12 +67,12 @@ namespace LootLockerAdminRequests
 
 }
 
-namespace LootLockerAdmin
+namespace LootLocker.Admin
 {
 
     public partial class LootLockerAPIManagerAdmin
     {
-        public static string UploadAFile(string filePath, string id, int gameId, Action<UploadAFileResponse> onComplete, string[] tags = null)
+        public static string UploadAFile(string filePath, string id, int gameId, Action<LootLockerUploadAFileResponse> onComplete, string[] tags = null)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.uploadFile;
 
@@ -92,14 +92,14 @@ namespace LootLockerAdmin
             string[] splitFilePath = filePath.Split(new char[] { '\\', '/' });
             string defaultFileName = splitFilePath[splitFilePath.Length - 1];
 
-            ServerRequest.UploadFile(endPoint.endPoint, endPoint.httpMethod, System.IO.File.ReadAllBytes(filePath), defaultFileName,
+            LootLockerServerRequest.UploadFile(endPoint.endPoint, endPoint.httpMethod, System.IO.File.ReadAllBytes(filePath), defaultFileName,
                 body: formData, onComplete: (serverResponse) =>
             {
-                UploadAFileResponse response = new UploadAFileResponse();
+                LootLockerUploadAFileResponse response = new LootLockerUploadAFileResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     Debug.Log("Response text: " + serverResponse.text);
-                    response = JsonConvert.DeserializeObject<UploadAFileResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerUploadAFileResponse>(serverResponse.text);
                     response.EventId = eventId;
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
@@ -110,26 +110,26 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
 
             return eventId;
         }
 
-        public static void GetFiles(FileFilterType filter, Action<GetFilesResponse> onComplete)
+        public static void GetFiles(LootLockerFileFilterType filter, Action<LootLockerGetFilesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPointsAdmin.current.getFiles;
 
-            string getVariable = string.Format(endPoint.endPoint, BaseServerAPI.activeConfig.gameID);
+            string getVariable = string.Format(endPoint.endPoint, LootLockerBaseServerAPI.activeConfig.gameID);
 
-            if (filter != FileFilterType.none) getVariable += "?filter=" + filter;
+            if (filter != LootLockerFileFilterType.none) getVariable += "?filter=" + filter;
 
-            ServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) =>
             {
-                var response = new GetFilesResponse();
+                var response = new LootLockerGetFilesResponse();
 
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<GetFilesResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetFilesResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -139,21 +139,21 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
-        public static void DeleteFile(string fileId, Action<DeleteFileResponse> onComplete)
+        public static void DeleteFile(string fileId, Action<LootLockerDeleteFileResponse> onComplete)
         {
             var endPointInfo = LootLockerEndPointsAdmin.current.deleteFile;
-            string getVariable = string.Format(endPointInfo.endPoint, BaseServerAPI.activeConfig.gameID, fileId);
+            string getVariable = string.Format(endPointInfo.endPoint, LootLockerBaseServerAPI.activeConfig.gameID, fileId);
 
-            ServerRequest.CallAPI(getVariable, endPointInfo.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPointInfo.httpMethod, "", (serverResponse) =>
             {
-                var response = new DeleteFileResponse();
+                var response = new LootLockerDeleteFileResponse();
 
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<DeleteFileResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerDeleteFileResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -163,22 +163,22 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
-        public static void UpdateFile(string fileId, UpdateFileRequest request, Action<UpdateFileResponse> onComplete)
+        public static void UpdateFile(string fileId, LootLockerUpdateFileRequest request, Action<LootLockerUpdateFileResponse> onComplete)
         {
             var json = JsonConvert.SerializeObject(request);
             var endPointInfo = LootLockerEndPointsAdmin.current.updateFile;
-            string getVariable = string.Format(endPointInfo.endPoint, BaseServerAPI.activeConfig.gameID, fileId);
+            string getVariable = string.Format(endPointInfo.endPoint, LootLockerBaseServerAPI.activeConfig.gameID, fileId);
 
-            ServerRequest.CallAPI(getVariable, endPointInfo.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPointInfo.httpMethod, json, (serverResponse) =>
             {
-                var response = new UpdateFileResponse();
+                var response = new LootLockerUpdateFileResponse();
 
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<UpdateFileResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerUpdateFileResponse>(serverResponse.text);
                     response.text = serverResponse.text;
                     onComplete?.Invoke(response);
                 }
@@ -188,7 +188,7 @@ namespace LootLockerAdmin
                     response.Error = serverResponse.Error;
                     onComplete?.Invoke(response);
                 }
-            }, useAuthToken: true, callerRole: LootLockerEnums.CallerRole.Admin);
+            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
 
 

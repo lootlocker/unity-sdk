@@ -1,5 +1,5 @@
 ﻿using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace LootLockerDemoApp
     public class ItemElement : MonoBehaviour
     {
         public static OnItemClickedEvent onElementClicked = new OnItemClickedEvent();
-        ItemData data;
+        ILootLockertemData data;
         public GameObject activeBorder;
         Image preview;
         public InventoryAssetResponse.DemoAppAsset asset;
@@ -48,7 +48,7 @@ namespace LootLockerDemoApp
             }
         }
 
-        public void Init(ItemData data)
+        public void Init(ILootLockertemData data)
         {
             this.data = data;
             asset = data as InventoryAssetResponse.DemoAppAsset;

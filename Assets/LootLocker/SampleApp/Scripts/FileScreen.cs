@@ -5,17 +5,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System;
-using LootLockerEnums;
+using LootLocker.LootLockerEnums;
 
 
-namespace LootLockerEnums
+namespace LootLocker.LootLockerEnums
 {
     public enum TypeOfFile { Image, Scene, AssetBundle, None }
 }
 
 namespace LootLockerDemoApp
 {
-    public class TempImageClass : IScreenShotOwner
+    public class TempImageClass : ILootLockerScreenShotOwner
     {
         public Action OnDownloadCompleted;
         public string url { get; set; }
@@ -31,7 +31,7 @@ namespace LootLockerDemoApp
 
 
 
-    public class FileScreen : MonoBehaviour, IStageOwner
+    public class FileScreen : MonoBehaviour, ILootLockerStageOwner
     {
         public Text typeOfFile;
         public Image image;
@@ -49,7 +49,7 @@ namespace LootLockerDemoApp
             bckBtn.onClick.AddListener(ViewInventory);
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             asset = stageData as InventoryAssetResponse.DemoAppAsset;
             if (asset != null)

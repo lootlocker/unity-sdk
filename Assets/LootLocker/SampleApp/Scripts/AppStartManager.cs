@@ -1,5 +1,5 @@
 ﻿using LootLocker;
-using LootLockerRequests;
+using LootLocker.Requests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace LootLockerDemoApp
 {
-    public class AppStartManager : MonoBehaviour, IStageOwner
+    public class AppStartManager : MonoBehaviour, ILootLockerStageOwner
     {
 
         public InputField usernameField, passwordField, sixDigitCodeField;
@@ -29,7 +29,7 @@ namespace LootLockerDemoApp
         passwordField.text = PlayerPrefs.GetString("AdminPassword","");
 #endif
         }
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             carouselScreen.SetActive(true);
             failedLoginContent.SetActive(false);
@@ -81,12 +81,12 @@ namespace LootLockerDemoApp
             });
         }
 
-        private void LoginAndCreateGame(AuthResponse response)
+        private void LoginAndCreateGame(LootLockerAuthResponse response)
         {
             int organisationID = response.user.organisations.FirstOrDefault().id;
             AppManager.activeOrganisationID = organisationID;
             ///lets try to find the demo game from the list of games coming from the server
-            Game demoGame = response.user.organisations.FirstOrDefault()?.games?.FirstOrDefault(x => x.is_demo == true);
+            LootLockerGame demoGame = response.user.organisations.FirstOrDefault()?.games?.FirstOrDefault(x => x.is_demo == true);
 
             //if we found one, lets set the config up
             if (demoGame != null)

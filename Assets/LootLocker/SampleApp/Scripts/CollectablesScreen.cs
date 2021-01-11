@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LootLockerRequests;
+using LootLocker.Requests;
 using LootLocker;
 using System.Linq;
 using System;
@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace LootLockerDemoApp
 {
-    public class CollectablesScreen : MonoBehaviour, IStageOwner
+    public class CollectablesScreen : MonoBehaviour, ILootLockerStageOwner
     {
         public Transform scrollViewContent;
         public GameObject collectableRecordPrefab;
@@ -65,7 +65,7 @@ namespace LootLockerDemoApp
                         Destroy(scrollViewContent.GetChild(i).gameObject);
                     }
 
-                    Collectable[] collectables = response.collectables;
+                    LootLockerCollectable[] collectables = response.collectables;
 
                     for (int i = 0; i < collectables.Length; i++)
                     {
@@ -94,7 +94,7 @@ namespace LootLockerDemoApp
             LoadingManager.HideLoadingScreen();
         }
 
-        public void UpdateScreenData(IStageData stageData)
+        public void UpdateScreenData(ILootLockerStageData stageData)
         {
             ViewCollectables();
         }
