@@ -1,4 +1,5 @@
 # unity-sdk
+Full documentation available here https://docs.lootlocker.io/unity-sdk/
 Source of the Unity SDK for LootLocker
 ## Installation
 
