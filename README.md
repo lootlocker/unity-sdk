@@ -28,10 +28,8 @@ The Admin SDK is provided as a simple tool to login to your LootLocker account a
 
 1. Navigate to the menu bar and select Window/Open LootLocker Admin Panel.
 2. Enter the email and password for your LootLocker account. If you do not have a LootLocker account you can create one by visiting [lootlocker.io/sign-up](https://www.lootlocker.io/sign-up).
-
    ![](/uploads/sdk-3.png)
 3. In the LootLocker Admin Panel, select the game you wish to use.
-
    ![](/uploads/sdk-4.png)
 4. In the Project view, navigate to LootLocker/Game/Resources/Config.
 5. Click on LootLockerConfig.
@@ -39,9 +37,7 @@ The Admin SDK is provided as a simple tool to login to your LootLocker account a
    1. Game Version e.g 1.0.0.0
    2. Platform e.g Android, Steam
    3. Environment e.g Development
-
       ![](/uploads/sdk-5.png)
-
 You are now ready to use LootLocker and connect to your game's APIs.
 
 ### Modifying the Config
@@ -51,7 +47,6 @@ Alternatively, you can configure your Unity project manually by excluding the Ad
 1. Login to the LootLocker Management Console by visiting [my.lootlocker.io](https://my.lootlocker.io)
 2. Click on Settings
 3. Copy your Game Name and API Key
-
    ![](/uploads/sdk-6.png)
 4. Return to Unity
 5. In the Project view, navigate to LootLocker/Game/Resources/Config
@@ -59,7 +54,6 @@ Alternatively, you can configure your Unity project manually by excluding the Ad
    1. Game Version e.g 1.0.0.0
    2. Platform e.g Android, Steam
    3. Environment e.g Development
-
       ![](/uploads/sdk-5.png)
 
 You are now ready to use LootLocker and connect to your game's APIs.
