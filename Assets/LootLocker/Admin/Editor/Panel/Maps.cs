@@ -18,13 +18,13 @@ namespace LootLocker.Admin
             Repaint();
             Debug.Log("Getting maps..");
             mapsResponse = null;
-            currentView = View.Loading;
+            currentView = LootLockerView.Loading;
             LootLockerSDKAdminManager.GettingAllMapsToAGame(activeGameID, (response) =>
             {
                 if (response.success)
                 {
                     mapsResponse = response;
-                    currentView = View.Maps;
+                    currentView = LootLockerView.Maps;
                     Repaint();
                     Debug.Log("Successful got all maps: " + response.text);
                 }
@@ -39,7 +39,7 @@ namespace LootLocker.Admin
         {
             Debug.Log("Current Map set to: " + mapID);
             activeMap = mapsResponse.maps.ToList().Find(m => m.map_id == mapID);
-            currentView = View.UpdateMap;
+            currentView = LootLockerView.UpdateMap;
         }
 
         void DrawMapsView()
@@ -62,14 +62,14 @@ namespace LootLocker.Admin
             {
                 activeMap = new LootLockerMap();
                 activeMap.spawn_points = new LootLockerSpawnpoint[0];
-                currentView = View.CreateMap;
+                currentView = LootLockerView.CreateMap;
             }
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Back", GUILayout.Height(20)))
             {
-                currentView = View.Menu;
+                currentView = LootLockerView.Menu;
             }
             EditorGUILayout.EndHorizontal();
 

@@ -21,7 +21,7 @@ namespace LootLocker.Admin
                 if (response.success)
                 {
                     gamesResponse = response;
-                    currentView = View.Games;
+                    currentView = LootLockerView.Games;
                     Repaint();
                     Debug.Log("Successful got all games: " + response.text);
                 }
@@ -126,7 +126,7 @@ namespace LootLocker.Admin
 
             if (GUILayout.Button("Back", GUILayout.Height(40)))
             {
-                currentView = View.Login;
+                currentView = LootLockerView.Login;
             }
 
             GUILayout.EndArea();
@@ -169,13 +169,13 @@ namespace LootLocker.Admin
             if (GUILayout.Button("Yes", GUILayout.Height(40)))
             {
                 DeleteGame();
-                currentView = View.Loading;
+                currentView = LootLockerView.Loading;
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("No", GUILayout.Height(40)))
             {
-                currentView = View.Games;
+                currentView = LootLockerView.Games;
             }
             EditorGUILayout.EndHorizontal();
             GUILayout.EndArea();
@@ -257,7 +257,7 @@ namespace LootLocker.Admin
                     steam_app_id = CreateGame_steamAppID.ToString()
                 };
                 CreateGame(cagr);
-                currentView = View.Loading;
+                currentView = LootLockerView.Loading;
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
@@ -283,7 +283,7 @@ namespace LootLocker.Admin
                 else
                 {
                     Debug.LogError("failed to create game: " + response.Error);
-                    currentView = View.CreateGame;
+                    currentView = LootLockerView.CreateGame;
                 }
             });
         }
@@ -312,7 +312,7 @@ namespace LootLocker.Admin
             activeGameID = id;
             if (!setToDelete)
             {
-                currentView = View.Loading;
+                currentView = LootLockerView.Loading;
                 LootLockerSDKAdminManager.GetDetailedInformationAboutAGame(id.ToString(), (response) =>
                  {
                      if (response.success)
@@ -327,7 +327,7 @@ namespace LootLocker.Admin
                              LootLockerConfig.current.apiKey = response.game.game_key;
                              LootLockerConfig.current.gameID = response.game.id;
                          }
-                         currentView = View.Menu;
+                         currentView = LootLockerView.Menu;
                      }
                      else
                      {
@@ -338,7 +338,7 @@ namespace LootLocker.Admin
             }
             else
             {
-                currentView = View.DeleteGameConfirmation;
+                currentView = LootLockerView.DeleteGameConfirmation;
             }
         }
 

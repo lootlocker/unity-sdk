@@ -26,7 +26,7 @@ namespace LootLocker.Admin
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Back", GUILayout.Height(20)))
             {
-                currentView = View.Menu;
+                currentView = LootLockerView.Menu;
             }
             GUILayout.EndHorizontal();
             GUILayout.EndArea();

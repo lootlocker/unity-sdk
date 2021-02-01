@@ -24,7 +24,7 @@ namespace LootLocker.Admin
         {
             LootLockerSDKAdminManager.DebugMessage("Getting assets..");
 
-            currentView = View.Loading;
+            currentView = LootLockerView.Loading;
 
             LootLockerSDKAdminManager.GetAssets((response) =>
             {
@@ -44,7 +44,7 @@ namespace LootLocker.Admin
                     if (response.success)
                     {
                         assetsResponse = response;
-                        currentView = View.Assets;
+                        currentView = LootLockerView.Assets;
                         Repaint();
                         LootLockerSDKAdminManager.DebugMessage("Successful got all assets: " + response.text);
                     }
@@ -71,7 +71,7 @@ namespace LootLocker.Admin
 
             if (GUILayout.Button("Back", GUILayout.Height(20)))
             {
-                currentView = View.Menu;
+                currentView = LootLockerView.Menu;
             }
 
             EditorGUILayout.Separator();
@@ -125,14 +125,14 @@ namespace LootLocker.Admin
             Debug.Log($"Current Asset set to: {assetsResponse.assets[assetIndex].id} Named: {assetsResponse.assets[assetIndex].name}");
 
             activeAsset = assetsResponse.assets[assetIndex];
-            currentView = View.UpdateAsset;
+            currentView = LootLockerView.UpdateAsset;
             SelectAssetBase();
         }
 
         void StartCreateAsset()
         {
             activeAsset = new LootLockerCommonAsset() { name = "untitleted", context = ContextNames[0] };
-            currentView = View.CreateAsset;
+            currentView = LootLockerView.CreateAsset;
             SelectAssetBase();
         }
 

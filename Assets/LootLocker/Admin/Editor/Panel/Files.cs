@@ -54,7 +54,7 @@ namespace LootLocker.Admin
                     });
 
                     getFilesResponse = response;
-                    currentView = View.Files;
+                    currentView = LootLockerView.Files;
                     Repaint();
                     Debug.Log("Successful got all files: " + response.text);
                 }
@@ -116,7 +116,7 @@ namespace LootLocker.Admin
 
             GUILayout.BeginArea(ContentSection);
 
-            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Menu;
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = LootLockerView.Menu;
             EditorGUILayout.Separator();
 
             EditorGUILayout.LabelField("Files", style);
@@ -286,7 +286,7 @@ namespace LootLocker.Admin
                 if (GUILayout.Button("Upload", GUILayout.Height(30)))
                 {
 
-                    currentView = View.Loading;
+                    currentView = LootLockerView.Loading;
 
                     var request = new LootLockerCreateAssetRequest() { name = assetName, context_id = Contexts[Array.IndexOf(ContextNames, activeAsset.context)].id };
 
@@ -315,7 +315,7 @@ namespace LootLocker.Admin
                                         else
                                         {
                                             Debug.LogError("Failed to upload file: " + uploadResponse.Error);
-                                            currentView = View.CreateFile;
+                                            currentView = LootLockerView.CreateFile;
                                         }
                                     }, tags: FileTags.Split(','));
 
@@ -323,7 +323,7 @@ namespace LootLocker.Admin
                                 else
                                 {
                                     Debug.LogError("Failed to get assets: " + getAssetsResponse.Error);
-                                    currentView = View.CreateFile;
+                                    currentView = LootLockerView.CreateFile;
                                 }
                             });
 
@@ -331,7 +331,7 @@ namespace LootLocker.Admin
                         else
                         {
                             Debug.LogError("failed to get create/update asset: " + response.Error);
-                            currentView = View.CreateFile;
+                            currentView = LootLockerView.CreateFile;
                         }
                     });
 
@@ -356,7 +356,7 @@ namespace LootLocker.Admin
         {
 
             filePath = "";
-            currentView = View.CreateFile;
+            currentView = LootLockerView.CreateFile;
 
             //LootLockerSDKAdminManager.GetAssets((response) =>
             //{
@@ -384,7 +384,7 @@ namespace LootLocker.Admin
         void SelectFile(int index)
         {
             activeFile = getFilesResponse.files[index];
-            currentView = View.File;
+            currentView = LootLockerView.File;
 
             FileTags = String.Empty;
             if (activeFile.tags == null) return;

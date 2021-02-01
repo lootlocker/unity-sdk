@@ -17,7 +17,7 @@ namespace LootLocker.Admin
         /// <summary>
         /// the default value is "Login" because it's abstract struct
         /// </summary>
-        View currentView;
+        LootLockerView currentView;
 
         Texture2D
         headerSectionTexture,
@@ -101,7 +101,7 @@ namespace LootLocker.Admin
             password = LootLockerAdminConfig.current.password;
             //these will be exposed to UI
 
-            if (currentView == View.Login && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            if (currentView == LootLockerView.Login && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
                 AdminLogin();
             }
@@ -118,7 +118,7 @@ namespace LootLocker.Admin
         private void OnInspectorUpdate()
         {
 
-            if (currentView == View.Loading)
+            if (currentView == LootLockerView.Loading)
             {
 
                 if (++curLoadingTextureIndex >= loadingTextures.Count)
@@ -176,69 +176,69 @@ namespace LootLocker.Admin
         {
             switch (currentView)
             {
-                case View.Login:
+                case LootLockerView.Login:
                     DrawLoginView();
                     break;
-                case View.Games:
+                case LootLockerView.Games:
                     DrawGamesView();
                     break;
                 //case View.Maps:
                 //    DrawMapsView();
                 //    break;
-                case View.Assets:
+                case LootLockerView.Assets:
                     DrawAssetsView();
                     break;
-                case View.Menu:
+                case LootLockerView.Menu:
                     DrawMenuView();
                     break;
                 //case View.Missions:
                 //    DrawMissionsView();
                 //    break;
-                case View.Loading:
+                case LootLockerView.Loading:
                     DrawLoading();
                     break;
                 //case View.UpdateMap:
                 //    DrawMapView();
                 //    activeMapMode = MapMode.Update;
                 //    break;
-                case View.UpdateAsset:
+                case LootLockerView.UpdateAsset:
                     DrawAssetView(create: false);
                     break;
                 //case View.CreateMap:
                 //    DrawMapView();
                 //    activeMapMode = MapMode.Create;
                 //    break;
-                case View.CreateGame:
+                case LootLockerView.CreateGame:
                     DrawCreateGameView();
                     break;
-                case View.DeleteGameConfirmation:
+                case LootLockerView.DeleteGameConfirmation:
                     DrawDeleteGameConfirmationView();
                     break;
-                case View.Files:
+                case LootLockerView.Files:
                     DrawFilesView();
                     break;
-                case View.CreateAsset:
+                case LootLockerView.CreateAsset:
                     DrawAssetView(create: true);
                     break;
-                case View.File:
+                case LootLockerView.File:
                     DrawFileView();
                     break;
-                case View.CreateFile:
+                case LootLockerView.CreateFile:
                     DrawCreateFileView();
                     break;
-                case View.TwoFactorAuth:
+                case LootLockerView.TwoFactorAuth:
                     DrawTwoFactorAuthView();
                     break;
 
-                case View.VerifyTwoFactorAuth:
+                case LootLockerView.VerifyTwoFactorAuth:
                     DrawVerifyTwoFactorAuthView();
                     break;
 
-                case View.VerifySuccess:
+                case LootLockerView.VerifySuccess:
                     DrawVerifySuccessView();
                     break;
 
-                case View.Remove2FAConfirm:
+                case LootLockerView.Remove2FAConfirm:
                     DrawRemoveTwoFactorAuthView();
                     break;
 
@@ -381,14 +381,14 @@ namespace LootLocker.Admin
         public void AdminRemove2FA()
         {
 
-            currentView = View.Remove2FAConfirm;
+            currentView = LootLockerView.Remove2FAConfirm;
 
         }
 
         public void AdminSetup2FA()
         {
 
-            currentView = View.Loading;
+            currentView = LootLockerView.Loading;
 
             LootLockerSDKAdminManager.SetupTwoFactorAuthentication((response) =>
             {
@@ -397,7 +397,7 @@ namespace LootLocker.Admin
                     Debug.LogError("Successful setup two factor authentication: " + response.text);
                     tfaTexture = new Texture2D(200, 200);
                     tfaTexture.LoadImage(Convert.FromBase64String(response.mfa_token_url.Substring(22)));
-                    currentView = View.VerifyTwoFactorAuth;
+                    currentView = LootLockerView.VerifyTwoFactorAuth;
                 }
                 else
                 {
@@ -410,7 +410,7 @@ namespace LootLocker.Admin
 
         public void AdminLogin()
         {
-            currentView = View.Loading;
+            currentView = LootLockerView.Loading;
 
             LootLockerSDKAdminManager.InitialAuthRequest(email, password, (response) =>
             {
@@ -447,7 +447,7 @@ namespace LootLocker.Admin
         {
             MFAKey = mFAKey;
             SecretCode = String.Empty;
-            currentView = View.TwoFactorAuth;
+            currentView = LootLockerView.TwoFactorAuth;
 
             TwoFATockenTimoutCo = EditorCoroutineUtility.StartCoroutineOwnerless(TwoFATockenTimout());
         }
@@ -474,7 +474,7 @@ namespace LootLocker.Admin
 
             EditorGUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Games;
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = LootLockerView.Games;
 
             EditorGUILayout.Separator();
 
@@ -496,7 +496,7 @@ namespace LootLocker.Admin
             if (GUILayout.Button("Verify", GUILayout.Height(20)))
             {
 
-                currentView = View.Loading;
+                currentView = LootLockerView.Loading;
 
                 LootLockerSDKAdminManager.VerifyTwoFactorAuthenticationSetup(verify2FASecret, (response) =>
                 {
@@ -504,12 +504,12 @@ namespace LootLocker.Admin
                     {
                         Debug.LogError("Successfully verified two factor authentication setup: " + response.text);
                         verify2FARecovery = response.recover_token;
-                        currentView = View.VerifySuccess;
+                        currentView = LootLockerView.VerifySuccess;
                     }
                     else
                     {
                         Debug.LogError("failed to set two factor authentication: " + response.Error);
-                        currentView = View.Games;
+                        currentView = LootLockerView.Games;
                     }
                 });
 
@@ -542,7 +542,7 @@ namespace LootLocker.Admin
 
             EditorGUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Login;
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = LootLockerView.Login;
 
             EditorGUILayout.EndVertical();
 
@@ -574,18 +574,18 @@ namespace LootLocker.Admin
             if (GUILayout.Button("Remove", GUILayout.Height(20)))
             {
 
-                currentView = View.Loading;
+                currentView = LootLockerView.Loading;
                 LootLockerSDKAdminManager.RemoveTwoFactorAuthentication(remove2FASecret, (response) =>
                 {
                     if (response.success)
                     {
                         Debug.Log("Successful removed 2fa: " + response.text);
                         mfaState = false;
-                        currentView = View.Games;
+                        currentView = LootLockerView.Games;
                     }
                     else
                     {
-                        currentView = View.Remove2FAConfirm;
+                        currentView = LootLockerView.Remove2FAConfirm;
                         Debug.LogError("failed to get admin auth response: " + response.Error);
                     }
                 });
@@ -594,7 +594,7 @@ namespace LootLocker.Admin
 
             EditorGUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Login;
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = LootLockerView.Login;
 
             EditorGUILayout.EndVertical();
 
@@ -629,7 +629,7 @@ namespace LootLocker.Admin
                 });
             }
 
-            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = View.Login;
+            if (GUILayout.Button("Back", GUILayout.Height(20))) currentView = LootLockerView.Login;
 
             GUILayout.EndArea();
         }
@@ -650,7 +650,7 @@ namespace LootLocker.Admin
 
         void ResetToLogin()
         {
-            currentView = View.Login;
+            currentView = LootLockerView.Login;
         }
 
     }
@@ -660,7 +660,7 @@ namespace LootLocker.Admin
 
 namespace Lootlocker.Admin.LootLockerViewType
 {
-    public enum View
+    public enum LootLockerView
     {
         Login, Menu, Games, Maps, Missions, Loading, UpdateMap, CreateMap, CreateGame,
         DeleteGameConfirmation, Assets, UpdateAsset, Files, CreateAsset, File, CreateFile,
