@@ -25,10 +25,6 @@ namespace LootLocker.Requests
 
         static bool LoadConfig()
         {
-            if (LootLockerConfig.current == null)
-                LootLockerConfig.current = Resources.Load("Config/LootLockerConfig") as LootLockerConfig;
-            if (LootLockerEndPoints.current == null)
-                LootLockerEndPoints.current = Resources.Load("Config/LootLockerEndPoints") as LootLockerEndPoints;
             LootLockerBaseServerAPI.activeConfig = LootLockerConfig.current;
 
             initialized = true;

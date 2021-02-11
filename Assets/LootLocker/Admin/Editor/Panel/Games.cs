@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -320,12 +320,14 @@ namespace LootLocker.Admin
                          LootLockerAdminConfig.current.gameName = response.game.development.name;
                          LootLockerAdminConfig.current.apiKey = response.game.development.game_key;
                          LootLockerAdminConfig.current.gameID = response.game.development.id;
+                         LootLockerAdminConfig.current.EditorSave();
 
                      //normal setup
                      if (LootLockerConfig.current != null)
                          {
                              LootLockerConfig.current.apiKey = response.game.game_key;
                              LootLockerConfig.current.gameID = response.game.id;
+                             LootLockerConfig.current.EditorSave();
                          }
                          currentView = LootLockerView.Menu;
                      }

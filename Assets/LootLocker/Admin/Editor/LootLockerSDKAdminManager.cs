@@ -30,13 +30,7 @@ using LootLocker.Requests;
             {
                 LootLockerSDKAdminManager.DebugMessage("Loading admin config..");
 
-                if (LootLockerAdminConfig.current == null)
-                    LootLockerAdminConfig.current = Resources.Load("Config/LootLockerAdminConfig") as LootLockerAdminConfig;
-
-                if (LootLockerEndPointsAdmin.current == null)
-                    LootLockerEndPointsAdmin.current = Resources.Load("Config/LootLockerEndPointsAdmin") as LootLockerEndPointsAdmin;
-
-                LootLockerBaseServerAPI.activeConfig = LootLockerAdminConfig.current;
+                LootLockerBaseServerAPI.activeConfig = LootLockerAdminConfig.Get();
 
                 return LootLockerEndPointsAdmin.current != null;
 

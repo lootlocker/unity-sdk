@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace LootLocker
 {
-    public class LootLockerConfig : LootLockerGenericConfig
+    public class LootLockerAdminConfig : LootLockerGenericConfig
     {
 #if UNITY_EDITOR
-        static LootLockerConfig()
+        static LootLockerAdminConfig()
         {
             ProjectSettingsBuildProcessor.OnBuild += OnProjectSettingsBuild;
         }
@@ -19,11 +19,11 @@ namespace LootLocker
         private static void OnProjectSettingsBuild(List<ScriptableObject> list, List<string> names)
         {
             list.Add(Get());
-            names.Add("LootLockerConfig");
+            names.Add("LootLockerAdminConfig");
         }
 #endif
 
-        private static LootLockerConfig settingsInstance;
+        private static LootLockerAdminConfig settingsInstance;
 
         public string SettingsPath
         {
@@ -37,33 +37,33 @@ namespace LootLocker
             }
         }
 
-        public virtual string SettingName { get { return "LootLockerConfig"; } }
+        public virtual string SettingName { get { return "LootLockerAdminConfig"; } }
 
-        public static LootLockerConfig Get()
+        public static LootLockerAdminConfig Get()
         {
             if (settingsInstance != null)
             {
                 return settingsInstance;
             }
 
-            LootLockerConfig tempInstance = CreateInstance<LootLockerConfig>();
+            LootLockerAdminConfig tempInstance = CreateInstance<LootLockerAdminConfig>();
 #if UNITY_EDITOR
             string path = tempInstance.SettingsPath;
 
             if (!File.Exists(path))
             {
-                settingsInstance = CreateInstance<LootLockerConfig>();
+                settingsInstance = CreateInstance<LootLockerAdminConfig>();
                 ProjectSettingsHelper.Save(settingsInstance, path);
             }
             else
             {
-                settingsInstance = ProjectSettingsHelper.Load<LootLockerConfig>(path);
+                settingsInstance = ProjectSettingsHelper.Load<LootLockerAdminConfig>(path);
             }
 
             settingsInstance.hideFlags = HideFlags.HideAndDontSave;
             return settingsInstance;
 #else
-            settingsInstance = Resources.Load<LootLockerConfig>(tempInstance.SettingsPath);
+            settingsInstance = Resources.Load<LootLockerAdminConfig>(tempInstance.SettingsPath);
             return settingsInstance;
 #endif
         }
@@ -75,19 +75,19 @@ namespace LootLocker
         }
 #endif
 
-        private static LootLockerConfig _current;
+        private static LootLockerAdminConfig _current;
 
-        public static LootLockerConfig current 
-        { 
+        public static LootLockerAdminConfig current
+        {
             get
             {
-                if(_current == null)
+                if (_current == null)
                 {
                     _current = Get();
                 }
 
                 return _current;
-            } 
+            }
         }
     }
 }
