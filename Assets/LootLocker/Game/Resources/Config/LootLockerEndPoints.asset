@@ -75,6 +75,12 @@ MonoBehaviour:
   setProfilePublic:
     endPoint: v1/player/profile/public
     httpMethod: 1
+  createCharacter:
+    endPoint: v1/player/character
+    httpMethod: 1
+  listCharacterTypes:
+    endPoint: v1/player/character/types
+    httpMethod: 0
   characterLoadouts:
     endPoint: v1/player/character/loadout
     httpMethod: 0

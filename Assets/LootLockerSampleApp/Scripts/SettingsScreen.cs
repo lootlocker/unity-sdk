@@ -1,19 +1,26 @@
-﻿using System.Collections;
+﻿using LootLocker;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LootLockerDemoApp
 {
+    public class ClassData: ILootLockerStageData
+    {
+        public string classType;
+    }
     public class SettingsScreen : MonoBehaviour
     {
         public ScreenCloser bottomNavigator;
         public ButtonExtention buttonExtentionEvent;
-        public Button changeClass;
-
+        public Button editDefaultCharacter;
+        public Button changeCharacter;
+        public PlayerDataObject dataObject;
         private void Awake()
         {
-            changeClass.onClick.AddListener(ViewClassSelectScreen);
+            editDefaultCharacter.onClick.AddListener(EditdefultCharacter);
+            changeCharacter.onClick.AddListener(ChangeCharacter);
         }
 
         public void RefreshGameData()
@@ -37,9 +44,15 @@ namespace LootLockerDemoApp
             bottomNavigator?.Close();
         }
 
-        public void ViewClassSelectScreen()
+        public void EditdefultCharacter()
         {
-            StagesManager.instance.GoToStage(StagesManager.StageID.SwapClass, null);
+            dataObject.swappingCharacter = true;
+            StagesManager.instance.GoToStage(StagesManager.StageID.CreateCharacter, null);
+        }
+
+        public void ChangeCharacter()
+        {
+            StagesManager.instance.GoToStage(StagesManager.StageID.CreateCharacter, null);
         }
     }
 }

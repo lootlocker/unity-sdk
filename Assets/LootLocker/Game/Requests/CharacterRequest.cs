@@ -30,6 +30,22 @@ namespace LootLocker.Requests
         }
     }
 
+
+    public class LootLockerListCharacterTypesResponse : LootLockerResponse
+    {
+        public bool success { get; set; }
+        public LootLockerCharacter_Types[] character_types { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerCharacter_Types
+    {
+        public int id;
+        public bool is_default;
+        public string name;
+    }
+
+
     public class LootLockerDefaultCharacterLoadout
     {
         public int variation_id { get; set; }
@@ -54,7 +70,13 @@ namespace LootLocker.Requests
         public string type { get; set; }
 
     }
+    public class LootLockerCreateCharacterRequest
+    {
+        public bool is_default { get; set; }
+        public string name { get; set; }
+        public string character_type_id { get; set; }
 
+    }
     public class LootLockerEquipByIDRequest
     {
         public int instance_id { get; set; }
@@ -71,20 +93,26 @@ namespace LootLocker.Requests
     {
         public bool success { get; set; }
         public LootLockerLootLockerLoadout[] loadouts { get; set; }
-    }
 
+        public LootLockerCharacter GetCharacter(string name)
+        {
+            LootLockerCharacter lootLockerCharacter = loadouts.FirstOrDefault(x => x.character.name == name)?.character;
+            return lootLockerCharacter;
+        }
+    }
+    [Serializable]
     public class LootLockerLootLockerLoadout : ILootLockerStageData
     {
         public LootLockerCharacter character { get; set; }
         public LootLockerLoadouts[] loadout { get; set; }
     }
-
+    [Serializable]
     public class LootLockerCharacter
     {
-        public int id { get; set; }
-        public string type { get; set; }
-        public string name { get; set; }
-        public bool is_default { get; set; }
+        public int id;
+        public string type;
+        public string name;
+        public bool is_default;
     }
 
     public class LootLockerCharacterAsset
@@ -98,6 +126,56 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
+        public static void CreateCharacter(LootLockerCreateCharacterRequest data, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.current.createCharacter;
+
+            string json = (data == null) ? "" : JsonConvert.SerializeObject(data);
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerCharacterLoadoutResponse>(serverResponse.text);
+                    response.text = serverResponse.text;
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true);
+        }
+
+        public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.current.listCharacterTypes;
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
+            {
+                LootLockerListCharacterTypesResponse response = new LootLockerListCharacterTypesResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerListCharacterTypesResponse>(serverResponse.text);
+                    response.text = serverResponse.text;
+                    onComplete?.Invoke(response);
+                }
+                else
+                {
+                    response.message = serverResponse.message;
+                    response.Error = serverResponse.Error;
+                    onComplete?.Invoke(response);
+                }
+            }, true);
+        }
+
         public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.current.characterLoadouts;

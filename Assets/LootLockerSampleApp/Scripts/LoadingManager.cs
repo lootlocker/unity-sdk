@@ -19,7 +19,6 @@ namespace LootLockerDemoApp
             }
             else
             {
-                Debug.LogError("Found Another" + gameObject.name);
                 Destroy(this.transform.parent.gameObject);
             }
         }

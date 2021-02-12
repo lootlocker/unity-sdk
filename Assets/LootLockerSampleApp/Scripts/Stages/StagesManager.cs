@@ -12,7 +12,7 @@ namespace LootLockerDemoApp
         public static StagesManager instance;
 
         [Serializable]
-        public enum StageID { App, Player, Home, Inventory, Store, GameSystem, Settings, Messages, ReadMessages, SwapClass, CreatePlayer, SelectPlayer, Collectables, Files, Storage };
+        public enum StageID { App, Player, Home, Inventory, Store, GameSystem, Settings, Messages, ReadMessages, SwapClass, CreatePlayer, SelectPlayer, Collectables, Files, Storage, CreateCharacter };
 
         [Serializable]
         public struct Stage
@@ -27,6 +27,7 @@ namespace LootLockerDemoApp
         private void Awake()
         {
             instance = this;
+            Application.targetFrameRate = 60;
         }
 
         public void GoToStage(GameObject newStageObject, ILootLockerStageData stageData)

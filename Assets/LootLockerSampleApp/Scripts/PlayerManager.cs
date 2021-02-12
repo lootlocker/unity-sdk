@@ -28,14 +28,13 @@ namespace LootLockerDemoApp
         public InputField newPlayerName;
         string playerKeyName = "localplayers";
         public Dictionary<LocalPlayer, GameObject> playerElements = new Dictionary<LocalPlayer, GameObject>();
-        string playerStorageKeyNameToUse;
         [Header("Easy Prefab Setup")]
         public bool isEasyPrefab;
-        string easyPrefabPlayerKeyName = "easyPrefabLocalplayers";
+        public static LocalPlayer localPlayer;
+        public PlayerDataObject playerDataObject;
 
         private void Awake()
         {
-            playerStorageKeyNameToUse = playerKeyName;
             StartEasyPrefab();
         }
 
@@ -43,7 +42,6 @@ namespace LootLockerDemoApp
         {
             if (isEasyPrefab)
             {
-                playerStorageKeyNameToUse = easyPrefabPlayerKeyName;
                 SetUpEasyPrefab();
                 ListPlayers();
             }
@@ -78,10 +76,10 @@ namespace LootLockerDemoApp
         public void ListPlayers()
         {
 
-            if (!PlayerPrefs.HasKey(playerStorageKeyNameToUse))
-                PlayerPrefs.SetString(playerStorageKeyNameToUse, JsonConvert.SerializeObject(new List<LocalPlayer>()));
+            if (!PlayerPrefs.HasKey(playerDataObject?.playerStorageKeyNameToUse))
+                PlayerPrefs.SetString(playerDataObject?.playerStorageKeyNameToUse, JsonConvert.SerializeObject(new List<LocalPlayer>()));
 
-            List<LocalPlayer> localPlayers = JsonConvert.DeserializeObject<List<LocalPlayer>>(PlayerPrefs.GetString(playerStorageKeyNameToUse));
+            List<LocalPlayer> localPlayers = JsonConvert.DeserializeObject<List<LocalPlayer>>(PlayerPrefs.GetString(playerDataObject?.playerStorageKeyNameToUse));
 
             FillPlayers(localPlayers);
 
@@ -102,65 +100,64 @@ namespace LootLockerDemoApp
                 playerElementObject.GetComponentInChildren<Text>().text = user.playerName;
                 playerElementObject.GetComponent<Button>().onClick.AddListener(() => SelectPlayer(user));
                 playerElements.Add(user, playerElementObject);
-
             }
-
         }
 
         public void ClickCreateNewPlayer()
         {
-
             playersScreen.SetActive(false);
             createPlayerScreen.SetActive(true);
-
         }
 
         public void ClickNextOnName()
         {
-
             if (string.IsNullOrEmpty(newPlayerName.text))
                 return; //TODO: Show a message saying player name can't be empty
-
             createPlayerScreen.SetActive(false);
             playersScreen.SetActive(true);
-            if (!isEasyPrefab)
-            {
-                CreatePlayerRequest createPlayerRequest = new CreatePlayerRequest { playerName = newPlayerName.text };
-                StagesManager.instance.GoToStage(StagesManager.StageID.SwapClass, createPlayerRequest);
-            }
-            else
-            {
-                StartSession();
-            }
+            StartNewSession();
         }
 
-        public void StartSession()
+        public void StartNewSession()
         {
             Guid guid = Guid.NewGuid();
+            LoadingManager.ShowLoadingScreen();
+            localPlayer = new LocalPlayer { playerName = newPlayerName.text, uniqueID = guid.ToString(), characterClass = null };
+            StartSession(localPlayer, (response) =>
+            {
+                Debug.Log("Created Session for new player with id: " + guid.ToString());
+                playerDataObject.SavePlayer(newPlayerName.text, guid.ToString());
+                //we want to reset the current character
+                playerDataObject?.SaveCharacter(new LootLockerCharacter {name = "None", type = "None"});
+                StagesManager.instance.GoToStage(StagesManager.StageID.CreateCharacter, localPlayer);
+                LoadingManager.HideLoadingScreen();
+            },
+            () =>
+            {
+                LoadingManager.HideLoadingScreen();
+            });
+        }
 
+        public void StartSession(LocalPlayer player, Action<LootLockerSessionResponse> onStartSessionCompleted, Action onSessionStartingFailed = null)
+        {
             LoadingManager.ShowLoadingScreen();
             //Starting a new session using the new id that has been created
-            LootLockerSDKManager.StartSession(guid.ToString(), (response) =>
+            LootLockerSDKManager.StartSession(player.uniqueID, (response) =>
             {
                 if (response.success)
                 {
-                    Debug.Log("Created Session for new player with id: " + guid.ToString());
-                    LocalPlayer localPlayer = new LocalPlayer { playerName = newPlayerName.text, uniqueID = guid.ToString(), characterClass = null };
-                    List<LocalPlayer> localPlayers = JsonConvert.DeserializeObject<List<LocalPlayer>>(PlayerPrefs.GetString(playerStorageKeyNameToUse));
-                    localPlayers.Add(localPlayer);
-                    PlayerPrefs.SetString(playerStorageKeyNameToUse, JsonConvert.SerializeObject(localPlayers));
-                    ListPlayers();
+                    playerDataObject.SaveSession(response);
+                    onStartSessionCompleted?.Invoke(response);
                     LoadingManager.HideLoadingScreen();
                 }
                 else
                 {
+                    onSessionStartingFailed?.Invoke();
                     Debug.LogError("Session failure: " + response.text);
                 }
 
             });
         }
-
-
 
         public void SelectPlayer(LocalPlayer selectedPlayer)
         {
@@ -168,47 +165,26 @@ namespace LootLockerDemoApp
             {
                 Debug.LogError("You clicked on player " + selectedPlayer.playerName + " thats all we know :) ");
                 return;
-
             }
             playersScreen.SetActive(false);
-
             createPlayerScreen.SetActive(false);
-
             LoadingManager.ShowLoadingScreen();
-
-            LootLockerConfig.current.deviceID = selectedPlayer.uniqueID;
-
-            LootLockerSDKManager.StartSession(selectedPlayer.uniqueID, (response) =>
+            StartSession(selectedPlayer, (response) =>
             {
-
-                if (response.success)
-                {
-                    playersScreen.SetActive(true);
-                    Debug.Log("Logged in successfully.");
-                    LoadingManager.HideLoadingScreen();
-                    LootLockerConfig.current.playerName = selectedPlayer.playerName;
-                    LootLockerConfig.current.playerClass = selectedPlayer.characterClass.type.ToString();
-                    StagesManager.instance.GoToStage(StagesManager.StageID.Home, response);
-
-                }
-                else
-                {
-                    playersScreen.SetActive(true);
-                    Debug.LogError("Log in failure.");
-                    LoadingManager.HideLoadingScreen();
-
-                }
-
-            });
-
+                playersScreen.SetActive(true);
+                Debug.Log("Logged in successfully.");
+                LoadingManager.HideLoadingScreen();
+                playerDataObject.SaveCharacter(selectedPlayer.playerName, selectedPlayer.characterClass);
+                LootLockerConfig.current.deviceID = selectedPlayer.uniqueID;
+                StagesManager.instance.GoToStage(StagesManager.StageID.Home, response);
+            },
+            () =>
+             {
+                 playersScreen.SetActive(true);
+                 Debug.LogError("Log in failure.");
+                 LoadingManager.HideLoadingScreen();
+             });
         }
-
     }
 
-    public class LocalPlayer
-    {
-        public string playerName, uniqueID;
-        public LootLockerCharacter characterClass;
-
-    }
 }

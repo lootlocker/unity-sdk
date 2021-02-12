@@ -201,6 +201,25 @@ namespace LootLocker.Requests
         #endregion
 
         #region Character
+        public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+
+            LootLockerCreateCharacterRequest data = new LootLockerCreateCharacterRequest();
+
+            data.name = newCharacterName;
+            data.is_default = isDefault;
+            data.character_type_id = characterTypeId;
+
+            LootLockerAPIManager.CreateCharacter(data,onComplete);
+        }
+
+        public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerAPIManager.ListCharacterTypes(onComplete);
+        }
+
         public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized()) return;

@@ -58,6 +58,7 @@ namespace LootLockerDemoApp
         public List<PopupData> messages = new List<PopupData>();
         bool displaying;
         PopupData currentPopup;
+        public Button closeBtn;
 
         private void Awake()
         {
@@ -78,6 +79,9 @@ namespace LootLockerDemoApp
             Instance.currentPopup = popupData;
             Instance?.button?.onClick?.RemoveAllListeners();
             Instance?.button?.onClick?.AddListener(() => { popupData?.btnAction(); });
+            Instance?.closeBtn?.onClick?.RemoveAllListeners();
+            Instance?.closeBtn?.onClick?.AddListener(Instance.Close);
+            Instance?.closeBtn?.onClick?.AddListener(() => { popupData?.btnAction(); });
             Instance.normalText.text = "";
             Instance.headerText.color = Color.black;
 

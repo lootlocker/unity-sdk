@@ -13,12 +13,11 @@ namespace LootLockerDemoApp
     public class HomeManager : MonoBehaviour, ILootLockerStageOwner
     {
         public ScreenOpener bottomOpener;
-
-        LootLockerSessionResponse sessionResponse;
+        public PlayerDataObject dataObject;
 
         [Header("Easy Prefab Setup")]
         public bool isEasyPrefab;
-
+        public PlayerDataObject playerDataObject;
         private void Awake()
         {
             StartEasyPrefab();
@@ -44,6 +43,7 @@ namespace LootLockerDemoApp
             {
                 if (response.success)
                 {
+                    playerDataObject.SaveSession(response);
                     UpdateScreenData(response);
                     Debug.Log("Created Session for new player with id: " + defaultUser);
                 }
@@ -76,10 +76,8 @@ namespace LootLockerDemoApp
         }
         public void UpdateScreenData(ILootLockerStageData stageData)
         {
-            LootLockerSessionResponse sessionResponse = stageData != null ? stageData as LootLockerSessionResponse : this.sessionResponse;
-            this.sessionResponse = sessionResponse;
-            GetComponentInChildren<PlayerProfile>()?.UpdateScreen(sessionResponse);
-            GetComponentInChildren<Progression>()?.UpdateScreen(sessionResponse);
+            GetComponentInChildren<PlayerProfile>()?.UpdateScreen(dataObject?.session);
+            GetComponentInChildren<Progression>()?.UpdateScreen(dataObject?.session);
             bottomOpener?.Open();
         }
 

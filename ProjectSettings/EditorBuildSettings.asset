@@ -6,42 +6,42 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/LootLocker/SampleApp/Scenes/AppScene.unity
+    path: Assets/LootLockerSampleApp/Scenes/AppScene.unity
     guid: 49a3868c93e9d4c86beb0f20c709ff2d
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/NavigationScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/NavigationScene.unity
     guid: 5782c5f9ad68dd34aa77f54e170ef109
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/AssetInstancesScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/AssetInstancesScene.unity
     guid: da670e81e5130324285652d1d8a74c04
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/AssetsScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/AssetsScene.unity
     guid: 874b754128a4bae4682dda0a0c5b9f42
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/CharacterScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/CharacterScene.unity
     guid: 434a9134e89226c47b6c57e63af86091
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/CollectablesScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/CollectablesScene.unity
     guid: 1cbee842b11ae004aa1690e17f894017
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/EventScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/EventScene.unity
     guid: 3e6cc42d5b29a0b4fb05b2866ce06e85
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/MessagesScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/MessagesScene.unity
     guid: ce600120bd616df4b817adbc5f51ef79
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/PersistentScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/PersistentScene.unity
     guid: 77e2a26752919ce429ec6c487995e066
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/PlayerScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/PlayerScene.unity
     guid: 9b18268fd1a47564e86d326868a75ca1
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/PurchaseScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/PurchaseScene.unity
     guid: a6d07c6bcf74e7146a0864ad22a8bc91
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/SessionScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/SessionScene.unity
     guid: 85d4f1ad75ab0794aabc40be4deff785
   - enabled: 1
-    path: Assets/LootLocker/Game/Samples/Scenes/GameTestScenes/VerifyScene.unity
+    path: Assets/LootLockerUnitySamples/Scenes/GameTestScenes/VerifyScene.unity
     guid: 87007997fec47694689796e9074bd4ad
   m_configObjects: {}

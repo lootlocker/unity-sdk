@@ -20,6 +20,7 @@ namespace LootLockerDemoApp
         Guid guid;
         public Button button;
         Action failResponse;
+        public PlayerDataObject playerDataObject;
 
         [Header("Easy Prefab Setup")]
         public bool isEasyPrefab;
@@ -95,7 +96,7 @@ namespace LootLockerDemoApp
             if (stageData != null)
             {
                 createPlayerRequest = stageData as CreatePlayerRequest;
-                LootLockerConfig.current.playerName = createPlayerRequest.playerName;
+                playerDataObject.SavePlayer(createPlayerRequest.playerName);
                 LoadingManager.ShowLoadingScreen();
                 failResponse = () => { StagesManager.instance.GoToStage(StagesManager.StageID.Player, null); };
                 //Starting session first before character is chosen
@@ -105,14 +106,38 @@ namespace LootLockerDemoApp
                     foreach (Transform tr in parent)
                         Destroy(tr.gameObject);
 
-                    LootLockerSDKManager.GetCharacterLoadout((response) =>
+
+                    LootLockerSDKManager.ListCharacterTypes((response) =>
                     {
                         if (response.success)
                         {
-                            foreach (LootLockerLootLockerLoadout loadout in response.loadouts)
+                            int index = 0;
+                            foreach (LootLockerCharacter_Types types in response.character_types)
                             {
-                                GameObject selectionButton = Instantiate(characterClassPrefab, parent);
-                                selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);
+                                index++;
+                                Action<LootLockerCharacterLoadoutResponse> tempListResponse = (listReponse) =>
+                                {
+                                    if (index == response.character_types.Length)
+                                    {
+                                        LootLockerSDKManager.GetCharacterLoadout((getLoadOutResponse) =>
+                                        {
+                                            if (getLoadOutResponse.success)
+                                            {
+                                                foreach (LootLockerLootLockerLoadout loadout in getLoadOutResponse.loadouts)
+                                                {
+                                                    GameObject selectionButton = Instantiate(characterClassPrefab, parent);
+                                                    selectionButton.GetComponent<ClassSelectionButton>()?.Init(loadout);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                StagesManager.instance.GoToStage(StagesManager.StageID.CreatePlayer, null);
+                                            }
+                                            LoadingManager.HideLoadingScreen();
+                                        });
+                                    }
+                                };
+                                LootLockerSDKManager.CreateCharacter(types.id.ToString(), types.name, types.is_default, tempListResponse);
                             }
                         }
                         else
@@ -121,6 +146,8 @@ namespace LootLockerDemoApp
                         }
                         LoadingManager.HideLoadingScreen();
                     });
+
+
                 });
                 //if we are creating a new character then we want to set character details once it is created
                 button.onClick.RemoveAllListeners();
@@ -135,7 +162,7 @@ namespace LootLockerDemoApp
                             localPlayers.Add(localPlayer);
                             PlayerPrefs.SetString("localplayers", JsonConvert.SerializeObject(localPlayers));
                             LootLockerConfig.current.deviceID = localPlayer.uniqueID;
-                            LootLockerConfig.current.playerClass = loadout.character.type.ToString();
+                           // playerDataObject._playerClass = loadout.character.type.ToString();
                         //Character has been set, we can now load the home page
                         StagesManager.instance.GoToStage(StagesManager.StageID.Home, sessionResponse);
                         }
@@ -186,23 +213,23 @@ namespace LootLockerDemoApp
         {
             ////now that we have a new player created, we need to set the default character of this player to the one that was selected
 
-            LootLockerSDKManager.UpdateCharacter(loadout.character.id.ToString(), LootLockerConfig.current.playerName, true, (updateResponse) =>
-            {
-                if (updateResponse.success)
-                {
-                    LootLockerConfig.current.playerClass = loadout.character.type;
-                    Debug.Log("Updated character info successfully: " + updateResponse.text);
-                    onCompletedUpdate?.Invoke();
-                    LoadingManager.HideLoadingScreen();
-                }
-                else
-                {
-                    failResponse?.Invoke();
-                    Debug.LogError("Failed to update character info: " + updateResponse.text);
-                    LoadingManager.HideLoadingScreen();
-                }
+            //LootLockerSDKManager.UpdateCharacter(loadout.character.id.ToString(), playerDataObject._playerName, true, (updateResponse) =>
+            //{
+            //    if (updateResponse.success)
+            //    {
+            //        playerDataObject._playerClass = loadout.character.type;
+            //        Debug.Log("Updated character info successfully: " + updateResponse.text);
+            //        onCompletedUpdate?.Invoke();
+            //        LoadingManager.HideLoadingScreen();
+            //    }
+            //    else
+            //    {
+            //        failResponse?.Invoke();
+            //        Debug.LogError("Failed to update character info: " + updateResponse.text);
+            //        LoadingManager.HideLoadingScreen();
+            //    }
 
-            });
+            //});
         }
 
         public void StartSession(Action OnCompletedSessionStart)
@@ -215,6 +242,7 @@ namespace LootLockerDemoApp
             {
                 if (response.success)
                 {
+                    playerDataObject.SaveSession(response);
                     sessionResponse = response;
                     Debug.Log("Session success: " + response.text);
                     OnCompletedSessionStart?.Invoke();

@@ -20,10 +20,6 @@ namespace LootLocker
         public string deviceID = "defaultPlayerId";
         [HideInInspector]
         public string email, password;
-        [HideInInspector]
-        public string playerName;
-        [HideInInspector]
-        public string playerClass;
         public platformType platform;
         public environmentType environment;
         public enum environmentType { Development, Live }

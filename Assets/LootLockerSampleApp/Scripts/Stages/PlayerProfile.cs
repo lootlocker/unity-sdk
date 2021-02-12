@@ -16,18 +16,22 @@ namespace LootLockerDemoApp
         public Text className;
         public Text credits;
         public Text level;
+        public Text characterName;
         public string creditsSprite = "Credits";
         public string xpSprite = "Xp";
         public Text message;
+        public PlayerDataObject playerDataObject;
 
         public void UpdateScreen(LootLockerSessionResponse sessionResponse)
         {
-            if (sessionResponse == null) return;
-            username.text = LootLockerConfig.current.playerName;
-            playerId.text = sessionResponse.player_id.ToString();
-            className.text = LootLockerConfig.current.playerClass;
-            credits.text = sessionResponse.account_balance.ToString();
-            level.text = sessionResponse.level.ToString();
+          //  if (sessionResponse == null) return;
+            username.text = playerDataObject.playerName;
+            playerId.text = playerDataObject.session.player_id.ToString();
+            className.text = playerDataObject.lootLockerCharacter.type;
+            credits.text = playerDataObject.session.account_balance.ToString();
+            characterName.text = playerDataObject.lootLockerCharacter.name;
+
+            level.text = playerDataObject.session.level.ToString();
             if (message != null)
                 message.text = "";
             LootLockerSDKManager.GetMessages((response) =>
@@ -95,6 +99,7 @@ namespace LootLockerDemoApp
                 LoadingManager.HideLoadingScreen();
                 if (response.success)
                 {
+                    playerDataObject.SaveSession(response);
                     header = "Success";
 
                     if (grant == Grant.Credits)

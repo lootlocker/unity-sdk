@@ -25,8 +25,11 @@ namespace LootLockerDemoApp
         private void Awake()
         {
 #if !UNITY_EDITOR
-        usernameField.text = PlayerPrefs.GetString("AdminUserName","");
-        passwordField.text = PlayerPrefs.GetString("AdminPassword","");
+        usernameField.text = PlayerPrefs.GetString("AdminUserName","emmanuel@cradaptive.com");
+        passwordField.text = PlayerPrefs.GetString("AdminPassword","Ihatefacebuk101!");
+#else
+            usernameField.text = "emmanuel@cradaptive.com";
+            passwordField.text = "Ihatefacebuk101!";
 #endif
         }
         public void UpdateScreenData(ILootLockerStageData stageData)
@@ -66,8 +69,8 @@ namespace LootLockerDemoApp
                     }
                     else
                     {
-                    //If authentication is successful, lets try to create a demo game or connect to the current demo game
-                    LoginAndCreateGame(response);
+                        //If authentication is successful, lets try to create a demo game or connect to the current demo game
+                        LoginAndCreateGame(response);
                     }
                 }
                 else
@@ -99,8 +102,8 @@ namespace LootLockerDemoApp
                 {
                     if (createGameResponse.success)
                     {
-                    //update the config of the game
-                    LootLockerConfig.current.UpdateAPIKey(createGameResponse.game.game_key);
+                        //update the config of the game
+                        LootLockerConfig.current.UpdateAPIKey(createGameResponse.game.game_key);
                         successScreen.SetActive(true);
                         activatingScreen.SetActive(false);
                     }
@@ -119,8 +122,8 @@ namespace LootLockerDemoApp
                 Debug.LogWarning("No game called Demo Game. Creating one...");
                 LootLockerSDKManager.CreatingAGame("Demo Game", "0", true, organisationID, true, (createGameResponse) =>
                 {
-                //we were succesful in creating a demo game
-                if (createGameResponse.success)
+                    //we were succesful in creating a demo game
+                    if (createGameResponse.success)
                     {
                         Debug.Log("Successful created a demo game: " + createGameResponse.text);
                         AppManager.activeGameID = createGameResponse.game.id;

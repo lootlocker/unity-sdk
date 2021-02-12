@@ -40,6 +40,8 @@ namespace LootLocker
 
         //Character
         [Header("Character Endpoints")]
+        public EndPointClass createCharacter;
+        public EndPointClass listCharacterTypes;
         public EndPointClass characterLoadouts;
         public EndPointClass getOtherPlayersCharacterLoadouts;
         public EndPointClass updateCharacter;
