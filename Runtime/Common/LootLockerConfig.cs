@@ -60,7 +60,7 @@ namespace LootLocker
             {
                 settingsInstance = ProjectSettingsHelper.Load<LootLockerConfig>(path);
             }
-   
+
             settingsInstance.hideFlags = HideFlags.HideAndDontSave;
             return settingsInstance;
 #else
@@ -91,34 +91,31 @@ namespace LootLocker
             }
         }
 
-        public  string apiKey;
+        public string apiKey;
         [HideInInspector]
-        public  string token;
+        public string token;
         [HideInInspector]
-        public  int gameID;
-        public  string game_version = "1.0";
+        public int gameID;
+        public string game_version = "1.0";
         [HideInInspector]
-        public  string deviceID = "defaultPlayerId";
-        [HideInInspector]
-        public  string email, password;
-        public  platformType platform;
-        public  environmentType environment;
-        public enum environmentType { Development, Live }
-        public enum platformType { android, ios, Steam, Windows }
-        public  bool developmentMode => environment == environmentType.Development ? true : false;
-        [HideInInspector]
-        public  string url = "https://api.lootlocker.io/game/v1";
-        [HideInInspector]
-        public  string adminUrl = "https://api.lootlocker.io/admin";
-        [HideInInspector]
-        public  string playerUrl = "https://api.lootlocker.io/player";
-        [HideInInspector]
-        public  string userUrl = "https://api.lootlocker.io/game";
-        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
-        public  DebugLevel currentDebugLevel;
-        public  bool allowTokenRefresh = true;
+        public string deviceID = "defaultPlayerId";
+        public platformType platform;
+        public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web ,Other }
 
-        public  void UpdateToken(string _token, string _player_identifier)
+        public bool developmentMode;
+        [HideInInspector]
+        public string url = "https://api.lootlocker.io/game/v1";
+        [HideInInspector]
+        public string adminUrl = "https://api.lootlocker.io/admin";
+        [HideInInspector]
+        public string playerUrl = "https://api.lootlocker.io/player";
+        [HideInInspector]
+        public string userUrl = "https://api.lootlocker.io/game";
+        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
+        public DebugLevel currentDebugLevel;
+        public bool allowTokenRefresh = true;
+
+        public void UpdateToken(string _token, string _player_identifier)
         {
             token = _token;
             deviceID = _player_identifier;

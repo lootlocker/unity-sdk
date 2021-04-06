@@ -65,12 +65,12 @@ namespace LootLocker.Admin
                 gameSettings.EditorSave();
             }
 
-            LootLockerConfig.environmentType environment = gameSettings.environment;
+            bool onDevelopmentMode = gameSettings.developmentMode;
             EditorGUI.BeginChangeCheck();
-            environment = (LootLockerConfig.environmentType)EditorGUILayout.EnumPopup("Environment", environment);
+            onDevelopmentMode = EditorGUILayout.Toggle("On Development Mode", onDevelopmentMode);
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.environment = environment;
+                gameSettings.developmentMode = onDevelopmentMode;
                 gameSettings.EditorSave();
             }
 

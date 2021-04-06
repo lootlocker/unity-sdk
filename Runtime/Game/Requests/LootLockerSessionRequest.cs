@@ -68,6 +68,7 @@ namespace LootLocker
                  {
                      LootLockerSDKManager.DebugMessage(serverResponse.text);
                      response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
+                     response.text = serverResponse.text;
                      LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
                      onComplete?.Invoke(response);
                  }
@@ -93,6 +94,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerSDKManager.DebugMessage(serverResponse.text);
+                    response.text = serverResponse.text;
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
                     onComplete?.Invoke(response);
                 }
