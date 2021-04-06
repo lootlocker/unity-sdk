@@ -1,1 +1,0 @@
-Full documentation for the app and SDK can be found at https://www.lootlocker.io/documentation
