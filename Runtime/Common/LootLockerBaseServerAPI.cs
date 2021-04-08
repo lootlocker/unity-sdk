@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using LootLocker.Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 using UnityEngine.SceneManagement;

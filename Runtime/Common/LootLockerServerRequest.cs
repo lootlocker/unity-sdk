@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using LootLocker.Newtonsoft.Json;
+using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 

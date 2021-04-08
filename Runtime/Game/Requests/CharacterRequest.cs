@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker.Requests;
-using LootLocker.Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Linq;
 
 

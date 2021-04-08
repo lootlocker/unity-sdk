@@ -4,7 +4,7 @@ using UnityEngine;
 using LootLocker.Requests;
 using LootLocker;
 using System;
-using LootLocker.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace LootLocker.Requests
 {

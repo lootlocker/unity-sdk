@@ -6,7 +6,7 @@ using LootLocker.Requests;
 using LootLocker;
 using System.Security.Cryptography;
 using System.Text;
-using LootLocker.Newtonsoft.Json;
+using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 
 namespace LootLocker.Requests
