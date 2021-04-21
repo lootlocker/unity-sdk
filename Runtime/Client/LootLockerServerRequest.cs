@@ -32,11 +32,11 @@ namespace LootLocker
     [System.Serializable]
     public class LootLockerResponse
     {
-     
+
         /// <summary>
         /// TRUE if http error OR server returns an error status
         /// </summary>
-        public bool hasError;
+        public bool hasError ;
         /// <summary>
         /// HTTP Status Code
         /// </summary>
@@ -47,26 +47,7 @@ namespace LootLocker
         /// </summary>
         public string text;
         public bool status;
-        public string message;
-        /// <summary>
-        /// A hashtable version of the server response, null if errors or unable to convert
-        /// </summary>
-        public Dictionary<string, object> data
-        {
-            get
-            {
-                if (this.hasError) return new Dictionary<string, object>();
-                try
-                {
-                    return JsonConvert.DeserializeObject<Dictionary<string, object>>(this.text);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(ex);
-                    return new Dictionary<string, object>();
-                }
-            }
-        }
+
         public string Error;
         /// <summary>
         /// A texture downloaded in the webrequest, if applicable, otherwise this will be null.

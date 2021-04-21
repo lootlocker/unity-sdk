@@ -99,18 +99,13 @@ namespace LootLocker
             {
                 LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
                     response = JsonConvert.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
-                    response.text = serverResponse.text;
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.text = serverResponse.text;
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, true);
         }
 
@@ -128,7 +123,6 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     response = JsonConvert.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
-
                     string[] collectableStrings = data.slug.Split('.');
 
                     string collectable = collectableStrings[0];
@@ -136,22 +130,15 @@ namespace LootLocker
                     string item = collectableStrings[2];
 
                     response.mainCollectable = response.collectables?.FirstOrDefault(x => x.name == collectable);
-
                     response.mainGroup = response.mainCollectable?.groups?.FirstOrDefault(x => x.name == group);
-
                     response.mainItem = response.mainGroup?.items?.FirstOrDefault(x => x.name == item);
-
-                    response.text = serverResponse.text;
-
-                    onComplete?.Invoke(response);
                 }
-                else
-                {
-                    response.text = serverResponse.text;
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, true);
         }
     }

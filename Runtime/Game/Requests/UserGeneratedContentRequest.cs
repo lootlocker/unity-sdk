@@ -138,17 +138,13 @@ namespace LootLocker
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -165,17 +161,13 @@ namespace LootLocker
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -189,17 +181,13 @@ namespace LootLocker
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -213,17 +201,13 @@ namespace LootLocker
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -235,17 +219,13 @@ namespace LootLocker
             {
                 LootLockerListingAssetCandidatesResponse response = new LootLockerListingAssetCandidatesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerListingAssetCandidatesResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -278,17 +258,13 @@ namespace LootLocker
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
 
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
@@ -302,17 +278,13 @@ namespace LootLocker
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
     }

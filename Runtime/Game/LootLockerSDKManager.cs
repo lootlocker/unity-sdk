@@ -53,7 +53,7 @@ namespace LootLocker.Requests
         public static void DebugMessage(string message, bool IsError = false)
         {
 #if     UNITY_EDITOR
-            if(LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
+            if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
             {
                 if (IsError)
                     Debug.LogError(message);
@@ -194,7 +194,7 @@ namespace LootLocker.Requests
             data.is_default = isDefault;
             data.character_type_id = characterTypeId;
 
-            LootLockerAPIManager.CreateCharacter(data,onComplete);
+            LootLockerAPIManager.CreateCharacter(data, onComplete);
         }
 
         public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
@@ -326,7 +326,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(key);
-            LootLockerAPIManager.GetSingleKeyPersistentStorage(data,onComplete);
+            LootLockerAPIManager.GetSingleKeyPersistentStorage(data, onComplete);
         }
 
         public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStoragResponse> onComplete)
@@ -368,7 +368,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetContext(onComplete);
         }
 
-        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, LootLocker.LootLockerEnums.AssetFilter filter =  LootLocker.LootLockerEnums.AssetFilter.none)
+        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, LootLocker.LootLockerEnums.AssetFilter filter = LootLocker.LootLockerEnums.AssetFilter.none)
         {
             if (!CheckInitialized()) return;
             LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter);
@@ -438,8 +438,8 @@ namespace LootLocker.Requests
             if (!CheckInitialized()) return;
             LootLockerGetRequest data = new LootLockerGetRequest();
 
-            for (int i = 0; i < assetIdsToRetrieve.Length; i++) 
-            data.getRequests.Add(assetIdsToRetrieve[i]);
+            for (int i = 0; i < assetIdsToRetrieve.Length; i++)
+                data.getRequests.Add(assetIdsToRetrieve[i]);
 
             LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
@@ -872,6 +872,61 @@ namespace LootLocker.Requests
             };
             LootLockerAPIManager.SubmittingACrashLog(data, onComplete);
         }
+        #endregion
+
+        #region Leaderboard
+        public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
+
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.member_id = member_id;
+
+            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+        }
+
+        public static void GetByListOfMembers(string[] members, int id, Action<LootLockerGetByListOfMembersResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetByListMembersRequest request = new LootLockerGetByListMembersRequest();
+
+            request.members = members;
+
+            LootLockerAPIManager.GetByListOfMembers(request, id.ToString(), onComplete);
+        }
+
+        public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
+            request.leaderboardId = leaderboardId;
+            request.count = count.ToString();
+
+            LootLockerAPIManager.GetScoreList(request, onComplete);
+        }
+
+        public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
+            request.leaderboardId = leaderboardId;
+            request.count = count.ToString();
+            request.after = after > 0 ? after.ToString() : null;
+
+            LootLockerAPIManager.GetScoreList(request, onComplete);
+        }
+
+        public static void SubmitScore(string member_id, int score, int id, Action<LootLockerSubmitScoreResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
+            request.member_id = member_id;
+            request.score = score;
+
+            LootLockerAPIManager.SubmitScore(request, id.ToString(), onComplete);
+        }
+
         #endregion
     }
 

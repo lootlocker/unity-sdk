@@ -154,5 +154,12 @@ namespace LootLocker
         //Crashes
         [Header("Crashes")]
         public EndPointClass submittingACrashLog = new EndPointClass("v1/crash", LootLockerHTTPMethod.POST);
+
+        //Leaderboards
+        [Header("Leaderboards")]
+        public EndPointClass getMemberRank = new EndPointClass("leaderboards/{0}/member/{1}", LootLockerHTTPMethod.GET);
+        public EndPointClass getByListOfMembers = new EndPointClass("leaderboards/{0}/members", LootLockerHTTPMethod.POST);
+        public EndPointClass getScoreList = new EndPointClass("leaderboards/{0}/list?count={1}", LootLockerHTTPMethod.GET);
+        public EndPointClass submitScore = new EndPointClass("leaderboards/{0}/submit", LootLockerHTTPMethod.POST);
     }
 }

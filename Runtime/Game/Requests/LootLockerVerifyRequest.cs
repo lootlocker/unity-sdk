@@ -44,17 +44,13 @@ namespace LootLocker
             {
                 LootLockerVerifyResponse response = new LootLockerVerifyResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerVerifyResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
-                    onComplete?.Invoke(response);
-                }
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                     response.status = serverResponse.status;
+            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
             }, false);
         }
 

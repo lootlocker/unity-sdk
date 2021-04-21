@@ -52,8 +52,8 @@ namespace LootLocker
                 }
                 else
                 {
-                    response.message = serverResponse.message;
-                    response.Error = serverResponse.Error;
+                         response.status = serverResponse.status;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }
             }, useAuthToken: false);

@@ -26,7 +26,8 @@ namespace LootLocker
         }
 
         protected Func<IEnumerator, System.Object> StartCoroutine;
-
+        int maxRetry = 3;
+        int tries = 0;
         /// <summary>
         /// This would be something like "www.mydomain.com" or "api.mydomain.com". But you could also directly supply the IPv4 address of the server to speed the calls up a little bit by bypassing DNS Lookup
         /// </summary>
@@ -93,20 +94,18 @@ namespace LootLocker
 
                     try
                     {
-#if UNITY_EDITOR
                         LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
-#endif
                     }
                     catch
                     {
-                        LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(),true);
-                        LootLockerSDKManager.DebugMessage(request.endpoint,true);
-                        LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text,true);
+                        LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(), true);
+                        LootLockerSDKManager.DebugMessage(request.endpoint, true);
+                        LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text, true);
                     }
 
                     LootLockerResponse response = new LootLockerResponse();
                     response.statusCode = (int)webRequest.responseCode;
-                    if (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error))
+                    if (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError || !string.IsNullOrEmpty(webRequest.error))
                     {
                         switch (webRequest.responseCode)
                         {
@@ -147,23 +146,28 @@ namespace LootLocker
                                 response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
                                 break;
                         }
-#if UNITY_EDITOR
+
                         LootLockerSDKManager.DebugMessage("Response code: " + webRequest.responseCode);
-#endif
-                        if (webRequest.responseCode != 401 || !LootLockerConfig.current.allowTokenRefresh)
+
+              
+                        if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && LootLockerConfig.current.platform != LootLockerConfig.platformType.Steam
+                            && tries < maxRetry) 
                         {
-                            response.Error += " " + webRequest.downloadHandler.text;
-                            response.text = webRequest.downloadHandler.text;
+                            tries++;
+                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find out. If you do not want this please turn off in the lootlocker config settings");
+                            RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else
                         {
-                            RefreshTokenAndCompleteCall(request, OnServerResponse);
-                        }
+                            tries = 0;
+                            response.Error += " " + webRequest.downloadHandler.text;
+                            response.text = webRequest.downloadHandler.text;
 
-                        response.status = false;
-                        response.hasError = true;
-                        response.text = webRequest.downloadHandler.text;
-                        OnServerResponse?.Invoke(response);
+                            response.status = false;
+                            response.hasError = true;
+                            response.text = webRequest.downloadHandler.text;
+                            OnServerResponse?.Invoke(response);
+                        }
 
                     }
                     else
@@ -173,6 +177,7 @@ namespace LootLocker
                         response.text = webRequest.downloadHandler.text;
                         OnServerResponse?.Invoke(response);
                     }
+
                 }
             }
         }
@@ -223,7 +228,7 @@ namespace LootLocker
 
                 if (texture == null)
                 {
-                    LootLockerSDKManager.DebugMessage("Texture download failed for: " + url,true);
+                    LootLockerSDKManager.DebugMessage("Texture download failed for: " + url, true);
                 }
 
                 OnComplete?.Invoke(texture);
@@ -255,17 +260,17 @@ namespace LootLocker
                         byte[] formSections = UnityWebRequest.SerializeFormSections(form, boundary);
                         // Set the content type - NO QUOTES around the boundary
                         string contentType = String.Concat("multipart/form-data; boundary=--", Encoding.UTF8.GetString(boundary));
-                    
+
                         //Debug.LogError("Content type Set: " + contentType);
                         // Make my request object and add the raw body. Set anything else you need here
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
-                        webRequest.uri = new Uri(url);  
+                        webRequest.uri = new Uri(url);
                         Debug.Log(url);//the url is wrong in some cases
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
-                        
+
                         // webRequest.method = "POST";
                         webRequest.method = UnityWebRequest.kHttpVerbPOST;
                     }
@@ -273,7 +278,7 @@ namespace LootLocker
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-                         LootLockerSDKManager.DebugMessage("REQUEST BODY = " + json);
+                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + json);
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
