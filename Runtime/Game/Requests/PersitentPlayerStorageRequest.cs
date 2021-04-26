@@ -14,7 +14,7 @@ namespace LootLocker.Requests
         public virtual LootLockerPayload[] payload { get; set; }
     }
 
-    public class LootLockerGetPersistentStoragRequest
+    public class LootLockerGetPersistentStorageRequest
     {
         public List<LootLockerPayload> payload = new List<LootLockerPayload>();
 
@@ -83,7 +83,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStoragRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             string json = "";
             if (data == null) return;

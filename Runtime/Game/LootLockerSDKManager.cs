@@ -332,12 +332,12 @@ namespace LootLocker.Requests
         public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized()) return;
-            LootLockerGetPersistentStoragRequest data = new LootLockerGetPersistentStoragRequest();
+            LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
             data.AddToPayload(new LootLockerPayload { key = key, value = value });
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
         }
 
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStoragRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized()) return;
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
