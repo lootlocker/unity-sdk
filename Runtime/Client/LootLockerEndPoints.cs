@@ -161,5 +161,10 @@ namespace LootLocker
         public EndPointClass getByListOfMembers = new EndPointClass("leaderboards/{0}/members", LootLockerHTTPMethod.POST);
         public EndPointClass getScoreList = new EndPointClass("leaderboards/{0}/list?count={1}", LootLockerHTTPMethod.GET);
         public EndPointClass submitScore = new EndPointClass("leaderboards/{0}/submit", LootLockerHTTPMethod.POST);
+
+        //Drop Tables
+        [Header("Drop Tables")]
+        public EndPointClass ComputeAndLockDropTable = new EndPointClass("v1/player/droptables/{0}/compute", LootLockerHTTPMethod.POST);
+        public EndPointClass PickDropsFromDropTable = new EndPointClass("v1/player/droptables/{0}/pick", LootLockerHTTPMethod.POST);
     }
 }

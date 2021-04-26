@@ -926,7 +926,20 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SubmitScore(request, id.ToString(), onComplete);
         }
+        public static void ComputeAndLockDropTable(int tableId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            LootLockerAPIManager.ComputeAndLockDropTable(tableId, onComplete);
+        }
 
+        public static void PickDropsFromDropTable(int[] picks, int tableId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
+        {
+            if (!CheckInitialized()) return;
+            PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
+            data.picks = picks;
+
+            LootLockerAPIManager.PickDropsFromDropTable(data,tableId, onComplete);
+        }
         #endregion
     }
 
