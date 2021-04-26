@@ -105,7 +105,12 @@ namespace LootLocker
 
                     LootLockerResponse response = new LootLockerResponse();
                     response.statusCode = (int)webRequest.responseCode;
+#if UNITY_2020_1_OR_NEWER
                     if (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError || !string.IsNullOrEmpty(webRequest.error))
+#else
+                    if (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error))
+#endif
+
                     {
                         switch (webRequest.responseCode)
                         {
