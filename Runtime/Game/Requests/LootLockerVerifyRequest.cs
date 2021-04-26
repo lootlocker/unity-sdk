@@ -48,8 +48,8 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                response.status = serverResponse.status;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, false);
         }

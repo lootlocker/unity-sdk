@@ -256,7 +256,7 @@ namespace LootLocker
                    if (string.IsNullOrEmpty(serverResponse.Error))
                    {
                        response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-                       if (response != null)
+                       if (response != null && response.assets.Length > 0) 
                            LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
                    }
 
@@ -281,7 +281,7 @@ namespace LootLocker
                 {
                     response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
 
-                    if (response != null)
+                    if (response != null && response.assets.Length > 0)
                         LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
                 }
                 //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
