@@ -8,30 +8,45 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
+using static LootLocker.LootLockerConfig;
 
 namespace LootLocker.Requests
 {
+
     public partial class LootLockerSDKManager
     {
         #region Init
 
         static bool initialized;
-        public static bool Init()
+        static bool Init()
         {
             DebugMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             return LoadConfig();
         }
 
+        public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode)
+        {
+            DebugMessage("SDK is Intializing");
+            LootLockerServerManager.CheckInit();
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode);
+        }
+
         static bool LoadConfig()
         {
             initialized = true;
+            if (LootLockerConfig.current == null)
+            {
+                Debug.LogError("SDK could not find settings, please contact support \n You can also set config manually by calling init");
+                return false;
+            }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
                 DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again");
                 initialized = false;
                 return false;
             }
+
 
             return initialized;
         }
@@ -78,21 +93,49 @@ namespace LootLocker.Requests
         #region Authentication
         public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerVerifyResponse response = new LootLockerVerifyResponse();
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(steamSessionTicket);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerVerifyResponse response = new LootLockerVerifyResponse();
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(deviceId);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
         public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerConfig.current.deviceID = deviceId;
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
@@ -938,7 +981,7 @@ namespace LootLocker.Requests
             PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
             data.picks = picks;
 
-            LootLockerAPIManager.PickDropsFromDropTable(data,tableId, onComplete);
+            LootLockerAPIManager.PickDropsFromDropTable(data, tableId, onComplete);
         }
         #endregion
     }

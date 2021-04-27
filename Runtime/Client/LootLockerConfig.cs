@@ -69,6 +69,17 @@ namespace LootLocker
 #endif
         }
 
+        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode)
+        {
+            settingsInstance = CreateInstance<LootLockerConfig>();
+            settingsInstance.apiKey = apiKey;
+            settingsInstance.game_version = gameVersion;
+            settingsInstance.platform = platform;
+            settingsInstance.developmentMode = onDevelopmentMode;
+
+            return true;
+        }
+
 #if UNITY_EDITOR
         public void EditorSave()
         {
