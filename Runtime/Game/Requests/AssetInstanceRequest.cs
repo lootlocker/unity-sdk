@@ -77,7 +77,7 @@ namespace LootLocker
     {
         public static void GetAllKeyValuePairs(Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getAllKeyValuePairs;
+            EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairs;
             string getVariable = endPoint.endPoint;
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
@@ -98,7 +98,7 @@ namespace LootLocker
 
         public static void GetAllKeyValuePairsToAnInstance(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getAllKeyValuePairsToAnInstance;
+            EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairsToAnInstance;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -118,7 +118,7 @@ namespace LootLocker
 
         public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getAKeyValuePairById;
+            EndPointClass endPoint = LootLockerEndPoints.getAKeyValuePairById;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -141,7 +141,7 @@ namespace LootLocker
 
         public static void CreateKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.createKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.createKeyValuePair;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -167,7 +167,7 @@ namespace LootLocker
 
         public static void UpdateOneOrMoreKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateOneOrMoreKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.updateOneOrMoreKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.updateOneOrMoreKeyValuePair;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -190,7 +190,7 @@ namespace LootLocker
 
         public static void UpdateKeyValuePairById(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.updateKeyValuePairById;
+            EndPointClass endPoint = LootLockerEndPoints.updateKeyValuePairById;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -213,7 +213,7 @@ namespace LootLocker
 
         public static void DeleteKeyValuePair(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
@@ -233,7 +233,7 @@ namespace LootLocker
 
         public static void InspectALootBox(LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -253,7 +253,7 @@ namespace LootLocker
 
         public static void OpenALootBox(LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 

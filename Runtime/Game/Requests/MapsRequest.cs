@@ -49,7 +49,7 @@ namespace LootLocker
     {
         public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAllMaps;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAllMaps;
 
             string getVariable = endPoint.endPoint;
 

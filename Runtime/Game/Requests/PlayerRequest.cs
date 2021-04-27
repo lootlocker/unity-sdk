@@ -159,7 +159,7 @@ namespace LootLocker
     {
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getPlayerInfo;
+            EndPointClass endPoint = LootLockerEndPoints.getPlayerInfo;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
@@ -177,7 +177,7 @@ namespace LootLocker
 
         public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getInventory;
+            EndPointClass endPoint = LootLockerEndPoints.getInventory;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
                {
@@ -195,7 +195,7 @@ namespace LootLocker
 
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getCurrencyBalance;
+            EndPointClass endPoint = LootLockerEndPoints.getCurrencyBalance;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
@@ -217,7 +217,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.submitXp;
+            EndPointClass endPoint = LootLockerEndPoints.submitXp;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
@@ -235,7 +235,7 @@ namespace LootLocker
 
         public static void GetXpAndLevel(LootLockerGetRequest data, Action<LootLockerXpResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getXpAndLevel;
+            EndPointClass endPoint = LootLockerEndPoints.getXpAndLevel;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
@@ -255,7 +255,7 @@ namespace LootLocker
 
         public static void GetPlayerAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.playerAssetNotifications;
+            EndPointClass endPoint = LootLockerEndPoints.playerAssetNotifications;
 
             string getVariable = endPoint.endPoint;
 
@@ -275,7 +275,7 @@ namespace LootLocker
 
         public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.playerAssetDeactivationNotification;
+            EndPointClass endPoint = LootLockerEndPoints.playerAssetDeactivationNotification;
 
             string getVariable = endPoint.endPoint;
 
@@ -295,7 +295,7 @@ namespace LootLocker
 
         public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.initiateDlcMigration;
+            EndPointClass endPoint = LootLockerEndPoints.initiateDlcMigration;
 
             string getVariable = endPoint.endPoint;
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
@@ -314,7 +314,7 @@ namespace LootLocker
 
         public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getDlcMigration;
+            EndPointClass endPoint = LootLockerEndPoints.getDlcMigration;
 
             string getVariable = endPoint.endPoint;
 
@@ -334,7 +334,7 @@ namespace LootLocker
 
         public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.setProfilePrivate;
+            EndPointClass endPoint = LootLockerEndPoints.setProfilePrivate;
 
             string getVariable = endPoint.endPoint;
 
@@ -354,7 +354,7 @@ namespace LootLocker
 
         public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.setProfilePublic;
+            EndPointClass endPoint = LootLockerEndPoints.setProfilePublic;
 
             string getVariable = endPoint.endPoint;
 

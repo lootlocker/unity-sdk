@@ -47,7 +47,7 @@ namespace LootLocker
     {
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getEntirePersistentStorage;
+            EndPointClass endPoint = LootLockerEndPoints.getEntirePersistentStorage;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
@@ -65,7 +65,7 @@ namespace LootLocker
 
         public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<LootLockerGetPersistentSingle> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getSingleKeyFromPersitenctStorage;
+            EndPointClass endPoint = LootLockerEndPoints.getSingleKeyFromPersitenctStorage;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -89,7 +89,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.updateOrCreateKeyValue;
+            EndPointClass endPoint = LootLockerEndPoints.updateOrCreateKeyValue;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
@@ -107,7 +107,7 @@ namespace LootLocker
 
         public static void DeleteKeyValue(LootLockerGetRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.deleteKeyValue;
+            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValue;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -127,7 +127,7 @@ namespace LootLocker
 
         public static void GetOtherPlayersPublicKeyValuePairs(LootLockerGetRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getOtherPlayersPublicKeyValuePairs;
+            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersPublicKeyValuePairs;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 

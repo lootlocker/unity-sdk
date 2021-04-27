@@ -11,32 +11,7 @@ namespace LootLocker
     public class LootLockerConfig : ScriptableObject
     {
 
-#if UNITY_EDITOR
-        static LootLockerConfig()
-        {
-            ProjectSettingsBuildProcessor.OnBuild += OnProjectSettingsBuild;
-        }
-
-        private static void OnProjectSettingsBuild(List<ScriptableObject> list, List<string> names)
-        {
-            list.Add(Get());
-            names.Add("LootLockerConfig");
-        }
-#endif
-
         private static LootLockerConfig settingsInstance;
-
-        public string SettingsPath
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return $"{ProjectSettingsConsts.ROOT_FOLDER}/{SettingName}.asset";
-#else
-                return $"{ProjectSettingsConsts.PACKAGE_NAME}/{SettingName}";
-#endif
-            }
-        }
 
         public virtual string SettingName { get { return "LootLockerConfig"; } }
 
@@ -46,46 +21,26 @@ namespace LootLocker
             {
                 return settingsInstance;
             }
-
-            LootLockerConfig tempInstance = CreateInstance<LootLockerConfig>();
-#if UNITY_EDITOR
-            string path = tempInstance.SettingsPath;
-
-            if (!File.Exists(path))
-            {
-                settingsInstance = CreateInstance<LootLockerConfig>();
-                ProjectSettingsHelper.Save(settingsInstance, path);
-            }
-            else
-            {
-                settingsInstance = ProjectSettingsHelper.Load<LootLockerConfig>(path);
-            }
-
-            settingsInstance.hideFlags = HideFlags.HideAndDontSave;
+            settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
             return settingsInstance;
-#else
-            settingsInstance = Resources.Load<LootLockerConfig>(tempInstance.SettingsPath);
-            return settingsInstance;
-#endif
         }
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, DebugLevel debugLevel = DebugLevel.Off, bool allowTokenRefresh = false)
         {
-            settingsInstance = CreateInstance<LootLockerConfig>();
+            settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
+
+            if (settingsInstance == null)
+                settingsInstance = CreateInstance<LootLockerConfig>();
+
             settingsInstance.apiKey = apiKey;
             settingsInstance.game_version = gameVersion;
             settingsInstance.platform = platform;
             settingsInstance.developmentMode = onDevelopmentMode;
+            settingsInstance.currentDebugLevel = debugLevel;
+            settingsInstance.allowTokenRefresh = allowTokenRefresh;
 
             return true;
         }
-
-#if UNITY_EDITOR
-        public void EditorSave()
-        {
-            ProjectSettingsHelper.Save(settingsInstance, SettingsPath);
-        }
-#endif
 
         private static LootLockerConfig _current;
 
@@ -111,7 +66,7 @@ namespace LootLocker
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
         public platformType platform;
-        public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web ,Other }
+        public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web, Other }
 
         public bool developmentMode;
         [HideInInspector]

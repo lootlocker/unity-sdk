@@ -93,7 +93,7 @@ namespace LootLocker
 
         public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingCollectables;
+            EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
@@ -115,7 +115,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.collectingAnItem;
+            EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {

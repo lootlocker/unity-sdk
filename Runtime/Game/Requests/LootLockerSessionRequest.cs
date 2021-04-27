@@ -56,7 +56,7 @@ namespace LootLocker
     {
         public static void Session(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.authenticationRequest;
+            EndPointClass endPoint = LootLockerEndPoints.authenticationRequest;
 
             string json = "";
             if (data == null) return;
@@ -81,7 +81,7 @@ namespace LootLocker
 
         public static void EndSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.endingSession;
+            EndPointClass endPoint = LootLockerEndPoints.endingSession;
 
             string json = "";
             if (data == null) return;

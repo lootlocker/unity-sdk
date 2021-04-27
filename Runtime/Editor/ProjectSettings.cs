@@ -8,8 +8,6 @@ namespace LootLocker.Admin
     public class ProjectSettings : SettingsProvider
     {
         private LootLockerConfig gameSettings;
-        private LootLockerEndPoints endPoints;
-        private SerializedObject endPointsSerialized;
         public ProjectSettings(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
         {
         }
@@ -19,11 +17,6 @@ namespace LootLocker.Admin
             if (gameSettings == null)
             {
                 gameSettings = LootLockerConfig.Get();
-            }
-            if (endPointsSerialized == null)
-            {
-                endPoints = LootLockerEndPoints.Get();
-                endPointsSerialized = new SerializedObject(endPoints);
             }
             using (new GUILayout.HorizontalScope())
             {
@@ -44,7 +37,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.apiKey = apiKey;
-                gameSettings.EditorSave();
             }
 
             string gameVersion = gameSettings.game_version;
@@ -53,7 +45,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.game_version = gameVersion;
-                gameSettings.EditorSave();
             }
 
             LootLockerConfig.platformType platform = gameSettings.platform;
@@ -62,7 +53,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.platform = platform;
-                gameSettings.EditorSave();
             }
 
             bool onDevelopmentMode = gameSettings.developmentMode;
@@ -71,7 +61,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.developmentMode = onDevelopmentMode;
-                gameSettings.EditorSave();
             }
 
             LootLockerConfig.DebugLevel debugLevel = gameSettings.currentDebugLevel;
@@ -80,7 +69,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.currentDebugLevel = debugLevel;
-                gameSettings.EditorSave();
             }
 
             bool allowTokenRefresh = gameSettings.allowTokenRefresh;
@@ -89,7 +77,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.allowTokenRefresh = allowTokenRefresh;
-                gameSettings.EditorSave();
             }
         }
 

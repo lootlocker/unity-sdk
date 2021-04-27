@@ -97,7 +97,7 @@ namespace LootLocker
     {
         public static void GetMemberRank(LootLockerGetMemberRankRequest data, Action<LootLockerGetMemberRankResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getMemberRank;
+            EndPointClass endPoint = LootLockerEndPoints.getMemberRank;
             string tempEndpoint = string.Format(endPoint.endPoint, data.leaderboardId, data.member_id);
             LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, (serverResponse) =>
             {
@@ -115,7 +115,7 @@ namespace LootLocker
 
         public static void GetByListOfMembers(LootLockerGetByListMembersRequest data, string id, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.getByListOfMembers;
+            EndPointClass requestEndPoint = LootLockerEndPoints.getByListOfMembers;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -139,7 +139,7 @@ namespace LootLocker
 
         public static void GetScoreList(LootLockerGetScoreListRequest getRequests, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.getScoreList;
+            EndPointClass requestEndPoint = LootLockerEndPoints.getScoreList;
 
             string tempEndpoint = requestEndPoint.endPoint;
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardId,int.Parse(getRequests.count));
@@ -166,7 +166,7 @@ namespace LootLocker
 
         public static void SubmitScore(LootLockerSubmitScoreRequest data, string id, Action<LootLockerSubmitScoreResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.submitScore;
+            EndPointClass requestEndPoint = LootLockerEndPoints.submitScore;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);

@@ -38,7 +38,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.playerVerification;
+            EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {

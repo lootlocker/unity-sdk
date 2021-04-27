@@ -49,7 +49,7 @@ namespace LootLocker
     {
         public static void ComputeAndLockDropTable(int tableId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.PickDropsFromDropTable;
+            EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
     
             string endPoint = string.Format(requestEndPoint.endPoint, tableId);
 
@@ -69,7 +69,7 @@ namespace LootLocker
 
         public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.PickDropsFromDropTable;
+            EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);

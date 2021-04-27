@@ -25,7 +25,7 @@ namespace LootLocker
     {
         public static void SubmittingACrashLog(LootLockerSubmittingACrashLogRequest data, Action<LootLockerResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.submittingACrashLog;
+            EndPointClass requestEndPoint = LootLockerEndPoints.submittingACrashLog;
 
             Dictionary<string, string> formData = new Dictionary<string, string>();
 

@@ -171,7 +171,7 @@ namespace LootLocker
     {
         public static void GetContext(Action<LootLockerContextResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingContexts;
+            EndPointClass endPoint = LootLockerEndPoints.gettingContexts;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
@@ -189,17 +189,17 @@ namespace LootLocker
 
         public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, LootLocker.LootLockerEnums.AssetFilter filter = LootLocker.LootLockerEnums.AssetFilter.none)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetListWithCount;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
             string getVariable = string.Format(endPoint.endPoint, assetCount);
 
             if (idOfLastAsset != null && assetCount > 0)
             {
-                endPoint = LootLockerEndPoints.current.gettingAssetListWithAfterAndCount;
+                endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
                 getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString());
             }
             else if (idOfLastAsset != null && assetCount > 0 && filter != LootLocker.LootLockerEnums.AssetFilter.none)
             {
-                endPoint = LootLockerEndPoints.current.gettingAssetListOriginal;
+                endPoint = LootLockerEndPoints.gettingAssetListOriginal;
                 string filterString = "";
                 switch (filter)
                 {
@@ -246,7 +246,7 @@ namespace LootLocker
 
         public static void GetAssetListWithCount(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetListWithCount;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -270,7 +270,7 @@ namespace LootLocker
 
         public static void GetAssetListWithAfterCount(LootLockerAssetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetListWithAfterAndCount;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
 
             string getVariable = string.Format(endPoint.endPoint, LootLockerAssetRequest.lastId, data.count);
 
@@ -294,7 +294,7 @@ namespace LootLocker
 
         public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getAssetsById;
+            EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
 
             string builtAssets = data.getRequests.First();
 
@@ -326,7 +326,7 @@ namespace LootLocker
 
         public static void GetAssetInformation(LootLockerGetRequest data, Action<LootLockerCommonAsset> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAssetInformationForOneorMoreAssets;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAssetInformationForOneorMoreAssets;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -346,7 +346,7 @@ namespace LootLocker
 
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.listingFavouriteAssets;
+            EndPointClass endPoint = LootLockerEndPoints.listingFavouriteAssets;
 
             string getVariable = endPoint.endPoint;
 
@@ -366,7 +366,7 @@ namespace LootLocker
 
         public static void AddFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.addingFavouriteAssets;
+            EndPointClass endPoint = LootLockerEndPoints.addingFavouriteAssets;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -386,7 +386,7 @@ namespace LootLocker
 
         public static void RemoveFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.removingFavouriteAssets;
+            EndPointClass endPoint = LootLockerEndPoints.removingFavouriteAssets;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 

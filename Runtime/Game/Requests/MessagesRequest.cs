@@ -42,7 +42,7 @@ namespace LootLocker
 
         public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getMessages;
+            EndPointClass endPoint = LootLockerEndPoints.getMessages;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
             {

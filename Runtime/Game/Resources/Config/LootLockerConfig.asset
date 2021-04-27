@@ -9,20 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2d020b95eaef8d4e8f093a26decba27, type: 3}
+  m_Script: {fileID: 11500000, guid: 229899d0a9432e949bee860825252188, type: 3}
   m_Name: LootLockerConfig
   m_EditorClassIdentifier: 
-  gameName: LootLocker Demo Game
-  apiKey: d68e80882e497af07338bdff0aa9822c9e609a68
-  token: 37e65eb6a67d7ba703afb05d1999a8b21d943c1e
-  gameID: 348
-  game_version: 1.0.0.0
-  deviceID: 8dbf12e81bb7e2902490065e4e3e5da491dbf4f5
-  email: emmanuel@cradaptive.com
-  password: Ihatefacebuk101!
+  apiKey: 1f42799da6f88f1b3effe02c83f3777149392436
+  token: 
+  gameID: 0
+  game_version: 1.0.0.
+  deviceID: defaultPlayerId
   platform: 0
-  environment: 0
-  url: https://api.lootlocker.io/game
+  developmentMode: 1
+  url: https://api.lootlocker.io/game/v1
   adminUrl: https://api.lootlocker.io/admin
   playerUrl: https://api.lootlocker.io/player
   userUrl: https://api.lootlocker.io/game

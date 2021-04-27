@@ -72,7 +72,7 @@ namespace LootLocker
     {
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAllMissions;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAllMissions;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) =>
             {
@@ -90,7 +90,7 @@ namespace LootLocker
 
         public static void GettingASingleMission(LootLockerGetRequest data, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.gettingASingleMission;
+            EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleMission;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
@@ -110,7 +110,7 @@ namespace LootLocker
 
         public static void StartingAMission(LootLockerGetRequest data, Action<LootLockerStartingAMissionResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.startingMission;
+            EndPointClass requestEndPoint = LootLockerEndPoints.startingMission;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
@@ -134,7 +134,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.finishingMission;
+            EndPointClass requestEndPoint = LootLockerEndPoints.finishingMission;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 

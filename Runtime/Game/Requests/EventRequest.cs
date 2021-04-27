@@ -119,7 +119,7 @@ namespace LootLocker
     {
         public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingAllEvents;
+            EndPointClass endPoint = LootLockerEndPoints.gettingAllEvents;
 
             string getVariable = endPoint.endPoint;
 
@@ -145,7 +145,7 @@ namespace LootLocker
 
         public static void GettingASingleEvent(LootLockerGetRequest data, Action<LootLockerSingleEventResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.gettingASingleEvent;
+            EndPointClass endPoint = LootLockerEndPoints.gettingASingleEvent;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -171,7 +171,7 @@ namespace LootLocker
 
         public static void StartingEvent(LootLockerGetRequest data, Action<LootLockerStartinEventResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.startingEvent;
+            EndPointClass endPoint = LootLockerEndPoints.startingEvent;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -194,7 +194,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.finishingEvent;
+            EndPointClass endPoint = LootLockerEndPoints.finishingEvent;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 

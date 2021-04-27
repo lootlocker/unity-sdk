@@ -57,7 +57,7 @@ namespace LootLocker
                 if (data == null) return;
                 else json = JsonConvert.SerializeObject(data);
 
-                EndPointClass endPoint = LootLockerEndPoints.current.normalPurchaseCall;
+                EndPointClass endPoint = LootLockerEndPoints.normalPurchaseCall;
 
                 LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
@@ -79,7 +79,7 @@ namespace LootLocker
                 if (data == null) return;
                 else json = JsonConvert.SerializeObject(data);
 
-                EndPointClass endPoint = LootLockerEndPoints.current.rentalPurchaseCall;
+                EndPointClass endPoint = LootLockerEndPoints.rentalPurchaseCall;
 
                 LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod,json, (serverResponse) =>
                 {
@@ -101,7 +101,7 @@ namespace LootLocker
                 if (data == null) return;
                 else json = JsonConvert.SerializeObject(data);
 
-                EndPointClass endPoint = LootLockerEndPoints.current.iosPurchaseVerification;
+                EndPointClass endPoint = LootLockerEndPoints.iosPurchaseVerification;
 
                 LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
@@ -123,7 +123,7 @@ namespace LootLocker
                 if (data == null) return;
                 else json = JsonConvert.SerializeObject(data);
 
-                EndPointClass endPoint = LootLockerEndPoints.current.androidPurchaseVerification;
+                EndPointClass endPoint = LootLockerEndPoints.androidPurchaseVerification;
 
                 LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
@@ -141,7 +141,7 @@ namespace LootLocker
 
             public static void PollingOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
             {
-                EndPointClass endPoint = LootLockerEndPoints.current.pollingOrderStatus;
+                EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
 
                 string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -161,7 +161,7 @@ namespace LootLocker
 
             public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
             {
-                EndPointClass endPoint = LootLockerEndPoints.current.activatingARentalAsset;
+                EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;
 
                 string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 

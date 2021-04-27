@@ -45,7 +45,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.triggeringAnEvent;
+            EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
@@ -64,7 +64,7 @@ namespace LootLocker
         public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
 
-            EndPointClass endPoint = LootLockerEndPoints.current.listingTriggeredTriggerEvents;
+            EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {

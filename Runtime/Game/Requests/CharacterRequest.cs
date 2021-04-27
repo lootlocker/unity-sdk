@@ -143,7 +143,7 @@ namespace LootLocker
     {
         public static void CreateCharacter(LootLockerCreateCharacterRequest data, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.createCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.createCharacter;
 
             string json = (data == null) ? "" : JsonConvert.SerializeObject(data);
 
@@ -165,7 +165,7 @@ namespace LootLocker
 
         public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.listCharacterTypes;
+            EndPointClass endPoint = LootLockerEndPoints.listCharacterTypes;
 
             string getVariable = endPoint.endPoint;
 
@@ -185,7 +185,7 @@ namespace LootLocker
 
         public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.characterLoadouts;
+            EndPointClass endPoint = LootLockerEndPoints.characterLoadouts;
 
             string getVariable = endPoint.endPoint;
 
@@ -205,7 +205,7 @@ namespace LootLocker
 
         public static void GetOtherPlayersCharacterLoadout(LootLockerGetRequest data, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getOtherPlayersCharacterLoadouts;
+            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersCharacterLoadouts;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
@@ -229,7 +229,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.updateCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.updateCharacter;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -253,7 +253,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.equipIDAssetToDefaultCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToDefaultCharacter;
 
             string getVariable = endPoint.endPoint;
 
@@ -277,7 +277,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.equipGlobalAssetToDefaultCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToDefaultCharacter;
 
             string getVariable = endPoint.endPoint;
 
@@ -301,7 +301,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.equipIDAssetToCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToCharacter;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -325,7 +325,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.equipGlobalAssetToCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToCharacter;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -345,7 +345,7 @@ namespace LootLocker
 
         public static void UnEquipIdAssetToDefaultCharacter(LootLockerGetRequest lootLockerGetRequest, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.unEquipIDAssetToDefaultCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.unEquipIDAssetToDefaultCharacter;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -365,7 +365,7 @@ namespace LootLocker
 
         public static void UnEquipIdAssetToCharacter(LootLockerGetRequest lootLockerGetRequest, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.unEquipIDAssetToCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.unEquipIDAssetToCharacter;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -385,7 +385,7 @@ namespace LootLocker
 
         public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getCurrentLoadoutToDefaultCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.getCurrentLoadoutToDefaultCharacter;
 
             string getVariable = endPoint.endPoint;
 
@@ -405,7 +405,7 @@ namespace LootLocker
 
         public static void GetCurrentLoadOutToOtherCharacter(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getOtherPlayersCharacterLoadouts;
+            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersCharacterLoadouts;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -425,7 +425,7 @@ namespace LootLocker
 
         public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.current.getEquipableContextToDefaultCharacter;
+            EndPointClass endPoint = LootLockerEndPoints.getEquipableContextToDefaultCharacter;
 
             string getVariable = endPoint.endPoint;
 

@@ -132,7 +132,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            EndPointClass endPoint = LootLockerEndPoints.current.creatingAnAssetCandidate;
+            EndPointClass endPoint = LootLockerEndPoints.creatingAnAssetCandidate;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
@@ -150,7 +150,7 @@ namespace LootLocker
 
         public static void UpdatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.updatingAnAssetCandidate;
+            EndPointClass requestEndPoint = LootLockerEndPoints.updatingAnAssetCandidate;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
@@ -173,7 +173,7 @@ namespace LootLocker
 
         public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.gettingASingleAssetCandidate;
+            EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleAssetCandidate;
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
@@ -193,7 +193,7 @@ namespace LootLocker
 
         public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.deletingAnAssetCandidate;
+            EndPointClass requestEndPoint = LootLockerEndPoints.deletingAnAssetCandidate;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
@@ -213,7 +213,7 @@ namespace LootLocker
 
         public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.listingAssetCandidates;
+            EndPointClass requestEndPoint = LootLockerEndPoints.listingAssetCandidates;
 
             LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
             {
@@ -231,7 +231,7 @@ namespace LootLocker
 
         public static void AddingFilesToAssetCandidates(LootLockerAddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.addingFilesToAssetCandidates;
+            EndPointClass requestEndPoint = LootLockerEndPoints.addingFilesToAssetCandidates;
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
@@ -270,7 +270,7 @@ namespace LootLocker
 
         public static void RemovingFilesFromAssetCandidates(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.current.removingFilesFromAssetCandidates;
+            EndPointClass requestEndPoint = LootLockerEndPoints.removingFilesFromAssetCandidates;
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
