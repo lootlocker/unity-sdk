@@ -9,6 +9,7 @@ using System.Text;
 using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
+using System.Linq;
 
 namespace LootLocker.Requests
 {
@@ -411,34 +412,34 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetContext(onComplete);
         }
 
-        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, LootLocker.LootLockerEnums.AssetFilter filter = LootLocker.LootLockerEnums.AssetFilter.none)
+        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
             if (!CheckInitialized()) return;
-            LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter);
+            LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters);
         }
 
-        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete)
+        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
             if (!CheckInitialized()) return;
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetCount.ToString());
-            LootLockerAPIManager.GetAssetListWithCount(data, onComplete);
+            LootLockerAPIManager.GetAssetsOriginal((response) =>
+            {
+                if (response != null && response.assets.Length > 0)
+                    LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+
+                onComplete?.Invoke(response);
+            }, assetCount, null, filter, includeUGC, assetFilters);
         }
 
-        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete)
+        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
             if (!CheckInitialized()) return;
 
-            if (LootLockerAssetRequest.lastId != 0)
+            LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
-                LootLockerAssetRequest data = new LootLockerAssetRequest();
-                data.count = assetCount;
-                LootLockerAPIManager.GetAssetListWithAfterCount(data, onComplete);
-            }
-            else
-            {
-                GetAssetListWithCount(assetCount, onComplete);
-            }
+                if (response != null && response.assets.Length > 0)
+                    LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+                onComplete?.Invoke(response);
+            }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters);
         }
 
         public void ResetAssetCalls()

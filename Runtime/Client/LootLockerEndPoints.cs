@@ -61,8 +61,6 @@ namespace LootLocker
         [Header("Assets")]
         public static EndPointClass gettingContexts = new EndPointClass("v1/contexts", LootLockerHTTPMethod.GET);
         public static EndPointClass gettingAssetListWithCount = new EndPointClass("v1/assets/list?count={0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass gettingAssetListOriginal = new EndPointClass("v1/assets/list?after={0}&count={1}&filter={2}", LootLockerHTTPMethod.GET);
-        public static EndPointClass gettingAssetListWithAfterAndCount = new EndPointClass("v1/assets/list?after={0}&count={1}", LootLockerHTTPMethod.GET);
         public static EndPointClass getAssetsById = new EndPointClass("v1/assets/by/id?asset_ids={0}", LootLockerHTTPMethod.GET);
         public static EndPointClass gettingAllAssets = new EndPointClass("v1/assets", LootLockerHTTPMethod.GET);
         public static EndPointClass gettingAssetInformationForOneorMoreAssets = new EndPointClass("v1/asset/{0}", LootLockerHTTPMethod.GET);

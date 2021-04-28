@@ -187,55 +187,55 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, LootLocker.LootLockerEnums.AssetFilter filter = LootLocker.LootLockerEnums.AssetFilter.none)
+        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
             string getVariable = string.Format(endPoint.endPoint, assetCount);
-
-            if (idOfLastAsset != null && assetCount > 0)
+            string tempEndpoint = string.Empty;
+            string filterString = string.Empty;
+            if (idOfLastAsset != null)
             {
-                endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
-                getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString());
+                tempEndpoint = $"&after={idOfLastAsset}";
+                getVariable += tempEndpoint;
             }
-            else if (idOfLastAsset != null && assetCount > 0 && filter != LootLocker.LootLockerEnums.AssetFilter.none)
+
+            if (filter != null)
             {
-                endPoint = LootLockerEndPoints.gettingAssetListOriginal;
-                string filterString = "";
-                switch (filter)
+                filterString = GetStringOfEnum(filter.First());
+                for (int i = 1; i < filter.Count; i++)
                 {
-                    case LootLocker.LootLockerEnums.AssetFilter.purchasable:
-                        filterString = LootLocker.LootLockerEnums.AssetFilter.purchasable.ToString();
-                        break;
-                    case LootLocker.LootLockerEnums.AssetFilter.nonpurchasable:
-                        filterString = "!purchasable";
-                        break;
-                    case LootLocker.LootLockerEnums.AssetFilter.rentable:
-                        filterString = LootLocker.LootLockerEnums.AssetFilter.rentable.ToString();
-                        break;
-                    case LootLocker.LootLockerEnums.AssetFilter.nonrentable:
-                        filterString = "!rentable";
-                        break;
-                    case LootLocker.LootLockerEnums.AssetFilter.popular:
-                        filterString = LootLocker.LootLockerEnums.AssetFilter.popular.ToString();
-                        break;
-                    case LootLocker.LootLockerEnums.AssetFilter.nonpopular:
-                        filterString = "!popular";
-                        break;
+                    filterString += "," + GetStringOfEnum(filter[i]);
                 }
-                getVariable = string.Format(endPoint.endPoint, assetCount, idOfLastAsset.ToString(), filterString);
+                tempEndpoint = $"&filter={filterString}";
+                getVariable += tempEndpoint;
             }
 
+            if (includeUGC)
+            {
+                tempEndpoint = $"&include_ugc={includeUGC.ToString().ToLower()}";
+                getVariable += tempEndpoint;
+            }
+
+            if (assetFilters != null)
+            {
+                KeyValuePair<string, string> keys = assetFilters.First();
+                filterString = $"{keys.Key}={keys.Key}";
+                int count = 0;
+                foreach (var kvp in assetFilters)
+                {
+                    if (count > 0)
+                        filterString += $";{kvp.Key}={kvp.Key}";
+                    count++;
+                }
+                tempEndpoint = $"&asset_filters={filterString}";
+                getVariable += tempEndpoint;
+            }
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                {
                     response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-                    if (response != null)
-                        LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-                }
 
-                //        LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                 response.status = serverResponse.status;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
@@ -244,53 +244,81 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAssetListWithCount(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static string GetStringOfEnum(LootLocker.LootLockerEnums.AssetFilter filter)
         {
-            EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
-
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-               {
-                   LootLockerAssetResponse response = new LootLockerAssetResponse();
-                   if (string.IsNullOrEmpty(serverResponse.Error))
-                   {
-                       response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-                       if (response != null && response.assets.Length > 0) 
-                           LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-                   }
-
-                   //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                   response.text = serverResponse.text;
-                   response.status = serverResponse.status;
-                   response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                   onComplete?.Invoke(response);
-               }, true);
-        }
-
-        public static void GetAssetListWithAfterCount(LootLockerAssetRequest data, Action<LootLockerAssetResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
-
-            string getVariable = string.Format(endPoint.endPoint, LootLockerAssetRequest.lastId, data.count);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            string filterString = "";
+            switch (filter)
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-                    if (response != null && response.assets.Length > 0)
-                        LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-                }
-                //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.status = serverResponse.status;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+                case LootLocker.LootLockerEnums.AssetFilter.purchasable:
+                    filterString = LootLocker.LootLockerEnums.AssetFilter.purchasable.ToString();
+                    break;
+                case LootLocker.LootLockerEnums.AssetFilter.nonpurchasable:
+                    filterString = "!purchasable";
+                    break;
+                case LootLocker.LootLockerEnums.AssetFilter.rentable:
+                    filterString = LootLocker.LootLockerEnums.AssetFilter.rentable.ToString();
+                    break;
+                case LootLocker.LootLockerEnums.AssetFilter.nonrentable:
+                    filterString = "!rentable";
+                    break;
+                case LootLocker.LootLockerEnums.AssetFilter.popular:
+                    filterString = LootLocker.LootLockerEnums.AssetFilter.popular.ToString();
+                    break;
+                case LootLocker.LootLockerEnums.AssetFilter.nonpopular:
+                    filterString = "!popular";
+                    break;
+            }
+            return filterString;
         }
+
+
+        //public static void GetAssetListWithCount(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        //{
+        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
+
+        //    string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+
+        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+        //       {
+        //           LootLockerAssetResponse response = new LootLockerAssetResponse();
+        //           if (string.IsNullOrEmpty(serverResponse.Error))
+        //           {
+        //               response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
+        //               if (response != null && response.assets.Length > 0)
+        //                   LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+        //           }
+
+        //           //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+        //           response.text = serverResponse.text;
+        //           response.status = serverResponse.status;
+        //           response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+        //           onComplete?.Invoke(response);
+        //       }, true);
+        //}
+
+        //public static void GetAssetListWithAfterCount(LootLockerAssetRequest data, Action<LootLockerAssetResponse> onComplete)
+        //{
+        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
+
+        //    string getVariable = string.Format(endPoint.endPoint, LootLockerAssetRequest.lastId, data.count);
+
+        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+        //    {
+        //        LootLockerAssetResponse response = new LootLockerAssetResponse();
+        //        if (string.IsNullOrEmpty(serverResponse.Error))
+        //        {
+        //            response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
+
+        //            if (response != null && response.assets.Length > 0)
+        //                LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+        //        }
+        //        //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+        //        response.text = serverResponse.text;
+        //        response.status = serverResponse.status;
+        //        response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+        //        onComplete?.Invoke(response);
+        //    }, true);
+        //}
 
         public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
