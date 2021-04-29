@@ -159,7 +159,7 @@ namespace LootLocker
                             && tries < maxRetry) 
                         {
                             tries++;
-                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find out. If you do not want this please turn off in the lootlocker config settings");
+                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find one. If you do not want this please turn off in the lootlocker config settings");
                             RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else

@@ -69,7 +69,16 @@ namespace LootLocker.Requests
         public static void DebugMessage(string message, bool IsError = false)
         {
 #if     UNITY_EDITOR
-            if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
+            if (LootLockerConfig.current == null)
+            {
+                if (IsError)
+                    Debug.LogError(message);
+                else
+                    Debug.Log(message);
+                return;
+            }
+
+            if (LootLockerConfig.current!=null && LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
             {
                 if (IsError)
                     Debug.LogError(message);
@@ -101,6 +110,7 @@ namespace LootLocker.Requests
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
+                response.status = false;
                 onComplete?.Invoke(response);
                 return;
             }
@@ -117,6 +127,7 @@ namespace LootLocker.Requests
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
+                response.status = false;
                 onComplete?.Invoke(response);
                 return;
             }
@@ -143,14 +154,34 @@ namespace LootLocker.Requests
         }
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
 
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
@@ -160,69 +191,179 @@ namespace LootLocker.Requests
         //Player calls
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPlayerInfoResponse response = new LootLockerGetPlayerInfoResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetPlayerInfo(onComplete);
         }
 
         public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerInventoryResponse response = new LootLockerInventoryResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetInventory(onComplete);
         }
 
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerBalanceResponse response = new LootLockerBalanceResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetBalance(onComplete);
         }
 
         public static void SubmitXp(int xpToSubmit, Action<LootLockerXpSubmitResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerXpSubmitResponse response = new LootLockerXpSubmitResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerXpSubmitRequest xpSubmitRequest = new LootLockerXpSubmitRequest(xpToSubmit);
             LootLockerAPIManager.SubmitXp(xpSubmitRequest, onComplete);
         }
 
         public static void GetXpAndLevel(Action<LootLockerXpResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerXpResponse response = new LootLockerXpResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerXpRequest xpRequest = new LootLockerXpRequest();
             LootLockerAPIManager.GetXpAndLevel(xpRequest, onComplete);
         }
 
         public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPlayerAssetNotificationsResponse response = new LootLockerPlayerAssetNotificationsResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetPlayerAssetNotification(onComplete);
         }
 
         public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerDeactivatedAssetsResponse response = new LootLockerDeactivatedAssetsResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetDeactivatedAssetNotification(onComplete);
         }
 
         public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerDlcResponse response = new LootLockerDlcResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.InitiateDLCMigration(onComplete);
         }
 
         public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerDlcResponse response = new LootLockerDlcResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetDLCMigrated(onComplete);
         }
 
         public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerStandardResponse response = new LootLockerStandardResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.SetProfilePrivate(onComplete);
         }
 
         public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerStandardResponse response = new LootLockerStandardResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.SetProfilePublic(onComplete);
         }
         #endregion
@@ -230,7 +371,17 @@ namespace LootLocker.Requests
         #region Character
         public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             LootLockerCreateCharacterRequest data = new LootLockerCreateCharacterRequest();
 
@@ -243,19 +394,49 @@ namespace LootLocker.Requests
 
         public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerListCharacterTypesResponse response = new LootLockerListCharacterTypesResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.ListCharacterTypes(onComplete);
         }
 
         public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetCharacterLoadout(onComplete);
         }
 
         public static void GetOtherPlayersCharacterLoadout(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
 
             data.getRequests.Add(characterID);
@@ -265,7 +446,17 @@ namespace LootLocker.Requests
 
         public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             LootLockerUpdateCharacterRequest data = new LootLockerUpdateCharacterRequest();
 
@@ -281,7 +472,17 @@ namespace LootLocker.Requests
 
         public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
             data.instance_id = int.Parse(assetInstanceId);
             LootLockerAPIManager.EquipIdAssetToDefaultCharacter(data, onComplete);
@@ -289,7 +490,17 @@ namespace LootLocker.Requests
 
         public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
             data.asset_id = int.Parse(assetId);
             data.asset_variation_id = int.Parse(assetVariationId);
@@ -298,7 +509,17 @@ namespace LootLocker.Requests
 
         public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
             data.instance_id = int.Parse(assetInstanceId);
 
@@ -309,7 +530,17 @@ namespace LootLocker.Requests
 
         public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
             data.asset_id = int.Parse(assetId);
             data.asset_variation_id = int.Parse(assetVariationId);
@@ -320,7 +551,17 @@ namespace LootLocker.Requests
 
         public static void UnEquipIdAssetToDefaultCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
             lootLockerGetRequest.getRequests.Add(assetId);
@@ -329,7 +570,17 @@ namespace LootLocker.Requests
 
         public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
             lootLockerGetRequest.getRequests.Add(assetId);
@@ -338,13 +589,33 @@ namespace LootLocker.Requests
 
         public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetCurrentLoadOutToDefaultCharacter(onComplete);
         }
 
         public static void GetCurrentLoadOutToOtherCharacter(string characterID, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(characterID);
             lootLockerGetRequest.getRequests.Add(LootLockerConfig.current.platform.ToString());
@@ -353,7 +624,17 @@ namespace LootLocker.Requests
 
         public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerContextResponse response = new LootLockerContextResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetEquipableContextToDefaultCharacter(onComplete);
         }
         #endregion
@@ -361,13 +642,33 @@ namespace LootLocker.Requests
         #region PlayerStorage
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
         }
 
         public static void GetSingleKeyPersistentStorage(string key, Action<LootLockerGetPersistentSingle> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentSingle response = new LootLockerGetPersistentSingle();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(key);
             LootLockerAPIManager.GetSingleKeyPersistentStorage(data, onComplete);
@@ -375,7 +676,17 @@ namespace LootLocker.Requests
 
         public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
             data.AddToPayload(new LootLockerPayload { key = key, value = value });
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
@@ -383,13 +694,33 @@ namespace LootLocker.Requests
 
         public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
         }
 
         public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(keyToDelete);
             LootLockerAPIManager.DeleteKeyValue(data, onComplete);
@@ -398,7 +729,17 @@ namespace LootLocker.Requests
         public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
 
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(otherPlayerId);
             LootLockerAPIManager.GetOtherPlayersPublicKeyValuePairs(data, onComplete);
@@ -408,19 +749,49 @@ namespace LootLocker.Requests
         #region Assets
         public static void GetContext(Action<LootLockerContextResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerContextResponse response = new LootLockerContextResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetContext(onComplete);
         }
 
         public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters);
         }
 
         public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
                 if (response != null && response.assets.Length > 0)
@@ -432,7 +803,17 @@ namespace LootLocker.Requests
 
         public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
@@ -449,7 +830,17 @@ namespace LootLocker.Requests
 
         public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCommonAsset response = new LootLockerCommonAsset();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
             LootLockerAPIManager.GetAssetInformation(data, onComplete);
@@ -457,13 +848,33 @@ namespace LootLocker.Requests
 
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerFavouritesListResponse response = new LootLockerFavouritesListResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.ListFavouriteAssets(onComplete);
         }
 
         public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
             LootLockerAPIManager.AddFavouriteAsset(data, onComplete);
@@ -471,7 +882,17 @@ namespace LootLocker.Requests
 
         public static void RemoveFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
             LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
@@ -479,7 +900,17 @@ namespace LootLocker.Requests
 
         public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetResponse response = new LootLockerAssetResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
 
             for (int i = 0; i < assetIdsToRetrieve.Length; i++)
@@ -493,13 +924,33 @@ namespace LootLocker.Requests
         #region AssetInstance
         public static void GetAllKeyValuePairsForAssetInstances(Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetAllKeyValuePairsResponse response = new LootLockerGetAllKeyValuePairsResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetAllKeyValuePairs(onComplete);
         }
 
         public static void GetAllKeyValuePairsToAnInstance(int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(instanceId.ToString());
             LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(data, onComplete);
@@ -507,7 +958,17 @@ namespace LootLocker.Requests
 
         public static void GetAKeyValuePairByIdForAssetInstances(int assetId, int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             data.getRequests.Add(instanceId.ToString());
@@ -516,7 +977,17 @@ namespace LootLocker.Requests
 
         public static void CreateKeyValuePairForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
@@ -527,7 +998,17 @@ namespace LootLocker.Requests
 
         public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetId, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest request = new LootLockerGetRequest();
             request.getRequests.Add(assetId.ToString());
             LootLockerUpdateOneOrMoreKeyValuePairRequest createKeyValuePairRequest = new LootLockerUpdateOneOrMoreKeyValuePairRequest();
@@ -542,7 +1023,17 @@ namespace LootLocker.Requests
 
         public static void UpdateKeyValuePairByIdForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
@@ -553,7 +1044,17 @@ namespace LootLocker.Requests
 
         public static void DeleteKeyValuePairForAssetInstances(int assetId, int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             data.getRequests.Add(instanceId.ToString());
@@ -562,7 +1063,17 @@ namespace LootLocker.Requests
 
         public static void InspectALootBoxForAssetInstances(int assetId, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerInspectALootBoxResponse response = new LootLockerInspectALootBoxResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.InspectALootBox(data, onComplete);
@@ -570,7 +1081,17 @@ namespace LootLocker.Requests
 
         public static void OpenALootBoxForAssetInstances(int assetId, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerOpenLootBoxResponse response = new LootLockerOpenLootBoxResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.OpenALootBox(data, onComplete);
@@ -613,7 +1134,17 @@ namespace LootLocker.Requests
             Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             ConvertAssetDictionaries(kv_storage, filters, data_entities,
                 out List<LootLockerAssetKVPair> temp_kv, out List<LootLockerAssetKVPair> temp_filters, out List<LootLockerDataEntity> temp_data);
@@ -639,7 +1170,17 @@ namespace LootLocker.Requests
             string name = null, Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             ConvertAssetDictionaries(kv_storage, filters, data_entities,
                 out List<LootLockerAssetKVPair> temp_kv, out List<LootLockerAssetKVPair> temp_filters, out List<LootLockerDataEntity> temp_data);
@@ -667,7 +1208,17 @@ namespace LootLocker.Requests
 
         public static void DeletingAnAssetCandidate(int assetId, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.DeletingAnAssetCandidate(data, onComplete);
@@ -675,7 +1226,17 @@ namespace LootLocker.Requests
 
         public static void GettingASingleAssetCandidate(int assetId, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.GettingASingleAssetCandidate(data, onComplete);
@@ -683,14 +1244,34 @@ namespace LootLocker.Requests
 
         public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerListingAssetCandidatesResponse response = new LootLockerListingAssetCandidatesResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.ListingAssetCandidates(onComplete);
         }
 
         public static void AddingFilesToAssetCandidates(int assetId, string filePath, string fileName,
             FilePurpose filePurpose, Action<LootLockerUserGenerateContentResponse> onComplete, string fileContentType = null)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             LootLockerAddingFilesToAssetCandidatesRequest data = new LootLockerAddingFilesToAssetCandidatesRequest()
             {
@@ -709,7 +1290,17 @@ namespace LootLocker.Requests
 
         public static void RemovingFilesFromAssetCandidates(int assetId, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
@@ -722,13 +1313,33 @@ namespace LootLocker.Requests
         #region Events
         public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerEventResponse response = new LootLockerEventResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GettingAllEvents(onComplete);
         }
 
         public static void GettingASingleEvent(int missionId, Action<LootLockerSingleEventResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerSingleEventResponse response = new LootLockerSingleEventResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
             LootLockerAPIManager.GettingASingleEvent(data, onComplete);
@@ -736,7 +1347,17 @@ namespace LootLocker.Requests
 
         public static void StartingEvent(int missionId, Action<LootLockerStartinEventResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerStartinEventResponse response = new LootLockerStartinEventResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
             LootLockerAPIManager.StartingEvent(data, onComplete);
@@ -744,7 +1365,17 @@ namespace LootLocker.Requests
 
         public static void FinishingEvent(int missionId, string signature, string finishTime, string finishScore, LootLockerCheckpointTimes[] checkpointsScores, Action<LootLockerFinishEventResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerFinishEventResponse response = new LootLockerFinishEventResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerEventPayload payload = new LootLockerEventPayload { finish_score = finishScore, finish_time = finishTime };
             payload.checkpoint_times = checkpointsScores;
             FinishEventRequest data = new FinishEventRequest { signature = signature, payload = payload };
@@ -758,13 +1389,33 @@ namespace LootLocker.Requests
         #region Missions
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGettingAllMissionsResponse response = new LootLockerGettingAllMissionsResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GettingAllMissions(onComplete);
         }
 
         public static void GettingASingleMission(int missionId, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGettingASingleMissionResponse response = new LootLockerGettingASingleMissionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
             LootLockerAPIManager.GettingASingleMission(data, onComplete);
@@ -772,7 +1423,17 @@ namespace LootLocker.Requests
 
         public static void StartingAMission(int missionId, Action<LootLockerStartingAMissionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerStartingAMissionResponse response = new LootLockerStartingAMissionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
             LootLockerAPIManager.StartingAMission(data, onComplete);
@@ -781,7 +1442,17 @@ namespace LootLocker.Requests
         public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
             LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerFinishingAMissionResponse response = new LootLockerFinishingAMissionResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
 
             string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
             string hash;
@@ -805,7 +1476,17 @@ namespace LootLocker.Requests
         #region Maps
         public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerMapsResponse response = new LootLockerMapsResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GettingAllMaps(onComplete);
         }
         #endregion
@@ -813,7 +1494,17 @@ namespace LootLocker.Requests
         #region Purchasing
         public static void NormalPurchaseCall(int asset_id, int variation_id, Action<LootLockerPurchaseResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = asset_id, variation_id = variation_id };
             List<LootLockerNormalPurchaseRequest> datas = new List<LootLockerNormalPurchaseRequest>();
             datas.Add(data);
@@ -822,21 +1513,51 @@ namespace LootLocker.Requests
 
         public static void RentalPurchaseCall(int asset_id, int variation_id, int rental_option_id, Action<LootLockerPurchaseResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = asset_id, variation_id = variation_id, rental_option_id = rental_option_id };
             LootLockerAPIManager.RentalPurchaseCall(data, onComplete);
         }
 
         public static void IosPurchaseVerification(string receipt_data, Action<LootLockerPurchaseResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerIosPurchaseVerificationRequest[] data = new LootLockerIosPurchaseVerificationRequest[] { new LootLockerIosPurchaseVerificationRequest { receipt_data = receipt_data } };
             LootLockerAPIManager.IosPurchaseVerification(data, onComplete);
         }
 
         public static void AndroidPurchaseVerification(string purchase_token, int asset_id, Action<LootLockerPurchaseResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAndroidPurchaseVerificationRequest[] data = new LootLockerAndroidPurchaseVerificationRequest[] { new LootLockerAndroidPurchaseVerificationRequest { purchase_token = purchase_token, asset_id = asset_id } };
 
             LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
@@ -844,7 +1565,17 @@ namespace LootLocker.Requests
 
         public static void PollingOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.PollingOrderStatus(data, onComplete);
@@ -852,7 +1583,17 @@ namespace LootLocker.Requests
 
         public static void ActivatingARentalAsset(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.ActivatingARentalAsset(data, onComplete);
@@ -862,13 +1603,33 @@ namespace LootLocker.Requests
         #region Collectables
         public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GettingCollectables(onComplete);
         }
 
         public static void CollectingAnItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
             data.slug = slug;
             LootLockerAPIManager.CollectingAnItem(data, onComplete);
@@ -880,7 +1641,17 @@ namespace LootLocker.Requests
 
         public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetMessagesResponse response = new LootLockerGetMessagesResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.GetMessages(onComplete);
         }
 
@@ -889,14 +1660,34 @@ namespace LootLocker.Requests
         #region Events
         public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerTriggerAnEventResponse response = new LootLockerTriggerAnEventResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
             LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
         }
 
         public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerListingAllTriggersResponse response = new LootLockerListingAllTriggersResponse();
+                response.success = false;
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
         }
 
@@ -906,7 +1697,16 @@ namespace LootLocker.Requests
         public static void SubmittingACrashLog(string logFIlePath, string game_version, string type_identifier, string local_crash_time,
             Action<LootLockerResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerResponse response = new LootLockerResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerSubmittingACrashLogRequest data = new LootLockerSubmittingACrashLogRequest()
             {
                 logFilePath = logFIlePath,
@@ -921,7 +1721,16 @@ namespace LootLocker.Requests
         #region Leaderboard
         public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetMemberRankResponse response = new LootLockerGetMemberRankResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
             lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
@@ -932,7 +1741,16 @@ namespace LootLocker.Requests
 
         public static void GetByListOfMembers(string[] members, int id, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetByListOfMembersResponse response = new LootLockerGetByListOfMembersResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetByListMembersRequest request = new LootLockerGetByListMembersRequest();
 
             request.members = members;
@@ -942,7 +1760,16 @@ namespace LootLocker.Requests
 
         public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
             request.leaderboardId = leaderboardId;
             request.count = count.ToString();
@@ -952,7 +1779,16 @@ namespace LootLocker.Requests
 
         public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
             request.leaderboardId = leaderboardId;
             request.count = count.ToString();
@@ -963,7 +1799,16 @@ namespace LootLocker.Requests
 
         public static void SubmitScore(string member_id, int score, int id, Action<LootLockerSubmitScoreResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerSubmitScoreResponse response = new LootLockerSubmitScoreResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
             request.member_id = member_id;
             request.score = score;
@@ -972,13 +1817,31 @@ namespace LootLocker.Requests
         }
         public static void ComputeAndLockDropTable(int tableId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerComputeAndLockDropTableResponse response = new LootLockerComputeAndLockDropTableResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             LootLockerAPIManager.ComputeAndLockDropTable(tableId, onComplete);
         }
 
         public static void PickDropsFromDropTable(int[] picks, int tableId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
-            if (!CheckInitialized()) return;
+            if (!CheckInitialized())
+            {
+                LootLockerPickDropsFromDropTableResponse response = new LootLockerPickDropsFromDropTableResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
             PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
             data.picks = picks;
 
