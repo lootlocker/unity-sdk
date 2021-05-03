@@ -219,12 +219,12 @@ namespace LootLocker
             if (assetFilters != null)
             {
                 KeyValuePair<string, string> keys = assetFilters.First();
-                filterString = $"{keys.Key}={keys.Key}";
+                filterString = $"{keys.Key}={keys.Value}";
                 int count = 0;
                 foreach (var kvp in assetFilters)
                 {
                     if (count > 0)
-                        filterString += $";{kvp.Key}={kvp.Key}";
+                        filterString += $";{kvp.Key}={kvp.Value}";
                     count++;
                 }
                 tempEndpoint = $"&asset_filters={filterString}";
