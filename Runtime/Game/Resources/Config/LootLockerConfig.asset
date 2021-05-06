@@ -15,9 +15,9 @@ MonoBehaviour:
   apiKey: d68e80882e497af07338bdff0aa9822c9e609a68
   token: 64e5f6d949cfc75ab8470444c91648d8bf6475ef
   gameID: 0
-  game_version: 1.0.0.4
+  game_version: 1.0.0.0
   deviceID: defaultPlayerId
-  platform: 2
+  platform: 0
   developmentMode: 1
   url: https://api.lootlocker.io/game/v1
   adminUrl: https://api.lootlocker.io/admin

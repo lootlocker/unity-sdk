@@ -49,7 +49,7 @@ namespace LootLocker
     {
         public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
         {
-            EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
+            EndPointClass requestEndPoint = LootLockerEndPoints.ComputeAndLockDropTable;
 
             string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId, AddAssetDetails.ToString().ToLower());
 

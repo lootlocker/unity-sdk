@@ -78,7 +78,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            if (LootLockerConfig.current!=null && LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
+            if (LootLockerConfig.current != null && LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
             {
                 if (IsError)
                     Debug.LogError(message);
@@ -1740,7 +1740,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SubmitScore(request, id.ToString(), onComplete);
         }
 
-        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
         {
             if (!CheckInitialized())
             {
@@ -1752,7 +1752,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(response);
                 return;
             }
-            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete);
+            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete, AddAssetDetails, tag);
         }
 
         public static void PickDropsFromDropTable(int[] picks, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)

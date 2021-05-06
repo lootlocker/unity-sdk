@@ -17,6 +17,7 @@ namespace LootLocker.Admin
         public ProjectSettings(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
         {
         }
+
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
             if (gameSettings == null)
@@ -26,6 +27,7 @@ namespace LootLocker.Admin
             // This function is called when the user clicks on the MyCustom element in the Settings window.
             m_CustomSettings = GetSerializedSettings();
         }
+
         public override void OnGUI(string searchContext)
         {
             m_CustomSettings.Update();
