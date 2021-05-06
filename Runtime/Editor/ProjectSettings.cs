@@ -2,18 +2,34 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace LootLocker.Admin
 {
     public class ProjectSettings : SettingsProvider
     {
-        private LootLockerConfig gameSettings;
+        private static LootLockerConfig gameSettings;
+        private SerializedObject m_CustomSettings;
+        internal static SerializedObject GetSerializedSettings()
+        {
+            return new SerializedObject(gameSettings);
+        }
         public ProjectSettings(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
         {
         }
-
+        public override void OnActivate(string searchContext, VisualElement rootElement)
+        {
+            if (gameSettings == null)
+            {
+                gameSettings = LootLockerConfig.Get();
+            }
+            // This function is called when the user clicks on the MyCustom element in the Settings window.
+            m_CustomSettings = GetSerializedSettings();
+        }
         public override void OnGUI(string searchContext)
         {
+            m_CustomSettings.Update();
+
             if (gameSettings == null)
             {
                 gameSettings = LootLockerConfig.Get();
@@ -27,56 +43,54 @@ namespace LootLocker.Admin
                     DrawGameSettings();
                 }
             }
+            m_CustomSettings.ApplyModifiedProperties();
         }
 
         private void DrawGameSettings()
         {
-            string apiKey = gameSettings.apiKey;
             EditorGUI.BeginChangeCheck();
-            apiKey = EditorGUILayout.TextField("API Key", apiKey);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("apiKey"));
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.apiKey = apiKey;
+                gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue;
             }
 
-            string gameVersion = gameSettings.game_version;
             EditorGUI.BeginChangeCheck();
-            gameVersion = EditorGUILayout.TextField("Game Version", gameVersion);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("game_version"));
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.game_version = gameVersion;
+                gameSettings.game_version = m_CustomSettings.FindProperty("game_version").stringValue;
             }
 
-            LootLockerConfig.platformType platform = gameSettings.platform;
             EditorGUI.BeginChangeCheck();
-            platform = (LootLockerConfig.platformType)EditorGUILayout.EnumPopup("Platform", platform);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("platform"));
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.platform = platform;
+                gameSettings.platform = (LootLockerConfig.platformType)m_CustomSettings.FindProperty("platform").enumValueIndex;
             }
 
-            bool onDevelopmentMode = gameSettings.developmentMode;
             EditorGUI.BeginChangeCheck();
-            onDevelopmentMode = EditorGUILayout.Toggle("On Development Mode", onDevelopmentMode);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("developmentMode"));
+
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.developmentMode = onDevelopmentMode;
+                gameSettings.developmentMode = m_CustomSettings.FindProperty("developmentMode").boolValue;
             }
 
-            LootLockerConfig.DebugLevel debugLevel = gameSettings.currentDebugLevel;
             EditorGUI.BeginChangeCheck();
-            debugLevel = (LootLockerConfig.DebugLevel)EditorGUILayout.EnumPopup("Current Debug Level", debugLevel);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("currentDebugLevel"));
+
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.currentDebugLevel = debugLevel;
+                gameSettings.currentDebugLevel = (LootLockerConfig.DebugLevel)m_CustomSettings.FindProperty("currentDebugLevel").enumValueIndex;
             }
 
-            bool allowTokenRefresh = gameSettings.allowTokenRefresh;
             EditorGUI.BeginChangeCheck();
-            allowTokenRefresh = EditorGUILayout.Toggle("Allow Token Refresh", allowTokenRefresh);
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
+
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.allowTokenRefresh = allowTokenRefresh;
+                gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
         }
 

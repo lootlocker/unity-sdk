@@ -1310,82 +1310,6 @@ namespace LootLocker.Requests
         }
         #endregion
 
-        #region Events
-        public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                LootLockerEventResponse response = new LootLockerEventResponse();
-                response.success = false;
-                response.status = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
-                return;
-            }
-            LootLockerAPIManager.GettingAllEvents(onComplete);
-        }
-
-        public static void GettingASingleEvent(int missionId, Action<LootLockerSingleEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                LootLockerSingleEventResponse response = new LootLockerSingleEventResponse();
-                response.success = false;
-                response.status = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.GettingASingleEvent(data, onComplete);
-        }
-
-        public static void StartingEvent(int missionId, Action<LootLockerStartinEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                LootLockerStartinEventResponse response = new LootLockerStartinEventResponse();
-                response.success = false;
-                response.status = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.StartingEvent(data, onComplete);
-        }
-
-        public static void FinishingEvent(int missionId, string signature, string finishTime, string finishScore, LootLockerCheckpointTimes[] checkpointsScores, Action<LootLockerFinishEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                LootLockerFinishEventResponse response = new LootLockerFinishEventResponse();
-                response.success = false;
-                response.status = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
-                return;
-            }
-            LootLockerEventPayload payload = new LootLockerEventPayload { finish_score = finishScore, finish_time = finishTime };
-            payload.checkpoint_times = checkpointsScores;
-            FinishEventRequest data = new FinishEventRequest { signature = signature, payload = payload };
-            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-            lootLockerGetRequest.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.FinishingEvent(lootLockerGetRequest, data, onComplete);
-        }
-
-        #endregion
-
         #region Missions
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
@@ -1657,7 +1581,7 @@ namespace LootLocker.Requests
 
         #endregion
 
-        #region Events
+        #region TriggerEvents
         public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1815,7 +1739,8 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SubmitScore(request, id.ToString(), onComplete);
         }
-        public static void ComputeAndLockDropTable(int tableId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+
+        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1827,10 +1752,10 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(response);
                 return;
             }
-            LootLockerAPIManager.ComputeAndLockDropTable(tableId, onComplete);
+            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete);
         }
 
-        public static void PickDropsFromDropTable(int[] picks, int tableId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
+        public static void PickDropsFromDropTable(int[] picks, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1845,7 +1770,7 @@ namespace LootLocker.Requests
             PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
             data.picks = picks;
 
-            LootLockerAPIManager.PickDropsFromDropTable(data, tableId, onComplete);
+            LootLockerAPIManager.PickDropsFromDropTable(data, tableInstanceId, onComplete);
         }
         #endregion
     }

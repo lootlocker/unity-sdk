@@ -47,11 +47,17 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void ComputeAndLockDropTable(int tableId, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
-    
-            string endPoint = string.Format(requestEndPoint.endPoint, tableId);
+
+            string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId, AddAssetDetails.ToString().ToLower());
+
+            if (!string.IsNullOrEmpty(tag))
+            {
+                string tempEndpoint = $"&tag={tag}";
+                endPoint += tempEndpoint;
+            }
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
@@ -67,14 +73,14 @@ namespace LootLocker
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
-        public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
+        public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, tableId);
+            string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
