@@ -46,7 +46,7 @@ namespace LootLocker.Requests
     {
         public bool success => status;
         public LootLockerPagination pagination { get; set; }
-        public LootLockerMember[] members { get; set; }
+        public LootLockerMember[] items { get; set; }
     }
 
     public class LootLockerPagination

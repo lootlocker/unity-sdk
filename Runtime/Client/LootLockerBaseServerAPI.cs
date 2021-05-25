@@ -82,6 +82,7 @@ namespace LootLocker
                         if (Time.time - startTime >= maxTimeOut)
                         {
                             LootLockerSDKManager.DebugMessage("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
+                            OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
                             yield break;
                         }
                     }
