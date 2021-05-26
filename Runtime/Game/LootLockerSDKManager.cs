@@ -1682,7 +1682,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetByListOfMembers(request, id.ToString(), onComplete);
         }
 
-        public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        public static void GetScoreListMain(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1697,11 +1697,42 @@ namespace LootLocker.Requests
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
             request.leaderboardId = leaderboardId;
             request.count = count.ToString();
-
-            LootLockerAPIManager.GetScoreList(request, onComplete);
+            request.after = after > 0 ? after.ToString() : null;
+            Action<LootLockerGetScoreListResponse> callback = (response) =>
+            {
+                if (response != null && response.pagination != null)
+                {
+                    LootLockerGetScoreListRequest.nextCursor = response.pagination.next_cursor;
+                    LootLockerGetScoreListRequest.prevCursor = response.pagination.previous_cursor;
+                    response.pagination.allowNext = response.pagination.next_cursor > 0;
+                    response.pagination.allowPrev = (response.pagination.previous_cursor != null);
+                }
+                onComplete?.Invoke(response);
+            };
+            LootLockerAPIManager.GetScoreList(request, callback);
         }
 
-        public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
+        public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            GetScoreListMain(leaderboardId, count, -1, onComplete);
+        }
+
+        public static void GetNextScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            GetScoreListMain(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
+        }
+
+        public static void GetPrevScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            GetScoreListMain(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
+        }
+
+        public void ResetScoreCalls()
+        {
+            LootLockerGetScoreListRequest.Reset();
+        }
+
+        public static void GetScoreListOriginal(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1721,7 +1752,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetScoreList(request, onComplete);
         }
 
-        public static void SubmitScore(string member_id, int score, int id, Action<LootLockerSubmitScoreResponse> onComplete)
+        public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1734,10 +1765,10 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
-            request.member_id = member_id;
+            request.member_id = memberId;
             request.score = score;
 
-            LootLockerAPIManager.SubmitScore(request, id.ToString(), onComplete);
+            LootLockerAPIManager.SubmitScore(request, leaderboardId.ToString(), onComplete);
         }
 
         public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")

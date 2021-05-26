@@ -88,13 +88,7 @@ namespace LootLocker
         public int retryCount;
 
         #region Make ServerRequest and call send (3 functions)
-        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, Dictionary<string, object> body = null, Action<LootLockerResponse> onComplete = null)
-        {
-            new LootLockerServerRequest(endPoint, httpMethod, body).Send((response) =>
-             {
-                 onComplete?.Invoke(response);
-             });
-        }
+
         public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
 #if UNITY_EDITOR
@@ -116,6 +110,7 @@ namespace LootLocker
                  onComplete?.Invoke(response);
              });
         }
+
         public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -167,27 +162,7 @@ namespace LootLocker
                 LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-        public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, string body = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
-        {
-            this.retryCount = 0;
-            this.endpoint = endpoint;
-            this.httpMethod = httpMethod;
-            this.payload = null;
-            this.upload = upload;
-            this.uploadName = uploadName;
-            this.uploadType = uploadType;
-            this.jsonPayload = null;
-            this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
-            this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = callerRole;
-            this.form = null;
-            bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
 
-            if (this.payload != null && isNonPayloadMethod)
-            {
-                LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
-            }
-        }
         public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, Dictionary<string, object> payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
             this.retryCount = 0;
