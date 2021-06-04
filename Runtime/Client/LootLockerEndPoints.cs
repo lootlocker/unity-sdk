@@ -28,6 +28,8 @@ namespace LootLocker
         public static EndPointClass getDlcMigration = new EndPointClass("v1/player/dlcs", LootLockerHTTPMethod.GET);
         public static EndPointClass setProfilePrivate = new EndPointClass("v1/player/profile/public", LootLockerHTTPMethod.DELETE);
         public static EndPointClass setProfilePublic = new EndPointClass("v1/player/profile/public", LootLockerHTTPMethod.POST);
+        public static EndPointClass getPlayerName = new EndPointClass("player/name", LootLockerHTTPMethod.GET);
+        public static EndPointClass setPlayerName = new EndPointClass("player/name", LootLockerHTTPMethod.PATCH);
 
         //Character
         [Header("Character Endpoints")]

@@ -56,7 +56,7 @@ namespace LootLocker
                 return _current;
             }
         }
-
+        public (string key, string value) dateVersion = ( "LL-Version", "2021-03-01");
         public string apiKey;
         [HideInInspector]
         public string token;

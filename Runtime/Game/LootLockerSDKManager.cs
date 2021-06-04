@@ -366,6 +366,40 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.SetProfilePublic(onComplete);
         }
+
+        public static void GetPlayerName(Action<PlayerNameResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                PlayerNameResponse response = new PlayerNameResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+            LootLockerAPIManager.GetPlayerName(onComplete);
+        }
+
+        public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                PlayerNameResponse response = new PlayerNameResponse();
+                response.status = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+
+            PlayerNameRequest data = new PlayerNameRequest();
+            data.name = name;
+
+            LootLockerAPIManager.SetPlayerName(data, onComplete);
+        }
         #endregion
 
         #region Character

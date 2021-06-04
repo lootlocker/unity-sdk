@@ -36,7 +36,7 @@ namespace LootLocker
         /// <summary>
         /// TRUE if http error OR server returns an error status
         /// </summary>
-        public bool hasError ;
+        public bool hasError;
         /// <summary>
         /// HTTP Status Code
         /// </summary>
@@ -103,6 +103,9 @@ namespace LootLocker
                 headers.Add(callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token", callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? LootLockerConfig.current.adminToken : LootLockerConfig.current.token);
             }
 
+            if (LootLockerConfig.current != null)
+                headers.Add(LootLockerConfig.current.dateVersion.key, LootLockerConfig.current.dateVersion.value);
+
             LootLockerBaseServerAPI.I.SwitchURL(callerRole);
 
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) =>
@@ -130,9 +133,9 @@ namespace LootLocker
                    onComplete?.Invoke(response);
                });
         }
-#endregion
+        #endregion
 
-#region ServerRequest constructor
+        #region ServerRequest constructor
         public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null, Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, bool isFileUpload = true)
         {
             this.retryCount = 0;
@@ -203,7 +206,7 @@ namespace LootLocker
                 LootLockerSDKManager.DebugMessage("WARNING: Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
             }
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// just debug and call ServerAPI.SendRequest which takes the current ServerRequest and pass this response

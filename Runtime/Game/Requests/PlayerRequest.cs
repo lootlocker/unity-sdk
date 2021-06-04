@@ -25,6 +25,18 @@ namespace LootLocker.Requests
     }
 
     [System.Serializable]
+    public class PlayerNameRequest 
+    {
+        public string name { get; set; }
+    }
+
+    [System.Serializable]
+    public class PlayerNameResponse : LootLockerResponse
+    {
+        public bool success => status;
+        public string name { get; set; }
+    }
+    [System.Serializable]
     public class LootLockerDlcResponse : LootLockerResponse
     {
         public bool success { get; set; }
@@ -372,6 +384,50 @@ namespace LootLocker
             }, true);
         }
 
+        public static void GetPlayerName(Action<PlayerNameResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.getPlayerName;
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
+            {
+                PlayerNameResponse response = new PlayerNameResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                    response = JsonConvert.DeserializeObject<PlayerNameResponse>(serverResponse.text);
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                response.status = serverResponse.status;
+                response.Error = serverResponse.Error; 
+                response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }, true);
+        }
+
+        public static void SetPlayerName(PlayerNameRequest data, Action<PlayerNameResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.setPlayerName;
+            string json = "";
+            if (data == null) return;
+            else json = JsonConvert.SerializeObject(data);
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                PlayerNameResponse response = new PlayerNameResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                    response = JsonConvert.DeserializeObject<PlayerNameResponse>(serverResponse.text);
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                response.status = serverResponse.status;
+                response.Error = serverResponse.Error;
+                response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }, true);
+        }
     }
 
 }
