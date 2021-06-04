@@ -100,7 +100,7 @@ namespace LootLocker
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                headers.Add(callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token", LootLockerConfig.current.token);
+                headers.Add(callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token", callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? LootLockerConfig.current.adminToken : LootLockerConfig.current.token);
             }
 
             LootLockerBaseServerAPI.I.SwitchURL(callerRole);

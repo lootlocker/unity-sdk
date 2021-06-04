@@ -79,12 +79,9 @@ namespace LootLocker.Requests
         public int member_id { get; set; }
     }
 
-    public class LootLockerGetScoreListRequest
+    public class LootLockerGetScoreListRequest: LootLockerGetRequests
     {
         public int leaderboardId { get; set; }
-        public string count { get; set; }
-        public string after { get; set; }
-
         public static int? nextCursor;
         public static int? prevCursor;
         public static void Reset()
@@ -92,6 +89,12 @@ namespace LootLocker.Requests
             nextCursor = 0;
             prevCursor = 0;
         }
+    }
+
+    public class LootLockerGetRequests
+    {
+        public int count { get; set; }
+        public string after { get; set; }
     }
 
     public class LootLockerGetByListMembersRequest
@@ -152,12 +155,12 @@ namespace LootLocker
             EndPointClass requestEndPoint = LootLockerEndPoints.getScoreList;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardId, int.Parse(getRequests.count));
+            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardId, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
                 tempEndpoint = requestEndPoint.endPoint + "&after={2}";
-                endPoint = string.Format(tempEndpoint, getRequests.leaderboardId, int.Parse(getRequests.count), int.Parse(getRequests.after));
+                endPoint = string.Format(tempEndpoint, getRequests.leaderboardId, getRequests.count, int.Parse(getRequests.after));
             }
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) =>

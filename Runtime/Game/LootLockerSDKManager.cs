@@ -1696,7 +1696,7 @@ namespace LootLocker.Requests
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
             request.leaderboardId = leaderboardId;
-            request.count = count.ToString();
+            request.count = count;
             request.after = after > 0 ? after.ToString() : null;
             Action<LootLockerGetScoreListResponse> callback = (response) =>
             {
@@ -1746,7 +1746,7 @@ namespace LootLocker.Requests
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
             request.leaderboardId = leaderboardId;
-            request.count = count.ToString();
+            request.count = count;
             request.after = after > 0 ? after.ToString() : null;
 
             LootLockerAPIManager.GetScoreList(request, onComplete);

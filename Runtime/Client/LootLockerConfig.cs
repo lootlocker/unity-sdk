@@ -61,13 +61,14 @@ namespace LootLocker
         [HideInInspector]
         public string token;
         [HideInInspector]
+        public string adminToken;
+        [HideInInspector]
         public int gameID;
         public string game_version = "1.0";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
         public platformType platform;
         public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web, Other }
-
         public bool developmentMode;
         [HideInInspector]
         public string url = "https://api.lootlocker.io/game/v1";
