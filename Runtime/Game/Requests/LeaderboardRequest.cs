@@ -31,10 +31,10 @@ namespace LootLocker.Requests
     public class LootLockerGetByListOfMembersResponse : LootLockerResponse
     {
         public bool success => status;
-        public LootLockerMember[] members { get; set; }
+        public LootLockerLeaderboardMember[] members { get; set; }
     }
 
-    public class LootLockerMember
+    public class LootLockerLeaderboardMember
     {
         public string member_id { get; set; }
         public int rank { get; set; }
@@ -46,7 +46,7 @@ namespace LootLocker.Requests
     {
         public bool success => status;
         public LootLockerPagination pagination { get; set; }
-        public LootLockerMember[] items { get; set; }
+        public LootLockerLeaderboardMember[] items { get; set; }
     }
 
     public class LootLockerPagination
