@@ -828,7 +828,7 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
-                if (response != null && response.assets.Length > 0)
+                if (response != null&& response.assets != null && response.assets.Length > 0)
                     LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
 
                 onComplete?.Invoke(response);
@@ -851,7 +851,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
-                if (response != null && response.assets.Length > 0)
+                if (response != null && response.assets != null && response.assets.Length > 0)
                     LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
                 onComplete?.Invoke(response);
             }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters);
