@@ -828,8 +828,11 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
+				if (response.statusCode == 200)
+                {
                 if (response != null&& response.assets != null && response.assets.Length > 0)
                     LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+				}
 
                 onComplete?.Invoke(response);
             }, assetCount, null, filter, includeUGC, assetFilters);
@@ -851,8 +854,11 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
+			    if (response.statusCode == 200)
+                {
                 if (response != null && response.assets != null && response.assets.Length > 0)
                     LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+				}
                 onComplete?.Invoke(response);
             }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters);
         }
