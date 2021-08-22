@@ -15,7 +15,7 @@ namespace LootLocker.Requests
 
     public class LootLockerTriggerAnEventResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
@@ -24,7 +24,7 @@ namespace LootLocker.Requests
 
     public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public string[] triggers { get; set; }
     }
 
@@ -55,7 +55,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -74,7 +74,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);

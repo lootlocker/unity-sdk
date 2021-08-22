@@ -27,7 +27,7 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerSessionResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public string session_token { get; set; }
         public int player_id { get; set; }
         public bool seen_before { get; set; }
@@ -72,7 +72,7 @@ namespace LootLocker
 
                  //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                  response.text = serverResponse.text;
-                      response.status = serverResponse.status;
+                      response.success = serverResponse.success;
              response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                  onComplete?.Invoke(response);
 
@@ -94,7 +94,7 @@ namespace LootLocker
                 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);

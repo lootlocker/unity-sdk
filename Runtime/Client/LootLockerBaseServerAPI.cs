@@ -169,7 +169,7 @@ namespace LootLocker
                             response.Error += " " + webRequest.downloadHandler.text;
                             response.text = webRequest.downloadHandler.text;
 
-                            response.status = false;
+                            response.success = false;
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
                             OnServerResponse?.Invoke(response);
@@ -178,7 +178,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        response.status = true;
+                        response.success = true;
                         response.hasError = false;
                         response.text = webRequest.downloadHandler.text;
                         OnServerResponse?.Invoke(response);

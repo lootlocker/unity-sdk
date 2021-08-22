@@ -11,7 +11,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGetPlayerInfoResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public int? account_balance { get; set; }
         public int? xp { get; set; }
         public int? level { get; set; }
@@ -21,7 +21,7 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerStandardResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
     }
 
     [System.Serializable]
@@ -33,20 +33,19 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class PlayerNameResponse : LootLockerResponse
     {
-        public bool success => status;
         public string name { get; set; }
     }
     [System.Serializable]
     public class LootLockerDlcResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public string[] dlcs { get; set; }
     }
 
     [System.Serializable]
     public class LootLockerDeactivatedAssetsResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerDeactivatedObjects[] objects { get; set; }
     }
     [System.Serializable]
@@ -61,14 +60,14 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerBalanceResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public int? balance { get; set; }
     }
 
     [System.Serializable]
     public class LootLockerXpSubmitResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
         public bool check_grant_notifications { get; set; }
@@ -77,7 +76,7 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerXpResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public int? xp { get; set; }
         public int? level { get; set; }
     }
@@ -98,12 +97,9 @@ namespace LootLocker.Requests
 
     public class LootLockerInventoryResponse : LootLockerResponse
     {
-
-        public bool success;
-
         public LootLockerInventory[] inventory;
-
     }
+
     public class LootLockerInventory
     {
         public int instance_id { get; set; }
@@ -152,7 +148,7 @@ namespace LootLocker.Requests
 
     public class LootLockerPlayerAssetNotificationsResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerRewardObject[] objects { get; set; }
     }
 
@@ -181,7 +177,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -199,7 +195,7 @@ namespace LootLocker
 
                    //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                    response.text = serverResponse.text;
-                        response.status = serverResponse.status;
+                        response.success = serverResponse.success;
                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                    onComplete?.Invoke(response);
                }, true);
@@ -217,7 +213,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -239,7 +235,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -259,7 +255,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -279,7 +275,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -299,7 +295,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -318,7 +314,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -338,7 +334,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -358,7 +354,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -378,7 +374,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -390,7 +386,7 @@ namespace LootLocker
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (Action<LootLockerResponse>)((serverResponse) =>
             {
                 PlayerNameResponse response = new PlayerNameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -398,11 +394,11 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; 
                 response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
-            }, true);
+            }), true);
         }
 
         public static void SetPlayerName(PlayerNameRequest data, Action<PlayerNameResponse> onComplete)
@@ -414,7 +410,7 @@ namespace LootLocker
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (Action<LootLockerResponse>)((serverResponse) =>
             {
                 PlayerNameResponse response = new PlayerNameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -422,11 +418,11 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error;
                 response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
-            }, true);
+            }), true);
         }
     }
 

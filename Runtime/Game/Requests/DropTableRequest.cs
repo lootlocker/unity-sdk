@@ -10,7 +10,7 @@ namespace LootLocker.Requests
 
     public class LootLockerComputeAndLockDropTableResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerComputeAndLockItem[] items { get; set; }
     }
 
@@ -23,7 +23,7 @@ namespace LootLocker.Requests
     }
     public class LootLockerPickDropsFromDropTableResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerPickDropsFromDropTableItem[] items { get; set; }
     }
 
@@ -67,7 +67,7 @@ namespace LootLocker
 
                 // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
@@ -90,7 +90,7 @@ namespace LootLocker
 
                 // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);

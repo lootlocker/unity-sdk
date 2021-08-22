@@ -52,7 +52,7 @@ namespace LootLocker
                 }
                 else
                 {
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }

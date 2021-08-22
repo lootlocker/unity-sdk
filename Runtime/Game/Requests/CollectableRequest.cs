@@ -15,7 +15,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGettingCollectablesResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerCollectable[] collectables { get; set; }
     }
 
@@ -69,7 +69,7 @@ namespace LootLocker.Requests
 
     public class LootLockerCollectingAnItemResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerCollectable[] collectables { get; set; }
 
         public LootLockerCollectable mainCollectable;
@@ -103,7 +103,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -136,7 +136,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);

@@ -40,27 +40,27 @@ namespace LootLocker.Requests
 
     public class LootLockerGettingAllMissionsResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerMission[] missions { get; set; }
     }
 
     public class LootLockerGettingASingleMissionResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerMission mission { get; set; }
     }
 
 
     public class LootLockerStartingAMissionResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public string signature { get; set; }
     }
 
 
     public class LootLockerFinishingAMissionResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public int score { get; set; }
         public bool check_grant_notifications { get; set; }
     }
@@ -82,7 +82,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: false);
@@ -102,7 +102,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: false);
@@ -122,7 +122,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: false);
@@ -146,7 +146,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, useAuthToken: false);

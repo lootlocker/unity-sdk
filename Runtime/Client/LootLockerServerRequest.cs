@@ -23,7 +23,7 @@ namespace LootLocker
         CREATE = 5,
         OPTIONS = 6,
         PATCH = 7,
-        UPLOAD = 8
+        UPLOAD = 8 
     }
 
     /// <summary>
@@ -46,7 +46,8 @@ namespace LootLocker
         /// <para>If hasError = true, this will contain the error message.</para>
         /// </summary>
         public string text;
-        public bool status;
+        public bool success;
+
 
         public string Error;
         /// <summary>

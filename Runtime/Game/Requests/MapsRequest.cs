@@ -11,7 +11,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerMapsResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public LootLockerMap[] maps { get; set; }
     }
 
@@ -61,7 +61,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.status = serverResponse.status;
+                     response.success = serverResponse.success;
             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);

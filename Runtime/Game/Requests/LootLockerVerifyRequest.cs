@@ -23,7 +23,7 @@ namespace LootLocker.Requests
 
     public class LootLockerVerifyResponse : LootLockerResponse
     {
-        public bool success { set; get; }
+
     }
 }
 
@@ -48,7 +48,7 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, false);

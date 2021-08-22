@@ -1,6 +1,6 @@
 {
   "name": "com.lootlocker.lootlockersdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "LootLocker",
   "description": "LootLocker SDK",
   "unity": "2019.2",

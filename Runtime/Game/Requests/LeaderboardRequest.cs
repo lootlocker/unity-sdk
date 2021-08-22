@@ -13,7 +13,6 @@ namespace LootLocker.Requests
     public class LootLockerGetMemberRankResponse : LootLockerResponse
     {
         // we are doing thisfor legacy reasons, since it is no longer being set on the backend
-        public bool success => status;
         public string member_id { get; set; }
         public int rank { get; set; }
         public int score { get; set; }
@@ -30,7 +29,6 @@ namespace LootLocker.Requests
 
     public class LootLockerGetByListOfMembersResponse : LootLockerResponse
     {
-        public bool success => status;
         public LootLockerLeaderboardMember[] members { get; set; }
     }
 
@@ -44,9 +42,22 @@ namespace LootLocker.Requests
 
     public class LootLockerGetScoreListResponse : LootLockerResponse
     {
-        public bool success => status;
         public LootLockerPagination pagination { get; set; }
         public LootLockerLeaderboardMember[] items { get; set; }
+    }
+
+
+    public class LootLockerGetAllMemberRanksResponse : LootLockerResponse
+    {
+        public LootLockerLeaderboard[] leaderboards { get; set; }
+        public LootLockerPagination pagination { get; set; }
+    }
+
+    public class LootLockerLeaderboard
+    {
+        public LootLockerLeaderboardMember member { get; set; }
+        public int leaderboard_id { get; set; }
+        public string leaderboard_key { get; set; }
     }
 
     public class LootLockerPagination
@@ -60,7 +71,6 @@ namespace LootLocker.Requests
 
     public class LootLockerSubmitScoreResponse : LootLockerResponse
     {
-        public bool success => status;
         public string member_id { get; set; }
         public int rank { get; set; }
         public int score { get; set; }
@@ -79,9 +89,21 @@ namespace LootLocker.Requests
         public int member_id { get; set; }
     }
 
-    public class LootLockerGetScoreListRequest: LootLockerGetRequests
+    public class LootLockerGetScoreListRequest : LootLockerGetRequests
     {
         public int leaderboardId { get; set; }
+        public static int? nextCursor;
+        public static int? prevCursor;
+        public static void Reset()
+        {
+            nextCursor = 0;
+            prevCursor = 0;
+        }
+    }
+
+    public class LootLockerGetAllMemberRanksRequest : LootLockerGetRequests
+    {
+        public int member_id { get; set; }
         public static int? nextCursor;
         public static int? prevCursor;
         public static void Reset()
@@ -112,7 +134,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getMemberRank;
             string tempEndpoint = string.Format(endPoint.endPoint, data.leaderboardId, data.member_id);
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) =>
             {
                 LootLockerGetMemberRankResponse response = new LootLockerGetMemberRankResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -120,10 +142,10 @@ namespace LootLocker
 
                 //   LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            }), true, LootLockerCallerRole.User);
         }
 
         public static void GetByListOfMembers(LootLockerGetByListMembersRequest data, string id, Action<LootLockerGetByListOfMembersResponse> onComplete)
@@ -135,7 +157,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, id);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, ((serverResponse) =>
             {
                 LootLockerGetByListOfMembersResponse response = new LootLockerGetByListOfMembersResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -143,11 +165,38 @@ namespace LootLocker
 
                 //    LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
 
                 onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            }), true, LootLockerCallerRole.User);
+        }
+
+        public static void GetAllMemberRanks(LootLockerGetAllMemberRanksRequest getRequests, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            EndPointClass requestEndPoint = LootLockerEndPoints.getAllMemberRanks;
+
+            string tempEndpoint = requestEndPoint.endPoint;
+            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.member_id, getRequests.count);
+
+            if (!string.IsNullOrEmpty(getRequests.after))
+            {
+                tempEndpoint = requestEndPoint.endPoint + "&after={2}";
+                endPoint = string.Format(tempEndpoint, getRequests.member_id, getRequests.count, int.Parse(getRequests.after));
+            }
+
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, ((serverResponse) =>
+            {
+                LootLockerGetAllMemberRanksResponse response = new LootLockerGetAllMemberRanksResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                    response = JsonConvert.DeserializeObject<LootLockerGetAllMemberRanksResponse>(serverResponse.text);
+
+                //   LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }), true, LootLockerCallerRole.User);
         }
 
         public static void GetScoreList(LootLockerGetScoreListRequest getRequests, Action<LootLockerGetScoreListResponse> onComplete)
@@ -163,7 +212,7 @@ namespace LootLocker
                 endPoint = string.Format(tempEndpoint, getRequests.leaderboardId, getRequests.count, int.Parse(getRequests.after));
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, ((serverResponse) =>
             {
                 LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -171,10 +220,10 @@ namespace LootLocker
 
                 //   LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            }), true, LootLockerCallerRole.User);
         }
 
         public static void SubmitScore(LootLockerSubmitScoreRequest data, string id, Action<LootLockerSubmitScoreResponse> onComplete)
@@ -186,7 +235,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, id);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: ((serverResponse) =>
             {
                 LootLockerSubmitScoreResponse response = new LootLockerSubmitScoreResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
@@ -194,10 +243,10 @@ namespace LootLocker
 
                 // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                response.status = serverResponse.status;
+                response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            }), useAuthToken: true, callerRole: LootLockerCallerRole.User);
         }
 
     }

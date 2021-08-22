@@ -29,7 +29,7 @@ namespace LootLocker.Requests
 
     public class LootLockerPurchaseResponse : LootLockerResponse
     {
-        public bool success { get; set; }
+        
         public bool overlay { get; set; }
         public int order_id { get; set; }
     }
@@ -67,7 +67,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);
@@ -89,7 +89,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);
@@ -111,7 +111,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);
@@ -133,7 +133,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);
@@ -153,7 +153,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);
@@ -173,7 +173,7 @@ namespace LootLocker
 
                     //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                     response.text = serverResponse.text;
-                         response.status = serverResponse.status;
+                         response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
                     onComplete?.Invoke(response);
                 }, true);

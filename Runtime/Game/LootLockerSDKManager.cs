@@ -110,7 +110,7 @@ namespace LootLocker.Requests
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
-                response.status = false;
+                response.success = false;
                 onComplete?.Invoke(response);
                 return;
             }
@@ -127,7 +127,7 @@ namespace LootLocker.Requests
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
-                response.status = false;
+                response.success = false;
                 onComplete?.Invoke(response);
                 return;
             }
@@ -141,7 +141,7 @@ namespace LootLocker.Requests
             {
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -158,7 +158,7 @@ namespace LootLocker.Requests
             {
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -175,7 +175,7 @@ namespace LootLocker.Requests
             {
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -195,7 +195,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPlayerInfoResponse response = new LootLockerGetPlayerInfoResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -211,7 +211,7 @@ namespace LootLocker.Requests
             {
                 LootLockerInventoryResponse response = new LootLockerInventoryResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -227,7 +227,7 @@ namespace LootLocker.Requests
             {
                 LootLockerBalanceResponse response = new LootLockerBalanceResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -243,7 +243,7 @@ namespace LootLocker.Requests
             {
                 LootLockerXpSubmitResponse response = new LootLockerXpSubmitResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -260,7 +260,7 @@ namespace LootLocker.Requests
             {
                 LootLockerXpResponse response = new LootLockerXpResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -277,7 +277,7 @@ namespace LootLocker.Requests
             {
                 LootLockerPlayerAssetNotificationsResponse response = new LootLockerPlayerAssetNotificationsResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -293,7 +293,7 @@ namespace LootLocker.Requests
             {
                 LootLockerDeactivatedAssetsResponse response = new LootLockerDeactivatedAssetsResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -309,7 +309,7 @@ namespace LootLocker.Requests
             {
                 LootLockerDlcResponse response = new LootLockerDlcResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -325,7 +325,7 @@ namespace LootLocker.Requests
             {
                 LootLockerDlcResponse response = new LootLockerDlcResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -341,7 +341,7 @@ namespace LootLocker.Requests
             {
                 LootLockerStandardResponse response = new LootLockerStandardResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -357,7 +357,7 @@ namespace LootLocker.Requests
             {
                 LootLockerStandardResponse response = new LootLockerStandardResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -372,7 +372,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 PlayerNameResponse response = new PlayerNameResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -387,7 +387,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 PlayerNameResponse response = new PlayerNameResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -409,7 +409,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -432,7 +432,7 @@ namespace LootLocker.Requests
             {
                 LootLockerListCharacterTypesResponse response = new LootLockerListCharacterTypesResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -448,7 +448,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -464,7 +464,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -484,7 +484,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -510,7 +510,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -528,7 +528,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -547,7 +547,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -568,7 +568,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -589,7 +589,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -608,7 +608,7 @@ namespace LootLocker.Requests
             {
                 EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -627,7 +627,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -643,7 +643,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -662,7 +662,7 @@ namespace LootLocker.Requests
             {
                 LootLockerContextResponse response = new LootLockerContextResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -680,7 +680,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -696,7 +696,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentSingle response = new LootLockerGetPersistentSingle();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -714,7 +714,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -732,7 +732,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -748,7 +748,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -767,7 +767,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -787,7 +787,7 @@ namespace LootLocker.Requests
             {
                 LootLockerContextResponse response = new LootLockerContextResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -803,7 +803,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -819,7 +819,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -828,11 +828,11 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
-				if (response.statusCode == 200)
+                if (response.statusCode == 200)
                 {
-                if (response != null&& response.assets != null && response.assets.Length > 0)
-                    LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-				}
+                    if (response != null && response.assets != null && response.assets.Length > 0)
+                        LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+                }
 
                 onComplete?.Invoke(response);
             }, assetCount, null, filter, includeUGC, assetFilters);
@@ -844,7 +844,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -854,11 +854,11 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetAssetsOriginal((response) =>
             {
-			    if (response.statusCode == 200)
+                if (response.statusCode == 200)
                 {
-                if (response != null && response.assets != null && response.assets.Length > 0)
-                    LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-				}
+                    if (response != null && response.assets != null && response.assets.Length > 0)
+                        LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
+                }
                 onComplete?.Invoke(response);
             }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters);
         }
@@ -874,7 +874,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCommonAsset response = new LootLockerCommonAsset();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -892,7 +892,7 @@ namespace LootLocker.Requests
             {
                 LootLockerFavouritesListResponse response = new LootLockerFavouritesListResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -908,7 +908,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -926,7 +926,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -944,7 +944,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetResponse response = new LootLockerAssetResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -968,7 +968,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetAllKeyValuePairsResponse response = new LootLockerGetAllKeyValuePairsResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -984,7 +984,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1002,7 +1002,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1021,7 +1021,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1042,7 +1042,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1067,7 +1067,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1088,7 +1088,7 @@ namespace LootLocker.Requests
             {
                 LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1107,7 +1107,7 @@ namespace LootLocker.Requests
             {
                 LootLockerInspectALootBoxResponse response = new LootLockerInspectALootBoxResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1125,7 +1125,7 @@ namespace LootLocker.Requests
             {
                 LootLockerOpenLootBoxResponse response = new LootLockerOpenLootBoxResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1178,7 +1178,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1214,7 +1214,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1252,7 +1252,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1270,7 +1270,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1288,7 +1288,7 @@ namespace LootLocker.Requests
             {
                 LootLockerListingAssetCandidatesResponse response = new LootLockerListingAssetCandidatesResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1305,7 +1305,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1334,7 +1334,7 @@ namespace LootLocker.Requests
             {
                 LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1357,7 +1357,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGettingAllMissionsResponse response = new LootLockerGettingAllMissionsResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1373,7 +1373,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGettingASingleMissionResponse response = new LootLockerGettingASingleMissionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1391,7 +1391,7 @@ namespace LootLocker.Requests
             {
                 LootLockerStartingAMissionResponse response = new LootLockerStartingAMissionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1410,7 +1410,7 @@ namespace LootLocker.Requests
             {
                 LootLockerFinishingAMissionResponse response = new LootLockerFinishingAMissionResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1444,7 +1444,7 @@ namespace LootLocker.Requests
             {
                 LootLockerMapsResponse response = new LootLockerMapsResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1462,7 +1462,7 @@ namespace LootLocker.Requests
             {
                 LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1481,7 +1481,7 @@ namespace LootLocker.Requests
             {
                 LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1498,7 +1498,7 @@ namespace LootLocker.Requests
             {
                 LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1515,7 +1515,7 @@ namespace LootLocker.Requests
             {
                 LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1533,7 +1533,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1551,7 +1551,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1571,7 +1571,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1587,7 +1587,7 @@ namespace LootLocker.Requests
             {
                 LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1609,7 +1609,7 @@ namespace LootLocker.Requests
             {
                 LootLockerGetMessagesResponse response = new LootLockerGetMessagesResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1628,7 +1628,7 @@ namespace LootLocker.Requests
             {
                 LootLockerTriggerAnEventResponse response = new LootLockerTriggerAnEventResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1645,7 +1645,7 @@ namespace LootLocker.Requests
             {
                 LootLockerListingAllTriggersResponse response = new LootLockerListingAllTriggersResponse();
                 response.success = false;
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1664,7 +1664,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerResponse response = new LootLockerResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1688,7 +1688,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerGetMemberRankResponse response = new LootLockerGetMemberRankResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1708,7 +1708,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerGetByListOfMembersResponse response = new LootLockerGetByListOfMembersResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1722,12 +1722,82 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetByListOfMembers(request, id.ToString(), onComplete);
         }
 
+        public static void GetAllMemberRanksMain(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                LootLockerGetAllMemberRanksResponse response = new LootLockerGetAllMemberRanksResponse();
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+            LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
+            request.member_id = member_id;
+            request.count = count;
+            request.after = after > 0 ? after.ToString() : null;
+            Action<LootLockerGetAllMemberRanksResponse> callback = (response) =>
+            {
+                if (response != null && response.pagination != null)
+                {
+                    LootLockerGetAllMemberRanksRequest.nextCursor = response.pagination.next_cursor;
+                    LootLockerGetAllMemberRanksRequest.prevCursor = response.pagination.previous_cursor;
+                    response.pagination.allowNext = response.pagination.next_cursor > 0;
+                    response.pagination.allowPrev = (response.pagination.previous_cursor != null);
+                }
+                onComplete?.Invoke(response);
+            };
+            LootLockerAPIManager.GetAllMemberRanks(request, callback);
+        }
+
+        public static void GetAllMemberRanks(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            GetAllMemberRanksMain(member_id, count, -1, onComplete);
+        }
+
+        public static void GetAllMemberRanksNext(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.nextCursor.ToString()), onComplete);
+        }
+
+        public static void GetAllMemberRanksPrev(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.prevCursor.ToString()), onComplete);
+        }
+
+        public void ResetAllMemberRanksCalls()
+        {
+            LootLockerGetAllMemberRanksRequest.Reset();
+        }
+
+        public static void GetAllMemberRanksOriginal(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                LootLockerGetAllMemberRanksResponse response = new LootLockerGetAllMemberRanksResponse();
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+            LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
+            request.member_id = member_id;
+            request.count = count;
+            request.after = after > 0 ? after.ToString() : null;
+
+            LootLockerAPIManager.GetAllMemberRanks(request, onComplete);
+        }
+
         public static void GetScoreListMain(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1777,7 +1847,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1797,7 +1867,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerSubmitScoreResponse response = new LootLockerSubmitScoreResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1816,7 +1886,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerComputeAndLockDropTableResponse response = new LootLockerComputeAndLockDropTableResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
@@ -1831,7 +1901,7 @@ namespace LootLocker.Requests
             if (!CheckInitialized())
             {
                 LootLockerPickDropsFromDropTableResponse response = new LootLockerPickDropsFromDropTableResponse();
-                response.status = false;
+                response.success = false;
                 response.hasError = true;
                 response.Error = "SDk not initialised";
                 response.text = "SDk not initialised";
