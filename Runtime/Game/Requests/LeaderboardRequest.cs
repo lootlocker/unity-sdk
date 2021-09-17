@@ -76,7 +76,6 @@ namespace LootLocker.Requests
         public string member_id { get; set; }
         public int rank { get; set; }
         public int score { get; set; }
-
         public string metadata { get; set; }
     }
 
@@ -85,7 +84,6 @@ namespace LootLocker.Requests
     {
         public string member_id { get; set; }
         public int score { get; set; }
-
         public string metadata { get; set; }
     }
 
