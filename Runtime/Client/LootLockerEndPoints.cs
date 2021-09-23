@@ -69,7 +69,7 @@ namespace LootLocker
         public static EndPointClass gettingAssetBoneInformation = new EndPointClass("v1/asset/bones", LootLockerHTTPMethod.GET);
         public static EndPointClass listingFavouriteAssets = new EndPointClass("v1/asset/favourites", LootLockerHTTPMethod.GET);
         public static EndPointClass addingFavouriteAssets = new EndPointClass("v1/asset/{0}/favourite", LootLockerHTTPMethod.POST);
-        public static EndPointClass removingFavouriteAssets = new EndPointClass("v1/asset/258/favourite", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass removingFavouriteAssets = new EndPointClass("v1/asset/{0}/favourite", LootLockerHTTPMethod.DELETE);
 
         //Asset storage 
         [Header("Asset Instances")]
