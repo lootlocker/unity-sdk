@@ -79,7 +79,7 @@ namespace LootLocker
         public static EndPointClass createKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage", LootLockerHTTPMethod.POST);
         public static EndPointClass updateOneOrMoreKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage", LootLockerHTTPMethod.PUT);
         public static EndPointClass updateKeyValuePairById = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.PUT);
-        public static EndPointClass deleteKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass deleteKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass inspectALootBox = new EndPointClass("v1/asset/instance/{0}/inspect", LootLockerHTTPMethod.GET);
         public static EndPointClass openALootBox = new EndPointClass("v1/player/asset/instance/{0}/open", LootLockerHTTPMethod.PUT);
         //UGC
@@ -117,7 +117,7 @@ namespace LootLocker
         public static EndPointClass iosPurchaseVerification = new EndPointClass("v1/purchase", LootLockerHTTPMethod.POST);
         public static EndPointClass androidPurchaseVerification = new EndPointClass("v1/purchase", LootLockerHTTPMethod.POST);
         public static EndPointClass pollingOrderStatus = new EndPointClass("v1/purchase/{0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass activatingARentalAsset = new EndPointClass("v1/asset/instance/{0}/activate", LootLockerHTTPMethod.GET);
+        public static EndPointClass activatingARentalAsset = new EndPointClass("v1/asset/instance/{0}/activate", LootLockerHTTPMethod.POST);
 
         //EventTrigger
         [Header("EventTrigger")]
