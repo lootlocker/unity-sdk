@@ -996,11 +996,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(data, onComplete);
         }
 
-        public static void GetAKeyValuePairByIdForAssetInstances(int assetId, int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void GetAKeyValuePairByIdForAssetInstances(int assetId, int instanceId, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                LootLockerGetSingleKeyValuePairsResponse response = new LootLockerGetSingleKeyValuePairsResponse();
                 response.success = false;
                 response.success = false;
                 response.hasError = true;
