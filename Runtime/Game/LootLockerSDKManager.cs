@@ -1862,7 +1862,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetScoreList(request, onComplete);
         }
 
-        public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete, string metadata = "")
+        public static void SubmitScore(string memberId, int score, int leaderboardIdAction, Action<LootLockerSubmitScoreResponse> onComplete)
+        {
+            SubmitScore(memberId, score, leaderboardIdAction, "", onComplete);
+        }
+
+        public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             if (!CheckInitialized())
             {
