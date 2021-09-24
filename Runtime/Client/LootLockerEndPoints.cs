@@ -81,7 +81,7 @@ namespace LootLocker
         public static EndPointClass updateKeyValuePairById = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.PUT);
         public static EndPointClass deleteKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass inspectALootBox = new EndPointClass("v1/asset/instance/{0}/inspect", LootLockerHTTPMethod.GET);
-        public static EndPointClass openALootBox = new EndPointClass("v1/player/asset/instance/{0}/open", LootLockerHTTPMethod.PUT);
+        public static EndPointClass openALootBox = new EndPointClass("v1/asset/instance/{0}/open", LootLockerHTTPMethod.PUT);
         //UGC
         [Header("UGC")]
         public static EndPointClass creatingAnAssetCandidate = new EndPointClass("v1/player/assets/candidates", LootLockerHTTPMethod.POST);

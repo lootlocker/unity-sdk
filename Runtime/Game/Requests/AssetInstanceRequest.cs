@@ -238,7 +238,7 @@ namespace LootLocker
 
         public static void InspectALootBox(LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.inspectALootBox;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -258,7 +258,7 @@ namespace LootLocker
 
         public static void OpenALootBox(LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.openALootBox;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
