@@ -1,7 +1,6 @@
 # LootLocker Unity SDK
 
 <h1 align="center">
-  <br>
   <a href="https://www.lootlocker.io/"><img src="https://s3.eu-west-1.amazonaws.com/cdn.lootlocker.io/public/lootLocker_wide_dark_whiteBG.png" alt="LootLocker"></a>
 </h1>
 
