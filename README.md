@@ -55,4 +55,4 @@ This should force a download of the latest code.
 
 ## Support
 
-If you have any issues you can reach us on our [Dicord Server](https://discord.lootlocker.io/)
+If you have any issues or just wanna chat you can reach us on our [Discord Server](https://discord.lootlocker.io/)
