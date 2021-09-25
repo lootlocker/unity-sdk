@@ -17,6 +17,7 @@ namespace LootLocker.Requests
         public int rank { get; set; }
         public int score { get; set; }
         public LootLockerPlayer player { get; set; }
+        public string metadata { get; set; }
     }
 
     public class LootLockerPlayer
@@ -38,6 +39,7 @@ namespace LootLocker.Requests
         public int rank { get; set; }
         public int score { get; set; }
         public LootLockerPlayer player { get; set; }
+        public string metadata { get; set; }
     }
 
     public class LootLockerGetScoreListResponse : LootLockerResponse
@@ -74,6 +76,7 @@ namespace LootLocker.Requests
         public string member_id { get; set; }
         public int rank { get; set; }
         public int score { get; set; }
+        public string metadata { get; set; }
     }
 
 
@@ -81,6 +84,7 @@ namespace LootLocker.Requests
     {
         public string member_id { get; set; }
         public int score { get; set; }
+        public string metadata { get; set; }
     }
 
     public class LootLockerGetMemberRankRequest

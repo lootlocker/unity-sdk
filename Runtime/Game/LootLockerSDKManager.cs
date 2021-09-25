@@ -1864,6 +1864,11 @@ namespace LootLocker.Requests
 
         public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete)
         {
+            SubmitScore(memberId, score, leaderboardId, "", onComplete);
+        }
+
+        public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
+        {
             if (!CheckInitialized())
             {
                 LootLockerSubmitScoreResponse response = new LootLockerSubmitScoreResponse();
@@ -1877,6 +1882,8 @@ namespace LootLocker.Requests
             LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
             request.member_id = memberId;
             request.score = score;
+            if (!string.IsNullOrEmpty(metadata))
+                request.metadata = metadata;
 
             LootLockerAPIManager.SubmitScore(request, leaderboardId.ToString(), onComplete);
         }
