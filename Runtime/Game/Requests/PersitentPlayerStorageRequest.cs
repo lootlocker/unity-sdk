@@ -69,7 +69,7 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
             {
                 LootLockerGetPersistentSingle response = new LootLockerGetPersistentSingle();
                 if (string.IsNullOrEmpty(serverResponse.Error))

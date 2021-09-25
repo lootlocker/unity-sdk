@@ -155,7 +155,7 @@ namespace LootLocker.Requests
     public class LootLockerRewardObject
     {
         public int instance_id { get; set; }
-        public int variation_id { get; set; }
+        public int? variation_id { get; set; }
         public string acquisition_source { get; set; }
         public LootLockerCommonAsset asset { get; set; }
     }

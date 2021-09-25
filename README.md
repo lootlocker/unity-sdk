@@ -1,54 +1,58 @@
-# unity-sdk
-Full documentation available here https://docs.lootlocker.io/getting-started/unity-tutorials
+# LootLocker Unity SDK
 
-## Install from Unity Package Manager (Recommended)
+<h1 align="center">
+  <a href="https://www.lootlocker.io/"><img src="https://s3.eu-west-1.amazonaws.com/cdn.lootlocker.io/public/lootLocker_wide_dark_whiteBG.png" alt="LootLocker"></a>
+</h1>
 
-### Using GIT
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#Installation">Installation</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#updating">Updating</a> •
+  <a href="#support">Support</a>
+</p>
 
-Before you start, make sure you have git installed on your computer.
-Open the Unity editor and navigate to the Package Manager by clicking on Window and then Package Manager.
+---
 
-Click on the + at the top of the Package Manager window and select Add package from git URL.
+## About
 
-Enter the URL below into the text box and click Add. 
-https://github.com/LootLocker/unity-sdk.git
+LootLocker is a game backend-as-a-service that unlocks cross-platform systems so you can build, ship, and run your best games.
 
-The SDK is now installed in your project, and you are ready to configure the SDK and make your first API calls.
+Full documentation is available here https://docs.lootlocker.io/getting-started/unity-tutorials
+
+## Installation
+
+### Using Git
+
+Before you start, Git should be installed on your PC.
+We recommend using [Git for Windows](https://gitforwindows.org/)
+
+- In the Unity Editor go to `Window > Package Manager`
+- Click the + at the top left of the Package Manager window
+- Select `Add package from git URL...`
+- Paste the following URL `https://github.com/LootLocker/unity-sdk.git` and click `Add`
 
 ### Using the Entire Repo
 
-If you do not have git installed on your computer. You can install the SDK by downloading the entire repository and pasting in the packages folder of your project.
-You can download the entire repo by clicking Code and Download Zip
+- Download the code from here by choosing `Code` and then `Download Zip`
+- Unzip the files and place them in a folder in the Packages folder of your Unity Project
 
-The SDK is now installed in your project, and you are ready to configure the SDK and make your first API calls.
+## Configuration
 
-## Configure the SDK
+For a full walkthrough of how to configure the SDK, please see our [Guide to Configuring the Unity SDK](https://docs.lootlocker.io/getting-started/unity-tutorials/getting-started-with-unity/configure-the-sdk)
 
-It’s time to connect the SDK in your project to the LootLocker Management Console. Depending on the game engine, there might be different ways to achieve this, so make sure you read everything before getting started.
-Now that you have installed the SDK into your Unity project, you will want to connect the Unity project to your game in the LootLocker Management Console. The following steps walk you through configuring the LootLocker Unity SDK to work with a game that has already been created in the LootLocker Management Console. If you haven’t created a game or account yet, please visit my.lootlocker.io or follow this guide.
-There are two methods for setting up the SDK: setting it up manually in the project settings in the editor or using the Admin SDK. This tutorial will explain both ways.
+### For a short version
 
-### Configure via Project Settings
-Login to the LootLocker Management Console by visiting my.lootlocker.io.
+- Log on to the [LootLocker management console](https://my.lootlocker.io/login) and find your Game Settings.
+- Find your Game Key in the API section of the settings
+- Open `Edit > Project Settings` in the Unity Editor and find the `LootLocker SDK` tab.
+- Input Api Key using the Game Key from the LootLocker console page
 
-Click on Game Settings and copy your API Key.
+## Updating
 
-Return to the Unity Editor, Click on Edit, and then Project Settings.
+If you installed the SDK using the Git URL you can simply open the package manager and re-paste the Git URL.
+This should force a download of the latest code.
 
-Click on LootLocker SDK in the list to the left and fill in your API Key copied from the LootLocker dashboard.
+## Support
 
-Fill in all information based on data from the LootLocker Settings Menu.
-
-API Key is found in Game Settings in the LootLocker Management Console.
-
-Game Version refers to the current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended).
-
-Platform is the name of the platform the game will be built for (e.g Steam, PSN, Android, iOS).
-
-Environment lets you test your unpublished changes in the LootLocker Management Console by selecting Development instead of Live.
-
-Current Debug Level allows you to configure the debug level of the SDK. This can be set to Errors Only, Normal Only, or Off.
-
-Allow Token Refresh can be selected so that the SDK automatically attempts to refresh the session token if it expires. Otherwise the session token needs to be renewed manually.
-
-You have now configured the LootLocker SDK. In the next section you will learn how to make your first API calls.
+If you have any issues or just wanna chat you can reach us on our [Discord Server](https://discord.lootlocker.io/)

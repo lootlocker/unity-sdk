@@ -11,9 +11,14 @@ namespace LootLocker.Requests
 {
     public class LootLockerGetAllKeyValuePairsResponse : LootLockerResponse
     {
-        
         public int streamedObjectCount = 0;
         public LootLockerInstanceStoragePair[] keypairs;
+    }
+
+    public class LootLockerGetSingleKeyValuePairsResponse : LootLockerResponse
+    {
+        public int streamedObjectCount = 0;
+        public LootLockerInstanceStoragePair keypair;
     }
 
     public class LootLockerInstanceStoragePair
@@ -116,7 +121,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAKeyValuePairById;
             string json = "";
@@ -127,9 +132,9 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) =>
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
+                LootLockerGetSingleKeyValuePairsResponse response = new LootLockerGetSingleKeyValuePairsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerAssetDefaultResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerGetSingleKeyValuePairsResponse>(serverResponse.text);
 
                 //   LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
@@ -233,7 +238,7 @@ namespace LootLocker
 
         public static void InspectALootBox(LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.inspectALootBox;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
@@ -253,7 +258,7 @@ namespace LootLocker
 
         public static void OpenALootBox(LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
+            EndPointClass endPoint = LootLockerEndPoints.openALootBox;
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
