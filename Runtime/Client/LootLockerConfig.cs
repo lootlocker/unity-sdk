@@ -71,13 +71,13 @@ namespace LootLocker
         public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web, Other }
         public bool developmentMode;
         [HideInInspector]
-        public string url = "https://api.lootlocker.io/game/v1";
+        public string url = "https://api.tobias.dev.lootlocker.io/game/v1";
         [HideInInspector]
-        public string adminUrl = "https://api.lootlocker.io/admin";
+        public string adminUrl = "https://api.tobias.dev.lootlocker.io/admin";
         [HideInInspector]
-        public string playerUrl = "https://api.lootlocker.io/player";
+        public string playerUrl = "https://api.tobias.dev.lootlocker.io/player";
         [HideInInspector]
-        public string userUrl = "https://api.lootlocker.io/game";
+        public string userUrl = "https://api.tobias.dev.lootlocker.io/game";
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
         public DebugLevel currentDebugLevel;
         public bool allowTokenRefresh = true;
