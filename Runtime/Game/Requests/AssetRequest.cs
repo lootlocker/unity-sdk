@@ -186,7 +186,7 @@ namespace LootLocker
             }, true);
         }
 
-        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null)
+        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
             string getVariable = string.Format(endPoint.endPoint, assetCount);
@@ -212,6 +212,12 @@ namespace LootLocker
             if (includeUGC)
             {
                 tempEndpoint = $"&include_ugc={includeUGC.ToString().ToLower()}";
+                getVariable += tempEndpoint;
+            }
+
+            if (UGCCreatorPlayerID > 0)
+            {
+                tempEndpoint = $"&ugc_creator_player_id={UGCCreatorPlayerID.ToString().ToLower()}";
                 getVariable += tempEndpoint;
             }
 
