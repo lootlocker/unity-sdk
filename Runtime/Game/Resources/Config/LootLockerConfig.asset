@@ -20,9 +20,9 @@ MonoBehaviour:
   deviceID: ergheftghege
   platform: 0
   developmentMode: 1
-  url: https://api.tobias.dev.lootlocker.io/game/v1
-  adminUrl: https://apitobias.dev..lootlocker.io/admin
-  playerUrl: https://api.tobias.dev.lootlocker.io/player
-  userUrl: https://api.tobias.dev.lootlocker.io/game
+  url: https://api.lootlocker.io/game/v1
+  adminUrl: https://api.lootlocker.io/admin
+  playerUrl: https://api.lootlocker.io/player
+  userUrl: https://api.lootlocker.io/game
   currentDebugLevel: 0
   allowTokenRefresh: 1
