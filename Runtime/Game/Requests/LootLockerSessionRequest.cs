@@ -22,6 +22,9 @@ namespace LootLocker.Requests
         {
             this.player_identifier = player_identifier;
         }
+        public LootLockerSessionRequest()
+        {
+        }
     }
 
     [System.Serializable]
@@ -40,6 +43,12 @@ namespace LootLocker.Requests
         public LootLockerLevel_Thresholds level_thresholds { get; set; }
         public int account_balance { get; set; }
     }
+
+    public class LootLockerGuestSessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
+    }
+
     [System.Serializable]
     public class LootLockerLevel_Thresholds
     {
@@ -77,6 +86,34 @@ namespace LootLocker
                  onComplete?.Invoke(response);
 
              }, false);
+        }
+
+        public static void GuestSession(LootLockerGetRequest data, Action<LootLockerGuestSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.guestSessionRequest;
+
+            string json = "";
+            if (data == null)
+            {
+                return;
+            }
+
+            json = JsonConvert.SerializeObject(data);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerGuestSessionResponse response = new LootLockerGuestSessionResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerGuestSessionResponse>(serverResponse.text);
+                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                }
+
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+
+            }, false);
         }
 
         public static void EndSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)

@@ -149,6 +149,37 @@ namespace LootLocker.Requests
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
+
+        public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                LootLockerGuestSessionResponse response = new LootLockerGuestSessionResponse();
+                response.success = false;
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
+            string existingPlayerID = PlayerPrefs.GetString("LootLockerGuestPlayerID", "");
+            if (existingPlayerID != "")
+            {
+                sessionRequest = new LootLockerSessionRequest(existingPlayerID);
+            }
+
+            LootLockerAPIManager.GuestSession(sessionRequest, response =>
+            {
+                PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
+                PlayerPrefs.Save();
+
+                onComplete(response);
+            });
+        }
+
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
