@@ -1787,10 +1787,15 @@ namespace LootLocker.Requests
 
         public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete)
         {
-            SubmitScore(memberId, score, leaderboardId, "", onComplete);
+            SubmitScore(memberId, score, leaderboardId.ToString(), "", onComplete);
         }
 
-        public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
+        public static void SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete)
+        {
+            SubmitScore(memberId, score, leaderboardKey, "", onComplete);
+        }
+
+        public static void SubmitScore(string memberId, int score, string leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1808,7 +1813,7 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(metadata))
                 request.metadata = metadata;
 
-            LootLockerAPIManager.SubmitScore(request, leaderboardId.ToString(), onComplete);
+            LootLockerAPIManager.SubmitScore(request, leaderboardId, onComplete);
         }
 
         public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
