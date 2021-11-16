@@ -63,6 +63,34 @@ namespace LootLocker
     }
 
     /// <summary>
+    /// Convenience factory class for creating some responses that we use often.
+    /// </summary>
+    public class LootLockerResponseFactory
+    {
+        /// <summary>
+        /// Construct an error response to send to the client.
+        /// </summary>
+        public static T Error<T> (string errorMessage) where T : LootLockerResponse, new()
+        {
+            return new T()
+            {
+                success = false,
+                hasError = true,
+                Error = errorMessage,
+                text = errorMessage
+            };
+        }
+
+        /// <summary>
+        /// Construct an error response specifically when the SDK has not been initialized.
+        /// </summary>
+        public static T SDKNotInitializedError<T>() where T : LootLockerResponse, new()
+        {
+            return Error<T>("SDK not initialised");
+        }
+    }
+
+    /// <summary>
     /// Construct a request to send to the server.
     /// </summary>
     [System.Serializable]
@@ -113,6 +141,34 @@ namespace LootLocker
              {
                  onComplete?.Invoke(response);
              });
+        }
+
+        public static void CallDomainAuthAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null)
+        {
+            if (LootLockerConfig.current.domainKey.ToString().Length == 0)
+            {
+                #if UNITY_EDITOR
+                LootLockerSDKManager.DebugMessage("LootLocker domain key must be set in settings", true);
+                #endif
+                onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("LootLocker domain key must be set in settings"));
+
+                return;
+            }
+
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("domain-key", LootLockerConfig.current.domainKey);
+
+            if (LootLockerConfig.current.developmentMode)
+            {
+                headers.Add("is-development", "true");
+            }
+
+            LootLockerBaseServerAPI.I.SwitchURL(LootLockerCallerRole.Base);
+
+            new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: LootLockerCallerRole.Base).Send((response) =>
+            {
+                onComplete?.Invoke(response);
+            });
         }
 
         public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)

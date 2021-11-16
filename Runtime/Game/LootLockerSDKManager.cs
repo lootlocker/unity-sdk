@@ -26,11 +26,11 @@ namespace LootLocker.Requests
             return LoadConfig();
         }
 
-        public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode)
+        public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
             DebugMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode);
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode, domainKey);
         }
 
         static bool LoadConfig()
@@ -196,6 +196,27 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Create new user using the white label login system.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                response.success = false;
+                response.hasError = true;
+                response.Error = "SDk not initialised";
+                response.text = "SDk not initialised";
+                onComplete?.Invoke(response);
+                return;
+            }
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -211,6 +232,65 @@ namespace LootLocker.Requests
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
+        #endregion
+
+        #region White Label Login
+
+        /// <summary>
+        /// Create new user using the white label login system.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void WhiteLabelSignUp(string email, string password, Action<LootLockerWhiteLabelSignupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignupResponse>());
+                return;
+            }
+
+            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
+            {
+                email = email,
+                password = password
+            };
+
+            LootLockerAPIManager.WhiteLabelSignUp(input, onComplete);
+        }
+
+        /// <summary>
+        /// Request password reset email for the user.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void WhiteLabelRequestPassword(string email, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.WhiteLabelRequestPasswordReset(email, onComplete);
+        }
+
+        /// <summary>
+        /// Request verify account email for the user.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// Account verification must also be enabled.
+        /// </summary>
+        public static void WhiteLabelRequestVerification(int userID, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.WhiteLabelRequestAccountVerification(userID, onComplete);
+        }
+
         #endregion
 
         #region Player

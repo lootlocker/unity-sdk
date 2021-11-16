@@ -56,6 +56,22 @@ namespace LootLocker.Admin
             {
                 gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue;
             }
+            var content = new GUIContent();
+            content.text = "API key can be found in `Settings > Game settings > API` in the Web Console";
+            EditorGUILayout.HelpBox(content, false);
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("domainKey"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.domainKey = m_CustomSettings.FindProperty("domainKey").stringValue;
+            }
+            var domainContent = new GUIContent();
+            domainContent.text = "Domain key can be found in `Settings > Game settings > API` in the Web Console";
+            EditorGUILayout.HelpBox(domainContent, false);
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("game_version"));
@@ -63,6 +79,7 @@ namespace LootLocker.Admin
             {
                 gameSettings.game_version = m_CustomSettings.FindProperty("game_version").stringValue;
             }
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("platform"));
@@ -70,6 +87,7 @@ namespace LootLocker.Admin
             {
                 gameSettings.platform = (LootLockerConfig.platformType)m_CustomSettings.FindProperty("platform").enumValueIndex;
             }
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("developmentMode"));
@@ -78,6 +96,7 @@ namespace LootLocker.Admin
             {
                 gameSettings.developmentMode = m_CustomSettings.FindProperty("developmentMode").boolValue;
             }
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("currentDebugLevel"));
@@ -86,6 +105,7 @@ namespace LootLocker.Admin
             {
                 gameSettings.currentDebugLevel = (LootLockerConfig.DebugLevel)m_CustomSettings.FindProperty("currentDebugLevel").enumValueIndex;
             }
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
@@ -94,6 +114,7 @@ namespace LootLocker.Admin
             {
                 gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
+            EditorGUILayout.Space();
         }
 
         [SettingsProvider]
