@@ -119,7 +119,6 @@ namespace LootLocker
                     LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
                 }
 
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
                 response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;

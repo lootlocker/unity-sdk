@@ -154,13 +154,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGuestSessionResponse response = new LootLockerGuestSessionResponse();
-                response.success = false;
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
                 return;
             }
 
@@ -205,12 +199,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDk not initialised";
-                response.text = "SDk not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
