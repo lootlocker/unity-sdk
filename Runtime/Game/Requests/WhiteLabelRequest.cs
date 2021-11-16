@@ -68,6 +68,7 @@ namespace LootLocker
                     {
                         response = LootLockerResponseFactory.Error<LootLockerWhiteLabelSignupResponse>("error deserializing server response");
                         onComplete?.Invoke(response);
+                        return;
                     }
                 }
 
