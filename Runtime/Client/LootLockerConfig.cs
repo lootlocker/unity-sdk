@@ -25,7 +25,7 @@ namespace LootLocker
             return settingsInstance;
         }
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, DebugLevel debugLevel = DebugLevel.Off, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.Off, bool allowTokenRefresh = false)
         {
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
 
@@ -38,6 +38,7 @@ namespace LootLocker
             settingsInstance.developmentMode = onDevelopmentMode;
             settingsInstance.currentDebugLevel = debugLevel;
             settingsInstance.allowTokenRefresh = allowTokenRefresh;
+            settingsInstance.domainKey = domainKey;
 
             return true;
         }
@@ -63,12 +64,14 @@ namespace LootLocker
         [HideInInspector]
         public string adminToken;
         [HideInInspector]
+        public string domainKey;
+        [HideInInspector]
         public int gameID;
         public string game_version = "1.0";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
         public platformType platform;
-        public enum platformType { Android, iOS, Steam, Windows, GoG, Xbox, PlayStationNetwork, EpicStore, NintendoSwitch, Web, Other }
+        public enum platformType { Android, iOS, Steam, PlayStationNetwork }
         public bool developmentMode;
         [HideInInspector]
         public string url = "https://api.lootlocker.io/game/v1";
@@ -78,6 +81,8 @@ namespace LootLocker
         public string playerUrl = "https://api.lootlocker.io/player";
         [HideInInspector]
         public string userUrl = "https://api.lootlocker.io/game";
+        [HideInInspector]
+        public string baseUrl = "https://api.lootlocker.io";
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
         public DebugLevel currentDebugLevel;
         public bool allowTokenRefresh = true;

@@ -12,7 +12,7 @@ using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
-    public enum LootLockerCallerRole { User, Admin, Player };
+    public enum LootLockerCallerRole { User, Admin, Player, Base };
 }
 
 namespace LootLocker
@@ -46,6 +46,9 @@ namespace LootLocker
                     break;
                 case LootLocker.LootLockerEnums.LootLockerCallerRole.Player:
                     SERVER_URL = LootLockerConfig.current.playerUrl;
+                    break;
+                case LootLocker.LootLockerEnums.LootLockerCallerRole.Base:
+                    SERVER_URL = LootLockerConfig.current.baseUrl;
                     break;
                 default:
                     SERVER_URL = LootLockerConfig.current.url;
