@@ -14,6 +14,7 @@ namespace LootLocker.Requests
         public string key => LootLockerConfig.current.apiKey.ToString();
         public string platform => LootLockerConfig.current.platform.ToString();
         public string token { get; set; }
+        public bool development_mode => LootLockerConfig.current.developmentMode;
 
         public LootLockerVerifyRequest(string token)
         {
