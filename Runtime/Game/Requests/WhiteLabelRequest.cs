@@ -44,7 +44,7 @@ namespace LootLocker
                 return;
             }
             else
-            { 
+            {
                 json = JsonConvert.SerializeObject(input);
             }
 
