@@ -33,6 +33,7 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
         public string email { get; private set; }
         public string password { get; private set; }
+        public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
         public LootLockerWhiteLabelSessionRequest(string email, string password)
@@ -40,25 +41,17 @@ namespace LootLocker.Requests
             this.email = email;
             this.password = password;
         }
-    }
 
-    [System.Serializable]
-    public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
-    {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string nsa_id_token { get; private set; }
-        public string game_version => LootLockerConfig.current.game_version;
-        public bool development_mode => LootLockerConfig.current.developmentMode;
-        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
+        public LootLockerWhiteLabelSessionRequest(string email)
         {
-            this.nsa_id_token = nsa_id_token;
+            this.email = email;
         }
     }
 
     [System.Serializable]
     public class LootLockerSessionResponse : LootLockerResponse
     {
-
+        
         public string session_token { get; set; }
         public int player_id { get; set; }
         public bool seen_before { get; set; }
@@ -116,7 +109,20 @@ namespace LootLocker
              }, false);
         }
 
-        public static void WhiteLabelSession(LootLockerWhiteLabelSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        [System.Serializable]
+        public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
+        {
+            public string game_key => LootLockerConfig.current.apiKey?.ToString();
+            public string nsa_id_token { get; private set; }
+            public string game_version => LootLockerConfig.current.game_version;
+            public bool development_mode => LootLockerConfig.current.developmentMode;
+            public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
+            {
+                this.nsa_id_token = nsa_id_token;
+            }
+        }
+
+        public static void WhiteLabelSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelLoginSessionRequest;
 
@@ -185,7 +191,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                    LootLockerConfig.current.UpdateToken(response.session_token, "");
                 }
 
                 response.text = serverResponse.text;
@@ -208,7 +214,7 @@ namespace LootLocker
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-
+                
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                      response.success = serverResponse.success;
