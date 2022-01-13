@@ -108,19 +108,6 @@ namespace LootLocker
              }, false);
         }
 
-        [System.Serializable]
-        public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
-        {
-            public string game_key => LootLockerConfig.current.apiKey?.ToString();
-            public string nsa_id_token { get; private set; }
-            public string game_version => LootLockerConfig.current.game_version;
-            public bool development_mode => LootLockerConfig.current.developmentMode;
-            public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
-            {
-                this.nsa_id_token = nsa_id_token;
-            }
-        }
-
         public static void WhiteLabelSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelLoginSessionRequest;
