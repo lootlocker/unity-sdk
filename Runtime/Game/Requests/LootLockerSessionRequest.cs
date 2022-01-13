@@ -173,34 +173,6 @@ namespace LootLocker
             }, false);
         }
 
-        public static void NintendoSwitchSession(LootLockerNintendoSwitchSessionRequest data, Action<LootLockerSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.nintendoSwitchSessionRequest;
-
-            string json = "";
-            if (data == null)
-            {
-                return;
-            }
-
-            json = JsonConvert.SerializeObject(data);
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, "");
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-
-            }, false);
-        }
-
         public static void EndSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.endingSession;
@@ -213,7 +185,7 @@ namespace LootLocker
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-
+                
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                      response.success = serverResponse.success;

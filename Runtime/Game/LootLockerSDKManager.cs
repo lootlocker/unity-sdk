@@ -262,7 +262,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Create new user using the white label login system.
-        ///
+        /// 
         /// White label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
@@ -274,22 +274,6 @@ namespace LootLocker.Requests
             }
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Create a new session for a Nintendo Switch user
-        ///
-        /// The Nintendo Switch platform must be enabled in the web console for this to work.
-        /// </summary>
-        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            LootLockerAPIManager.LootLockerNintendoSwitchSessionRequest sessionRequest = new LootLockerAPIManager.LootLockerNintendoSwitchSessionRequest(nsa_id_token);
-            LootLockerAPIManager.NintendoSwitchSession(sessionRequest, onComplete);
         }
 
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
@@ -352,7 +336,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Create new user using the white label login system.
-        ///
+        /// 
         /// White label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
@@ -420,7 +404,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Request password reset email for the user.
-        ///
+        /// 
         /// White label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelRequestPassword(string email, Action<LootLockerResponse> onComplete)
@@ -436,7 +420,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Request verify account email for the user.
-        ///
+        /// 
         /// White label platform must be enabled in the web console for this to work.
         /// Account verification must also be enabled.
         /// </summary>
