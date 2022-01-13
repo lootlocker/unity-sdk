@@ -206,9 +206,6 @@ namespace LootLocker.Requests
                 return;
             }
 
-            //PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.player_identifier);
-            //PlayerPrefs.Save();
-
             string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
             if (existingSessionToken == "")
             {
@@ -307,6 +304,33 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
+        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (existingSessionToken == "")
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
+                return;
+            }
+
+            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
+            if (existingSessionEmail == "")
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
+                return;
+            }
+
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(existingSessionEmail);
+            sessionRequest.token = existingSessionToken;
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -363,7 +387,13 @@ namespace LootLocker.Requests
                 remember = remember
             };
 
-            LootLockerAPIManager.WhiteLabelLogin(input, onComplete);
+            LootLockerAPIManager.WhiteLabelLogin(input, response => {
+                PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
+                PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
+                PlayerPrefs.Save();
+
+                onComplete(response);
+            });
         }
 
         /// <summary>

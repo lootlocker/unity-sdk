@@ -51,7 +51,6 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerSessionResponse : LootLockerResponse
     {
-        
         public string session_token { get; set; }
         public int player_id { get; set; }
         public bool seen_before { get; set; }
@@ -135,7 +134,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                    LootLockerConfig.current.UpdateToken(response.session_token, "");
                 }
 
                 response.text = serverResponse.text;
@@ -214,7 +213,7 @@ namespace LootLocker
                 LootLockerSessionResponse response = new LootLockerSessionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                
+
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                      response.success = serverResponse.success;
