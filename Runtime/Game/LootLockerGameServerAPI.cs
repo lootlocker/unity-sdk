@@ -29,7 +29,7 @@ namespace LootLocker
 
             if (platform == Platforms.Steam)
             {
-                LootLockerSDKManager.DebugMessage("Token has expired, And token refresh is not supported in Steam calls", true);
+                LootLockerSDKManager.DebugMessage("Token has expired and token refresh is not supported for Steam", true);
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";
@@ -40,7 +40,7 @@ namespace LootLocker
 
             if (platform == Platforms.NintendoSwitch)
             {
-                LootLockerSDKManager.DebugMessage("Token has expired, And token refresh is not supported in Nintendo calls", true);
+                LootLockerSDKManager.DebugMessage("Token has expired and token refresh is not supported for Nintendo Switch", true);
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";
