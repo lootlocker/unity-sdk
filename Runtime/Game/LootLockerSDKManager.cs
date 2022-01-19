@@ -13,9 +13,18 @@ using System.Linq;
 
 namespace LootLocker.Requests
 {
-
     public partial class LootLockerSDKManager
     {
+        /// <summary>
+        /// Stores which platform the player currently has a session for.
+        /// </summary>
+        static string CurrentPlatform;
+
+        public static string GetCurrentPlatform()
+        {
+            return CurrentPlatform;
+        }
+
         #region Init
 
         static bool initialized;
@@ -144,7 +153,11 @@ namespace LootLocker.Requests
                 response.text = "SDk not initialised";
                 onComplete?.Invoke(response);
                 return;
+            
             }
+
+            CurrentPlatform = LootLockerConfig.current.platform.ToString();
+
             LootLockerConfig.current.deviceID = deviceId;
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
@@ -167,6 +180,8 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
+                CurrentPlatform = "guest";
+
                 PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
                 PlayerPrefs.Save();
 
@@ -186,6 +201,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(response);
                 return;
             }
+
+            CurrentPlatform = "steam";
+
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
@@ -273,6 +291,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
+            CurrentPlatform = "white_label";
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
@@ -285,6 +304,7 @@ namespace LootLocker.Requests
             }
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(input.email);
             sessionRequest.token = input.token;
+            CurrentPlatform = "white_label";
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
@@ -310,6 +330,7 @@ namespace LootLocker.Requests
                 return;
             }
 
+            CurrentPlatform = "white_label";
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(existingSessionEmail);
             sessionRequest.token = existingSessionToken;
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
@@ -327,6 +348,8 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(response);
                 return;
             }
+
+            CurrentPlatform = "";
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
