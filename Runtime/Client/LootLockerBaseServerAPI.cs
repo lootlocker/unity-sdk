@@ -156,11 +156,8 @@ namespace LootLocker
                                 break;
                         }
 
-                        LootLockerSDKManager.DebugMessage("Response code: " + webRequest.responseCode);
-
-              
-                        if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && LootLockerConfig.current.platform != LootLockerConfig.platformType.Steam
-                            && tries < maxRetry) 
+                        bool isSteam = LootLockerSDKManager.GetCurrentPlatform() == "steam";
+                        if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !isSteam && tries < maxRetry) 
                         {
                             tries++;
                             LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find one. If you do not want this please turn off in the lootlocker config settings");

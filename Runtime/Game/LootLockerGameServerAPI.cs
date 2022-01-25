@@ -7,9 +7,6 @@ using UnityEngine;
 
 namespace LootLocker
 {
-    /// <summary>
-    /// made for user, relay on playtime coroutines
-    /// </summary>
     public class LootLockerGameServerAPI : LootLockerBaseServerAPI
     {
         public new static LootLockerGameServerAPI I;
@@ -28,9 +25,11 @@ namespace LootLocker
 
         protected override void RefreshTokenAndCompleteCall(LootLockerServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse)
         {
-            if (LootLockerConfig.current.platform == LootLockerConfig.platformType.Steam)
+            string platform = LootLockerSDKManager.GetCurrentPlatform();
+
+            if (platform == Platforms.Steam)
             {
-                LootLockerSDKManager.DebugMessage("Token has expired, And token refresh not supported in Steam calls", true);
+                LootLockerSDKManager.DebugMessage("Token has expired and token refresh is not supported for Steam", true);
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";
@@ -39,9 +38,41 @@ namespace LootLocker
                 return;
             }
 
-            var sessionRequest = new LootLockerSessionRequest(LootLockerConfig.current.deviceID);
+            if (platform == Platforms.NintendoSwitch)
+            {
+                LootLockerSDKManager.DebugMessage("Token has expired and token refresh is not supported for Nintendo Switch", true);
+                LootLockerResponse res = new LootLockerResponse();
+                res.statusCode = 401;
+                res.Error = "Token Expired";
+                res.hasError = true;
+                OnServerResponse?.Invoke(res);
+                return;
+            }
 
-            LootLockerAPIManager.Session(sessionRequest, (response) =>
+            if (platform == Platforms.Guest)
+            {
+                LootLockerSDKManager.StartGuestSession(response =>
+                {
+                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                });
+                return;
+            } else if (platform == Platforms.WhiteLabel)
+            {
+                LootLockerSDKManager.StartWhiteLabelSession(response =>
+                {
+                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                });
+
+                return;
+            } else {
+                var sessionRequest = new LootLockerSessionRequest(LootLockerConfig.current.deviceID);
+                LootLockerAPIManager.Session(sessionRequest, (response) =>
+                {
+                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                });
+            }
+
+            void CompleteCall(LootLockerServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse, LootLockerSessionResponse response)
             {
                 if (response.success)
                 {
@@ -72,7 +103,7 @@ namespace LootLocker
                     res.hasError = true;
                     OnServerResponse?.Invoke(res);
                 }
-            });
+            }
         }
     }
 }
