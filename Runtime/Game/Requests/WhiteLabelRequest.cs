@@ -35,17 +35,17 @@ namespace LootLocker.Requests
         public int GameID { get; set; }
         public string Email { get; set; }
         public string CreatedAt { get; set; }
-        #nullable enable
-        public string? UpdatedAt { get; set; }
-        #nullable enable
-        public string? DeletedAt { get; set; }
-        #nullable enable
-        public string? ValidatedAt { get; set; }
+
+        public string UpdatedAt { get; set; }
+
+        public string DeletedAt { get; set; }
+
+        public string ValidatedAt { get; set; }
     }
 
     public class LootLockerWhiteLabelLoginResponse : LootLockerWhiteLabelSignupResponse
     {
-        public string? SessionToken { get; set; }
+        public string SessionToken { get; set; }
     }
 }
 
@@ -70,7 +70,7 @@ namespace LootLocker
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
             {
-                LootLockerWhiteLabelLoginResponse? response = new LootLockerWhiteLabelLoginResponse();
+                LootLockerWhiteLabelLoginResponse response = new LootLockerWhiteLabelLoginResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
                 {
                     DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -115,7 +115,7 @@ namespace LootLocker
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
             {
-                LootLockerWhiteLabelVerifySessionResponse? response = new LootLockerWhiteLabelVerifySessionResponse();
+                LootLockerWhiteLabelVerifySessionResponse response = new LootLockerWhiteLabelVerifySessionResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
                 {
                     DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -159,7 +159,7 @@ namespace LootLocker
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
             {
-                LootLockerWhiteLabelSignupResponse? response = new LootLockerWhiteLabelSignupResponse();
+                LootLockerWhiteLabelSignupResponse response = new LootLockerWhiteLabelSignupResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
                 {
                     DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -195,7 +195,7 @@ namespace LootLocker
             var json = JsonConvert.SerializeObject(new { email });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerResponse? response = new LootLockerResponse
+                LootLockerResponse response = new LootLockerResponse
                 {
                     text = serverResponse.text,
                     success = serverResponse.success,
@@ -214,7 +214,7 @@ namespace LootLocker
             var json = JsonConvert.SerializeObject(new { user_id = userID });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerResponse? response = new LootLockerResponse
+                LootLockerResponse response = new LootLockerResponse
                 {
                     text = serverResponse.text,
                     success = serverResponse.success,
