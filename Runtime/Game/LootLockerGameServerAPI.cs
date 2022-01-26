@@ -72,17 +72,17 @@ namespace LootLocker
                 });
             }
 
-            void CompleteCall(LootLockerServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse, LootLockerSessionResponse response)
+            void CompleteCall(LootLockerServerRequest newcacheServerRequest, Action<LootLockerResponse> newOnServerResponse, LootLockerSessionResponse response)
             {
                 if (response.success)
                 {
                     Dictionary<string, string> headers = new Dictionary<string, string>();
                     headers.Add("x-session-token", LootLockerConfig.current.token);
-                    cacheServerRequest.extraHeaders = headers;
-                    if (cacheServerRequest.retryCount < 4)
+                    newcacheServerRequest.extraHeaders = headers;
+                    if (newcacheServerRequest.retryCount < 4)
                     {
-                        SendRequest(cacheServerRequest, OnServerResponse);
-                        cacheServerRequest.retryCount++;
+                        SendRequest(newcacheServerRequest, newOnServerResponse);
+                        newcacheServerRequest.retryCount++;
                     }
                     else
                     {
@@ -91,7 +91,7 @@ namespace LootLocker
                         res.statusCode = 401;
                         res.Error = "Token Expired";
                         res.hasError = true;
-                        OnServerResponse?.Invoke(res);
+                        newOnServerResponse?.Invoke(res);
                     }
                 }
                 else
@@ -101,7 +101,7 @@ namespace LootLocker
                     res.statusCode = 401;
                     res.Error = "Token Expired";
                     res.hasError = true;
-                    OnServerResponse?.Invoke(res);
+                    newOnServerResponse?.Invoke(res);
                 }
             }
         }
