@@ -114,12 +114,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerVerifyResponse response = new LootLockerVerifyResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
                 return;
             }
             LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(steamSessionTicket);
@@ -130,13 +125,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerVerifyResponse response = new LootLockerVerifyResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
-                return;
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
             }
             LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(deviceId);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
@@ -146,14 +135,8 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
-            
             }
 
             CurrentPlatform = LootLockerConfig.current.platform.ToString();
@@ -193,12 +176,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
 
@@ -340,12 +318,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
 
@@ -466,12 +439,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPlayerInfoResponse response = new LootLockerGetPlayerInfoResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPlayerInfoResponse>());
                 return;
             }
             LootLockerAPIManager.GetPlayerInfo(onComplete);
@@ -481,12 +449,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerInventoryResponse response = new LootLockerInventoryResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
                 return;
             }
             LootLockerAPIManager.GetInventory(onComplete);
@@ -496,12 +459,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerBalanceResponse response = new LootLockerBalanceResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceResponse>());
                 return;
             }
             LootLockerAPIManager.GetBalance(onComplete);
@@ -511,12 +469,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerXpSubmitResponse response = new LootLockerXpSubmitResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpSubmitResponse>());
                 return;
             }
             LootLockerXpSubmitRequest xpSubmitRequest = new LootLockerXpSubmitRequest(xpToSubmit);
@@ -527,12 +480,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerXpResponse response = new LootLockerXpResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
                 return;
             }
             LootLockerXpRequest xpRequest = new LootLockerXpRequest();
@@ -543,12 +491,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPlayerAssetNotificationsResponse response = new LootLockerPlayerAssetNotificationsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerAssetNotificationsResponse>());
                 return;
             }
             LootLockerAPIManager.GetPlayerAssetNotification(onComplete);
@@ -558,12 +501,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerDeactivatedAssetsResponse response = new LootLockerDeactivatedAssetsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDeactivatedAssetsResponse>());
                 return;
             }
             LootLockerAPIManager.GetDeactivatedAssetNotification(onComplete);
@@ -573,12 +511,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerDlcResponse response = new LootLockerDlcResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
                 return;
             }
             LootLockerAPIManager.InitiateDLCMigration(onComplete);
@@ -588,12 +521,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerDlcResponse response = new LootLockerDlcResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
                 return;
             }
             LootLockerAPIManager.GetDLCMigrated(onComplete);
@@ -603,12 +531,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerStandardResponse response = new LootLockerStandardResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
                 return;
             }
             LootLockerAPIManager.SetProfilePrivate(onComplete);
@@ -618,12 +541,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerStandardResponse response = new LootLockerStandardResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
                 return;
             }
             LootLockerAPIManager.SetProfilePublic(onComplete);
@@ -633,12 +551,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                PlayerNameResponse response = new PlayerNameResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
                 return;
             }
             LootLockerAPIManager.GetPlayerName(onComplete);
@@ -648,12 +561,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                PlayerNameResponse response = new PlayerNameResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
                 return;
             }
 
@@ -669,12 +577,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
 
@@ -691,12 +594,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerListCharacterTypesResponse response = new LootLockerListCharacterTypesResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCharacterTypesResponse>());
                 return;
             }
             LootLockerAPIManager.ListCharacterTypes(onComplete);
@@ -706,12 +604,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
             LootLockerAPIManager.GetCharacterLoadout(onComplete);
@@ -721,12 +614,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -740,12 +628,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
 
@@ -765,12 +648,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
@@ -782,12 +660,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
@@ -800,12 +673,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
@@ -820,12 +688,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
@@ -840,12 +703,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
@@ -858,12 +716,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                EquipAssetToCharacterLoadoutResponse response = new EquipAssetToCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
@@ -876,12 +729,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadouttoDefaultCharacterResponse>());
                 return;
             }
             LootLockerAPIManager.GetCurrentLoadOutToDefaultCharacter(onComplete);
@@ -891,13 +739,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetCurrentLoadouttoDefaultCharacterResponse response = new LootLockerGetCurrentLoadouttoDefaultCharacterResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
-                return;
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadouttoDefaultCharacterResponse>());
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(characterID);
@@ -909,12 +751,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerContextResponse response = new LootLockerContextResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>());
                 return;
             }
             LootLockerAPIManager.GetEquipableContextToDefaultCharacter(onComplete);
@@ -926,12 +763,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
                 return;
             }
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
@@ -941,12 +773,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentSingle response = new LootLockerGetPersistentSingle();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentSingle>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -958,12 +785,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
                 return;
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
@@ -975,12 +797,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
                 return;
             }
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
@@ -990,12 +807,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1008,12 +820,7 @@ namespace LootLocker.Requests
 
             if (!CheckInitialized())
             {
-                LootLockerGetPersistentStoragResponse response = new LootLockerGetPersistentStoragResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1027,12 +834,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerContextResponse response = new LootLockerContextResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>());
                 return;
             }
             LootLockerAPIManager.GetContext(onComplete);
@@ -1042,12 +844,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
             LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
@@ -1057,12 +854,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
             LootLockerAPIManager.GetAssetsOriginal((response) =>
@@ -1081,12 +873,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
 
@@ -1110,12 +897,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCommonAsset response = new LootLockerCommonAsset();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCommonAsset>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1127,12 +909,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerFavouritesListResponse response = new LootLockerFavouritesListResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFavouritesListResponse>());
                 return;
             }
             LootLockerAPIManager.ListFavouriteAssets(onComplete);
@@ -1142,12 +919,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1159,12 +931,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1176,12 +943,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1199,12 +961,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetAllKeyValuePairsResponse response = new LootLockerGetAllKeyValuePairsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllKeyValuePairsResponse>());
                 return;
             }
             LootLockerAPIManager.GetAllKeyValuePairs(onComplete);
@@ -1214,12 +971,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1231,12 +983,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetSingleKeyValuePairsResponse response = new LootLockerGetSingleKeyValuePairsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetSingleKeyValuePairsResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1249,12 +996,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1269,12 +1011,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
                 return;
             }
             LootLockerGetRequest request = new LootLockerGetRequest();
@@ -1293,12 +1030,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1313,12 +1045,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerAssetDefaultResponse response = new LootLockerAssetDefaultResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1331,12 +1058,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerInspectALootBoxResponse response = new LootLockerInspectALootBoxResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInspectALootBoxResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1348,12 +1070,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerOpenLootBoxResponse response = new LootLockerOpenLootBoxResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerOpenLootBoxResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1400,12 +1117,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
 
@@ -1435,12 +1147,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
 
@@ -1472,12 +1179,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1489,12 +1191,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1506,12 +1203,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerListingAssetCandidatesResponse response = new LootLockerListingAssetCandidatesResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAssetCandidatesResponse>());
                 return;
             }
             LootLockerAPIManager.ListingAssetCandidates(onComplete);
@@ -1522,12 +1214,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
 
@@ -1550,12 +1237,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
                 return;
             }
 
@@ -1572,12 +1254,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGettingAllMissionsResponse response = new LootLockerGettingAllMissionsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingAllMissionsResponse>());
                 return;
             }
             LootLockerAPIManager.GettingAllMissions(onComplete);
@@ -1587,12 +1264,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGettingASingleMissionResponse response = new LootLockerGettingASingleMissionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingASingleMissionResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1604,12 +1276,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerStartingAMissionResponse response = new LootLockerStartingAMissionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartingAMissionResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1622,12 +1289,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerFinishingAMissionResponse response = new LootLockerFinishingAMissionResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishingAMissionResponse>());
                 return;
             }
 
@@ -1655,12 +1317,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerMapsResponse response = new LootLockerMapsResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>());
                 return;
             }
             LootLockerAPIManager.GettingAllMaps(onComplete);
@@ -1672,12 +1329,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
             LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = asset_id, variation_id = variation_id };
@@ -1690,12 +1342,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
             LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = asset_id, variation_id = variation_id, rental_option_id = rental_option_id };
@@ -1706,12 +1353,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
             LootLockerIosPurchaseVerificationRequest[] data = new LootLockerIosPurchaseVerificationRequest[] { new LootLockerIosPurchaseVerificationRequest { receipt_data = receipt_data } };
@@ -1722,12 +1364,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPurchaseResponse response = new LootLockerPurchaseResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
             LootLockerAndroidPurchaseVerificationRequest[] data = new LootLockerAndroidPurchaseVerificationRequest[] { new LootLockerAndroidPurchaseVerificationRequest { purchase_token = purchase_token, asset_id = asset_id } };
@@ -1739,12 +1376,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1756,12 +1388,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCharacterLoadoutResponse response = new LootLockerCharacterLoadoutResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -1775,12 +1402,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingCollectablesResponse>());
                 return;
             }
             LootLockerAPIManager.GettingCollectables(onComplete);
@@ -1790,12 +1412,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectingAnItemResponse>());
                 return;
             }
             LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
@@ -1811,12 +1428,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetMessagesResponse response = new LootLockerGetMessagesResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMessagesResponse>());
                 return;
             }
             LootLockerAPIManager.GetMessages(onComplete);
@@ -1829,12 +1441,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerTriggerAnEventResponse response = new LootLockerTriggerAnEventResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
                 return;
             }
             LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
@@ -1845,12 +1452,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerListingAllTriggersResponse response = new LootLockerListingAllTriggersResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAllTriggersResponse>());
                 return;
             }
             LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
@@ -1864,12 +1466,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerResponse response = new LootLockerResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
             }
             LootLockerSubmittingACrashLogRequest data = new LootLockerSubmittingACrashLogRequest()
@@ -1888,12 +1485,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetMemberRankResponse response = new LootLockerGetMemberRankResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
                 return;
             }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
@@ -1908,12 +1500,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetByListOfMembersResponse response = new LootLockerGetByListOfMembersResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetByListOfMembersResponse>());
                 return;
             }
             LootLockerGetByListMembersRequest request = new LootLockerGetByListMembersRequest();
@@ -1927,12 +1514,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetAllMemberRanksResponse response = new LootLockerGetAllMemberRanksResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>());
                 return;
             }
             LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
@@ -1977,12 +1559,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetAllMemberRanksResponse response = new LootLockerGetAllMemberRanksResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>());
                 return;
             }
             LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
@@ -1997,12 +1574,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>());
                 return;
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
@@ -2047,12 +1619,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerGetScoreListResponse response = new LootLockerGetScoreListResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>());
                 return;
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
@@ -2077,12 +1644,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerSubmitScoreResponse response = new LootLockerSubmitScoreResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>());
                 return;
             }
             LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
@@ -2098,12 +1660,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerComputeAndLockDropTableResponse response = new LootLockerComputeAndLockDropTableResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>());
                 return;
             }
             LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete, AddAssetDetails, tag);
@@ -2113,12 +1670,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                LootLockerPickDropsFromDropTableResponse response = new LootLockerPickDropsFromDropTableResponse();
-                response.success = false;
-                response.hasError = true;
-                response.Error = "SDK not initialised";
-                response.text = "SDK not initialised";
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPickDropsFromDropTableResponse>());
                 return;
             }
             PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
