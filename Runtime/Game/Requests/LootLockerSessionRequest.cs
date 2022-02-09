@@ -190,7 +190,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                    LootLockerConfig.current.UpdateToken(response.session_token, "");
                 }
 
                 response.text = serverResponse.text;
