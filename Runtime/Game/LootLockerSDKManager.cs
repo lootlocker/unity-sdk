@@ -172,6 +172,33 @@ namespace LootLocker.Requests
             });
         }
 
+        public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
+                return;
+            }
+
+            if (identifier.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerGuestSessionResponse>("identifier cannot be empty"));
+                return;
+            }
+
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(identifier);
+
+            LootLockerAPIManager.GuestSession(sessionRequest, response =>
+            {
+                CurrentPlatform = "guest";
+
+                PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
+                PlayerPrefs.Save();
+
+                onComplete(response);
+            });
+        }
+
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
