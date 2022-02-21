@@ -158,5 +158,9 @@ namespace LootLocker
         [Header("Drop Tables")]
         public static EndPointClass ComputeAndLockDropTable = new EndPointClass("v1/player/droptables/{0}/compute?asset_details={1}", LootLockerHTTPMethod.POST);
         public static EndPointClass PickDropsFromDropTable = new EndPointClass("v1/player/droptables/{0}/pick", LootLockerHTTPMethod.POST);
+
+        // Misc
+        [Header("Misc")]
+        public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
     }
 }

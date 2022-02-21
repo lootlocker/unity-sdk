@@ -1706,6 +1706,22 @@ namespace LootLocker.Requests
             LootLockerAPIManager.PickDropsFromDropTable(data, tableInstanceId, onComplete);
         }
         #endregion
+
+        #region Misc
+
+        public static void Ping(Action<LootLockerPingResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPingResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.Ping(onComplete);
+        }
+
+
+        #endregion
     }
 
     public class ResponseError
