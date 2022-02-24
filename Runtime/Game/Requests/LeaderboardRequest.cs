@@ -131,7 +131,6 @@ namespace LootLocker.Requests
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
         public static void GetMemberRank(LootLockerGetMemberRankRequest data, Action<LootLockerGetMemberRankResponse> onComplete)

@@ -46,7 +46,6 @@ namespace LootLocker.Requests
 
     public class LootLockerAssetResponse : LootLockerResponse
     {
-        
         public LootLockerCommonAsset[] assets { get; set; }
     }
 
