@@ -111,6 +111,7 @@ namespace LootLocker.Requests
         public bool initially_purchasable { get; set; }
         public LootLockerFile[] files { get; set; }
         public LootLockerAssetCandidate asset_candidate { get; set; }
+        public string[] data_entities { get; set; }
     }
 
     public class LootLockerAssetCandidate
