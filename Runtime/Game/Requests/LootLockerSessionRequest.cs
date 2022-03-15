@@ -77,6 +77,19 @@ namespace LootLocker.Requests
         public int next { get; set; }
         public bool next_is_prestige { get; set; }
     }
+
+    [System.Serializable]
+    public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string nsa_id_token { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public bool development_mode => LootLockerConfig.current.developmentMode;
+        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
+        {
+            this.nsa_id_token = nsa_id_token;
+        }
+    }
 }
 
 namespace LootLocker
@@ -149,6 +162,34 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     response = JsonConvert.DeserializeObject<LootLockerGuestSessionResponse>(serverResponse.text);
+                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                }
+
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+
+            }, false);
+        }
+
+        public static void NintendoSwitchSession(LootLockerNintendoSwitchSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.nintendoSwitchSessionRequest;
+
+            string json = "";
+            if (data == null)
+            {
+                return;
+            }
+
+            json = JsonConvert.SerializeObject(data);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
                     LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
                 }
 

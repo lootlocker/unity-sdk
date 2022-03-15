@@ -341,6 +341,22 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Create a new session for a Nintendo Switch user
+        ///
+        /// The Nintendo Switch platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            LootLockerNintendoSwitchSessionRequest sessionRequest = new LootLockerNintendoSwitchSessionRequest(nsa_id_token);
+            LootLockerAPIManager.NintendoSwitchSession(sessionRequest, onComplete);
+        }
+
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
