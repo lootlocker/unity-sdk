@@ -1752,49 +1752,37 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ReportsGetTypes(onComplete);
         }
 
-        public static void ReportsCreatePlayer(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void ReportsCreatePlayer(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreatePlayerResponse>());
                 return;
             }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
-            lootLockerGetMemberRankRequest.member_id = member_id;
-
-            LootLockerAPIManager.ReportsCreatePlayer(lootLockerGetMemberRankRequest, onComplete);
+            LootLockerAPIManager.ReportsCreatePlayer(input, onComplete);
         }
 
-        public static void ReportsCreateUGC(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void ReportsCreateAsset(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreateAssetResponse>());
                 return;
             }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
-            lootLockerGetMemberRankRequest.member_id = member_id;
-
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            LootLockerAPIManager.ReportsCreateAsset(input, onComplete);
         }
 
-        public static void ReportsGetRemovedUGCForPlayer(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void ReportsGetRemovedUGCForPlayer(Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>());
                 return;
             }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
-
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
-            lootLockerGetMemberRankRequest.member_id = member_id;
-
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            
+            LootLockerAPIManager.ReportsGetRemovedUGCForPlayer(onComplete);
         }
 
         #endregion
