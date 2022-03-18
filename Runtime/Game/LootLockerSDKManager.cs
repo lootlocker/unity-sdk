@@ -1739,6 +1739,66 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Reports
+
+        public static void ReportsGetTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>());
+                return;
+            }
+            
+            LootLockerAPIManager.ReportsGetTypes(onComplete);
+        }
+
+        public static void ReportsCreatePlayer(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                return;
+            }
+            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
+
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.member_id = member_id;
+
+            LootLockerAPIManager.ReportsCreatePlayer(lootLockerGetMemberRankRequest, onComplete);
+        }
+
+        public static void ReportsCreateUGC(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                return;
+            }
+            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
+
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.member_id = member_id;
+
+            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+        }
+
+        public static void ReportsGetRemovedUGCForPlayer(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                return;
+            }
+            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
+
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.member_id = member_id;
+
+            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+        }
+
+        #endregion
+
         #region Misc
 
         public static void Ping(Action<LootLockerPingResponse> onComplete)
