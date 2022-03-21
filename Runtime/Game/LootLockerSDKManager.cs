@@ -357,6 +357,22 @@ namespace LootLocker.Requests
             LootLockerAPIManager.NintendoSwitchSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Create a new session for a Xbox One user
+        ///
+        /// The Xbox One platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            LootLockerXboxOneSessionRequest sessionRequest = new LootLockerXboxOneSessionRequest(xbox_user_token);
+            LootLockerAPIManager.XboxOneSession(sessionRequest, onComplete);
+        }
+
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
