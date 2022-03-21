@@ -114,7 +114,44 @@ namespace LootLocker
         public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetRemovedUGCForPlayer;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, ((serverResponse) =>
+            string tempEndpoint = endPoint.endPoint;
+
+            if (!string.IsNullOrEmpty(input.After))
+            {
+                tempEndpoint = tempEndpoint + "?after={0}";
+                tempEndpoint = string.Format(tempEndpoint, input.After);
+            }
+
+            if (input.Count > 0)
+            {
+                if (tempEndpoint.IndexOf("?") > -1)
+                {
+                    tempEndpoint = tempEndpoint + "&";
+                } else
+                {
+                    tempEndpoint = tempEndpoint + "?";
+                }
+
+                tempEndpoint = tempEndpoint + "count={0}";
+                tempEndpoint = string.Format(tempEndpoint, input.Count);
+            }
+
+            if (!string.IsNullOrEmpty(input.Since))
+            {
+                if (tempEndpoint.IndexOf("?") > -1)
+                {
+                    tempEndpoint = tempEndpoint + "&";
+                }
+                else
+                {
+                    tempEndpoint = tempEndpoint + "?";
+                }
+
+                tempEndpoint = tempEndpoint + "since={0}";
+                tempEndpoint = string.Format(tempEndpoint, input.Since);
+            }
+
+            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) =>
             {
                 LootLockerReportsGetRemovedAssetsResponse response = new LootLockerReportsGetRemovedAssetsResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
