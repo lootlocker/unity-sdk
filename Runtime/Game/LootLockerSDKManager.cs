@@ -1741,7 +1741,12 @@ namespace LootLocker.Requests
 
         #region Reports
 
-        public static void ReportsGetTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        /// <summary>
+        /// Retrieves the different types of report possible.
+        /// 
+        /// These can be changed in the web interface or through the Admin API.
+        /// </summary>
+        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1749,10 +1754,13 @@ namespace LootLocker.Requests
                 return;
             }
             
-            LootLockerAPIManager.ReportsGetTypes(onComplete);
+            LootLockerAPIManager.GetReportTypes(onComplete);
         }
 
-        public static void ReportsCreatePlayer(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete)
+        /// <summary>
+        /// Create a report of a player
+        /// </summary>
+        public static void CreatePlayerReport(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1760,10 +1768,13 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ReportsCreatePlayer(input, onComplete);
+            LootLockerAPIManager.CreatePlayerReport(input, onComplete);
         }
 
-        public static void ReportsCreateAsset(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete)
+        /// <summary>
+        /// Create a report of an asset
+        /// </summary>
+        public static void CreateAssetReport(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1771,10 +1782,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ReportsCreateAsset(input, onComplete);
+            LootLockerAPIManager.CreateAssetReport(input, onComplete);
         }
 
-        public static void ReportsGetRemovedUGCForPlayer(Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
+        /// <summary>
+        /// Get removed UGC for the current player. 
+        /// 
+        /// If any of their UGC has been removed as a result of reports they will be returned in this method
+        /// </summary>
+        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1782,7 +1798,7 @@ namespace LootLocker.Requests
                 return;
             }
             
-            LootLockerAPIManager.ReportsGetRemovedUGCForPlayer(onComplete);
+            LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
         }
 
         #endregion

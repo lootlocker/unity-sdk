@@ -52,6 +52,28 @@ namespace LootLocker.Requests
         public RemovedAsset[] Assets { get; set; }
     }
 
+    public class GetRemovedUGCForPlayerInput
+    {
+        /// <summary>
+        /// Only get UGC removed after this date.
+        /// 
+        /// Should follow RFC3339 format
+        /// </summary>
+        public string Since { get; set; }
+        
+        /// <summary>
+        /// Used for pagination.
+        /// 
+        /// Set this to the ID of the last retrieved report to get the next ones after.
+        /// </summary>
+        public string After { get; set; }
+
+        /// <summary>
+        /// Number of report you want to retrieve
+        /// </summary>
+        public int Count { get; set; }
+    }
+
     public class ReportsCreatePlayerRequest
     {
         public int[] report_types { get; set; }
@@ -71,7 +93,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void ReportsGetTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetTypes;
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, ((serverResponse) =>
@@ -89,7 +111,7 @@ namespace LootLocker
             }), true, LootLockerCallerRole.User);
         }
 
-        public static void ReportsGetRemovedUGCForPlayer(Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
+        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetRemovedUGCForPlayer;
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, ((serverResponse) =>
@@ -107,7 +129,7 @@ namespace LootLocker
             }), true, LootLockerCallerRole.User);
         }
 
-        public static void ReportsCreatePlayer(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
+        public static void CreatePlayerReport(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreatePlayer;
             string json = "";
@@ -129,7 +151,7 @@ namespace LootLocker
             }), true, LootLockerCallerRole.User);
         }
 
-        public static void ReportsCreateAsset(ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
+        public static void CreateAssetReport(ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreateAsset;
             string json = "";
