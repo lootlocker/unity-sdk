@@ -164,5 +164,12 @@ namespace LootLocker
         // Misc
         [Header("Misc")]
         public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
+
+        // Reports
+        [Header("Reports")]
+        public static EndPointClass reportsGetTypes = new EndPointClass("reports/types", LootLockerHTTPMethod.GET);
+        public static EndPointClass reportsGetRemovedUGCForPlayer = new EndPointClass("player/ugc/removed", LootLockerHTTPMethod.GET);
+        public static EndPointClass reportsCreatePlayer = new EndPointClass("reports/player", LootLockerHTTPMethod.POST);
+        public static EndPointClass reportsCreateAsset = new EndPointClass("reports/asset", LootLockerHTTPMethod.POST);
     }
 }

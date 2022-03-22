@@ -1739,6 +1739,70 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Reports
+
+        /// <summary>
+        /// Retrieves the different types of report possible.
+        /// 
+        /// These can be changed in the web interface or through the Admin API.
+        /// </summary>
+        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>());
+                return;
+            }
+            
+            LootLockerAPIManager.GetReportTypes(onComplete);
+        }
+
+        /// <summary>
+        /// Create a report of a player
+        /// </summary>
+        public static void CreatePlayerReport(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreatePlayerResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.CreatePlayerReport(input, onComplete);
+        }
+
+        /// <summary>
+        /// Create a report of an asset
+        /// </summary>
+        public static void CreateAssetReport(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreateAssetResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.CreateAssetReport(input, onComplete);
+        }
+
+        /// <summary>
+        /// Get removed UGC for the current player. 
+        /// 
+        /// If any of their UGC has been removed as a result of reports they will be returned in this method
+        /// </summary>
+        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>());
+                return;
+            }
+            
+            LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
+        }
+
+        #endregion
+
         #region Misc
 
         public static void Ping(Action<LootLockerPingResponse> onComplete)
