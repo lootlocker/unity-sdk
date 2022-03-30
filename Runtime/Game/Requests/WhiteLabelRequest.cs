@@ -40,7 +40,7 @@ namespace LootLocker.Requests
 
         public string DeletedAt { get; set; }
 
-        public string ValidatedAt { get; set; }
+        public string VerifiedAt { get; set; }
     }
 
     public class LootLockerWhiteLabelLoginResponse : LootLockerWhiteLabelSignupResponse
