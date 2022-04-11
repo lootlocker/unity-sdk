@@ -1540,7 +1540,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Leaderboard
-        public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void GetMemberRank(string leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1551,6 +1551,21 @@ namespace LootLocker.Requests
 
             lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
             lootLockerGetMemberRankRequest.member_id = member_id;
+
+            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+        }
+
+        public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                return;
+            }
+            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
+
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.member_id = member_id.ToString();
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }

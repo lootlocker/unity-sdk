@@ -90,7 +90,7 @@ namespace LootLocker.Requests
     public class LootLockerGetMemberRankRequest
     {
         public string leaderboardId { get; set; }
-        public int member_id { get; set; }
+        public string member_id { get; set; }
     }
 
     public class LootLockerGetScoreListRequest : LootLockerGetRequests
