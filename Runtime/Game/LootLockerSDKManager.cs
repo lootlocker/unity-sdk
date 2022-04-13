@@ -373,6 +373,22 @@ namespace LootLocker.Requests
             LootLockerAPIManager.XboxOneSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Create a new session for Sing in with Apple
+        ///
+        /// The Apple sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartAppleSession(string token, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(token);
+            LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
+        }
+
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
