@@ -374,7 +374,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Create a new session for Sing in with Apple
+        /// Create a new session for Sign in with Apple
         ///
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
