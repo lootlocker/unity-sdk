@@ -1624,7 +1624,7 @@ namespace LootLocker.Requests
             GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.prevCursor.ToString()), onComplete);
         }
 
-        public void ResetAllMemberRanksCalls()
+        public static void ResetAllMemberRanksCalls()
         {
             LootLockerGetAllMemberRanksRequest.Reset();
         }
@@ -1684,7 +1684,7 @@ namespace LootLocker.Requests
             GetScoreListMain(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
         }
 
-        public void ResetScoreCalls()
+        public static void ResetScoreCalls()
         {
             LootLockerGetScoreListRequest.Reset();
         }
