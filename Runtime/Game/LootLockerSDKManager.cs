@@ -963,7 +963,7 @@ namespace LootLocker.Requests
             }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
         }
 
-        public void ResetAssetCalls()
+        public static void ResetAssetCalls()
         {
             LootLockerAssetRequest.lastId = 0;
         }
