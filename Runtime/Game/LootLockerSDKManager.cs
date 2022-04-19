@@ -121,6 +121,17 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
+        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
+        {
+            Array.Resize(ref ticket, (int)ticketSize);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < ticketSize; i++)
+            {
+                sb.AppendFormat("{0:x2}", ticket[i]);
+            }
+            return sb.ToString();
+        }
+
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
         {
             if (!CheckInitialized())
