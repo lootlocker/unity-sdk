@@ -26,6 +26,22 @@ namespace LootLocker.Requests
         {
         }
     }
+    [System.Serializable]
+    public class LootLockerSteamSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string platform => "Steam";
+        public string player_identifier { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public bool development_mode => LootLockerConfig.current.developmentMode;
+        public LootLockerSteamSessionRequest(string player_identifier)
+        {
+            this.player_identifier = player_identifier;
+        }
+        public LootLockerSteamSessionRequest()
+        {
+        }
+    }
 
     [System.Serializable]
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest

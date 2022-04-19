@@ -21,6 +21,15 @@ namespace LootLocker.Requests
             this.token = token;
         }
     }
+    public class LootLockerVerifySteamRequest : LootLockerVerifyRequest
+    {
+        public string platform => "Steam";
+
+        public LootLockerVerifySteamRequest(string token) : base (token) 
+        {
+            this.token = token;
+        }
+    }
 
     public class LootLockerVerifyResponse : LootLockerResponse
     {
