@@ -102,6 +102,18 @@ namespace LootLocker.Requests
             this.xbox_user_token = xbox_user_token;
         }
     }
+
+    public class LootLockerAppleSignInSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string apple_user_token { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public bool development_mode => LootLockerConfig.current.developmentMode;
+        public LootLockerAppleSignInSessionRequest(string apple_user_token)
+        {
+            this.apple_user_token = apple_user_token;
+        }
+    }
 }
 
 namespace LootLocker
@@ -216,6 +228,34 @@ namespace LootLocker
         public static void XboxOneSession(LootLockerXboxOneSessionRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.xboxSessionRequest;
+
+            string json = "";
+            if (data == null)
+            {
+                return;
+            }
+
+            json = JsonConvert.SerializeObject(data);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerSessionResponse response = new LootLockerSessionResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
+                    LootLockerConfig.current.UpdateToken(response.session_token, "");
+                }
+
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+
+            }, false);
+        }
+
+        public static void AppleSession(LootLockerAppleSignInSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.appleSessionRequest;
 
             string json = "";
             if (data == null)
