@@ -117,8 +117,19 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
                 return;
             }
-            LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(steamSessionTicket);
+            LootLockerVerifySteamRequest verifyRequest = new LootLockerVerifySteamRequest(steamSessionTicket);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
+        }
+
+        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
+        {
+            Array.Resize(ref ticket, (int)ticketSize);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < ticketSize; i++)
+            {
+                sb.AppendFormat("{0:x2}", ticket[i]);
+            }
+            return sb.ToString();
         }
 
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
@@ -209,7 +220,7 @@ namespace LootLocker.Requests
 
             CurrentPlatform = "steam";
 
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
+            LootLockerSteamSessionRequest sessionRequest = new LootLockerSteamSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
 
