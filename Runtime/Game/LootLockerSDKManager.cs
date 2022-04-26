@@ -1261,7 +1261,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdatingAnAssetCandidate(data, getRequest, onComplete);
         }
 
-        public static void DeletingAnAssetCandidate(int assetId, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void DeletingAnAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1269,11 +1269,11 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetCandidateID.ToString());
             LootLockerAPIManager.DeletingAnAssetCandidate(data, onComplete);
         }
 
-        public static void GettingASingleAssetCandidate(int assetId, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void GettingASingleAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1281,7 +1281,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetCandidateID.ToString());
             LootLockerAPIManager.GettingASingleAssetCandidate(data, onComplete);
         }
 
@@ -1295,7 +1295,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListingAssetCandidates(onComplete);
         }
 
-        public static void AddingFilesToAssetCandidates(int assetId, string filePath, string fileName,
+        public static void AddingFilesToAssetCandidates(int assetCandidateID, string filePath, string fileName,
             FilePurpose filePurpose, Action<LootLockerUserGenerateContentResponse> onComplete, string fileContentType = null)
         {
             if (!CheckInitialized())
@@ -1314,12 +1314,12 @@ namespace LootLocker.Requests
 
             LootLockerGetRequest getRequest = new LootLockerGetRequest();
 
-            getRequest.getRequests.Add(assetId.ToString());
+            getRequest.getRequests.Add(assetCandidateID.ToString());
 
             LootLockerAPIManager.AddingFilesToAssetCandidates(data, getRequest, onComplete);
         }
 
-        public static void RemovingFilesFromAssetCandidates(int assetId, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void RemovingFilesFromAssetCandidates(int assetCandidateID, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1328,7 +1328,7 @@ namespace LootLocker.Requests
             }
 
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetCandidateID.ToString());
             data.getRequests.Add(fileId.ToString());
 
             LootLockerAPIManager.RemovingFilesFromAssetCandidates(data, onComplete);
@@ -1411,27 +1411,27 @@ namespace LootLocker.Requests
         #endregion
 
         #region Purchasing
-        public static void NormalPurchaseCall(int asset_id, int variation_id, Action<LootLockerPurchaseResponse> onComplete)
+        public static void NormalPurchaseCall(int assetID, int variationID, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
-            LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = asset_id, variation_id = variation_id };
+            LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = assetID, variation_id = variationID };
             List<LootLockerNormalPurchaseRequest> datas = new List<LootLockerNormalPurchaseRequest>();
             datas.Add(data);
             LootLockerAPIManager.NormalPurchaseCall(datas.ToArray(), onComplete);
         }
 
-        public static void RentalPurchaseCall(int asset_id, int variation_id, int rental_option_id, Action<LootLockerPurchaseResponse> onComplete)
+        public static void RentalPurchaseCall(int assetID, int variationID, int rentalOptionID, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
                 return;
             }
-            LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = asset_id, variation_id = variation_id, rental_option_id = rental_option_id };
+            LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = assetID, variation_id = variationID, rental_option_id = rentalOptionID };
             LootLockerAPIManager.RentalPurchaseCall(data, onComplete);
         }
 
