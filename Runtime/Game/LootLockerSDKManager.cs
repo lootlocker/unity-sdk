@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -176,8 +176,11 @@ namespace LootLocker.Requests
             {
                 CurrentPlatform = "guest";
 
-                PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
-                PlayerPrefs.Save();
+                if (response.success)
+                {
+                    PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
+                    PlayerPrefs.Save();
+                }
 
                 onComplete(response);
             });
