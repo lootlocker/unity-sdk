@@ -411,6 +411,13 @@ namespace LootLocker.Requests
                 return;
             }
 
+            // Clear White Label Login credentials
+            if (CurrentPlatform == "white_label")
+            {
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
+            }
+
             CurrentPlatform = "";
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
