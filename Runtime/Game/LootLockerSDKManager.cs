@@ -403,6 +403,31 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
         }
 
+        public static void EndSession(Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            // Clear White Label Login credentials
+            if (CurrentPlatform == "white_label")
+            {
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
+            }
+
+            CurrentPlatform = "";
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
+            LootLockerAPIManager.EndSession(sessionRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Calling this method with devideId is deprecated
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <param name="onComplete"></param>
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized())
