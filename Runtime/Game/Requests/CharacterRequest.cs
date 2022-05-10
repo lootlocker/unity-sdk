@@ -43,6 +43,7 @@ namespace LootLocker.Requests
         public int id;
         public bool is_default;
         public string name;
+        public LootLockerStorage [] storage;
     }
 
 
