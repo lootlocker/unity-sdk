@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,6 +28,39 @@ namespace LootLocker.Requests
     public class PlayerNameRequest 
     {
         public string name { get; set; }
+    }
+    
+    public class LookupPlayerNamesRequest
+    {
+        public ulong[] player_ids { get; set; }
+        public string[] player_public_uids { get; set; }
+        public ulong[] steam_ids { get; set; }
+        public ulong[] psn_ids { get; set; }
+        public string[] xbox_ids { get; set; }
+
+        public LookupPlayerNamesRequest()
+        {
+            player_ids = new ulong[]{};
+            player_public_uids = new string[]{};
+            steam_ids = new ulong[]{};
+            psn_ids = new ulong[]{};
+            xbox_ids = new string[]{};
+        }
+    }
+    
+    [System.Serializable]
+    public class PlayerNameLookupResponse : LootLockerResponse
+    {
+        public PlayerNameWithIDs[] players { get; set; }
+    }
+
+    public class PlayerNameWithIDs : LootLockerResponse
+    {
+        public uint player_id { get; set; }
+        public string player_public_uid { get; set; }
+        public string name { get; set; }
+        public string last_active_platform { get; set; }
+        public string platform_player_id { get; set; }
     }
 
     [System.Serializable]
@@ -391,6 +424,48 @@ namespace LootLocker
                 PlayerNameResponse response = new PlayerNameResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                     response = JsonConvert.DeserializeObject<PlayerNameResponse>(serverResponse.text);
+
+                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error; 
+                response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }), true);
+        }
+        
+        public static void LookupPlayerNames(LookupPlayerNamesRequest lookupPlayerNamesRequest, Action<PlayerNameLookupResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.lookupPlayerNames;
+
+            string getVariable = endPoint.endPoint + "?";
+            
+            foreach (var playerID in lookupPlayerNamesRequest.player_ids)
+            {
+                getVariable += $"player_id={playerID}&";
+            }
+            foreach (var playerPublicUID in lookupPlayerNamesRequest.player_public_uids)
+            {
+                getVariable += $"player_public_uid={playerPublicUID}&";
+            }
+            foreach (var steamID in lookupPlayerNamesRequest.steam_ids)
+            {
+                getVariable += $"steam_id={steamID}&";
+            }
+            foreach (var psnID in lookupPlayerNamesRequest.psn_ids)
+            {
+                getVariable += $"psn_id={psnID}&";
+            }
+            foreach (var xboxID in lookupPlayerNamesRequest.xbox_ids)
+            {
+                getVariable += $"xbox_id={xboxID}&";
+            }
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (Action<LootLockerResponse>)((serverResponse) =>
+            {
+                PlayerNameLookupResponse response = new PlayerNameLookupResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                    response = JsonConvert.DeserializeObject<PlayerNameLookupResponse>(serverResponse.text);
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
