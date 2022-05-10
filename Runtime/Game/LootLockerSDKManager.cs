@@ -678,6 +678,104 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetPlayerName(onComplete);
         }
 
+        public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                player_ids = playerIds
+            }, onComplete);
+        }
+
+        public static void LookupPlayerNamesByPlayerPublicUIds(string[] playerPublicUIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                player_public_uids = playerPublicUIds
+            }, onComplete);
+        }
+
+        public static void LookupPlayerNamesBySteamIds(ulong[] steamIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                steam_ids = steamIds
+            }, onComplete);
+        }
+
+        public static void LookupPlayerNamesBySteamIds(string[] steamIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                steam_ids = steamIds.Select(steamId => Convert.ToUInt64(steamId)).ToArray()
+            }, onComplete);
+        }
+
+        public static void LookupPlayerNamesByPSNIds(ulong[] psnIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                psn_ids = psnIds
+            }, onComplete);
+        }
+        
+        public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                psn_ids = psnIds.Select(psnId => Convert.ToUInt64(psnId)).ToArray()
+            }, onComplete);
+        }
+
+        public static void LookupPlayerNamesByXboxIds(string[] xboxIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            {
+                xbox_ids = xboxIds
+            }, onComplete);
+        }
+
         public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
         {
             if (!CheckInitialized())
