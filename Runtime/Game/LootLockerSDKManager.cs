@@ -863,6 +863,25 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
         }
 
+        public static void SetDefaultCharacter(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                return;
+            }
+
+            LootLockerUpdateCharacterRequest data = new LootLockerUpdateCharacterRequest();
+
+            data.is_default = true;
+
+            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
+
+            lootLockerGetRequest.getRequests.Add(characterID);
+
+            LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
+        }
+
         public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1186,7 +1205,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllKeyValuePairs(onComplete);
         }
 
-        public static void GetAllKeyValuePairsToAnInstance(int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void GetAllKeyValuePairsToAnInstance(int assetInstanceID, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1194,11 +1213,11 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(instanceId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(data, onComplete);
         }
 
-        public static void GetAKeyValuePairByIdForAssetInstances(int assetId, int instanceId, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
+        public static void GetAKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1206,12 +1225,12 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            data.getRequests.Add(instanceId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
+            data.getRequests.Add(keyValueID.ToString());
             LootLockerAPIManager.GetAKeyValuePairById(data, onComplete);
         }
 
-        public static void CreateKeyValuePairForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void CreateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1219,14 +1238,14 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
             LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
             createKeyValuePairRequest.key = key;
             createKeyValuePairRequest.value = value;
             LootLockerAPIManager.CreateKeyValuePair(data, createKeyValuePairRequest, onComplete);
         }
 
-        public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetId, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetInstanceID, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1234,7 +1253,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest request = new LootLockerGetRequest();
-            request.getRequests.Add(assetId.ToString());
+            request.getRequests.Add(assetInstanceID.ToString());
             LootLockerUpdateOneOrMoreKeyValuePairRequest createKeyValuePairRequest = new LootLockerUpdateOneOrMoreKeyValuePairRequest();
             List<LootLockerCreateKeyValuePairRequest> temp = new List<LootLockerCreateKeyValuePairRequest>();
             foreach (var d in data)
@@ -1244,7 +1263,22 @@ namespace LootLocker.Requests
             createKeyValuePairRequest.storage = temp.ToArray();
             LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(request, createKeyValuePairRequest, onComplete);
         }
-
+        public static void UpdateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                return;
+            }
+            LootLockerGetRequest request = new LootLockerGetRequest();
+            request.getRequests.Add(assetInstanceID.ToString());
+            LootLockerUpdateOneOrMoreKeyValuePairRequest createKeyValuePairRequest = new LootLockerUpdateOneOrMoreKeyValuePairRequest();
+            List<LootLockerCreateKeyValuePairRequest> temp = new List<LootLockerCreateKeyValuePairRequest>();
+            temp.Add(new LootLockerCreateKeyValuePairRequest { key = key, value = value });
+            createKeyValuePairRequest.storage = temp.ToArray();
+            LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(request, createKeyValuePairRequest, onComplete);
+        }
+        [ObsoleteAttribute("This function with 3 parameters is deprecated, use this function with 4 parameters instead:\n(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete)")]
         public static void UpdateKeyValuePairByIdForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1259,8 +1293,7 @@ namespace LootLocker.Requests
             createKeyValuePairRequest.value = value;
             LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
         }
-
-        public static void DeleteKeyValuePairForAssetInstances(int assetId, int instanceId, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void UpdateKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1268,12 +1301,34 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            data.getRequests.Add(instanceId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
+            data.getRequests.Add(keyValueID.ToString());
+            LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
+            if (key != null)
+            {
+                createKeyValuePairRequest.key = key;
+            }
+            if (value != null)
+            {
+                createKeyValuePairRequest.value = value;
+            }
+            LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
+        }
+
+        public static void DeleteKeyValuePairForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerAssetDefaultResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetInstanceID.ToString());
+            data.getRequests.Add(keyValueID.ToString());
             LootLockerAPIManager.DeleteKeyValuePair(data, onComplete);
         }
 
-        public static void InspectALootBoxForAssetInstances(int assetId, Action<LootLockerInspectALootBoxResponse> onComplete)
+        public static void InspectALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1281,11 +1336,11 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.InspectALootBox(data, onComplete);
         }
 
-        public static void OpenALootBoxForAssetInstances(int assetId, Action<LootLockerOpenLootBoxResponse> onComplete)
+        public static void OpenALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1293,7 +1348,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.OpenALootBox(data, onComplete);
         }
         #endregion
