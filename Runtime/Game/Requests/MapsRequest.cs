@@ -11,7 +11,6 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerMapsResponse : LootLockerResponse
     {
-        
         public LootLockerMap[] maps { get; set; }
     }
 
@@ -53,19 +52,7 @@ namespace LootLocker
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerMapsResponse response = new LootLockerMapsResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerMapsResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-
     }
 }

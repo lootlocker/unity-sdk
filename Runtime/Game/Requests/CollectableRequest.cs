@@ -10,12 +10,10 @@ using UnityEngine.UI;
 
 namespace LootLocker.Requests
 {
-
     #region GettingCollectable
 
     public class LootLockerGettingCollectablesResponse : LootLockerResponse
     {
-        
         public LootLockerCollectable[] collectables { get; set; }
     }
 
@@ -27,7 +25,7 @@ namespace LootLocker.Requests
         public LootLockerReward[] rewards { get; set; }
     }
 
-    public class LootLockerReward 
+    public class LootLockerReward
     {
         public LootLockerCommonAsset asset { get; set; }
         public int asset_variation_id { get; set; }
@@ -43,7 +41,7 @@ namespace LootLocker.Requests
         public LootLockerReward[] rewards { get; set; }
     }
 
-    public class LootLockerItem 
+    public class LootLockerItem
     {
         public string name { get; set; }
         public bool collected { get; set; }
@@ -53,8 +51,6 @@ namespace LootLocker.Requests
         public Image preview { get; set; }
         public int downloadAttempts { get; set; }
         public LootLockerFile[] files { get; set; }
-
-
     }
 
     #endregion
@@ -64,12 +60,10 @@ namespace LootLocker.Requests
     public class LootLockerCollectingAnItemRequest
     {
         public string slug { get; set; }
-
     }
 
     public class LootLockerCollectingAnItemResponse : LootLockerResponse
     {
-        
         public LootLockerCollectable[] collectables { get; set; }
 
         public LootLockerCollectable mainCollectable;
@@ -79,18 +73,13 @@ namespace LootLocker.Requests
         public LootLockerItem mainItem;
     }
 
-
-
     #endregion
-
 }
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
-
         public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
@@ -103,8 +92,9 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error;
+                response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
         }
@@ -136,11 +126,11 @@ namespace LootLocker
 
                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error;
+                response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
         }
     }
-
 }

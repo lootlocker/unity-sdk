@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,6 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
-
     [System.Serializable]
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
@@ -18,14 +17,17 @@ namespace LootLocker.Requests
         public string player_identifier { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerSessionRequest(string player_identifier)
         {
             this.player_identifier = player_identifier;
         }
+
         public LootLockerSessionRequest()
         {
         }
     }
+
     [System.Serializable]
     public class LootLockerSteamSessionRequest : LootLockerGetRequest
     {
@@ -34,10 +36,12 @@ namespace LootLocker.Requests
         public string player_identifier { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerSteamSessionRequest(string player_identifier)
         {
             this.player_identifier = player_identifier;
         }
+
         public LootLockerSteamSessionRequest()
         {
         }
@@ -52,6 +56,7 @@ namespace LootLocker.Requests
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerWhiteLabelSessionRequest(string email, string password)
         {
             this.email = email;
@@ -101,6 +106,7 @@ namespace LootLocker.Requests
         public string nsa_id_token { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
         {
             this.nsa_id_token = nsa_id_token;
@@ -113,6 +119,7 @@ namespace LootLocker.Requests
         public string xbox_user_token { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerXboxOneSessionRequest(string xbox_user_token)
         {
             this.xbox_user_token = xbox_user_token;
@@ -125,6 +132,7 @@ namespace LootLocker.Requests
         public string apple_user_token { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
+
         public LootLockerAppleSignInSessionRequest(string apple_user_token)
         {
             this.apple_user_token = apple_user_token;
@@ -144,21 +152,11 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-             {
-                 LootLockerSessionResponse response = new LootLockerSessionResponse();
-                 if (string.IsNullOrEmpty(serverResponse.Error))
-                 {
-                     response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                     LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
-                 }
-
-                 //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                 response.text = serverResponse.text;
-                      response.success = serverResponse.success;
-             response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                 onComplete?.Invoke(response);
-
-             }, false);
+            {
+                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                onComplete?.Invoke(response);
+            }, false);
         }
 
         public static void WhiteLabelSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
@@ -170,18 +168,9 @@ namespace LootLocker
             else json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, "");
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, "");
                 onComplete?.Invoke(response);
-
             }, false);
         }
 
@@ -198,18 +187,9 @@ namespace LootLocker
             json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerGuestSessionResponse response = new LootLockerGuestSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerGuestSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                var response = LootLockerResponse.Serialize<LootLockerGuestSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
                 onComplete?.Invoke(response);
-
             }, false);
         }
 
@@ -226,18 +206,9 @@ namespace LootLocker
             json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, "");
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                var response = LootLockerResponse.Serialize<LootLockerGuestSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, "");
                 onComplete?.Invoke(response);
-
             }, false);
         }
 
@@ -254,18 +225,9 @@ namespace LootLocker
             json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, "");
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, "");
                 onComplete?.Invoke(response);
-
             }, false);
         }
 
@@ -282,18 +244,9 @@ namespace LootLocker
             json = JsonConvert.SerializeObject(data);
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                    LootLockerConfig.current.UpdateToken(response.session_token, "");
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
+                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, "");
                 onComplete?.Invoke(response);
-
             }, false);
         }
 
@@ -304,20 +257,8 @@ namespace LootLocker
             string json = "";
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerSessionResponse response = new LootLockerSessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerSessionResponse>(serverResponse.text);
-                
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-
     }
-
 }

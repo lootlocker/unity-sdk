@@ -9,14 +9,19 @@ using LootLocker.LootLockerEnums;
 
 namespace LootLocker.LootLockerEnums
 {
-    public enum FilePurpose { primary_thumbnail, thumbnail, file }
+    public enum FilePurpose
+    {
+        primary_thumbnail,
+        thumbnail,
+        file
+    }
 }
 
 
 namespace LootLocker.Requests
 {
-
     #region Asset Candidate Properties
+
     public class LootLockerAssetKVPair
     {
         public string key { get; set; }
@@ -54,27 +59,30 @@ namespace LootLocker.Requests
             // don't serialize the context_id property if it is not set.
             return (context_id >= 0);
         }
+
         public bool ShouldSerializename()
         {
             // don't serialize the name property if it is not set.
             return (name != null && name.Length > 0);
         }
+
         public bool ShouldSerializekv_storage()
         {
             // don't serialize the kv_storage property if it is not set.
             return (kv_storage != null && kv_storage.Length > 0);
         }
+
         public bool ShouldSerializefilters()
         {
             // don't serialize the filters property if it is not set.
             return (filters != null && filters.Length > 0);
         }
+
         public bool ShouldSerializedata_entities()
         {
             // don't serialize the data_entities property if it is not set.
             return (data_entities != null && data_entities.Length > 0);
         }
-
     }
 
     public class LootLockerAssetFile
@@ -85,12 +93,14 @@ namespace LootLocker.Requests
         public string name { get; set; }
         public string purpose { get; set; }
     }
+
     #endregion
 
     public class LootLockerCreatingOrUpdatingAnAssetCandidateRequest
     {
         public LootLockerAssetData data { get; set; }
         public bool completed { get; set; } = false;
+
         public bool ShouldSerializecompleted()
         {
             // don't serialize the completed property if it is not set.
@@ -108,14 +118,12 @@ namespace LootLocker.Requests
 
     public class LootLockerUserGenerateContentResponse : LootLockerResponse
     {
-        
         public int asset_candidate_id { get; set; }
         public LootLockerAsset_Candidates asset_candidate { get; set; }
     }
 
     public class LootLockerListingAssetCandidatesResponse : LootLockerResponse
     {
-        
         public LootLockerAsset_Candidates[] asset_candidates { get; set; }
     }
 }
@@ -123,7 +131,6 @@ namespace LootLocker.Requests
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
         public static void CreatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -134,18 +141,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.creatingAnAssetCandidate;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void UpdatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -157,18 +153,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -177,18 +162,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true, LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -197,36 +171,14 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.listingAssetCandidates;
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
-            {
-                LootLockerListingAssetCandidatesResponse response = new LootLockerListingAssetCandidatesResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerListingAssetCandidatesResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void AddingFilesToAssetCandidates(LootLockerAddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -250,22 +202,10 @@ namespace LootLocker
             {
                 data.fileContentType = "multipart/form-data";
             }
+
             byte[] fileData = System.IO.File.ReadAllBytes(data.filePath);
 
-            LootLockerServerRequest.UploadFile(endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType,
-                formData, (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.UploadFile(endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType, formData, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void RemovingFilesFromAssetCandidates(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -274,18 +214,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) =>
-            {
-                LootLockerUserGenerateContentResponse response = new LootLockerUserGenerateContentResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerUserGenerateContentResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
     }
 }

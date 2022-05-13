@@ -47,6 +47,7 @@ namespace LootLocker.Requests
         public int[] ReportTypes { get; set; }
         public string RemovedAt { get; set; }
     }
+
     public class LootLockerReportsGetRemovedAssetsResponse : LootLockerResponse
     {
         public RemovedAsset[] Assets { get; set; }
@@ -60,7 +61,7 @@ namespace LootLocker.Requests
         /// Should follow RFC3339 format
         /// </summary>
         public string Since { get; set; }
-        
+
         /// <summary>
         /// Used for pagination.
         /// 
@@ -96,19 +97,7 @@ namespace LootLocker
         public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetTypes;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, ((serverResponse) =>
-            {
-                LootLockerReportsGetTypesResponse response = new LootLockerReportsGetTypesResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerReportsGetTypesResponse>(serverResponse.text);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }), true, LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
@@ -127,7 +116,8 @@ namespace LootLocker
                 if (tempEndpoint.IndexOf("?") > -1)
                 {
                     tempEndpoint = tempEndpoint + "&";
-                } else
+                }
+                else
                 {
                     tempEndpoint = tempEndpoint + "?";
                 }
@@ -151,19 +141,7 @@ namespace LootLocker
                 tempEndpoint = string.Format(tempEndpoint, input.Since);
             }
 
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) =>
-            {
-                LootLockerReportsGetRemovedAssetsResponse response = new LootLockerReportsGetRemovedAssetsResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerReportsGetRemovedAssetsResponse>(serverResponse.text);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }), true, LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void CreatePlayerReport(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
@@ -173,19 +151,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, ((serverResponse) =>
-            {
-                LootLockerReportsCreatePlayerResponse response = new LootLockerReportsCreatePlayerResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error)) {
-                    response = JsonConvert.DeserializeObject<LootLockerReportsCreatePlayerResponse>(serverResponse.text);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-
-                onComplete?.Invoke(response);
-            }), true, LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void CreateAssetReport(ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
@@ -195,20 +161,7 @@ namespace LootLocker
             if (data == null) return;
             else json = JsonConvert.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, ((serverResponse) =>
-            {
-                LootLockerReportsCreateAssetResponse response = new LootLockerReportsCreateAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    response = JsonConvert.DeserializeObject<LootLockerReportsCreateAssetResponse>(serverResponse.text);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-
-                onComplete?.Invoke(response);
-            }), true, LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
     }
 }

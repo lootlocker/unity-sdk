@@ -8,12 +8,10 @@ using System;
 
 namespace LootLocker.Requests
 {
-
     #region GetMessages
 
     public class LootLockerGetMessagesResponse : LootLockerResponse
     {
-        
         public LootLockerGMMessage[] messages { get; set; }
     }
 
@@ -31,33 +29,17 @@ namespace LootLocker.Requests
     }
 
     #endregion
-
 }
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
-
         public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getMessages;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) =>
-            {
-                LootLockerGetMessagesResponse response = new LootLockerGetMessagesResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerGetMessagesResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-
     }
-
 }
