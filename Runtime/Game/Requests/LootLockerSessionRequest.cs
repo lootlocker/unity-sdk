@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -95,7 +95,7 @@ namespace LootLocker.Requests
     {
         public int current { get; set; }
         public bool current_is_prestige { get; set; }
-        public int next { get; set; }
+        public int? next { get; set; }
         public bool next_is_prestige { get; set; }
     }
 
