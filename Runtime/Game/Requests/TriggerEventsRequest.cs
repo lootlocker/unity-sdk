@@ -15,7 +15,6 @@ namespace LootLocker.Requests
 
     public class LootLockerTriggerAnEventResponse : LootLockerResponse
     {
-        
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
@@ -24,16 +23,12 @@ namespace LootLocker.Requests
 
     public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
-        
         public string[] triggers { get; set; }
     }
-
-
 }
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
         public EndPointClass triggeringAnEvent;
@@ -47,38 +42,14 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerTriggerAnEventResponse response = new LootLockerTriggerAnEventResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerTriggerAnEventResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
-
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
-            {
-                LootLockerListingAllTriggersResponse response = new LootLockerListingAllTriggersResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerListingAllTriggersResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                     response.success = serverResponse.success;
-            response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
     }
-
 }

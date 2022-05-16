@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace LootLocker.Requests
 {
-
     public class LootLockerComputeAndLockDropTableResponse : LootLockerResponse
     {
-        
         public LootLockerComputeAndLockItem[] items { get; set; }
     }
 
@@ -21,9 +19,9 @@ namespace LootLocker.Requests
         public int? asset_rental_option_id { get; set; }
         public int id { get; set; }
     }
+
     public class LootLockerPickDropsFromDropTableResponse : LootLockerResponse
     {
-        
         public LootLockerPickDropsFromDropTableItem[] items { get; set; }
     }
 
@@ -40,7 +38,6 @@ namespace LootLocker.Requests
     {
         public int[] picks { get; set; }
     }
-
 }
 
 namespace LootLocker
@@ -59,18 +56,7 @@ namespace LootLocker
                 endPoint += tempEndpoint;
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerComputeAndLockDropTableResponse response = new LootLockerComputeAndLockDropTableResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerComputeAndLockDropTableResponse>(serverResponse.text);
-
-                // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
         public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
@@ -82,18 +68,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) =>
-            {
-                LootLockerPickDropsFromDropTableResponse response = new LootLockerPickDropsFromDropTableResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerPickDropsFromDropTableResponse>(serverResponse.text);
-
-                // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
     }
 }

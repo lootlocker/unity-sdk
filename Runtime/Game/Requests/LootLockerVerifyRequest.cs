@@ -21,11 +21,12 @@ namespace LootLocker.Requests
             this.token = token;
         }
     }
+
     public class LootLockerVerifySteamRequest : LootLockerVerifyRequest
     {
         public string platform => "Steam";
 
-        public LootLockerVerifySteamRequest(string token) : base (token) 
+        public LootLockerVerifySteamRequest(string token) : base(token)
         {
             this.token = token;
         }
@@ -33,13 +34,11 @@ namespace LootLocker.Requests
 
     public class LootLockerVerifyResponse : LootLockerResponse
     {
-
     }
 }
 
 namespace LootLocker
 {
-
     public partial class LootLockerAPIManager
     {
         public static void Verify(LootLockerVerifyRequest data, Action<LootLockerVerifyResponse> onComplete)
@@ -50,19 +49,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerVerifyResponse response = new LootLockerVerifyResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerVerifyResponse>(serverResponse.text);
-
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, false);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, false);
         }
-
     }
 }

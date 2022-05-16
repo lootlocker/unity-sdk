@@ -9,7 +9,16 @@ using System.Linq;
 
 namespace LootLocker.LootLockerEnums
 {
-    public enum AssetFilter { purchasable, nonpurchasable, rentable, nonrentable, popular, nonpopular, none }
+    public enum AssetFilter
+    {
+        purchasable,
+        nonpurchasable,
+        rentable,
+        nonrentable,
+        popular,
+        nonpopular,
+        none
+    }
 }
 
 namespace LootLocker.Requests
@@ -38,6 +47,7 @@ namespace LootLocker.Requests
     {
         public int count;
         public static int lastId;
+
         public static void ResetAssetCalls()
         {
             lastId = 0;
@@ -142,7 +152,6 @@ namespace LootLocker.Requests
 
     public class LootLockerContextResponse : LootLockerResponse
     {
-        
         public LootLockerContext[] contexts { get; set; }
     }
 
@@ -158,10 +167,8 @@ namespace LootLocker.Requests
 
     public class LootLockerFavouritesListResponse : LootLockerResponse
     {
-        
         public int[] favourites { get; set; }
     }
-
 }
 
 namespace LootLocker
@@ -172,21 +179,11 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingContexts;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerContextResponse response = new LootLockerContextResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerContextResponse>(serverResponse.text);
-
-                //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0)
+        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
+            int UGCCreatorPlayerID = 0)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
             string getVariable = string.Format(endPoint.endPoint, assetCount);
@@ -205,6 +202,7 @@ namespace LootLocker
                 {
                     filterString += "," + GetStringOfEnum(filter[i]);
                 }
+
                 tempEndpoint = $"&filter={filterString}";
                 getVariable += tempEndpoint;
             }
@@ -232,21 +230,12 @@ namespace LootLocker
                         filterString += $";{kvp.Key}={kvp.Value}";
                     count++;
                 }
+
                 tempEndpoint = $"&asset_filters={filterString}";
                 getVariable += tempEndpoint;
             }
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
 
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static string GetStringOfEnum(LootLocker.LootLockerEnums.AssetFilter filter)
@@ -273,6 +262,7 @@ namespace LootLocker
                     filterString = "!popular";
                     break;
             }
+
             return filterString;
         }
 
@@ -338,18 +328,7 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-                //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public void ResetAssetCalls()
@@ -363,18 +342,7 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerCommonAsset response = new LootLockerCommonAsset();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerCommonAsset>(serverResponse.text);
-
-                //    LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
@@ -383,18 +351,7 @@ namespace LootLocker
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                LootLockerFavouritesListResponse response = new LootLockerFavouritesListResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerFavouritesListResponse>(serverResponse.text);
-
-                //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void AddFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
@@ -403,18 +360,7 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) =>
-            {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-                //   LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void RemoveFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
@@ -423,20 +369,7 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) =>
-            {
-                LootLockerAssetResponse response = new LootLockerAssetResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-                // LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-
     }
-
 }
