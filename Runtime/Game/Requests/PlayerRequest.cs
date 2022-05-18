@@ -313,7 +313,7 @@ namespace LootLocker
                 getVariable += $"xbox_id={xboxID}&";
             }
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void SetPlayerName(PlayerNameRequest data, Action<PlayerNameResponse> onComplete)
