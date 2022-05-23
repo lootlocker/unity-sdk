@@ -83,7 +83,7 @@ namespace LootLocker
         {
             if (serverResponse == null)
             {
-                return new T() { success = false, Error = "Unkown error, please check your internet connection." };
+                return new T() { success = false, Error = "Unknown error, please check your internet connection." };
             }
             else if (!string.IsNullOrEmpty(serverResponse.Error))
             {
