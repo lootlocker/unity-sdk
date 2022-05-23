@@ -79,9 +79,16 @@ namespace LootLocker
         }
 
         public static T Serialize<T>(LootLockerResponse serverResponse)
-            where T : LootLockerResponse
+            where T : LootLockerResponse, new() 
         {
-            if (!string.IsNullOrEmpty(serverResponse.Error)) return null;
+            if (serverResponse == null)
+            {
+                return new T() { success = false, Error = "Unkown error, please check your internet connection." };
+            }
+            else if (!string.IsNullOrEmpty(serverResponse.Error))
+            {
+                return new T() { success = false, Error = serverResponse.Error };
+            }
 
             var response = JsonConvert.DeserializeObject<T>(serverResponse.text);
 
