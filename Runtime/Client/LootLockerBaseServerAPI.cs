@@ -98,6 +98,12 @@ namespace LootLocker
 
                     try
                     {
+                        if (webRequest.error != null)
+                        {
+                            LootLockerSDKManager.DebugMessage($"Server request failed: {webRequest.error}");
+                            yield break;
+                        }
+                        
                         LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
                     }
                     catch
