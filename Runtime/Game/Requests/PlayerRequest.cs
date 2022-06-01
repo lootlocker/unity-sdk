@@ -130,6 +130,7 @@ namespace LootLocker.Requests
         public int? variation_id { get; set; }
         public string rental_option_id { get; set; }
         public string acquisition_source { get; set; }
+        public DateTime acquisition_date { get; set; }
         public LootLockerCommonAsset asset { get; set; }
         public LootLockerRental rental { get; set; }
 
