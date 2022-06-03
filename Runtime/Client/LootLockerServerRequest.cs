@@ -65,17 +65,9 @@ namespace LootLocker
         public string EventId;
 
         public static void Serialize<T>(Action<T> onComplete, LootLockerResponse serverResponse)
-            where T : LootLockerResponse
+            where T : LootLockerResponse, new()
         {
-            if (!string.IsNullOrEmpty(serverResponse.Error)) return;
-
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text);
-
-            response.text = serverResponse.text;
-            response.success = serverResponse.success;
-            response.Error = serverResponse.Error;
-            response.statusCode = serverResponse.statusCode;
-            onComplete?.Invoke(response);
+            onComplete?.Invoke(Serialize<T>(serverResponse));
         }
 
         public static T Serialize<T>(LootLockerResponse serverResponse)
@@ -90,7 +82,7 @@ namespace LootLocker
                 return new T() { success = false, Error = serverResponse.Error };
             }
 
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text);
+            var response = JsonConvert.DeserializeObject<T>(serverResponse.text) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
