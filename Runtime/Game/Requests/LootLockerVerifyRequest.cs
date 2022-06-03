@@ -24,7 +24,7 @@ namespace LootLocker.Requests
 
     public class LootLockerVerifySteamRequest : LootLockerVerifyRequest
     {
-        public string platform => "Steam";
+        public new string platform => "Steam";
 
         public LootLockerVerifySteamRequest(string token) : base(token)
         {
