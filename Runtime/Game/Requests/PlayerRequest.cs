@@ -137,6 +137,28 @@ namespace LootLocker.Requests
 
         public float balance;
     }
+    
+    public class LootLockerPlayerFileRequest
+    {
+        public string purpose { get; set; }
+        public string path_to_file { get; set; }
+    }
+    
+    public class LootLockerPlayerFilesResponse : LootLockerResponse
+    {
+        public LootLockerPlayerFile[] items { get; set; }
+    }
+
+    public class LootLockerPlayerFile : LootLockerResponse
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public int size { get; set; }
+        public string purpose { get; set; }
+        public string url { get; set; }
+        public DateTime url_expires_at { get; set; }
+        public DateTime created_at { get; set; }
+    }
 
     [System.Serializable]
     public class LootLockerAssetClass
