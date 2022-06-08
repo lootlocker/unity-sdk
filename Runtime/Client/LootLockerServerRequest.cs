@@ -65,17 +65,9 @@ namespace LootLocker
         public string EventId;
 
         public static void Serialize<T>(Action<T> onComplete, LootLockerResponse serverResponse)
-            where T : LootLockerResponse
+            where T : LootLockerResponse, new()
         {
-            if (!string.IsNullOrEmpty(serverResponse.Error)) return;
-
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text);
-
-            response.text = serverResponse.text;
-            response.success = serverResponse.success;
-            response.Error = serverResponse.Error;
-            response.statusCode = serverResponse.statusCode;
-            onComplete?.Invoke(response);
+            onComplete?.Invoke(Serialize<T>(serverResponse));
         }
 
         public static T Serialize<T>(LootLockerResponse serverResponse)
@@ -90,7 +82,7 @@ namespace LootLocker
                 return new T() { success = false, Error = serverResponse.Error };
             }
 
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text);
+            var response = JsonConvert.DeserializeObject<T>(serverResponse.text) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
@@ -183,6 +175,12 @@ namespace LootLocker
 
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
+        
+        public static void CallAPI(EndPointClass endpoint, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true,
+            LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
+        {
+            CallAPI(endpoint.endPoint, endpoint.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken, callerRole);
+        }
 
         public static void CallDomainAuthAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null)
         {
@@ -224,6 +222,12 @@ namespace LootLocker
             LootLockerBaseServerAPI.I.SwitchURL(callerRole);
 
             new LootLockerServerRequest(endPoint, httpMethod, file, fileName, fileContentType, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
+        }
+        
+        public static void UploadFile(EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null,
+            bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
+        {
+            UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken, callerRole);
         }
 
         #endregion

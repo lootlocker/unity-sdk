@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using LootLocker.Requests;
 using LootLocker;
@@ -789,6 +790,132 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SetPlayerName(data, onComplete);
         }
+        
+        public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getSingleplayerFile;
+            
+            endpoint.endPoint = string.Format(endpoint.endPoint, fileId);
+
+            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getplayerFiles, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose }
+            };
+
+
+            var fileBytes = new byte[] { };
+            try
+            {
+                fileBytes = File.ReadAllBytes(pathToFile);
+            }
+            catch (Exception e)
+            {
+                DebugMessage($"File error: {e.Message}");
+                return;
+            }
+            
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body, 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
+        }
+        
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose }
+            };
+            
+            var fileBytes = new byte[fileStream.Length];
+            try
+            {
+                fileStream.Read(fileBytes, 0, Convert.ToInt32(fileStream.Length));
+            }
+            catch (Exception e)
+            {
+                DebugMessage($"File error: {e.Message}");
+                return;
+            }
+
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body, 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
+        }
+        
+        
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose }
+            };
+
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body, 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
+        }
+        
+        public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.deletePlayerFile;
+            
+            endpoint.endPoint = string.Format(endpoint.endPoint, fileId);
+
+            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
         #endregion
 
         #region Character
