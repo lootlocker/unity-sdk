@@ -207,9 +207,6 @@ namespace LootLocker.Requests
             {
                 CurrentPlatform = "guest";
 
-                PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
-                PlayerPrefs.Save();
-
                 onComplete(response);
             });
         }
