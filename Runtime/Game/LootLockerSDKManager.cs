@@ -2014,6 +2014,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllMemberRanks(request, onComplete);
         }
 
+        [Obsolete("Please use GetScoreList instead.")]
+        public static void GetScoreListMain(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
+        {
+            GetScoreList(leaderboardId, count, after, onComplete);
+        }
+
         public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
