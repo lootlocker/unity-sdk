@@ -790,7 +790,9 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SetPlayerName(data, onComplete);
         }
+        #endregion
         
+        #region Player files
         public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -805,7 +807,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-        
+
         public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -814,10 +816,25 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getplayerFiles, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
+                return;
+            }
+            
+            var endpoint = LootLockerEndPoints.getPlayerFilesByPlayerId;
+            
+            endpoint.endPoint = string.Format(endpoint.endPoint, playerId);
+
+            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -827,7 +844,8 @@ namespace LootLocker.Requests
 
             var body = new Dictionary<string, string>()
             {
-                { "purpose", filePurpose }
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() }
             };
 
 
@@ -849,7 +867,12 @@ namespace LootLocker.Requests
                 });
         }
         
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            UploadPlayerFile(pathToFile, filePurpose, false, onComplete);
+        }
+
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -859,7 +882,8 @@ namespace LootLocker.Requests
 
             var body = new Dictionary<string, string>()
             {
-                { "purpose", filePurpose }
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() }
             };
             
             var fileBytes = new byte[fileStream.Length];
@@ -880,8 +904,12 @@ namespace LootLocker.Requests
                 });
         }
         
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            UploadPlayerFile(fileStream, filePurpose, false, onComplete);
+        }
         
-        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -891,7 +919,8 @@ namespace LootLocker.Requests
 
             var body = new Dictionary<string, string>()
             {
-                { "purpose", filePurpose }
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() }
             };
 
             LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body, 
@@ -899,6 +928,11 @@ namespace LootLocker.Requests
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
+        }
+
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        {
+            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
         }
         
         public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
@@ -915,7 +949,6 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-
         #endregion
 
         #region Character

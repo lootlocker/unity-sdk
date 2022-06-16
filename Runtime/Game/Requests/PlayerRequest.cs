@@ -155,6 +155,8 @@ namespace LootLocker.Requests
         public string name { get; set; }
         public int size { get; set; }
         public string purpose { get; set; }
+        [JsonProperty("public")]
+        public bool is_public { get; set; }
         public string url { get; set; }
         public DateTime url_expires_at { get; set; }
         public DateTime created_at { get; set; }
