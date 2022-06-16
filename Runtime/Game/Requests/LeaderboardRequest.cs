@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,6 +96,7 @@ namespace LootLocker.Requests
     public class LootLockerGetScoreListRequest : LootLockerGetRequests
     {
         public int leaderboardId { get; set; }
+        public string leaderboardKey { get; set; }
         public static int? nextCursor;
         public static int? prevCursor;
 
@@ -180,7 +181,8 @@ namespace LootLocker
             if (!string.IsNullOrEmpty(getRequests.after))
             {
                 tempEndpoint = requestEndPoint.endPoint + "&after={2}";
-                endPoint = string.Format(tempEndpoint, getRequests.leaderboardId, getRequests.count, int.Parse(getRequests.after));
+
+                endPoint = string.Format(tempEndpoint, getRequests.leaderboardKey ?? getRequests.leaderboardId.ToString(), getRequests.count, int.Parse(getRequests.after));
             }
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
