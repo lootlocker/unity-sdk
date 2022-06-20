@@ -377,7 +377,7 @@ namespace LootLocker
         
         public static void LookupPlayer1stPartyPlatformIDs(LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
-            var endPoint = LootLockerEndPoints.lookupPlayer1stPlatformIDs;
+            var endPoint = LootLockerEndPoints.lookupPlayer1stPartyPlatformIDs;
 
             var getVariable = endPoint.endPoint + "?";
 
