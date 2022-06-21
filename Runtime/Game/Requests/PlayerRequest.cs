@@ -40,6 +40,40 @@ namespace LootLocker.Requests
             xbox_ids = new string[] { };
         }
     }
+    
+    public class LookupPlayer1stPartyPlatformIDsRequest
+    {
+        public ulong[] player_ids { get; set; }
+        public string[] player_public_uids { get; set; }
+
+        public LookupPlayer1stPartyPlatformIDsRequest()
+        {
+            player_ids = new ulong[] { };
+            player_public_uids = new string[] { };
+        }
+    }
+    
+    [System.Serializable]
+    public class Player1stPartyPlatformIDsLookupResponse : LootLockerResponse
+    {
+        public PlayerWith1stPartyPlatformIDs[] players { get; set; }
+    }
+
+    public class PlayerWith1stPartyPlatformIDs
+    {
+        public uint player_id { get; set; }
+        public string player_public_uid { get; set; }
+        public string name { get; set; }
+        public string last_active_platform { get; set; }
+        public PlatformIDs platform_ids { get; set; }
+    }
+    
+    public class PlatformIDs
+    {
+        public ulong? steam_id { get; set; }
+        public string xbox_id { get; set; }
+        public ulong? psn_id { get; set; }
+    }
 
     [System.Serializable]
     public class PlayerNameLookupResponse : LootLockerResponse
@@ -336,6 +370,25 @@ namespace LootLocker
             foreach (var xboxID in lookupPlayerNamesRequest.xbox_ids)
             {
                 getVariable += $"xbox_id={xboxID}&";
+            }
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        public static void LookupPlayer1stPartyPlatformIDs(LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
+        {
+            var endPoint = LootLockerEndPoints.lookupPlayer1stPartyPlatformIDs;
+
+            var getVariable = endPoint.endPoint + "?";
+
+            foreach (var playerID in lookupPlayer1stPartyPlatformIDsRequest.player_ids)
+            {
+                getVariable += $"player_id={playerID}&";
+            }
+
+            foreach (var playerPublicUID in lookupPlayer1stPartyPlatformIDsRequest.player_public_uids)
+            {
+                getVariable += $"player_public_uid={playerPublicUID}&";
             }
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
