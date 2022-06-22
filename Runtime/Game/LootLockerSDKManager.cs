@@ -166,7 +166,7 @@ namespace LootLocker.Requests
 
         public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
