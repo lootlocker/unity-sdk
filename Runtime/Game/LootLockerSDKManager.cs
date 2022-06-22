@@ -62,15 +62,36 @@ namespace LootLocker.Requests
             return initialized;
         }
 
+
+        private static bool CheckActiveSession()
+        {
+            if (LootLockerConfig.current.token.Length == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Utility function to check if the sdk has been initiazed
         /// </summary>
         /// <returns></returns>
-        public static bool CheckInitialized()
+        public static bool CheckInitialized(bool skipSessionCheck = false)
         {
             if (!initialized)
             {
-                return Init();
+                LootLockerConfig.current.UpdateToken("", "");
+                if (!Init())
+                {
+                    return false;
+                }
+            }
+
+            if (!skipSessionCheck && !CheckActiveSession())
+            {
+                Debug.LogError("You cannot call this method before an active LootLocker session is started");
+                return false;
             }
 
             return true;
@@ -113,7 +134,7 @@ namespace LootLocker.Requests
         #region Authentication
         public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
                 return;
@@ -135,7 +156,7 @@ namespace LootLocker.Requests
 
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
             }
@@ -160,7 +181,7 @@ namespace LootLocker.Requests
 
         public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
                 return;
@@ -189,7 +210,7 @@ namespace LootLocker.Requests
 
         public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
                 return;
@@ -213,7 +234,7 @@ namespace LootLocker.Requests
 
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -235,7 +256,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void CheckWhiteLabelSession(Action<bool> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete(false);
                 return;
@@ -273,7 +294,7 @@ namespace LootLocker.Requests
 
         public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete(false);
                 return;
@@ -302,7 +323,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -314,7 +335,7 @@ namespace LootLocker.Requests
 
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -327,7 +348,7 @@ namespace LootLocker.Requests
 
         public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -360,7 +381,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -376,7 +397,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
@@ -392,7 +413,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void StartAppleSession(string token, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
