@@ -489,7 +489,13 @@ namespace LootLocker.Requests
                 password = password
             };
 
-            LootLockerAPIManager.WhiteLabelLogin(input, onComplete);
+            LootLockerAPIManager.WhiteLabelLogin(input, response => {
+                PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
+                PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
+                PlayerPrefs.Save();
+
+                onComplete(response);
+            });
         }
 
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
