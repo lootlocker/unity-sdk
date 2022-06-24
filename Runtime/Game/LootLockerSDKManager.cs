@@ -477,7 +477,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>());
                 return;
@@ -494,7 +494,7 @@ namespace LootLocker.Requests
 
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>());
                 return;
@@ -523,7 +523,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void WhiteLabelSignUp(string email, string password, Action<LootLockerWhiteLabelSignupResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignupResponse>());
                 return;
@@ -545,7 +545,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void WhiteLabelRequestPassword(string email, Action<LootLockerResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
@@ -562,7 +562,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void WhiteLabelRequestVerification(int userID, Action<LootLockerResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
