@@ -1,6 +1,6 @@
 name: Fetch Upstream
 
-on: pull_request
+on: workflow_dispatch
 
 jobs:
   fetch-upstream:
