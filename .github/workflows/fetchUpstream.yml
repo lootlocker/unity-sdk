@@ -1,7 +1,15 @@
-      - name: Merge Upstream
-        uses: exions/merge-upstream@v1
-        with:
-          upstream: ${{ github.event.inputs.upstream }}
-          upstream-branch: ${{ github.event.inputs.upstream-branch }}
-          branch: ${{ github.event.inputs.branch }}
-          token: ${{ secrets.TOKEN }}
+name: Fetch Upstream
+
+on: pull_request
+
+jobs:
+  fetch-upstream:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Fetch Upstream
+      uses: bdougie/fetch-upstream@master
+      with:
+        upstream: https://github.com/LootLocker/unity-sdk.git
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
