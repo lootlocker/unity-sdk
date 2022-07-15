@@ -6,9 +6,9 @@ jobs:
   fetch-upstream:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
     - name: Fetch Upstream
-      uses: bdougie/fetch-upstream@master
+      uses: bdougie/fetch-upstream@main
       with:
         upstream: LootLocker/unity-sdk.git
       env:
