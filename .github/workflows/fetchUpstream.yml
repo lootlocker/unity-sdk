@@ -10,6 +10,6 @@ jobs:
     - name: Fetch Upstream
       uses: bdougie/fetch-upstream@master
       with:
-        upstream: https://github.com/LootLocker/unity-sdk.git
+        upstream: LootLocker/unity-sdk.git
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
