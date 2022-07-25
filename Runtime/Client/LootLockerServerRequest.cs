@@ -175,12 +175,6 @@ namespace LootLocker
 
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
-        
-        public static void CallAPI(EndPointClass endpoint, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true,
-            LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
-        {
-            CallAPI(endpoint.endPoint, endpoint.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken, callerRole);
-        }
 
         public static void CallDomainAuthAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null)
         {

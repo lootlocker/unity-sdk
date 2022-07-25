@@ -847,11 +847,9 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = LootLockerEndPoints.getSingleplayerFile;
-            
-            endpoint.endPoint = string.Format(endpoint.endPoint, fileId);
+            var endpoint = string.Format(LootLockerEndPoints.getSingleplayerFile.endPoint, fileId);
 
-            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete)
@@ -862,7 +860,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
         
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
@@ -873,11 +871,9 @@ namespace LootLocker.Requests
                 return;
             }
             
-            var endpoint = LootLockerEndPoints.getPlayerFilesByPlayerId;
-            
-            endpoint.endPoint = string.Format(endpoint.endPoint, playerId);
+            var endpoint = string.Format(LootLockerEndPoints.getPlayerFilesByPlayerId.endPoint, playerId);
 
-            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
         public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
@@ -989,11 +985,9 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = LootLockerEndPoints.deletePlayerFile;
-            
-            endpoint.endPoint = string.Format(endpoint.endPoint, fileId);
+            var endpoint = string.Format(LootLockerEndPoints.deletePlayerFile.endPoint, fileId);
 
-            LootLockerServerRequest.CallAPI(endpoint, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
         #endregion
 
