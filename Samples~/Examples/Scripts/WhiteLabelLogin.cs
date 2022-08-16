@@ -26,12 +26,12 @@ public class WhiteLabelLogin : MonoBehaviour
     {
         string email = existingUserEmailInputField.text;
         string password = existingUserPasswordInputField.text;
-        LootLockerSDKManager.WhiteLabelLogin(email, password, false, response =>
+        LootLockerSDKManager.WhiteLabelLogin(email, password, false, loginResponse =>
         {
-            if (!response.success)
+            if (!loginResponse.success)
             {
                 // Error
-                infoText.text = "Error logging in:" + response.Error;
+                infoText.text = "Error logging in:" + loginResponse.Error;
                 return;
             }
             else
@@ -40,16 +40,16 @@ public class WhiteLabelLogin : MonoBehaviour
             }
 
             // Is the account verified?
-            if (response.VerifiedAt == null)
+            if (loginResponse.VerifiedAt == null)
             {
                 // Stop here if you want to require your players to verify their email before continuing,
                 // verification must also be enabled on the LootLocker dashboard
             }
 
             // Player is logged in, now start a game session
-            LootLockerSDKManager.StartWhiteLabelSession((response) =>
+            LootLockerSDKManager.StartWhiteLabelSession((startSessionResponse) =>
             {
-                if (response.success)
+                if (startSessionResponse.success)
                 {
                     // Session was succesfully started;
                     // After this you can use LootLocker features
@@ -58,7 +58,7 @@ public class WhiteLabelLogin : MonoBehaviour
                 else
                 {
                     // Error
-                    infoText.text = "Error starting LootLocker session:" + response.Error;
+                    infoText.text = "Error starting LootLocker session:" + startSessionResponse.Error;
                 }
             });
         });
