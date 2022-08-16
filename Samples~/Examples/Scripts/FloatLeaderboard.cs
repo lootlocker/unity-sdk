@@ -12,6 +12,8 @@ public class FloatLeaderboard : MonoBehaviour
     public Text leaderboardTop10Text;
     public Text leaderboardCenteredText;
 
+    public static int AmountToDivideBy = 10000;
+
     /*
     * leaderboardKey or leaderboardID can be used.
     * leaderboardKey can be the same between stage and live /development mode on/off.
@@ -69,13 +71,9 @@ public class FloatLeaderboard : MonoBehaviour
          */
         // Not working, fix!
         float floatScore = float.Parse(scoreInputField.text);
-        floatScore *= 10000;
-        Debug.Log("1:" + floatScore);
-        string formattedString = floatScore.ToString();
+        floatScore *= AmountToDivideBy;
+        string formattedString = Mathf.FloorToInt(floatScore).ToString();
 
-        // Only 4 decimals
-        formattedString = formattedString.Substring(0, 5);
-        Debug.Log("2:" + formattedString);
         LootLockerSDKManager.SubmitScore("", int.Parse(formattedString), leaderboardKey, metadata, (response) =>
         {
             if (response.success)
@@ -137,8 +135,8 @@ public class FloatLeaderboard : MonoBehaviour
                             leaderboardText += currentEntry.rank + ".";
                             leaderboardText += currentEntry.player.id;
                             leaderboardText += " - ";
-                            float dividedScore = (float)currentEntry.score / 1000f;
-                            leaderboardText += dividedScore.ToString();
+                            float dividedScore = (float)currentEntry.score / AmountToDivideBy;
+                            leaderboardText += dividedScore.ToString("F4");
 
                             /*
                             * End highlighting the player
@@ -183,8 +181,8 @@ public class FloatLeaderboard : MonoBehaviour
                     leaderboardText += currentEntry.rank + ".";
                     leaderboardText += currentEntry.player.id;
                     leaderboardText += " - ";
-                    float dividedScore = (float)currentEntry.score / 1000f;
-                    leaderboardText += dividedScore.ToString();
+                    float dividedScore = (float)currentEntry.score / AmountToDivideBy;
+                    leaderboardText += dividedScore.ToString("F4");
                     leaderboardText += "\n";
                 }
                 leaderboardTop10Text.text = leaderboardText;
