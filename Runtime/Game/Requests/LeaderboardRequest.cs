@@ -57,7 +57,7 @@ namespace LootLocker.Requests
 
     public class LootLockerLeaderboard
     {
-        public LootLockerLeaderboardMember member { get; set; }
+        public LootLockerLeaderboardMember rank { get; set; }
         public int leaderboard_id { get; set; }
         public string leaderboard_key { get; set; }
     }
