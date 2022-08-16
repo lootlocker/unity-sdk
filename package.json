@@ -6,7 +6,7 @@
   "unity": "2019.2",
   "changelogUrl": "https://docs.lootlocker.com/changelogs/unity-sdk",
   "documentationUrl": "https://docs.lootlocker.com/",
-  "licensesUrl": "https://raw.githubusercontent.com/LootLocker/unity-sdk/feature/included-examples/LICENSE",
+  "licensesUrl": "https://github.com/LootLocker/unity-sdk/LICENSE",
   "author": {
     "name": "LootLocker",
     "email": "hello@lootlocker.com",
