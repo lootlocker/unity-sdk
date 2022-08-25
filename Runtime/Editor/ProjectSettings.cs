@@ -29,7 +29,6 @@ namespace LootLocker.Admin
             }
             // This function is called when the user clicks on the MyCustom element in the Settings window.
             m_CustomSettings = GetSerializedSettings();
-            // Check if API-key has been entered (more than 20 characters long)
 
         }
 
