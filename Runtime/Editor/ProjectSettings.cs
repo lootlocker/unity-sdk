@@ -10,6 +10,9 @@ namespace LootLocker.Admin
     {
         private static LootLockerConfig gameSettings;
         private SerializedObject m_CustomSettings;
+
+        public delegate void SendAttributionDelegate();
+        public static event SendAttributionDelegate APIKeyEnteredEvent;
         internal static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(gameSettings);
@@ -26,11 +29,22 @@ namespace LootLocker.Admin
             }
             // This function is called when the user clicks on the MyCustom element in the Settings window.
             m_CustomSettings = GetSerializedSettings();
+
         }
 
         public override void OnGUI(string searchContext)
         {
             m_CustomSettings.Update();
+
+            // For Unity Attribution
+            if (gameSettings.apiKey.Length > 20)
+            {
+                if (EditorPrefs.GetBool("attributionChecked") == false)
+                {
+                    EditorPrefs.SetBool("attributionChecked", true);
+                    APIKeyEnteredEvent?.Invoke();
+                }
+            }
 
             if (gameSettings == null)
             {
