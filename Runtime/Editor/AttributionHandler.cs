@@ -55,8 +55,8 @@ namespace LootLocker.Admin
                     // Re-enable logging
                     LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.All;
 
-                    // Resubscribe in 5 seconds
-                    Task task = ResetAttributionCheckAfterXSeconds(5);
+                    // Resubscribe in 1 seconds
+                    Task task = ResetAttributionCheckAfterXSeconds(1);
                 }
             });
         }
