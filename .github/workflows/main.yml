@@ -1,0 +1,78 @@
+name: Build with Game CI
+
+on: [push]
+
+jobs:
+  build:
+    name: Build for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: ./Tests~/BasicBuildTest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          #- StandaloneOSX # Build a macOS standalone (Intel 64-bit).
+          #- StandaloneWindows # Build a Windows standalone.
+          #- StandaloneWindows64 # Build a Windows 64-bit standalone.
+          #- StandaloneLinux64 # Build a Linux 64-bit standalone.
+          #- iOS # Build an iOS player.
+          #- Android # Build an Android .apk standalone app.
+          - WebGL # WebGL.
+        testMode:
+          - playmode
+          #- editmode
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Cache
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      # Build
+     # - name: Build project
+     #   uses: game-ci/unity-builder@v2
+     #   env:
+     #     UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+     #     UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+     #     UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+     #   with:
+     #     allowDirtyBuild: true
+     #     targetPlatform: ${{ matrix.targetPlatform }}
+     #     unityVersion: 2019.4.40f1
+
+      # Output
+     # - uses: actions/upload-artifact@v2
+     #   with:
+     #     name: Build-${{ matrix.targetPlatform }}
+     #     path: build/${{ matrix.targetPlatform }}
+
+      # Test
+      - name: Run tests
+        id: tests
+        uses: game-ci/unity-test-runner@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.targetPlatform }}-${{ matrix.testMode }}-artifacts
+          checkName: ${{ matrix.targetPlatform }}-${{ matrix.testMode }} Test Results
+          projectPath: Tests~/BasicBuildTest
+          #allowDirtyBuild: true
+          #targetPlatform: ${{ matrix.targetPlatform }}
+          testPlatform: ${{ matrix.targetPlatform }}
+          unityVersion: 2019.4.40f1
+        #  githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Test results for ${{ matrix.targetPlatform }}-${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
