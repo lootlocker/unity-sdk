@@ -230,8 +230,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loginInformationText: {fileID: 612739964}
   playerIdText: {fileID: 563797227}
-  apiKey: 964f802f3d6adf7b496fac34c592c69243641c4e
-  domainKey: qes7624r
+  apiKey: 
+  domainKey: 
 --- !u!4 &579039907
 Transform:
   m_ObjectHideFlags: 0

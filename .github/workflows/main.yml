@@ -62,6 +62,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
+          customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
           testMode: ${{ matrix.testMode }}
           artifactsPath: ${{ matrix.targetPlatform }}-${{ matrix.testMode }}-artifacts
           checkName: ${{ matrix.targetPlatform }}-${{ matrix.testMode }} Test Results
