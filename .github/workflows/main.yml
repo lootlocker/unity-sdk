@@ -1,6 +1,19 @@
 name: Test SDK with Unity Headless Test Runner and Game CI
 
-on: [pull_request]
+on:
+  pull_request:
+    branches: # Made towards the following
+      - main
+    types: # Only on the following activity
+      - opened
+      - synchronize # Changes to the branch like new commits, ammends, etc.
+      - reopened
+      - unlocked
+  push:
+    branches: # Made towards the following
+      - main
+    tags:
+      - v**
 
 jobs:
   test:
