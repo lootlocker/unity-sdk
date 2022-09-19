@@ -1864,11 +1864,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.PollingOrderStatus(data, onComplete);
         }
 
-        public static void ActivatingARentalAsset(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        public static void ActivatingARentalAsset(int assetId, Action<LootLockerActivateARentalAssetResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateARentalAssetResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();

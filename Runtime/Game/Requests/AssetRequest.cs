@@ -169,6 +169,11 @@ namespace LootLocker.Requests
     {
         public int[] favourites { get; set; }
     }
+
+    public class LootLockerActivateARentalAssetResponse : LootLockerResponse
+    {
+        public int time_left;
+    }
 }
 
 namespace LootLocker
