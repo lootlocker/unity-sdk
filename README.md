@@ -9,7 +9,8 @@
   <a href="#Installation">Installation</a> •
   <a href="#configuration">Configuration</a> •
   <a href="#updating">Updating</a> •
-  <a href="#support">Support</a>
+  <a href="#support">Support</a> •
+  <a href="#Development">Development</a>
 </p>
 
 ---
@@ -56,3 +57,11 @@ This should force a download of the latest code.
 ## Support
 
 If you have any issues or just wanna chat you can reach us on our [Discord Server](https://discord.lootlocker.io/)
+
+## Development
+
+### Testing the SDK
+
+Status: [![Test SDK with Unity](https://github.com/LootLocker/unity-sdk/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/LootLocker/unity-sdk/actions/workflows/main.yml)
+
+There is a Test Suite for the SDK, but it is in an [external repo](https://github.com/LootLocker/unity-sdk-tests) to keep the size of this one down. It is run automatically on any pull requests towards or updates to main. You can also run it locally, just follow the steps in the test repo.
