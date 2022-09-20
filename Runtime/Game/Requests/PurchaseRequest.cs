@@ -101,7 +101,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateARentalAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;
 
