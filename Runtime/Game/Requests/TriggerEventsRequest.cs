@@ -46,7 +46,7 @@ namespace LootLocker.Requests
         public string updated { get; set; }
         public string marked_new { get; set; }
         public int default_variation_id { get; set; }
-        public LootLockerDefault_Loadouts default_loadouts { get; set; }
+        //public LootLockerDefault_Loadouts default_loadouts { get; set; }
         public string description { get; set; }
         public object links { get; set; }
         public LootLockerStorage [] storage { get; set; }
@@ -62,7 +62,7 @@ namespace LootLocker.Requests
         public List<object> data_entities { get; set; }
         public LootLockerHeroEquipExceptions hero_equip_exceptions { get; set; }
         public object asset_candidate { get; set; }
-        public int drop_table_max_picks { get; set; }
+        public int? drop_table_max_picks { get; set; }
     }
 
     public class LootLockerHeroEquipExceptions
