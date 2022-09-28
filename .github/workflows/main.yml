@@ -33,8 +33,6 @@ jobs:
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v2
-        #with:
-        #  path: ./unity-sdk
 
       - name: Checkout test repository
         uses: actions/checkout@v2
@@ -42,11 +40,7 @@ jobs:
           repository: LootLocker/unity-sdk-tests
           path: ./tests~ # Unity ignores folders with ~ from inclusion
 
-      - name: INFO
-        run: pwd && ls -als && ls -als .. && ls -als */
-
       - name: Set SDK path in test repo
-        id: set-sdk
         run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
 
       - name: Cache Libraries
