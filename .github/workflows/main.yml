@@ -66,7 +66,8 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Test results for ${{ matrix.unityVersion }}-${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.artifactsPath }}
+      # Commented out because as of right now it doesn't expand the test results, just repeat pass/fail
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: Test results for ${{ matrix.unityVersion }}-${{ matrix.testMode }}
+      #    path: ${{ steps.tests.outputs.artifactsPath }}
