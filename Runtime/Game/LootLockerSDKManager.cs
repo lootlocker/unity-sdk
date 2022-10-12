@@ -283,14 +283,32 @@ namespace LootLocker.Requests
         ///
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        public static void StartAppleSession(string token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
                 return;
             }
-            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(token);
+            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(authorization_code);
+            LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Apple
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        ///
+        /// 
+        /// The Apple sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
+                return;
+            }
+            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(refresh_token);
             LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
         }
 
