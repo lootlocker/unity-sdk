@@ -79,7 +79,7 @@ namespace LootLocker
             }
             else if (!string.IsNullOrEmpty(serverResponse.Error))
             {
-                return new T() { success = false, Error = serverResponse.Error };
+                return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
             }
 
             var response = JsonConvert.DeserializeObject<T>(serverResponse.text) ?? new T();
