@@ -65,7 +65,7 @@ namespace LootLocker.Requests
 
         private static bool CheckActiveSession()
         {
-            if (LootLockerConfig.current.token.Length == 0)
+            if (string.IsNullOrEmpty(LootLockerConfig.current.token))
             {
                 return false;
             }
@@ -424,10 +424,14 @@ namespace LootLocker.Requests
 
         public static void EndSession(Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
+            }
+            else if (!CheckActiveSession())
+            {
+                onComplete?.Invoke(new LootLockerSessionResponse() { success = true, hasError = false });
             }
 
             // Clear White Label Login credentials
@@ -449,22 +453,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete"></param>
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            // Clear White Label Login credentials
-            if (CurrentPlatform == "white_label")
-            {
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
-            }
-
-            CurrentPlatform = "";
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
-            LootLockerAPIManager.EndSession(sessionRequest, onComplete);
+            EndSession(onComplete);
         }
         #endregion
 
