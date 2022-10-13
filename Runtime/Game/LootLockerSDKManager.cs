@@ -422,6 +422,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// End active session (if any exists)
+        ///
+        /// Succeeds if a session was ended or no sessions were active
+        ///
+        /// </summary>
         public static void EndSession(Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -431,7 +437,7 @@ namespace LootLocker.Requests
             }
             else if (!CheckActiveSession())
             {
-                onComplete?.Invoke(new LootLockerSessionResponse() { success = true, hasError = false });
+                onComplete?.Invoke(new LootLockerSessionResponse() { success = true, hasError = false, text = "No active session" });
             }
 
             // Clear White Label Login credentials
