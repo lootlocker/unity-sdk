@@ -338,7 +338,7 @@ namespace LootLocker.Requests
         #region White Label
 
         /// <summary>
-        /// Create new user using the white label login system.
+        /// Log in a white label user with the given email and password combination, verify user, and start a session.
         /// 
         /// White label platform must be enabled in the web console for this to work.
         /// </summary>
@@ -365,6 +365,12 @@ namespace LootLocker.Requests
             });
         }
 
+        /// <summary>
+        /// Log in a white label user with the given email and password combination, verify user, and start a session.
+        /// Set remember=true to prolong the session lifetime
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -445,7 +451,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Checks if we have a stored session and also if that session is valid.
+        /// Checks for a stored session and if that session is valid.
         /// 
         /// Depending on response of this method the developer can either start a session using the token,
         /// or show a login form.
@@ -490,6 +496,14 @@ namespace LootLocker.Requests
             });
         }
 
+        /// <summary>
+        /// Checks if the provided session token is valid for the provided white label email.
+        /// 
+        /// Depending on response of this method the developer can either start a session using the token,
+        /// or show a login form.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
         public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
         {
             if (!CheckInitialized(true))
@@ -515,7 +529,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Create new user using the white label login system.
+        /// Start a game session using the cached white label token and email if any exist
         /// 
         /// White label platform must be enabled in the web console for this to work.
         /// </summary>
@@ -531,6 +545,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Start a game label session using the provided email and password
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -544,6 +563,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Start a game session using the provided request
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
         public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
