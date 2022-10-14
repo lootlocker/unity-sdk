@@ -189,7 +189,7 @@ namespace LootLocker.Requests
 
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             string existingPlayerID = PlayerPrefs.GetString("LootLockerGuestPlayerID", "");
-            if (existingPlayerID != "")
+            if (!string.IsNullOrEmpty(existingPlayerID))
             {
                 sessionRequest = new LootLockerSessionRequest(existingPlayerID);
             }
@@ -244,134 +244,6 @@ namespace LootLocker.Requests
 
             LootLockerSteamSessionRequest sessionRequest = new LootLockerSteamSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Checks if we have a stored session and also if that session is valid.
-        /// 
-        /// Depending on response of this method the developer can either start a session using the token,
-        /// or show a login form.
-        /// 
-        /// White label platform must be enabled in the web console for this to work.
-        /// </summary>
-        public static void CheckWhiteLabelSession(Action<bool> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete(false);
-                return;
-            }
-
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (existingSessionToken == "")
-            {
-                onComplete(false);
-                return;
-            }
-
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (existingSessionEmail == "")
-            {
-                onComplete(false);
-                return;
-            }
-
-            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
-            sessionRequest.email = existingSessionEmail;
-            sessionRequest.token = existingSessionToken;
-
-            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
-            });
-        }
-
-        public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete(false);
-                return;
-            }
-
-            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
-            sessionRequest.email = email;
-            sessionRequest.token = token;
-
-            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
-            });
-        }
-
-        /// <summary>
-        /// Create new user using the white label login system.
-        /// 
-        /// White label platform must be enabled in the web console for this to work.
-        /// </summary>
-        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
-            CurrentPlatform = "white_label";
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
-        }
-
-        public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(input.email);
-            sessionRequest.token = input.token;
-            CurrentPlatform = "white_label";
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
-        }
-
-        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (existingSessionToken == "")
-            {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
-                return;
-            }
-
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (existingSessionEmail == "")
-            {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
-                return;
-            }
-
-            CurrentPlatform = "white_label";
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(existingSessionEmail);
-            sessionRequest.token = existingSessionToken;
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
         /// <summary>
@@ -463,7 +335,7 @@ namespace LootLocker.Requests
         }
         #endregion
 
-        #region White Label Login
+        #region White Label
 
         /// <summary>
         /// Create new user using the white label login system.
@@ -570,6 +442,134 @@ namespace LootLocker.Requests
             }
 
             LootLockerAPIManager.WhiteLabelRequestAccountVerification(userID, onComplete);
+        }
+
+        /// <summary>
+        /// Checks if we have a stored session and also if that session is valid.
+        /// 
+        /// Depending on response of this method the developer can either start a session using the token,
+        /// or show a login form.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void CheckWhiteLabelSession(Action<bool> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete(false);
+                return;
+            }
+
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (string.IsNullOrEmpty(existingSessionToken))
+            {
+                onComplete(false);
+                return;
+            }
+
+            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
+            if (string.IsNullOrEmpty(existingSessionEmail))
+            {
+                onComplete(false);
+                return;
+            }
+
+            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
+            sessionRequest.email = existingSessionEmail;
+            sessionRequest.token = existingSessionToken;
+
+            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    onComplete(false);
+                    return;
+                }
+
+                onComplete(true);
+            });
+        }
+
+        public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete(false);
+                return;
+            }
+
+            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
+            sessionRequest.email = email;
+            sessionRequest.token = token;
+
+            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    onComplete(false);
+                    return;
+                }
+
+                onComplete(true);
+            });
+        }
+
+        /// <summary>
+        /// Create new user using the white label login system.
+        /// 
+        /// White label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
+            CurrentPlatform = "white_label";
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
+        public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(input.email);
+            sessionRequest.token = input.token;
+            CurrentPlatform = "white_label";
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
+        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (string.IsNullOrEmpty(existingSessionToken))
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
+                return;
+            }
+
+            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
+            if (string.IsNullOrEmpty(existingSessionEmail))
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
+                return;
+            }
+
+            CurrentPlatform = "white_label";
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(existingSessionEmail);
+            sessionRequest.token = existingSessionToken;
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
         #endregion
