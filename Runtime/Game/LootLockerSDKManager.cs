@@ -344,25 +344,7 @@ namespace LootLocker.Requests
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>());
-                return;
-            }
-
-            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
-            {
-                email = email,
-                password = password
-            };
-
-            LootLockerAPIManager.WhiteLabelLogin(input, response => {
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
-                PlayerPrefs.Save();
-
-                onComplete(response);
-            });
+            WhiteLabelLogin(email, password, false, onComplete);
         }
 
         /// <summary>
@@ -705,7 +687,7 @@ namespace LootLocker.Requests
                 player_ids = playerIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -719,7 +701,7 @@ namespace LootLocker.Requests
                 player_public_uids = playerPublicUIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -789,7 +771,7 @@ namespace LootLocker.Requests
                 psn_ids = psnIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -832,7 +814,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SetPlayerName(data, onComplete);
         }
         #endregion
-        
+
         #region Player files
         public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
         {
@@ -857,7 +839,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-        
+
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -865,7 +847,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
                 return;
             }
-            
+
             var endpoint = string.Format(LootLockerEndPoints.getPlayerFilesByPlayerId.endPoint, playerId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
@@ -896,14 +878,14 @@ namespace LootLocker.Requests
                 DebugMessage($"File error: {e.Message}");
                 return;
             }
-            
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body, 
+
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-        
+
         public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(pathToFile, filePurpose, false, onComplete);
@@ -922,7 +904,7 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
-            
+
             var fileBytes = new byte[fileStream.Length];
             try
             {
@@ -934,18 +916,18 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body, 
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-        
+
         public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(fileStream, filePurpose, false, onComplete);
         }
-        
+
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -960,7 +942,7 @@ namespace LootLocker.Requests
                 { "public", isPublic.ToString().ToLower() }
             };
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body, 
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
@@ -971,7 +953,7 @@ namespace LootLocker.Requests
         {
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
         }
-        
+
         public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1964,7 +1946,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetMemberRank(int leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1974,13 +1956,13 @@ namespace LootLocker.Requests
             }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
-            
+
             lootLockerGetMemberRankRequest.leaderboardId = leaderboardId.ToString();
             lootLockerGetMemberRankRequest.member_id = member_id;
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetMemberRank(int leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2010,7 +1992,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetByListOfMembers(string[] members, int leaderboardId, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2134,7 +2116,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, -1, onComplete);
         }
-        
+
         public static void GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2169,7 +2151,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
         }
-        
+
         public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
@@ -2179,7 +2161,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
         }
-        
+
         public static void GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
@@ -2210,7 +2192,7 @@ namespace LootLocker.Requests
         {
             SubmitScore(memberId, score, leaderboardId.ToString(), "", onComplete);
         }
-        
+
         public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2286,7 +2268,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>());
                 return;
             }
-            
+
             LootLockerAPIManager.GetReportTypes(onComplete);
         }
 
@@ -2330,7 +2312,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>());
                 return;
             }
-            
+
             LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
         }
 
