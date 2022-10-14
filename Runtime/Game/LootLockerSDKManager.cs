@@ -301,14 +301,14 @@ namespace LootLocker.Requests
         /// 
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
+        public static void RefreshAppleSession(string player_identifier, string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
                 return;
             }
-            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(refresh_token);
+            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(player_identifier, refresh_token);
             LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
         }
 

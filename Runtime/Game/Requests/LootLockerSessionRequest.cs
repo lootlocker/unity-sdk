@@ -114,6 +114,7 @@ namespace LootLocker.Requests
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
         public string refresh_token { get; set; }
+        public string player_identifier { get; set; }
     }
 
     [System.Serializable]
@@ -169,12 +170,14 @@ namespace LootLocker.Requests
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
         public string refresh_token { get; private set; }
+        public string player_identifier { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
-        public LootLockerAppleRefreshSessionRequest(string refresh_token)
+        public LootLockerAppleRefreshSessionRequest(string player_identifier, string refresh_token)
         {
             this.refresh_token = refresh_token;
+            this.player_identifier = player_identifier;
         }
     }
 }
