@@ -466,34 +466,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (string.IsNullOrEmpty(existingSessionToken))
-            {
-                onComplete(false);
-                return;
-            }
-
             string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (string.IsNullOrEmpty(existingSessionEmail))
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (string.IsNullOrEmpty(existingSessionToken) || string.IsNullOrEmpty(existingSessionEmail))
             {
                 onComplete(false);
                 return;
             }
 
-            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
-            sessionRequest.email = existingSessionEmail;
-            sessionRequest.token = existingSessionToken;
-
-            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
-            });
+            VerifyWhiteLabelSession(existingSessionEmail, existingSessionToken, onComplete);
         }
 
         /// <summary>
@@ -512,19 +493,18 @@ namespace LootLocker.Requests
                 return;
             }
 
+            VerifyWhiteLabelSession(email, token, onComplete);
+        }
+
+        private static void VerifyWhiteLabelSession(string email, string token, Action<bool> onComplete)
+        {
             LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
             sessionRequest.email = email;
             sessionRequest.token = token;
 
             LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
             {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
+                onComplete(response.success);
             });
         }
 
