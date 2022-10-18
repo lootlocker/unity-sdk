@@ -52,11 +52,12 @@ namespace LootLocker.Requests
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
         public string email { get; set; }
-        public string password { get; set; }
+        public string password { get; set; } // DEPRECATED PARAMETER
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
         public LootLockerWhiteLabelSessionRequest(string email, string password, string token)
         {
             this.email = email;
@@ -64,6 +65,7 @@ namespace LootLocker.Requests
             this.token = token;
         }
 
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
         public LootLockerWhiteLabelSessionRequest(string email, string password)
         {
             this.email = email;

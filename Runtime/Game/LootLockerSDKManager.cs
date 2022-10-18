@@ -338,9 +338,9 @@ namespace LootLocker.Requests
         #region White Label
 
         /// <summary>
-        /// Log in a white label user with the given email and password combination, verify user, and start a session.
+        /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
@@ -348,10 +348,10 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Log in a white label user with the given email and password combination, verify user, and start a session.
+        /// Log in a White Label user with the given email and password combination, verify user, and start a session.
         /// Set remember=true to prolong the session lifetime
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
@@ -378,9 +378,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Create new user using the white label login system.
+        /// Create new user using the White Label login system.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelSignUp(string email, string password, Action<LootLockerWhiteLabelSignupResponse> onComplete)
         {
@@ -402,7 +402,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Request password reset email for the user.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelRequestPassword(string email, Action<LootLockerResponse> onComplete)
         {
@@ -418,7 +418,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Request verify account email for the user.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// Account verification must also be enabled.
         /// </summary>
         public static void WhiteLabelRequestVerification(int userID, Action<LootLockerResponse> onComplete)
@@ -438,7 +438,7 @@ namespace LootLocker.Requests
         /// Depending on response of this method the developer can either start a session using the token,
         /// or show a login form.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void CheckWhiteLabelSession(Action<bool> onComplete)
         {
@@ -460,12 +460,12 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Checks if the provided session token is valid for the provided white label email.
+        /// Checks if the provided session token is valid for the provided White Label email.
         /// 
         /// Depending on response of this method the developer can either start a session using the token,
         /// or show a login form.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
         {
@@ -491,9 +491,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a game session using the cached white label token and email if any exist
+        /// Start a LootLocker Session using the cached White Label token and email if any exist
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
         {
@@ -522,10 +522,12 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// DEPRECATED
         /// Start a game label session using the provided email and password
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
+        [ObsoleteAttribute("StartWhiteLabelSession with email & password is deprecated, use WhiteLabelLogin method and then the parameter-less StartWhiteLabelSession method")]
         public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
         {
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = email, password = password };
@@ -533,9 +535,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a game session using the provided request
+        /// Start a LootLocker Session using the provided request
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
         {
