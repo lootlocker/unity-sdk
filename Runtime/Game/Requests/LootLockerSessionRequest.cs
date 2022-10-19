@@ -51,21 +51,40 @@ namespace LootLocker.Requests
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string email { get; private set; }
-        public string password { get; private set; }
+        public string email { get; set; }
+        public string password { get; set; } // DEPRECATED PARAMETER
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
+        public LootLockerWhiteLabelSessionRequest(string email, string password, string token)
+        {
+            this.email = email;
+            this.password = password;
+            this.token = token;
+        }
+
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
         public LootLockerWhiteLabelSessionRequest(string email, string password)
         {
             this.email = email;
             this.password = password;
+            this.token = null;
         }
 
         public LootLockerWhiteLabelSessionRequest(string email)
         {
             this.email = email;
+            this.password = null;
+            this.token = null;
+        }
+
+        public LootLockerWhiteLabelSessionRequest()
+        {
+            this.email = null;
+            this.password = null;
+            this.token = null;
         }
     }
 
@@ -160,7 +179,7 @@ namespace LootLocker
             }, false);
         }
 
-        public static void WhiteLabelSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
+        public static void WhiteLabelSession(LootLockerWhiteLabelSessionRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelLoginSessionRequest;
 

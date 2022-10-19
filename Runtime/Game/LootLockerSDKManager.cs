@@ -189,7 +189,7 @@ namespace LootLocker.Requests
 
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             string existingPlayerID = PlayerPrefs.GetString("LootLockerGuestPlayerID", "");
-            if (existingPlayerID != "")
+            if (!string.IsNullOrEmpty(existingPlayerID))
             {
                 sessionRequest = new LootLockerSessionRequest(existingPlayerID);
             }
@@ -244,134 +244,6 @@ namespace LootLocker.Requests
 
             LootLockerSteamSessionRequest sessionRequest = new LootLockerSteamSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Checks if we have a stored session and also if that session is valid.
-        /// 
-        /// Depending on response of this method the developer can either start a session using the token,
-        /// or show a login form.
-        /// 
-        /// White label platform must be enabled in the web console for this to work.
-        /// </summary>
-        public static void CheckWhiteLabelSession(Action<bool> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete(false);
-                return;
-            }
-
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (existingSessionToken == "")
-            {
-                onComplete(false);
-                return;
-            }
-
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (existingSessionEmail == "")
-            {
-                onComplete(false);
-                return;
-            }
-
-            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
-            sessionRequest.email = existingSessionEmail;
-            sessionRequest.token = existingSessionToken;
-
-            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
-            });
-        }
-
-        public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete(false);
-                return;
-            }
-
-            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
-            sessionRequest.email = email;
-            sessionRequest.token = token;
-
-            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    onComplete(false);
-                    return;
-                }
-
-                onComplete(true);
-            });
-        }
-
-        /// <summary>
-        /// Create new user using the white label login system.
-        /// 
-        /// White label platform must be enabled in the web console for this to work.
-        /// </summary>
-        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(email, password);
-            CurrentPlatform = "white_label";
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
-        }
-
-        public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest input, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(input.email);
-            sessionRequest.token = input.token;
-            CurrentPlatform = "white_label";
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
-        }
-
-        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (existingSessionToken == "")
-            {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
-                return;
-            }
-
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (existingSessionEmail == "")
-            {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
-                return;
-            }
-
-            CurrentPlatform = "white_label";
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest(existingSessionEmail);
-            sessionRequest.token = existingSessionToken;
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
         /// <summary>
@@ -463,36 +335,24 @@ namespace LootLocker.Requests
         }
         #endregion
 
-        #region White Label Login
+        #region White Label
 
         /// <summary>
-        /// Create new user using the white label login system.
+        /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>());
-                return;
-            }
-
-            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
-            {
-                email = email,
-                password = password
-            };
-
-            LootLockerAPIManager.WhiteLabelLogin(input, response => {
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
-                PlayerPrefs.Save();
-
-                onComplete(response);
-            });
+            WhiteLabelLogin(email, password, false, onComplete);
         }
 
+        /// <summary>
+        /// Log in a White Label user with the given email and password combination, verify user, and start a session.
+        /// Set remember=true to prolong the session lifetime
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -518,9 +378,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Create new user using the white label login system.
+        /// Create new user using the White Label login system.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelSignUp(string email, string password, Action<LootLockerWhiteLabelSignupResponse> onComplete)
         {
@@ -542,7 +402,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Request password reset email for the user.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         public static void WhiteLabelRequestPassword(string email, Action<LootLockerResponse> onComplete)
         {
@@ -558,7 +418,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Request verify account email for the user.
         /// 
-        /// White label platform must be enabled in the web console for this to work.
+        /// White Label platform must be enabled in the web console for this to work.
         /// Account verification must also be enabled.
         /// </summary>
         public static void WhiteLabelRequestVerification(int userID, Action<LootLockerResponse> onComplete)
@@ -570,6 +430,124 @@ namespace LootLocker.Requests
             }
 
             LootLockerAPIManager.WhiteLabelRequestAccountVerification(userID, onComplete);
+        }
+
+        /// <summary>
+        /// Checks for a stored session and if that session is valid.
+        /// 
+        /// Depending on response of this method the developer can either start a session using the token,
+        /// or show a login form.
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void CheckWhiteLabelSession(Action<bool> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete(false);
+                return;
+            }
+
+            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (string.IsNullOrEmpty(existingSessionToken) || string.IsNullOrEmpty(existingSessionEmail))
+            {
+                onComplete(false);
+                return;
+            }
+
+            VerifyWhiteLabelSession(existingSessionEmail, existingSessionToken, onComplete);
+        }
+
+        /// <summary>
+        /// Checks if the provided session token is valid for the provided White Label email.
+        /// 
+        /// Depending on response of this method the developer can either start a session using the token,
+        /// or show a login form.
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete(false);
+                return;
+            }
+
+            VerifyWhiteLabelSession(email, token, onComplete);
+        }
+
+        private static void VerifyWhiteLabelSession(string email, string token, Action<bool> onComplete)
+        {
+            LootLockerWhiteLabelVerifySessionRequest sessionRequest = new LootLockerWhiteLabelVerifySessionRequest();
+            sessionRequest.email = email;
+            sessionRequest.token = token;
+
+            LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
+            {
+                onComplete(response.success);
+            });
+        }
+
+        /// <summary>
+        /// Start a LootLocker Session using the cached White Label token and email if any exist
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            if (string.IsNullOrEmpty(existingSessionToken))
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
+                return;
+            }
+
+            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
+            if (string.IsNullOrEmpty(existingSessionEmail))
+            {
+                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
+                return;
+            }
+
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = existingSessionEmail, token = existingSessionToken };
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
+        /// <summary>
+        /// DEPRECATED
+        /// Start a game label session using the provided email and password
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        [ObsoleteAttribute("StartWhiteLabelSession with email & password is deprecated, use WhiteLabelLogin method and then the parameter-less StartWhiteLabelSession method")]
+        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
+        {
+            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = email, password = password };
+            StartWhiteLabelSession(sessionRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Start a LootLocker Session using the provided request
+        /// 
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            CurrentPlatform = "white_label";
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
         #endregion
@@ -711,7 +689,7 @@ namespace LootLocker.Requests
                 player_ids = playerIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -725,7 +703,7 @@ namespace LootLocker.Requests
                 player_public_uids = playerPublicUIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -795,7 +773,7 @@ namespace LootLocker.Requests
                 psn_ids = psnIds
             }, onComplete);
         }
-        
+
         public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -838,7 +816,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SetPlayerName(data, onComplete);
         }
         #endregion
-        
+
         #region Player files
         public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
         {
@@ -863,7 +841,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
-        
+
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -871,7 +849,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
                 return;
             }
-            
+
             var endpoint = string.Format(LootLockerEndPoints.getPlayerFilesByPlayerId.endPoint, playerId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
@@ -902,14 +880,14 @@ namespace LootLocker.Requests
                 DebugMessage($"File error: {e.Message}");
                 return;
             }
-            
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body, 
+
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-        
+
         public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(pathToFile, filePurpose, false, onComplete);
@@ -928,7 +906,7 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
-            
+
             var fileBytes = new byte[fileStream.Length];
             try
             {
@@ -940,18 +918,18 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body, 
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-        
+
         public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(fileStream, filePurpose, false, onComplete);
         }
-        
+
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -966,7 +944,7 @@ namespace LootLocker.Requests
                 { "public", isPublic.ToString().ToLower() }
             };
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body, 
+            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Serialize(onComplete, serverResponse);
@@ -977,7 +955,7 @@ namespace LootLocker.Requests
         {
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
         }
-        
+
         public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1970,7 +1948,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetMemberRank(int leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1980,13 +1958,13 @@ namespace LootLocker.Requests
             }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
-            
+
             lootLockerGetMemberRankRequest.leaderboardId = leaderboardId.ToString();
             lootLockerGetMemberRankRequest.member_id = member_id;
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetMemberRank(int leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2016,7 +1994,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
-        
+
         public static void GetByListOfMembers(string[] members, int leaderboardId, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2140,7 +2118,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, -1, onComplete);
         }
-        
+
         public static void GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2175,7 +2153,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
         }
-        
+
         public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
@@ -2185,7 +2163,7 @@ namespace LootLocker.Requests
         {
             GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
         }
-        
+
         public static void GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
@@ -2216,7 +2194,7 @@ namespace LootLocker.Requests
         {
             SubmitScore(memberId, score, leaderboardId.ToString(), "", onComplete);
         }
-        
+
         public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2292,7 +2270,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>());
                 return;
             }
-            
+
             LootLockerAPIManager.GetReportTypes(onComplete);
         }
 
@@ -2336,7 +2314,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>());
                 return;
             }
-            
+
             LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
         }
 
