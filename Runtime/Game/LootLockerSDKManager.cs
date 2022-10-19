@@ -88,7 +88,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Utility function to check if the sdk has been initiazed
         /// </summary>
-        /// <returns>Treu if initialized, false otherwise.</returns>
+        /// <returns>True if initialized, false otherwise.</returns>
         public static bool CheckInitialized(bool skipSessionCheck = false)
         {
             if (!initialized)
