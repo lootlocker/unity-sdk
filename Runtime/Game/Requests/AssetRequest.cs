@@ -23,9 +23,17 @@ namespace LootLocker.LootLockerEnums
 
 namespace LootLocker.Requests
 {
-    public class LootLockerLinks
+    public class LootLockerLinks : Dictionary<string, string>
     {
-        public string thumbnail { get; set; }
+        public string thumbnail
+        {
+            get
+            {
+                TryGetValue("thumbnail", out var value);
+                return value;
+            }
+            set => thumbnail = value;
+        }
     }
 
     public class LootLockerDefault_Loadouts_Info
