@@ -327,14 +327,32 @@ namespace LootLocker.Requests
         ///
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        public static void StartAppleSession(string token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
                 return;
             }
-            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(token);
+            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(authorization_code);
+            LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Apple
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        ///
+        /// 
+        /// The Apple sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
+                return;
+            }
+            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(refresh_token);
             LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
         }
 
@@ -1042,7 +1060,6 @@ namespace LootLocker.Requests
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -1649,7 +1666,8 @@ namespace LootLocker.Requests
         {
             LootLockerAssetRequest.lastId = 0;
         }
-
+        
+        [Obsolete("This function will soon be removed. Use GetAssetInformation(int assetId, Action<LootLockerCommonAsset> onComplete) with int parameter instead")]
         public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
         {
             if (!CheckInitialized())
@@ -1660,6 +1678,21 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
             LootLockerAPIManager.GetAssetInformation(data, onComplete);
+        }
+
+        public static void GetAssetInformation(int assetId, Action<LootLockerSingleAssetResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleAssetResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+
+            data.getRequests.Add(assetId.ToString());
+
+            // Using GetAssetByID in the background
+            LootLockerAPIManager.GetAssetById(data, onComplete);
         }
 
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
