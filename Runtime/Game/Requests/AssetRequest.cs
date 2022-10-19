@@ -357,6 +357,35 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
+        public static void GetAssetById(LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
+
+            string builtAssets = data.getRequests.First();
+
+            if (data.getRequests.Count > 0)
+                for (int i = 1; i < data.getRequests.Count; i++)
+                    builtAssets += "," + data.getRequests[i];
+
+            string getVariable = string.Format(endPoint.endPoint, builtAssets);
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (serverResponse) => {
+
+                LootLockerAssetResponse realResponse = LootLockerResponse.Serialize<LootLockerAssetResponse>(serverResponse);
+                LootLockerSingleAssetResponse newResponse = new LootLockerSingleAssetResponse();
+
+                string serializedAsset = JsonConvert.SerializeObject(realResponse.assets[0], Formatting.Indented);
+
+                newResponse.asset = JsonConvert.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
+
+                string singleAssetResponse = JsonConvert.SerializeObject(newResponse, Formatting.Indented);
+                newResponse.text = singleAssetResponse;
+                newResponse.SetResponseInfo(serverResponse);
+
+                LootLockerResponse.Serialize(onComplete, newResponse);
+            });
+        }
+
         public void ResetAssetCalls()
         {
             LootLockerAssetRequest.lastId = 0;
