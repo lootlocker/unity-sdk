@@ -36,6 +36,15 @@ namespace LootLocker.Requests
             return LoadConfig();
         }
 
+        /// <summary>
+        /// Manually initialize the SDK.
+        /// </summary>
+        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
+        /// <param name="platform">What platform you are using, only used for purchases, use Android if you are unsure</param>
+        /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
+        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <returns></returns>
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
             DebugMessage("SDK is Intializing");
@@ -132,6 +141,11 @@ namespace LootLocker.Requests
         #endregion
 
         #region Authentication
+        /// <summary>
+        /// Verify the player's steam identity with the server.
+        /// </summary>
+        /// <param name="steamSessionTicket"></param>
+        /// <param name="onComplete"></param>
         public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -143,6 +157,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
+        /// <summary>
+        /// Convert a steam ticket so LootLocker can read it.
+        /// </summary>
+        /// <param name="ticket"></param>
+        /// <param name="ticketSize"></param>
+        /// <returns></returns>
         public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
         {
             Array.Resize(ref ticket, (int)ticketSize);
@@ -154,6 +174,11 @@ namespace LootLocker.Requests
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Verify the players identity with the server and selected platform.
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <param name="onComplete"></param>
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -164,6 +189,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
+        /// <summary>
+        /// Start a session with the paltform used in the platform selected in Project Settings -> Platform, this is required before any other calls can be made.
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <param name="onComplete"></param>
         public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -179,6 +209,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Session(sessionRequest, onComplete);
         }
 
+        /// <summary>
+        /// Start a guest session.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -208,6 +242,11 @@ namespace LootLocker.Requests
             });
         }
 
+        /// <summary>
+        /// Start a guest session with an identifier, can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <param name="onComplete"></param>
         public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -232,6 +271,11 @@ namespace LootLocker.Requests
             });
         }
 
+        /// <summary>
+        /// Start a steam session.
+        /// </summary>
+        /// <param name="steamId64"></param>
+        /// <param name="onComplete"></param>
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -324,11 +368,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
 
-        /// <summary>
-        /// Calling this method with devideId is deprecated
-        /// </summary>
-        /// <param name="deviceId"></param>
-        /// <param name="onComplete"></param>
+        [Obsololete("Calling this method with devideId is deprecated")]
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             EndSession(onComplete);
@@ -553,7 +593,10 @@ namespace LootLocker.Requests
         #endregion
 
         #region Player
-        //Player calls
+        /// <summary>
+        /// Get general information about the player, such as the XP, Level information and their account balance.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -564,6 +607,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetPlayerInfo(onComplete);
         }
 
+        /// <summary>
+        /// Get the players inventory.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -574,6 +621,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetInventory(onComplete);
         }
 
+        /// <summary>
+        /// Get the amount of credits/currency that the player has.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -584,6 +635,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetBalance(onComplete);
         }
 
+        /// <summary>
+        /// Award XP to the player.
+        /// </summary>
+        /// <param name="xpToSubmit">Amount of XP</param>
+        /// <param name="onComplete"></param>
         public static void SubmitXp(int xpToSubmit, Action<LootLockerXpSubmitResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -595,6 +651,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SubmitXp(xpSubmitRequest, onComplete);
         }
 
+        [Obsolete("This function will be removed at a later stage, use GetPlayerInfo instead")]
         public static void GetXpAndLevel(Action<LootLockerXpResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -606,6 +663,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetXpAndLevel(xpRequest, onComplete);
         }
 
+        /// <summary>
+        /// Get assets that have been given to the player since the last time this endpoint was called.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -616,6 +677,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetPlayerAssetNotification(onComplete);
         }
 
+        /// <summary>
+        /// Get asset deactivations since the last time this endpoint was called.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -626,6 +691,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetDeactivatedAssetNotification(onComplete);
         }
 
+        /// <summary>
+        /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migration, if any.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -636,6 +705,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.InitiateDLCMigration(onComplete);
         }
 
+        /// <summary>
+        /// Get a list of DLC's migrated for the player.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -646,6 +719,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetDLCMigrated(onComplete);
         }
 
+        /// <summary>
+        /// Set the players profile to be private.  This means that their inventory will not be displayed publicly on Steam and other places.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -656,6 +733,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SetProfilePrivate(onComplete);
         }
 
+        /// <summary>
+        /// Set the players profile to public. This means that their inventory will be displayed publicly on Steam and other places.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -666,6 +747,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SetProfilePublic(onComplete);
         }
 
+        /// <summary>
+        /// Get the logged in players name.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetPlayerName(Action<PlayerNameResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -676,6 +761,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetPlayerName(onComplete);
         }
 
+        /// <summary>
+        /// Get players 1st party platform ID's from the provided list of playerID's.
+        /// </summary>
+        /// <param name="playerIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayer1stPartyPlatformIds(ulong[] playerIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -690,6 +780,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players 1st party platform ID's from the provided list of playerID's.
+        /// </summary>
+        /// <param name="playerPublicUIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -704,6 +799,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by playerID's.
+        /// </summary>
+        /// <param name="playerIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -718,6 +818,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerPublicUIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesByPlayerPublicUIds(string[] playerPublicUIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -732,6 +837,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by steam ID's.
+        /// </summary>
+        /// <param name="steamIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesBySteamIds(ulong[] steamIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -746,6 +856,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by Steam ID's.
+        /// </summary>
+        /// <param name="steamIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesBySteamIds(string[] steamIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -760,6 +875,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by PSN ID's.
+        /// </summary>
+        /// <param name="psnIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesByPSNIds(ulong[] psnIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -774,6 +894,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by PSN ID's.
+        /// </summary>
+        /// <param name="psnIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -788,6 +913,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Get players names of the players fropm their last active platform by Xbox ID's.
+        /// </summary>
+        /// <param name="xboxIds"></param>
+        /// <param name="onComplete"></param>
         public static void LookupPlayerNamesByXboxIds(string[] xboxIds, Action<PlayerNameLookupResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -802,6 +932,11 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// <summary>
+        /// Set the logged in players name. Max length of a name is 255 characters.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="onComplete"></param>
         public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -818,6 +953,11 @@ namespace LootLocker.Requests
         #endregion
 
         #region Player files
+        /// <summary>
+        /// Returns an URL where you can access the file. You can get the ID of files when you upload them, or call the list endpoint. 
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="onComplete"></param>
         public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -831,6 +971,10 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Returns all the files that your currently active player own.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -842,6 +986,10 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Returns all public files that the player with the provided playerID owns.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -855,6 +1003,13 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Upload a file with the provided name and content. The file will be owned by the currently active player.
+        /// </summary>
+        /// <param name="pathToFile"></param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -888,11 +1043,25 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// <summary>
+        /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
+        /// It will not be viewable by other players.
+        /// </summary>
+        /// <param name="pathToFile"></param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(pathToFile, filePurpose, false, onComplete);
         }
 
+        /// <summary>
+        /// Upload a file using a Filestream. The file will be owned by the currently active player.
+        /// </summary>
+        /// <param name="fileStream"></param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -925,11 +1094,25 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// <summary>
+        /// Upload a file using a Filestream. The file will be owned by the currently active player.
+        /// </summary>
+        /// <param name="fileStream"></param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(fileStream, filePurpose, false, onComplete);
         }
 
+        /// <summary>
+        /// Upload a file using a byte array. Can be useful if you don't want to upload without storing anything on disk. The file will be owned by the currently active player.
+        /// </summary>
+        /// <param name="fileBytes"></param>
+        /// <param name="fileName">Name of the file on LootLocker</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
         {
             if (!CheckInitialized())
@@ -951,11 +1134,23 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// <summary>
+        /// Upload a file using a byte array. Can be useful if you don't want to upload without storing anything on disk. The file will be owned by the currently active player.
+        /// </summary>
+        /// <param name="fileBytes"></param>
+        /// <param name="fileName">Name of the file on LootLocker</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="onComplete"></param>
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
         }
 
+        /// <summary>
+        /// The file will be deleted immediately and the action can not be reversed. You will get the ID of files when you upload a file, or with GetAllPlayerFiles().
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="onComplete"></param>
         public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -971,6 +1166,14 @@ namespace LootLocker.Requests
         #endregion
 
         #region Character
+        /// <summary>
+        /// Create a character with the provided type and name. The character will be owned by the currently active player.
+        /// Use ListCharacterTypes() to get a list of available character types for your game.
+        /// </summary>
+        /// <param name="characterTypeId">Use ListCharacterTypes() to get a list of available character types for your game.</param>
+        /// <param name="newCharacterName"></param>
+        /// <param name="isDefault">Should this character be the default character?</param>
+        /// <param name="onComplete"></param>
         public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -988,6 +1191,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateCharacter(data, onComplete);
         }
 
+        /// <summary>
+        /// List all available character types for your game.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -998,6 +1205,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListCharacterTypes(onComplete);
         }
 
+        /// <summary>
+        /// Get all character loadouts for your game.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1008,6 +1219,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetCharacterLoadout(onComplete);
         }
 
+        /// <summary>
+        /// Get a character loadout from a specific characterID.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="onComplete"></param>
         public static void GetOtherPlayersCharacterLoadout(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1022,6 +1238,13 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetOtherPlayersCharacterLoadout(data, onComplete);
         }
 
+        /// <summary>
+        /// Update information about the character. The character must be owned by the currently active player.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="newCharacterName">New name for the character</param>
+        /// <param name="isDefault">Should the character be the default character?</param>
+        /// <param name="onComplete"></param>
         public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1042,6 +1265,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
         }
 
+        /// <summary>
+        /// Set the character with characterID as the default character for the currently active player. The character must be owned by the currently active player.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="onComplete"></param>
         public static void SetDefaultCharacter(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1061,6 +1289,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
         }
 
+        /// <summary>
+        /// Equip an asset to the players default character.
+        /// </summary>
+        /// <param name="assetInstanceId"></param>
+        /// <param name="onComplete"></param>
         public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1073,6 +1306,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipIdAssetToDefaultCharacter(data, onComplete);
         }
 
+        /// <summary>
+        /// Equip a global asset to the players default character.
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <param name="assetVariationId"></param>
+        /// <param name="onComplete"></param>
         public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1086,6 +1325,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipGlobalAssetToDefaultCharacter(data, onComplete);
         }
 
+        /// <summary>
+        /// Equip an asset to a specific character. The character must be owned by the currently active player.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="assetInstanceId"></param>
+        /// <param name="onComplete"></param>
         public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1101,6 +1346,13 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipIdAssetToCharacter(lootLockerGetRequest, data, onComplete);
         }
 
+        /// <summary>
+        /// Equip a global asset to a specific character. The character must be owned by the currently active player.
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <param name="assetVariationId"></param>
+        /// <param name="characterID"></param>
+        /// <param name="onComplete"></param>
         public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1116,6 +1368,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipGlobalAssetToCharacter(lootLockerGetRequest, data, onComplete);
         }
 
+        /// <summary>
+        /// Unequip an asset from the players default character.
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <param name="onComplete"></param>
         public static void UnEquipIdAssetToDefaultCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1129,6 +1386,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UnEquipIdAssetToDefaultCharacter(lootLockerGetRequest, onComplete);
         }
 
+        [Obsolete("This method is deprecated and will be removed soon, use UnEquipIdAssetToCharacter with two parameters (int characterID, string assetId) instead")]
         public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1142,6 +1400,29 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UnEquipIdAssetToCharacter(lootLockerGetRequest, onComplete);
         }
 
+        /// <summary>
+        /// Unequip an asset from a specific character. The character must be owned by the currently active player.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="assetId"></param>
+        /// <param name="onComplete"></param>
+        public static void UnEquipIdAssetToCharacter(int characterID, string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                return;
+            }
+            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
+            lootLockerGetRequest.getRequests.Add(characterID.ToString());
+            lootLockerGetRequest.getRequests.Add(assetId);
+            LootLockerAPIManager.UnEquipIdAssetToCharacter(lootLockerGetRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Get the loadout for the players default character.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1152,6 +1433,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetCurrentLoadOutToDefaultCharacter(onComplete);
         }
 
+        /// <summary>
+        /// Get the loadout for a specific character.
+        /// </summary>
+        /// <param name="characterID"></param>
+        /// <param name="onComplete"></param>
         public static void GetCurrentLoadOutToOtherCharacter(string characterID, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1164,6 +1450,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetCurrentLoadOutToOtherCharacter(lootLockerGetRequest, onComplete);
         }
 
+        /// <summary>
+        /// Get the equippable contexts for the players default character.
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1176,6 +1466,10 @@ namespace LootLocker.Requests
         #endregion
 
         #region PlayerStorage
+        /// <summary>
+        /// Get the player storage for the currently active player (key/values).
+        /// </summary>
+        /// <param name="onComplete"></param>
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1186,6 +1480,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
         }
 
+        /// <summary>
+        /// Get a specific key from the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key">Name of the key</param>
+        /// <param name="onComplete"></param>
         public static void GetSingleKeyPersistentStorage(string key, Action<LootLockerGetPersistentSingle> onComplete)
         {
             if (!CheckInitialized())
@@ -1198,6 +1497,12 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetSingleKeyPersistentStorage(data, onComplete);
         }
 
+        /// <summary>
+        /// Update or create a key/value pair in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="onComplete"></param>
         public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1209,7 +1514,32 @@ namespace LootLocker.Requests
             data.AddToPayload(new LootLockerPayload { key = key, value = value });
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
         }
+        
+        /// <summary>
+        /// Update or create a key/value pair in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="isPublic">Is this key/value public?</param>
+        /// <param name="onComplete"></param>
+        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                return;
+            }
+            LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
+            data.AddToPayload(new LootLockerPayload { key = key, value = value , is_public = isPublic});
+            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+        }
+        
 
+        /// <summary>
+        /// Update or create multiple key/value pairs in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="data">New LootLockerGetPersistentStorageRequest with multiple keys</param>
+        /// <param name="onComplete"></param>
         public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1220,6 +1550,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
         }
 
+        /// <summary>
+        /// Delete a key from the player storage for the currently active player.
+        /// </summary>
+        /// <param name="keyToDelete"></param>
+        /// <param name="onComplete"></param>
         public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1232,6 +1567,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeleteKeyValue(data, onComplete);
         }
 
+        /// <summary>
+        /// Get the public player storage(key/values) for a specific player.
+        /// </summary>
+        /// <param name="otherPlayerId"></param>
+        /// <param name="onComplete"></param>
         public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStoragResponse> onComplete)
         {
 
