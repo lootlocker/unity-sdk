@@ -67,6 +67,19 @@ namespace LootLocker.Requests
         public LootLockerCommonAsset[] assets { get; set; }
     }
 
+    public class LootLockerSingleAssetResponse : LootLockerResponse
+    {
+        public LootLockerCommonAsset asset { get; set; }
+
+        public void SetResponseInfo(LootLockerResponse response)
+        {
+            this.hasError = response.hasError;
+            this.statusCode = response.statusCode;
+            this.success = response.success;
+            this.Error = response.Error;
+        }
+    }
+
     public class LootLockerRental_Options
     {
         public int id { get; set; }

@@ -1309,7 +1309,8 @@ namespace LootLocker.Requests
         {
             LootLockerAssetRequest.lastId = 0;
         }
-
+        
+        [Obsolete("This function will soon be removed. Use GetAssetInformation(int assetId, Action<LootLockerCommonAsset> onComplete) with int parameter instead")]
         public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
         {
             if (!CheckInitialized())
@@ -1320,6 +1321,21 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
             LootLockerAPIManager.GetAssetInformation(data, onComplete);
+        }
+
+        public static void GetAssetInformation(int assetId, Action<LootLockerSingleAssetResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleAssetResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+
+            data.getRequests.Add(assetId.ToString());
+
+            // Using GetAssetByID in the background
+            LootLockerAPIManager.GetAssetById(data, onComplete);
         }
 
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
