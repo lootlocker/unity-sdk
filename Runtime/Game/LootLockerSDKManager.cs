@@ -198,7 +198,8 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a session with the paltform used in the platform selected in Project Settings -> Platform, this is required before any other calls can be made.
+        /// Start a session with the platform used in the platform selected in Project Settings -> Platform, this is required before any other calls can be made.
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="deviceId">The ID of the current device the player is on</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -396,7 +397,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
 
-        [Obsololete("Calling this method with devideId is deprecated")]
+        [Obsolete("Calling this method with devideId is deprecated")]
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             EndSession(onComplete);
@@ -418,7 +419,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Log in a White Label user with the given email and password combination, verify user, and start a session.
+        /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// Set remember=true to prolong the session lifetime
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
@@ -1455,7 +1456,7 @@ namespace LootLocker.Requests
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(characterID.ToString());
-            lootLockerGetRequest.getRequests.Add(assetId);
+            lootLockerGetRequest.getRequests.Add(assetInstanceId.ToString());
             LootLockerAPIManager.UnEquipIdAssetToCharacter(lootLockerGetRequest, onComplete);
         }
 
@@ -1825,7 +1826,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId);
+            data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
         }
 
@@ -1845,21 +1846,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetAssetByID(int[] assetIdsToRetrieve, Action<LootLockerSingleAssetResponse> onComplete) instead")]
-        public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-
-            for (int i = 0; i < assetIdsToRetrieve.Length; i++)
-                data.getRequests.Add(assetIdsToRetrieve[i]);
-
-            LootLockerAPIManager.GetAssetsById(data, onComplete);
-        }
        /// <summary>
         /// Get multiple assets by their IDs.
         /// </summary>
@@ -1875,7 +1861,7 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
 
             for (int i = 0; i < assetIdsToRetrieve.Length; i++)
-                data.getRequests.Add(assetIdsToRetrieve[i].Tostring());
+                data.getRequests.Add(assetIdsToRetrieve[i].ToString());
 
             LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
@@ -2530,7 +2516,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
+            data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.ActivatingARentalAsset(data, onComplete);
         }
         #endregion
@@ -2611,7 +2597,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
                 return;
             }
-            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
+            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = triggerName };
             LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
         }
 
