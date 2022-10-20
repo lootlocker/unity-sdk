@@ -536,7 +536,7 @@ namespace LootLocker.Requests
             }
 
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = existingSessionEmail, token = existingSessionToken };
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+            StartWhiteLabelSession(sessionRequest, onComplete);
         }
 
         /// <summary>
