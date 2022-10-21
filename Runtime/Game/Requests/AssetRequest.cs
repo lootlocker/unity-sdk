@@ -40,7 +40,7 @@ namespace LootLocker.Requests
                 }
                 else
                 {
-                    TryAdd(nameof(thumbnail), value);
+                    Add(nameof(thumbnail), value);
                 }
             }
         }
