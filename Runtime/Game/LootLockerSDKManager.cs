@@ -2574,7 +2574,11 @@ namespace LootLocker.Requests
         #endregion
 
         #region TriggerEvents
-        [Obsolete("This method is deprecated, please use ExecuteTrigger instead.")]
+        /// <summary>
+        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
+        /// </summary>
+        /// <param name="eventName">Name of the trigger to execute</param>
+        /// <param name="onComplete">onComplete Action</param>
         public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2585,38 +2589,12 @@ namespace LootLocker.Requests
             LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
             LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
         }
-        /// <summary>
-        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
-        /// </summary>
-        /// <param name="triggerName">Name of the trigger to execute</param>
-        /// <param name="onComplete">onComplete Action</param>
-        public static void ExecuteTrigger(string triggerName, Action<LootLockerTriggerAnEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
-                return;
-            }
-            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = triggerName };
-            LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
-        }
-
-        [Obsolete("This method is deprecated, please use ListExecutedTriggers instead.")]
-        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAllTriggersResponse>());
-                return;
-            }
-            LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
-        }
 
         /// <summary>
         ///  Lists the triggers that a player have already executed.
         /// </summary>
         /// <param name="onComplete">onComplete Action</param>
-        public static void ListExecutedTriggers(Action<LootLockerListingAllTriggersResponse> onComplete)
+        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
             if (!CheckInitialized())
             {
