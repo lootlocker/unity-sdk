@@ -989,7 +989,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1054098186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fedc3c3c5d7517d46ad6cdda7d19858c, type: 3}
+  m_Script: {fileID: 11500000, guid: 82239edd97dd9d548ab4d0a35c4fff52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   scoreInputField: {fileID: 2113338354}

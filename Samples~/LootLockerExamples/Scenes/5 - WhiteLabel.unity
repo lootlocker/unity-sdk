@@ -164,7 +164,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 70033312}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f468bc59d2fbcf2438984096ec45f58c, type: 3}
+  m_Script: {fileID: 11500000, guid: c481b4aed6207f048bb40f485be12c0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   newUserEmailInputField: {fileID: 1880639186}
@@ -702,7 +702,7 @@ GameObject:
   - component: {fileID: 549792643}
   - component: {fileID: 549792642}
   m_Layer: 5
-  m_Name: PasswordInputField
+  m_Name: NewUserPasswordInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2062,7 +2062,7 @@ GameObject:
   - component: {fileID: 1610837083}
   - component: {fileID: 1610837082}
   m_Layer: 5
-  m_Name: EmailAdressInputField
+  m_Name: ExistingUserEmailAdressInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2209,7 +2209,7 @@ GameObject:
   - component: {fileID: 1763739197}
   - component: {fileID: 1763739196}
   m_Layer: 5
-  m_Name: PasswordInputField
+  m_Name: ExistingUserPasswordInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2356,7 +2356,7 @@ GameObject:
   - component: {fileID: 1880639187}
   - component: {fileID: 1880639186}
   m_Layer: 5
-  m_Name: EmailAdressInputField
+  m_Name: NewUserEmailAdressInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
