@@ -29,10 +29,20 @@ namespace LootLocker.Requests
         {
             get
             {
-                TryGetValue("thumbnail", out var value);
+                TryGetValue(nameof(thumbnail), out var value);
                 return value;
             }
-            set => thumbnail = value;
+            set
+            {
+                if (ContainsKey(nameof(thumbnail)))
+                {
+                    this[nameof(thumbnail)] = value;
+                }
+                else
+                {
+                    Add(nameof(thumbnail), value);
+                }
+            }
         }
     }
 

@@ -605,7 +605,7 @@ namespace LootLocker.Requests
             }
 
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = existingSessionEmail, token = existingSessionToken };
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+            StartWhiteLabelSession(sessionRequest, onComplete);
         }
 
         [ObsoleteAttribute("This function is deprecated and will be removed soon, please use the parameter-less StartWhiteLabelSession method instead.")]
