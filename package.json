@@ -18,9 +18,9 @@
   },
   "samples": [
         {
-            "displayName": "LootLocker Examples",
+            "displayName": "LootLockerExamples",
             "description": "Contains samples for a few different features",
-            "path": "Samples~/Examples"
+            "path": "Samples~/LootLockerExamples"
         }
     ]
 }
