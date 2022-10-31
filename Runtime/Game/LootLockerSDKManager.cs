@@ -44,7 +44,7 @@ namespace LootLocker.Requests
         /// <param name="platform">What platform you are using, only used for purchases, use Android if you are unsure</param>
         /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
-        /// <returns>True if succesful, false otherwise</returns>
+        /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
             DebugMessage("SDK is Intializing");
@@ -170,7 +170,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="ticket"></param>
         /// <param name="ticketSize"></param>
-        /// <returns></returns>
+        /// <returns>A converted SteamSessionTicket as a string for use with StartSteamSession.</returns>
         public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
         {
             Array.Resize(ref ticket, (int)ticketSize);
