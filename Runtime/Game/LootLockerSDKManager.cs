@@ -706,7 +706,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get assets that have been given to the player since the last time this endpoint was called.
+        /// Get assets that have been given to the currently logged in player since the last time this endpoint was called.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerAssetNotificationsResponse</param>
         public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
@@ -720,7 +720,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get asset deactivations since the last time this endpoint was called.
+        /// Get asset deactivations for the currently logged in player since the last time this endpoint was called.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDeactivatedAssetsResponse</param>
         public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete)
