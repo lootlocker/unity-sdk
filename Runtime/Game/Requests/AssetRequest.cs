@@ -100,12 +100,6 @@ namespace LootLocker.Requests
         public object links { get; set; }
     }
 
-    //public class LootLockerStorage
-    //{
-    //    public string key;
-    //    public string value;
-    //}
-
     public class LootLockerRarity
     {
         public string name { get; set; }
@@ -301,55 +295,6 @@ namespace LootLocker
 
             return filterString;
         }
-
-
-        //public static void GetAssetListWithCount(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
-        //{
-        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
-
-        //    string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
-
-        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-        //       {
-        //           LootLockerAssetResponse response = new LootLockerAssetResponse();
-        //           if (string.IsNullOrEmpty(serverResponse.Error))
-        //           {
-        //               response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-        //               if (response != null && response.assets.Length > 0)
-        //                   LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-        //           }
-
-        //           //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-        //           response.text = serverResponse.text;
-        //           response.status = serverResponse.status;
-        //           response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-        //           onComplete?.Invoke(response);
-        //       }, true);
-        //}
-
-        //public static void GetAssetListWithAfterCount(LootLockerAssetRequest data, Action<LootLockerAssetResponse> onComplete)
-        //{
-        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
-
-        //    string getVariable = string.Format(endPoint.endPoint, LootLockerAssetRequest.lastId, data.count);
-
-        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-        //    {
-        //        LootLockerAssetResponse response = new LootLockerAssetResponse();
-        //        if (string.IsNullOrEmpty(serverResponse.Error))
-        //        {
-        //            response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-        //            if (response != null && response.assets.Length > 0)
-        //                LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-        //        }
-        //        //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-        //        response.text = serverResponse.text;
-        //        response.status = serverResponse.status;
-        //        response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-        //        onComplete?.Invoke(response);
-        //    }, true);
-        //}
 
         public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
