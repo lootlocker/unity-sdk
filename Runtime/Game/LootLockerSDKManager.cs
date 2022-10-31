@@ -113,7 +113,7 @@ namespace LootLocker.Requests
         /// LootLocker Debug-messages, only visible in the Unity Editor.
         /// </summary>
         /// <param name="message">A message as a string</param>
-        /// <param name="IsError">Is is an error or not?</param>
+        /// <param name="IsError">Is this an error or not?</param>
         public static void DebugMessage(string message, bool IsError = false)
         {
 #if     UNITY_EDITOR
