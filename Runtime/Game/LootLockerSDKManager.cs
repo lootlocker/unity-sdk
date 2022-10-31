@@ -2242,10 +2242,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Missions
-        /// <summary>
-        /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingAllMissionsResponse</param>
+        [Obsolete("Please use ´the function GetAllMissions() instead")]
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2257,10 +2254,20 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get information about a single mission. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
+        /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
-        /// <param name="missionId">The ID of the mission to get information about</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingASingleMissionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingAllMissionsResponse</param>
+        public static void GetAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingAllMissionsResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingAllMissions(onComplete);
+        }
+
+        [Obsolete("Please use the function GetMission() instead")]
         public static void GettingASingleMission(int missionId, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2274,10 +2281,23 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
+        /// Get information about a single mission. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
-        /// <param name="missionId">The ID of the mission to start</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStartingAMissionResponse</param>
+        /// <param name="missionId">The ID of the mission to get information about</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingASingleMissionResponse</param>
+        public static void GetMission(int missionId, Action<LootLockerGettingASingleMissionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingASingleMissionResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.GettingASingleMission(data, onComplete);
+        }
+
+        [Obsolete("Please use the function StartMission() instead")]
         public static void StartingAMission(int missionId, Action<LootLockerStartingAMissionResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2291,6 +2311,51 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
+        /// </summary>
+        /// <param name="missionId">The ID of the mission to start</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStartingAMissionResponse</param>
+        public static void StartMission(int missionId, Action<LootLockerStartingAMissionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartingAMissionResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.StartingAMission(data, onComplete);
+        }
+
+        [Obsolete("Please use the function FinishMission() instead")]
+        public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
+            LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishingAMissionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishingAMissionResponse>());
+                return;
+            }
+
+            string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
+            string hash;
+            using (SHA1 sha1Hash = SHA1.Create())
+            {
+                byte[] sourceBytes = Encoding.UTF8.GetBytes(source);
+                byte[] hashBytes = sha1Hash.ComputeHash(sourceBytes);
+                hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
+            }
+
+            LootLockerFinishingAMissionRequest data = new LootLockerFinishingAMissionRequest()
+            {
+                signature = hash,
+                payload = finishingPayload
+            };
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.FinishingAMission(data, onComplete);
+        }
+
+        /// <summary>
         /// Finish a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="missionId">The ID of the mission to start</param>
@@ -2298,7 +2363,7 @@ namespace LootLocker.Requests
         /// <param name="playerId">ID of the current player</param>
         /// <param name="finishingPayload">A LootLockerFinishingPayload with variables for how the mission was completed</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerFinishingAMissionResponse</param>
-        public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
+        public static void FinishMission(int missionId, string startingMissionSignature, string playerId,
             LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2327,11 +2392,21 @@ namespace LootLocker.Requests
         #endregion
 
         #region Maps
+        [Obsolete("Please use the function GetAllMaps() instead.")]
+        public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingAllMaps(onComplete);
+        }
         /// <summary>
         /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMapsResponse</param>
-        public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
+        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2414,16 +2489,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
         }
 
-        /// <summary>
-        /// This will give you the current status of a purchase. These statuses can be returned;
-        /// open - The order is being processed
-        /// closed - The order have been processed successfully
-        /// refunded - The order has been refunded
-        /// canceled - The order has been canceled
-        /// failed - The order failed
-        /// </summary>
-        /// <param name="assetId">The ID of the asset to check the status for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
+        [Obsolete("Please use the function PollOrderStatus() instead")]
         public static void PollingOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2437,11 +2503,46 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// This will give you the current status of a purchase. These statuses can be returned;
+        /// open - The order is being processed
+        /// closed - The order have been processed successfully
+        /// refunded - The order has been refunded
+        /// canceled - The order has been canceled
+        /// failed - The order failed
+        /// </summary>
+        /// <param name="assetId">The ID of the asset to check the status for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
+        public static void PollOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetId.ToString());
+            LootLockerAPIManager.PollingOrderStatus(data, onComplete);
+        }
+
+        [Obsolete("Please use the function ActivateRentalAsset() instead")]
+        public static void ActivatingARentalAsset(int assetInstanceID, Action<LootLockerActivateARentalAssetResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateARentalAssetResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetInstanceID.ToString());
+            LootLockerAPIManager.ActivatingARentalAsset(data, onComplete);
+        }
+
+        /// <summary>
         /// Activate a rental asset. This will grant the asset to the player and start the rental timer on the server.
         /// </summary>
         /// <param name="assetId">The asset instance ID of the asset to activate</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerActivateARentalAssetResponse</param>
-        public static void ActivatingARentalAsset(int assetInstanceID, Action<LootLockerActivateARentalAssetResponse> onComplete)
+        public static void ActivateRentalAsset(int assetInstanceID, Action<LootLockerActivateARentalAssetResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2455,10 +2556,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Collectables
-        /// <summary>
-        /// Get all collectables for the game.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingCollectablesResponse</param>
+        [Obsolete("Please use the function GetCollectables() instead")]
         public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2470,11 +2568,38 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get all collectables for the game.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingCollectablesResponse</param>
+        public static void GetCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingCollectablesResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingCollectables(onComplete);
+        }
+
+        [Obsolete("Please use the function CollectItem() instead")]
+        public static void CollectingAnItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectingAnItemResponse>());
+                return;
+            }
+            LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
+            data.slug = slug;
+            LootLockerAPIManager.CollectingAnItem(data, onComplete);
+        }
+
+        /// <summary>
         /// Collect a collectable item. This will grant the collectable to the player.
         /// </summary>
         /// <param name="slug">A string representing what was collected, example; Carsdriven.Bugs.Dune</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCollectingAnItemResponse</param>
-        public static void CollectingAnItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
+        public static void CollectItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2507,11 +2632,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region TriggerEvents
-        /// <summary>
-        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
-        /// </summary>
-        /// <param name="eventName">Name of the trigger to execute</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
+        [Obsolete("Please use the function ExecuteTrigger() instead")]
         public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2524,10 +2645,37 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
+        /// </summary>
+        /// <param name="eventName">Name of the trigger to execute</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
+        public static void ExecuteTrigger(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
+                return;
+            }
+            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
+            LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
+        }
+
+        [Obsolete("Please use the function ListExecutedTriggers() instead")]
+        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAllTriggersResponse>());
+                return;
+            }
+            LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
+        }
+
+        /// <summary>
         ///  Lists the triggers that a player have already executed.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAllTriggersResponse</param>
-        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
+        public static void ListExecutedTriggers(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
             if (!CheckInitialized())
             {
