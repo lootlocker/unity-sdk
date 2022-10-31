@@ -1418,20 +1418,6 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetId">ID of the asset to unequip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void UnEquipIdAssetToDefaultCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
-                return;
-            }
-            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-
-            lootLockerGetRequest.getRequests.Add(assetId);
-            LootLockerAPIManager.UnEquipIdAssetToDefaultCharacter(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This method is deprecated and will be removed soon, use UnEquipIdAssetToCharacter with two parameters (int characterID, int assetId) instead")]
         public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
