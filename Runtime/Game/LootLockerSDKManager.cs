@@ -2317,7 +2317,7 @@ namespace LootLocker.Requests
 
         #region Missions
         /// <summary>
-        /// Get all available missions for the current game.
+        /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingAllMissionsResponse</param>
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
@@ -2331,7 +2331,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get information about a single mission.
+        /// Get information about a single mission. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="missionId">The ID of the mission to get information about</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingASingleMissionResponse</param>
@@ -2348,7 +2348,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a mission for the current player.
+        /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="missionId">The ID of the mission to start</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStartingAMissionResponse</param>
@@ -2365,7 +2365,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Finish a mission for the current player.
+        /// Finish a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="missionId">The ID of the mission to start</param>
         /// <param name="startingMissionSignature">Mission signature is received when starting a mission</param>
