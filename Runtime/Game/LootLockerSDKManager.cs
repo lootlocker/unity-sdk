@@ -150,7 +150,7 @@ namespace LootLocker.Requests
 
         #region Authentication
         /// <summary>
-        /// Verify the player's steam identity with the server.
+        /// Verify the player's steam identity with the server. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
@@ -166,7 +166,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Convert a steam ticket so LootLocker can read it.
+        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="ticket"></param>
         /// <param name="ticketSize"></param>
@@ -281,7 +281,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a steam session.
+        /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="steamId64">Steam ID ass a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
@@ -881,7 +881,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by steam ID's.
+        /// Get player names of the players from their last active platform by steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -900,7 +900,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by Steam ID's.
+        /// Get player names of the players from their last active platform by Steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
