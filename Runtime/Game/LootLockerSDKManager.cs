@@ -2059,10 +2059,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="name">Name of the asset candidate</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
-        /// <param name="kv_storage">A Dictionary<string, string> of key-values to use</param>
-        /// <param name="filters">A Dictionary<string, string> of key-values that can be used to filter out assets</param>
-        /// <param name="data_entities">A Dictionary<string, string> of data to include in the asset candidate</param>
-        /// <param name="context_id">An ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
+        /// <param name="kv_storage">(Optional) Dictionary<string, string> of key-values to use</param>
+        /// <param name="filters">(Optional) Dictionary<string, string> of key-values that can be used to filter out assets</param>
+        /// <param name="data_entities">(Optional) Dictionary<string, string> of data to include in the asset candidate</param>
+        /// <param name="context_id">(Optional) ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
         public static void CreatingAnAssetCandidate(string name, Action<LootLockerUserGenerateContentResponse> onComplete,
             Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1)
@@ -2099,11 +2099,11 @@ namespace LootLocker.Requests
         /// <param name="assetId">ID of the asset candidate to update</param>
         /// <param name="isCompleted">If true, the asset candidate will become an asset and can not be edited any more.</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
-        /// <param name="name">New name of the asset candidate</param>
-        /// <param name="kv_storage">A Dictionary<string, string> of key-values to use</param>
-        /// <param name="filters">A Dictionary<string, string> of key-values that can be used to filter out assets</param>
-        /// <param name="data_entities">A Dictionary<string, string> of data to include in the asset candidate</param>
-        /// <param name="context_id">An ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
+        /// <param name="name">(Optional) New name of the asset candidate</param>
+        /// <param name="kv_storage">(Optional)A Dictionary<string, string> of key-values to use</param>
+        /// <param name="filters">(Optional)A Dictionary<string, string> of key-values that can be used to filter out assets</param>
+        /// <param name="data_entities">(Optional)A Dictionary<string, string> of data to include in the asset candidate</param>
+        /// <param name="context_id">(Optional)An ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
         public static void UpdatingAnAssetCandidate(int assetId, bool isCompleted, Action<LootLockerUserGenerateContentResponse> onComplete,
             string name = null, Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1)
