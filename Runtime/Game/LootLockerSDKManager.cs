@@ -735,7 +735,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Initiate DLC Migration for the player: https://docs.lootlocker.com/background/live-ops-tools#dlc-migration
-        /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any.
+        /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any. If you only want the ID's of the assets you can also use  GetDLCMigrated(Action<LootLockerDlcResponse> onComplete).
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDlcResponse</param>
         public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete)
@@ -749,7 +749,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get a list of DLC's migrated for the player.
+        /// Get a list of DLC's migrated for the player. This response will only list the asset-ID's of the migrated DLC, if you want more information about the assets, use GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete) instead.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDlcResponse</param>
         public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete)
