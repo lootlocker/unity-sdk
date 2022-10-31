@@ -1743,7 +1743,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListFavouriteAssets(onComplete);
         }
 
-        [Obsolete("This function will be removed soon. Use AddFavouriteAsset(int assetID, Action<LootLockerFavouritesListResponse> onComplete) instead")]
+        /// <summary>
+        /// Add an asset to the current players favorite assets.
+        /// </summary>
+        /// <param name="assetId">The ID of the asset to add to favourites</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
         public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1755,24 +1759,12 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetId);
             LootLockerAPIManager.AddFavouriteAsset(data, onComplete);
         }
-        /// <summary>
-        /// Add an asset to the current players favorite assets.
-        /// </summary>
-        /// <param name="assetId">The ID of the asset to add to favourites</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void AddFavouriteAsset(int assetId, Action<LootLockerAssetResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            LootLockerAPIManager.AddFavouriteAsset(data, onComplete);
-        }
 
-        [Obsolete("This function will be removed soon. Use RemoveFavouriteAsset(int assetID, Action<LootLockerFavouritesListResponse> onComplete) instead")]
+        /// <summary>
+        /// Remove an asset from the current players favorite assets.
+        /// </summary>
+        /// <param name="assetId">The ID of the asset to remove from favourites</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
         public static void RemoveFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1784,24 +1776,12 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetId);
             LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
         }
-        /// <summary>
-        /// Remove an asset from the current players favorite assets.
-        /// </summary>
-        /// <param name="assetId">The ID of the asset to remove from favourites</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void RemoveFavouriteAsset(int assetId, Action<LootLockerAssetResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
-        }
 
-        [Obsolete("This function will be removed soon. Use GetAssetByID(int assetID, Action<LootLockerSingleAssetResponse> onComplete) instead")]
+        /// <summary>
+        /// Get multiple assets by their IDs.
+        /// </summary>
+        /// <param name="assetIdsToRetrieve">A list of multiple assets to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
         public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1813,26 +1793,6 @@ namespace LootLocker.Requests
 
             for (int i = 0; i < assetIdsToRetrieve.Length; i++)
                 data.getRequests.Add(assetIdsToRetrieve[i]);
-
-            LootLockerAPIManager.GetAssetsById(data, onComplete);
-        }
-
-        /// <summary>
-        /// Get multiple assets by their IDs.
-        /// </summary>
-        /// <param name="assetIdsToRetrieve">A list of multiple assets to retrieve</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void GetAssetsById(int[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-
-            for (int i = 0; i < assetIdsToRetrieve.Length; i++)
-                data.getRequests.Add(assetIdsToRetrieve[i].ToString());
 
             LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
