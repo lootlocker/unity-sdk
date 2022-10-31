@@ -153,7 +153,7 @@ namespace LootLocker.Requests
         /// Verify the player's steam identity with the server.
         /// </summary>
         /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerVerifyResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
         public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -186,7 +186,7 @@ namespace LootLocker.Requests
         /// Verify the player's identity with the server and selected platform.
         /// </summary>
         /// <param name="deviceId"></param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerVerifyResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -202,7 +202,7 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="deviceId">The ID of the current device the player is on</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -221,7 +221,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a guest session.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerGuestSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
         public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -255,7 +255,7 @@ namespace LootLocker.Requests
         /// Start a guest session with an identifier, you can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
         /// </summary>
         /// <param name="identifier">Identifier for the player</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerGuestSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
         public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -283,8 +283,8 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a steam session.
         /// </summary>
-        /// <param name="steamId64">Steam ID as a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="steamId64">Steam ID ass a string</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -304,7 +304,7 @@ namespace LootLocker.Requests
         /// The Nintendo Switch platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="nsa_id_token">nsa (Nintendo Switch Account) id token as a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -321,7 +321,7 @@ namespace LootLocker.Requests
         /// The Xbox One platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="xbox_user_token">Xbox user token as a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of typeLootLockerSessionResponse</param>
         public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -356,7 +356,7 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
         public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -372,7 +372,7 @@ namespace LootLocker.Requests
         /// End active session (if any exists)
         /// Succeeds if a session was ended or no sessions were active
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void EndSession(Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -412,7 +412,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="email">E-mail for an existing user</param>
         /// <param name="password">Password for an existing user</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerWhiteLabelLoginResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerWhiteLabelLoginResponse</param>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
             WhiteLabelLogin(email, password, false, onComplete);
@@ -426,7 +426,7 @@ namespace LootLocker.Requests
         /// <param name="email">E-mail for an existing user</param>
         /// <param name="password">Password for an existing user</param>
         /// <param name="remember">Set remember=true to prolong the session lifetime</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerWhiteLabelLoginResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerWhiteLabelLoginResponse</param>
         public static void WhiteLabelLogin(string email, string password, bool remember, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -636,7 +636,7 @@ namespace LootLocker.Requests
 
         #region Player
         /// <summary>
-        /// Get general information about the current player, such as the XP, Level information and their account balance.
+        /// Get general information about the current current player, such as the XP, Level information and their account balance.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPlayerInfoResponse</param>
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
@@ -1086,6 +1086,7 @@ namespace LootLocker.Requests
                 });
         }
 
+/// 
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -1210,7 +1211,7 @@ namespace LootLocker.Requests
 
         #region Character
 
-        /// <summary>
+        /// /// <summary>
         /// Create a character with the provided type and name. The character will be owned by the currently active player.
         /// Use ListCharacterTypes() to get a list of available character types for your game.
         /// </summary>
@@ -2007,6 +2008,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
         }
 
+/// 
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance by key/value-id.
         /// </summary>
