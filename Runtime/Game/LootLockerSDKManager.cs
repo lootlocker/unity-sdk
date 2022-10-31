@@ -183,7 +183,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Verify the players identity with the server and selected platform.
+        /// Verify the player's identity with the server and selected platform.
         /// </summary>
         /// <param name="deviceId"></param>
         /// <param name="onComplete">onComplete Action</param>
@@ -252,7 +252,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a guest session with an identifier, can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
+        /// Start a guest session with an identifier, you can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
         /// </summary>
         /// <param name="identifier">Identifier for the player</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -283,7 +283,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a steam session.
         /// </summary>
-        /// <param name="steamId64">Steam ID a a string</param>
+        /// <param name="steamId64">Steam ID as a string</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
@@ -303,7 +303,7 @@ namespace LootLocker.Requests
         /// Create a new session for a Nintendo Switch user
         /// The Nintendo Switch platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="nsa_id_token">nsa id token</param>
+        /// <param name="nsa_id_token">nsa (Nintendo Switch Account) id token as a string</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
         {
@@ -320,7 +320,7 @@ namespace LootLocker.Requests
         /// Create a new session for a Xbox One user
         /// The Xbox One platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="xbox_user_token">Xbox user token</param>
+        /// <param name="xbox_user_token">Xbox user token as a string</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
         {
@@ -355,7 +355,7 @@ namespace LootLocker.Requests
         /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="refresh_token">Token received from Apple</param>
+        /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
         {
@@ -410,8 +410,8 @@ namespace LootLocker.Requests
         /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="email">E-mail for the new user</param>
-        /// <param name="password">Password for the new user</param>
+        /// <param name="email">E-mail for an existing user</param>
+        /// <param name="password">Password for an existing user</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void WhiteLabelLogin(string email, string password, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
@@ -543,7 +543,7 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="email">E-mail for the user</param>
-        /// <param name="token">The token can be received when starting a White Label session.</param>
+        /// <param name="token">The token is received when starting a White Label session.</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void CheckWhiteLabelSession(string email, string token, Action<bool> onComplete)
         {
@@ -619,7 +619,7 @@ namespace LootLocker.Requests
         /// Start a LootLocker Session using the provided White Label request.
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="sessionRequest">A succesful White Label Session Request</param>
+        /// <param name="sessionRequest">A White Label Session Request with inner values already set</param>
         /// <param name="onComplete">onComplete Action</param>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
         {
@@ -636,7 +636,7 @@ namespace LootLocker.Requests
 
         #region Player
         /// <summary>
-        /// Get general information about the player, such as the XP, Level information and their account balance.
+        /// Get general information about the current player, such as the XP, Level information and their account balance.
         /// </summary>
         /// <param name="onComplete">onComplete Action</param>
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
@@ -734,6 +734,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Initiate DLC Migration for the player: https://docs.lootlocker.com/background/live-ops-tools#dlc-migration
         /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any.
         /// </summary>
         /// <param name="onComplete">onComplete Action</param>
@@ -842,7 +843,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players from their last active platform by playerID's.
+        /// Get player names of the players from their last active platform by playerID's.
         /// </summary>
         /// <param name="playerIds">A list of multiple player ID's<</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -861,7 +862,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players from their last active platform by public playerID's.
+        /// Get player names of the players from their last active platform by public playerID's.
         /// </summary>
         /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -880,7 +881,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players from their last active platform by steam ID's.
+        /// Get player names of the players from their last active platform by steam ID's.
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -899,7 +900,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players from their last active platform by Steam ID's.
+        /// Get player names of the players from their last active platform by Steam ID's.
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -918,7 +919,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players from their last active platform by PSN ID's.
+        /// Get player names of the players from their last active platform by PSN ID's.
         /// </summary>
         /// <param name="psnIds">A list of multiple player PSN ID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -937,7 +938,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players fropm their last active platform by PSN ID's.
+        /// Get player names of the players fropm their last active platform by PSN ID's.
         /// </summary>
         /// <param name="psnIds">A list of multiple player PSN ID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -956,7 +957,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get players names of the players fropm their last active platform by Xbox ID's.
+        /// Get player names of the players fropm their last active platform by Xbox ID's.
         /// </summary>
         /// <param name="xboxIds">A list of multiple player XBOX ID's</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -996,7 +997,7 @@ namespace LootLocker.Requests
 
         #region Player files
         /// <summary>
-        /// Returns an URL where you can access the file. You can get the ID of files when you upload them, or call the list endpoint. 
+        /// Returns a URL where you can access the file. You can get the ID of files when you upload them, or call the list endpoint. 
         /// </summary>
         /// <param name="fileId">Id of the file, can be retrieved with GetAllPlayerFiles() or when the file is uploaded</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -1084,6 +1085,7 @@ namespace LootLocker.Requests
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
+
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -1147,7 +1149,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Upload a file using a byte array. Can be useful if you don't want to upload without storing anything on disk. The file will be owned by the currently active player.
+        /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
         /// <param name="fileBytes">Byte array to upload</param>
         /// <param name="fileName">Name of the file on LootLocker</param>
@@ -1176,7 +1178,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Upload a file using a byte array. Can be useful if you don't want to upload without storing anything on disk. The file will be owned by the currently active player.
+        /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
         /// <param name="fileBytes">Byte array to upload</param>
         /// <param name="fileName">Name of the file on LootLocker</param>
@@ -1207,6 +1209,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Character
+
         /// <summary>
         /// Create a character with the provided type and name. The character will be owned by the currently active player.
         /// Use ListCharacterTypes() to get a list of available character types for your game.
@@ -1772,6 +1775,7 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.ListFavouriteAssets(onComplete);
         }
+
         [Obsolete("This function will be removed soon. Use AddFavouriteAsset(int assetID, Action<LootLockerFavouritesListResponse> onComplete) instead")]
         public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
         {
@@ -1814,7 +1818,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
         }
         /// <summary>
-        /// /// Remove an asset from the current players favorite assets.
+        /// Remove an asset from the current players favorite assets.
         /// </summary>
         /// <param name="assetId">The ID of the asset to remove from favourites</param>
         /// <param name="onComplete">onComplete Action</param>
@@ -2002,6 +2006,7 @@ namespace LootLocker.Requests
             createKeyValuePairRequest.value = value;
             LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
         }
+
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance by key/value-id.
         /// </summary>
@@ -2361,7 +2366,7 @@ namespace LootLocker.Requests
         /// Finish a mission for the current player.
         /// </summary>
         /// <param name="missionId">The ID of the mission to start</param>
-        /// <param name="startingMissionSignature">Mission signature can be received when starting a mission</param>
+        /// <param name="startingMissionSignature">Mission signature is received when starting a mission</param>
         /// <param name="playerId">ID of the current player</param>
         /// <param name="finishingPayload">A LootLockerFinishingPayload with variables for how the mission was completed</param>
         /// <param name="onComplete">onComplete Action</param>
