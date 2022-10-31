@@ -2402,7 +2402,7 @@ namespace LootLocker.Requests
 
         #region Maps
         /// <summary>
-        /// Get all available maps for the current game.
+        /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMapsResponse</param>
         public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
