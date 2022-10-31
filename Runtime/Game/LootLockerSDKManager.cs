@@ -198,7 +198,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a session with the platform used in the platform selected in Project Settings -> Platform, this is required before any other calls can be made.
+        /// Start a session with the platform used in the platform selected in Project Settings -> Platform.
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="deviceId">The ID of the current device the player is on</param>
