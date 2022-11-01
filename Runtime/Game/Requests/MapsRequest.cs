@@ -46,7 +46,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
+        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAllMaps;
 
