@@ -92,7 +92,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void PollingOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        public static void PollOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
 
@@ -101,7 +101,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateARentalAssetResponse> onComplete)
+        public static void ActivateRentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateRentalAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;
 

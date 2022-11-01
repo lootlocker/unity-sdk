@@ -8,24 +8,35 @@ using System;
 
 namespace LootLocker.Requests
 {
+    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerRequest instead")]
     public class LootLockerTriggerAnEventRequest
     {
         public string name { get; set; }
     }
 
+    public class LootLockerExecuteTriggerRequest : LootLockerTriggerAnEventRequest
+    {
+    }
+   
+    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerResponse instead")]
     public class LootLockerTriggerAnEventResponse : LootLockerResponse
     {
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
-
         public LootLockerGrantedAssets [] granted_assets;
     }
+    public class LootLockerExecuteTriggerResponse : LootLockerTriggerAnEventResponse
+    {
+    }
 
-
+    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerListAllTriggersResponse instead")]
     public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
         public string[] triggers { get; set; }
+    }
+    public class LootLockerListAllTriggersResponse : LootLockerListingAllTriggersResponse
+    {
     }
 
     public class LootLockerGrantedAssets
@@ -80,7 +91,7 @@ namespace LootLocker
         public EndPointClass triggeringAnEvent;
         public EndPointClass listingTriggeredTriggerEvents;
 
-        public static void TriggeringAnEvent(LootLockerTriggerAnEventRequest data, Action<LootLockerTriggerAnEventResponse> onComplete)
+        public static void ExecuteTrigger(LootLockerExecuteTriggerRequest data, Action<LootLockerExecuteTriggerResponse> onComplete)
         {
             string json = "";
             if (data == null) return;
@@ -91,7 +102,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
-        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
+        public static void ListAllExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 
