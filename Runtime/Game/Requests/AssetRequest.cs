@@ -194,15 +194,19 @@ namespace LootLocker.Requests
     {
         public int[] favourites { get; set; }
     }
+
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerActivateRentalAssetResponse instead")]
     public class LootLockerActivateARentalAssetResponse : LootLockerResponse
     {
         public int time_left;
     }
 
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerActivateRentalAssetResponse : LootLockerActivateARentalAssetResponse
     {
     }
+    #pragma warning restore 0618
 }
 
 namespace LootLocker

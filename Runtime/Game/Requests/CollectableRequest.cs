@@ -11,10 +11,12 @@ using UnityEngine.UI;
 namespace LootLocker.Requests
 {
     #region GettingCollectable
-
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerGetCollectablesResponse : LootLockerGettingCollectablesResponse
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetCollectablesResponse instead")]
     public class LootLockerGettingCollectablesResponse : LootLockerResponse
