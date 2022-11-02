@@ -39,9 +39,12 @@ namespace LootLocker.Requests
         public LootLockerFinishingPayload payload { get; set; }
     }
 
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerFinishMissionRequest : LootLockerFinishingAMissionRequest
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetAllMissionsResponse instead")]
     public class LootLockerGettingAllMissionsResponse : LootLockerResponse
@@ -49,9 +52,12 @@ namespace LootLocker.Requests
         public LootLockerMission[] missions { get; set; }
     }
     
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerGetAllMissionsResponse : LootLockerGettingAllMissionsResponse
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetMissionResponse isntead")]
     public class LootLockerGettingASingleMissionResponse : LootLockerResponse
@@ -59,18 +65,25 @@ namespace LootLocker.Requests
         public LootLockerMission mission { get; set; }
     }
 
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerGetMissionResponse : LootLockerGettingASingleMissionResponse
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerStartMissionResponse instead")]
     public class LootLockerStartingAMissionResponse : LootLockerResponse
     {
         public string signature { get; set; }
     }
+
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerStartMissionResponse : LootLockerStartingAMissionResponse
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerFinishMissionResponse instead")]
     public class LootLockerFinishingAMissionResponse : LootLockerResponse
@@ -78,9 +91,13 @@ namespace LootLocker.Requests
         public int score { get; set; }
         public bool check_grant_notifications { get; set; }
     }
+
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerFinishMissionResponse : LootLockerFinishingAMissionResponse
     {
     }
+    #pragma warning restore 0618
 }
 
 namespace LootLocker

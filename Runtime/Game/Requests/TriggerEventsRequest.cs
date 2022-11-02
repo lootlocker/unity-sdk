@@ -14,9 +14,12 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerExecuteTriggerRequest : LootLockerTriggerAnEventRequest
     {
     }
+    #pragma warning restore 0618
    
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerResponse instead")]
     public class LootLockerTriggerAnEventResponse : LootLockerResponse
@@ -26,18 +29,24 @@ namespace LootLocker.Requests
         public LootLockerLevel[] levels { get; set; }
         public LootLockerGrantedAssets [] granted_assets;
     }
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerExecuteTriggerResponse : LootLockerTriggerAnEventResponse
     {
     }
+    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerListAllTriggersResponse instead")]
     public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
         public string[] triggers { get; set; }
     }
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerListAllTriggersResponse : LootLockerListingAllTriggersResponse
     {
     }
+    #pragma warning restore 0618
 
     public class LootLockerGrantedAssets
     {
