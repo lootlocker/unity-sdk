@@ -101,7 +101,6 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                     response = JsonConvert.DeserializeObject<LootLockerGetCollectablesResponse>(serverResponse.text);
 
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
                 response.Error = serverResponse.Error;
@@ -135,7 +134,6 @@ namespace LootLocker
                     response.mainItem = response.mainGroup?.items?.FirstOrDefault(x => x.name == item);
                 }
 
-                //LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
                 response.Error = serverResponse.Error;
