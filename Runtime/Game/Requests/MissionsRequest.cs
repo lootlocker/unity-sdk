@@ -15,14 +15,14 @@ namespace LootLocker.Requests
         public int asset_id { get; set; }
         public int rounds { get; set; }
         public string round_length { get; set; }
-        public object? difficulty_name { get; set; }
-        public object? difficulty_multiplier { get; set; }
-        public string? difficulty_color { get; set; }
+        public object difficulty_name { get; set; }
+        public object difficulty_multiplier { get; set; }
+        public string difficulty_color { get; set; }
         public int? difficulty_id { get; set; }
-        public LootLockerGoals? goals { get; set; }
-        public LootLockerCheckpoint[]? checkpoints { get; set; }
+        public LootLockerGoals goals { get; set; }
+        public LootLockerCheckpoint[] checkpoints { get; set; }
         public bool player_access { get; set; }
-        public string? best_goal { get; set; }
+        public string best_goal { get; set; }
     }
 
     public class LootLockerFinishingPayload
