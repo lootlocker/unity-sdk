@@ -82,9 +82,12 @@ namespace LootLocker.Requests
 
     }
 
+    #pragma warning disable 0618
+    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
     public class LootLockerCollectItemResponse : LootLockerCollectingAnItemResponse
     {
     }
+    #pragma warning restore 0618
 
     #endregion
 }
