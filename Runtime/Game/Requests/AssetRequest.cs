@@ -201,12 +201,10 @@ namespace LootLocker.Requests
         public int time_left;
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerActivateRentalAssetResponse : LootLockerActivateARentalAssetResponse
+    public class LootLockerActivateRentalAssetResponse : LootLockerResponse
     {
+        public int time_left;
     }
-    #pragma warning restore 0618
 }
 
 namespace LootLocker

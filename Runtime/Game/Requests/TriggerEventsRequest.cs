@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
-using LootLocker.Requests;
+﻿using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace LootLocker.Requests
 {
@@ -14,39 +11,40 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerExecuteTriggerRequest : LootLockerTriggerAnEventRequest
+
+    public class LootLockerExecuteTriggerRequest : LootLockerResponse
     {
+        public string name { get; set; }
     }
-    #pragma warning restore 0618
-   
+
+
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerResponse instead")]
     public class LootLockerTriggerAnEventResponse : LootLockerResponse
     {
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
-        public LootLockerGrantedAssets [] granted_assets;
+        public LootLockerGrantedAssets[] granted_assets;
     }
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerExecuteTriggerResponse : LootLockerTriggerAnEventResponse
+
+    public class LootLockerExecuteTriggerResponse : LootLockerResponse
     {
+        public bool check_grant_notifications { get; set; }
+        public LootLockerXp xp { get; set; }
+        public LootLockerLevel[] levels { get; set; }
+        public LootLockerGrantedAssets[] granted_assets;
     }
-    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerListAllTriggersResponse instead")]
     public class LootLockerListingAllTriggersResponse : LootLockerResponse
     {
         public string[] triggers { get; set; }
     }
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerListAllTriggersResponse : LootLockerListingAllTriggersResponse
+
+    public class LootLockerListAllTriggersResponse : LootLockerResponse
     {
+        public string[] triggers { get; set; }
     }
-    #pragma warning restore 0618
 
     public class LootLockerGrantedAssets
     {
@@ -111,7 +109,27 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
         }
 
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function ExecuteTrigger() instead")]
+        public static void TriggeringAnEvent(LootLockerTriggerAnEventRequest data, Action<LootLockerTriggerAnEventResponse> onComplete)
+        {
+            string json = "";
+            if (data == null) return;
+            else json = JsonConvert.SerializeObject(data);
+
+            EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
         public static void ListAllExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListExecutedTriggers() instead")]
+        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 

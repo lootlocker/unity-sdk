@@ -11,12 +11,10 @@ using UnityEngine.UI;
 namespace LootLocker.Requests
 {
     #region GettingCollectable
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerGetCollectablesResponse : LootLockerGettingCollectablesResponse
+    public class LootLockerGetCollectablesResponse : LootLockerResponse
     {
+        public LootLockerCollectable[] collectables { get; set; }
     }
-    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetCollectablesResponse instead")]
     public class LootLockerGettingCollectablesResponse : LootLockerResponse
@@ -82,12 +80,16 @@ namespace LootLocker.Requests
 
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerCollectItemResponse : LootLockerCollectingAnItemResponse
+    public class LootLockerCollectItemResponse : LootLockerResponse
     {
+        public LootLockerCollectable[] collectables { get; set; }
+
+        public LootLockerCollectable mainCollectable;
+
+        public LootLockerGroup mainGroup;
+
+        public LootLockerItem mainItem;
     }
-    #pragma warning restore 0618
 
     #endregion
 }
@@ -96,7 +98,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GettingCollectables(Action<LootLockerGetCollectablesResponse> onComplete)
+        public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
 
@@ -114,7 +116,60 @@ namespace LootLocker
             }, true);
         }
 
-        public static void CollectingItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectItemResponse> onComplete)
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCollectables() instead")]
+        public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
+            {
+                LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                    response = JsonConvert.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
+
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error;
+                response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }, true);
+        }
+
+        public static void CollectItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectItemResponse> onComplete)
+        {
+            string json = "";
+            if (data == null) return;
+            else json = JsonConvert.SerializeObject(data);
+
+            EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerCollectItemResponse response = new LootLockerCollectItemResponse();
+                if (string.IsNullOrEmpty(serverResponse.Error))
+                {
+                    response = JsonConvert.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
+                    string[] collectableStrings = data.slug.Split('.');
+
+                    string collectable = collectableStrings[0];
+                    string group = collectableStrings[1];
+                    string item = collectableStrings[2];
+
+                    response.mainCollectable = response.collectables?.FirstOrDefault(x => x.name == collectable);
+                    response.mainGroup = response.mainCollectable?.groups?.FirstOrDefault(x => x.name == group);
+                    response.mainItem = response.mainGroup?.items?.FirstOrDefault(x => x.name == item);
+                }
+
+                response.text = serverResponse.text;
+                response.success = serverResponse.success;
+                response.Error = serverResponse.Error;
+                response.statusCode = serverResponse.statusCode;
+                onComplete?.Invoke(response);
+            }, true);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function CollectItem() instead")]
+        public static void CollectingAnItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectingAnItemResponse> onComplete)
         {
             string json = "";
             if (data == null) return;

@@ -39,12 +39,11 @@ namespace LootLocker.Requests
         public LootLockerFinishingPayload payload { get; set; }
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerFinishMissionRequest : LootLockerFinishingAMissionRequest
+    public class LootLockerFinishMissionRequest : LootLockerGetRequest
     {
+        public string signature { get; set; }
+        public LootLockerFinishingPayload payload { get; set; }
     }
-    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetAllMissionsResponse instead")]
     public class LootLockerGettingAllMissionsResponse : LootLockerResponse
@@ -52,12 +51,10 @@ namespace LootLocker.Requests
         public LootLockerMission[] missions { get; set; }
     }
     
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerGetAllMissionsResponse : LootLockerGettingAllMissionsResponse
+    public class LootLockerGetAllMissionsResponse : LootLockerResponse
     {
+        public LootLockerMission[] missions { get; set; }
     }
-    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetMissionResponse isntead")]
     public class LootLockerGettingASingleMissionResponse : LootLockerResponse
@@ -65,12 +62,10 @@ namespace LootLocker.Requests
         public LootLockerMission mission { get; set; }
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerGetMissionResponse : LootLockerGettingASingleMissionResponse
+    public class LootLockerGetMissionResponse : LootLockerResponse
     {
+        public LootLockerMission mission { get; set; }
     }
-    #pragma warning restore 0618
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerStartMissionResponse instead")]
     public class LootLockerStartingAMissionResponse : LootLockerResponse
@@ -78,12 +73,11 @@ namespace LootLocker.Requests
         public string signature { get; set; }
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerStartMissionResponse : LootLockerStartingAMissionResponse
+    public class LootLockerStartMissionResponse : LootLockerResponse
     {
+        public string signature { get; set; }
     }
-    #pragma warning restore 0618
+
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerFinishMissionResponse instead")]
     public class LootLockerFinishingAMissionResponse : LootLockerResponse
@@ -92,12 +86,11 @@ namespace LootLocker.Requests
         public bool check_grant_notifications { get; set; }
     }
 
-    #pragma warning disable 0618
-    // Disabling the "Obsolete warning" for this class, since we want to keep the old class for backwards compatibility.
-    public class LootLockerFinishMissionResponse : LootLockerFinishingAMissionResponse
+    public class LootLockerFinishMissionResponse : LootLockerResponse
     {
+        public int score { get; set; }
+        public bool check_grant_notifications { get; set; }
     }
-    #pragma warning restore 0618
 }
 
 namespace LootLocker
@@ -111,7 +104,25 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
         }
 
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMissions() instead")]
+        public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.gettingAllMissions;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
+        }
+
         public static void GetMission(LootLockerGetRequest data, Action<LootLockerGetMissionResponse> onComplete)
+        {
+            EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleMission;
+
+            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetMission() instead")]
+        public static void GettingASingleMission(LootLockerGetRequest data, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleMission;
 
@@ -129,7 +140,30 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
         }
 
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function StartMission() instead")]
+        public static void StartingAMission(LootLockerGetRequest data, Action<LootLockerStartingAMissionResponse> onComplete)
+        {
+            EndPointClass requestEndPoint = LootLockerEndPoints.startingMission;
+
+            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
+        }
+
         public static void FinishMission(LootLockerFinishMissionRequest data, Action<LootLockerFinishMissionResponse> onComplete)
+        {
+            string json = "";
+            if (data == null) return;
+            else json = JsonConvert.SerializeObject(data);
+
+            EndPointClass requestEndPoint = LootLockerEndPoints.finishingMission;
+
+            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: false);
+        }
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function FinishMission() instead")]
+        public static void FinishingAMission(LootLockerFinishingAMissionRequest data, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
             string json = "";
             if (data == null) return;

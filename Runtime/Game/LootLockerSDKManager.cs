@@ -2245,7 +2245,12 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMissions() instead")]
         public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
         {
-            GetAllMissions(onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingAllMissionsResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingAllMissions(onComplete);
         }
 
         /// <summary>
@@ -2265,7 +2270,14 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetMission() instead")]
         public static void GettingASingleMission(int missionId, Action<LootLockerGettingASingleMissionResponse> onComplete)
         {
-            GetMission(missionId, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingASingleMissionResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.GettingASingleMission(data, onComplete);
         }
 
         /// <summary>
@@ -2288,7 +2300,14 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function StartMission() instead")]
         public static void StartingAMission(int missionId, Action<LootLockerStartingAMissionResponse> onComplete)
         {
-            StartMission(missionId, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartingAMissionResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.StartingAMission(data, onComplete);
         }
 
         /// <summary>
@@ -2312,7 +2331,28 @@ namespace LootLocker.Requests
         public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
             LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
-            FinishMission(missionId, startingMissionSignature, playerId, finishingPayload, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishingAMissionResponse>());
+                return;
+            }
+
+            string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
+            string hash;
+            using (SHA1 sha1Hash = SHA1.Create())
+            {
+                byte[] sourceBytes = Encoding.UTF8.GetBytes(source);
+                byte[] hashBytes = sha1Hash.ComputeHash(sourceBytes);
+                hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
+            }
+
+            LootLockerFinishingAMissionRequest data = new LootLockerFinishingAMissionRequest()
+            {
+                signature = hash,
+                payload = finishingPayload
+            };
+            data.getRequests.Add(missionId.ToString());
+            LootLockerAPIManager.FinishingAMission(data, onComplete);
         }
 
         /// <summary>
@@ -2354,7 +2394,12 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMaps() instead.")]
         public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
-            GetAllMaps(onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingAllMaps(onComplete);
         }
         /// <summary>
         /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
@@ -2446,7 +2491,14 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus() instead")]
         public static void PollingOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            PollOrderStatus(assetId, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetId.ToString());
+            LootLockerAPIManager.PollingOrderStatus(data, onComplete);
         }
 
         /// <summary>
@@ -2474,7 +2526,14 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function ActivateRentalAsset() instead")]
         public static void ActivatingARentalAsset(int assetInstanceID, Action<LootLockerActivateARentalAssetResponse> onComplete)
         {
-            ActivateRentalAsset(assetInstanceID, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateARentalAssetResponse>());
+                return;
+            }
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetInstanceID.ToString());
+            LootLockerAPIManager.ActivatingARentalAsset(data, onComplete);
         }
 
         /// <summary>
@@ -2499,7 +2558,12 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCollectables() instead")]
         public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
         {
-            GetCollectables(onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingCollectablesResponse>());
+                return;
+            }
+            LootLockerAPIManager.GettingCollectables(onComplete);
         }
 
         /// <summary>
@@ -2513,13 +2577,20 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCollectablesResponse>());
                 return;
             }
-            LootLockerAPIManager.GettingCollectables(onComplete);
+            LootLockerAPIManager.GetCollectables(onComplete);
         }
 
         [Obsolete("This function is deprecated and will be removed soon. Please use the function CollectItem() instead")]
         public static void CollectingAnItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
         {
-            CollectItem(slug, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectingAnItemResponse>());
+                return;
+            }
+            LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
+            data.slug = slug;
+            LootLockerAPIManager.CollectingAnItem(data, onComplete);
         }
 
         /// <summary>
@@ -2536,7 +2607,7 @@ namespace LootLocker.Requests
             }
             LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
             data.slug = slug;
-            LootLockerAPIManager.CollectingItem(data, onComplete);
+            LootLockerAPIManager.CollectItem(data, onComplete);
         }
 
         #endregion
@@ -2563,7 +2634,13 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function ExecuteTrigger() instead")]
         public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
         {
-            ExecuteTrigger(eventName, onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
+                return;
+            }
+            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
+            LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
         }
 
         /// <summary>
@@ -2585,7 +2662,12 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function ListExecutedTriggers() instead")]
         public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
-            ListExecutedTriggers(onComplete);
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAllTriggersResponse>());
+                return;
+            }
+            LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
         }
 
         /// <summary>
