@@ -46,6 +46,16 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
+        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.gettingAllMaps;
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMaps() instead.")]
         public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAllMaps;

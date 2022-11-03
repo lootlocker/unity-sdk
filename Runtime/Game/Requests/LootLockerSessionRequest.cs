@@ -295,7 +295,7 @@ namespace LootLocker
         private static void AppleSession(string json, Action<LootLockerAppleSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.appleSessionRequest;
-            if (string.IsNullOrEmpty(json) == null)
+            if (string.IsNullOrEmpty(json))
             {
                 return;
             }
