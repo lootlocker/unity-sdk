@@ -51,21 +51,40 @@ namespace LootLocker.Requests
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string email { get; private set; }
-        public string password { get; private set; }
+        public string email { get; set; }
+        public string password { get; set; } // DEPRECATED PARAMETER
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
+        public LootLockerWhiteLabelSessionRequest(string email, string password, string token)
+        {
+            this.email = email;
+            this.password = password;
+            this.token = token;
+        }
+
+        [ObsoleteAttribute("StartWhiteLabelSession with password is deprecated")]
         public LootLockerWhiteLabelSessionRequest(string email, string password)
         {
             this.email = email;
             this.password = password;
+            this.token = null;
         }
 
         public LootLockerWhiteLabelSessionRequest(string email)
         {
             this.email = email;
+            this.password = null;
+            this.token = null;
+        }
+
+        public LootLockerWhiteLabelSessionRequest()
+        {
+            this.email = null;
+            this.password = null;
+            this.token = null;
         }
     }
 
@@ -89,6 +108,12 @@ namespace LootLocker.Requests
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
+    }
+
+    [System.Serializable]
+    public class LootLockerAppleSessionResponse : LootLockerSessionResponse
+    {
+        public string refresh_token { get; set; }
     }
 
     [System.Serializable]
@@ -130,13 +155,26 @@ namespace LootLocker.Requests
     public class LootLockerAppleSignInSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string apple_user_token { get; private set; }
+        public string apple_authorization_code { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
-        public LootLockerAppleSignInSessionRequest(string apple_user_token)
+        public LootLockerAppleSignInSessionRequest(string apple_authorization_code)
         {
-            this.apple_user_token = apple_user_token;
+            this.apple_authorization_code = apple_authorization_code;
+        }
+    }
+
+    public class LootLockerAppleRefreshSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string refresh_token { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public bool development_mode => LootLockerConfig.current.developmentMode;
+
+        public LootLockerAppleRefreshSessionRequest(string refresh_token)
+        {
+            this.refresh_token = refresh_token;
         }
     }
 }
@@ -160,7 +198,7 @@ namespace LootLocker
             }, false);
         }
 
-        public static void WhiteLabelSession(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
+        public static void WhiteLabelSession(LootLockerWhiteLabelSessionRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelLoginSessionRequest;
 
@@ -232,20 +270,39 @@ namespace LootLocker
             }, false);
         }
 
-        public static void AppleSession(LootLockerAppleSignInSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        public static void AppleSession(LootLockerAppleSignInSessionRequest data, Action<LootLockerAppleSessionResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.appleSessionRequest;
-
-            string json = "";
             if (data == null)
             {
                 return;
             }
 
-            json = JsonConvert.SerializeObject(data);
+            string json = JsonConvert.SerializeObject(data);
+            AppleSession(json, onComplete);
+        }
+
+        public static void AppleSession(LootLockerAppleRefreshSessionRequest data, Action<LootLockerAppleSessionResponse> onComplete)
+        {
+            if (data == null)
+            {
+                return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
+            AppleSession(json, onComplete);
+        }
+
+        private static void AppleSession(string json, Action<LootLockerAppleSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.appleSessionRequest;
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
+
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                var response = LootLockerAppleSessionResponse.Serialize<LootLockerAppleSessionResponse>(serverResponse);
                 LootLockerConfig.current.UpdateToken(response.session_token, "");
                 onComplete?.Invoke(response);
             }, false);

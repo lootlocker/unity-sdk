@@ -79,7 +79,7 @@ namespace LootLocker
             }
             else if (!string.IsNullOrEmpty(serverResponse.Error))
             {
-                return new T() { success = false, Error = serverResponse.Error };
+                return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
             }
 
             var response = JsonConvert.DeserializeObject<T>(serverResponse.text) ?? new T();
@@ -164,8 +164,14 @@ namespace LootLocker
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                headers.Add(callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token",
-                    callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin ? LootLockerConfig.current.adminToken : LootLockerConfig.current.token);
+                if (callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin && !string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+                {
+                    headers.Add("x-auth-token", LootLockerConfig.current.adminToken);
+                }
+                else if (callerRole != LootLocker.LootLockerEnums.LootLockerCallerRole.Admin && !string.IsNullOrEmpty(LootLockerConfig.current.token))
+                {
+                    headers.Add("x-session-token", LootLockerConfig.current.token);
+                }
             }
 
             if (LootLockerConfig.current != null)

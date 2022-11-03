@@ -1,0 +1,73 @@
+name: Test SDK with Unity
+
+on:
+  pull_request:
+    branches: # Made towards the following
+      - main
+    types: # Only on the following activity
+      - opened
+      - synchronize # Changes to the branch like new commits, ammends, etc.
+      - reopened
+      - unlocked
+  push:
+    branches: # Made towards the following
+      - main
+    tags:
+      - v**
+
+jobs:
+  test:
+    name: ${{ matrix.unityVersion }}-${{ matrix.testMode }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - playmode
+          # No tests yet, commented out for efficiency
+          #- editmode
+        unityVersion:
+          - 2019.4.40f1
+          - 2020.3.38f1
+          - 2021.3.8f1
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v2
+
+      - name: Checkout test repository
+        uses: actions/checkout@v2
+        with:
+          repository: LootLocker/unity-sdk-tests
+          path: ./tests~ # Unity ignores folders with ~ from inclusion
+
+      - name: Set SDK path in test repo
+        run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
+
+      - name: Cache Libraries
+        uses: actions/cache@v2
+        with:
+          path: tests~/Library
+          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}
+          restore-keys: Library-
+
+      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}
+        uses: game-ci/unity-test-runner@v2
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: ${{ matrix.testMode }}
+          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-artifacts
+          projectPath: tests~/
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
+
+      # Commented out because as of right now it doesn't expand the test results, just repeat pass/fail
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: Test results for ${{ matrix.unityVersion }}-${{ matrix.testMode }}
+      #    path: ${{ steps.tests.outputs.artifactsPath }}

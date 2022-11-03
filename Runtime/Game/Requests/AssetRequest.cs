@@ -23,9 +23,27 @@ namespace LootLocker.LootLockerEnums
 
 namespace LootLocker.Requests
 {
-    public class LootLockerLinks
+    public class LootLockerLinks : Dictionary<string, string>
     {
-        public string thumbnail { get; set; }
+        public string thumbnail
+        {
+            get
+            {
+                TryGetValue(nameof(thumbnail), out var value);
+                return value;
+            }
+            set
+            {
+                if (ContainsKey(nameof(thumbnail)))
+                {
+                    this[nameof(thumbnail)] = value;
+                }
+                else
+                {
+                    Add(nameof(thumbnail), value);
+                }
+            }
+        }
     }
 
     public class LootLockerDefault_Loadouts_Info
@@ -59,6 +77,19 @@ namespace LootLocker.Requests
         public LootLockerCommonAsset[] assets { get; set; }
     }
 
+    public class LootLockerSingleAssetResponse : LootLockerResponse
+    {
+        public LootLockerCommonAsset asset { get; set; }
+
+        public void SetResponseInfo(LootLockerResponse response)
+        {
+            this.hasError = response.hasError;
+            this.statusCode = response.statusCode;
+            this.success = response.success;
+            this.Error = response.Error;
+        }
+    }
+
     public class LootLockerRental_Options
     {
         public int id { get; set; }
@@ -68,12 +99,6 @@ namespace LootLocker.Requests
         public object sales_price { get; set; }
         public object links { get; set; }
     }
-
-    //public class LootLockerStorage
-    //{
-    //    public string key;
-    //    public string value;
-    //}
 
     public class LootLockerRarity
     {
@@ -168,6 +193,17 @@ namespace LootLocker.Requests
     public class LootLockerFavouritesListResponse : LootLockerResponse
     {
         public int[] favourites { get; set; }
+    }
+
+    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerActivateRentalAssetResponse instead")]
+    public class LootLockerActivateARentalAssetResponse : LootLockerResponse
+    {
+        public int time_left;
+    }
+
+    public class LootLockerActivateRentalAssetResponse : LootLockerResponse
+    {
+        public int time_left;
     }
 }
 
@@ -266,55 +302,6 @@ namespace LootLocker
             return filterString;
         }
 
-
-        //public static void GetAssetListWithCount(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
-        //{
-        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
-
-        //    string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
-
-        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-        //       {
-        //           LootLockerAssetResponse response = new LootLockerAssetResponse();
-        //           if (string.IsNullOrEmpty(serverResponse.Error))
-        //           {
-        //               response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-        //               if (response != null && response.assets.Length > 0)
-        //                   LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-        //           }
-
-        //           //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-        //           response.text = serverResponse.text;
-        //           response.status = serverResponse.status;
-        //           response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-        //           onComplete?.Invoke(response);
-        //       }, true);
-        //}
-
-        //public static void GetAssetListWithAfterCount(LootLockerAssetRequest data, Action<LootLockerAssetResponse> onComplete)
-        //{
-        //    EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithAfterAndCount;
-
-        //    string getVariable = string.Format(endPoint.endPoint, LootLockerAssetRequest.lastId, data.count);
-
-        //    LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) =>
-        //    {
-        //        LootLockerAssetResponse response = new LootLockerAssetResponse();
-        //        if (string.IsNullOrEmpty(serverResponse.Error))
-        //        {
-        //            response = JsonConvert.DeserializeObject<LootLockerAssetResponse>(serverResponse.text);
-
-        //            if (response != null && response.assets.Length > 0)
-        //                LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
-        //        }
-        //        //     LootLockerSDKManager.DebugMessage(serverResponse.text, !string.IsNullOrEmpty(serverResponse.Error));
-        //        response.text = serverResponse.text;
-        //        response.status = serverResponse.status;
-        //        response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-        //        onComplete?.Invoke(response);
-        //    }, true);
-        //}
-
         public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
@@ -329,6 +316,35 @@ namespace LootLocker
             string getVariable = string.Format(endPoint.endPoint, builtAssets);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        public static void GetAssetById(LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
+
+            string builtAssets = data.getRequests.First();
+
+            if (data.getRequests.Count > 0)
+                for (int i = 1; i < data.getRequests.Count; i++)
+                    builtAssets += "," + data.getRequests[i];
+
+            string getVariable = string.Format(endPoint.endPoint, builtAssets);
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (serverResponse) => {
+
+                LootLockerAssetResponse realResponse = LootLockerResponse.Serialize<LootLockerAssetResponse>(serverResponse);
+                LootLockerSingleAssetResponse newResponse = new LootLockerSingleAssetResponse();
+
+                string serializedAsset = JsonConvert.SerializeObject(realResponse.assets[0], Formatting.Indented);
+
+                newResponse.asset = JsonConvert.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
+
+                string singleAssetResponse = JsonConvert.SerializeObject(newResponse, Formatting.Indented);
+                newResponse.text = singleAssetResponse;
+                newResponse.SetResponseInfo(serverResponse);
+
+                LootLockerResponse.Serialize(onComplete, newResponse);
+            });
         }
 
         public void ResetAssetCalls()
