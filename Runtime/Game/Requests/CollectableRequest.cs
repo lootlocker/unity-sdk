@@ -179,10 +179,10 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                LootLockerCollectItemResponse response = new LootLockerCollectItemResponse();
+                LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
+                    response = JsonConvert.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
 
                     string collectable = collectableStrings[0];
