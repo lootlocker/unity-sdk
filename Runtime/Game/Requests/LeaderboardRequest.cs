@@ -95,7 +95,6 @@ namespace LootLocker.Requests
 
     public class LootLockerGetScoreListRequest : LootLockerGetRequests
     {
-        public int leaderboardId { get; set; }
         public string leaderboardKey { get; set; }
         public static int? nextCursor;
         public static int? prevCursor;
@@ -176,13 +175,13 @@ namespace LootLocker
             EndPointClass requestEndPoint = LootLockerEndPoints.getScoreList;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardId, getRequests.count);
+            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardKey, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
                 tempEndpoint = requestEndPoint.endPoint + "&after={2}";
 
-                endPoint = string.Format(tempEndpoint, getRequests.leaderboardKey ?? getRequests.leaderboardId.ToString(), getRequests.count, int.Parse(getRequests.after));
+                endPoint = string.Format(tempEndpoint, getRequests.leaderboardKey, getRequests.count, int.Parse(getRequests.after));
             }
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
