@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEditor;
 using System.Threading.Tasks;
 
+#if UNITY_EDITOR
 namespace LootLocker.Admin
 {
+
     [ExecuteInEditMode]
     public class AttributionHandler : MonoBehaviour
     {
@@ -103,3 +105,4 @@ namespace LootLocker.Admin
         }
     }
 }
+#endif

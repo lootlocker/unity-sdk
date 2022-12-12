@@ -1,8 +1,10 @@
-﻿using LootLocker.Requests;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace LootLocker
@@ -17,15 +19,31 @@ namespace LootLocker
 
         public static LootLockerConfig Get()
         {
+
             if (settingsInstance != null)
             {
                 return settingsInstance;
             }
+            //Try to load it
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
+
+#if UNITY_EDITOR
+            // Could not be loaded, create it
+            if (settingsInstance == null)
+            {
+
+                // Create a new Config
+                LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
+                string path = "Assets/LootLocker SDK/Runtime/Game/Resources/Config/LootLockerConfig.asset";
+                AssetDatabase.CreateAsset(newConfig, path);
+                EditorApplication.delayCall += AssetDatabase.SaveAssets;
+                AssetDatabase.Refresh();
+            }
+#endif
             return settingsInstance;
         }
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.Off, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
 
@@ -57,7 +75,7 @@ namespace LootLocker
                 return _current;
             }
         }
-        public (string key, string value) dateVersion = ( "LL-Version", "2021-03-01");
+        public (string key, string value) dateVersion = ("LL-Version", "2021-03-01");
         public string apiKey;
         [HideInInspector]
         public string token;
@@ -67,12 +85,12 @@ namespace LootLocker
         public string domainKey;
         [HideInInspector]
         public int gameID;
-        public string game_version = "1.0";
+        public string game_version = "1.0.0.0";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
         public platformType platform;
         public enum platformType { Android, iOS, Steam, PlayStationNetwork }
-        public bool developmentMode;
+        public bool developmentMode = true;
         [HideInInspector]
         public string url = "https://api.lootlocker.io/game/v1";
         [HideInInspector]
@@ -84,7 +102,7 @@ namespace LootLocker
         [HideInInspector]
         public string baseUrl = "https://api.lootlocker.io";
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
-        public DebugLevel currentDebugLevel;
+        public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
 
         public void UpdateToken(string _token, string _player_identifier)

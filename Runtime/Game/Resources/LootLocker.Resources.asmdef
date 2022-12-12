@@ -1,8 +1,6 @@
 {
-    "name": "lootlocker.lootlockersdk.runtime",
-    "references": [
-        "GUID:ee1632cd6d5ed7147bd3acfe954feb0b"
-    ],
+    "name": "LootLocker.Resources",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
