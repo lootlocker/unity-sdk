@@ -19,7 +19,6 @@ namespace LootLocker
 
         public static LootLockerConfig Get()
         {
-
             if (settingsInstance != null)
             {
                 return settingsInstance;
@@ -50,10 +49,25 @@ namespace LootLocker
                 EditorApplication.delayCall += AssetDatabase.SaveAssets;
                 AssetDatabase.Refresh();
             }
+
+#else
+            throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
 #endif
             return settingsInstance;
         }
 
+#if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        static void CreateConfigFile()
+        {
+            if (EditorPrefs.GetBool("BonfigFileCreated") == false)
+            {
+                // Create config file instantly when SDK has been installed
+                Get();
+                EditorPrefs.SetBool("BonfigFileCreated", true);
+            }
+        }
+#endif
         public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
