@@ -24,6 +24,7 @@ namespace LootLocker
             {
                 return settingsInstance;
             }
+
             //Try to load it
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
 
@@ -31,11 +32,21 @@ namespace LootLocker
             // Could not be loaded, create it
             if (settingsInstance == null)
             {
-
                 // Create a new Config
                 LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
-                string path = "Assets/LootLocker SDK/Runtime/Game/Resources/Config/LootLockerConfig.asset";
-                AssetDatabase.CreateAsset(newConfig, path);
+
+                // Folder needs to exist for Unity to be able to create an asset in it
+                string dir = Application.dataPath+ "/LootLockerSDK/Resources/Config";
+
+                // If directory does not exist, create it
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                // Create config asset
+                string configAssetPath = "Assets/LootLockerSDK/Resources/Config/LootLockerConfig.asset";
+                AssetDatabase.CreateAsset(newConfig, configAssetPath);
                 EditorApplication.delayCall += AssetDatabase.SaveAssets;
                 AssetDatabase.Refresh();
             }
