@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 
 namespace LootLocker.Admin
 {
+    // Test
     public class ProjectSettings : SettingsProvider
     {
         private static LootLockerConfig gameSettings;
