@@ -60,11 +60,19 @@ namespace LootLocker
         [InitializeOnLoadMethod]
         static void CreateConfigFile()
         {
-            if (EditorPrefs.GetBool("BonfigFileCreated") == false)
+
+            // Get the path to the project directory
+            string projectPath = Application.dataPath;
+
+            // Use the Directory class to get the creation time of the project directory
+            DateTime creationTime = Directory.GetCreationTime(projectPath);
+            string configFileEditorPref = "configFileCreated" + creationTime.GetHashCode().ToString();
+
+            if (EditorPrefs.GetBool(configFileEditorPref) == false)
             {
                 // Create config file instantly when SDK has been installed
                 Get();
-                EditorPrefs.SetBool("BonfigFileCreated", true);
+                EditorPrefs.SetBool(configFileEditorPref, true);
             }
         }
 #endif
