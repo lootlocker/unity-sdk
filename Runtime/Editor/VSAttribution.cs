@@ -1,6 +1,7 @@
 using System;
 using UnityEngine.Analytics;
 
+#if UNITY_EDITOR
 namespace UnityEditor.VSAttribution
 {
 	public static class VSAttribution
@@ -66,3 +67,4 @@ namespace UnityEditor.VSAttribution
 		}
 	}
 }
+#endif
