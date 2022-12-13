@@ -15,6 +15,10 @@ namespace LootLocker.Admin
         public static event SendAttributionDelegate APIKeyEnteredEvent;
         internal static SerializedObject GetSerializedSettings()
         {
+            if (gameSettings == null)
+            {
+                gameSettings = LootLockerConfig.Get();
+            }
             return new SerializedObject(gameSettings);
         }
         public ProjectSettings(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
@@ -34,10 +38,14 @@ namespace LootLocker.Admin
 
         public override void OnGUI(string searchContext)
         {
+            if (gameSettings == null)
+            {
+                gameSettings = LootLockerConfig.Get();
+            }
             m_CustomSettings.Update();
 
             // For Unity Attribution
-            if (gameSettings.apiKey.Length > 20)
+            if (string.IsNullOrEmpty(gameSettings.apiKey) == false && gameSettings.apiKey.Length > 20)
             {
                 if (EditorPrefs.GetBool("attributionChecked") == false)
                 {
