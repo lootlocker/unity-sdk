@@ -1,3 +1,15 @@
-﻿{
-	"name": "lootlocker.lootlockersdk.runtime"
+{
+    "name": "lootlocker.lootlockersdk.runtime",
+    "references": [
+        "GUID:ee1632cd6d5ed7147bd3acfe954feb0b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

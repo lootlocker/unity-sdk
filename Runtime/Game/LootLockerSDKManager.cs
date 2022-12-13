@@ -2690,10 +2690,10 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the current ranking for a specific player on a leaderboard.
         /// </summary>
-        /// <param name="leaderboardId">ID or key of the leaderboard as a string</param>
+        /// <param name="leaderboardKey">Key of the leaderboard as a string</param>
         /// <param name="member_id">ID of the player as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        public static void GetMemberRank(string leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2702,101 +2702,65 @@ namespace LootLocker.Requests
             }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
 
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
+            lootLockerGetMemberRankRequest.leaderboardId = leaderboardKey;
             lootLockerGetMemberRankRequest.member_id = member_id;
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
         }
 
         /// <summary>
-        /// Get the current ranking for a specific player on a leaderboard.
+        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard</param>
         /// <param name="member_id">ID of the player as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
         public static void GetMemberRank(int leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
-                return;
-            }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
-
-
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId.ToString();
-            lootLockerGetMemberRankRequest.member_id = member_id;
-
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            GetMemberRank(leaderboardId.ToString(), member_id, onComplete);
         }
 
         /// <summary>
-        /// Get the current ranking for a specific player on a leaderboard.
+        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard as an int</param>
         /// <param name="member_id">ID of the player as an int</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
         public static void GetMemberRank(int leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
-                return;
-            }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
-
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId.ToString();
-            lootLockerGetMemberRankRequest.member_id = member_id.ToString();
-
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            GetMemberRank(leaderboardId.ToString(), member_id.ToString(), onComplete);
         }
 
         /// <summary>
-        /// Get the current ranking for a specific player on a leaderboard.
+        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
         /// </summary>
         /// <param name="leaderboardId">ID or key of the leaderboard as a string</param>
         /// <param name="member_id">ID of the player as an int</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
         public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
-                return;
-            }
-            LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
-
-            lootLockerGetMemberRankRequest.leaderboardId = leaderboardId;
-            lootLockerGetMemberRankRequest.member_id = member_id.ToString();
-
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            GetMemberRank(leaderboardId, member_id.ToString(), onComplete);
         }
 
         /// <summary>
-        /// Get the current ranking for several members on a specific leaderboard.
+        /// DEPRECATED: Get the current ranking for several members on a specific leaderboard.
         /// </summary>
         /// <param name="members">List of members to get as string</param>
         /// <param name="leaderboardId">ID of the leaderboard as an int</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetByListOfMembersResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete) instead.")]
         public static void GetByListOfMembers(string[] members, int leaderboardId, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetByListOfMembersResponse>());
-                return;
-            }
-            LootLockerGetByListMembersRequest request = new LootLockerGetByListMembersRequest();
-
-            request.members = members;
-
-            LootLockerAPIManager.GetByListOfMembers(request, leaderboardId.ToString(), onComplete);
+            GetByListOfMembers(members, leaderboardId.ToString(), onComplete);
         }
 
         /// <summary>
         /// Get the current ranking for several members on a specific leaderboard.
         /// </summary>
         /// <param name="members">List of members to get as string</param>
-        /// <param name="leaderboardKey">ID or key of the leaderboard as a string</param>
+        /// <param name="leaderboardKey">Key of the leaderboard as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetByListOfMembersResponse</param>
         public static void GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
@@ -2914,43 +2878,25 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get the entries for a specific leaderboard.
+        /// DEPRECATED: Get the entries for a specific leaderboard.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="after">How many after the last entry to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
         public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>());
-                return;
-            }
-            LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
-            request.leaderboardId = leaderboardId;
-            request.count = count;
-            request.after = after > 0 ? after.ToString() : null;
-            Action<LootLockerGetScoreListResponse> callback = (response) =>
-            {
-                if (response != null && response.pagination != null)
-                {
-                    LootLockerGetScoreListRequest.nextCursor = response.pagination.next_cursor;
-                    LootLockerGetScoreListRequest.prevCursor = response.pagination.previous_cursor;
-                    response.pagination.allowNext = response.pagination.next_cursor > 0;
-                    response.pagination.allowPrev = (response.pagination.previous_cursor != null);
-                }
-                onComplete?.Invoke(response);
-            };
-            LootLockerAPIManager.GetScoreList(request, callback);
+            GetScoreList(leaderboardId.ToString(), count, after, onComplete);
         }
 
         /// <summary>
-        /// Get the entries for a specific leaderboard.
+        /// DEPRECATED: Get the entries for a specific leaderboard.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
         public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardId, count, -1, onComplete);
@@ -2959,7 +2905,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the entries for a specific leaderboard.
         /// </summary>
-        /// <param name="leaderboardKey">ID or key of the leaderboard to get entries for</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="after">How many after the last entry to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
@@ -2991,7 +2937,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the entries for a specific leaderboard.
         /// </summary>
-        /// <param name="leaderboardKey">ID or key of the leaderboard to get entries for</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
         public static void GetScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
@@ -3000,20 +2946,21 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get the next entries for a specific leaderboard. Can be called after GetScoreList.
+        /// DEPRECATED: Get the next entries for a specific leaderboard. Can be called after GetScoreList.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
         public static void GetNextScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
+            GetScoreList(leaderboardId.ToString(), count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
         }
 
         /// <summary>
         /// Get the next entries for a specific leaderboard. Can be called after GetScoreList.
         /// </summary>
-        /// <param name="leaderboardKey">ID or key of the leaderboard to get entries for</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
         public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
@@ -3022,20 +2969,21 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get the previous entries for a specific leaderboard. Can be called after GetScoreList or GetNextScoreList.
+        /// DEPRECATED: Get the previous entries for a specific leaderboard. Can be called after GetScoreList or GetNextScoreList.
         /// </summary>
         /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
         public static void GetPrevScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
-            GetScoreList(leaderboardId, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
+            GetScoreList(leaderboardId.ToString(), count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
         }
 
         /// <summary>
         /// Get the previous entries for a specific leaderboard. Can be called after GetScoreList or GetNextScoreList.
         /// </summary>
-        /// <param name="leaderboardKey">ID of the leaderboard to get entries for</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
         public static void GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
@@ -3060,7 +3008,7 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
-            request.leaderboardId = leaderboardId;
+            request.leaderboardKey = leaderboardId.ToString();
             request.count = count;
             request.after = after > 0 ? after.ToString() : null;
 
@@ -3068,39 +3016,30 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Submit a score to a leaderboard.
+        /// DEPRECATED: Submit a score to a leaderboard.
         /// </summary>
         /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
         /// <param name="score">The score to upload</param>
         /// <param name="leaderboardId">ID of the leaderboard to submit score to</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete) instead.")]
         public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             SubmitScore(memberId, score, leaderboardId.ToString(), "", onComplete);
         }
 
         /// <summary>
-        /// Submit a score to a leaderboard with additional metadata.
+        /// DEPRECATED: Submit a score to a leaderboard with additional metadata.
         /// </summary>
         /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
         /// <param name="score">The score to upload</param>
         /// <param name="leaderboardId">ID of the leaderboard to submit score to</param>
         /// <param name="metadata">Additional metadata to add to the score</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        [Obsolete("This function is deprecated and will be removed soon. Please use (string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) instead.")]
         public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>());
-                return;
-            }
-            LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
-            request.member_id = memberId;
-            request.score = score;
-            if (!string.IsNullOrEmpty(metadata))
-                request.metadata = metadata;
-
-            LootLockerAPIManager.SubmitScore(request, leaderboardId.ToString(), onComplete);
+            SubmitScore(memberId, score, leaderboardId.ToString(), metadata, onComplete);
         }
 
         /// <summary>
@@ -3108,7 +3047,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
         /// <param name="score">The score to upload</param>
-        /// <param name="leaderboardKey">ID or key of the leaderboard to submit score to</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
         public static void SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete)
         {
@@ -3120,7 +3059,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
         /// <param name="score">The score to upload</param>
-        /// <param name="leaderboardKey">ID or key of the leaderboard to submit score to</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
         /// <param name="metadata">Additional metadata to add to the score</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
         public static void SubmitScore(string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
