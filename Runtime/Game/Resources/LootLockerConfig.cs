@@ -51,7 +51,10 @@ namespace LootLocker
             }
 
 #else
-            throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
+            if (settingsInstance == null)
+            {
+                throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
+            }
 #endif
             return settingsInstance;
         }
