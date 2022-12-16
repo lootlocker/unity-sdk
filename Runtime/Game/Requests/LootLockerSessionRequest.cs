@@ -113,6 +113,7 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
+        public string player_identifier { get; set; }
         public string refresh_token { get; set; }
     }
 
@@ -303,7 +304,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerAppleSessionResponse.Serialize<LootLockerAppleSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, "");
+                LootLockerConfig.current.UpdateToken(response.session_token, response.player_identifier);
                 onComplete?.Invoke(response);
             }, false);
         }
