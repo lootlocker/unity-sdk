@@ -1,6 +1,6 @@
 {
   "name": "com.lootlocker.lootlockersdk",
-  "version": "1.1.41",
+  "version": "1.1.42",
   "displayName": "LootLocker",
   "description": "LootLocker is a game backend-as-a-service with plug and play tools to upgrade your game and give your players the best experience possible. Designed for teams of all shapes and sizes, on mobile, PC and console. From solo developers, indie teams, AAA studios, and publishers. Built with cross-platform in mind.\n\n\u25AA Manage your game\nSave time and upgrade your game with leaderboards, progression, and more. Completely off-the-shelf features, built to work with any game and platform.\n\n\u25AA Manage your content\nTake charge of your game's content on all platforms, in one place. Sort, edit and manage everything, from cosmetics to currencies, UGC to DLC. Without breaking a sweat.\n\n\u25AA Manage your players\nStore your players' data together in one place. Access their profile and friends list cross-platform. Manage reports, messages, refunds and gifts to keep them hooked.\n",
   "unity": "2019.2",
