@@ -81,18 +81,17 @@ namespace LootLocker
 #endif
         public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
-            settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
+            _current = Get();
 
-            if (settingsInstance == null)
-                settingsInstance = CreateInstance<LootLockerConfig>();
+            _current.apiKey = apiKey;
+            _current.game_version = gameVersion;
+            _current.platform = platform;
+            _current.developmentMode = onDevelopmentMode;
+            _current.currentDebugLevel = debugLevel;
+            _current.allowTokenRefresh = allowTokenRefresh;
+            _current.domainKey = domainKey;
 
-            settingsInstance.apiKey = apiKey;
-            settingsInstance.game_version = gameVersion;
-            settingsInstance.platform = platform;
-            settingsInstance.developmentMode = onDevelopmentMode;
-            settingsInstance.currentDebugLevel = debugLevel;
-            settingsInstance.allowTokenRefresh = allowTokenRefresh;
-            settingsInstance.domainKey = domainKey;
+            _current = settingsInstance;
 
             return true;
         }
