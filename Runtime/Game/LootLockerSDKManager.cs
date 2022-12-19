@@ -49,25 +49,25 @@ namespace LootLocker.Requests
         {
             DebugMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode, domainKey);
+            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode, domainKey);
+            return initialized;
         }
 
         static bool LoadConfig()
         {
-            initialized = true;
+            initialized = false;
             if (LootLockerConfig.current == null)
             {
-                Debug.LogError("SDK could not find settings, please contact support \n You can also set config manually by calling init");
+                Debug.LogError("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)");
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
                 DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again");
-                initialized = false;
                 return false;
             }
 
-
+            initialized = true;
             return initialized;
         }
 
