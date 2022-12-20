@@ -284,7 +284,41 @@ namespace LootLocker
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + json);
+
+                        var payloadDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json); ;
+                        if (payloadDictionary != null)
+                        {
+                            List<string> stringsToObfuscate =
+                                new List<string> { "game_key", "email", "password", "domain_key" };
+                            const int charactersToShowAtStartAndEnd = 3;
+                            foreach (string stringToObfuscate in stringsToObfuscate)
+                            {
+                                string valueToObfuscate;
+                                try
+                                {
+                                    valueToObfuscate = JsonConvert.SerializeObject(payloadDictionary[stringToObfuscate]);
+                                }
+                                catch (KeyNotFoundException)
+                                {
+                                    continue;
+                                }
+                                if (string.IsNullOrEmpty(valueToObfuscate) && valueToObfuscate.Equals("null", StringComparison.Ordinal))
+                                {
+                                    continue;
+                                }
+                                int replaceFrom = charactersToShowAtStartAndEnd*2 >= valueToObfuscate.Length ? 0 : charactersToShowAtStartAndEnd+1;
+                                int replaceTo = valueToObfuscate.Length - charactersToShowAtStartAndEnd <= replaceFrom ? valueToObfuscate.Length - 1 : valueToObfuscate.Length - 1 - charactersToShowAtStartAndEnd;
+                                StringBuilder replacement = new StringBuilder();
+                                replacement.Append('X', replaceTo - replaceFrom);
+                                StringBuilder obfuscatedValue = new StringBuilder(valueToObfuscate);
+                                obfuscatedValue.Remove(replaceFrom, replacement.Length);
+                                obfuscatedValue.Insert(replaceFrom, replacement.ToString());
+                                payloadDictionary[stringToObfuscate] = JsonConvert.DeserializeObject(obfuscatedValue.ToString());
+                            }
+                        }
+
+                        string obfuscatedJson = JsonConvert.SerializeObject(payloadDictionary);
+                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + obfuscatedJson);
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
