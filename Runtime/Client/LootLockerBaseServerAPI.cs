@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 using LootLocker.Requests;
+using Newtonsoft.Json.Linq;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -98,13 +99,13 @@ namespace LootLocker
 
                     try
                     {
-                        LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+                        LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
                     }
                     catch
                     {
                         LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(), true);
                         LootLockerSDKManager.DebugMessage(request.endpoint, true);
-                        LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text, true);
+                        LootLockerSDKManager.DebugMessage(ObfuscateJsonStringForLogging(webRequest.downloadHandler.text), true);
                     }
 
                     LootLockerResponse response = new LootLockerResponse();
@@ -160,7 +161,7 @@ namespace LootLocker
                         if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !isSteam && tries < maxRetry) 
                         {
                             tries++;
-                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find one. If you do not want this please turn off in the lootlocker config settings");
+                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find one. If you do not want this please turn off in the LootLocker config settings");
                             RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else
@@ -284,41 +285,7 @@ namespace LootLocker
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-
-                        var payloadDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json); ;
-                        if (payloadDictionary != null)
-                        {
-                            List<string> stringsToObfuscate =
-                                new List<string> { "game_key", "email", "password", "domain_key" };
-                            const int charactersToShowAtStartAndEnd = 3;
-                            foreach (string stringToObfuscate in stringsToObfuscate)
-                            {
-                                string valueToObfuscate;
-                                try
-                                {
-                                    valueToObfuscate = JsonConvert.SerializeObject(payloadDictionary[stringToObfuscate]);
-                                }
-                                catch (KeyNotFoundException)
-                                {
-                                    continue;
-                                }
-                                if (string.IsNullOrEmpty(valueToObfuscate) && valueToObfuscate.Equals("null", StringComparison.Ordinal))
-                                {
-                                    continue;
-                                }
-                                int replaceFrom = charactersToShowAtStartAndEnd*2 >= valueToObfuscate.Length ? 0 : charactersToShowAtStartAndEnd+1;
-                                int replaceTo = valueToObfuscate.Length - charactersToShowAtStartAndEnd <= replaceFrom ? valueToObfuscate.Length - 1 : valueToObfuscate.Length - 1 - charactersToShowAtStartAndEnd;
-                                StringBuilder replacement = new StringBuilder();
-                                replacement.Append('X', replaceTo - replaceFrom);
-                                StringBuilder obfuscatedValue = new StringBuilder(valueToObfuscate);
-                                obfuscatedValue.Remove(replaceFrom, replacement.Length);
-                                obfuscatedValue.Insert(replaceFrom, replacement.ToString());
-                                payloadDictionary[stringToObfuscate] = JsonConvert.DeserializeObject(obfuscatedValue.ToString());
-                            }
-                        }
-
-                        string obfuscatedJson = JsonConvert.SerializeObject(payloadDictionary);
-                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + obfuscatedJson);
+                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + ObfuscateJsonStringForLogging(json));
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
@@ -362,6 +329,103 @@ namespace LootLocker
             }
 
             return webRequest;
+        }
+
+        private struct ObfuscationDetails
+        {
+            public string key;
+            public char replacementChar;
+            public int visibleCharsFromBeginning;
+            public int visibleCharsFromEnd;
+            public bool hideCharactersForShortStrings;
+
+            public ObfuscationDetails(string key, char replacementChar = '*', int visibleCharsFromBeginning = 3, int visibleCharsFromEnd = 3, bool hideCharactersForShortStrings = true)
+            {
+                this.key = key;
+                this.replacementChar = replacementChar;
+                this.visibleCharsFromBeginning = visibleCharsFromBeginning;
+                this.visibleCharsFromEnd = visibleCharsFromEnd;
+                this.hideCharactersForShortStrings = hideCharactersForShortStrings;
+            }
+        }
+
+        static readonly List<ObfuscationDetails> FieldsToObfuscate = new List<ObfuscationDetails>
+        {
+            new ObfuscationDetails("game_key", '*', 4, 3, false),
+            new ObfuscationDetails("email"),
+            new ObfuscationDetails("password", '*', 0, 0),
+            new ObfuscationDetails("domain_key"),
+            new ObfuscationDetails("session_token"),
+            new ObfuscationDetails("token")
+        };
+
+        private static string ObfuscateJsonStringForLogging(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+
+            JObject jsonObject;
+            try
+            {
+                jsonObject = JObject.Parse(json);
+            }
+            catch (JsonReaderException)
+            {
+                return json;
+            }
+            ;
+            if (jsonObject.HasValues)
+            {
+                foreach (ObfuscationDetails obfuscationInfo in FieldsToObfuscate)
+                {
+                    string valueToObfuscate;
+                    try
+                    {
+                        JToken jsonValue;
+                        jsonObject.TryGetValue(obfuscationInfo.key, StringComparison.Ordinal, out jsonValue);
+                        if (jsonValue == null || (jsonValue.Type != JTokenType.String && jsonValue.Type != JTokenType.Integer))
+                            continue;
+                        valueToObfuscate = jsonValue.ToString();
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(valueToObfuscate))
+                        continue;
+
+                    if (valueToObfuscate.Equals("null", StringComparison.Ordinal))
+                        continue;
+
+                    int replaceFrom = 0;
+                    int replaceTo = valueToObfuscate.Length;
+
+                    // Deal with short strings
+                    if (valueToObfuscate.Length <= obfuscationInfo.visibleCharsFromBeginning + obfuscationInfo.visibleCharsFromEnd)
+                    {
+                        if (!obfuscationInfo.hideCharactersForShortStrings) // Hide nothing, else hide everything
+                            continue;
+                    }
+                    // Replace in
+                    else
+                    {
+                        replaceFrom += obfuscationInfo.visibleCharsFromBeginning;
+                        replaceTo -= obfuscationInfo.visibleCharsFromEnd;
+                    }
+
+                    StringBuilder replacement = new StringBuilder();
+                    replacement.Append(obfuscationInfo.replacementChar, replaceTo - replaceFrom);
+                    StringBuilder obfuscatedValue = new StringBuilder(valueToObfuscate);
+                    obfuscatedValue.Remove(replaceFrom, replacement.Length);
+                    obfuscatedValue.Insert(replaceFrom, replacement.ToString());
+                    jsonObject[obfuscationInfo.key] = obfuscatedValue.ToString();
+                }
+            }
+
+            return JsonConvert.SerializeObject(jsonObject, Formatting.None);
         }
 
         string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)
