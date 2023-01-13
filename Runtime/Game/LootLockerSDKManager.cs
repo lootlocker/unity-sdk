@@ -609,7 +609,7 @@ namespace LootLocker.Requests
             StartWhiteLabelSession(sessionRequest, onComplete);
         }
 
-        [ObsoleteAttribute("This function is deprecated and will be removed soon, please use the parameter-less StartWhiteLabelSession method instead.")]
+        [ObsoleteAttribute("This function is deprecated and will be removed soon, please use StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete) instead.")]
         public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
         {
             LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = email, password = password };
@@ -632,6 +632,22 @@ namespace LootLocker.Requests
             current.platformOverride = "white_label";
             CurrentPlatform = "white_label";
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+        }
+
+        public static void WhiteLabelLoginAndStartSession(string email, string password, bool rememberMe, Action<LootLockerWhiteLabelLoginAndStartSessionResponse> onComplete)
+        {
+            WhiteLabelLogin(email, password, loginResponse =>
+            {
+                if (!loginResponse.success)
+                {
+                    onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, null));
+                    return;
+                }
+                StartWhiteLabelSession(sessionResponse =>
+                {
+                    onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, sessionResponse));
+                });
+            });
         }
 
         #endregion
