@@ -49,6 +49,35 @@ namespace LootLocker.Requests
     {
         public string SessionToken { get; set; }
     }
+
+    [System.Serializable]
+    public class LootLockerWhiteLabelLoginAndStartSessionResponse : LootLockerResponse
+    {
+        public LootLockerWhiteLabelLoginResponse LoginResponse { get; set; }
+        public LootLockerSessionResponse SessionResponse { get; set; }
+
+        public static LootLockerWhiteLabelLoginAndStartSessionResponse MakeWhiteLabelLoginAndStartSessionResponse(
+            LootLockerWhiteLabelLoginResponse loginResponse, LootLockerSessionResponse sessionResponse)
+        {
+            if (loginResponse == null && sessionResponse == null)
+            {
+                return new LootLockerWhiteLabelLoginAndStartSessionResponse();
+            }
+
+            return new LootLockerWhiteLabelLoginAndStartSessionResponse
+            {
+                statusCode = sessionResponse?.statusCode ?? loginResponse.statusCode,
+                success = sessionResponse?.success ?? loginResponse.success,
+                Error = sessionResponse?.Error ?? loginResponse?.Error,
+                EventId = sessionResponse?.EventId ?? loginResponse?.EventId,
+                hasError = sessionResponse?.hasError ?? loginResponse.hasError,
+                text = sessionResponse?.text ?? loginResponse?.text,
+                texture = sessionResponse?.texture ?? loginResponse?.texture,
+                LoginResponse = loginResponse,
+                SessionResponse = sessionResponse
+            };
+        }
+    }
 }
 
 namespace LootLocker
