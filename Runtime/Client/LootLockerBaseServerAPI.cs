@@ -156,7 +156,7 @@ namespace LootLocker
                                 break;
                         }
 
-                        bool isSteam = LootLockerSDKManager.GetCurrentPlatform() == "steam";
+                        bool isSteam = LootLockerConfig.current.platform.ToString() == "steam";
                         if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !isSteam && tries < maxRetry) 
                         {
                             tries++;
