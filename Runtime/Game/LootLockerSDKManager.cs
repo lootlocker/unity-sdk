@@ -1394,6 +1394,151 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Player progressions
+
+        /// <summary>
+        /// Returns all progressions the player is currently on.
+        /// </summary>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetAllPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressions> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressions>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getAllPlayerProgressions.endPoint;
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Returns all progressions the player is currently on.
+        /// </summary>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetAllPlayerProgressions(int count, Action<LootLockerPaginatedPlayerProgressions> onComplete)
+        {
+            GetAllPlayerProgressions(count, null, onComplete);
+        }
+        
+        /// <summary>
+        /// Returns all progressions the player is currently on.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetAllPlayerProgressions(Action<LootLockerPaginatedPlayerProgressions> onComplete)
+        {
+            GetAllPlayerProgressions(-1, null, onComplete);
+        }
+        
+        /// <summary>
+        /// Returns a single progression the player is currently on.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgression</param>
+        public static void GetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgression> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgression>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getSinglePlayerProgression.endPoint, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Adds points to a player progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="amount">Amount of points to be added</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
+        public static void AddPointsToPlayerProgression(string progressionKey, int amount, Action<LootLockerPlayerProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.addPointsToPlayerProgression.endPoint, progressionKey);
+
+            var body = JsonConvert.SerializeObject(new { amount });  
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Subtracts points from a player progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// /// <param name="amount">Amount of points to be subtracted</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
+        public static void SubtractPointsFromPlayerProgression(string progressionKey, int amount, Action<LootLockerPlayerProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromPlayerProgression.endPoint, progressionKey);
+            
+            var body = JsonConvert.SerializeObject(new { amount });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Resets a player progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
+        public static void ResetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.resetPlayerProgression.endPoint, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Deletes a player progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void DeletePlayerProgression(string progressionKey, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.deletePlayerProgression.endPoint, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        #endregion
+
         #region Character
 
         /// /// <summary>
@@ -1681,6 +1826,159 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Character progressions
+
+        /// <summary>
+        /// Returns all progressions the character is currently on.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">How many extra rows after the characters position</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
+        public static void GetAllCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressions> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedCharacterProgressions>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getAllCharacterProgressions.endPoint, characterId);
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Returns all progressions the character is currently on.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
+        public static void GetAllCharacterProgressions(int characterId, int count, Action<LootLockerPaginatedCharacterProgressions> onComplete)
+        {
+            GetAllCharacterProgressions(characterId, count, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns all progressions the character is currently on.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
+        public static void GetAllCharacterProgressions(int characterId, Action<LootLockerPaginatedCharacterProgressions> onComplete)
+        {
+            GetAllCharacterProgressions(characterId, -1, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns a single progression the character is currently on.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgression</param>
+        public static void GetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgression> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgression>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getSingleCharacterProgression.endPoint, characterId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Adds points to a character progression.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="amount">Amount of points to add</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
+        public static void AddPointsToCharacterProgression(int characterId, string progressionKey, int amount, Action<LootLockerCharacterProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.addPointsToCharacterProgression.endPoint, characterId, progressionKey);
+
+            var body = JsonConvert.SerializeObject(new { amount });  
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Subtracts points from a character progression.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="amount">Amount of points to subtract</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
+        public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, int amount, Action<LootLockerCharacterProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromCharacterProgression.endPoint, characterId, progressionKey);
+            
+            var body = JsonConvert.SerializeObject(new { amount });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Resets a character progression.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
+        public static void ResetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionWithRewards> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewards>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.resetCharacterProgression.endPoint, characterId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Deletes a character progression.
+        /// </summary>
+        /// <param name="characterId">Id of the character</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void DeleteCharacterProgression(int characterId, string progressionKey, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.deleteCharacterProgression.endPoint, characterId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        #endregion
+        
         #region PlayerStorage
         /// <summary>
         /// Get the player storage for the currently active player (key/values).
@@ -2424,6 +2722,121 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.RemovingFilesFromAssetCandidates(data, onComplete);
         }
+        #endregion
+        
+        #region Progressions
+
+        /// <summary>
+        /// Returns all progressions.
+        /// </summary>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
+        public static void GetAllProgressions(int count, string after, Action<LootLockerPaginatedProgressions> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressions>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getAllProgressions.endPoint;
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Returns all progressions.
+        /// </summary>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
+        public static void GetAllProgressions(int count, Action<LootLockerPaginatedProgressions> onComplete)
+        {
+            GetAllProgressions(count, null, onComplete);
+        }
+        
+        /// <summary>
+        /// Returns all progressions.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
+        public static void GetAllProgressions(Action<LootLockerPaginatedProgressions> onComplete)
+        {
+            GetAllProgressions(-1, null, onComplete);
+        }
+        
+        /// <summary>
+        /// Returns a single progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerProgression</param>
+        public static void GetProgression(string progressionKey, Action<LootLockerProgression> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgression>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getSingleProgression.endPoint, progressionKey);
+            
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Returns all progression tiers for the specified progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
+        public static void GetProgressionTiers(string progressionKey, int count, int after, Action<LootLockerPaginatedProgressionTiers> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionTiers>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getProgressionTiers.endPoint, progressionKey);
+            
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (after > 0)
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Returns all progression tiers for the specified progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
+        public static void GetProgressionTiers(string progressionKey, int count, Action<LootLockerPaginatedProgressionTiers> onComplete)
+        {
+            GetProgressionTiers(progressionKey, -1, count, onComplete);
+        }
+        
+        /// <summary>
+        /// Returns all progression tiers for the specified progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
+        public static void GetProgressionTiers(string progressionKey, Action<LootLockerPaginatedProgressionTiers> onComplete)
+        {
+            GetProgressionTiers(progressionKey, -1, -1, onComplete);
+        }
+
         #endregion
 
         #region Missions
