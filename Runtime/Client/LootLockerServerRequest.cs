@@ -92,6 +92,12 @@ namespace LootLocker
             return response;
         }
     }
+    public class LootLockerPagination
+    {
+        public int total { get; set; }
+        public string next_cursor { get; set; }
+        public string previous_cursor { get; set; }
+    }
 
     /// <summary>
     /// Convenience factory class for creating some responses that we use often.
