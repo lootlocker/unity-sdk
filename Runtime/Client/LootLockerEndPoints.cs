@@ -52,7 +52,7 @@ namespace LootLocker
         public static EndPointClass deletePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.DELETE);
 
         // Player Progressions
-        [Header("PlayerProgressions")]
+        [Header("Player Progressions")]
         public static EndPointClass getAllPlayerProgressions = new EndPointClass("player/progressions", LootLockerHTTPMethod.GET);
         public static EndPointClass getSinglePlayerProgression = new EndPointClass("player/progressions/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass addPointsToPlayerProgression = new EndPointClass("player/progressions/{0}/points/add", LootLockerHTTPMethod.POST);
@@ -79,7 +79,7 @@ namespace LootLocker
         public static EndPointClass listCharacterTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
         
         // Character Progressions
-        [Header("charactersProgressions")]
+        [Header("Character Progressions")]
         public static EndPointClass getAllCharacterProgressions = new EndPointClass("player/characters/{0}/progressions", LootLockerHTTPMethod.GET);
         public static EndPointClass getSingleCharacterProgression = new EndPointClass("player/characters/{0}/progressions/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass addPointsToCharacterProgression = new EndPointClass("player/characters/{0}/progressions/{1}/points/add", LootLockerHTTPMethod.POST);

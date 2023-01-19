@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace LootLocker.Requests
 {
@@ -14,7 +13,7 @@ namespace LootLocker.Requests
     
     public class LootLockerPaginatedProgressions : LootLockerResponse
     {
-        public LootLockerPagination pagination { get; set; }
+        public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerProgression> items { get; set; }
         
         public class LootLockerProgression
@@ -40,7 +39,7 @@ namespace LootLocker.Requests
     
     public class LootLockerPaginatedPlayerProgressions : LootLockerResponse
     {
-        public LootLockerPagination pagination { get; set; }
+        public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerPlayerProgression> items { get; set; }
         
         public class LootLockerPlayerProgression
@@ -75,7 +74,7 @@ namespace LootLocker.Requests
     
     public class LootLockerPaginatedCharacterProgressions : LootLockerResponse
     {
-        public LootLockerPagination pagination { get; set; }
+        public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerCharacterProgression> items { get; set; }
         
         public class LootLockerCharacterProgression
@@ -91,7 +90,7 @@ namespace LootLocker.Requests
         }
     }
 
-    public class LootLockerCharacterProgressionWithRewards : LootLockerPlayerProgression
+    public class LootLockerCharacterProgressionWithRewards : LootLockerCharacterProgression
     {
         public List<LootLockerAwardedTier> awarded_tiers { get; set; }
     }
@@ -132,17 +131,9 @@ namespace LootLocker.Requests
         public List<LootLockerAssetReward> asset_rewards { get; set; }
     }
 
-    public class LootLockerProgressionTier : LootLockerResponse
-    {
-        public string id { get; set; }
-        public int step { get; set; }
-        public int points_threshold { get; set; }
-        public LootLockerRewards rewards { get; set; }
-    }
-    
     public class LootLockerPaginatedProgressionTiers : LootLockerResponse
     {
-        public LootLockerPagination pagination { get; set; }
+        public LootLockerPaginationResponse<int> pagination { get; set; }
         public List<LootLockerProgressionTier> items { get; set; }
         
         public class LootLockerProgressionTier
@@ -152,10 +143,5 @@ namespace LootLocker.Requests
             public int points_threshold { get; set; }
             public LootLockerRewards rewards { get; set; }
         }
-    }
-
-    public abstract class LLResponse
-    {
-        
     }
 }

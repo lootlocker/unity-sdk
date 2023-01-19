@@ -92,11 +92,11 @@ namespace LootLocker
             return response;
         }
     }
-    public class LootLockerPagination
+    public class LootLockerPaginationResponse<TKey>
     {
         public int total { get; set; }
-        public string next_cursor { get; set; }
-        public string previous_cursor { get; set; }
+        public TKey next_cursor { get; set; }
+        public TKey previous_cursor { get; set; }
     }
 
     /// <summary>
