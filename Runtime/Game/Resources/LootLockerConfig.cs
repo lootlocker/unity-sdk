@@ -141,6 +141,9 @@ namespace LootLocker
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
 
+        // This is used to override the platform when using WhiteLabel or Guest Login since they are not "real platforms"
+        public string platformOverride = "";
+
         public void UpdateToken(string _token, string _player_identifier)
         {
             token = _token;
