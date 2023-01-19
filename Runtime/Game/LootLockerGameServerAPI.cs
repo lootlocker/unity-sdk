@@ -25,7 +25,7 @@ namespace LootLocker
 
         protected override void RefreshTokenAndCompleteCall(LootLockerServerRequest cacheServerRequest, Action<LootLockerResponse> OnServerResponse)
         {
-            string platform = LootLockerConfig.current.platform.ToString();
+            string platform = LootLockerSDKManager.GetCurrentPlatform();
 
             if (platform == Platforms.Steam)
             {
@@ -48,8 +48,7 @@ namespace LootLocker
                 OnServerResponse?.Invoke(res);
                 return;
             }
-            
-            platform = LootLockerConfig.current.platformOverride;
+
             if (platform == Platforms.Guest)
             {
                 LootLockerSDKManager.StartGuestSession(response =>
