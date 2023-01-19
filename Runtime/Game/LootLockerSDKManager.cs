@@ -1400,7 +1400,7 @@ namespace LootLocker.Requests
         /// Returns all progressions the player is currently on.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
-        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="after">Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
         public static void GetAllPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressions> onComplete)
         {
@@ -1484,7 +1484,7 @@ namespace LootLocker.Requests
         /// Subtracts points from a player progression.
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
-        /// /// <param name="amount">Amount of points to be subtracted</param>
+        /// <param name="amount">Amount of points to be subtracted</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
         public static void SubtractPointsFromPlayerProgression(string progressionKey, int amount, Action<LootLockerPlayerProgressionWithRewards> onComplete)
         {
@@ -1541,7 +1541,7 @@ namespace LootLocker.Requests
 
         #region Character
 
-        /// /// <summary>
+        /// <summary>
         /// Create a character with the provided type and name. The character will be owned by the currently active player.
         /// Use ListCharacterTypes() to get a list of available character types for your game.
         /// </summary>
@@ -1833,7 +1833,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="characterId">Id of the character</param>
         /// <param name="count">Amount of entries to receive</param>
-        /// <param name="after">How many extra rows after the characters position</param>
+        /// <param name="after">Used for pagination, id of the character progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
         public static void GetAllCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressions> onComplete)
         {
@@ -2730,7 +2730,7 @@ namespace LootLocker.Requests
         /// Returns all progressions.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
-        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="after">Used for pagination, id of the progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
         public static void GetAllProgressions(int count, string after, Action<LootLockerPaginatedProgressions> onComplete)
         {
@@ -2794,7 +2794,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="count">Amount of entries to receive</param>
-        /// <param name="after">How many extra rows after the players position</param>
+        /// <param name="after">Used for pagination, step of the tier from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
         public static void GetProgressionTiers(string progressionKey, int count, int after, Action<LootLockerPaginatedProgressionTiers> onComplete)
         {
