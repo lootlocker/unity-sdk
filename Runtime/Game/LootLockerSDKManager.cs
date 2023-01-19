@@ -16,6 +16,15 @@ namespace LootLocker.Requests
 {
     public partial class LootLockerSDKManager
     {
+        /// <summary>
+        /// Stores which platform the player currently has a session for.
+        /// </summary>
+        static string CurrentPlatform;
+
+        public static string GetCurrentPlatform()
+        {
+            return CurrentPlatform;
+        }
 
         #region Init
 
@@ -202,6 +211,8 @@ namespace LootLocker.Requests
                 return;
             }
 
+            CurrentPlatform = LootLockerConfig.current.platform.ToString();
+
             LootLockerConfig.current.deviceID = deviceId;
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
@@ -228,6 +239,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
+                CurrentPlatform = "guest";
                 current.platformOverride = "guest";
                 if (response.success)
                 {
@@ -262,6 +274,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
+                CurrentPlatform = "guest";
                 current.platformOverride = "guest";
                 onComplete(response);
             });
@@ -280,7 +293,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            current.platformOverride = "steam";
+            CurrentPlatform = "steam";
 
             LootLockerSteamSessionRequest sessionRequest = new LootLockerSteamSessionRequest(steamId64);
             LootLockerAPIManager.Session(sessionRequest, onComplete);
@@ -373,12 +386,13 @@ namespace LootLocker.Requests
             }
 
             // Clear White Label Login credentials
-            if (current.platformOverride == "white_label")
+            if (CurrentPlatform == "white_label")
             {
                 PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
                 PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
             }
 
+            CurrentPlatform = "";
             current.platformOverride = "";
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
@@ -616,6 +630,7 @@ namespace LootLocker.Requests
                 return;
             }
             current.platformOverride = "white_label";
+            CurrentPlatform = "white_label";
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
 
