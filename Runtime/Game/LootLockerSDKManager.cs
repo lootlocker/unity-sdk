@@ -240,7 +240,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
                 CurrentPlatform = "guest";
-
+                current.platformOverride = "guest";
                 if (response.success)
                 {
                     PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
@@ -275,7 +275,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
                 CurrentPlatform = "guest";
-
+                current.platformOverride = "guest";
                 onComplete(response);
             });
         }
@@ -393,6 +393,7 @@ namespace LootLocker.Requests
             }
 
             CurrentPlatform = "";
+            current.platformOverride = "";
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
@@ -628,6 +629,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
+            current.platformOverride = "white_label";
             CurrentPlatform = "white_label";
             LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
         }
@@ -648,6 +650,36 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetPlayerInfo(onComplete);
         }
+
+        /// <summary>
+        /// Get the players XP and Level information from a playerIdentifier. This uses the same platform as the current session.
+        /// If you are using multiple platforms (White Label + Steam for example), you must use the GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete) method instead.
+        /// </summary>
+        /// <param name="playerIdentifier">The player identifier for this platform.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpResponse</param>
+        public static void GetOtherPlayerInfo(string playerIdentifier, Action<LootLockerXpResponse> onComplete)
+        {
+            string currentPlatform = current.platformOverride != "" ? current.platformOverride : current.platform.ToString();
+            GetOtherPlayerInfo(playerIdentifier, currentPlatform, onComplete);
+        }
+
+        /// <summary>
+        /// Get the players XP and Level information from a playerIdentifier.
+        /// </summary>
+        /// <param name="playerIdentifier">The player identifier for this platform.</param>
+        /// <param name="platform">The platform that the user is present on as a string.</param>
+        /// <param name="onComplete"></param>
+        public static void GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
+                return;
+            }
+            LootLockerOtherPlayerInfoRequest infoRequest = new LootLockerOtherPlayerInfoRequest(playerIdentifier, platform);
+            LootLockerAPIManager.GetOtherPlayerInfo(infoRequest, onComplete);
+        }
+
 
         /// <summary>
         /// Get the players inventory.
