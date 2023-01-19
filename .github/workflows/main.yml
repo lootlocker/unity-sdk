@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: # Made towards the following
       - main
+      - release/**
     types: # Only on the following activity
       - opened
       - synchronize # Changes to the branch like new commits, ammends, etc.
