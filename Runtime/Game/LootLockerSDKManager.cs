@@ -19,11 +19,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Stores which platform the player currently has a session for.
         /// </summary>
-        static string CurrentPlatform;
-
         public static string GetCurrentPlatform()
         {
-            return CurrentPlatform;
+            return CurrentPlatform.GetString();
         }
 
         #region Init
@@ -41,15 +39,31 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
-        /// <param name="platform">What platform you are using, only used for purchases, use Android if you are unsure</param>
         /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
+        public static bool Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)
+        {
+            DebugMessage("SDK is Intializing");
+            LootLockerServerManager.CheckInit();
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey);
+        }
+
+        /// <summary>
+        /// Manually initialize the SDK.
+        /// </summary>
+        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
+        /// <param name="platform">DEPRECATED: What platform you are using, only used for purchases, use Android if you are unsure</param>
+        /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
+        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <returns>True if initialized successfully, false otherwise</returns>
+        [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)")]
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
             DebugMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
-            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, platform, onDevelopmentMode, domainKey);
+            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey, platform);
             return initialized;
         }
 
@@ -203,6 +217,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="deviceId">The ID of the current device the player is on</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        [Obsolete("DEPRECATED: Please use the StartSession method for the platform you're on. For Android use Guest Session. For iOS use Apple Session. If you are unsure of what to use, use Guest Session.")]
         public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -211,11 +226,77 @@ namespace LootLocker.Requests
                 return;
             }
 
-            CurrentPlatform = LootLockerConfig.current.platform.ToString();
+            if (LootLockerConfig.current.platform != platformType.Unused)
+            {
+                CurrentPlatform.Set(LootLockerConfig.current.platform);
+            }
 
             LootLockerConfig.current.deviceID = deviceId;
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
-            LootLockerAPIManager.Session(sessionRequest, onComplete);
+            LootLockerAPIManager.Session(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Start a Playstation Network session
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="psnOnlineId">The player's Online ID</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartPlaystationNetworkSession(string psnOnlineId, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.PlayStationNetwork);
+
+            LootLockerConfig.current.deviceID = psnOnlineId;
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(psnOnlineId);
+            LootLockerAPIManager.Session(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Start a Amazon Luna session
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="amazonLunaGuid">The player's Amazon Luna GUID</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartAmazonLunaSession(string amazonLunaGuid, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.AmazonLuna);
+
+            LootLockerConfig.current.deviceID = amazonLunaGuid;
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(amazonLunaGuid);
+            LootLockerAPIManager.Session(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -230,6 +311,7 @@ namespace LootLocker.Requests
                 return;
             }
 
+            CurrentPlatform.Set(Platforms.Guest);
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             string existingPlayerID = PlayerPrefs.GetString("LootLockerGuestPlayerID", "");
             if (!string.IsNullOrEmpty(existingPlayerID))
@@ -239,12 +321,14 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
-                CurrentPlatform = "guest";
-                current.platformOverride = "guest";
                 if (response.success)
                 {
                     PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
                     PlayerPrefs.Save();
+                }
+                else
+                {
+                    CurrentPlatform.Reset();
                 }
 
                 onComplete(response);
@@ -269,13 +353,21 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerGuestSessionResponse>("identifier cannot be empty"));
                 return;
             }
+            CurrentPlatform.Set(Platforms.Guest);
 
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(identifier);
 
             LootLockerAPIManager.GuestSession(sessionRequest, response =>
             {
-                CurrentPlatform = "guest";
-                current.platformOverride = "guest";
+                if (response.success)
+                {
+                    PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
+                    PlayerPrefs.Save();
+                }
+                else
+                {
+                    CurrentPlatform.Reset();
+                }
                 onComplete(response);
             });
         }
@@ -293,10 +385,16 @@ namespace LootLocker.Requests
                 return;
             }
 
-            CurrentPlatform = "steam";
+            CurrentPlatform.Set(Platforms.Steam);
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
+            LootLockerAPIManager.Session(sessionRequest, response => {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
 
-            LootLockerSteamSessionRequest sessionRequest = new LootLockerSteamSessionRequest(steamId64);
-            LootLockerAPIManager.Session(sessionRequest, onComplete);
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -312,8 +410,16 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
+            CurrentPlatform.Set(Platforms.NintendoSwitch);
             LootLockerNintendoSwitchSessionRequest sessionRequest = new LootLockerNintendoSwitchSessionRequest(nsa_id_token);
-            LootLockerAPIManager.NintendoSwitchSession(sessionRequest, onComplete);
+            LootLockerAPIManager.NintendoSwitchSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -329,8 +435,17 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
+
+            CurrentPlatform.Set(Platforms.XboxOne);
             LootLockerXboxOneSessionRequest sessionRequest = new LootLockerXboxOneSessionRequest(xbox_user_token);
-            LootLockerAPIManager.XboxOneSession(sessionRequest, onComplete);
+            LootLockerAPIManager.XboxOneSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -346,8 +461,17 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
                 return;
             }
+
+            CurrentPlatform.Set(Platforms.AppleSignIn);
             LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(authorization_code);
-            LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
+            LootLockerAPIManager.AppleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -364,8 +488,17 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
                 return;
             }
+
+            CurrentPlatform.Set(Platforms.AppleSignIn);
             LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(refresh_token);
-            LootLockerAPIManager.AppleSession(sessionRequest, onComplete);
+            LootLockerAPIManager.AppleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         /// <summary>
@@ -386,14 +519,13 @@ namespace LootLocker.Requests
             }
 
             // Clear White Label Login credentials
-            if (CurrentPlatform == "white_label")
+            if (CurrentPlatform.Get() == Platforms.WhiteLabel)
             {
                 PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
                 PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
             }
 
-            CurrentPlatform = "";
-            current.platformOverride = "";
+            CurrentPlatform.Reset();
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
             LootLockerAPIManager.EndSession(sessionRequest, onComplete);
         }
@@ -629,9 +761,16 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
                 return;
             }
-            current.platformOverride = "white_label";
-            CurrentPlatform = "white_label";
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, onComplete);
+
+            CurrentPlatform.Set(Platforms.WhiteLabel);
+            LootLockerAPIManager.WhiteLabelSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
 
         public static void WhiteLabelLoginAndStartSession(string email, string password, bool rememberMe, Action<LootLockerWhiteLabelLoginAndStartSessionResponse> onComplete)
@@ -675,8 +814,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpResponse</param>
         public static void GetOtherPlayerInfo(string playerIdentifier, Action<LootLockerXpResponse> onComplete)
         {
-            string currentPlatform = current.platformOverride != "" ? current.platformOverride : current.platform.ToString();
-            GetOtherPlayerInfo(playerIdentifier, currentPlatform, onComplete);
+            GetOtherPlayerInfo(playerIdentifier, CurrentPlatform.GetString(), onComplete);
         }
 
         /// <summary>
@@ -692,6 +830,12 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
                 return;
             }
+
+            if (string.IsNullOrEmpty(platform))
+            {
+                platform = CurrentPlatform.GetString();
+            }
+
             LootLockerOtherPlayerInfoRequest infoRequest = new LootLockerOtherPlayerInfoRequest(playerIdentifier, platform);
             LootLockerAPIManager.GetOtherPlayerInfo(infoRequest, onComplete);
         }
@@ -986,7 +1130,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get player names of the players fropm their last active platform by PSN ID's.
+        /// Get player names of the players from their last active platform by PSN ID's.
         /// </summary>
         /// <param name="psnIds">A list of multiple player PSN ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1005,7 +1149,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get player names of the players fropm their last active platform by Xbox ID's.
+        /// Get player names of the players from their last active platform by Xbox ID's.
         /// </summary>
         /// <param name="xboxIds">A list of multiple player XBOX ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1327,7 +1471,7 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
 
             data.getRequests.Add(characterID);
-            data.getRequests.Add(LootLockerConfig.current.platform.ToString());
+            data.getRequests.Add(CurrentPlatform.GetString());
             LootLockerAPIManager.GetOtherPlayersCharacterLoadout(data, onComplete);
         }
 
@@ -1525,7 +1669,7 @@ namespace LootLocker.Requests
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(characterID);
-            lootLockerGetRequest.getRequests.Add(LootLockerConfig.current.platform.ToString());
+            lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetString());
             LootLockerAPIManager.GetCurrentLoadOutToOtherCharacter(lootLockerGetRequest, onComplete);
         }
 

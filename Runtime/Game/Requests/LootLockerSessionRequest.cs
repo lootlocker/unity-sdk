@@ -13,7 +13,7 @@ namespace LootLocker.Requests
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string platform => LootLockerConfig.current.platform.ToString();
+        public string platform => CurrentPlatform.GetString();
         public string player_identifier { get; private set; }
         public string game_version => LootLockerConfig.current.game_version;
         public bool development_mode => LootLockerConfig.current.developmentMode;
@@ -24,25 +24,6 @@ namespace LootLocker.Requests
         }
 
         public LootLockerSessionRequest()
-        {
-        }
-    }
-
-    [System.Serializable]
-    public class LootLockerSteamSessionRequest : LootLockerGetRequest
-    {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string platform => "Steam";
-        public string player_identifier { get; private set; }
-        public string game_version => LootLockerConfig.current.game_version;
-        public bool development_mode => LootLockerConfig.current.developmentMode;
-
-        public LootLockerSteamSessionRequest(string player_identifier)
-        {
-            this.player_identifier = player_identifier;
-        }
-
-        public LootLockerSteamSessionRequest()
         {
         }
     }
@@ -184,7 +165,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void Session(LootLockerGetRequest data, Action<LootLockerSessionResponse> onComplete)
+        public static void Session(LootLockerSessionRequest data, Action<LootLockerSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.authenticationRequest;
 
@@ -194,7 +175,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                LootLockerConfig.current.UpdateToken(response.session_token, data?.player_identifier);
                 onComplete?.Invoke(response);
             }, false);
         }
