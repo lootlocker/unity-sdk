@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -33,6 +31,7 @@ namespace LootLocker
             {
                 // Create a new Config
                 LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
+                newConfig.platform = platformType.Unused;
 
                 // Folder needs to exist for Unity to be able to create an asset in it
                 string dir = Application.dataPath+ "/LootLockerSDK/Resources/Config";
@@ -79,19 +78,19 @@ namespace LootLocker
             }
         }
 #endif
-        public static bool CreateNewSettings(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey, platformType platform = platformType.Unused, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
-            _current.platform = platform;
+            if(platform != platformType.Unused) {
+                _current.platform = platform;
+            }
             _current.developmentMode = onDevelopmentMode;
             _current.currentDebugLevel = debugLevel;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
-
-            _current = settingsInstance;
 
             return true;
         }
@@ -123,8 +122,9 @@ namespace LootLocker
         public string game_version = "1.0.0.0";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
-        public platformType platform;
-        public enum platformType { Android, iOS, Steam, PlayStationNetwork }
+        [HideInInspector]
+        public platformType platform; // TODO: Deprecated, remove in version 1.2.0
+        public enum platformType { Android, iOS, Steam, PlayStationNetwork, Unused }
         public bool developmentMode = true;
         [HideInInspector]
         public string url = "https://api.lootlocker.io/game/v1";
@@ -139,9 +139,6 @@ namespace LootLocker
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
-
-        // This is used to override the platform when using WhiteLabel or Guest Login since they are not "real platforms"
-        public string platformOverride = "";
 
         public void UpdateToken(string _token, string _player_identifier)
         {

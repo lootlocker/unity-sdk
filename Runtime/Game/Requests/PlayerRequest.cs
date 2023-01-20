@@ -242,7 +242,7 @@ namespace LootLocker.Requests
         {
             getRequests.Clear();
             getRequests.Add(LootLockerConfig.current.deviceID);
-            getRequests.Add(LootLockerConfig.current.platform.ToString());
+            getRequests.Add(CurrentPlatform.GetString());
         }
     }
 
