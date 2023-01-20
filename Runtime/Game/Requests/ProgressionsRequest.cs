@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LootLocker.Requests
 {
-    public class LootLockerProgression : LootLockerResponse
+    public class LootLockerProgressionResponse : LootLockerResponse
     {
         public string id { get; set; }
         public string key { get; set; }
@@ -11,7 +11,7 @@ namespace LootLocker.Requests
         public bool active { get; set; }
     }
     
-    public class LootLockerPaginatedProgressions : LootLockerResponse
+    public class LootLockerPaginatedProgressionsResponse : LootLockerResponse
     {
         public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerProgression> items { get; set; }
@@ -25,7 +25,7 @@ namespace LootLocker.Requests
         }
     }
     
-    public class LootLockerPlayerProgression : LootLockerResponse
+    public class LootLockerPlayerProgressionResponse : LootLockerResponse
     {
         public string id { get; set; }
         public string progression_key { get; set; }
@@ -37,7 +37,7 @@ namespace LootLocker.Requests
         public DateTime? last_level_up { get; set; }
     }
     
-    public class LootLockerPaginatedPlayerProgressions : LootLockerResponse
+    public class LootLockerPaginatedPlayerProgressionsResponse : LootLockerResponse
     {
         public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerPlayerProgression> items { get; set; }
@@ -55,12 +55,12 @@ namespace LootLocker.Requests
         }
     }
 
-    public class LootLockerPlayerProgressionWithRewards : LootLockerPlayerProgression
+    public class LootLockerPlayerProgressionWithRewardsResponse : LootLockerPlayerProgressionResponse
     {
         public List<LootLockerAwardedTier> awarded_tiers { get; set; }
     }
 
-    public class LootLockerCharacterProgression : LootLockerResponse
+    public class LootLockerCharacterProgressionResponse : LootLockerResponse
     {
         public string id { get; set; }
         public string progression_key { get; set; }
@@ -72,7 +72,7 @@ namespace LootLocker.Requests
         public DateTime? last_level_up { get; set; }
     }
     
-    public class LootLockerPaginatedCharacterProgressions : LootLockerResponse
+    public class LootLockerPaginatedCharacterProgressionsResponse : LootLockerResponse
     {
         public LootLockerPaginationResponse<string> pagination { get; set; }
         public List<LootLockerCharacterProgression> items { get; set; }
@@ -90,7 +90,7 @@ namespace LootLocker.Requests
         }
     }
 
-    public class LootLockerCharacterProgressionWithRewards : LootLockerCharacterProgression
+    public class LootLockerCharacterProgressionWithRewardsResponse : LootLockerCharacterProgressionResponse
     {
         public List<LootLockerAwardedTier> awarded_tiers { get; set; }
     }
@@ -131,9 +131,9 @@ namespace LootLocker.Requests
         public List<LootLockerAssetReward> asset_rewards { get; set; }
     }
 
-    public class LootLockerPaginatedProgressionTiers : LootLockerResponse
+    public class LootLockerPaginatedProgressionTiersResponse : LootLockerResponse
     {
-        public LootLockerPaginationResponse<int> pagination { get; set; }
+        public LootLockerPaginationResponse<int?> pagination { get; set; }
         public List<LootLockerProgressionTier> items { get; set; }
         
         public class LootLockerProgressionTier
