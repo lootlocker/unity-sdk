@@ -156,12 +156,11 @@ namespace LootLocker
                                 response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
                                 break;
                         }
-
-                        bool isSteam = LootLockerSDKManager.GetCurrentPlatform() == "steam";
-                        if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !isSteam && tries < maxRetry) 
+                        
+                        if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && tries < maxRetry) 
                         {
                             tries++;
-                            LootLockerSDKManager.DebugMessage("Refreshing Token, Since we could not find one. If you do not want this please turn off in the LootLocker config settings");
+                            LootLockerSDKManager.DebugMessage("Refreshing Token, since we could not find one. If you do not want this please turn off in the LootLocker config settings");
                             RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else
