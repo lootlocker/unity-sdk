@@ -104,14 +104,6 @@ namespace LootLocker.Admin
             EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("platform"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.platform = (LootLockerConfig.platformType)m_CustomSettings.FindProperty("platform").enumValueIndex;
-            }
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("developmentMode"));
 
             if (EditorGUI.EndChangeCheck())

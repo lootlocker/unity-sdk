@@ -12,7 +12,7 @@ namespace LootLocker.Requests
     public class LootLockerVerifyRequest
     {
         public string key => LootLockerConfig.current.apiKey.ToString();
-        public string platform => LootLockerConfig.current.platform.ToString();
+        public string platform => CurrentPlatform.GetString();
         public string token { get; set; }
         public bool development_mode => LootLockerConfig.current.developmentMode;
 
