@@ -1,9 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
 using LootLocker.Requests;
 
 
@@ -11,10 +7,9 @@ namespace LootLocker.Requests
 {
     public class LootLockerVerifyRequest
     {
-        public string key => LootLockerConfig.current.apiKey.ToString();
+        public string key => LootLockerConfig.current.apiKey;
         public string platform => CurrentPlatform.GetString();
         public string token { get; set; }
-        public bool development_mode => LootLockerConfig.current.developmentMode;
 
         public LootLockerVerifyRequest(string token)
         {
@@ -24,7 +19,7 @@ namespace LootLocker.Requests
 
     public class LootLockerVerifySteamRequest : LootLockerVerifyRequest
     {
-        public new string platform => "Steam";
+        public new string platform => CurrentPlatform.GetPlatformRepresentation(Platforms.Steam).PlatformString;
 
         public LootLockerVerifySteamRequest(string token) : base(token)
         {
@@ -45,8 +40,8 @@ namespace LootLocker
         {
             string json = "";
             if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
-
+            json = JsonConvert.SerializeObject(data);
+            LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, false);
