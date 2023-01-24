@@ -171,7 +171,7 @@ namespace LootLocker.Requests
         public string name { get; set; }
         public object primary_color { get; set; }
         public object secondary_color { get; set; }
-        public public Dictionary<string, string> links { get; set; }
+        public Dictionary<string, string> links { get; set; }
     }
 
 
