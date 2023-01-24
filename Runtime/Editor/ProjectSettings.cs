@@ -78,8 +78,17 @@ namespace LootLocker.Admin
             {
                 gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue;
             }
+
+            bool deprecatedApiKey = !gameSettings.IsPrefixedApiKey();
+            if (deprecatedApiKey)
+            {
+                EditorGUILayout.HelpBox(
+                    "WARNING: this is a deprecated API Key, please visit https://console.lootlocker.com/settings/api-keys and generate a new one",
+                    MessageType.Warning, false);
+            }
+
             var content = new GUIContent();
-            content.text = "API key can be found in `Settings > Game settings > API` in the Web Console";
+            content.text = "API key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(content, false);
             EditorGUILayout.Space();
 
@@ -91,7 +100,7 @@ namespace LootLocker.Admin
                 gameSettings.domainKey = m_CustomSettings.FindProperty("domainKey").stringValue;
             }
             var domainContent = new GUIContent();
-            domainContent.text = "Domain key can be found in `Settings > Game settings > API` in the Web Console";
+            domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(domainContent, false);
             EditorGUILayout.Space();
 
@@ -100,15 +109,6 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.game_version = m_CustomSettings.FindProperty("game_version").stringValue;
-            }
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("developmentMode"));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.developmentMode = m_CustomSettings.FindProperty("developmentMode").boolValue;
             }
             EditorGUILayout.Space();
 
@@ -129,6 +129,19 @@ namespace LootLocker.Admin
                 gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
             EditorGUILayout.Space();
+
+            if (deprecatedApiKey)
+            {
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("developmentMode"));
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    gameSettings.developmentMode = m_CustomSettings.FindProperty("developmentMode").boolValue;
+                }
+
+                EditorGUILayout.Space();
+            }
         }
 
         [SettingsProvider]
