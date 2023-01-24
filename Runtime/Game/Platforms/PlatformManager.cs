@@ -54,42 +54,53 @@ namespace LootLocker.Requests
             ,"Apple Sign In" // AppleSignIn
         };
 
-        private static Platforms currentPlatform;
-        private static string currentPlatformString;
-        private static string currentPlatformFriendlyString;
+        public struct PlatformRepresentation
+        {
+            public Platforms Platform;
+            public string PlatformString;
+            public string PlatformFriendlyString;
+        }
+
+        private static PlatformRepresentation current;
 
         public override string ToString()
         {
-            return currentPlatformString;
+            return current.PlatformString;
         }
 
         public static Platforms Get()
         {
-            return currentPlatform;
+            return current.Platform;
         }
 
         public static string GetString()
         {
-            return currentPlatformString;
+            return current.PlatformString;
         }
 
         public static string GetFriendlyString()
         {
-            return currentPlatformFriendlyString;
+            return current.PlatformFriendlyString;
         }
 
         public static void Set(Platforms platform)
         {
-            currentPlatform = platform;
-            currentPlatformString = PlatformStrings[(int)currentPlatform];
-            currentPlatformFriendlyString = PlatformFriendlyStrings[(int)currentPlatform];
+            current = GetPlatformRepresentation(platform);
         }
 
         public static void Reset()
         {
-            currentPlatform = Platforms.None;
-            currentPlatformString = PlatformStrings[(int)currentPlatform];
-            currentPlatformFriendlyString = PlatformFriendlyStrings[(int)currentPlatform];
+            current = GetPlatformRepresentation(Platforms.None);
+        }
+
+        public static PlatformRepresentation GetPlatformRepresentation(Platforms platform)
+        {
+            return new PlatformRepresentation
+            {
+                Platform = platform,
+                PlatformString = PlatformStrings[(int)platform],
+                PlatformFriendlyString = PlatformFriendlyStrings[(int)platform]
+            };
         }
 
         // TODO: Deprecated, remove in version 1.2.0
