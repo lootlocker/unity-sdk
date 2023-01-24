@@ -203,7 +203,7 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("domain-key", LootLockerConfig.current.domainKey);
 
-            if (LootLockerConfig.current.developmentMode)
+            if(!LootLockerConfig.current.IsPrefixedApiKey() && LootLockerConfig.current.developmentMode)
             {
                 headers.Add("is-development", "true");
             }

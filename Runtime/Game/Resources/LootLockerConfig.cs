@@ -95,6 +95,23 @@ namespace LootLocker
             return true;
         }
 
+        // TODO: Deprecated, remove in version 1.2.0
+        public bool IsPrefixedApiKey()
+        {
+            return !string.IsNullOrEmpty(apiKey) && (apiKey.StartsWith("dev_") || apiKey.StartsWith("prod_"));
+        }
+
+        // TODO: Deprecated, remove in version 1.2.0
+        public static void AddDevelopmentModeFieldToJsonStringIfNeeded(ref string json)
+        {
+            if (!current.IsPrefixedApiKey())
+            {
+                json = json.Remove(json.Length - 1, 1); // Remove '}'
+                string devModeJsonString = ", \"development_mode\": " + current.developmentMode;
+                json = json + devModeJsonString.ToLower() + "}";
+            }
+        }
+
         private static LootLockerConfig _current;
 
         public static LootLockerConfig current
@@ -125,6 +142,7 @@ namespace LootLocker
         [HideInInspector]
         public platformType platform; // TODO: Deprecated, remove in version 1.2.0
         public enum platformType { Android, iOS, Steam, PlayStationNetwork, Unused }
+        [HideInInspector]
         public bool developmentMode = true;
         [HideInInspector]
         public string url = "https://api.lootlocker.io/game/v1";
@@ -145,6 +163,5 @@ namespace LootLocker
             token = _token;
             deviceID = _player_identifier;
         }
-
     }
 }
