@@ -83,7 +83,7 @@ namespace LootLocker.Admin
             if (deprecatedApiKey)
             {
                 EditorGUILayout.HelpBox(
-                    "WARNING: this is a deprecated API Key, please visit https://console.lootlocker.com/settings/api-keys and generate a new one",
+                    "WARNING: this is a legacy API Key, please visit https://console.lootlocker.com/settings/api-keys and generate a new one",
                     MessageType.Warning, false);
             }
 
