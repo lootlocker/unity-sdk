@@ -1472,7 +1472,7 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to be added</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void AddPointsToPlayerProgression(string progressionKey, int amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        public static void AddPointsToPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1493,7 +1493,7 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to be subtracted</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void SubtractPointsFromPlayerProgression(string progressionKey, int amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        public static void SubtractPointsFromPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1909,7 +1909,7 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to add</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
-        public static void AddPointsToCharacterProgression(int characterId, string progressionKey, int amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
+        public static void AddPointsToCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1931,7 +1931,7 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to subtract</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
-        public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, int amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
+        public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
