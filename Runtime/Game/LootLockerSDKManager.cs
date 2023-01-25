@@ -1397,12 +1397,12 @@ namespace LootLocker.Requests
         #region Player progressions
 
         /// <summary>
-        /// Returns all progressions the player is currently on.
+        /// Returns multiple progressions the player is currently on.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetAllPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        public static void GetPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1423,22 +1423,22 @@ namespace LootLocker.Requests
         }
         
         /// <summary>
-        /// Returns all progressions the player is currently on.
+        /// Returns multiple progressions the player is currently on.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetAllPlayerProgressions(int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        public static void GetPlayerProgressions(int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
         {
-            GetAllPlayerProgressions(count, null, onComplete);
+            GetPlayerProgressions(count, null, onComplete);
         }
         
         /// <summary>
-        /// Returns all progressions the player is currently on.
+        /// Returns multiple progressions the player is currently on.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetAllPlayerProgressions(Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        public static void GetPlayerProgressions(Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
         {
-            GetAllPlayerProgressions(-1, null, onComplete);
+            GetPlayerProgressions(-1, null, onComplete);
         }
         
         /// <summary>
@@ -1829,13 +1829,13 @@ namespace LootLocker.Requests
         #region Character progressions
 
         /// <summary>
-        /// Returns all progressions the character is currently on.
+        /// Returns multiple progressions the character is currently on.
         /// </summary>
         /// <param name="characterId">Id of the character</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the character progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetAllCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        public static void GetCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1856,24 +1856,24 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Returns all progressions the character is currently on.
+        /// Returns multiple progressions the character is currently on.
         /// </summary>
         /// <param name="characterId">Id of the character</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetAllCharacterProgressions(int characterId, int count, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        public static void GetCharacterProgressions(int characterId, int count, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
         {
-            GetAllCharacterProgressions(characterId, count, null, onComplete);
+            GetCharacterProgressions(characterId, count, null, onComplete);
         }
 
         /// <summary>
-        /// Returns all progressions the character is currently on.
+        /// Returns multiple progressions the character is currently on.
         /// </summary>
         /// <param name="characterId">Id of the character</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetAllCharacterProgressions(int characterId, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        public static void GetCharacterProgressions(int characterId, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
         {
-            GetAllCharacterProgressions(characterId, -1, null, onComplete);
+            GetCharacterProgressions(characterId, -1, null, onComplete);
         }
 
         /// <summary>
@@ -2727,12 +2727,12 @@ namespace LootLocker.Requests
         #region Progressions
 
         /// <summary>
-        /// Returns all progressions.
+        /// Returns multiple progressions.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetAllProgressions(int count, string after, Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        public static void GetProgressions(int count, string after, Action<LootLockerPaginatedProgressionsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2753,22 +2753,22 @@ namespace LootLocker.Requests
         }
         
         /// <summary>
-        /// Returns all progressions.
+        /// Returns multiple progressions.
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetAllProgressions(int count, Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        public static void GetProgressions(int count, Action<LootLockerPaginatedProgressionsResponse> onComplete)
         {
-            GetAllProgressions(count, null, onComplete);
+            GetProgressions(count, null, onComplete);
         }
         
         /// <summary>
-        /// Returns all progressions.
+        /// Returns multiple progressions.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetAllProgressions(Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        public static void GetProgressions(Action<LootLockerPaginatedProgressionsResponse> onComplete)
         {
-            GetAllProgressions(-1, null, onComplete);
+            GetProgressions(-1, null, onComplete);
         }
         
         /// <summary>
@@ -2790,7 +2790,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Returns all progression tiers for the specified progression.
+        /// Returns multiple progression tiers for the specified progression.
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="count">Amount of entries to receive</param>
@@ -2817,7 +2817,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Returns all progression tiers for the specified progression.
+        /// Returns multiple progression tiers for the specified progression.
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="count">Amount of entries to receive</param>
@@ -2828,7 +2828,7 @@ namespace LootLocker.Requests
         }
         
         /// <summary>
-        /// Returns all progression tiers for the specified progression.
+        /// Returns multiple progression tiers for the specified progression.
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
