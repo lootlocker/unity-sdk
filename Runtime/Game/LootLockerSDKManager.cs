@@ -2803,7 +2803,7 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, step of the tier from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
-        public static void GetProgressionTiers(string progressionKey, int count, int after, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
+        public static void GetProgressionTiers(string progressionKey, int count, ulong? after, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -2817,7 +2817,7 @@ namespace LootLocker.Requests
             if (count > 0)
                 endpoint += $"count={count}&";
 
-            if (after > 0)
+            if (after.HasValue && after > 0)
                 endpoint += $"after={after}&";
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
@@ -2831,7 +2831,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
         public static void GetProgressionTiers(string progressionKey, int count, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
         {
-            GetProgressionTiers(progressionKey, -1, count, onComplete);
+            GetProgressionTiers(progressionKey, count,  null, onComplete);
         }
         
         /// <summary>
@@ -2841,7 +2841,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
         public static void GetProgressionTiers(string progressionKey, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
         {
-            GetProgressionTiers(progressionKey, -1, -1, onComplete);
+            GetProgressionTiers(progressionKey, -1, null, onComplete);
         }
 
         #endregion
