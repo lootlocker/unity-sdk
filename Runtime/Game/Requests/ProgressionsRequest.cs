@@ -30,10 +30,10 @@ namespace LootLocker.Requests
         public string id { get; set; }
         public string progression_key { get; set; }
         public string progression_name { get; set; }
-        public int step { get; set; }
-        public int points { get; set; }
-        public int previous_threshold { get; set; }
-        public int next_threshold { get; set; }
+        public ulong step { get; set; }
+        public ulong points { get; set; }
+        public ulong previous_threshold { get; set; }
+        public ulong? next_threshold { get; set; }
         public DateTime? last_level_up { get; set; }
     }
     
@@ -47,10 +47,10 @@ namespace LootLocker.Requests
             public string id { get; set; }
             public string progression_key { get; set; }
             public string progression_name { get; set; }
-            public int step { get; set; }
-            public int points { get; set; }
-            public int previous_threshold { get; set; }
-            public int next_threshold { get; set; }
+            public ulong step { get; set; }
+            public ulong points { get; set; }
+            public ulong previous_threshold { get; set; }
+            public ulong? next_threshold { get; set; }
             public DateTime? last_level_up { get; set; }
         }
     }
@@ -65,10 +65,10 @@ namespace LootLocker.Requests
         public string id { get; set; }
         public string progression_key { get; set; }
         public string progression_name { get; set; }
-        public int step { get; set; }
-        public int points { get; set; }
-        public int previous_threshold { get; set; }
-        public int next_threshold { get; set; }
+        public ulong step { get; set; }
+        public ulong points { get; set; }
+        public ulong previous_threshold { get; set; }
+        public ulong? next_threshold { get; set; }
         public DateTime? last_level_up { get; set; }
     }
     
@@ -82,10 +82,10 @@ namespace LootLocker.Requests
             public string id { get; set; }
             public string progression_key { get; set; }
             public string progression_name { get; set; }
-            public int step { get; set; }
-            public int points { get; set; }
-            public int previous_threshold { get; set; }
-            public int next_threshold { get; set; }
+            public ulong step { get; set; }
+            public ulong points { get; set; }
+            public ulong previous_threshold { get; set; }
+            public ulong? next_threshold { get; set; }
             public DateTime? last_level_up { get; set; }
         }
     }
@@ -97,16 +97,16 @@ namespace LootLocker.Requests
 
     public class LootLockerAwardedTier
     {
-        public int step { get; set; }
-        public int points_threshold { get; set; }
+        public ulong step { get; set; }
+        public ulong points_threshold { get; set; }
         public LootLockerRewards rewards { get; set; }
     }
     
     public class LootLockerAssetReward
     {
         public int asset_id { get; set; }
-        public object asset_variation_id { get; set; }
-        public object asset_rental_option_id { get; set; }
+        public int asset_variation_id { get; set; }
+        public int asset_rental_option_id { get; set; }
     }
 
     public class LootLockerProgressionPointsReward
@@ -114,7 +114,7 @@ namespace LootLocker.Requests
         public string progression_id { get; set; }
         public string progression_key { get; set; }
         public string progression_name { get; set; }
-        public int amount { get; set; }
+        public ulong amount { get; set; }
     }
 
     public class LootLockerProgressionResetReward
@@ -133,14 +133,14 @@ namespace LootLocker.Requests
 
     public class LootLockerPaginatedProgressionTiersResponse : LootLockerResponse
     {
-        public LootLockerPaginationResponse<int?> pagination { get; set; }
+        public LootLockerPaginationResponse<ulong?> pagination { get; set; }
         public List<LootLockerProgressionTier> items { get; set; }
         
         public class LootLockerProgressionTier
         {
             public string id { get; set; }
-            public int step { get; set; }
-            public int points_threshold { get; set; }
+            public ulong step { get; set; }
+            public ulong points_threshold { get; set; }
             public LootLockerRewards rewards { get; set; }
         }
     }
