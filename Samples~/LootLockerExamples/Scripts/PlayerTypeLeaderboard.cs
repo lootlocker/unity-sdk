@@ -5,6 +5,7 @@ using LootLocker.Requests;
 using UnityEngine.UI;
 using System;
 
+namespace LootLocker {
 public class PlayerTypeLeaderboard : MonoBehaviour
 {
     public InputField scoreInputField;
@@ -189,4 +190,5 @@ public class PlayerTypeLeaderboard : MonoBehaviour
             }
         });
     }
+}
 }
