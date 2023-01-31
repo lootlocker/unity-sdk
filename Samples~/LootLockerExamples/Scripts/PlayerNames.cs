@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LootLocker.Requests;
 
+namespace LootLocker {
 public class PlayerNames : MonoBehaviour
 {
     public Text informationText;
@@ -74,4 +75,5 @@ public class PlayerNames : MonoBehaviour
     {
         playerNameText.text = "Player name:"+name;
     }
+}
 }

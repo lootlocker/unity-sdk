@@ -3,6 +3,7 @@ using System;
 using UnityEngine.UI;
 using LootLocker.Requests;
 
+namespace LootLocker {
 public class WhiteLabelLogin : MonoBehaviour
 {
     // Input fields
@@ -119,4 +120,5 @@ public class WhiteLabelLogin : MonoBehaviour
             }
         });
     }
+}
 }

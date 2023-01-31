@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LootLocker.Requests;
 
+namespace LootLocker {
 public class FloatLeaderboard : MonoBehaviour
 {
     public InputField scoreInputField;
@@ -193,4 +194,5 @@ public class FloatLeaderboard : MonoBehaviour
             }
         });
     }
+}
 }

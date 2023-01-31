@@ -5,6 +5,7 @@ using LootLocker.Requests;
 using UnityEngine.UI;
 using System;
 
+namespace LootLocker {
 public class GenericTypeLeaderboard : MonoBehaviour
 {
     public InputField scoreInputField;
@@ -230,4 +231,5 @@ public class GenericTypeLeaderboard : MonoBehaviour
         // Return the updated string
         return incrementalScoreString;
     }
+}
 }
