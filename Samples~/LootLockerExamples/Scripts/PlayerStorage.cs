@@ -4,6 +4,7 @@ using UnityEngine;
 using LootLocker.Requests;
 using UnityEngine.UI;
 
+namespace LootLocker {
 public class PlayerStorage : MonoBehaviour
 {
     public Text informationText;
@@ -100,4 +101,5 @@ public class PlayerStorage : MonoBehaviour
             valueText.text += payload[i].value + "\n";
         }
     }
+}
 }

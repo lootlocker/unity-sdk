@@ -4,6 +4,7 @@ using UnityEngine;
 using LootLocker.Requests;
 using UnityEngine.UI;
 
+namespace LootLocker {
 public class GuestLoginLootLockerIdentifier : MonoBehaviour
 {
     public Text loginInformationText;
@@ -33,4 +34,5 @@ public class GuestLoginLootLockerIdentifier : MonoBehaviour
             }
         });
     }
+}
 }
