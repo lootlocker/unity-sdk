@@ -53,7 +53,7 @@ namespace LootLocker
             catch (ArgumentException e)
             {
                 error = "An error has occurred. Please try again.";
-                LootLockerSDKManager.DebugMessage("Argument exception: " + e);
+                LootLockerSDKManager.DebugMessage("Argument exception: " + e, true);
                 return false;
             }
 
