@@ -85,7 +85,7 @@ namespace LootLocker
                         yield return null;
                         if (Time.time - startTime >= maxTimeOut)
                         {
-                            LootLockerSDKManager.DebugMessage("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
+                            LootLockerSDKManager.DebugMessage("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url, true);
                             OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
                             yield break;
                         }
@@ -129,7 +129,7 @@ namespace LootLocker
                                 response.Error = "Payment Required -- Payment failed. Insufficient funds, etc.";
                                 break;
                             case 401:
-                                response.Error = "Unauthroized -- Your session_token is invalid";
+                                response.Error = "Unauthorized -- Your session_token is invalid";
                                 break;
                             case 403:
                                 response.Error = "Forbidden -- You do not have access";
@@ -160,26 +160,38 @@ namespace LootLocker
                         if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && tries < maxRetry) 
                         {
                             tries++;
-                            LootLockerSDKManager.DebugMessage("Refreshing Token, since we could not find one. If you do not want this please turn off in the LootLocker config settings");
+                            LootLockerSDKManager.DebugMessage("Refreshing Token, since we could not find one. If you do not want this please turn off in the LootLocker config settings", true);
                             RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else
                         {
                             tries = 0;
                             response.Error += " " + webRequest.downloadHandler.text;
-                            response.text = webRequest.downloadHandler.text;
-
+                            response.statusCode = (int)webRequest.responseCode;
                             response.success = false;
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
                             OnServerResponse?.Invoke(response);
+                            LootLockerSDKManager.DebugMessage(response.Error, true);
                         }
 
                     }
                     else
                     {
+                        try
+                        {
+                            LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+                        }
+                        catch
+                        {
+                            LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(), true);
+                            LootLockerSDKManager.DebugMessage(request.endpoint, true);
+                            LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text, true);
+                        }
+                        
                         response.success = true;
                         response.hasError = false;
+                        response.statusCode = (int)webRequest.responseCode;
                         response.text = webRequest.downloadHandler.text;
                         OnServerResponse?.Invoke(response);
                     }
