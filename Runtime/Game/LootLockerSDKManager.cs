@@ -77,7 +77,7 @@ namespace LootLocker.Requests
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again");
+                DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again", true);
                 return false;
             }
 
@@ -155,7 +155,7 @@ namespace LootLocker.Requests
             else if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.NormalOnly)
             {
                 if (!IsError)
-                    Debug.LogError(message);
+                    Debug.Log(message);
             }
 #endif
         }
@@ -1267,7 +1267,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                DebugMessage($"File error: {e.Message}");
+                DebugMessage($"File error: {e.Message}", true);
                 return;
             }
 
@@ -1319,7 +1319,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                DebugMessage($"File error: {e.Message}");
+                DebugMessage($"File error: {e.Message}", true);
                 return;
             }
 
