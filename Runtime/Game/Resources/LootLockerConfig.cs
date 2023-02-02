@@ -154,7 +154,7 @@ namespace LootLocker
         public string userUrl = "https://api.lootlocker.io/game";
         [HideInInspector]
         public string baseUrl = "https://api.lootlocker.io";
-        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off }
+        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
 
