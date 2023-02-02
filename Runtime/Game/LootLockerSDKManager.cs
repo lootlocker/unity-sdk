@@ -69,12 +69,12 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                LootLockerLogger.EditorMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)", true);
+                LootLockerLogger.EditorMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                LootLockerLogger.EditorMessage("Key has not been set, Please login to sdk manager or set key manually and then try again", true);
+                LootLockerLogger.EditorMessage("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
 
@@ -113,7 +113,7 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                LootLockerLogger.EditorMessage("You cannot call this method before an active LootLocker session is started", true);
+                LootLockerLogger.EditorMessage("You cannot call this method before an active LootLocker session is started", LootLockerLogger.LogLevel.Warning);
                 return false;
             }
 
@@ -1227,7 +1227,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.EditorMessage($"File error: {e.Message}", true);
+                LootLockerLogger.EditorMessage($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
@@ -1279,7 +1279,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.EditorMessage($"File error: {e.Message}", true);
+                LootLockerLogger.EditorMessage($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
