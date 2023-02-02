@@ -16,16 +16,14 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// LootLocker Log messages, only visible in the Unity Editor.
+        /// Get logger for the specified level. Use like: GetForLevel(LogLevel::Info)(message);
         /// </summary>
-        /// <param name="message">A message as a string</param>
         /// <param name="logLevel">What level should this be logged as</param>
-        public static void EditorMessage(string message, LogLevel logLevel = LogLevel.Info)
+        public static Action<string> GetForLogLevel(LogLevel logLevel = LogLevel.Info)
         {
-#if UNITY_EDITOR
             if (!ShouldLog(logLevel))
             {
-                return;
+                return ignored => { };
             }
 
             AdjustLogLevelToSettings(ref logLevel);
@@ -33,22 +31,19 @@ namespace LootLocker
             switch (logLevel)
             {
                 case LogLevel.Error:
-                    Debug.LogError(message);
-                    break;
+                    return Debug.LogError;
                 case LogLevel.Warning:
-                    Debug.LogWarning(message);
-                    break;
+                    return Debug.LogWarning;
                 case LogLevel.Verbose:
                 case LogLevel.Info:
                 default:
-                    Debug.Log(message);
-                    break;
+                    return Debug.Log;
             }
-#endif
         }
 
         private static bool ShouldLog(LogLevel logLevel)
         {
+#if UNITY_EDITOR
             switch (logLevel)
             {
                 case LogLevel.Error:
@@ -113,6 +108,7 @@ namespace LootLocker
                     break;
                 }
             }
+#endif
 
             return false;
         }
