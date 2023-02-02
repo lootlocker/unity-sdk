@@ -47,13 +47,13 @@ namespace LootLocker
             catch (RegexMatchTimeoutException e)
             {
                 error = "An error has occurred. Please try again.";
-                LootLockerSDKManager.DebugMessage("Regex exception: " + e, true);
+                LootLockerLogger.EditorMessage("Regex exception: " + e, true);
                 return false;
             }
             catch (ArgumentException e)
             {
                 error = "An error has occurred. Please try again.";
-                LootLockerSDKManager.DebugMessage("Argument exception: " + e, true);
+                LootLockerLogger.EditorMessage("Argument exception: " + e, true);
                 return false;
             }
 
@@ -72,7 +72,7 @@ namespace LootLocker
             catch (RegexMatchTimeoutException e)
             {
                 error = "The email you entered was invalid.";
-                LootLockerSDKManager.DebugMessage("Regex exception: " + e, true);
+                LootLockerLogger.EditorMessage("Regex exception: " + e, true);
                 return false;
             }
         }
