@@ -46,7 +46,7 @@ namespace LootLocker
                 LootLockerResponse response = new LootLockerResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    LootLockerSDKManager.DebugMessage(serverResponse.text);
+                    LootLockerLogger.EditorMessage(serverResponse.text);
                     response = JsonConvert.DeserializeObject<LootLockerResponse>(serverResponse.text);
                     onComplete?.Invoke(response);
                 }

@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using LootLocker.Requests;
-using LootLocker;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
@@ -29,7 +26,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            DebugMessage("SDK is Intializing");
+            LootLockerLogger.EditorMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             return LoadConfig();
         }
@@ -44,7 +41,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)
         {
-            DebugMessage("SDK is Intializing");
+            LootLockerLogger.EditorMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey);
         }
@@ -61,7 +58,7 @@ namespace LootLocker.Requests
         [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)")]
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
-            DebugMessage("SDK is Intializing");
+            LootLockerLogger.EditorMessage("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey, platform);
             return initialized;
@@ -72,12 +69,12 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                DebugMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)", true);
+                LootLockerLogger.EditorMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)", true);
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                DebugMessage("Key has not been set, Please login to sdk manager or set key manually and then try again", true);
+                LootLockerLogger.EditorMessage("Key has not been set, Please login to sdk manager or set key manually and then try again", true);
                 return false;
             }
 
@@ -116,52 +113,11 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                DebugMessage("You cannot call this method before an active LootLocker session is started", true);
+                LootLockerLogger.EditorMessage("You cannot call this method before an active LootLocker session is started", true);
                 return false;
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// LootLocker Debug-messages, only visible in the Unity Editor.
-        /// </summary>
-        /// <param name="message">A message as a string</param>
-        /// <param name="IsError">Is this an error or not?</param>
-        public static void DebugMessage(string message, bool IsError = false)
-        {
-#if     UNITY_EDITOR
-            if (LootLockerConfig.current == null)
-            {
-                if (IsError)
-                    Debug.LogError(message);
-                else
-                    Debug.Log(message);
-                return;
-            }
-
-            if (LootLockerConfig.current != null && LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.All)
-            {
-                if (IsError)
-                    Debug.LogError(message);
-                else
-                    Debug.Log(message);
-            }
-            else if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.ErrorOnly)
-            {
-                if (IsError)
-                    Debug.LogError(message);
-            }
-            else if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.NormalOnly)
-            {
-                if (!IsError)
-                    Debug.LogError(message);
-            }
-            else if(LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.AllAsNormal)
-            {
-                Debug.Log(message);
-            }
-#endif
         }
 
         #endregion
@@ -1271,7 +1227,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                DebugMessage($"File error: {e.Message}", true);
+                LootLockerLogger.EditorMessage($"File error: {e.Message}", true);
                 return;
             }
 
@@ -1323,7 +1279,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                DebugMessage($"File error: {e.Message}", true);
+                LootLockerLogger.EditorMessage($"File error: {e.Message}", true);
                 return;
             }
 

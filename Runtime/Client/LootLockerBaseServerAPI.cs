@@ -69,7 +69,7 @@ namespace LootLocker
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildURL(request.endpoint, request.queryParams);
 #if UNITY_EDITOR
-                LootLockerSDKManager.DebugMessage("ServerRequest URL: " + url);
+                LootLockerLogger.EditorMessage("ServerRequest URL: " + url);
 #endif
 
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
@@ -85,7 +85,7 @@ namespace LootLocker
                         yield return null;
                         if (Time.time - startTime >= maxTimeOut)
                         {
-                            LootLockerSDKManager.DebugMessage("Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url, true);
+                            LootLockerLogger.EditorMessage("Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url, true);
                             OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
                             yield break;
                         }
@@ -99,13 +99,13 @@ namespace LootLocker
 
                     try
                     {
-                        LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
+                        LootLockerLogger.EditorMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
                     }
                     catch
                     {
-                        LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(), true);
-                        LootLockerSDKManager.DebugMessage(request.endpoint, true);
-                        LootLockerSDKManager.DebugMessage(ObfuscateJsonStringForLogging(webRequest.downloadHandler.text), true);
+                        LootLockerLogger.EditorMessage(request.httpMethod.ToString(), true);
+                        LootLockerLogger.EditorMessage(request.endpoint, true);
+                        LootLockerLogger.EditorMessage(ObfuscateJsonStringForLogging(webRequest.downloadHandler.text), true);
                     }
 
                     LootLockerResponse response = new LootLockerResponse();
@@ -160,7 +160,7 @@ namespace LootLocker
                         if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && tries < maxRetry) 
                         {
                             tries++;
-                            LootLockerSDKManager.DebugMessage("Refreshing Token, since we could not find one. If you do not want this please turn off in the LootLocker config settings", true);
+                            LootLockerLogger.EditorMessage("Refreshing Token, since we could not find one. If you do not want this please turn off in the LootLocker config settings", true);
                             RefreshTokenAndCompleteCall(request,(value)=> { tries = 0; OnServerResponse?.Invoke(value); });
                         }
                         else
@@ -172,7 +172,7 @@ namespace LootLocker
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
                             OnServerResponse?.Invoke(response);
-                            LootLockerSDKManager.DebugMessage(ObfuscateJsonStringForLogging(response.Error), true);
+                            LootLockerLogger.EditorMessage(ObfuscateJsonStringForLogging(response.Error), true);
                         }
 
                     }
@@ -180,13 +180,13 @@ namespace LootLocker
                     {
                         try
                         {
-                            LootLockerSDKManager.DebugMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
+                            LootLockerLogger.EditorMessage("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
                         }
                         catch
                         {
-                            LootLockerSDKManager.DebugMessage(request.httpMethod.ToString(), true);
-                            LootLockerSDKManager.DebugMessage(request.endpoint, true);
-                            LootLockerSDKManager.DebugMessage(webRequest.downloadHandler.text, true);
+                            LootLockerLogger.EditorMessage(request.httpMethod.ToString(), true);
+                            LootLockerLogger.EditorMessage(request.endpoint, true);
+                            LootLockerLogger.EditorMessage(webRequest.downloadHandler.text, true);
                         }
                         
                         response.success = true;
@@ -246,7 +246,7 @@ namespace LootLocker
 
                 if (texture == null)
                 {
-                    LootLockerSDKManager.DebugMessage("Texture download failed for: " + url, true);
+                    LootLockerLogger.EditorMessage("Texture download failed for: " + url, true);
                 }
 
                 OnComplete?.Invoke(texture);
@@ -283,7 +283,7 @@ namespace LootLocker
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
                         webRequest.uri = new Uri(url);
-                        LootLockerSDKManager.DebugMessage(url);//the url is wrong in some cases
+                        LootLockerLogger.EditorMessage(url);//the url is wrong in some cases
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
@@ -295,7 +295,7 @@ namespace LootLocker
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-                        LootLockerSDKManager.DebugMessage("REQUEST BODY = " + ObfuscateJsonStringForLogging(json));
+                        LootLockerLogger.EditorMessage("REQUEST BODY = " + ObfuscateJsonStringForLogging(json));
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
