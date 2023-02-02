@@ -117,7 +117,7 @@ namespace LootLocker
         /// </summary>
         public static T SDKNotInitializedError<T>() where T : LootLockerResponse, new()
         {
-            return Error<T>("SDK not initialised");
+            return Error<T>("SDK not initialized");
         }
     }
 
@@ -197,7 +197,7 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("domain-key", LootLockerConfig.current.domainKey);
 
-            if(!LootLockerConfig.current.IsPrefixedApiKey() && LootLockerConfig.current.developmentMode)
+            if((!LootLockerConfig.current.IsPrefixedApiKey() && LootLockerConfig.current.developmentMode) || LootLockerConfig.current.apiKey.StartsWith("dev_"))
             {
                 headers.Add("is-development", "true");
             }
