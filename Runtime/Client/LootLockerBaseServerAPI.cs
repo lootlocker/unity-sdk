@@ -85,7 +85,7 @@ namespace LootLocker
                         yield return null;
                         if (Time.time - startTime >= maxTimeOut)
                         {
-                            LootLockerSDKManager.DebugMessage("ERROR: Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url, true);
+                            LootLockerSDKManager.DebugMessage("Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url, true);
                             OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
                             yield break;
                         }
@@ -172,7 +172,7 @@ namespace LootLocker
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
                             OnServerResponse?.Invoke(response);
-                            LootLockerSDKManager.DebugMessage(response.Error, true);
+                            LootLockerSDKManager.DebugMessage(ObfuscateJsonStringForLogging(response.Error), true);
                         }
 
                     }
@@ -278,13 +278,12 @@ namespace LootLocker
                         byte[] formSections = UnityWebRequest.SerializeFormSections(form, boundary);
                         // Set the content type - NO QUOTES around the boundary
                         string contentType = String.Concat("multipart/form-data; boundary=--", Encoding.UTF8.GetString(boundary));
-
-                        //Debug.LogError("Content type Set: " + contentType);
+                        
                         // Make my request object and add the raw body. Set anything else you need here
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
                         webRequest.uri = new Uri(url);
-                        Debug.Log(url);//the url is wrong in some cases
+                        LootLockerSDKManager.DebugMessage(url);//the url is wrong in some cases
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
