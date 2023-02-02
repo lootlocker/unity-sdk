@@ -72,7 +72,7 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                Debug.LogError("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)");
+                DebugMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)", true);
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
@@ -116,7 +116,7 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                Debug.LogError("You cannot call this method before an active LootLocker session is started");
+                DebugMessage("You cannot call this method before an active LootLocker session is started", true);
                 return false;
             }
 

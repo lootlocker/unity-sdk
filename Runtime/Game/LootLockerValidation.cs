@@ -90,7 +90,6 @@ namespace LootLocker
             bool hasLength = lengthCheck.IsMatch(password);
 
             bool isValidPassword = hasNumber && hasUppercase && hasLength;
-            //Debug.Log("Is password valid? = " + isValidPassword);
 
             if (!isValidPassword)
             {
