@@ -1,11 +1,6 @@
 using Newtonsoft.Json;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
 using LootLocker.Requests;
-using LootLocker.LootLockerEnums;
 using Newtonsoft.Json.Serialization;
 
 namespace LootLocker.Requests
