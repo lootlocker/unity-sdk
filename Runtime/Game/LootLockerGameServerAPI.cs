@@ -109,7 +109,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Session refresh failed");
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Info)("Session refresh failed");
                     LootLockerResponse res = new LootLockerResponse();
                     res.statusCode = 401;
                     res.Error = "Token Expired";
@@ -119,7 +119,7 @@ namespace LootLocker
             }
             else
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Session refresh failed");
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Info)("Session refresh failed");
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";
