@@ -155,7 +155,11 @@ namespace LootLocker.Requests
             else if (LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.NormalOnly)
             {
                 if (!IsError)
-                    Debug.Log(message);
+                    Debug.LogError(message);
+            }
+            else if(LootLockerConfig.current.currentDebugLevel == LootLockerConfig.DebugLevel.AllAsNormal)
+            {
+                Debug.Log(message);
             }
 #endif
         }
