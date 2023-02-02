@@ -45,7 +45,7 @@ namespace LootLocker
                 }
                 case Platforms.AppleSignIn:
                 {
-                    LootLockerLogger.EditorMessage($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
                     LootLockerResponse res = new LootLockerResponse
                     {
                         statusCode = 401,
@@ -58,7 +58,7 @@ namespace LootLocker
                 case Platforms.NintendoSwitch:
                 case Platforms.Steam:
                 {
-                    LootLockerLogger.EditorMessage($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}", LootLockerLogger.LogLevel.Warning);
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}");
                     LootLockerResponse res = new LootLockerResponse
                     {
                         statusCode = 401,
@@ -82,7 +82,7 @@ namespace LootLocker
                 case Platforms.None:
                 default:
                 {
-                    LootLockerLogger.EditorMessage($"Platform {CurrentPlatform.GetFriendlyString()} not supported", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"Platform {CurrentPlatform.GetFriendlyString()} not supported");
                     LootLockerResponse res = new LootLockerResponse
                     {
                         statusCode = 401,
@@ -109,7 +109,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    LootLockerLogger.EditorMessage("Session refresh failed", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Session refresh failed");
                     LootLockerResponse res = new LootLockerResponse();
                     res.statusCode = 401;
                     res.Error = "Token Expired";
@@ -119,7 +119,7 @@ namespace LootLocker
             }
             else
             {
-                LootLockerLogger.EditorMessage("Session refresh failed", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Session refresh failed");
                 LootLockerResponse res = new LootLockerResponse();
                 res.statusCode = 401;
                 res.Error = "Token Expired";
