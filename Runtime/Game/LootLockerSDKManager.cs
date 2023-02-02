@@ -26,7 +26,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerLogger.EditorMessage("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             return LoadConfig();
         }
@@ -41,7 +41,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)
         {
-            LootLockerLogger.EditorMessage("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey);
         }
@@ -58,7 +58,7 @@ namespace LootLocker.Requests
         [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)")]
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
-            LootLockerLogger.EditorMessage("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
             LootLockerServerManager.CheckInit();
             initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey, platform);
             return initialized;
@@ -69,12 +69,12 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                LootLockerLogger.EditorMessage("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                LootLockerLogger.EditorMessage("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
                 return false;
             }
 
@@ -113,7 +113,7 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                LootLockerLogger.EditorMessage("You cannot call this method before an active LootLocker session is started", LootLockerLogger.LogLevel.Warning);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("You cannot call this method before an active LootLocker session is started");
                 return false;
             }
 
@@ -1227,7 +1227,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.EditorMessage($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
                 return;
             }
 
@@ -1279,7 +1279,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.EditorMessage($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
                 return;
             }
 
