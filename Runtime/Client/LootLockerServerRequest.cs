@@ -156,7 +156,7 @@ namespace LootLocker
             LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
 #if UNITY_EDITOR
-            LootLockerSDKManager.DebugMessage("Caller Type: " + callerRole.ToString());
+            LootLockerSDKManager.DebugMessage("Caller Type: " + callerRole);
 #endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
