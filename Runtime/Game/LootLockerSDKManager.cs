@@ -468,26 +468,31 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void EndSession(Action<LootLockerSessionResponse> onComplete)
         {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-            else if (!CheckActiveSession())
+            if (!CheckInitialized(true) || !CheckActiveSession())
             {
                 onComplete?.Invoke(new LootLockerSessionResponse() { success = true, hasError = false, text = "No active session" });
+                return;
             }
 
-            // Clear White Label Login credentials
-            if (CurrentPlatform.Get() == Platforms.WhiteLabel)
-            {
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
-            }
-
-            CurrentPlatform.Reset();
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
-            LootLockerAPIManager.EndSession(sessionRequest, onComplete);
+            LootLockerAPIManager.EndSession(sessionRequest, response =>
+            {
+                if (response.success)
+                {
+                    // Clear White Label Login credentials
+                    if (CurrentPlatform.Get() == Platforms.WhiteLabel)
+                    {
+                        PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
+                        PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
+                    }
+
+                    CurrentPlatform.Reset();
+
+                    LootLockerConfig.current.UpdateToken("", "");
+                }
+
+                onComplete?.Invoke(response);
+            });
         }
 
         [Obsolete("Calling this method with devideId is deprecated")]
