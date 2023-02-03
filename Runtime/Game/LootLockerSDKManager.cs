@@ -232,6 +232,34 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Start an Android Network session
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="deviceId">The player's Device ID</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartAndroidSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Android);
+
+            LootLockerConfig.current.deviceID = deviceId;
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
+            LootLockerAPIManager.Session(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
         /// Start a Amazon Luna session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
