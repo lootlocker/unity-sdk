@@ -13,6 +13,7 @@ namespace LootLocker.Requests
         ,NintendoSwitch
         ,AmazonLuna
         ,AppleSignIn
+        ,Android
     }
 
     public class CurrentPlatform
@@ -40,6 +41,7 @@ namespace LootLocker.Requests
             ,"nintendo_switch" // NintendoSwitch
             ,"amazon_luna" // AmazonLuna
             ,"apple_sign_in" // AppleSignIn
+            ,"android" // Android
         };
         private static readonly string[] PlatformFriendlyStrings = new[]
         {
@@ -52,6 +54,7 @@ namespace LootLocker.Requests
             ,"Nintendo Switch" // NintendoSwitch
             ,"Amazon Luna" // AmazonLuna
             ,"Apple Sign In" // AppleSignIn
+            ,"Android" // Android
         };
 
         public struct PlatformRepresentation
