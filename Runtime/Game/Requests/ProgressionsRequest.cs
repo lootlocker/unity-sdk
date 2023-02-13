@@ -105,8 +105,8 @@ namespace LootLocker.Requests
     public class LootLockerAssetReward
     {
         public int asset_id { get; set; }
-        public int asset_variation_id { get; set; }
-        public int asset_rental_option_id { get; set; }
+        public int? asset_variation_id { get; set; }
+        public int? asset_rental_option_id { get; set; }
     }
 
     public class LootLockerProgressionPointsReward
