@@ -36,14 +36,13 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
-        /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
-        public static bool Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)
+        public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
             LootLockerLogger.GetForLogLevel()("SDK is Intializing");
             LootLockerServerManager.CheckInit();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey);
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
 
         /// <summary>
@@ -52,15 +51,15 @@ namespace LootLocker.Requests
         /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
         /// <param name="platform">DEPRECATED: What platform you are using, only used for purchases, use Android if you are unsure</param>
-        /// <param name="onDevelopmentMode">Reflecting stage/live on the LootLocker webconsole</param>
+        /// <param name="onDevelopmentMode">DEPRECATED: Reflecting stage/live on the LootLocker webconsole</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
-        [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)")]
+        [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, string domainKey)")]
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
             LootLockerLogger.GetForLogLevel()("SDK is Intializing");
             LootLockerServerManager.CheckInit();
-            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, onDevelopmentMode, domainKey, platform);
+            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, onDevelopmentMode, platform);
             return initialized;
         }
 
