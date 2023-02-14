@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -78,7 +78,7 @@ namespace LootLocker
             }
         }
 #endif
-        public static bool CreateNewSettings(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey, platformType platform = platformType.Unused, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, bool onDevelopmentMode = false, platformType platform = platformType.Unused, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             _current = Get();
 
