@@ -1177,6 +1177,21 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SetPlayerName(data, onComplete);
         }
+
+        /// <summary>
+        /// Mark the logged in player for deletion. After 30 days the player will be deleted from the system.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse></param>
+        public static void SetPlayerName(Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse> ());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.deletePlayer.endPoint, LootLockerEndPoints.deletePlayer.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+        }
         #endregion
 
         #region Player files
