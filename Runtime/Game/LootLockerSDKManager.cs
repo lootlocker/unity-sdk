@@ -767,7 +767,7 @@ namespace LootLocker.Requests
 
         public static void WhiteLabelLoginAndStartSession(string email, string password, bool rememberMe, Action<LootLockerWhiteLabelLoginAndStartSessionResponse> onComplete)
         {
-            WhiteLabelLogin(email, password, loginResponse =>
+            WhiteLabelLogin(email, password, rememberMe, loginResponse =>
             {
                 if (!loginResponse.success)
                 {
