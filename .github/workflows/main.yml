@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: # Made towards the following
       - main
-      - release/**
+      - release/*
+      - dev*
     types: # Only on the following activity
       - opened
       - synchronize # Changes to the branch like new commits, ammends, etc.
@@ -13,6 +14,7 @@ on:
   push:
     branches: # Made towards the following
       - main
+      - dev
     tags:
       - v**
 
