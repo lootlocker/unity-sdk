@@ -43,6 +43,7 @@ namespace LootLocker
         public static EndPointClass setProfilePublic = new EndPointClass("v1/player/profile/public", LootLockerHTTPMethod.POST);
         public static EndPointClass getPlayerName = new EndPointClass("player/name", LootLockerHTTPMethod.GET);
         public static EndPointClass setPlayerName = new EndPointClass("player/name", LootLockerHTTPMethod.PATCH);
+        public static EndPointClass deletePlayer = new EndPointClass("player", LootLockerHTTPMethod.DELETE);
         public static EndPointClass lookupPlayerNames = new EndPointClass("player/lookup/name", LootLockerHTTPMethod.GET);
         public static EndPointClass lookupPlayer1stPartyPlatformIDs = new EndPointClass("player/lookup/ids", LootLockerHTTPMethod.GET);
         public static EndPointClass getPlayerFiles = new EndPointClass("player/files", LootLockerHTTPMethod.GET);
