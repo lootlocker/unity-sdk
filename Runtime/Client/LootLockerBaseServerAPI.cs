@@ -247,7 +247,7 @@ namespace LootLocker
             UnityWebRequest webRequest;
             switch (request.httpMethod)
             {
-                case LootLockerHTTPMethod.UPLOAD:
+                case LootLockerHTTPMethod.UPLOAD_FILE:
                     webRequest = UnityWebRequest.Post(url, request.form);
                     break;
                 case LootLockerHTTPMethod.POST:
