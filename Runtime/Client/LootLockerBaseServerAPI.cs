@@ -178,17 +178,6 @@ namespace LootLocker
                     }
                     else
                     {
-                        try
-                        {
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + webRequest.downloadHandler.text);
-                        }
-                        catch
-                        {
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.httpMethod.ToString());
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.endpoint);
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(webRequest.downloadHandler.text);
-                        }
-                        
                         response.success = true;
                         response.hasError = false;
                         response.statusCode = (int)webRequest.responseCode;
