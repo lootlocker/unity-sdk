@@ -1182,7 +1182,7 @@ namespace LootLocker.Requests
         /// Mark the logged in player for deletion. After 30 days the player will be deleted from the system.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse></param>
-        public static void SetPlayerName(Action<LootLockerResponse> onComplete)
+        public static void DeletePlayer(Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
             {

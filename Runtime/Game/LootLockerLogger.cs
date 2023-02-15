@@ -115,8 +115,7 @@ namespace LootLocker
 
         private static void AdjustLogLevelToSettings(ref LogLevel logLevel)
         {
-            if (LootLockerConfig.current != null &&
-                LootLockerConfig.DebugLevel.AllAsNormal == LootLockerConfig.current.currentDebugLevel)
+            if (LootLockerConfig.current != null && LootLockerConfig.DebugLevel.AllAsNormal == LootLockerConfig.current.currentDebugLevel)
             {
                 logLevel = LogLevel.Info;
             }
