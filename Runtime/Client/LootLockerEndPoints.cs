@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -49,7 +49,7 @@ namespace LootLocker
         public static EndPointClass getPlayerFiles = new EndPointClass("player/files", LootLockerHTTPMethod.GET);
         public static EndPointClass getPlayerFilesByPlayerId = new EndPointClass("player/{0}/files", LootLockerHTTPMethod.GET);
         public static EndPointClass getSingleplayerFile = new EndPointClass("player/files/{0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass uploadPlayerFile = new EndPointClass("player/files", LootLockerHTTPMethod.UPLOAD);
+        public static EndPointClass uploadPlayerFile = new EndPointClass("player/files", LootLockerHTTPMethod.UPLOAD_FILE);
         public static EndPointClass deletePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.DELETE);
 
         // Player Progressions
@@ -127,7 +127,7 @@ namespace LootLocker
         public static EndPointClass gettingASingleAssetCandidate = new EndPointClass("v1/player/assets/candidates/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass deletingAnAssetCandidate = new EndPointClass("v1/player/assets/candidates/{0}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass listingAssetCandidates = new EndPointClass("v1/player/assets/candidates", LootLockerHTTPMethod.GET);
-        public static EndPointClass addingFilesToAssetCandidates = new EndPointClass("v1/player/assets/candidates/{0}/file", LootLockerHTTPMethod.UPLOAD);
+        public static EndPointClass addingFilesToAssetCandidates = new EndPointClass("v1/player/assets/candidates/{0}/file", LootLockerHTTPMethod.UPLOAD_FILE);
         public static EndPointClass removingFilesFromAssetCandidates = new EndPointClass("v1/player/assets/candidates/{0}/file/{1}", LootLockerHTTPMethod.DELETE);
 
         // Events
