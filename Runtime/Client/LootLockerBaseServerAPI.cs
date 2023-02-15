@@ -69,7 +69,7 @@ namespace LootLocker
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildURL(request.endpoint, request.queryParams);
 #if UNITY_EDITOR
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest URL: " + url);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest " + request.httpMethod + " URL: " + url);
 #endif
 
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
@@ -99,7 +99,7 @@ namespace LootLocker
 
                     try
                     {
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " + request.httpMethod + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " + webRequest.responseCode + " " + request.endpoint + " completed in " + (Time.time - startTime).ToString("n4") + " secs.\nResponse: " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
                     }
                     catch
                     {
