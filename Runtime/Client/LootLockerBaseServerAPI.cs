@@ -250,6 +250,11 @@ namespace LootLocker
                 case LootLockerHTTPMethod.UPLOAD_FILE:
                     webRequest = UnityWebRequest.Post(url, request.form);
                     break;
+                case LootLockerHTTPMethod.UPDATE_FILE:
+                    // Workaround for UnityWebRequest with PUT HTTP verb not having form fields
+                    webRequest = UnityWebRequest.Post(url, request.form);
+                    webRequest.method = UnityWebRequest.kHttpVerbPUT;
+                    break;
                 case LootLockerHTTPMethod.POST:
                 case LootLockerHTTPMethod.PATCH:
                 // Defaults are fine for PUT
