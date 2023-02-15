@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -171,8 +171,8 @@ namespace LootLocker
                             response.success = false;
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
-                            OnServerResponse?.Invoke(response);
                             LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(ObfuscateJsonStringForLogging(response.Error));
+                            OnServerResponse?.Invoke(response);
                         }
 
                     }
