@@ -1284,8 +1284,7 @@ namespace LootLocker.Requests
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-
-/// 
+        
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -1376,7 +1375,7 @@ namespace LootLocker.Requests
                     LootLockerResponse.Serialize(onComplete, serverResponse);
                 });
         }
-
+        
         /// <summary>
         /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
@@ -1387,6 +1386,99 @@ namespace LootLocker.Requests
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
         {
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
+        }
+        
+        ///////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>
+        /// Update an existing player file with a new file.
+        /// </summary>
+        /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
+        /// <param name="pathToFile">Path to the file, example: Application.persistentDataPath + "/" + fileName;</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        public static void UpdatePlayerFile(int fileId, string pathToFile, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+            
+            var fileBytes = new byte[] { };
+            try
+            {
+                fileBytes = File.ReadAllBytes(pathToFile);
+            }
+            catch (Exception e)
+            {
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                return;
+            }
+            
+            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(), 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
+        }
+
+        /// <summary>
+        /// Update an existing player file with a new file using a Filestream. Can be useful if you want to upload without storing anything on disk.
+        /// </summary>
+        /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
+        /// <param name="fileStream">Filestream to upload</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        public static void UpdatePlayerFile(int fileId, FileStream fileStream, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var fileBytes = new byte[fileStream.Length];
+            try
+            {
+                fileStream.Read(fileBytes, 0, Convert.ToInt32(fileStream.Length));
+            }
+            catch (Exception e)
+            {
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(), 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
+        }
+
+        /// <summary>
+        /// Update an existing player file with a new file using a byte array. Can be useful if you want to upload without storing anything on disk.
+        /// </summary>
+        /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
+        /// <param name="fileBytes">Byte array to upload</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        public static void UpdatePlayerFile(int fileId, byte[] fileBytes, Action<LootLockerPlayerFile> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(), 
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Serialize(onComplete, serverResponse);
+                });
         }
 
         /// <summary>

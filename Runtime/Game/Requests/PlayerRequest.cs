@@ -199,6 +199,7 @@ namespace LootLocker.Requests
     public class LootLockerPlayerFile : LootLockerResponse
     {
         public int id { get; set; }
+        public string revision_id { get; set; }
         public string name { get; set; }
         public int size { get; set; }
         public string purpose { get; set; }
