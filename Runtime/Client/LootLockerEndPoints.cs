@@ -26,7 +26,7 @@ namespace LootLocker
         public static EndPointClass whiteLabelVerifySession = new EndPointClass("white-label-login/verify-session", LootLockerHTTPMethod.POST);
         public static EndPointClass whiteLabelRequestPasswordReset = new EndPointClass("white-label-login/request-reset-password", LootLockerHTTPMethod.POST);
         public static EndPointClass whiteLabelRequestAccountVerification = new EndPointClass("white-label-login/request-verification", LootLockerHTTPMethod.POST);
-        public static EndPointClass whiteLabelLoginSessionRequest = new EndPointClass("session/white-label", LootLockerHTTPMethod.POST);
+        public static EndPointClass whiteLabelLoginSessionRequest = new EndPointClass("v2/session/white-label", LootLockerHTTPMethod.POST);
 
         // Player
         [Header("Player")]
