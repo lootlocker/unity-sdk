@@ -23,7 +23,7 @@ namespace LootLocker
         CREATE = 5,
         OPTIONS = 6,
         PATCH = 7,
-        UPLOAD = 8
+        UPLOAD_FILE = 8
     }
 
     /// <summary>
