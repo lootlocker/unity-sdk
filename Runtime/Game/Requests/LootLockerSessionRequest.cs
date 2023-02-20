@@ -218,6 +218,21 @@ namespace LootLocker
                 onComplete?.Invoke(response);
             }, false);
         }
+        public static void GoogleSession(LootLockerSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.googleSessionRequest;
+
+            string json = "";
+            if (data == null) return;
+            else json = JsonConvert.SerializeObject(data);
+            LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, data?.player_identifier);
+                onComplete?.Invoke(response);
+            }, false);
+        }
 
         public static void NintendoSwitchSession(LootLockerNintendoSwitchSessionRequest data, Action<LootLockerSessionResponse> onComplete)
         {
