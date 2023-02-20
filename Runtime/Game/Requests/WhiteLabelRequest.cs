@@ -139,5 +139,24 @@ namespace LootLocker
             var json = JsonConvert.SerializeObject(new { user_id = userID });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+
+        public static void WhiteLabelRequestAccountVerification(string email, Action<LootLockerResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestAccountVerification;
+
+            var json = JsonConvert.SerializeObject(new { email = email });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerResponse response = new LootLockerResponse
+                {
+                    text = serverResponse.text,
+                    success = serverResponse.success,
+                    Error = serverResponse.Error,
+                    statusCode = serverResponse.statusCode
+                };
+
+                onComplete?.Invoke(response);
+            });
+        }
     }
 }
