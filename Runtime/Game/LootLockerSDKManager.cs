@@ -636,6 +636,24 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Request verify account email for the user.
+        /// White Label platform must be enabled in the web console for this to work.
+        /// Account verification must also be enabled.
+        /// </summary>
+        /// <param name="email">Email of the player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void WhiteLabelRequestVerification(string email, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.WhiteLabelRequestAccountVerification(email, onComplete);
+        }
+
+        /// <summary>
         /// Checks for a stored session and if that session is valid.
         /// Depending on response of this method the developer can either start a session using the token,
         /// or show a login form.
