@@ -19,6 +19,7 @@ namespace LootLocker
         {
             if (settingsInstance != null)
             {
+                settingsInstance.ConstructUrls();
                 return settingsInstance;
             }
 
@@ -55,6 +56,7 @@ namespace LootLocker
                 throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
             }
 #endif
+            settingsInstance?.ConstructUrls();
             return settingsInstance;
         }
 
@@ -112,6 +114,19 @@ namespace LootLocker
             }
         }
 
+        private void ConstructUrls()
+        {
+            string StartOfUrl = UrlPrependage;
+            if (domainKey != null)
+            {
+                StartOfUrl += domainKey + ".";
+            }
+            adminUrl = StartOfUrl + UrlCore + AdminUrlAppendage;
+            playerUrl = StartOfUrl + UrlCore + PlayerUrlAppendage;
+            userUrl = StartOfUrl + UrlCore + UserUrlAppendage;
+            baseUrl = StartOfUrl + UrlCore;
+        }
+
         private static LootLockerConfig _current;
 
         public static LootLockerConfig current
@@ -144,16 +159,20 @@ namespace LootLocker
         public enum platformType { Android, iOS, Steam, PlayStationNetwork, Unused }
         [HideInInspector]
         public bool developmentMode = true;
-        [HideInInspector]
-        public string url = "https://api.lootlocker.io/game/v1";
-        [HideInInspector]
-        public string adminUrl = "https://api.lootlocker.io/admin";
-        [HideInInspector]
-        public string playerUrl = "https://api.lootlocker.io/player";
-        [HideInInspector]
-        public string userUrl = "https://api.lootlocker.io/game";
-        [HideInInspector]
-        public string baseUrl = "https://api.lootlocker.io";
+
+        [HideInInspector] private static readonly string UrlPrependage = "https://";
+        [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";
+        [HideInInspector] private static readonly string UrlAppendage = "/v1";
+        [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
+        [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
+        [HideInInspector] private static readonly string UserUrlAppendage = "/game";
+
+        [HideInInspector] public string url = UrlPrependage + UrlCore + UrlAppendage;
+
+        [HideInInspector] public string adminUrl = UrlPrependage + UrlCore + AdminUrlAppendage;
+        [HideInInspector] public string playerUrl = UrlPrependage + UrlCore + PlayerUrlAppendage;
+        [HideInInspector] public string userUrl = UrlPrependage + UrlCore + UserUrlAppendage;
+        [HideInInspector] public string baseUrl = UrlPrependage + UrlCore;
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
