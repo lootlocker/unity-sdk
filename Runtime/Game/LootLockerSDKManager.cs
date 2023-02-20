@@ -259,6 +259,34 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Start a Game session for a Google User
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartGoogleSession(string idToken, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Google);
+
+            LootLockerConfig.current.deviceID = idToken;
+            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(idToken);
+            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
         /// Start a Amazon Luna session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
