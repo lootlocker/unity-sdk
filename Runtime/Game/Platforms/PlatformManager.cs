@@ -14,6 +14,7 @@ namespace LootLocker.Requests
         ,AmazonLuna
         ,AppleSignIn
         ,Android
+        ,Google
     }
 
     public class CurrentPlatform
@@ -42,6 +43,7 @@ namespace LootLocker.Requests
             ,"amazon_luna" // AmazonLuna
             ,"apple_sign_in" // AppleSignIn
             ,"android" // Android
+            ,"google" // Google
         };
         private static readonly string[] PlatformFriendlyStrings = new[]
         {
@@ -55,6 +57,7 @@ namespace LootLocker.Requests
             ,"Amazon Luna" // AmazonLuna
             ,"Apple Sign In" // AppleSignIn
             ,"Android" // Android
+            ,"Google" // Google
         };
 
         public struct PlatformRepresentation
@@ -112,7 +115,7 @@ namespace LootLocker.Requests
             switch (platform)
             {
                 case LootLockerConfig.platformType.Android:
-                    Set(Platforms.Guest);
+                    Set(Platforms.Android);
                     break;
                 case LootLockerConfig.platformType.iOS:
                     Set(Platforms.AppleSignIn);
