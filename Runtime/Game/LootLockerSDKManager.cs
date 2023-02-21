@@ -8,11 +8,23 @@ using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace LootLocker.Requests
 {
     public partial class LootLockerSDKManager
     {
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            LootLockerLogger.GetForLogLevel()("SDK is resetting for entering Playmode");
+            initialized = false;
+        }
+#endif
+
         /// <summary>
         /// Stores which platform the player currently has a session for.
         /// </summary>
@@ -26,7 +38,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
             LootLockerServerManager.CheckInit();
             return LoadConfig();
         }
@@ -40,7 +52,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
-            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
             LootLockerServerManager.CheckInit();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
@@ -57,7 +69,7 @@ namespace LootLocker.Requests
         [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, string domainKey)")]
         public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
         {
-            LootLockerLogger.GetForLogLevel()("SDK is Intializing");
+            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
             LootLockerServerManager.CheckInit();
             initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, onDevelopmentMode, platform);
             return initialized;
@@ -77,6 +89,7 @@ namespace LootLocker.Requests
                 return false;
             }
 
+            LootLockerLogger.GetForLogLevel()("SDK is Initialized");
             initialized = true;
             return initialized;
         }
@@ -96,7 +109,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Utility function to check if the sdk has been initiazed
+        /// Utility function to check if the sdk has been initialized
         /// </summary>
         /// <returns>True if initialized, false otherwise.</returns>
         public static bool CheckInitialized(bool skipSessionCheck = false)

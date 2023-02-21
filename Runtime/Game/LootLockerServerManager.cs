@@ -1,5 +1,7 @@
 using UnityEngine;
-using LootLocker;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace LootLocker
 {
@@ -37,6 +39,14 @@ namespace LootLocker
                     DontDestroyOnLoad(i.gameObject);
             }
         }
+
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            i = null;
+        }
+#endif
 
         void Awake()
         {
