@@ -1,4 +1,7 @@
 using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace LootLocker.Requests
 {
@@ -132,5 +135,14 @@ namespace LootLocker.Requests
                     break;
             }
         }
+
+
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            Reset();
+        }
+#endif
     }
 }

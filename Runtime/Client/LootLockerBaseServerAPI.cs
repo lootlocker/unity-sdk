@@ -5,8 +5,6 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System;
 using System.Text;
-using UnityEngine.SceneManagement;
-using UnityEngine.Events;
 using System.Net;
 using LootLocker.Requests;
 using Newtonsoft.Json.Linq;
