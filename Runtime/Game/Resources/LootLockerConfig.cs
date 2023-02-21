@@ -141,6 +141,7 @@ namespace LootLocker
                 return _current;
             }
         }
+
         public (string key, string value) dateVersion = ("LL-Version", "2021-03-01");
         public string apiKey;
         [HideInInspector]
@@ -178,5 +179,13 @@ namespace LootLocker
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
+
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            _current = null;
+        }
+#endif
     }
 }
