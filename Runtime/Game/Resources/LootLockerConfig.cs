@@ -116,15 +116,15 @@ namespace LootLocker
 
         private void ConstructUrls()
         {
-            string StartOfUrl = UrlPrependage;
-            if (domainKey != null)
+            string startOfUrl = UrlPrependage;
+            if (!string.IsNullOrEmpty(domainKey))
             {
-                StartOfUrl += domainKey + ".";
+                startOfUrl += domainKey + ".";
             }
-            adminUrl = StartOfUrl + UrlCore + AdminUrlAppendage;
-            playerUrl = StartOfUrl + UrlCore + PlayerUrlAppendage;
-            userUrl = StartOfUrl + UrlCore + UserUrlAppendage;
-            baseUrl = StartOfUrl + UrlCore;
+            adminUrl = startOfUrl + UrlCore + AdminUrlAppendage;
+            playerUrl = startOfUrl + UrlCore + PlayerUrlAppendage;
+            userUrl = startOfUrl + UrlCore + UserUrlAppendage;
+            baseUrl = startOfUrl + UrlCore;
         }
 
         private static LootLockerConfig _current;
@@ -161,7 +161,7 @@ namespace LootLocker
         public bool developmentMode = true;
 
         [HideInInspector] private static readonly string UrlPrependage = "https://";
-        [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";
+        [HideInInspector] private static readonly string UrlCore = "api.stage.internal.dev.lootlocker.cloud";//"api.lootlocker.io";
         [HideInInspector] private static readonly string UrlAppendage = "/v1";
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
