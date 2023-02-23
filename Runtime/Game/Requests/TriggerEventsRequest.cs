@@ -1,4 +1,4 @@
-﻿using LootLocker.Requests;
+using LootLocker.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -106,7 +106,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         [Obsolete("This function is deprecated and will be removed soon. Please use the function ExecuteTrigger() instead")]
@@ -118,14 +118,14 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void ListAllExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         [Obsolete("This function is deprecated and will be removed soon. Please use the function ListExecutedTriggers() instead")]
@@ -133,7 +133,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
