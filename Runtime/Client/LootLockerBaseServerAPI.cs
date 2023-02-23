@@ -77,22 +77,26 @@ namespace LootLocker
                     webRequest.downloadHandler = new DownloadHandlerBuffer();
 
                     float startTime = Time.time;
-                    float maxTimeOut = 5f;
+                    float maxTimeOutSeconds = 5f;
+                    bool timedOut = false;
 
-                    yield return webRequest.SendWebRequest();
-                    while (!webRequest.isDone)
+                    UnityWebRequestAsyncOperation unityWebRequestAsyncOperation = webRequest.SendWebRequest();
+                    yield return new WaitUntil(() =>
                     {
-                        yield return null;
-                        if (Time.time - startTime >= maxTimeOut)
+                        if (unityWebRequestAsyncOperation == null)
                         {
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod.ToString() + " " + url);
-                            OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
-                            yield break;
+                            return true;
                         }
-                    }
 
-                    if (!webRequest.isDone)
+                        timedOut = !unityWebRequestAsyncOperation.isDone && Time.time - startTime >= maxTimeOutSeconds;
+
+                        return timedOut || unityWebRequestAsyncOperation.isDone;
+
+                    });
+
+                    if (!webRequest.isDone && timedOut)
                     {
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
                         OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
                         yield break;
                     }
