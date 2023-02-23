@@ -14,7 +14,7 @@
   },
   "type": "tool",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "2.0.0"
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
   },
   "samples": [
         {
