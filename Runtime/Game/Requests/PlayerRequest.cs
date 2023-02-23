@@ -294,9 +294,13 @@ namespace LootLocker
 
         public static void SubmitXp(LootLockerXpSubmitRequest data, Action<LootLockerXpSubmitResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerXpSubmitResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             var endPoint = LootLockerEndPoints.submitXp;
 
@@ -416,9 +420,13 @@ namespace LootLocker
 
         public static void SetPlayerName(PlayerNameRequest data, Action<PlayerNameResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             var endPoint = LootLockerEndPoints.setPlayerName;
 

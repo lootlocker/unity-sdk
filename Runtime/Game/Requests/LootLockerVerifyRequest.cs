@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using LootLocker.Requests;
 
@@ -38,9 +38,12 @@ namespace LootLocker
     {
         public static void Verify(LootLockerVerifyRequest data, Action<LootLockerVerifyResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerVerifyResponse>());
+            	return;
+            }
+            string json = JsonConvert.SerializeObject(data);
             LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 

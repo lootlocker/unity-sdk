@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using System;
 using LootLocker.Requests;
-using Newtonsoft.Json.Serialization;
 
 namespace LootLocker.Requests
 {
@@ -83,32 +82,14 @@ namespace LootLocker
         public static void WhiteLabelLogin(LootLockerWhiteLabelUserRequest input, Action<LootLockerWhiteLabelLoginResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelLogin;
-
-            string json = "";
-            if (input == null)
+            
+            if(input == null)
             {
-                return;
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerWhiteLabelLoginResponse>());
+            	return;
             }
-            else
-            {
-                json = JsonConvert.SerializeObject(input);
-            }
-
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
-            {
-                LootLockerWhiteLabelLoginResponse response = new LootLockerWhiteLabelLoginResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
-                {
-                    DefaultContractResolver contractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
-
-                    response = JsonConvert.DeserializeObject<LootLockerWhiteLabelLoginResponse>(serverResponse.text, new JsonSerializerSettings
-                    {
-                        ContractResolver = contractResolver,
-                        Formatting = Formatting.Indented
-                    });
+            
+            string json = JsonConvert.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
@@ -116,26 +97,14 @@ namespace LootLocker
         public static void WhiteLabelVerifySession(LootLockerWhiteLabelVerifySessionRequest input, Action<LootLockerWhiteLabelVerifySessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelVerifySession;
-
-            string json = "";
-            if (input == null)
+            
+            if(input == null)
             {
-                return;
-            }
-            else
-            {
-                json = JsonConvert.SerializeObject(input);
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerWhiteLabelVerifySessionResponse>());
+            	return;
             }
 
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
-            {
-                LootLockerWhiteLabelVerifySessionResponse response = new LootLockerWhiteLabelVerifySessionResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
-                {
-                    DefaultContractResolver contractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
+            string json = JsonConvert.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
@@ -144,38 +113,13 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelSignUp;
 
-            string json = "";
-            if (input == null) {
+            if (input == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerWhiteLabelSignupResponse>());
                 return;
             }
-            else
-            { 
-                json = JsonConvert.SerializeObject(input);
-            }
 
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, ((serverResponse) =>
-            {
-                LootLockerWhiteLabelSignupResponse response = new LootLockerWhiteLabelSignupResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error) && serverResponse.text != null)
-                {
-                    DefaultContractResolver contractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
-
-                    response = JsonConvert.DeserializeObject<LootLockerWhiteLabelSignupResponse>(serverResponse.text, new JsonSerializerSettings
-                    {
-                        ContractResolver = contractResolver,
-                        Formatting = Formatting.Indented
-                    });
-
-                    if (response == null)
-                    {
-                        response = LootLockerResponseFactory.Error<LootLockerWhiteLabelSignupResponse>("error deserializing server response");
-                        onComplete?.Invoke(response);
-                        return;
-                    }
-                }
+            string json = JsonConvert.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }

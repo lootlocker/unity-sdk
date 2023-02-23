@@ -429,7 +429,7 @@ namespace LootLocker
                 }
             }
 
-            return JsonConvert.SerializeObject(jsonObject, Formatting.None);
+            return JsonConvert.SerializeObject(jsonObject);
         }
 
         string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -152,9 +152,13 @@ namespace LootLocker
 
         public static void FinishMission(LootLockerFinishMissionRequest data, Action<LootLockerFinishMissionResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishMissionResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass requestEndPoint = LootLockerEndPoints.finishingMission;
 
@@ -165,9 +169,13 @@ namespace LootLocker
         [Obsolete("This function is deprecated and will be removed soon. Please use the function FinishMission() instead")]
         public static void FinishingAMission(LootLockerFinishingAMissionRequest data, Action<LootLockerFinishingAMissionResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishingAMissionResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass requestEndPoint = LootLockerEndPoints.finishingMission;
 

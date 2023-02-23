@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker;
@@ -95,9 +95,13 @@ namespace LootLocker
 
         public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetSingleKeyValuePairsResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.getAKeyValuePairById;
 
@@ -108,9 +112,13 @@ namespace LootLocker
 
         public static void CreateKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.createKeyValuePair;
 
@@ -121,9 +129,13 @@ namespace LootLocker
 
         public static void UpdateOneOrMoreKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateOneOrMoreKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateOneOrMoreKeyValuePair;
 
@@ -134,9 +146,13 @@ namespace LootLocker
 
         public static void UpdateKeyValuePairById(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateKeyValuePairById;
 
