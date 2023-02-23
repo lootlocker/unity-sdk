@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -141,7 +141,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.creatingAnAssetCandidate;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void UpdatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -153,7 +153,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -162,7 +162,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -171,14 +171,14 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.listingAssetCandidates;
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void AddingFilesToAssetCandidates(LootLockerAddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -205,7 +205,7 @@ namespace LootLocker
 
             byte[] fileData = System.IO.File.ReadAllBytes(data.filePath);
 
-            LootLockerServerRequest.UploadFile(endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType, formData, (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.UploadFile(endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType, formData, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void RemovingFilesFromAssetCandidates(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
@@ -214,7 +214,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0], data.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

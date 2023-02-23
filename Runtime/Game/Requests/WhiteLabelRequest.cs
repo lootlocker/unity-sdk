@@ -110,19 +110,7 @@ namespace LootLocker
                         Formatting = Formatting.Indented
                     });
 
-                    if (response == null)
-                    {
-                        response = LootLockerResponseFactory.Error<LootLockerWhiteLabelLoginResponse>("error deserializing server response");
-                        onComplete?.Invoke(response);
-                        return;
-                    }
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }));
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
 
         public static void WhiteLabelVerifySession(LootLockerWhiteLabelVerifySessionRequest input, Action<LootLockerWhiteLabelVerifySessionResponse> onComplete)
@@ -149,25 +137,7 @@ namespace LootLocker
                         NamingStrategy = new SnakeCaseNamingStrategy()
                     };
 
-                    response = JsonConvert.DeserializeObject<LootLockerWhiteLabelVerifySessionResponse>(serverResponse.text, new JsonSerializerSettings
-                    {
-                        ContractResolver = contractResolver,
-                        Formatting = Formatting.Indented
-                    });
-
-                    if (response == null)
-                    {
-                        response = LootLockerResponseFactory.Error<LootLockerWhiteLabelVerifySessionResponse>("error deserializing server response");
-                        onComplete?.Invoke(response);
-                        return;
-                    }
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }));
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
 
         public static void WhiteLabelSignUp(LootLockerWhiteLabelUserRequest input, Action<LootLockerWhiteLabelSignupResponse> onComplete)
@@ -207,11 +177,7 @@ namespace LootLocker
                     }
                 }
 
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }));
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
 
         public static void WhiteLabelRequestPasswordReset(string email, Action<LootLockerResponse> onComplete)
@@ -219,18 +185,7 @@ namespace LootLocker
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestPasswordReset;
 
             var json = JsonConvert.SerializeObject(new { email });
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerResponse response = new LootLockerResponse
-                {
-                    text = serverResponse.text,
-                    success = serverResponse.success,
-                    Error = serverResponse.Error,
-                    statusCode = serverResponse.statusCode
-                };
-
-                onComplete?.Invoke(response);
-            });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void WhiteLabelRequestAccountVerification(int userID, Action<LootLockerResponse> onComplete)
@@ -238,18 +193,7 @@ namespace LootLocker
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestAccountVerification;
 
             var json = JsonConvert.SerializeObject(new { user_id = userID });
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerResponse response = new LootLockerResponse
-                {
-                    text = serverResponse.text,
-                    success = serverResponse.success,
-                    Error = serverResponse.Error,
-                    statusCode = serverResponse.statusCode
-                };
-
-                onComplete?.Invoke(response);
-            });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
