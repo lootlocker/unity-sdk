@@ -116,7 +116,7 @@ namespace LootLocker
 
         private void ConstructUrls()
         {
-            string startOfUrl = UrlPrependage;
+            string startOfUrl = UrlProtocol;
             if (!string.IsNullOrEmpty(domainKey))
             {
                 startOfUrl += domainKey + ".";
@@ -160,19 +160,19 @@ namespace LootLocker
         [HideInInspector]
         public bool developmentMode = true;
 
-        [HideInInspector] private static readonly string UrlPrependage = "https://";
-        [HideInInspector] private static readonly string UrlCore = "api.stage.internal.dev.lootlocker.cloud";//"api.lootlocker.io";
+        [HideInInspector] private static readonly string UrlProtocol = "https://";
+        [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";
         [HideInInspector] private static readonly string UrlAppendage = "/v1";
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
         [HideInInspector] private static readonly string UserUrlAppendage = "/game";
 
-        [HideInInspector] public string url = UrlPrependage + UrlCore + UrlAppendage;
+        [HideInInspector] public string url = UrlProtocol + UrlCore + UrlAppendage;
 
-        [HideInInspector] public string adminUrl = UrlPrependage + UrlCore + AdminUrlAppendage;
-        [HideInInspector] public string playerUrl = UrlPrependage + UrlCore + PlayerUrlAppendage;
-        [HideInInspector] public string userUrl = UrlPrependage + UrlCore + UserUrlAppendage;
-        [HideInInspector] public string baseUrl = UrlPrependage + UrlCore;
+        [HideInInspector] public string adminUrl = UrlProtocol + UrlCore + AdminUrlAppendage;
+        [HideInInspector] public string playerUrl = UrlProtocol + UrlCore + PlayerUrlAppendage;
+        [HideInInspector] public string userUrl = UrlProtocol + UrlCore + UserUrlAppendage;
+        [HideInInspector] public string baseUrl = UrlProtocol + UrlCore;
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
