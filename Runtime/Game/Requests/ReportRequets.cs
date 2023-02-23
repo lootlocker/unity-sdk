@@ -78,14 +78,14 @@ namespace LootLocker.Requests
     public class ReportsCreatePlayerRequest
     {
         public int[] report_types { get; set; }
-        public string text { get; set; }
+        public string message { get; set; }
         public int player_id { get; set; }
     }
 
     public class ReportsCreateAssetRequest
     {
         public int[] report_types { get; set; }
-        public string text { get; set; }
+        public string message { get; set; }
         public int asset_id { get; set; }
     }
 }
