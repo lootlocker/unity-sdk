@@ -1,7 +1,5 @@
-using Newtonsoft.Json;
 using System;
 using LootLocker.Requests;
-using Newtonsoft.Json.Serialization;
 
 namespace LootLocker.Requests
 {

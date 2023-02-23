@@ -147,9 +147,13 @@ namespace LootLocker
         public static void CreatePlayerReport(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreatePlayer;
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreatePlayerResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -157,9 +161,13 @@ namespace LootLocker
         public static void CreateAssetReport(ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreateAsset;
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreateAssetResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

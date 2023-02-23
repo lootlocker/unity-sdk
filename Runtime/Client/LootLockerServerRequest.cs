@@ -142,6 +142,14 @@ namespace LootLocker
         {
             return Error<T>("SDK not initialized");
         }
+
+        /// <summary>
+        /// Construct an error response because an unserializable input has been given
+        /// </summary>
+        public static T InputUnserializableError<T>() where T : LootLockerResponse, new()
+        {
+            return Error<T>("Method parameter could not be serialized");
+        }
     }
 
     /// <summary>

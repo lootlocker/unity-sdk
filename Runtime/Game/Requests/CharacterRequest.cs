@@ -1,4 +1,4 @@
-using LootLocker;
+﻿using LootLocker;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -137,8 +137,13 @@ namespace LootLocker
         public static void CreateCharacter(LootLockerCreateCharacterRequest data, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.createCharacter;
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCharacterLoadoutResponse>());
+                return;
+            }
 
-            string json = (data == null) ? "" : JsonConvert.SerializeObject(data);
+            string json = JsonConvert.SerializeObject(data);
 
             string getVariable = endPoint.endPoint;
 
@@ -174,9 +179,13 @@ namespace LootLocker
 
         public static void UpdateCharacter(LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateCharacterRequest data, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCharacterLoadoutResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateCharacter;
 
@@ -187,9 +196,13 @@ namespace LootLocker
 
         public static void EquipIdAssetToDefaultCharacter(LootLockerEquipByIDRequest data, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<EquipAssetToCharacterLoadoutResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToDefaultCharacter;
 
@@ -200,9 +213,13 @@ namespace LootLocker
 
         public static void EquipGlobalAssetToDefaultCharacter(LootLockerEquipByAssetRequest data, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<EquipAssetToCharacterLoadoutResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToDefaultCharacter;
 
@@ -213,9 +230,13 @@ namespace LootLocker
 
         public static void EquipIdAssetToCharacter(LootLockerGetRequest lootLockerGetRequest, LootLockerEquipByIDRequest data, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<EquipAssetToCharacterLoadoutResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToCharacter;
 
@@ -226,9 +247,13 @@ namespace LootLocker
 
         public static void EquipGlobalAssetToCharacter(LootLockerGetRequest lootLockerGetRequest, LootLockerEquipByAssetRequest data, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
         {
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<EquipAssetToCharacterLoadoutResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToCharacter;
 

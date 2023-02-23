@@ -62,9 +62,13 @@ namespace LootLocker
         public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if(data == null)
+            {
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPickDropsFromDropTableResponse>());
+            	return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
 
             string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId);
 
