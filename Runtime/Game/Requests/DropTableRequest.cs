@@ -56,7 +56,7 @@ namespace LootLocker
                 endPoint += tempEndpoint;
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
 
         public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
@@ -68,7 +68,7 @@ namespace LootLocker
 
             string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
+            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true, callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.User);
         }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
+using Newtonsoft.Json.Serialization;
 
 
 // using LootLocker.Admin;
@@ -12,6 +13,21 @@ using LootLocker.Requests;
 //this is common between user and admin
 namespace LootLocker
 {
+
+    public static class LootLockerJsonSettings
+    {
+        public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
+            Formatting = Formatting.None
+        };
+        public static readonly JsonSerializerSettings Indented = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
+            Formatting = Formatting.None
+        };
+    }
+
     [System.Serializable]
     public enum LootLockerHTTPMethod
     {
@@ -65,13 +81,13 @@ namespace LootLocker
         /// </summary>
         public string EventId;
 
-        public static void Serialize<T>(Action<T> onComplete, LootLockerResponse serverResponse)
+        public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse, JsonSerializerSettings settings = null)
             where T : LootLockerResponse, new()
         {
-            onComplete?.Invoke(Serialize<T>(serverResponse));
+            onComplete?.Invoke(Deserialize<T>(serverResponse, settings));
         }
 
-        public static T Serialize<T>(LootLockerResponse serverResponse)
+        public static T Deserialize<T>(LootLockerResponse serverResponse, JsonSerializerSettings settings = null)
             where T : LootLockerResponse, new() 
         {
             if (serverResponse == null)
@@ -83,7 +99,7 @@ namespace LootLocker
                 return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
             }
 
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text) ?? new T();
+            var response = JsonConvert.DeserializeObject<T>(serverResponse.text, settings ?? LootLockerJsonSettings.Default) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
@@ -159,8 +175,7 @@ namespace LootLocker
 
         #region Make ServerRequest and call send (3 functions)
 
-        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true,
-            LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
+        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
 #if UNITY_EDITOR
             LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Caller Type: " + callerRole);
@@ -233,7 +248,7 @@ namespace LootLocker
         public static void UploadFile(EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null,
             bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
-            UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Serialize(onComplete, serverResponse); }, useAuthToken, callerRole);
+            UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole);
         }
 
         #endregion
