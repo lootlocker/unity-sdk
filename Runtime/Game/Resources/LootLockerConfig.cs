@@ -148,6 +148,8 @@ namespace LootLocker
         [HideInInspector]
         public string adminToken;
         [HideInInspector]
+        public string refreshToken;
+        [HideInInspector]
         public string domainKey;
         [HideInInspector]
         public int gameID;
@@ -176,11 +178,5 @@ namespace LootLocker
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
-
-        public void UpdateToken(string _token, string _player_identifier)
-        {
-            token = _token;
-            deviceID = _player_identifier;
-        }
     }
 }
