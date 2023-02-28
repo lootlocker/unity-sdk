@@ -103,7 +103,9 @@ namespace LootLocker.Requests
         {
             if (!initialized)
             {
-                LootLockerConfig.current.UpdateToken("", "");
+                LootLockerConfig.current.token = "";
+                LootLockerConfig.current.refreshToken = "";
+                LootLockerConfig.current.deviceID = "";
                 if (!Init())
                 {
                     return false;
@@ -468,9 +470,9 @@ namespace LootLocker.Requests
         /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
+        /// <param name="refresh_token">(Optional) Token received in response from StartGoogleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete)
+        public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string refresh_token = "")
         {
             if (!CheckInitialized(true))
             {
@@ -479,7 +481,7 @@ namespace LootLocker.Requests
             }
 
             CurrentPlatform.Set(Platforms.Google);
-            LootLockerGoogleRefreshSessionRequest sessionRequest = new LootLockerGoogleRefreshSessionRequest(refresh_token);
+            LootLockerGoogleRefreshSessionRequest sessionRequest = new LootLockerGoogleRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
             LootLockerAPIManager.GoogleSession(sessionRequest, response =>
             {
                 if (!response.success)
@@ -521,9 +523,9 @@ namespace LootLocker.Requests
         /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
+        /// <param name="refresh_token">(Optional) Token received in response from StartAppleSession request</param>
+        public static void RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string refresh_token = "")
         {
             if (!CheckInitialized(true))
             {
@@ -532,7 +534,7 @@ namespace LootLocker.Requests
             }
 
             CurrentPlatform.Set(Platforms.AppleSignIn);
-            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(refresh_token);
+            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
             LootLockerAPIManager.AppleSession(sessionRequest, response =>
             {
                 if (!response.success)
@@ -570,7 +572,9 @@ namespace LootLocker.Requests
 
                     CurrentPlatform.Reset();
 
-                    LootLockerConfig.current.UpdateToken("", "");
+                    LootLockerConfig.current.token = "";
+                    LootLockerConfig.current.deviceID = "";
+                    LootLockerConfig.current.refreshToken = "";
                 }
 
                 onComplete?.Invoke(response);
