@@ -259,34 +259,6 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a Game session for a Google User
-        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
-        /// </summary>
-        /// <param name="idToken">The Id Token from google sign in</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartGoogleSession(string idToken, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            CurrentPlatform.Set(Platforms.Google);
-
-            LootLockerConfig.current.deviceID = idToken;
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(idToken);
-            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
-        }
-
-        /// <summary>
         /// Start a Amazon Luna session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
@@ -454,6 +426,61 @@ namespace LootLocker.Requests
             CurrentPlatform.Set(Platforms.XboxOne);
             LootLockerXboxOneSessionRequest sessionRequest = new LootLockerXboxOneSessionRequest(xbox_user_token);
             LootLockerAPIManager.XboxOneSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Start a Game session for a Google User
+        /// The Google sign in platform must be enabled in the web console for this to work.
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartGoogleSession(string idToken, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Google);
+
+            LootLockerGoogleSignInSessionRequest sessionRequest = new LootLockerGoogleSignInSessionRequest(idToken);
+            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Google
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Google sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
+        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Google);
+            LootLockerGoogleRefreshSessionRequest sessionRequest = new LootLockerGoogleRefreshSessionRequest(refresh_token);
+            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
             {
                 if (!response.success)
                 {
