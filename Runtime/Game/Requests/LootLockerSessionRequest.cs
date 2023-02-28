@@ -90,6 +90,13 @@ namespace LootLocker.Requests
     }
 
     [System.Serializable]
+    public class LootLockerGoogleSessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
+        public string refresh_token { get; set; }
+    }
+
+    [System.Serializable]
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
@@ -127,6 +134,30 @@ namespace LootLocker.Requests
         public LootLockerXboxOneSessionRequest(string xbox_user_token)
         {
             this.xbox_user_token = xbox_user_token;
+        }
+    }
+
+    public class LootLockerGoogleSignInSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string id_token { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerGoogleSignInSessionRequest(string id_token)
+        {
+            this.id_token = id_token;
+        }
+    }
+
+    public class LootLockerGoogleRefreshSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string refresh_token { get; private set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerGoogleRefreshSessionRequest(string refresh_token)
+        {
+            this.refresh_token = refresh_token;
         }
     }
 
@@ -218,18 +249,43 @@ namespace LootLocker
                 onComplete?.Invoke(response);
             }, false);
         }
-        public static void GoogleSession(LootLockerSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+
+        public static void GoogleSession(LootLockerGoogleSignInSessionRequest data, Action<LootLockerGoogleSessionResponse> onComplete)
+        {
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGoogleSessionResponse>());
+                return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
+            GoogleSession(json, onComplete);
+        }
+
+        public static void GoogleSession(LootLockerGoogleRefreshSessionRequest data, Action<LootLockerGoogleSessionResponse> onComplete)
+        {
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGoogleSessionResponse>());
+                return;
+            }
+
+            string json = JsonConvert.SerializeObject(data);
+            GoogleSession(json, onComplete);
+        }
+
+        private static void GoogleSession(string json, Action<LootLockerGoogleSessionResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.googleSessionRequest;
-
-            string json = "";
-            if (data == null) return;
-            else json = JsonConvert.SerializeObject(data);
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
             LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
-                var response = LootLockerResponse.Serialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, data?.player_identifier);
+                var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
+                LootLockerConfig.current.UpdateToken(response.session_token, response.player_identifier);
                 onComplete?.Invoke(response);
             }, false);
         }
