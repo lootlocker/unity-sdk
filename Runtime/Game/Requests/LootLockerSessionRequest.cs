@@ -205,7 +205,8 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, data?.player_identifier);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = data?.player_identifier;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -225,7 +226,8 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, "");
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = "";
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -245,7 +247,8 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, (data as LootLockerSessionRequest)?.player_identifier);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = (data as LootLockerSessionRequest)?.player_identifier;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -285,7 +288,9 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, response.player_identifier);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = response.player_identifier;
+                LootLockerConfig.current.refreshToken = response.refresh_token;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -306,7 +311,8 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, "");
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = "";
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -326,7 +332,8 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, "");
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = "";
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -366,7 +373,9 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
-                LootLockerConfig.current.UpdateToken(response.session_token, response.player_identifier);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.deviceID = response.player_identifier;
+                LootLockerConfig.current.refreshToken = response.refresh_token;
                 onComplete?.Invoke(response);
             }, false);
         }
