@@ -587,18 +587,7 @@ namespace LootLocker.Requests
             {
                 if (response.success)
                 {
-                    // Clear White Label Login credentials
-                    if (CurrentPlatform.Get() == Platforms.WhiteLabel)
-                    {
-                        PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
-                        PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
-                    }
-
-                    CurrentPlatform.Reset();
-
-                    LootLockerConfig.current.token = "";
-                    LootLockerConfig.current.deviceID = "";
-                    LootLockerConfig.current.refreshToken = "";
+                    ClearLocalSession();
                 }
 
                 onComplete?.Invoke(response);
@@ -609,6 +598,26 @@ namespace LootLocker.Requests
         public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
         {
             EndSession(onComplete);
+        }
+
+
+        /// <summary>
+        /// Clears client session data. WARNING: This does not end the session in LootLocker servers.
+        /// </summary>
+        public static void ClearLocalSession()
+        {
+            // Clear White Label Login credentials
+            if (CurrentPlatform.Get() == Platforms.WhiteLabel)
+            {
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
+                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
+            }
+
+            CurrentPlatform.Reset();
+
+            LootLockerConfig.current.token = "";
+            LootLockerConfig.current.deviceID = "";
+            LootLockerConfig.current.refreshToken = "";
         }
         #endregion
 
@@ -1291,7 +1300,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.deletePlayer.endPoint, LootLockerEndPoints.deletePlayer.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.deletePlayer.endPoint, LootLockerEndPoints.deletePlayer.httpMethod, null, onComplete:
+                (serverResponse) =>
+                {
+                    if (serverResponse != null && serverResponse.success)
+                    {
+                        ClearLocalSession();
+                    }
+                    LootLockerResponse.Deserialize(onComplete, serverResponse);
+                });
         }
         #endregion
 
