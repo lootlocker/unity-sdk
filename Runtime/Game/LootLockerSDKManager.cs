@@ -1838,6 +1838,16 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Registers a player progression if it doesn't exist. Same as adding 0 points to a progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
+        public static void RegisterPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        {
+            AddPointsToPlayerProgression(progressionKey, 0, onComplete);
+        }
+
         #endregion
 
         #region Character
