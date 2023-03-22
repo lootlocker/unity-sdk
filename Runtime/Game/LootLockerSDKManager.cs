@@ -2303,6 +2303,19 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
         }
+        /// <summary>
+        /// Get the player storage as a Dictionary<string, string> for the currently active player (key/values).
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponseDictionary</param>
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponseDictionary> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponseDictionary>());
+                return;
+            }
+            LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
+        }
 
         /// <summary>
         /// Get a specific key from the player storage for the currently active player.
@@ -2336,6 +2349,47 @@ namespace LootLocker.Requests
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
             data.AddToPayload(new LootLockerPayload { key = key, value = value });
+            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+        }
+
+        /// <summary>
+        /// Update or create a key/value pair in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key">Name of the key</param>
+        /// <param name="value">Value of the key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
+        public static void UpdateOrCreateKeyValue(Dictionary<string,string> keyValuePairs, bool isPublic, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                return;
+            }
+            LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
+            // Add all the key value pairs to the payload
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                data.AddToPayload(new LootLockerPayload { key = keyValuePair.Key, value = keyValuePair.Value });
+            }
+            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+        }
+
+        /// <summary>
+        /// Update or create a key/value pair in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key">Name of the key</param>
+        /// <param name="value">Value of the key</param>
+        /// <param name="isPublic">Is the key public?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                return;
+            }
+            LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
+            data.AddToPayload(new LootLockerPayload { key = key, value = value, is_public = isPublic });
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
         }
 
