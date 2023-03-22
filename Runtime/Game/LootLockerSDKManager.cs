@@ -2353,6 +2353,25 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Update or create a key/value pair in the player storage for the currently active player.
+        /// </summary>
+        /// <param name="key">Name of the key</param>
+        /// <param name="value">Value of the key</param>
+        /// <param name="isPublic">Is the key public?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                return;
+            }
+            LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
+            data.AddToPayload(new LootLockerPayload { key = key, value = value, is_public = isPublic });
+            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+        }
+
+        /// <summary>
         /// Update or create multiple key/value pairs in the player storage for the currently active player.
         /// </summary>
         /// <param name="data">A LootLockerGetPersistentStorageRequest with multiple keys</param>
