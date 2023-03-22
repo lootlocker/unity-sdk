@@ -8,6 +8,10 @@ namespace LootLocker.Requests
     {
         public virtual LootLockerPayload[] payload { get; set; }
     }
+    public class LootLockerGetPersistentStoragResponseDictionary : LootLockerResponse
+    {
+        public virtual Dictionary<string, string> payload { get; set; }
+    }
 
     public class LootLockerGetPersistentStorageRequest
     {
@@ -47,6 +51,13 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponseDictionary> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.getEntirePersistentStorage;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<LootLockerGetPersistentSingle> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getSingleKeyFromPersitenctStorage;
@@ -56,7 +67,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete, bool isPublic = false)
         {
             if(data == null)
             {
