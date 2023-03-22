@@ -4006,6 +4006,23 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Lock a drop table and return information about the assets that were computed.
+        /// </summary>
+        /// <param name="tableInstanceId">Asset instance ID of the drop table to compute</param>
+        /// <param name="AddAssetDetails">If true, return additional information about the asset</param>
+        /// <param name="tag">Specific tag to use</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerComputeAndLockDropTableResponse</param>
+        public static void ComputeAndLockDropTable(int tableInstanceId, bool AddAssetDetails, string tag, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>());
+                return;
+            }
+            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete, AddAssetDetails, tag);
+        }
+
+        /// <summary>
         /// Send a list of id's from a ComputeAndLockDropTable()-call to grant the assets to the player.
         /// </summary>
         /// <param name="picks">A list of the ID's of the picks to choose</param>
