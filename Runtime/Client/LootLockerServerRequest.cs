@@ -426,7 +426,11 @@ namespace LootLocker
                 return;
             }
             Dictionary<string, string> headers = new Dictionary<string, string>();
-
+            if (file.Length == 0)
+            {
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
+                return;
+            }
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
