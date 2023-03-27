@@ -76,7 +76,7 @@ namespace LootLocker
         public Texture2D texture;
 
         /// <summary>
-        /// inheritdoc added this because unity main thread excuting style cut the calling stack and make the event orphant seealso calling multiple events 
+        /// inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events 
         /// of the same type makes use unable to identify each one
         /// </summary>
         public string EventId;

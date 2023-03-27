@@ -95,7 +95,7 @@ namespace LootLocker
                     if (!webRequest.isDone && timedOut)
                     {
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
-                        OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, Error = "{\"error\": \"" + request.endpoint + " Timed out.\"}" });
+                        OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, text = "{\"error\": \"" + request.endpoint + " Timed out.\"}", Error = request.endpoint + " Timed out." });
                         yield break;
                     }
 
