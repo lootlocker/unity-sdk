@@ -18,6 +18,7 @@ namespace LootLocker.Requests
         ,AppleSignIn
         ,Android
         ,Google
+        ,Epic
     }
 
     public class CurrentPlatform
@@ -47,6 +48,7 @@ namespace LootLocker.Requests
             ,"apple_sign_in" // AppleSignIn
             ,"android" // Android
             ,"google" // Google
+            ,"epic" // Epic Online Services / Epic Games
         };
         private static readonly string[] PlatformFriendlyStrings = new[]
         {
@@ -61,6 +63,7 @@ namespace LootLocker.Requests
             ,"Apple Sign In" // AppleSignIn
             ,"Android" // Android
             ,"Google" // Google
+            ,"Epic Online Services" // Epic Online Services / Epic Games
         };
 
         public struct PlatformRepresentation
