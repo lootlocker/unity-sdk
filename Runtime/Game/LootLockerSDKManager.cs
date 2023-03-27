@@ -583,6 +583,70 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Create a new session for an Epic Online Services (EOS) user
+        /// The Epic Games platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="id_token">ESO Id Token as a string</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
+        public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>());
+                return;
+            }
+            CurrentPlatform.Set(Platforms.Epic);
+            LootLockerEpicSessionRequest sessionRequest = new LootLockerEpicSessionRequest(id_token);
+            LootLockerAPIManager.EpicSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Epic
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Epic sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
+        public static void RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete)
+        {
+            RefreshEpicSession("", onComplete);
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Epic
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete) method.
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Epic sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="refresh_token">Token received in response from StartEpicSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
+        public static void RefreshEpicSession(string refresh_token, Action<LootLockerEpicSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Epic);
+            LootLockerEpicRefreshSessionRequest sessionRequest = new LootLockerEpicRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
+            LootLockerAPIManager.EpicSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
         /// End active session (if any exists)
         /// Succeeds if a session was ended or no sessions were active
         /// </summary>
