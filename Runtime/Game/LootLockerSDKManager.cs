@@ -586,7 +586,7 @@ namespace LootLocker.Requests
         /// Create a new session for an Epic Online Services (EOS) user
         /// The Epic Games platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="id_token">ESO Id Token as a string</param>
+        /// <param name="id_token">EOS Id Token as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
         public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete)
         {
