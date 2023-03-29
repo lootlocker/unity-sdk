@@ -153,11 +153,11 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Construct an error response because an rate limit has been hit
+        /// Construct an error response because the rate limit has been hit
         /// </summary>
         public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit) where T : LootLockerResponse, new()
         {
-            return Error<T>(string.Format("You are sending too many requests and are being rate limited for %d seconds. Call was to endpoint %s", secondsLeftOfRateLimit, method));
+            return Error<T>(string.Format("Your request to %s was not sent. You are sending too many requests and are being rate limited for %d seconds", method, secondsLeftOfRateLimit));
         }
     }
 
@@ -170,7 +170,7 @@ namespace LootLocker
         /* -- Configurable constants -- */
         // Tripwire settings, allow for a max total of n requests per x seconds
         protected const int TripWireTimeFrameSeconds = 60;
-        protected const int MaxRequestsPerTripWireTimeFrame = 280; // The backend rate limit is 300 requests per minute so we'll limit it slightly before that
+        protected const int MaxRequestsPerTripWireTimeFrame = 280;
         protected const int SecondsPerBucket = 5; // Needs to evenly divide the time frame
 
         // Moving average settings, allow for a max average of n requests per x seconds
@@ -253,8 +253,8 @@ namespace LootLocker
                 isRateLimited |= _totalRequestsInBucketsInTripWireTimeFrame >= MaxRequestsPerTripWireTimeFrame; // If the request count for the time frame is greater than the max requests per time frame, set isRateLimited to true
                 isRateLimited |= _totalRequestsInBuckets / RateLimitMovingAverageBucketCount > MaxRequestsPerBucketOnMovingAverage; // If the average number of requests per bucket is greater than the max requests on moving average, set isRateLimited to true
 #if UNITY_EDITOR
-                if (_totalRequestsInBucketsInTripWireTimeFrame >= MaxRequestsPerTripWireTimeFrame) Debug.Log("Rate Limit Hit due to Trip Wire, count = " + _totalRequestsInBucketsInTripWireTimeFrame + " out of allowed " + MaxRequestsPerTripWireTimeFrame);
-                if (_totalRequestsInBuckets / RateLimitMovingAverageBucketCount > MaxRequestsPerBucketOnMovingAverage) Debug.Log("Rate Limit Hit due to Moving Average, count = " + _totalRequestsInBuckets / RateLimitMovingAverageBucketCount + " out of allowed " + MaxRequestsPerBucketOnMovingAverage);
+                if (_totalRequestsInBucketsInTripWireTimeFrame >= MaxRequestsPerTripWireTimeFrame) LootLockerLogger.GetForLogLevel()("Rate Limit Hit due to Trip Wire, count = " + _totalRequestsInBucketsInTripWireTimeFrame + " out of allowed " + MaxRequestsPerTripWireTimeFrame);
+                if (_totalRequestsInBuckets / RateLimitMovingAverageBucketCount > MaxRequestsPerBucketOnMovingAverage) LootLockerLogger.GetForLogLevel()("Rate Limit Hit due to Moving Average, count = " + _totalRequestsInBuckets / RateLimitMovingAverageBucketCount + " out of allowed " + MaxRequestsPerBucketOnMovingAverage);
 #endif
                 if (isRateLimited)
                 {
