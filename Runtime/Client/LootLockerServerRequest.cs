@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using Newtonsoft.Json.Serialization;
+using UnityEditor;
 
 
 // using LootLocker.Admin;
@@ -279,10 +280,31 @@ namespace LootLocker
             return maxRequests;
         }
 
-        private static readonly RateLimiter _rateLimiter = new RateLimiter();
-        public static RateLimiter Get() { return _rateLimiter; }
-    }
+        private static RateLimiter _rateLimiter = null;
 
+        public static RateLimiter Get()
+        {
+            if (_rateLimiter == null)
+            {
+                Reset();
+            }
+            return _rateLimiter;
+        }
+
+        public static void Reset()
+        {
+            _rateLimiter = new RateLimiter();
+        }
+
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            LootLockerLogger.GetForLogLevel()("Reset RateLimiter due to entering play mode");
+            Reset();
+        }
+#endif
+    }
     #endregion
 
     /// <summary>
