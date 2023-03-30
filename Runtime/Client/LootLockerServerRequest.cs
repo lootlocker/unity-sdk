@@ -171,7 +171,7 @@ namespace LootLocker
         /// </summary>
         public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit) where T : LootLockerResponse, new()
         {
-            return Error<T>(string.Format("Your request to %s was not sent. You are sending too many requests and are being rate limited for %d seconds", method, secondsLeftOfRateLimit));
+            return Error<T>(string.Format("Your request to {0} was not sent. You are sending too many requests and are being rate limited for {1} seconds", method, secondsLeftOfRateLimit));
         }
     }
 
