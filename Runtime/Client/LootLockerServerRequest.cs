@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using Newtonsoft.Json.Serialization;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 
 // using LootLocker.Admin;
