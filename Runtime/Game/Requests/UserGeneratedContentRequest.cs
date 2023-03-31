@@ -1,11 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
 using LootLocker.Requests;
-using LootLocker.LootLockerEnums;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -141,7 +136,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.creatingAnAssetCandidate;
 
@@ -157,7 +152,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
 

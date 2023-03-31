@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
 using System;
 using LootLocker.Requests;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace LootLocker.Requests
 {
@@ -300,7 +300,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             var endPoint = LootLockerEndPoints.submitXp;
 
@@ -426,7 +426,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             var endPoint = LootLockerEndPoints.setPlayerName;
 

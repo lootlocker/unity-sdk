@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Net;
 using LootLocker.Requests;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json.Linq;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -289,7 +291,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        string json = (request.payload != null && request.payload.Count > 0) ? JsonConvert.SerializeObject(request.payload) : request.jsonPayload;
+                        string json = (request.payload != null && request.payload.Count > 0) ? LootLockerJson.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + ObfuscateJsonStringForLogging(json));
 #endif
@@ -431,7 +433,7 @@ namespace LootLocker
                 }
             }
 
-            return JsonConvert.SerializeObject(jsonObject);
+            return LootLockerJson.SerializeObject(jsonObject);
         }
 
         string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)
