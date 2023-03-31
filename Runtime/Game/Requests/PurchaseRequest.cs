@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
-using LootLocker.Requests;
-using Newtonsoft.Json;
+﻿using LootLocker.Requests;
 using System;
 
 namespace LootLocker.Requests
@@ -56,7 +51,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.normalPurchaseCall;
 
@@ -71,7 +66,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.rentalPurchaseCall;
 
@@ -86,7 +81,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.iosPurchaseVerification;
 
@@ -101,7 +96,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.androidPurchaseVerification;
 

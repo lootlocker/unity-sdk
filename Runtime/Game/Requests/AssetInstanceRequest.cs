@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
-using LootLocker.Requests;
-using Newtonsoft.Json;
+﻿using LootLocker.Requests;
 using System;
-using System.Linq;
 
 namespace LootLocker.Requests
 {
@@ -101,7 +95,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.getAKeyValuePairById;
 
@@ -118,7 +112,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.createKeyValuePair;
 
@@ -135,7 +129,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateOneOrMoreKeyValuePair;
 
@@ -152,7 +146,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateKeyValuePairById;
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿//using Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -335,11 +336,11 @@ namespace LootLocker
                 LootLockerAssetResponse realResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
                 LootLockerSingleAssetResponse newResponse = new LootLockerSingleAssetResponse();
 
-                string serializedAsset = JsonConvert.SerializeObject(realResponse.assets[0], Formatting.Indented);
+                string serializedAsset = LootLockerJson.SerializeObject(realResponse.assets[0], LootLockerJsonSettings.Indented);
 
-                newResponse.asset = JsonConvert.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
+                newResponse.asset = LootLockerJson.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
 
-                string singleAssetResponse = JsonConvert.SerializeObject(newResponse, Formatting.Indented);
+                string singleAssetResponse = LootLockerJson.SerializeObject(newResponse, LootLockerJsonSettings.Indented);
                 newResponse.text = singleAssetResponse;
                 newResponse.SetResponseInfo(serverResponse);
 

@@ -1,10 +1,5 @@
-﻿using LootLocker;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 using LootLocker.Requests;
-using Newtonsoft.Json;
 using System.Linq;
 
 
@@ -143,7 +138,7 @@ namespace LootLocker
                 return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             string getVariable = endPoint.endPoint;
 
@@ -185,7 +180,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.updateCharacter;
 
@@ -202,7 +197,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToDefaultCharacter;
 
@@ -219,7 +214,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToDefaultCharacter;
 
@@ -236,7 +231,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToCharacter;
 
@@ -253,7 +248,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToCharacter;
 

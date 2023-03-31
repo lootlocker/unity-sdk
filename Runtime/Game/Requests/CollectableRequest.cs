@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
-using LootLocker.Requests;
-using Newtonsoft.Json;
+﻿using LootLocker.Requests;
 using System;
 using System.Linq;
 using UnityEngine.UI;
@@ -106,7 +101,7 @@ namespace LootLocker
             {
                 LootLockerGetCollectablesResponse response = new LootLockerGetCollectablesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerGetCollectablesResponse>(serverResponse.text);
+                    response = LootLockerJson.DeserializeObject<LootLockerGetCollectablesResponse>(serverResponse.text);
 
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
@@ -125,7 +120,7 @@ namespace LootLocker
             {
                 LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = JsonConvert.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
+                    response = LootLockerJson.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
 
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
@@ -143,7 +138,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
 
@@ -152,7 +147,7 @@ namespace LootLocker
                 LootLockerCollectItemResponse response = new LootLockerCollectItemResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
+                    response = LootLockerJson.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
 
                     string collectable = collectableStrings[0];
@@ -181,7 +176,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(data);
+            string json = LootLockerJson.SerializeObject(data);
 
             EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
 
@@ -190,7 +185,7 @@ namespace LootLocker
                 LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
-                    response = JsonConvert.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
+                    response = LootLockerJson.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
 
                     string collectable = collectableStrings[0];

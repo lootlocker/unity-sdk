@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
-using LootLocker.Requests;
-using Newtonsoft.Json.Serialization;
+using Unity.Plastic.Newtonsoft.Json.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -29,6 +28,19 @@ namespace LootLocker
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
             Formatting = Formatting.None
         };
+    }
+
+    public static class LootLockerJson
+    {
+        public static string SerializeObject(object obj, JsonSerializerSettings settings = null)
+        {
+            return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json, JsonSerializerSettings settings = null)
+        {
+            return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
+        }
     }
 
     [System.Serializable]
@@ -102,7 +114,7 @@ namespace LootLocker
                 return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
             }
 
-            var response = JsonConvert.DeserializeObject<T>(serverResponse.text, settings ?? LootLockerJsonSettings.Default) ?? new T();
+            var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, settings ?? LootLockerJsonSettings.Default) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
