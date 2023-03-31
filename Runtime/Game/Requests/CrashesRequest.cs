@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿//using Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(serverResponse.Error))
                 {
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)(serverResponse.text);
-                    response = JsonConvert.DeserializeObject<LootLockerResponse>(serverResponse.text);
+                    response = LootLockerJson.DeserializeObject<LootLockerResponse>(serverResponse.text);
                     onComplete?.Invoke(response);
                 }
                 else

@@ -4,7 +4,6 @@ using System.IO;
 using UnityEngine;
 using System.Security.Cryptography;
 using System.Text;
-using Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
@@ -1776,7 +1775,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.addPointsToPlayerProgression.endPoint, progressionKey);
 
-            var body = JsonConvert.SerializeObject(new { amount });  
+            var body = LootLockerJson.SerializeObject(new { amount });  
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -1797,7 +1796,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromPlayerProgression.endPoint, progressionKey);
             
-            var body = JsonConvert.SerializeObject(new { amount });
+            var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2223,7 +2222,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.addPointsToCharacterProgression.endPoint, characterId, progressionKey);
 
-            var body = JsonConvert.SerializeObject(new { amount });  
+            var body = LootLockerJson.SerializeObject(new { amount });  
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2245,7 +2244,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromCharacterProgression.endPoint, characterId, progressionKey);
             
-            var body = JsonConvert.SerializeObject(new { amount });
+            var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3246,7 +3245,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
+            string source = LootLockerJson.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
             string hash;
             using (SHA1 sha1Hash = SHA1.Create())
             {
@@ -3280,7 +3279,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishMissionResponse>());
                 return;
             }
-            string source = JsonConvert.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
+            string source = LootLockerJson.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
             string hash;
             using (SHA1 sha1Hash = SHA1.Create())
             {

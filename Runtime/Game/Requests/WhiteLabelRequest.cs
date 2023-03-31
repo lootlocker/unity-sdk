@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using LootLocker.Requests;
 
@@ -89,7 +88,7 @@ namespace LootLocker
             	return;
             }
             
-            string json = JsonConvert.SerializeObject(input);
+            string json = LootLockerJson.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
@@ -104,7 +103,7 @@ namespace LootLocker
             	return;
             }
 
-            string json = JsonConvert.SerializeObject(input);
+            string json = LootLockerJson.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
@@ -119,7 +118,7 @@ namespace LootLocker
                 return;
             }
 
-            string json = JsonConvert.SerializeObject(input);
+            string json = LootLockerJson.SerializeObject(input);
 
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
         }
@@ -128,7 +127,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestPasswordReset;
 
-            var json = JsonConvert.SerializeObject(new { email });
+            var json = LootLockerJson.SerializeObject(new { email });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
@@ -136,7 +135,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestAccountVerification;
 
-            var json = JsonConvert.SerializeObject(new { user_id = userID });
+            var json = LootLockerJson.SerializeObject(new { user_id = userID });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
@@ -144,7 +143,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestAccountVerification;
 
-            var json = JsonConvert.SerializeObject(new { email = email });
+            var json = LootLockerJson.SerializeObject(new { email = email });
             LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 LootLockerResponse response = new LootLockerResponse
