@@ -4006,8 +4006,8 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="tableInstanceId">Asset instance ID of the drop table to compute</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerComputeAndLockDropTableResponse</param>
-        /// <param name="AddAssetDetails">If true, return additional information about the asset</param>
-        /// <param name="tag">Specific tag to use</param>
+        /// <param name="AddAssetDetails">Optional:If true, return additional information about the asset</param>
+        /// <param name="tag">Optional:Specific tag to use</param>
         public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
         {
             if (!CheckInitialized())
