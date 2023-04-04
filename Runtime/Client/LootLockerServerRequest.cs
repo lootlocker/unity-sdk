@@ -428,7 +428,10 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (file.Length == 0)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
+                #if UNITY_EDITOR
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
+                #endif
+                onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("File content is empty, not allowed."));
                 return;
             }
             if (useAuthToken)
