@@ -77,7 +77,6 @@ namespace LootLocker
                     webRequest.downloadHandler = new DownloadHandlerBuffer();
 
                     float startTime = Time.time;
-                    float maxTimeOutSeconds = 5f;
                     bool timedOut = false;
 
                     UnityWebRequestAsyncOperation unityWebRequestAsyncOperation = webRequest.SendWebRequest();
@@ -88,7 +87,7 @@ namespace LootLocker
                             return true;
                         }
 
-                        timedOut = !unityWebRequestAsyncOperation.isDone && Time.time - startTime >= maxTimeOutSeconds;
+                        timedOut = !unityWebRequestAsyncOperation.isDone && Time.time - startTime >= LootLockerConfig.current.clientSideRequestTimeOut;
 
                         return timedOut || unityWebRequestAsyncOperation.isDone;
 
@@ -96,7 +95,7 @@ namespace LootLocker
 
                     if (!webRequest.isDone && timedOut)
                     {
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
                         OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, text = "{\"error\": \"" + request.endpoint + " Timed out.\"}", Error = request.endpoint + " Timed out." });
                         yield break;
                     }
