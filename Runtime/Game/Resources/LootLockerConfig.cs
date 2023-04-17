@@ -176,6 +176,7 @@ namespace LootLocker
         [HideInInspector] public string playerUrl = UrlProtocol + UrlCore + PlayerUrlAppendage;
         [HideInInspector] public string userUrl = UrlProtocol + UrlCore + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + UrlCore;
+        [HideInInspector] public float clientSideRequestTimeOut = 10f;
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public bool allowTokenRefresh = true;
