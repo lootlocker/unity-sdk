@@ -19,7 +19,7 @@ namespace LootLocker.Requests
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
-            LootLockerLogger.GetForLogLevel()("SDK is resetting for entering Playmode");
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is resetting for entering Playmode");
             initialized = false;
         }
 #endif
