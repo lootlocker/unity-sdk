@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LootLocker.Requests;
-using LootLocker;
+﻿using LootLocker.Requests;
 using System;
-//using Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json;
 
 namespace LootLocker.Requests
 {

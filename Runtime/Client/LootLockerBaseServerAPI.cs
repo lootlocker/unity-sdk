@@ -2,14 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-//using Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Net;
 using LootLocker.Requests;
-//using Newtonsoft.Json.Linq;
-using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -366,13 +362,15 @@ namespace LootLocker
             new ObfuscationDetails("token")
         };
 
+        //TODO: Fix this json usage
         private static string ObfuscateJsonStringForLogging(string json)
         {
-            if (string.IsNullOrEmpty(json))
+            return json;
+            /*if (string.IsNullOrEmpty(json))
             {
                 return json;
             }
-
+            
             JObject jsonObject;
             try
             {
@@ -432,7 +430,7 @@ namespace LootLocker
                 }
             }
 
-            return LootLockerJson.SerializeObject(jsonObject);
+            return LootLockerJson.SerializeObject(jsonObject);*/
         }
 
         string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)
