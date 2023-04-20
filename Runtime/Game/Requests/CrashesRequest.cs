@@ -1,10 +1,5 @@
-﻿//using Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using LootLocker;
 using LootLocker.Requests;
 
 

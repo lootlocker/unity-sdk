@@ -1,16 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Unity.Plastic.Newtonsoft.Json;
 using LootLocker.LootLockerEnums;
-using Unity.Plastic.Newtonsoft.Json.Serialization;
+using LootLocker.ZeroDepJson;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
-
-// using LootLocker.Admin;
-// using LootLocker.Admin.Requests;
 
 //this is common between user and admin
 namespace LootLocker
@@ -18,7 +13,10 @@ namespace LootLocker
 
     public static class LootLockerJsonSettings
     {
-        public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
+        public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
+
+        public static readonly JsonOptions Indented = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly, "\t");
+        /*public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
             Formatting = Formatting.None
@@ -27,12 +25,21 @@ namespace LootLocker
         {
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
             Formatting = Formatting.None
-        };
+        };*/
     }
 
     public static class LootLockerJson
     {
-        public static string SerializeObject(object obj, JsonSerializerSettings settings = null)
+        public static string SerializeObject(object obj, JsonOptions options = null)
+        {
+            return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json, JsonOptions options = null)
+        {
+            return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
+        }
+        /*public static string SerializeObject(object obj, JsonSerializerSettings settings = null)
         {
             return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
         }
@@ -40,7 +47,7 @@ namespace LootLocker
         public static T DeserializeObject<T>(string json, JsonSerializerSettings settings = null)
         {
             return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
-        }
+        }*/
     }
 
     [System.Serializable]
@@ -96,13 +103,13 @@ namespace LootLocker
         /// </summary>
         public string EventId;
 
-        public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse, JsonSerializerSettings settings = null)
+        public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse, JsonOptions options = null)
             where T : LootLockerResponse, new()
         {
-            onComplete?.Invoke(Deserialize<T>(serverResponse, settings));
+            onComplete?.Invoke(Deserialize<T>(serverResponse, options));
         }
 
-        public static T Deserialize<T>(LootLockerResponse serverResponse, JsonSerializerSettings settings = null)
+        public static T Deserialize<T>(LootLockerResponse serverResponse, JsonOptions options = null)
             where T : LootLockerResponse, new() 
         {
             if (serverResponse == null)
@@ -114,7 +121,7 @@ namespace LootLocker
                 return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
             }
 
-            var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, settings ?? LootLockerJsonSettings.Default) ?? new T();
+            var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
