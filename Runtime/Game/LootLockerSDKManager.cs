@@ -521,7 +521,7 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="authorization_code">Authorization code, provided by apple</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
         public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -572,6 +572,63 @@ namespace LootLocker.Requests
             CurrentPlatform.Set(Platforms.AppleSignIn);
             LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
             LootLockerAPIManager.AppleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Create a new session for Sign in with Apple Game Center
+        /// The Apple Game Center sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="bundleId">The Apple Game Center bundle id of your app</param>
+        /// <param name="playerId">The user's player id in Apple Game Center</param>
+        /// <param name="publicKeyUrl">The url of the public key generated from Apple Game Center Identity Verification</param>
+        /// <param name="signature">The signature generated from Apple Game Center Identity Verification</param>
+        /// <param name="salt">The salt of the signature generated from Apple Game Center Identity Verification</param>
+        /// <param name="timestamp">The timestamp of the verification generated from Apple Game Center Identity Verification</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
+        public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.AppleGameCenter);
+            LootLockerAppleGameCenterSessionRequest sessionRequest = new LootLockerAppleGameCenterSessionRequest(bundleId, playerId, publicKeyUrl, signature, salt, timestamp);
+            LootLockerAPIManager.AppleGameCenterSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Apple Game Center
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Apple Game Center sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
+        public static void RefreshAppleGameCenterSession(Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.AppleGameCenter);
+            LootLockerAppleGameCenterRefreshSessionRequest sessionRequest = new LootLockerAppleGameCenterRefreshSessionRequest(LootLockerConfig.current.refreshToken);
+            LootLockerAPIManager.AppleGameCenterSession(sessionRequest, response =>
             {
                 if (!response.success)
                 {
