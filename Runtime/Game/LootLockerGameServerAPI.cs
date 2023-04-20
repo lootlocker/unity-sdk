@@ -43,8 +43,42 @@ namespace LootLocker
                     });
                     return;
                 }
+                case Platforms.AppleGameCenter:
                 case Platforms.AppleSignIn:
+                case Platforms.Epic:
+                case Platforms.Google:
                 {
+                    // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
+                    if (!cacheServerRequest.jsonPayload.Contains("refresh_token") && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken))
+                    {
+                        switch (CurrentPlatform.Get())
+                        {
+                            case Platforms.AppleGameCenter:
+                                LootLockerSDKManager.RefreshAppleGameCenterSession(response =>
+                                {
+                                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                                });
+                                return;
+                            case Platforms.AppleSignIn:
+                                LootLockerSDKManager.RefreshAppleSession(response =>
+                                {
+                                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                                });
+                                return;
+                            case Platforms.Epic:
+                                LootLockerSDKManager.RefreshEpicSession(response =>
+                                {
+                                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                                });
+                                return;
+                            case Platforms.Google:
+                                LootLockerSDKManager.RefreshGoogleSession(response =>
+                                {
+                                    CompleteCall(cacheServerRequest, OnServerResponse, response);
+                                });
+                                return;
+                        }
+                    }
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
                     LootLockerResponse res = new LootLockerResponse
                     {
