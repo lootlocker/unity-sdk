@@ -16,6 +16,7 @@ namespace LootLocker.Requests
         ,NintendoSwitch
         ,AmazonLuna
         ,AppleSignIn
+        ,AppleGameCenter
         ,Android
         ,Google
         ,Epic
@@ -46,6 +47,7 @@ namespace LootLocker.Requests
             ,"nintendo_switch" // NintendoSwitch
             ,"amazon_luna" // AmazonLuna
             ,"apple_sign_in" // AppleSignIn
+            ,"apple_game_center" // Apple Game Center
             ,"android" // Android
             ,"google" // Google
             ,"epic" // Epic Online Services / Epic Games
@@ -61,6 +63,7 @@ namespace LootLocker.Requests
             ,"Nintendo Switch" // NintendoSwitch
             ,"Amazon Luna" // AmazonLuna
             ,"Apple Sign In" // AppleSignIn
+            ,"Apple Game Center" // Apple Game Center
             ,"Android" // Android
             ,"Google" // Google
             ,"Epic Online Services" // Epic Online Services / Epic Games

@@ -98,7 +98,14 @@ namespace LootLocker.Requests
         public string refresh_token { get; set; }
     }
 
-    [Serializable]
+    [System.Serializable]
+    public class LootLockerAppleGameCenterSessionResponse : LootLockerSessionResponse
+    {
+        public string player_name { get; set; }
+        public string refresh_token { get; set; }
+    }
+
+    [System.Serializable]
     public class LootLockerEpicSessionResponse : LootLockerSessionResponse
     {
         public string refresh_token { get; set; }
@@ -207,6 +214,40 @@ namespace LootLocker.Requests
         public string game_version => LootLockerConfig.current.game_version;
 
         public LootLockerAppleRefreshSessionRequest(string refresh_token)
+        {
+            this.refresh_token = refresh_token;
+        }
+    }
+
+    public class LootLockerAppleGameCenterSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_version => LootLockerConfig.current.game_version;
+        public string bundle_id { get; private set; }
+        public string player_id { get; private set; }
+        public string public_key_url { get; private set; }
+        public string signature { get; private set; }
+        public string salt { get; private set; }
+        public long timestamp { get; private set; }
+
+        public LootLockerAppleGameCenterSessionRequest(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp)
+        {
+            this.bundle_id = bundleId;
+            this.player_id = playerId;
+            this.public_key_url = publicKeyUrl;
+            this.signature = signature;
+            this.salt = salt;
+            this.timestamp = timestamp;
+        }
+    }
+
+    public class LootLockerAppleGameCenterRefreshSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_version => LootLockerConfig.current.game_version;
+        public string refresh_token { get; private set; }
+
+        public LootLockerAppleGameCenterRefreshSessionRequest(string refresh_token)
         {
             this.refresh_token = refresh_token;
         }
@@ -440,6 +481,47 @@ namespace LootLocker
                 var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = response.player_identifier;
+                LootLockerConfig.current.refreshToken = response.refresh_token;
+                onComplete?.Invoke(response);
+            }, false);
+        }
+
+        public static void AppleGameCenterSession(LootLockerAppleGameCenterSessionRequest data, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        {
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleGameCenterSessionResponse>());
+                return;
+            }
+
+            string json = LootLockerJson.SerializeObject(data);
+            AppleGameCenterSession(json, onComplete);
+        }
+
+        public static void AppleGameCenterSession(LootLockerAppleGameCenterRefreshSessionRequest data, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        {
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleGameCenterSessionResponse>());
+                return;
+            }
+
+            string json = LootLockerJson.SerializeObject(data);
+            AppleGameCenterSession(json, onComplete);
+        }
+
+        private static void AppleGameCenterSession(string json, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.appleGameCenterSessionRequest;
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
+            LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            {
+                var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
+                LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.refreshToken = response.refresh_token;
                 onComplete?.Invoke(response);
             }, false);
