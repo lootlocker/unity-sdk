@@ -19,6 +19,7 @@ namespace LootLocker
         public static EndPointClass epicSessionRequest = new EndPointClass("session/epic", LootLockerHTTPMethod.POST);
         public static EndPointClass xboxSessionRequest = new EndPointClass("session/xbox-one", LootLockerHTTPMethod.POST);
         public static EndPointClass appleSessionRequest = new EndPointClass("session/apple", LootLockerHTTPMethod.POST);
+        public static EndPointClass appleGameCenterSessionRequest = new EndPointClass("session/apple/game-center", LootLockerHTTPMethod.POST);
         public static EndPointClass googleSessionRequest = new EndPointClass("session/google", LootLockerHTTPMethod.POST);
 
         // White Label Login
