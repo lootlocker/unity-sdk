@@ -357,7 +357,7 @@ namespace LootLocker
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
-            LootLockerLogger.GetForLogLevel()("Reset RateLimiter due to entering play mode");
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Reset RateLimiter due to entering play mode");
             Reset();
         }
 #endif
