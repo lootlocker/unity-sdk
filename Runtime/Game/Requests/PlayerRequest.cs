@@ -1,6 +1,6 @@
 using System;
 using LootLocker.Requests;
-using Unity.Plastic.Newtonsoft.Json;
+using LootLocker.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
@@ -203,7 +203,7 @@ namespace LootLocker.Requests
         public string name { get; set; }
         public int size { get; set; }
         public string purpose { get; set; }
-        [JsonProperty("public")]
+        [Json(Name = "public")]
         public bool is_public { get; set; }
         public string url { get; set; }
         public DateTime url_expires_at { get; set; }
