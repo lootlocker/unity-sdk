@@ -56,10 +56,10 @@ namespace LootLocker.Requests
         public object links { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerAssetRequest : LootLockerResponse
     {
-        public int count;
+        public int count { get; set; }
         public static int lastId;
 
         public static void ResetAssetCalls()
@@ -109,7 +109,7 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerCommonAsset : LootLockerResponse
     {
         public int id { get; set; }
@@ -146,8 +146,8 @@ namespace LootLocker.Requests
 
     public class LootLockerAssetCandidate
     {
-        public int created_by_player_id;
-        public string created_by_player_uid;
+        public int created_by_player_id { get; set; }
+        public string created_by_player_uid { get; set; }
     }
 
     public class LootLockerFile
@@ -194,12 +194,12 @@ namespace LootLocker.Requests
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerActivateRentalAssetResponse instead")]
     public class LootLockerActivateARentalAssetResponse : LootLockerResponse
     {
-        public int time_left;
+        public int time_left { get; set; }
     }
 
     public class LootLockerActivateRentalAssetResponse : LootLockerResponse
     {
-        public int time_left;
+        public int time_left { get; set; }
     }
 }
 
@@ -331,11 +331,11 @@ namespace LootLocker
                 LootLockerAssetResponse realResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
                 LootLockerSingleAssetResponse newResponse = new LootLockerSingleAssetResponse();
 
-                string serializedAsset = LootLockerJson.SerializeObject(realResponse.assets[0], LootLockerJsonSettings.Indented);
+                string serializedAsset = LootLockerJson.SerializeObject(realResponse.assets[0]);
 
                 newResponse.asset = LootLockerJson.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
 
-                string singleAssetResponse = LootLockerJson.SerializeObject(newResponse, LootLockerJsonSettings.Indented);
+                string singleAssetResponse = LootLockerJson.SerializeObject(newResponse);
                 newResponse.text = singleAssetResponse;
                 newResponse.SetResponseInfo(serverResponse);
 

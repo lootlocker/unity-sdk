@@ -67,11 +67,11 @@ namespace LootLocker.Requests
     {
         public LootLockerCollectable[] collectables { get; set; }
 
-        public LootLockerCollectable mainCollectable;
+        public LootLockerCollectable mainCollectable { get; set; }
 
-        public LootLockerGroup mainGroup;
+        public LootLockerGroup mainGroup { get; set; }
 
-        public LootLockerItem mainItem;
+        public LootLockerItem mainItem { get; set; }
 
     }
 
@@ -79,11 +79,11 @@ namespace LootLocker.Requests
     {
         public LootLockerCollectable[] collectables { get; set; }
 
-        public LootLockerCollectable mainCollectable;
+        public LootLockerCollectable mainCollectable { get; set; }
 
-        public LootLockerGroup mainGroup;
+        public LootLockerGroup mainGroup { get; set; }
 
-        public LootLockerItem mainItem;
+        public LootLockerItem mainItem { get; set; }
     }
 
     #endregion

@@ -14,18 +14,6 @@ namespace LootLocker
     public static class LootLockerJsonSettings
     {
         public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
-
-        public static readonly JsonOptions Indented = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly, "\t");
-        /*public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
-            Formatting = Formatting.None
-        };
-        public static readonly JsonSerializerSettings Indented = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
-            Formatting = Formatting.None
-        };*/
     }
 
     public static class LootLockerJson
@@ -39,18 +27,9 @@ namespace LootLocker
         {
             return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
         }
-        /*public static string SerializeObject(object obj, JsonSerializerSettings settings = null)
-        {
-            return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
-        }
-
-        public static T DeserializeObject<T>(string json, JsonSerializerSettings settings = null)
-        {
-            return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
-        }*/
     }
 
-    [System.Serializable]
+    [Serializable]
     public enum LootLockerHTTPMethod
     {
         GET = 0,
@@ -68,40 +47,39 @@ namespace LootLocker
     /// <summary>
     /// All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easier handling in client code.
     /// </summary>
-    [System.Serializable]
     public class LootLockerResponse
     {
         /// <summary>
         /// TRUE if http error OR server returns an error status
         /// </summary>
-        public bool hasError;
+        public bool hasError { get; set; }
 
         /// <summary>
         /// HTTP Status Code
         /// </summary>
-        public int statusCode;
+        public int statusCode { get; set; }
 
         /// <summary>
         /// Raw text response from the server
         /// <para>If hasError = true, this will contain the error message.</para>
         /// </summary>
-        public string text;
+        public string text { get; set; }
 
-        public bool success;
+        public bool success { get; set; }
 
 
-        public string Error;
+        public string Error { get; set; }
 
         /// <summary>
         /// A texture downloaded in the webrequest, if applicable, otherwise this will be null.
         /// </summary>
-        public Texture2D texture;
+        public Texture2D texture { get; set; }
 
         /// <summary>
         /// inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events 
         /// of the same type makes use unable to identify each one
         /// </summary>
-        public string EventId;
+        public string EventId { get; set; }
 
         public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse, JsonOptions options = null)
             where T : LootLockerResponse, new()
@@ -331,18 +309,18 @@ namespace LootLocker
     /// <summary>
     /// Construct a request to send to the server.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct LootLockerServerRequest
     {
-        public string endpoint;
-        public LootLockerHTTPMethod httpMethod;
+        public string endpoint { get; set; }
+        public LootLockerHTTPMethod httpMethod { get; set; }
         public Dictionary<string, object> payload;
-        public string jsonPayload;
-        public byte[] upload;
-        public string uploadName;
-        public string uploadType;
+        public string jsonPayload { get; set; }
+        public byte[] upload { get; set; }
+        public string uploadName { get; set; }
+        public string uploadType { get; set; }
         public LootLocker.LootLockerEnums.LootLockerCallerRole adminCall;
-        public WWWForm form;
+        public WWWForm form { get; set; }
 
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -355,7 +333,7 @@ namespace LootLocker
         /// </summary>
         public Dictionary<string, string> queryParams;
 
-        public int retryCount;
+        public int retryCount { get; set; }
 
         #region Make ServerRequest and call send (3 functions)
 

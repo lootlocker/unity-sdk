@@ -5,14 +5,14 @@ namespace LootLocker.Requests
 {
     public class LootLockerGetAllKeyValuePairsResponse : LootLockerResponse
     {
-        public int streamedObjectCount = 0;
-        public LootLockerInstanceStoragePair[] keypairs;
+        public int streamedObjectCount { get; set; } = 0;
+        public LootLockerInstanceStoragePair[] keypairs { get; set; }
     }
 
     public class LootLockerGetSingleKeyValuePairsResponse : LootLockerResponse
     {
-        public int streamedObjectCount = 0;
-        public LootLockerInstanceStoragePair keypair;
+        public int streamedObjectCount { get; set; } = 0;
+        public LootLockerInstanceStoragePair keypair { get; set; }
     }
 
     public class LootLockerInstanceStoragePair

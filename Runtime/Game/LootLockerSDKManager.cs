@@ -4166,9 +4166,9 @@ namespace LootLocker.Requests
 
     public class ResponseError
     {
-        public bool success;
-        public string error;
-        public string[] messages;
-        public string error_id;
+        public bool success { get; set; }
+        public string error { get; set; }
+        public string[] messages { get; set; }
+        public string error_id { get; set; }
     }
 }

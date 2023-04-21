@@ -1,15 +1,16 @@
-﻿using LootLocker;
+﻿using System;
+using LootLocker;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace LootLocker
 {
-    [System.Serializable]
+    [Serializable]
     public class EndPointClass
     {
-        public string endPoint;
-        public LootLockerHTTPMethod httpMethod;
+        public string endPoint { get; set; }
+        public LootLockerHTTPMethod httpMethod { get; set; }
 
         public EndPointClass() { }
 

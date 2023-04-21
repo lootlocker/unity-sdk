@@ -33,10 +33,10 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerPayload
     {
-        public string key;
-        public string value;
-        public int order;
-        public bool is_public;
+        public string key { get; set; }
+        public string value { get; set; }
+        public int order { get; set; }
+        public bool is_public { get; set; }
     }
 }
 
