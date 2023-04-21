@@ -5,9 +5,12 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.Net;
-#if !USE_LOOTLOCKER_ZERODEPJSON
+#if !LOOTLOCKER_USE_ZERODEPJSON && !LOOTLOCKER_USE_NEWTONSOFTJSON
 using LLlibs.Newtonsoft.Json;
 using LLlibs.Newtonsoft.Json.Linq;
+#elif LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 #endif
 using LootLocker.Requests;
 
@@ -368,7 +371,7 @@ namespace LootLocker
 
         private static string ObfuscateJsonStringForLogging(string json)
         {
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
             //TODO: Fix this json usage
             return json;
 #else

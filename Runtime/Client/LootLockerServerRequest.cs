@@ -2,9 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using LootLocker.LootLockerEnums;
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
 using LootLocker.ZeroDepJson;
-#else //USE_LOOTLOCKER_ZERODEPJSON
+#elif LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+#else
 using LLlibs.Newtonsoft.Json.Serialization;
 using LLlibs.Newtonsoft.Json;
 #endif
@@ -18,9 +21,9 @@ namespace LootLocker
 
     public static class LootLockerJsonSettings
     {
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
         public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
-#else //USE_LOOTLOCKER_ZERODEPJSON
+#else //LOOTLOCKER_USE_ZERODEPJSON
         public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
@@ -31,7 +34,7 @@ namespace LootLocker
 
     public static class LootLockerJson
     {
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
         public static string SerializeObject(object obj)
         {
             return SerializeObject(obj, LootLockerJsonSettings.Default);
@@ -51,7 +54,7 @@ namespace LootLocker
         {
             return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
         }
-#else //USE_LOOTLOCKER_ZERODEPJSON
+#else //LOOTLOCKER_USE_ZERODEPJSON
         public static string SerializeObject(object obj)
         {
             return SerializeObject(obj, LootLockerJsonSettings.Default);
@@ -128,9 +131,9 @@ namespace LootLocker
         public string EventId { get; set; }
 
         public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse,
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
             JsonOptions options = null
-#else //USE_LOOTLOCKER_ZERODEPJSON
+#else //LOOTLOCKER_USE_ZERODEPJSON
       JsonSerializerSettings options = null
 #endif
             )
@@ -140,9 +143,9 @@ namespace LootLocker
         }
 
         public static T Deserialize<T>(LootLockerResponse serverResponse,
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
             JsonOptions options = null
-#else //USE_LOOTLOCKER_ZERODEPJSON
+#else //LOOTLOCKER_USE_ZERODEPJSON
             JsonSerializerSettings options = null
 #endif
             )
