@@ -202,8 +202,8 @@ namespace LootLocker
 
         protected struct ServerError
         {
-            public HttpStatusCode status;
-            public string text;
+            public HttpStatusCode status { get; set; }
+            public string text { get; set; }
         }
 
         protected void BroadcastError(ServerError error)
@@ -336,11 +336,11 @@ namespace LootLocker
 
         private struct ObfuscationDetails
         {
-            public string key;
-            public char replacementChar;
-            public int visibleCharsFromBeginning;
-            public int visibleCharsFromEnd;
-            public bool hideCharactersForShortStrings;
+            public string key { get; set; }
+            public char replacementChar { get; set; }
+            public int visibleCharsFromBeginning { get; set; }
+            public int visibleCharsFromEnd { get; set; }
+            public bool hideCharactersForShortStrings { get; set; }
 
             public ObfuscationDetails(string key, char replacementChar = '*', int visibleCharsFromBeginning = 3, int visibleCharsFromEnd = 3, bool hideCharactersForShortStrings = true)
             {

@@ -3,32 +3,32 @@ using System;
 
 namespace LootLocker.Requests
 {
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEventResponse : LootLockerResponse
     {
         public LootLockerEvent[] events { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerSingleEventResponse : LootLockerResponse
     {
         public LootLockerEvent events { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerFinishEventResponse : LootLockerResponse
     {
         public int score { get; set; }
         public bool check_grant_notifications { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerStartinEventResponse : LootLockerResponse
     {
         public string signature { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEvent
     {
         public int event_id { get; set; }
@@ -45,7 +45,7 @@ namespace LootLocker.Requests
         public string best_goal { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerGoals
     {
         public LootLockerGold gold { get; set; }
@@ -53,7 +53,7 @@ namespace LootLocker.Requests
         public LootLockerBronze bronze { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerGold
     {
         public string goal { get; set; }
@@ -61,7 +61,7 @@ namespace LootLocker.Requests
         public LootLockerCommonAsset[] assets { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerSilver
     {
         public string goal { get; set; }
@@ -69,7 +69,7 @@ namespace LootLocker.Requests
         public object[] assets { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerBronze
     {
         public string goal { get; set; }
@@ -77,7 +77,7 @@ namespace LootLocker.Requests
         public object[] assets { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerCheckpoint
     {
         public int index { get; set; }
@@ -86,14 +86,14 @@ namespace LootLocker.Requests
         public string your_second_key { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class FinishEventRequest
     {
         public string signature { get; set; }
         public LootLockerEventPayload payload { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEventPayload
     {
         public string finish_time { get; set; }
@@ -101,12 +101,12 @@ namespace LootLocker.Requests
         public LootLockerCheckpointTimes[] checkpoint_times { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerCheckpointTimes
     {
-        public int index;
-        public int time;
-        public int score;
+        public int index { get; set; }
+        public int time { get; set; }
+        public int score { get; set; }
     }
 }
 

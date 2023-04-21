@@ -43,7 +43,7 @@ namespace LootLocker.Requests
         public string SessionToken { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerWhiteLabelLoginAndStartSessionResponse : LootLockerResponse
     {
         public LootLockerWhiteLabelLoginResponse LoginResponse { get; set; }
@@ -90,7 +90,7 @@ namespace LootLocker
             
             string json = LootLockerJson.SerializeObject(input);
 
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void WhiteLabelVerifySession(LootLockerWhiteLabelVerifySessionRequest input, Action<LootLockerWhiteLabelVerifySessionResponse> onComplete)
@@ -105,7 +105,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(input);
 
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void WhiteLabelSignUp(LootLockerWhiteLabelUserRequest input, Action<LootLockerWhiteLabelSignupResponse> onComplete)
@@ -120,7 +120,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(input);
 
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void WhiteLabelRequestPasswordReset(string email, Action<LootLockerResponse> onComplete)

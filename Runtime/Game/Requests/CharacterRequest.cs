@@ -31,9 +31,9 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerCharacter_Types
     {
-        public int id;
-        public bool is_default;
-        public string name;
+        public int id { get; set; }
+        public bool is_default { get; set; }
+        public string name { get; set; }
         public LootLockerStorage [] storage;
     }
 
@@ -99,24 +99,24 @@ namespace LootLocker.Requests
 
     public class EquipAssetToCharacterLoadoutResponse : LootLockerResponse
     {
-        public LootLockerCharacter character;
-        public LootLockerLoadouts[] loadout;
+        public LootLockerCharacter character { get; set; }
+        public LootLockerLoadouts[] loadout { get; set; }
     }
 
-    [Serializable]
+    //[Serializable]
     public class LootLockerLootLockerLoadout
     {
-        public LootLockerCharacter character;
-        public LootLockerLoadouts[] loadout;
+        public LootLockerCharacter character { get; set; }
+        public LootLockerLoadouts[] loadout { get; set; }
     }
 
-    [Serializable]
+    //[Serializable]
     public class LootLockerCharacter
     {
-        public int id;
-        public string type;
-        public string name;
-        public bool is_default;
+        public int id { get; set; }
+        public string type { get; set; }
+        public string name { get; set; }
+        public bool is_default { get; set; }
     }
 
     public class LootLockerCharacterAsset

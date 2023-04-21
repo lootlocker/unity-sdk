@@ -18,7 +18,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.ping;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, LootLockerJsonSettings.Indented); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
