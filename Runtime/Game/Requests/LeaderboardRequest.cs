@@ -90,8 +90,8 @@ namespace LootLocker.Requests
     public class LootLockerGetScoreListRequest : LootLockerGetRequests
     {
         public string leaderboardKey { get; set; }
-        public static int? nextCursor;
-        public static int? prevCursor;
+        public static int? nextCursor { get; set; }
+        public static int? prevCursor { get; set; }
 
         public static void Reset()
         {
@@ -103,8 +103,8 @@ namespace LootLocker.Requests
     public class LootLockerGetAllMemberRanksRequest : LootLockerGetRequests
     {
         public int member_id { get; set; }
-        public static int? nextCursor;
-        public static int? prevCursor;
+        public static int? nextCursor { get; set; }
+        public static int? prevCursor { get; set; }
 
         public static void Reset()
         {

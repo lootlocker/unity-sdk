@@ -60,7 +60,7 @@ namespace LootLocker.Requests
     public class LootLockerAssetRequest : LootLockerResponse
     {
         public int count { get; set; }
-        public static int lastId;
+        public static int lastId { get; set; }
 
         public static void ResetAssetCalls()
         {
