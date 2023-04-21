@@ -5,12 +5,14 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.Net;
-#if !LOOTLOCKER_USE_ZERODEPJSON && !LOOTLOCKER_USE_NEWTONSOFTJSON
-using LLlibs.Newtonsoft.Json;
-using LLlibs.Newtonsoft.Json.Linq;
+#if LOOTLOCKER_USE_ZERODEPJSON
+using LootLocker.ZeroDepJson;
 #elif LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+#else
+using LLlibs.Newtonsoft.Json;
+using LLlibs.Newtonsoft.Json.Linq;
 #endif
 using LootLocker.Requests;
 
@@ -172,12 +174,12 @@ namespace LootLocker
                         else
                         {
                             tries = 0;
-                            response.Error += " " + webRequest.downloadHandler.text;
+                            response.Error += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
                             response.statusCode = (int)webRequest.responseCode;
                             response.success = false;
                             response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(ObfuscateJsonStringForLogging(response.Error));
+                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.Error);
                             OnServerResponse?.Invoke(response);
                         }
 
@@ -372,8 +374,72 @@ namespace LootLocker
         private static string ObfuscateJsonStringForLogging(string json)
         {
 #if LOOTLOCKER_USE_ZERODEPJSON
-            //TODO: Fix this json usage
-            return json;
+            if (string.IsNullOrEmpty(json) || json.Equals("{}"))
+            {
+                return json;
+            }
+
+            Dictionary<string, object> jsonObject = null;
+            try
+            {
+                jsonObject = Json.Deserialize(json) as Dictionary<string, object>;
+            }
+            catch (JsonException)
+            {
+                return json;
+            }
+
+            if (jsonObject != null && jsonObject.Count > 0)
+            {
+                foreach (ObfuscationDetails obfuscationInfo in FieldsToObfuscate)
+                {
+                    string valueToObfuscate;
+                    try
+                    {
+                        if (!jsonObject.ContainsKey(obfuscationInfo.key))
+                        {
+                            continue;
+                        }
+
+                        valueToObfuscate = Json.Serialize(jsonObject[obfuscationInfo.key]);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(valueToObfuscate))
+                        continue;
+
+                    if (valueToObfuscate.Equals("null", StringComparison.Ordinal))
+                        continue;
+
+                    int replaceFrom = 0;
+                    int replaceTo = valueToObfuscate.Length;
+
+                    // Deal with short strings
+                    if (valueToObfuscate.Length <= obfuscationInfo.visibleCharsFromBeginning + obfuscationInfo.visibleCharsFromEnd)
+                    {
+                        if (!obfuscationInfo.hideCharactersForShortStrings) // Hide nothing, else hide everything
+                            continue;
+                    }
+                    // Replace in
+                    else
+                    {
+                        replaceFrom += obfuscationInfo.visibleCharsFromBeginning;
+                        replaceTo -= obfuscationInfo.visibleCharsFromEnd;
+                    }
+
+                    StringBuilder replacement = new StringBuilder();
+                    replacement.Append(obfuscationInfo.replacementChar, replaceTo - replaceFrom);
+                    StringBuilder obfuscatedValue = new StringBuilder(valueToObfuscate);
+                    obfuscatedValue.Remove(replaceFrom, replacement.Length);
+                    obfuscatedValue.Insert(replaceFrom, replacement.ToString());
+                    jsonObject[obfuscationInfo.key] = obfuscatedValue.ToString();
+                }
+            }
+
+            return LootLockerJson.SerializeObject(jsonObject);
 #else
             if (string.IsNullOrEmpty(json))
             {
