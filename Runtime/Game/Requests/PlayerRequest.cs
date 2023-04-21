@@ -1,7 +1,9 @@
 using System;
 using LootLocker.Requests;
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
 using LootLocker.ZeroDepJson;
+#elif LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
 #else
 using LLlibs.Newtonsoft.Json;
 #endif
@@ -208,7 +210,7 @@ namespace LootLocker.Requests
         public int size { get; set; }
         public string purpose { get; set; }
 
-#if USE_LOOTLOCKER_ZERODEPJSON
+#if LOOTLOCKER_USE_ZERODEPJSON
         [Json(Name = "public")]
 #else
         [JsonProperty("public")]
