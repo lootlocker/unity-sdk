@@ -2,7 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using LootLocker.LootLockerEnums;
+#if USE_LOOTLOCKER_ZERODEPJSON
 using LootLocker.ZeroDepJson;
+#else //USE_LOOTLOCKER_ZERODEPJSON
+using LLlibs.Newtonsoft.Json.Serialization;
+using LLlibs.Newtonsoft.Json;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,20 +18,61 @@ namespace LootLocker
 
     public static class LootLockerJsonSettings
     {
+#if USE_LOOTLOCKER_ZERODEPJSON
         public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
+#else //USE_LOOTLOCKER_ZERODEPJSON
+        public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
+            Formatting = Formatting.None
+        };
+#endif
     }
 
     public static class LootLockerJson
     {
-        public static string SerializeObject(object obj, JsonOptions options = null)
+#if USE_LOOTLOCKER_ZERODEPJSON
+        public static string SerializeObject(object obj)
+        {
+            return SerializeObject(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObject(object obj, JsonOptions options)
         {
             return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
         }
 
-        public static T DeserializeObject<T>(string json, JsonOptions options = null)
+        public static T DeserializeObject<T>(string json)
+        {
+            return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json, JsonOptions options)
         {
             return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
         }
+#else //USE_LOOTLOCKER_ZERODEPJSON
+        public static string SerializeObject(object obj)
+        {
+            return SerializeObject(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObject(object obj, JsonSerializerSettings settings)
+        {
+            return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json)
+        {
+            return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
+        }
+
+
+        public static T DeserializeObject<T>(string json, JsonSerializerSettings settings)
+        {
+            return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
+        }
+#endif
     }
 
     [Serializable]
@@ -81,13 +127,25 @@ namespace LootLocker
         /// </summary>
         public string EventId { get; set; }
 
-        public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse, JsonOptions options = null)
+        public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse,
+#if USE_LOOTLOCKER_ZERODEPJSON
+            JsonOptions options = null
+#else //USE_LOOTLOCKER_ZERODEPJSON
+      JsonSerializerSettings options = null
+#endif
+            )
             where T : LootLockerResponse, new()
         {
             onComplete?.Invoke(Deserialize<T>(serverResponse, options));
         }
 
-        public static T Deserialize<T>(LootLockerResponse serverResponse, JsonOptions options = null)
+        public static T Deserialize<T>(LootLockerResponse serverResponse,
+#if USE_LOOTLOCKER_ZERODEPJSON
+            JsonOptions options = null
+#else //USE_LOOTLOCKER_ZERODEPJSON
+            JsonSerializerSettings options = null
+#endif
+            )
             where T : LootLockerResponse, new() 
         {
             if (serverResponse == null)
@@ -314,12 +372,12 @@ namespace LootLocker
     {
         public string endpoint { get; set; }
         public LootLockerHTTPMethod httpMethod { get; set; }
-        public Dictionary<string, object> payload;
+        public Dictionary<string, object> payload { get; set; }
         public string jsonPayload { get; set; }
         public byte[] upload { get; set; }
         public string uploadName { get; set; }
         public string uploadType { get; set; }
-        public LootLocker.LootLockerEnums.LootLockerCallerRole adminCall;
+        public LootLocker.LootLockerEnums.LootLockerCallerRole adminCall { get; set; }
         public WWWForm form { get; set; }
 
         /// <summary>
@@ -413,9 +471,9 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (file.Length == 0)
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
-                #endif
+#endif
                 onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("File content is empty, not allowed."));
                 return;
             }
