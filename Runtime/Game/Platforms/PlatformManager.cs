@@ -68,9 +68,9 @@ namespace LootLocker.Requests
 
         public struct PlatformRepresentation
         {
-            public Platforms Platform;
-            public string PlatformString;
-            public string PlatformFriendlyString;
+            public Platforms Platform { get; set; }
+            public string PlatformString { get; set; }
+            public string PlatformFriendlyString { get; set; }
         }
 
         private static PlatformRepresentation current;

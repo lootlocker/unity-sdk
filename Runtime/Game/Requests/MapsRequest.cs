@@ -12,27 +12,27 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerMap
     {
-        public int map_id;
-        public int asset_id;
-        public LootLockerSpawn_Points[] spawn_points;
-        public bool player_access;
+        public int map_id { get; set; }
+        public int asset_id { get; set; }
+        public LootLockerSpawn_Points[] spawn_points { get; set; }
+        public bool player_access { get; set; }
     }
 
     [Serializable]
     public class LootLockerSpawn_Points
     {
-        public int asset_id;
-        public string position;
-        public string rotation;
-        public LootLockerCamera[] cameras;
-        public bool player_access;
+        public int asset_id { get; set; }
+        public string position { get; set; }
+        public string rotation { get; set; }
+        public LootLockerCamera[] cameras { get; set; }
+        public bool player_access { get; set; }
     }
 
     [Serializable]
     public class LootLockerCamera
     {
-        public string position;
-        public string rotation;
+        public string position { get; set; }
+        public string rotation { get; set; }
     }
 }
 

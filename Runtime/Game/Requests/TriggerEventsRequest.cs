@@ -23,7 +23,7 @@ namespace LootLocker.Requests
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
-        public LootLockerGrantedAssets[] granted_assets;
+        public LootLockerGrantedAssets[] granted_assets { get; set; }
     }
 
     public class LootLockerExecuteTriggerResponse : LootLockerResponse
@@ -31,7 +31,7 @@ namespace LootLocker.Requests
         public bool check_grant_notifications { get; set; }
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
-        public LootLockerGrantedAssets[] granted_assets;
+        public LootLockerGrantedAssets[] granted_assets { get; set; }
     }
 
     [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerListAllTriggersResponse instead")]
@@ -84,9 +84,9 @@ namespace LootLocker.Requests
 
     public class LootLockerHeroEquipExceptions
     {
-        public bool can_equip;
-        public int hero_id;
-        public string name;
+        public bool can_equip { get; set; }
+        public int hero_id { get; set; }
+        public string name { get; set; }
     }
 }
 

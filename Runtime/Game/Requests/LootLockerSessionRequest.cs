@@ -4,7 +4,7 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
-    [System.Serializable]
+    [Serializable]
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
@@ -22,7 +22,7 @@ namespace LootLocker.Requests
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
@@ -62,7 +62,7 @@ namespace LootLocker.Requests
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerSessionResponse : LootLockerResponse
     {
         public string session_token { get; set; }
@@ -84,27 +84,27 @@ namespace LootLocker.Requests
         public string player_identifier { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerGoogleSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
         public string refresh_token { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
         public string refresh_token { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEpicSessionResponse : LootLockerSessionResponse
     {
         public string refresh_token { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerLevel_Thresholds
     {
         public int current { get; set; }
@@ -113,7 +113,7 @@ namespace LootLocker.Requests
         public bool next_is_prestige { get; set; }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
@@ -126,7 +126,7 @@ namespace LootLocker.Requests
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEpicSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
@@ -139,7 +139,7 @@ namespace LootLocker.Requests
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LootLockerEpicRefreshSessionRequest : LootLockerGetRequest
     {
         public string game_key => LootLockerConfig.current.apiKey?.ToString();
