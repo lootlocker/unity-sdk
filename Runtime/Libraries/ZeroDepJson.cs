@@ -1088,11 +1088,6 @@ namespace ZeroDepJson
             {
                 reader.Read();
                 var s = ReadString(reader, options);
-                if (options.SerializationOptions.HasFlag(JsonSerializationOptions.AutoParseDateTime))
-                {
-                    if (TryParseDateTime(s, options.DateTimeStyles, out var dt))
-                        return dt;
-                }
                 return s;
             }
 

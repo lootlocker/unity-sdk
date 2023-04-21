@@ -5,6 +5,10 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.Net;
+#if !USE_LOOTLOCKER_ZERODEPJSON
+using LLlibs.Newtonsoft.Json;
+using LLlibs.Newtonsoft.Json.Linq;
+#endif
 using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
@@ -362,11 +366,13 @@ namespace LootLocker
             new ObfuscationDetails("token")
         };
 
-        //TODO: Fix this json usage
         private static string ObfuscateJsonStringForLogging(string json)
         {
+#if USE_LOOTLOCKER_ZERODEPJSON
+            //TODO: Fix this json usage
             return json;
-            /*if (string.IsNullOrEmpty(json))
+#else
+            if (string.IsNullOrEmpty(json))
             {
                 return json;
             }
@@ -430,7 +436,8 @@ namespace LootLocker
                 }
             }
 
-            return LootLockerJson.SerializeObject(jsonObject);*/
+            return LootLockerJson.SerializeObject(jsonObject);
+#endif
         }
 
         string BuildURL(string endpoint, Dictionary<string, string> queryParams = null)
