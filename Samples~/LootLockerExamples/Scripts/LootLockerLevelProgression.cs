@@ -131,10 +131,8 @@ namespace LootLocker
             });
         }
 
-        void UpdateProgressionUI(ulong currentTier, ulong currentPoints, ulong previousTierPoints, ulong? nextTierPoints, bool leveledUp = false)
+        void UpdateProgressionUI(ulong currentTier, ulong currentPoints, ulong previousTierPoints, ulong? nextTierPoints)
         {
-            // Do something with leveled up, shoiw text or such?
-
             // Update the UI with the progression information
             currentTierText.text = "Current tier: " + currentTier;
 
