@@ -146,11 +146,16 @@ namespace LootLocker
                 if (response.success)
                 {
                     Debug.Log("Points added to progression");
+
                     // If the player leveled up, the count of awarded_tiers will be greater than 0
+                    if (response.awarded_tiers.Count > 0)
+                    {
+                        Debug.Log("Player leveled up");
+                    }
+
                     UpdateProgressionUI2(response.step, response.points, response.previous_threshold, response.next_threshold);
 
                     // Since progression 1 is connected to progression 2, we need to update it as well
-                    // Since progression 2 is connected to progression 1, we need to update it as well
                     LootLockerSDKManager.GetPlayerProgression(progressionKey1, (response) =>
                     {
                         if (response.success)
@@ -236,10 +241,8 @@ namespace LootLocker
             currentPointsText1.text = "Current points: " + currentPoints;
         }
 
-        void UpdateProgressionUI2(ulong currentTier, ulong currentPoints, ulong previousTierPoints, ulong? nextTierPoints, bool leveledUp = false)
+        void UpdateProgressionUI2(ulong currentTier, ulong currentPoints, ulong previousTierPoints, ulong? nextTierPoints)
         {
-            // Do something with leveled up, shoiw text or such?
-
             // Update the UI with the progression information
             currentTierText2.text = "Current tier: " + currentTier;
 
