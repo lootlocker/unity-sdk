@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 using LootLocker.LootLockerEnums;
 #if LOOTLOCKER_USE_ZERODEPJSON
-using LootLocker.ZeroDepJson;
+using LLlibs.ZeroDepJson;
 #elif LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
