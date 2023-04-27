@@ -10,9 +10,6 @@ using LLlibs.ZeroDepJson;
 #elif LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-#else
-using LLlibs.Newtonsoft.Json;
-using LLlibs.Newtonsoft.Json.Linq;
 #endif
 using LootLocker.Requests;
 

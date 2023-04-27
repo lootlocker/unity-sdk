@@ -4,8 +4,6 @@ using LootLocker.Requests;
 using LLlibs.ZeroDepJson;
 #elif LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
-#else
-using LLlibs.Newtonsoft.Json;
 #endif
 
 namespace LootLocker.Requests
