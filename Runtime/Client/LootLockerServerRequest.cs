@@ -7,9 +7,6 @@ using LLlibs.ZeroDepJson;
 #elif LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-#else
-using LLlibs.Newtonsoft.Json.Serialization;
-using LLlibs.Newtonsoft.Json;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
