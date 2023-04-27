@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 #if LOOTLOCKER_USE_ZERODEPJSON
-using LootLocker.ZeroDepJson;
+using LLlibs.ZeroDepJson;
 #endif
 
 namespace LootLocker.Requests
