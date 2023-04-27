@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using LootLocker.LootLockerEnums;
-#if LOOTLOCKER_USE_ZERODEPJSON
-using LLlibs.ZeroDepJson;
-#elif LOOTLOCKER_USE_NEWTONSOFTJSON
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+#else
+using LLlibs.ZeroDepJson;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,40 +18,20 @@ namespace LootLocker
 
     public static class LootLockerJsonSettings
     {
-#if LOOTLOCKER_USE_ZERODEPJSON
-        public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
-#else //LOOTLOCKER_USE_ZERODEPJSON
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
         public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
             Formatting = Formatting.None
         };
+#else
+        public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
 #endif
     }
 
     public static class LootLockerJson
     {
-#if LOOTLOCKER_USE_ZERODEPJSON
-        public static string SerializeObject(object obj)
-        {
-            return SerializeObject(obj, LootLockerJsonSettings.Default);
-        }
-
-        public static string SerializeObject(object obj, JsonOptions options)
-        {
-            return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
-        }
-
-        public static T DeserializeObject<T>(string json)
-        {
-            return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
-        }
-
-        public static T DeserializeObject<T>(string json, JsonOptions options)
-        {
-            return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
-        }
-#else //LOOTLOCKER_USE_ZERODEPJSON
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
         public static string SerializeObject(object obj)
         {
             return SerializeObject(obj, LootLockerJsonSettings.Default);
@@ -72,7 +52,27 @@ namespace LootLocker
         {
             return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
         }
-#endif
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+        public static string SerializeObject(object obj)
+        {
+            return SerializeObject(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObject(object obj, JsonOptions options)
+        {
+            return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json)
+        {
+            return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
+        }
+
+        public static T DeserializeObject<T>(string json, JsonOptions options)
+        {
+            return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
+        }
+#endif //LOOTLOCKER_USE_NEWTONSOFTJSON
     }
 
     [Serializable]
@@ -128,10 +128,10 @@ namespace LootLocker
         public string EventId { get; set; }
 
         public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse,
-#if LOOTLOCKER_USE_ZERODEPJSON
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            JsonSerializerSettings options = null
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
             JsonOptions options = null
-#else //LOOTLOCKER_USE_ZERODEPJSON
-      JsonSerializerSettings options = null
 #endif
             )
             where T : LootLockerResponse, new()
@@ -140,10 +140,10 @@ namespace LootLocker
         }
 
         public static T Deserialize<T>(LootLockerResponse serverResponse,
-#if LOOTLOCKER_USE_ZERODEPJSON
-            JsonOptions options = null
-#else //LOOTLOCKER_USE_ZERODEPJSON
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
             JsonSerializerSettings options = null
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+            JsonOptions options = null
 #endif
             )
             where T : LootLockerResponse, new() 
