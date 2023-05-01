@@ -15,7 +15,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGetPersistentStorageRequest
     {
-        public List<LootLockerPayload> payload = new List<LootLockerPayload>();
+        public List<LootLockerPayload> payload { get; set; } = new List<LootLockerPayload>();
 
         public void AddToPayload(LootLockerPayload newPayload)
         {
