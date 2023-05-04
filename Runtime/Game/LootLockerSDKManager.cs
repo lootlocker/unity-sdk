@@ -37,7 +37,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is Initializing");
             LootLockerServerManager.CheckInit();
             return LoadConfig();
         }
@@ -88,7 +88,7 @@ namespace LootLocker.Requests
                 return false;
             }
 
-            LootLockerLogger.GetForLogLevel()("SDK is Initialized");
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is Initialized");
             initialized = true;
             return initialized;
         }
