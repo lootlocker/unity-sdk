@@ -286,9 +286,9 @@ namespace LootLocker
 
         public static void GetCurrentLoadOutToOtherCharacter(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersCharacterLoadouts;
+            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersLoadoutToDefaultCharacter;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
