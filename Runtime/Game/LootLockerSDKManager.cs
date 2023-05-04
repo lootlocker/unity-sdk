@@ -479,7 +479,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Refresh a previous session signed in with Google.
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
@@ -491,7 +491,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Refresh a previous session signed in with Google.
         /// If you do not want to manually handle the refresh token we recommend using the RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete) method.
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
@@ -544,7 +544,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Refresh a previous session signed in with Apple
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
@@ -556,7 +556,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Refresh a previous session signed in with Apple
         /// If you do not want to manually handle the refresh token we recommend using the RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete) method.
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
@@ -614,7 +614,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Refresh a previous session signed in with Apple Game Center
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Apple Game Center sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
@@ -665,7 +665,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Refresh a previous session signed in with Epic
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Epic sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
@@ -677,7 +677,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Refresh a previous session signed in with Epic
         /// If you do not want to manually handle the refresh token we recommend using the RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete) method.
-        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Epic sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartEpicSession request</param>
