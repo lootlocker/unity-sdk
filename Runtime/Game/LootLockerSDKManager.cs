@@ -1962,11 +1962,22 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get a character loadout from a specific characterID.
+        /// Get a character loadout from a specific player on the current platform.
         /// </summary>
-        /// <param name="characterID">ID of the character</param>
+        /// <param name="player_id">ID of the player</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void GetOtherPlayersCharacterLoadout(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        public static void GetOtherPlayersCharacterLoadout(string player_id, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        {
+            GetOtherPlayersCharacterLoadout(player_id, CurrentPlatform.Get(), onComplete);
+        }
+
+        /// <summary>
+        /// Get a character loadout from a specific player and platform
+        /// </summary>
+        /// <param name="player_id">ID of the player</param>
+        /// <param name="platform">The platform that the ID of the player is for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
+        public static void GetOtherPlayersCharacterLoadout(string player_id, Platforms platform, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1975,8 +1986,8 @@ namespace LootLocker.Requests
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
 
-            data.getRequests.Add(characterID);
-            data.getRequests.Add(CurrentPlatform.GetString());
+            data.getRequests.Add(player_id);
+            data.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
             LootLockerAPIManager.GetOtherPlayersCharacterLoadout(data, onComplete);
         }
 
@@ -2162,19 +2173,30 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get the loadout for a specific character.
+        /// Get the current loadout for the default character of the specified player on the current platform
         /// </summary>
-        /// <param name="characterID">ID of the character to get the loadout for</param>
+        /// <param name="playerID">ID of the player to get the loadout for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadouttoDefaultCharacterResponse</param>
-        public static void GetCurrentLoadOutToOtherCharacter(string characterID, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
+        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
+        {
+            GetCurrentLoadOutToOtherCharacter(playerID, CurrentPlatform.Get(), onComplete);
+        }
+
+        /// <summary>
+        /// Get the current loadout for the default character of the specified player and platform
+        /// </summary>
+        /// <param name="playerID">ID of the player to get the loadout for</param>
+        /// <param name="platform">The platform that the ID of the player is for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadouttoDefaultCharacterResponse</param>
+        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadouttoDefaultCharacterResponse>());
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-            lootLockerGetRequest.getRequests.Add(characterID);
-            lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetString());
+            lootLockerGetRequest.getRequests.Add(playerID);
+            lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
             LootLockerAPIManager.GetCurrentLoadOutToOtherCharacter(lootLockerGetRequest, onComplete);
         }
 
