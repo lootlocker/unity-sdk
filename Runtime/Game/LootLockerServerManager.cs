@@ -51,7 +51,7 @@ namespace LootLocker
         void Awake()
         {
             CheckInit();
-            DontDestroyOnLoad(gameObject); //the same as i.gameobject (is there's only one instance in the scene)
+            DontDestroyOnLoad(gameObject); //the same as i.gameobject (if there's only one instance in the scene)
         }
 
     }
