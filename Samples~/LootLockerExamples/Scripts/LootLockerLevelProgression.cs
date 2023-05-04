@@ -33,21 +33,21 @@ namespace LootLocker
              * LootLocker will create an identifier for the user and store it in PlayerPrefs.
              * If you want to create a new player when testing, you can use PlayerPrefs.DeleteKey("LootLockerGuestPlayerID");
              */
-            LootLockerSDKManager.StartGuestSession((response) =>
+            LootLockerSDKManager.StartGuestSession((startGuestSessionResponse) =>
             {
-                if (response.success)
+                if (startGuestSessionResponse.success)
                 {
                     // New player
-                    if(response.seen_before == false)
+                    if(startGuestSessionResponse.seen_before == false)
                     {
                         // Register the progression to the player; this will create the progression if it doesn't already exist.
                         // It is the same as adding 0 to the progression.
-                        LootLockerSDKManager.RegisterPlayerProgression(progressionKey, (response) =>
+                        LootLockerSDKManager.RegisterPlayerProgression(progressionKey, (registerPlayerProgressionResponse) =>
                         {
-                            if (response.success)
+                            if (registerPlayerProgressionResponse.success)
                             {
                                 Debug.Log("Progression registered");
-                                UpdateProgressionUI(response.step, response.points, response.previous_threshold, response.next_threshold);
+                                UpdateProgressionUI(registerPlayerProgressionResponse.step, registerPlayerProgressionResponse.points, registerPlayerProgressionResponse.previous_threshold, registerPlayerProgressionResponse.next_threshold);
                             }
                             else
                             {
@@ -59,17 +59,17 @@ namespace LootLocker
                     {
                         // This player is old and has already registered the progression
                         // So we just need to get it.
-                        LootLockerSDKManager.GetPlayerProgression(progressionKey, (response) =>
+                        LootLockerSDKManager.GetPlayerProgression(progressionKey, (getPlayerProgressionResponse) =>
                         {
-                            if (response.success)
+                            if (getPlayerProgressionResponse.success)
                             {
                                 /*
-                                 * response.step is the current tier of the progression
-                                 * response.points is the current amount of points taht the player has in the progression
-                                 * response.previous_threshold is the amount of points needed to reach the previous tier
-                                 * response.next_threshold is the amount of points needed to reach the next tier
+                                 * getPlayerProgressionResponse.step is the current tier of the progression
+                                 * getPlayerProgressionResponse.points is the current amount of points taht the player has in the progression
+                                 * getPlayerProgressionResponse.previous_threshold is the amount of points needed to reach the previous tier
+                                 * getPlayerProgressionResponse.next_threshold is the amount of points needed to reach the next tier
                                  * */
-                                UpdateProgressionUI(response.step, response.points, response.previous_threshold, response.next_threshold);
+                                UpdateProgressionUI(getPlayerProgressionResponse.step, getPlayerProgressionResponse.points, getPlayerProgressionResponse.previous_threshold, getPlayerProgressionResponse.next_threshold);
                             }
                             else
                             {
@@ -99,13 +99,13 @@ namespace LootLocker
             // Add X amount of points to the progression
             // All progressions uses ulong as the type for the points, so you need to cast the value to ulong.
             // Progressions will not be able to go below 0 (no negative progressions).
-            LootLockerSDKManager.AddPointsToPlayerProgression(progressionKey, (ulong)pointsAmountSlider.value, (response) =>
+            LootLockerSDKManager.AddPointsToPlayerProgression(progressionKey, (ulong)pointsAmountSlider.value, (addPointsToPlayerProgressionResponse) =>
             {
-                if(response.success)
+                if(addPointsToPlayerProgressionResponse.success)
                 {
                     Debug.Log("Points added to progression");
                     // If the player leveled up, the count of awarded_tiers will be greater than 0
-                    UpdateProgressionUI(response.step, response.points, response.previous_threshold, response.next_threshold);
+                    UpdateProgressionUI(addPointsToPlayerProgressionResponse.step, addPointsToPlayerProgressionResponse.points, addPointsToPlayerProgressionResponse.previous_threshold, addPointsToPlayerProgressionResponse.next_threshold);
                 }
                 else
                 {
@@ -117,12 +117,12 @@ namespace LootLocker
         public void ResetProgression()
         {
             // Reset the progression to 0
-            LootLockerSDKManager.ResetPlayerProgression(progressionKey, (response) =>
+            LootLockerSDKManager.ResetPlayerProgression(progressionKey, (resetPlayerProgressionResponse) =>
             {
-                if(response.success)
+                if(resetPlayerProgressionResponse.success)
                 {
                     Debug.Log("Progression reset");
-                    UpdateProgressionUI(response.step, response.points, response.previous_threshold, response.next_threshold);
+                    UpdateProgressionUI(resetPlayerProgressionResponse.step, resetPlayerProgressionResponse.points, resetPlayerProgressionResponse.previous_threshold, resetPlayerProgressionResponse.next_threshold);
                 }
                 else
                 {
