@@ -124,6 +124,15 @@ namespace LootLocker
         public static EndPointClass inspectALootBox = new EndPointClass("v1/asset/instance/{0}/inspect", LootLockerHTTPMethod.GET);
         public static EndPointClass openALootBox = new EndPointClass("v1/asset/instance/{0}/open", LootLockerHTTPMethod.PUT);
         
+        // Asset instance progressions
+        [Header("Asset instance progressions")]
+        public static EndPointClass getAllAssetInstanceProgressions = new EndPointClass("player/assets/instances/{0}/progressions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getSingleAssetInstanceProgression = new EndPointClass("player/assets/instances/{0}/progressions/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass addPointsToAssetInstanceProgression = new EndPointClass("player/assets/instances/{0}/progressions/{1}/points/add", LootLockerHTTPMethod.POST);
+        public static EndPointClass subtractPointsFromAssetInstanceProgression = new EndPointClass("player/assets/instances/{0}/progressions/{1}/points/subtract", LootLockerHTTPMethod.POST);
+        public static EndPointClass resetAssetInstanceProgression = new EndPointClass("player/assets/instances/{0}/progressions/{1}/reset", LootLockerHTTPMethod.POST);
+        public static EndPointClass deleteAssetInstanceProgression = new EndPointClass("player/assets/instances/{0}/progressions/{1}", LootLockerHTTPMethod.DELETE);
+        
         // UGC
         [Header("UGC")]
         public static EndPointClass creatingAnAssetCandidate = new EndPointClass("v1/player/assets/candidates", LootLockerHTTPMethod.POST);
