@@ -2900,6 +2900,159 @@ namespace LootLocker.Requests
             LootLockerAPIManager.OpenALootBox(data, onComplete);
         }
         #endregion
+        
+        #region AssetInstance progressions
+
+        /// <summary>
+        /// Returns multiple progressions for an asset instance.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">Used for pagination, ID of the asset instance progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, string after, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedAssetInstanceProgressionsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getAllAssetInstanceProgressions.endPoint, assetInstanceId);
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Returns multiple progressions for an asset instance.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        {
+            GetAssetInstanceProgressions(assetInstanceId, count, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns multiple progressions for an asset instance.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        {
+            GetAssetInstanceProgressions(assetInstanceId, -1, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns multiple progressions for an asset instance.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgression</param>
+        public static void GetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getSingleAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Adds points to an asset instance progression.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="amount">Amount of points to add</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
+        public static void AddPointsToAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.addPointsToAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+
+            var body = LootLockerJson.SerializeObject(new { amount });  
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Subtracts points from an asset instance progression.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="amount">Amount of points to subtract</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
+        public static void SubtractPointsFromAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            
+            var body = LootLockerJson.SerializeObject(new { amount });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Resets an asset instance progression.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
+        public static void ResetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.resetAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// Deletes an asset instance progression.
+        /// </summary>
+        /// <param name="assetInstanceId">ID of the asset instance</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void DeleteAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.deleteAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        
+        #endregion
 
         #region UserGeneratedContent
         /// <summary>
