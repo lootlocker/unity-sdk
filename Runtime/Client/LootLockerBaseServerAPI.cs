@@ -116,8 +116,10 @@ namespace LootLocker
                     LootLockerResponse response = new LootLockerResponse();
                     response.statusCode = (int)webRequest.responseCode;
 #if UNITY_2020_1_OR_NEWER
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("webRequest.result: " + webRequest.result + ", .error: " + webRequest.error);
                     if (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError || !string.IsNullOrEmpty(webRequest.error))
 #else
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("webRequest.isHttpError: " + webRequest.isHttpError + ", .isNetworkError: " + webRequest.isNetworkError + ", .error: " + webRequest.error);
                     if (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error))
 #endif
 
