@@ -1418,7 +1418,7 @@ namespace LootLocker.Requests
 
             if (name.Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID"), StringComparison.OrdinalIgnoreCase) && CurrentPlatform.Get() == Platforms.Guest)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>(": Setting the Player name to the Identifier is not allowed"));
+                onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
                 return;
             }
 
