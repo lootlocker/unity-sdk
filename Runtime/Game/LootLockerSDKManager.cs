@@ -7,6 +7,7 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
+using static LootLocker.Requests.CurrentPlatform;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1414,6 +1415,13 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
                 return;
             }
+
+            if (name.Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID"), StringComparison.OrdinalIgnoreCase) && CurrentPlatform.Get() == Platforms.Guest)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>(": Setting the Player name to the Identifier is not allowed"));
+                return;
+            }
+
 
             PlayerNameRequest data = new PlayerNameRequest();
             data.name = name;
