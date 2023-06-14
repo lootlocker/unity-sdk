@@ -8,6 +8,10 @@ using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
 using static LootLocker.Requests.CurrentPlatform;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
+using System.Diagnostics;
+using File = System.IO.File;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1057,6 +1061,90 @@ namespace LootLocker.Requests
                     onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, sessionResponse));
                 });
             });
+        }
+
+        #endregion
+
+        #region Account Linking
+
+        /// <summary>
+        /// Start an account linking process on behalf of the currently signed in player
+        /// When you want to link an additional provider to a player, you start by initiating an account link.The player can then navigate to the online link flow using the code_page_url and code, or the qr_code and continue the linking process.
+        /// For the duration of the linking process you can check the status using the CheckStatusOfAccountLinkingProcess method.
+        /// Returned from this method is the ID of the linking process, make sure to save that so that you can check the status of the process later.
+        /// https://ref.lootlocker.com/game-api/#start-account-link
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAccountLinkStartResponse</param>
+        public static void StartAccountLinkingProcess(Action<LootLockerAccountLinkStartResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountLinkStartResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.StartAccountLinkingProcess;
+
+            LootLockerServerRequest.CallAPI(endpoint.endPoint, endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Check the status of an ongoing account linking process
+        /// https://ref.lootlocker.com/game-api/#check-account-link-status
+        /// </summary>
+        /// <param name="LinkID">The ID of the account linking process which was returned when starting the linking process</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAccountLinkProcessStatusResponse</param>
+        public static void CheckStatusOfAccountLinkingProcess(string LinkID, Action<LootLockerAccountLinkProcessStatusResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountLinkProcessStatusResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.CheckStatusOfAccountLinkingProcess;
+
+            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, LinkID), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Cancel an ongoing account linking process
+        /// The response will be empty unless an error occurs
+        /// https://ref.lootlocker.com/game-api/#cancel-account-link
+        /// </summary>
+        /// <param name="LinkID">The ID of the account linking process which was returned when starting the linking process</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCancelAccountLinkingProcessResponse</param>
+        public static void CancelAccountLinkingProcess(string LinkID, Action<LootLockerCancelAccountLinkingProcessResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCancelAccountLinkingProcessResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.CancelAccountLinkingProcess;
+
+            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, LinkID), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Unlink a provider from the currently signed in player
+        /// The response will be empty unless an error occurs
+        /// https://ref.lootlocker.com/game-api/#unlink-provider
+        /// </summary>
+        /// <param name="Provider">What provider to unlink from the currently logged in player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUnlinkProviderFromAccountResponse</param>
+        public static void UnlinkProviderFromAccount(Platforms Provider, Action<LootLockerUnlinkProviderFromAccountResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUnlinkProviderFromAccountResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.UnlinkProviderFromAccount;
+
+            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, CurrentPlatform.GetPlatformRepresentation(Provider).PlatformString), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
