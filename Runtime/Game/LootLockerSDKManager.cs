@@ -453,7 +453,6 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a Game session for a Google User
         /// The Google sign in platform must be enabled in the web console for this to work.
-        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
@@ -468,6 +467,39 @@ namespace LootLocker.Requests
             CurrentPlatform.Set(Platforms.Google);
 
             LootLockerGoogleSignInSessionRequest sessionRequest = new LootLockerGoogleSignInSessionRequest(idToken);
+            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
+        }
+        
+        /// <summary>
+        /// Start a Game session for a Google User
+        /// The Google sign in platform must be enabled in the web console for this to work.
+        /// Desired Google platform also must be configured under advanced options in the web console.
+        /// </summary>
+        /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="googlePlatform">Google OAuth2 ClientID platform</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Google);
+
+            var sessionRequest = new LootLockerGoogleSignInWithPlatformSessionRequest(idToken)
+            {
+                platform = googlePlatform.ToString()
+            };
+
             LootLockerAPIManager.GoogleSession(sessionRequest, response =>
             {
                 if (!response.success)
