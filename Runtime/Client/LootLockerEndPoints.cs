@@ -31,6 +31,13 @@ namespace LootLocker
         public static EndPointClass whiteLabelRequestAccountVerification = new EndPointClass("white-label-login/request-verification", LootLockerHTTPMethod.POST);
         public static EndPointClass whiteLabelLoginSessionRequest = new EndPointClass("v2/session/white-label", LootLockerHTTPMethod.POST);
 
+        // Account Linking
+        [Header("Account Linking")]
+        public static EndPointClass StartAccountLinkingProcess = new EndPointClass("upa/link/start", LootLockerHTTPMethod.POST);
+        public static EndPointClass CheckStatusOfAccountLinkingProcess = new EndPointClass("upa/link/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass CancelAccountLinkingProcess = new EndPointClass("upa/link/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass UnlinkProviderFromAccount = new EndPointClass("player/providers/{0}", LootLockerHTTPMethod.DELETE);
+
         // Player
         [Header("Player")]
         public static EndPointClass getPlayerInfo = new EndPointClass("v1/player/info", LootLockerHTTPMethod.GET);
