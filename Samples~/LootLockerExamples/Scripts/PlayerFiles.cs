@@ -1,9 +1,7 @@
 using LootLocker.Requests;
-using Newtonsoft.Json;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -105,14 +103,18 @@ namespace LootLocker
             UnityWebRequest www = new UnityWebRequest(url);
             www.downloadHandler = new DownloadHandlerBuffer();
             yield return www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                // Show results as text
+            // Unity 2020.1 and newer does not use isNetworkError and isHttpError anymore
+#if UNITY_2020_1_OR_NEWER
+                if (www.result != UnityWebRequest.Result.Success)
+#else
+                if (www.isNetworkError || www.isHttpError)
+#endif
+                {
+                    Debug.Log(www.error);
+                }
+                else
+                {
+                    // Show results as text
                 Debug.Log(www.downloadHandler.text);
                 fileContent(www.downloadHandler.text);
             }
