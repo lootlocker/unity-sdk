@@ -182,6 +182,21 @@ namespace LootLocker.Requests
             this.id_token = id_token;
         }
     }
+    
+    public enum GooglePlatform
+    {
+        web, android, ios, desktop
+    }
+
+    public class LootLockerGoogleSignInWithPlatformSessionRequest : LootLockerGoogleSignInSessionRequest
+    {
+        public string platform { get; set; }
+
+        public LootLockerGoogleSignInWithPlatformSessionRequest(string id_token) : base(id_token)
+        {
+            this.id_token = id_token;
+        }
+    }
 
     public class LootLockerGoogleRefreshSessionRequest : LootLockerGetRequest
     {
