@@ -49,8 +49,8 @@ namespace LootLocker.Requests
             ,"apple_sign_in" // AppleSignIn
             ,"apple_game_center" // Apple Game Center
             ,"android" // Android
-            ,"google" // Google
-            ,"epic" // Epic Online Services / Epic Games
+            ,"google_sign_in" // Google
+            ,"epic_games" // Epic Online Services / Epic Games
         };
         private static readonly string[] PlatformFriendlyStrings = new[]
         {
