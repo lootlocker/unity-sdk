@@ -389,7 +389,8 @@ namespace LootLocker.Requests
 
             CurrentPlatform.Set(Platforms.Steam);
             LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
-            LootLockerAPIManager.Session(sessionRequest, response => {
+            LootLockerAPIManager.Session(sessionRequest, response =>
+            {
                 if (!response.success)
                 {
                     CurrentPlatform.Reset();
@@ -793,7 +794,8 @@ namespace LootLocker.Requests
                 remember = remember
             };
 
-            LootLockerAPIManager.WhiteLabelLogin(input, response => {
+            LootLockerAPIManager.WhiteLabelLogin(input, response =>
+            {
                 PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
                 PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
                 PlayerPrefs.Save();
@@ -1416,12 +1418,19 @@ namespace LootLocker.Requests
                 return;
             }
 
-            if (CurrentPlatform.Get() == Platforms.Guest && name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
+            if (CurrentPlatform.Get() == Platforms.Guest)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
-                return;
-            }
+                if (name.ToLower().Contains("player"))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
+                    return;
 
+                } else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
+                    return;
+                }
+            }
 
             PlayerNameRequest data = new PlayerNameRequest();
             data.name = name;
@@ -1437,7 +1446,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse> ());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
             }
 
@@ -1543,7 +1552,7 @@ namespace LootLocker.Requests
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
                 });
         }
-        
+
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -1634,7 +1643,7 @@ namespace LootLocker.Requests
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
                 });
         }
-        
+
         /// <summary>
         /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
@@ -1646,9 +1655,9 @@ namespace LootLocker.Requests
         {
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
         }
-        
+
         ///////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>
         /// Update an existing player file with a new file.
         /// </summary>
@@ -1662,7 +1671,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
                 return;
             }
-            
+
             var fileBytes = new byte[] { };
             try
             {
@@ -1673,10 +1682,10 @@ namespace LootLocker.Requests
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
                 return;
             }
-            
+
             var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(), 
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -1710,7 +1719,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(), 
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -1733,7 +1742,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(), 
+            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -1786,7 +1795,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
@@ -1796,7 +1805,7 @@ namespace LootLocker.Requests
         {
             GetPlayerProgressions(count, null, onComplete);
         }
-        
+
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
@@ -1805,7 +1814,7 @@ namespace LootLocker.Requests
         {
             GetPlayerProgressions(-1, null, onComplete);
         }
-        
+
         /// <summary>
         /// Returns a single progression the player is currently on.
         /// </summary>
@@ -1823,7 +1832,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Adds points to a player progression.
         /// </summary>
@@ -1840,11 +1849,11 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.addPointsToPlayerProgression.endPoint, progressionKey);
 
-            var body = LootLockerJson.SerializeObject(new { amount });  
+            var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Subtracts points from a player progression.
         /// </summary>
@@ -1860,12 +1869,12 @@ namespace LootLocker.Requests
             }
 
             var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromPlayerProgression.endPoint, progressionKey);
-            
+
             var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Resets a player progression.
         /// </summary>
@@ -1883,7 +1892,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Deletes a player progression.
         /// </summary>
@@ -2309,7 +2318,7 @@ namespace LootLocker.Requests
 
             var endpoint = string.Format(LootLockerEndPoints.addPointsToCharacterProgression.endPoint, characterId, progressionKey);
 
-            var body = LootLockerJson.SerializeObject(new { amount });  
+            var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2330,7 +2339,7 @@ namespace LootLocker.Requests
             }
 
             var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromCharacterProgression.endPoint, characterId, progressionKey);
-            
+
             var body = LootLockerJson.SerializeObject(new { amount });
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -2354,7 +2363,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Deletes a character progression.
         /// </summary>
@@ -2373,9 +2382,9 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         #endregion
-        
+
         #region PlayerStorage
         /// <summary>
         /// Get the player storage for the currently active player (key/values).
@@ -2607,7 +2616,7 @@ namespace LootLocker.Requests
         {
             LootLockerAssetRequest.lastId = 0;
         }
-        
+
         [Obsolete("This function will soon be removed. Use GetAssetInformation(int assetId, Action<LootLockerCommonAsset> onComplete) with int parameter instead")]
         public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
         {
@@ -3152,7 +3161,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RemovingFilesFromAssetCandidates(data, onComplete);
         }
         #endregion
-        
+
         #region Progressions
 
         /// <summary>
@@ -3180,7 +3189,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        
+
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
@@ -3190,7 +3199,7 @@ namespace LootLocker.Requests
         {
             GetProgressions(count, null, onComplete);
         }
-        
+
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
@@ -3199,7 +3208,7 @@ namespace LootLocker.Requests
         {
             GetProgressions(-1, null, onComplete);
         }
-        
+
         /// <summary>
         /// Returns a single progression.
         /// </summary>
@@ -3214,7 +3223,7 @@ namespace LootLocker.Requests
             }
 
             var endpoint = string.Format(LootLockerEndPoints.getSingleProgression.endPoint, progressionKey);
-            
+
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
@@ -3234,7 +3243,7 @@ namespace LootLocker.Requests
             }
 
             var endpoint = string.Format(LootLockerEndPoints.getProgressionTiers.endPoint, progressionKey);
-            
+
             endpoint += "?";
             if (count > 0)
                 endpoint += $"count={count}&";
@@ -3253,9 +3262,9 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
         public static void GetProgressionTiers(string progressionKey, int count, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
         {
-            GetProgressionTiers(progressionKey, count,  null, onComplete);
+            GetProgressionTiers(progressionKey, count, null, onComplete);
         }
-        
+
         /// <summary>
         /// Returns multiple progression tiers for the specified progression.
         /// </summary>
