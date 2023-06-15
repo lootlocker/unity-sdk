@@ -249,7 +249,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   informationText: {fileID: 1312418106}
   availablePlayerFilesText: {fileID: 1690107264}
-  playerFilesTextContent: {fileID: 1214373701}
+  playerFilesTextContent: {fileID: 1076014855}
+  playerFilesTextPlaceholder: {fileID: 1214373701}
   saveOnDisk: 0
   fileIdUploadInput: {fileID: 1720643739}
   fileIdDownloadInput: {fileID: 2051800220}
@@ -900,7 +901,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 111827319}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9960471
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1999,7 +2000,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 8.501343, y: 65.43576}
+  m_AnchoredPosition: {x: 8.501343, y: 63.565052}
   m_SizeDelta: {x: 16.070007, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1312418105
