@@ -901,7 +901,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 111827319}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9960471
+  m_Size: 0.99999243
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1233,7 +1233,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '<b>White Label</b>
+  m_Text: '<b>Player Files</b>
 
     Player files can be used for storing any type
     of information. Player files are stored as files and then downloaded from a URL,
@@ -2000,7 +2000,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 8.501343, y: 63.565052}
+  m_AnchoredPosition: {x: 8.501343, y: 63.564358}
   m_SizeDelta: {x: 16.070007, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1312418105
