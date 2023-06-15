@@ -13,7 +13,8 @@ namespace LootLocker
     {
         public Text informationText;
         public Text availablePlayerFilesText;
-        public Text playerFilesTextContent;
+        public InputField playerFilesTextContent;
+        public Text playerFilesTextPlaceholder;
 
         // Enable this to save the file on the disk as well as uploading it to LootLocker
         public bool saveOnDisk;
@@ -87,7 +88,8 @@ namespace LootLocker
                     StartCoroutine(Download(response.url, (fileContent) =>
                     {
                         informationText.text += "Got player file content" + "\n";
-                        playerFilesTextContent.text = fileContent;
+                        playerFilesTextContent.text = "";
+                        playerFilesTextPlaceholder.text = fileContent;
                     }));
                 }
                 else
@@ -114,7 +116,7 @@ namespace LootLocker
                 }
                 else
                 {
-                // Show results as text
+                    // Show results as text
                 Debug.Log(www.downloadHandler.text);
                 fileContent(www.downloadHandler.text);
             }
@@ -231,7 +233,6 @@ namespace LootLocker
                 {
                     informationText.text += "Error" + response.Error + "\n";
                 }
-                GetPlayerFiles();
             });
         }
 
