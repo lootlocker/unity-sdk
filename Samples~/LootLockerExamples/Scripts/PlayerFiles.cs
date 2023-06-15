@@ -114,7 +114,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    // Show results as text
+                // Show results as text
                 Debug.Log(www.downloadHandler.text);
                 fileContent(www.downloadHandler.text);
             }
@@ -231,6 +231,7 @@ namespace LootLocker
                 {
                     informationText.text += "Error" + response.Error + "\n";
                 }
+                GetPlayerFiles();
             });
         }
 
