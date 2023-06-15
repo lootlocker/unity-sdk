@@ -93,7 +93,7 @@ namespace LootLocker
             _current.currentDebugLevel = debugLevel;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
-
+            _current.ConstructUrls();
             return true;
         }
 
