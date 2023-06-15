@@ -73,7 +73,6 @@ namespace LootLocker
 #if UNITY_EDITOR
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest " + request.httpMethod + " URL: " + url);
 #endif
-
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
                 {
                     webRequest.downloadHandler = new DownloadHandlerBuffer();
@@ -203,7 +202,8 @@ namespace LootLocker
             { "Access-Control-Allow-Credentials", "true" },
             { "Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time" },
             { "Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS, HEAD" },
-            { "Access-Control-Allow-Origin", "*" }
+            { "Access-Control-Allow-Origin", "*" },
+            { "User-Instance-Identifier", System.Guid.NewGuid().ToString() }
         };
 
         protected event System.Action<ServerError> OnError;
