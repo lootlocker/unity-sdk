@@ -77,7 +77,7 @@ namespace LootLocker
         public void GetPlayerFileContent()
         {
             // You get the URL of the file from LootLocker
-            // You need to download the fl yourself from LootLocker.
+            // You need to download the file yourself from LootLocker.
             // You can use the IEnumerator Download() method below
             LootLockerSDKManager.GetPlayerFile(int.Parse(fileIdDownloadInput.text), (response) =>
             {
