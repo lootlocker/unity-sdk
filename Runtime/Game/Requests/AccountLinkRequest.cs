@@ -1,8 +1,4 @@
 ﻿using LootLocker.LootLockerEnums;
-using LootLocker.Requests;
-using System;
-using System.Collections.Generic;
-using static UnityEngine.UI.CanvasScaler;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -12,12 +8,11 @@ namespace LootLocker.LootLockerEnums
     public enum LootLockerAccountLinkingProcessStatus
     {
         Undefined = 0,
-		Started = 1,
-		Cancelled = 2,
-		Completed = 3
+        Started = 1,
+        Cancelled = 2,
+        Completed = 3
     };
 }
-
 
 namespace LootLocker.Requests
 {
@@ -57,7 +52,7 @@ namespace LootLocker.Requests
          * Current status of the specified account linking process
          */
 
-        LootLockerAccountLinkingProcessStatus Status = LootLockerAccountLinkingProcessStatus.Undefined;
+        LootLockerAccountLinkingProcessStatus Status;
         /*
          * Time when the specified account linking process was started
          */

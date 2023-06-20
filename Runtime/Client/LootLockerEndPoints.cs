@@ -34,7 +34,7 @@ namespace LootLocker
         // Account Linking
         [Header("Account Linking")]
         public static EndPointClass StartAccountLinkingProcess = new EndPointClass("upa/link/start", LootLockerHTTPMethod.POST);
-        public static EndPointClass CheckStatusOfAccountLinkingProcess = new EndPointClass("upa/link/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass CheckAccountLinkingProcessStatus = new EndPointClass("upa/link/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass CancelAccountLinkingProcess = new EndPointClass("upa/link/{0}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass UnlinkProviderFromAccount = new EndPointClass("player/providers/{0}", LootLockerHTTPMethod.DELETE);
 
