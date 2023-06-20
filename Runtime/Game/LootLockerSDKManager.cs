@@ -7,10 +7,6 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
-using static LootLocker.Requests.CurrentPlatform;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
-using System.Diagnostics;
 using File = System.IO.File;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -1065,12 +1061,14 @@ namespace LootLocker.Requests
 
         #endregion
 
+#if LOOTLOCKER_ENABLE_ACCOUNT_LINKING
+
         #region Account Linking
 
         /// <summary>
         /// Start an account linking process on behalf of the currently signed in player
         /// When you want to link an additional provider to a player, you start by initiating an account link.The player can then navigate to the online link flow using the code_page_url and code, or the qr_code and continue the linking process.
-        /// For the duration of the linking process you can check the status using the CheckStatusOfAccountLinkingProcess method.
+        /// For the duration of the linking process you can check the status using the CheckAccountLinkingProcessStatus method.
         /// Returned from this method is the ID of the linking process, make sure to save that so that you can check the status of the process later.
         /// https://ref.lootlocker.com/game-api/#start-account-link
         /// </summary>
@@ -1094,7 +1092,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="LinkID">The ID of the account linking process which was returned when starting the linking process</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAccountLinkProcessStatusResponse</param>
-        public static void CheckStatusOfAccountLinkingProcess(string LinkID, Action<LootLockerAccountLinkProcessStatusResponse> onComplete)
+        public static void CheckAccountLinkingProcessStatus(string LinkID, Action<LootLockerAccountLinkProcessStatusResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -1102,7 +1100,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = LootLockerEndPoints.CheckStatusOfAccountLinkingProcess;
+            var endpoint = LootLockerEndPoints.CheckAccountLinkingProcessStatus;
 
             LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, LinkID), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -1148,6 +1146,8 @@ namespace LootLocker.Requests
         }
 
         #endregion
+
+#endif
 
         #region Player
         /// <summary>
