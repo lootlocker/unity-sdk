@@ -94,6 +94,41 @@ namespace LootLocker.Requests
     {
         public List<LootLockerAwardedTier> awarded_tiers { get; set; }
     }
+    
+    public class LootLockerAssetInstanceProgressionResponse : LootLockerResponse
+    {
+        public string id { get; set; }
+        public string progression_key { get; set; }
+        public string progression_name { get; set; }
+        public ulong step { get; set; }
+        public ulong points { get; set; }
+        public ulong previous_threshold { get; set; }
+        public ulong? next_threshold { get; set; }
+        public DateTime? last_level_up { get; set; }
+    }
+
+    public class LootLockerPaginatedAssetInstanceProgressionsResponse : LootLockerResponse
+    {
+        public LootLockerPaginationResponse<string> pagination { get; set; }
+        public List<LootLockerAssetInstanceProgression> items { get; set; }
+    
+        public class LootLockerAssetInstanceProgression
+        {
+            public string id { get; set; }
+            public string progression_key { get; set; }
+            public string progression_name { get; set; }
+            public ulong step { get; set; }
+            public ulong points { get; set; }
+            public ulong previous_threshold { get; set; }
+            public ulong? next_threshold { get; set; }
+            public DateTime? last_level_up { get; set; }
+        }
+    }
+
+    public class LootLockerAssetInstanceProgressionWithRewardsResponse : LootLockerAssetInstanceProgressionResponse
+    {
+        public List<LootLockerAwardedTier> awarded_tiers { get; set; }
+    }
 
     public class LootLockerAwardedTier
     {
