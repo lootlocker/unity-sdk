@@ -3976,6 +3976,25 @@ namespace LootLocker.Requests
         {
             GetProgressionTiers(progressionKey, -1, null, onComplete);
         }
+        
+        /// <summary>
+        /// Returns a single progression tier for the specified progression.
+        /// </summary>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="step">Step of the progression tier that is being fetched</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerProgressionTierResponse</param>
+        public static void GetProgressionTier(string progressionKey, ulong step, Action<LootLockerProgressionTierResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionTierResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getProgressionTier.endPoint, progressionKey, step);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
 
         #endregion
 
