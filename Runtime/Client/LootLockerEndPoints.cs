@@ -227,6 +227,7 @@ namespace LootLocker
         public static EndPointClass getAllProgressions = new EndPointClass("progressions", LootLockerHTTPMethod.GET);
         public static EndPointClass getSingleProgression = new EndPointClass("progressions/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass getProgressionTiers = new EndPointClass("progressions/{0}/tiers", LootLockerHTTPMethod.GET);
+        public static EndPointClass getProgressionTier = new EndPointClass("progressions/{0}/tiers/{1}", LootLockerHTTPMethod.GET);
 
         // Drop Tables
         [Header("Drop Tables")]

@@ -173,10 +173,16 @@ namespace LootLocker.Requests
         
         public class LootLockerProgressionTier
         {
-            public string id { get; set; }
             public ulong step { get; set; }
             public ulong points_threshold { get; set; }
             public LootLockerRewards rewards { get; set; }
         }
+    }
+    
+    public class LootLockerProgressionTierResponse : LootLockerResponse
+    {
+        public ulong step { get; set; }
+        public ulong points_threshold { get; set; }
+        public LootLockerRewards rewards { get; set; }
     }
 }
