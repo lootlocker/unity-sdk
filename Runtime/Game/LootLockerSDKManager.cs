@@ -2084,6 +2084,16 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListCharacterTypes(onComplete);
         }
 
+        public static void ListPlayerCharacters(Action<LootLockerPlayerCharacterListResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerCharacterListResponse>());
+                return;
+            }
+            LootLockerAPIManager.ListPlayerCharacters(onComplete);
+        }
+
         /// <summary>
         /// Get all character loadouts for your game.
         /// </summary>
