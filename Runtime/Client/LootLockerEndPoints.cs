@@ -90,7 +90,24 @@ namespace LootLocker
         public static EndPointClass createCharacter = new EndPointClass("v1/player/character", LootLockerHTTPMethod.POST);
         public static EndPointClass listCharacterTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
         public static EndPointClass listPlayerCharacters = new EndPointClass("v1/player/character/list", LootLockerHTTPMethod.GET);
-        
+
+        // Hero
+        [Header("Hero")]
+        public static EndPointClass getGameHeroes = new EndPointClass("v1/heroes", LootLockerHTTPMethod.GET);
+        public static EndPointClass getHero = new EndPointClass("v1/player/heroes/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerHeroes = new EndPointClass("v1/player/heroes", LootLockerHTTPMethod.GET);
+        public static EndPointClass listOtherPlayersHeroesBySteamID64 = new EndPointClass("v1/heroes/list/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersDefaultHeroBySteamID64 = new EndPointClass("v1/player/heroes/default/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass createHero = new EndPointClass("v1/player/heroes/", LootLockerHTTPMethod.POST);
+        public static EndPointClass updateHero = new EndPointClass("v1/player/heroes/{0}", LootLockerHTTPMethod.PUT);
+        public static EndPointClass deleteHero = new EndPointClass("v1/player/heroes/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass getHeroInventory = new EndPointClass("v1/player/heroes/{0}/inventory", LootLockerHTTPMethod.GET);
+        public static EndPointClass getHeroLoadout = new EndPointClass("v1/player/heroes/{0}/loadout", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersHeroLoadout = new EndPointClass("v1/heroes/{0}/loadout", LootLockerHTTPMethod.GET);
+        public static EndPointClass addAssetToHeroLoadout = new EndPointClass("v1/player/heroes/{0}/loadout", LootLockerHTTPMethod.POST);
+        public static EndPointClass addAssetVariationToHeroLoadout = new EndPointClass("v1/player/heroes/{0}/loadout", LootLockerHTTPMethod.POST);
+        public static EndPointClass removeAssetFromHeroLoadout = new EndPointClass("v1/player/heroes/{0}/loadout/{1}", LootLockerHTTPMethod.DELETE);
+
         // Character Progressions
         [Header("Character Progressions")]
         public static EndPointClass getAllCharacterProgressions = new EndPointClass("player/characters/{0}/progressions", LootLockerHTTPMethod.GET);
