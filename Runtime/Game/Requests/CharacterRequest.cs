@@ -123,6 +123,11 @@ namespace LootLocker.Requests
     {
         public string Asset { get; set; }
     }
+
+    public class LootLockerPlayerCharacterListResponse : LootLockerResponse
+    {
+        public LootLockerCharacter[] characters { get; set; }
+    }
 }
 
 namespace LootLocker
@@ -148,6 +153,15 @@ namespace LootLocker
         public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listCharacterTypes;
+
+            string getVariable = endPoint.endPoint;
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void ListPlayerCharacters(Action<LootLockerPlayerCharacterListResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.listPlayerCharacters;
 
             string getVariable = endPoint.endPoint;
 
