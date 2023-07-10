@@ -90,6 +90,7 @@ namespace LootLocker
         public static EndPointClass getEquipableContextbyCharacter = new EndPointClass("v1/player/character/{0}/contexts", LootLockerHTTPMethod.GET);
         public static EndPointClass createCharacter = new EndPointClass("v1/player/character", LootLockerHTTPMethod.POST);
         public static EndPointClass listCharacterTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerCharacters = new EndPointClass("v1/player/character/list", LootLockerHTTPMethod.GET);
         
         // Character Progressions
         [Header("Character Progressions")]
