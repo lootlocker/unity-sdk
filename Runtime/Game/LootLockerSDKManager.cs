@@ -477,7 +477,7 @@ namespace LootLocker.Requests
                 onComplete(response);
             });
         }
-        
+
         /// <summary>
         /// Start a Game session for a Google User
         /// The Google sign in platform must be enabled in the web console for this to work.
@@ -1138,94 +1138,6 @@ namespace LootLocker.Requests
         }
 
         #endregion
-
-#if LOOTLOCKER_ENABLE_ACCOUNT_LINKING
-
-        #region Account Linking
-
-        /// <summary>
-        /// Start an account linking process on behalf of the currently signed in player
-        /// When you want to link an additional provider to a player, you start by initiating an account link.The player can then navigate to the online link flow using the code_page_url and code, or the qr_code and continue the linking process.
-        /// For the duration of the linking process you can check the status using the CheckAccountLinkingProcessStatus method.
-        /// Returned from this method is the ID of the linking process, make sure to save that so that you can check the status of the process later.
-        /// https://ref.lootlocker.com/game-api/#start-account-link
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAccountLinkStartResponse</param>
-        public static void StartAccountLinkingProcess(Action<LootLockerAccountLinkStartResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountLinkStartResponse>());
-                return;
-            }
-
-            var endpoint = LootLockerEndPoints.StartAccountLinkingProcess;
-
-            LootLockerServerRequest.CallAPI(endpoint.endPoint, endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Check the status of an ongoing account linking process
-        /// https://ref.lootlocker.com/game-api/#check-account-link-status
-        /// </summary>
-        /// <param name="LinkID">The ID of the account linking process which was returned when starting the linking process</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAccountLinkProcessStatusResponse</param>
-        public static void CheckAccountLinkingProcessStatus(string LinkID, Action<LootLockerAccountLinkProcessStatusResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountLinkProcessStatusResponse>());
-                return;
-            }
-
-            var endpoint = LootLockerEndPoints.CheckAccountLinkingProcessStatus;
-
-            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, LinkID), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Cancel an ongoing account linking process
-        /// The response will be empty unless an error occurs
-        /// https://ref.lootlocker.com/game-api/#cancel-account-link
-        /// </summary>
-        /// <param name="LinkID">The ID of the account linking process which was returned when starting the linking process</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCancelAccountLinkingProcessResponse</param>
-        public static void CancelAccountLinkingProcess(string LinkID, Action<LootLockerCancelAccountLinkingProcessResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCancelAccountLinkingProcessResponse>());
-                return;
-            }
-
-            var endpoint = LootLockerEndPoints.CancelAccountLinkingProcess;
-
-            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, LinkID), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Unlink a provider from the currently signed in player
-        /// The response will be empty unless an error occurs
-        /// https://ref.lootlocker.com/game-api/#unlink-provider
-        /// </summary>
-        /// <param name="Provider">What provider to unlink from the currently logged in player</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUnlinkProviderFromAccountResponse</param>
-        public static void UnlinkProviderFromAccount(Platforms Provider, Action<LootLockerUnlinkProviderFromAccountResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUnlinkProviderFromAccountResponse>());
-                return;
-            }
-
-            var endpoint = LootLockerEndPoints.UnlinkProviderFromAccount;
-
-            LootLockerServerRequest.CallAPI(string.Format(endpoint.endPoint, CurrentPlatform.GetPlatformRepresentation(Provider).PlatformString), endpoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        #endregion
-
-#endif
 
         #region Player
         /// <summary>
@@ -2161,6 +2073,293 @@ namespace LootLocker.Requests
         public static void RegisterPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
         {
             AddPointsToPlayerProgression(progressionKey, 0, onComplete);
+        }
+
+        #endregion
+
+
+        #region Hero
+
+        /// <summary>
+        /// Create a hero with the provided type and name. The hero will be owned by the currently active player.
+        /// </summary>
+        /// <param name="heroId">The id of the hero</param>
+        /// <param name="name">The new name for the hero</param>
+        /// <param name="isDefault">Should this hero be the default hero?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void CreateHero(int heroId, string name, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+            LootLockerCreateHeroRequest data = new LootLockerCreateHeroRequest();
+
+            data.hero_id = heroId;
+            data.name = name;
+            data.is_default = isDefault;
+
+
+            LootLockerAPIManager.CreateHero(data, onComplete);
+        }
+
+        /// <summary>
+        /// List the heroes with names and character information
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGameHeroResponse</param>
+        public static void GetGameHeroes(Action<LootLockerGameHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameHeroResponse>());
+                return;
+            }
+            LootLockerAPIManager.GetGameHeroes(onComplete);
+        }
+
+        /// <summary>
+        /// List the heroes that the current player owns
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void ListPlayerHeroes(Action<LootLockerListHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListHeroResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.ListPlayerHeroes(onComplete);
+        }
+
+        /// <summary>
+        /// List player that the player with the specified SteamID64 owns
+        /// </summary>
+        /// <param name="steamID64">Steam id of the requested player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void ListOtherPlayersHeroesBySteamID64(int steamID64, Action<LootLockerPlayerHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.ListOtherPlayersHeroesBySteamID64(steamID64, onComplete);
+        }
+
+        /// <summary>
+        /// Create a hero for the current player with the supplied name from the game hero specified with the supplied hero id, asset variation id, and whether to set as default.
+        /// </summary>
+        /// <param name="name">The new name for the hero</param>
+        /// <param name="heroId">The id of the hero</param>
+        /// <param name="assetVariationId">ID of the asset variation to use</param>
+        /// <param name="isDefault">Should this hero be the default hero?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void CreateHeroWithVariation(string name, int heroId, int assetVariationId, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerCreateHeroWithVariationRequest data = new LootLockerCreateHeroWithVariationRequest();
+
+            data.name = name;
+            data.hero_id = heroId;
+            data.asset_variation_id = assetVariationId;
+            data.is_default = isDefault;
+
+            LootLockerAPIManager.CreateHeroWithVariation(data, onComplete);
+        }
+
+        /// <summary>
+        /// Return information about the requested hero on the current player
+        /// </summary>
+        /// <param name="heroId">The id of the hero to get</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void GetHero(int heroId, Action<LootLockerPlayerHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetHero(heroId, onComplete);
+        }
+
+        /// <summary>
+        /// Get the default hero for the player with the specified SteamID64
+        /// </summary>
+        /// <param name="steamId">Steam Id of the requested player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void GetOtherPlayersDefaultHeroBySteamID64(int steamId, Action<LootLockerPlayerHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetOtherPlayersDefaultHeroBySteamID64(steamId, onComplete);
+
+        }
+
+        /// <summary>
+        /// Update the name of the hero with the specified id and/or set it as default for the current player
+        /// </summary>
+        /// <param name="heroId">Id of the hero</param>
+        /// <param name="name">The new name for the hero</param>
+        /// <param name="isDefault">Should this hero be the default hero?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void UpdateHero(string heroId, string name, bool isDefault, Action<LootLockerPlayerHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                return;
+            }
+
+            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
+
+            lootLockerGetRequest.getRequests.Add(heroId);
+
+            LootLockerUpdateHeroRequest data = new LootLockerUpdateHeroRequest();
+            data.name = name;
+            data.is_default = isDefault;
+
+
+            LootLockerAPIManager.UpdateHero(lootLockerGetRequest, data, onComplete);
+        }
+
+        /// <summary>
+        /// Remove the hero with the specified id from the current players list of heroes.
+        /// </summary>
+        /// <param name="heroID">HeroID Id of the hero</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
+        public static void DeleteHero(int heroID, Action<LootLockerPlayerHeroResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.DeleteHero(heroID, onComplete);
+        }
+
+        /// <summary>
+        /// List Asset Instances owned by the specified hero
+        /// </summary>
+        /// <param name="heroID">HeroID Id of the hero</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
+        public static void GetHeroInventory(int heroID, Action<LootLockerInventoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetHeroInventory(heroID, onComplete);
+        }
+
+        /// <summary>
+        /// List the loadout of the specified hero that the current player owns
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void GetHeroLoadout(Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetHeroLoadout(onComplete);
+        }
+
+        /// <summary>
+        /// List the loadout of the specified hero that the another player owns
+        /// </summary>
+        /// <param name="heroID">HeroID Id of the hero</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void GetOtherPlayersHeroLoadout(int heroID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetOtherPlayersHeroLoadout(heroID, onComplete);
+        }
+
+        /// <summary>
+        /// Equip the specified Asset Instance to the specified Hero that the current player owns
+        /// </summary>
+        /// <param name="heroID">Id of the hero</param>
+        /// <param name="assetInstanceID">Id of the asset instance to give</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void AddAssetToHeroLoadout(int heroID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerAddAssetToHeroLoadoutRequest data = new LootLockerAddAssetToHeroLoadoutRequest();
+
+            data.asset_instance_id = assetInstanceID;
+            data.hero_id = heroID;
+
+
+            LootLockerAPIManager.AddAssetToHeroLoadout(data, onComplete);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="heroID">Id of the hero</param>
+        /// <param name="assetID">Id of the asset</param>
+        /// <param name="assetInstanceID">Id of the asset instance to give</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
+        public static void AddAssetVariationToHeroLoadout(int heroID, int assetID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerAddAssetVariationToHeroLoadoutRequest data = new LootLockerAddAssetVariationToHeroLoadoutRequest();
+
+            data.hero_id = heroID;
+            data.asset_id = assetID;
+            data.asset_variation_id = assetInstanceID;
+
+            LootLockerAPIManager.AddAssetVariationToHeroLoadout(data, onComplete);
+        }
+
+        public static void RemoveAssetFromHeroLoadout(string assetID, string heroID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                return;
+            }
+
+            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
+
+            lootLockerGetRequest.getRequests.Add(assetID);
+            lootLockerGetRequest.getRequests.Add(heroID);
+
+            LootLockerAPIManager.RemoveAssetFromHeroLoadout(lootLockerGetRequest, onComplete);
         }
 
         #endregion
