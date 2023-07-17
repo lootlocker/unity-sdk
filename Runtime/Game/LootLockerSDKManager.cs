@@ -1202,6 +1202,32 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the players inventory.
         /// </summary>
+        /// <param name="count">Amount of assets to retrieve</param>
+        /// <param name="after">The instance ID the list should start from</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
+        public static void GetInventory(int count, int after, Action<LootLockerInventoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getInventory.endPoint;
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+            if (after > 0)
+                endpoint += $"after={after}&";
+
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get the players inventory.
+        /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
         public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
         {
@@ -1210,7 +1236,25 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
                 return;
             }
-            LootLockerAPIManager.GetInventory(onComplete);
+            GetInventory(-1, -1, onComplete);
+        }
+
+        /// <summary>
+        /// Get the players inventory.
+        /// </summary>
+        /// <param name="count">Amount of assets to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
+        public static void GetInventory(int count, Action<LootLockerInventoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                return;
+            }
+
+
+            GetInventory(count, -1, onComplete);
+
         }
 
         /// <summary>
