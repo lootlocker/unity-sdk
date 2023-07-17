@@ -287,12 +287,6 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-        public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
-        {
-            var endPoint = LootLockerEndPoints.getInventory;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
 
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
         {
