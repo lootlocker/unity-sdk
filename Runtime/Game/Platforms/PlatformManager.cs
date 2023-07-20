@@ -105,6 +105,7 @@ namespace LootLocker.Requests
 
         public static void Set(Platforms platform)
         {
+            PlayerPrefs.SetInt("LastActivePlatform", (int)platform);
             current = GetPlatformRepresentation(platform);
         }
 
