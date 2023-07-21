@@ -4539,6 +4539,22 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Ping(onComplete);
         }
 
+        /// <summary>
+        /// Get the Platform the user last used. This can be used to know what login method to prompt.
+        /// </summary>
+        /// <returns>The platform that was last used by the user</returns>
+        public static Platforms GetLastActivePlatform()
+        {
+            if (CurrentPlatform.Get() == Platforms.None)
+            {
+                return (Platforms)PlayerPrefs.GetInt("LastActivePlatform");
+            }
+            else
+            {
+                return CurrentPlatform.Get();
+            }
+        }
+
 
         #endregion
     }
