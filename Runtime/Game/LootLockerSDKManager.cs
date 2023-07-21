@@ -749,7 +749,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>());
                 return;
             }
-            CurrentPlatform.Set(Platforms.Epic);
+            CurrentPlatform.Set(Platforms.Meta);
             var sessionRequest = new LootLockerMetaSessionRequest()
             {
                 user_id = user_id,
