@@ -735,6 +735,83 @@ namespace LootLocker.Requests
                 onComplete(response);
             });
         }
+        
+        /// <summary>
+        /// Start a Meta session
+        /// </summary>
+        /// <param name="user_id">User ID as a string</param>
+        /// <param name="nonce">Nonce as a string</param>
+        /// <param name="onComplete">Action to handle the response of type LootLockerMetaSessionResponse</param>
+        public static void StartMetaSession(string user_id, string nonce, Action<LootLockerMetaSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>());
+                return;
+            }
+            CurrentPlatform.Set(Platforms.Epic);
+            var sessionRequest = new LootLockerMetaSessionRequest()
+            {
+                user_id = user_id,
+                nonce = nonce
+            };
+            
+            var endPoint = LootLockerEndPoints.metaSessionRequest;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(sessionRequest), (serverResponse) =>
+            {
+                var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.refreshToken = response.refresh_token;
+                LootLockerConfig.current.deviceID = "";
+                onComplete?.Invoke(response);
+            }, false);
+        }
+
+        /// <summary>
+        /// Refresh a previous Meta session
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Meta sign in platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
+        public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete)
+        {
+            RefreshMetaSession("", onComplete);
+        }
+
+        /// <summary>
+        /// Refresh a previous Meta session
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete) method.
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Meta platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="refresh_token">Token received in response from StartMetaSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
+        public static void RefreshMetaSession(string refresh_token, Action<LootLockerMetaSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Meta);
+            var sessionRequest = new LootLockerMetaRefreshSessionRequest()
+            {
+                refresh_token = string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token
+            };
+            var endPoint = LootLockerEndPoints.metaSessionRequest;
+            
+            
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(sessionRequest), (serverResponse) =>
+            {
+                var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
+                LootLockerConfig.current.token = response.session_token;
+                LootLockerConfig.current.refreshToken = response.refresh_token;
+                LootLockerConfig.current.deviceID = "";
+                onComplete?.Invoke(response);
+            }, false);
+        }
 
         /// <summary>
         /// End active session (if any exists)
