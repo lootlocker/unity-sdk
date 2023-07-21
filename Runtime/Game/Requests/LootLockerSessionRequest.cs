@@ -110,6 +110,11 @@ namespace LootLocker.Requests
     {
         public string refresh_token { get; set; }
     }
+    
+    public class LootLockerMetaSessionResponse : LootLockerSessionResponse
+    {
+        public string refresh_token { get; set; }
+    }
 
     [Serializable]
     public class LootLockerLevel_Thresholds
@@ -157,6 +162,25 @@ namespace LootLocker.Requests
         {
             this.refresh_token = refresh_token;
         }
+    }
+    
+    [Serializable]
+    public class LootLockerMetaSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_version => LootLockerConfig.current.game_version;
+        
+        public string user_id { get; set; }
+
+        public string nonce { get; set; }
+    }
+    
+    [Serializable]
+    public class LootLockerMetaRefreshSessionRequest : LootLockerGetRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string refresh_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
     }
 
     public class LootLockerXboxOneSessionRequest : LootLockerGetRequest
