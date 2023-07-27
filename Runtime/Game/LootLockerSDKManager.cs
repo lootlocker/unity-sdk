@@ -737,7 +737,8 @@ namespace LootLocker.Requests
         }
         
         /// <summary>
-        /// Start a Meta session
+        /// Start a Meta / Oculus session
+        /// The Meta / Oculus platform must be enabled and configured in the web console for this to work.
         /// </summary>
         /// <param name="user_id">User ID as a string</param>
         /// <param name="nonce">Nonce as a string</param>
@@ -769,9 +770,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Refresh a previous Meta session
+        /// Refresh a previous Meta / Oculus session
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
-        /// The Meta sign in platform must be enabled and configured in the web console for this to work.
+        /// The Meta / Oculus platform must be enabled and configured in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
         public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete)
