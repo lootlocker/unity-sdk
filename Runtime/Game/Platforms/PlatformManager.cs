@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -8,20 +7,20 @@ namespace LootLocker.Requests
 {
     public enum Platforms
     {
-        None,
-        Guest,
-        WhiteLabel,
-        Steam,
-        PlayStationNetwork,
-        XboxOne,
-        NintendoSwitch,
-        AmazonLuna,
-        AppleSignIn,
-        AppleGameCenter,
-        Android,
-        Google,
-        Epic,
-        Meta
+        None
+        ,Guest
+        ,WhiteLabel
+        ,Steam
+        ,PlayStationNetwork
+        ,XboxOne
+        ,NintendoSwitch
+        ,AmazonLuna
+        ,AppleSignIn
+        ,AppleGameCenter
+        ,Android
+        ,Google
+        ,Epic
+        ,Meta
     }
 
     public class CurrentPlatform
@@ -42,63 +41,37 @@ namespace LootLocker.Requests
         private static readonly string[] PlatformStrings = new[]
         {
             "" // None
-            ,
-            "guest" // Guest
-            ,
-            "white_label_login" // WhiteLabel
-            ,
-            "steam" // Steam
-            ,
-            "psn" // PSN
-            ,
-            "xbox_one" // XboxOne
-            ,
-            "nintendo_switch" // NintendoSwitch
-            ,
-            "amazon_luna" // AmazonLuna
-            ,
-            "apple_sign_in" // AppleSignIn
-            ,
-            "apple_game_center" // Apple Game Center
-            ,
-            "android" // Android
-            ,
-            "google_sign_in" // Google
-            ,
-            "epic_games" // Epic Online Services / Epic Games
-            ,
-            "meta" // Meta
+            ,"guest" // Guest
+            ,"white_label_login" // WhiteLabel
+            ,"steam" // Steam
+            ,"psn" // PSN
+            ,"xbox_one" // XboxOne
+            ,"nintendo_switch" // NintendoSwitch
+            ,"amazon_luna" // AmazonLuna
+            ,"apple_sign_in" // AppleSignIn
+            ,"apple_game_center" // Apple Game Center
+            ,"android" // Android
+            ,"google_sign_in" // Google
+            ,"epic_games" // Epic Online Services / Epic Games
+            ,"meta" // Meta
         };
 
         private static readonly string[] PlatformFriendlyStrings = new[]
         {
             "None" // None
-            ,
-            "Guest" // Guest
-            ,
-            "White Label" // WhiteLabel
-            ,
-            "Steam" // Steam
-            ,
-            "Playstation Network" // PSN
-            ,
-            "Xbox One" // XboxOne
-            ,
-            "Nintendo Switch" // NintendoSwitch
-            ,
-            "Amazon Luna" // AmazonLuna
-            ,
-            "Apple Sign In" // AppleSignIn
-            ,
-            "Apple Game Center" // Apple Game Center
-            ,
-            "Android" // Android
-            ,
-            "Google" // Google
-            ,
-            "Epic Online Services" // Epic Online Services / Epic Games
-            ,
-            "Meta" // Meta
+            ,"Guest" // Guest
+            ,"White Label" // WhiteLabel
+            ,"Steam" // Steam
+            ,"Playstation Network" // PSN
+            ,"Xbox One" // XboxOne
+            ,"Nintendo Switch" // NintendoSwitch
+            ,"Amazon Luna" // AmazonLuna
+            ,"Apple Sign In" // AppleSignIn
+            ,"Apple Game Center" // Apple Game Center
+            ,"Android" // Android
+            ,"Google" // Google
+            ,"Epic Online Services" // Epic Online Services / Epic Games
+            ,"Meta" // Meta
         };
 
         public struct PlatformRepresentation
