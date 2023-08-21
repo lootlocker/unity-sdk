@@ -5015,6 +5015,60 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Balances
+        /// <summary>
+        /// Get a list of balances in a specified wallet
+        /// </summary>
+        /// <param name="walletID">Unique ID of the wallet to get balances for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListBalancesInWallet(string walletID, Action<LootLockerListBalancesForWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.listBalancesInWallet.endPoint, walletID);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get information about a specified wallet
+        /// </summary>
+        /// <param name="walletID">Unique ID of the wallet to get information for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetWalletByWalletID(string walletID, Action<LootLockerGetWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.getWalletByWalletId.endPoint, walletID);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get information about a wallet for a specified holder
+        /// </summary>
+        /// <param name="holderID">Unique ID of the holder of the wallet you want to get information for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetWalletByHolderID(string holderID, Action<LootLockerGetWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderID);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        #endregion
+
         #region Misc
 
         /// <summary>
