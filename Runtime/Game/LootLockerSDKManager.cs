@@ -8,6 +8,7 @@ using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
 using File = System.IO.File;
+using System.Net;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -4956,6 +4957,60 @@ namespace LootLocker.Requests
             }
 
             LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
+        }
+
+        #endregion
+
+        #region Currency
+        /// <summary>
+        /// Get a list of available currencies for the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCurrencies.endPoint, LootLockerEndPoints.listCurrencies.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get a specific currency by code
+        /// </summary>
+        /// <param name="currencyCode">The short code for the currency to fetch information for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetCurrencyByCode(string currencyCode, Action<LootLockerGetCurrencyByCodeResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrencyByCodeResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getCurrencyByCode.endPoint, currencyCode);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyByCode.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get a list of the denominations available for a specific currency
+        /// </summary>
+        /// <param name="currencyCode">The short code for the currency to fetch denominations for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetCurrencyDenominations(string currencyCode, Action<LootLockerListDenominationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListDenominationsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDenominations.endPoint, currencyCode);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDenominations.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion

@@ -234,6 +234,12 @@ namespace LootLocker
         public static EndPointClass ComputeAndLockDropTable = new EndPointClass("v1/player/droptables/{0}/compute?asset_details={1}", LootLockerHTTPMethod.POST);
         public static EndPointClass PickDropsFromDropTable = new EndPointClass("v1/player/droptables/{0}/pick", LootLockerHTTPMethod.POST);
 
+        // Currencies
+        [Header("Currencies")]
+        public static EndPointClass listCurrencies = new EndPointClass("v1/currency", LootLockerHTTPMethod.GET);
+        public static EndPointClass getCurrencyByCode = new EndPointClass("v1/currency/{0]", LootLockerHTTPMethod.GET);
+        public static EndPointClass getCurrencyDenominations = new EndPointClass("v1/currency/{0}/denominations", LootLockerHTTPMethod.GET);
+
         // Misc
         [Header("Misc")]
         public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
