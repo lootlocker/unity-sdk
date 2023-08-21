@@ -7,7 +7,7 @@
     /*
      * Information about a particular currency
      */
-    public class LootLockerCurrency : LootLockerResponse
+    public class LootLockerCurrency
     {
         /*
          * The unique id of the currency
@@ -26,7 +26,7 @@
     /*
      * Represents a denomination of a currency
      */
-    public class LootLockerDenomination : LootLockerResponse
+    public class LootLockerDenomination
     {
         /*
          * The unique id of the denomination

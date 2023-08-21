@@ -240,6 +240,12 @@ namespace LootLocker
         public static EndPointClass getCurrencyByCode = new EndPointClass("v1/currency/{0]", LootLockerHTTPMethod.GET);
         public static EndPointClass getCurrencyDenominations = new EndPointClass("v1/currency/{0}/denominations", LootLockerHTTPMethod.GET);
 
+        // Balances
+        [Header("Balances")]
+        public static EndPointClass listBalancesInWallet = new EndPointClass("v1/balances/wallet/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getWalletByWalletId = new EndPointClass("v1/wallets/{0]", LootLockerHTTPMethod.GET);
+        public static EndPointClass getWalletByHolderId = new EndPointClass("v1/wallets/holder/{0}", LootLockerHTTPMethod.GET);
+
         // Misc
         [Header("Misc")]
         public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
