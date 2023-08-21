@@ -1,9 +1,4 @@
-﻿using LootLocker.LootLockerEnums;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace LootLocker.Requests
+﻿namespace LootLocker.Requests
 {
     //==================================================
     // Data Definitions
@@ -14,10 +9,6 @@ namespace LootLocker.Requests
      */
     public class LootLockerCurrency : LootLockerResponse
     {
-        /*
-         * The time when this currency was created
-         */
-        public string created_at { get; set; }
         /*
          * The unique id of the currency
          */
@@ -30,14 +21,6 @@ namespace LootLocker.Requests
          * The unique short code of the currency
          */
         public string code { get; set; }
-        /*
-         * Whether this currency is published or not
-         */
-        public bool published { get; set; }
-        /*
-         * The time when this currency was published (if it was)
-         */
-        public string published_at { get; set; }
     };
 
     /*
@@ -45,10 +28,6 @@ namespace LootLocker.Requests
      */
     public class LootLockerDenomination : LootLockerResponse
     {
-        /*
-         * The time when this denomination was created
-         */
-        public string created_at { get; set; }
         /*
          * The unique id of the denomination
          */
@@ -77,10 +56,6 @@ namespace LootLocker.Requests
     public class LootLockerGetCurrencyByCodeResponse : LootLockerResponse
     {
         /*
-         * The time when this currency was created
-         */
-        public string created_at { get; set; }
-        /*
          * The unique id of the currency
          */
         public string id { get; set; }
@@ -92,14 +67,6 @@ namespace LootLocker.Requests
          * The unique short code of the currency
          */
         public string code { get; set; }
-        /*
-         * Whether this currency is published or not
-         */
-        public bool published { get; set; }
-        /*
-         * The time when this currency was published (if it was)
-         */
-        public string published_at { get; set; }
     };
 
     /*
