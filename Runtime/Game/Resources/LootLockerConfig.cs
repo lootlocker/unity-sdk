@@ -121,11 +121,20 @@ namespace LootLocker
             {
                 startOfUrl += domainKey + ".";
             }
-            adminUrl = startOfUrl + UrlCore + AdminUrlAppendage;
-            playerUrl = startOfUrl + UrlCore + PlayerUrlAppendage;
-            userUrl = startOfUrl + UrlCore + UserUrlAppendage;
-            baseUrl = startOfUrl + UrlCore;
+            string activeUrlCore = string.IsNullOrEmpty(URLCoreOverride) ? UrlCore : URLCoreOverride;
+            adminUrl = startOfUrl + activeUrlCore + AdminUrlAppendage;
+            playerUrl = startOfUrl + activeUrlCore + PlayerUrlAppendage;
+            userUrl = startOfUrl + activeUrlCore + UserUrlAppendage;
+            baseUrl = startOfUrl + activeUrlCore;
         }
+
+#if UNITY_INCLUDE_TESTS
+        public void OverrideURLCore(string newURL)
+        {
+            URLCoreOverride = newURL;
+            ConstructUrls();
+        }
+#endif
 
         private static LootLockerConfig _current;
 
@@ -169,6 +178,10 @@ namespace LootLocker
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
         [HideInInspector] private static readonly string UserUrlAppendage = "/game";
+
+#if UNITY_INCLUDE_TESTS
+        [HideInInspector] private static string URLCoreOverride = String.Empty;
+#endif
 
         [HideInInspector] public string url = UrlProtocol + UrlCore + UrlAppendage;
 
