@@ -195,6 +195,7 @@ namespace LootLocker
         public static EndPointClass androidPurchaseVerification = new EndPointClass("v1/purchase", LootLockerHTTPMethod.POST);
         public static EndPointClass pollingOrderStatus = new EndPointClass("v1/purchase/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass activatingARentalAsset = new EndPointClass("v1/asset/instance/{0}/activate", LootLockerHTTPMethod.POST);
+        public static EndPointClass purchaseCatalogItem = new EndPointClass("/purchase", LootLockerHTTPMethod.POST);
 
         // EventTrigger
         [Header("EventTrigger")]

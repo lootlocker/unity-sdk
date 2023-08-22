@@ -4310,6 +4310,29 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.ActivateRentalAsset(data, onComplete);
         }
+
+        /// <summary>
+        /// Purchase one or more catalog items using a specified wallet
+        /// </summary>
+        /// <param name="walletID">The id of the wallet to use for the purchase</param>
+        /// <param name="itemsToPurchase">A list of items to purchase along with the quantity of each item to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void LootLockerPurchaseCatalogItems(string walletID, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action<LootLockerPurchaseCatalogItemResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseCatalogItemResponse>());
+                return;
+            }
+
+            LootLockerPurchaseCatalogItemRequest data = new LootLockerPurchaseCatalogItemRequest();
+            data.wallet_id = walletID;
+            data.items = itemsToPurchase;
+            var body = LootLockerJson.SerializeObject(new { data });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.purchaseCatalogItem.endPoint, LootLockerEndPoints.purchaseCatalogItem.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         #endregion
 
         #region Collectables
