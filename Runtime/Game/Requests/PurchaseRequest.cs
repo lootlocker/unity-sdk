@@ -37,6 +37,41 @@ namespace LootLocker.Requests
         public int asset_id { get; set; }
         public string purchase_token { get; set; }
     }
+
+    public class LootLockerPurchaseCatalogItemResponse : LootLockerResponse
+    {
+
+    }
+
+    /*
+     * 
+     */
+    public class LootLockerCatalogItemAndQuantityPair
+    {
+        /*
+         * The unique id of the catalog item to purchase
+         */
+        public string catalog_item_id { get; set; }
+        /*
+         * The quantity of the specified item to purchase
+         */
+        public int quantity { get; set; }
+    }
+
+    /*
+     * 
+     */
+    public class LootLockerPurchaseCatalogItemRequest
+    {
+        /*
+         * The id of the wallet to be used for the purchase
+         */
+        public string wallet_id { get; set; }
+        /*
+         * A list of items to purchase
+         */
+        public LootLockerCatalogItemAndQuantityPair[] items { get; set; }
+    }
 }
 
 namespace LootLocker
