@@ -207,6 +207,7 @@ namespace LootLocker
             return response;
         }
     }
+
     public class LootLockerPaginationResponse<TKey>
     {
         public int total { get; set; }

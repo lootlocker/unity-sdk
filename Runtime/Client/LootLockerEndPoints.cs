@@ -247,6 +247,11 @@ namespace LootLocker
         public static EndPointClass getWalletByWalletId = new EndPointClass("v1/wallets/{0]", LootLockerHTTPMethod.GET);
         public static EndPointClass getWalletByHolderId = new EndPointClass("v1/wallets/holder/{0}", LootLockerHTTPMethod.GET);
 
+        // Catalogs
+        [Header("Catalogs")]
+        public static EndPointClass listCatalogs = new EndPointClass("v1/game/catalog", LootLockerHTTPMethod.GET);
+        public static EndPointClass listCatalogItems = new EndPointClass("v1/game/catalog/{0}/prices", LootLockerHTTPMethod.GET);
+
         // Misc
         [Header("Misc")]
         public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
