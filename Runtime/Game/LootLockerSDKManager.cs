@@ -5092,6 +5092,49 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Catalog
+        /// <summary>
+        /// List the catalogs available for the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCatalogs(Action<LootLockerListCatalogsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCatalogs.endPoint, LootLockerEndPoints.listCatalogs.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List the items available in a specific catalog
+        /// </summary>
+        /// <param name="catalogKey">Unique Key of the catalog that you want to get items for</param>
+        /// <param name="count">Amount of catalog items to receive. Use null to simply get the default amount.</param>
+        /// <param name="after">Used for pagination, this is the cursor to start getting items from. Use null to get items from the beginning. Use the cursor from a previous call to get the next count of items in the list.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogItemsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogItemsResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.listCatalogItems.endPoint, catalogKey); 
+            
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"per_page={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"cursor={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listCatalogItems.httpMethod, onComplete: (serverResponse) => { LootLockerCatalogRequestUtils.ParseLootLockerListCatalogItemsResponse(onComplete, serverResponse); });
+        }
+        #endregion
+
         #region Misc
 
         /// <summary>
