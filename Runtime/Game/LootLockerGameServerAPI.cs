@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using LootLocker;
 using LootLocker.Requests;
-using UnityEngine;
 
 namespace LootLocker
 {
@@ -80,26 +77,14 @@ namespace LootLocker
                         }
                     }
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
-                    LootLockerResponse res = new LootLockerResponse
-                    {
-                        statusCode = 401,
-                        Error = "Token Expired",
-                        hasError = true
-                    };
-                    OnServerResponse?.Invoke(res);
+                    OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
                     return;
                 }
                 case Platforms.NintendoSwitch:
                 case Platforms.Steam:
                 {
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}");
-                    LootLockerResponse res = new LootLockerResponse
-                    {
-                        statusCode = 401,
-                        Error = "Token Expired",
-                        hasError = true
-                    };
-                    OnServerResponse?.Invoke(res);
+                    OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
                     return;
                 }
                 case Platforms.PlayStationNetwork:
@@ -117,13 +102,7 @@ namespace LootLocker
                 default:
                 {
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"Platform {CurrentPlatform.GetFriendlyString()} not supported");
-                    LootLockerResponse res = new LootLockerResponse
-                    {
-                        statusCode = 401,
-                        Error = $"Platform {CurrentPlatform.GetFriendlyString()} not supported",
-                        hasError = true
-                    };
-                    OnServerResponse?.Invoke(res);
+                    OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>($"Platform {CurrentPlatform.GetFriendlyString()} not supported", 401));
                     return;
                 }
             }
@@ -144,21 +123,14 @@ namespace LootLocker
                 else
                 {
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Info)("Session refresh failed");
-                    LootLockerResponse res = new LootLockerResponse();
-                    res.statusCode = 401;
-                    res.Error = "Token Expired";
-                    res.hasError = true;
-                    newOnServerResponse?.Invoke(res);
+                    newOnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
                 }
             }
             else
             {
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Info)("Session refresh failed");
                 LootLockerResponse res = new LootLockerResponse();
-                res.statusCode = 401;
-                res.Error = "Token Expired";
-                res.hasError = true;
-                newOnServerResponse?.Invoke(res);
+                newOnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
             }
         }
     }

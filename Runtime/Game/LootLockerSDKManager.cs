@@ -823,7 +823,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true) || !CheckActiveSession())
             {
-                onComplete?.Invoke(new LootLockerSessionResponse() { success = true, hasError = false, text = "No active session" });
+                onComplete?.Invoke(new LootLockerSessionResponse() { success = true, text = "No active session" });
                 return;
             }
 

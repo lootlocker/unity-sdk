@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LootLocker.Requests;
 using System.Linq;
+using UnityEngine.UI;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -76,14 +77,6 @@ namespace LootLocker.Requests
     public class LootLockerSingleAssetResponse : LootLockerResponse
     {
         public LootLockerCommonAsset asset { get; set; }
-
-        public void SetResponseInfo(LootLockerResponse response)
-        {
-            this.hasError = response.hasError;
-            this.statusCode = response.statusCode;
-            this.success = response.success;
-            this.Error = response.Error;
-        }
     }
 
     public class LootLockerRental_Options
@@ -326,21 +319,20 @@ namespace LootLocker
 
             string getVariable = string.Format(endPoint.endPoint, builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (serverResponse) => {
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (Action<LootLockerResponse>)((serverResponse) => {
 
-                LootLockerAssetResponse realResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
-                LootLockerSingleAssetResponse newResponse = new LootLockerSingleAssetResponse();
+                LootLockerAssetResponse assetListResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
+                LootLockerSingleAssetResponse singleAssetResponse = new LootLockerSingleAssetResponse();
+                singleAssetResponse.success = assetListResponse.success;
+                singleAssetResponse.statusCode = assetListResponse.statusCode;
+                singleAssetResponse.errorData = assetListResponse.errorData;
+                singleAssetResponse.EventId = assetListResponse.EventId;
+                singleAssetResponse.asset = assetListResponse.assets != null && assetListResponse.assets.Count() > 0 ? assetListResponse.assets[0] : null;
+                string serializedSingleAssetResponse = LootLockerJson.SerializeObject(singleAssetResponse);
+                singleAssetResponse.text = serializedSingleAssetResponse;
 
-                string serializedAsset = LootLockerJson.SerializeObject(realResponse.assets[0]);
-
-                newResponse.asset = LootLockerJson.DeserializeObject<LootLockerCommonAsset>(serializedAsset);
-
-                string singleAssetResponse = LootLockerJson.SerializeObject(newResponse);
-                newResponse.text = singleAssetResponse;
-                newResponse.SetResponseInfo(serverResponse);
-
-                LootLockerResponse.Deserialize(onComplete, newResponse);
-            });
+                onComplete?.Invoke(singleAssetResponse);
+            }));
         }
 
         public void ResetAssetCalls()
