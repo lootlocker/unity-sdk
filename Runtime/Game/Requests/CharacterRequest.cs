@@ -101,6 +101,7 @@ namespace LootLocker.Requests
     {
         public LootLockerCharacter character { get; set; }
         public LootLockerLoadouts[] loadout { get; set; }
+        public string error { get; set; }
     }
 
     //[Serializable]
