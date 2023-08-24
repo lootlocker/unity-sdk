@@ -61,11 +61,9 @@ namespace LootLocker.Requests
             {
                 statusCode = sessionResponse?.statusCode ?? loginResponse.statusCode,
                 success = sessionResponse?.success ?? loginResponse.success,
-                Error = sessionResponse?.Error ?? loginResponse?.Error,
+                errorData = sessionResponse?.errorData ?? loginResponse?.errorData,
                 EventId = sessionResponse?.EventId ?? loginResponse?.EventId,
-                hasError = sessionResponse?.hasError ?? loginResponse.hasError,
                 text = sessionResponse?.text ?? loginResponse?.text,
-                texture = sessionResponse?.texture ?? loginResponse?.texture,
                 LoginResponse = loginResponse,
                 SessionResponse = sessionResponse
             };
@@ -144,18 +142,7 @@ namespace LootLocker
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelRequestAccountVerification;
 
             var json = LootLockerJson.SerializeObject(new { email = email });
-            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerResponse response = new LootLockerResponse
-                {
-                    text = serverResponse.text,
-                    success = serverResponse.success,
-                    Error = serverResponse.Error,
-                    statusCode = serverResponse.statusCode
-                };
-
-                onComplete?.Invoke(response);
-            });
+            LootLockerServerRequest.CallDomainAuthAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete);
         }
     }
 }

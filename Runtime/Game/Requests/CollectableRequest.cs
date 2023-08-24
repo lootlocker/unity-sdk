@@ -99,16 +99,8 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
-                LootLockerGetCollectablesResponse response = new LootLockerGetCollectablesResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = LootLockerJson.DeserializeObject<LootLockerGetCollectablesResponse>(serverResponse.text);
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error;
-                response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
+                onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerGetCollectablesResponse>(serverResponse));
+            });
         }
 
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCollectables() instead")]
@@ -118,15 +110,7 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
-                LootLockerGettingCollectablesResponse response = new LootLockerGettingCollectablesResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                    response = LootLockerJson.DeserializeObject<LootLockerGettingCollectablesResponse>(serverResponse.text);
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.Error = serverResponse.Error;
-                response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
+                onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerGettingCollectablesResponse>(serverResponse));
             }, true);
         }
 
@@ -145,7 +129,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 LootLockerCollectItemResponse response = new LootLockerCollectItemResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
+                if (serverResponse.success)
                 {
                     response = LootLockerJson.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
@@ -161,7 +145,7 @@ namespace LootLocker
 
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
-                response.Error = serverResponse.Error;
+                response.errorData = serverResponse.errorData;
                 response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);
@@ -183,7 +167,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
+                if (serverResponse.success)
                 {
                     response = LootLockerJson.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
@@ -199,7 +183,7 @@ namespace LootLocker
 
                 response.text = serverResponse.text;
                 response.success = serverResponse.success;
-                response.Error = serverResponse.Error;
+                response.errorData = serverResponse.errorData;
                 response.statusCode = serverResponse.statusCode;
                 onComplete?.Invoke(response);
             }, true);

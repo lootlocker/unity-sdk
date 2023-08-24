@@ -90,35 +90,75 @@ namespace LootLocker
         UPDATE_FILE = 9
     }
 
+    public class LootLockerErrorData
+    {
+        /// <summary>
+        /// A descriptive code identifying the error.
+        /// </summary>
+        public string code { get; set; }
+
+        /// <summary>
+        /// A link to further documentation on the error.
+        /// </summary>
+        public string doc_url { get; set; }
+
+        /// <summary>
+        /// A unique identifier of the request to use in contact with support.
+        /// </summary>
+        public string request_id { get; set; }
+
+        /// <summary>
+        /// A unique identifier for tracing the request through LootLocker systems, use this in contact with support.
+        /// </summary>
+        public string trace_id { get; set; }
+
+        /// <summary>
+        /// If the request was not a success this property will hold any error messages
+        /// </summary>
+        public string message { get; set; }
+    }
+
     /// <summary>
     /// All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easier handling in client code.
     /// </summary>
     public class LootLockerResponse
     {
         /// <summary>
-        /// TRUE if http error OR server returns an error status
-        /// </summary>
-        public bool hasError { get; set; }
-
-        /// <summary>
         /// HTTP Status Code
         /// </summary>
         public int statusCode { get; set; }
 
         /// <summary>
-        /// Raw text response from the server
-        /// <para>If hasError = true, this will contain the error message.</para>
+        /// Whether this request was a success
+        /// </summary>
+        public bool success { get; set; }
+
+        /// <summary>
+        /// Raw text/http body from the server response
         /// </summary>
         public string text { get; set; }
 
-        public bool success { get; set; }
+        /// <summary>
+        /// If this request was not a success, this structure holds all the information needed to identify the problem
+        /// </summary>
+        public LootLockerErrorData errorData { get; set; }
 
+        /// <summary>
+        /// TRUE if http error OR server returns an error status
+        /// </summary>
+        [Obsolete("This property is deprecated, use success instead")]
+        public bool hasError { get { return !success; } }
 
-        public string Error { get; set; }
+        /// <summary>
+        /// If the request was not a success this property will hold any error messages
+        /// </summary>
+        [Obsolete("This property is deprecated, replaced by the errorData.message property")]
+        public string Error { get { return errorData?.message; } }
 
         /// <summary>
         /// A texture downloaded in the webrequest, if applicable, otherwise this will be null.
         /// </summary>
+        [Obsolete("This property is deprecated")]
         public Texture2D texture { get; set; }
 
         /// <summary>
@@ -150,18 +190,18 @@ namespace LootLocker
         {
             if (serverResponse == null)
             {
-                return new T() { success = false, Error = "Unknown error, please check your internet connection." };
+                return LootLockerResponseFactory.Error<T>("Unknown error, please check your internet connection.");
             }
-            else if (!string.IsNullOrEmpty(serverResponse.Error))
+            else if (serverResponse.errorData != null && !string.IsNullOrEmpty(serverResponse.errorData.code))
             {
-                return new T() { success = false, Error = serverResponse.Error, statusCode = serverResponse.statusCode };
+                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
             }
 
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
 
             response.text = serverResponse.text;
             response.success = serverResponse.success;
-            response.Error = serverResponse.Error;
+            response.errorData = serverResponse.errorData;
             response.statusCode = serverResponse.statusCode;
 
             return response;
@@ -182,14 +222,14 @@ namespace LootLocker
         /// <summary>
         /// Construct an error response to send to the client.
         /// </summary>
-        public static T Error<T>(string errorMessage) where T : LootLockerResponse, new()
+        public static T Error<T>(string errorMessage, int statusCode = 0) where T : LootLockerResponse, new()
         {
             return new T()
             {
                 success = false,
-                hasError = true,
-                Error = errorMessage,
-                text = errorMessage
+                text = errorMessage,
+                statusCode = statusCode,
+                errorData = new LootLockerErrorData() { message = errorMessage }
             };
         }
 

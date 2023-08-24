@@ -37,22 +37,7 @@ namespace LootLocker
             }
 
             LootLockerServerRequest.UploadFile(requestEndPoint.endPoint, requestEndPoint.httpMethod, System.IO.File.ReadAllBytes(data.logFilePath), 
-                data.logFileName, "application/zip", formData, onComplete: (serverResponse) =>
-            {
-                LootLockerResponse response = new LootLockerResponse();
-                if (string.IsNullOrEmpty(serverResponse.Error))
-                {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)(serverResponse.text);
-                    response = LootLockerJson.DeserializeObject<LootLockerResponse>(serverResponse.text);
-                    onComplete?.Invoke(response);
-                }
-                else
-                {
-                         response.success = serverResponse.success;
-                response.Error = serverResponse.Error; response.statusCode = serverResponse.statusCode;
-                    onComplete?.Invoke(response);
-                }
-            }, useAuthToken: false);
+                data.logFileName, "application/zip", formData, onComplete: onComplete, useAuthToken: false);
         }
     }
 }

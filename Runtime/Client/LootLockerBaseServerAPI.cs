@@ -60,6 +60,16 @@ namespace LootLocker
             callerRole = mainCallerRole;
         }
 
+        private bool WebRequestSucceeded(UnityWebRequest webRequest)
+        {
+            return !
+#if UNITY_2020_1_OR_NEWER
+            (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError || !string.IsNullOrEmpty(webRequest.error));
+#else
+            (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error));
+#endif
+        }
+
         public void SendRequest(LootLockerServerRequest request, System.Action<LootLockerResponse> OnServerResponse = null)
         {
             StartCoroutine(coroutine());
@@ -97,7 +107,7 @@ namespace LootLocker
                     if (!webRequest.isDone && timedOut)
                     {
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
-                        OnServerResponse?.Invoke(new LootLockerResponse() { hasError = true, statusCode = 408, text = "{\"error\": \"" + request.endpoint + " Timed out.\"}", Error = request.endpoint + " Timed out." });
+                        OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>(request.endpoint + " Timed out."));
                         yield break;
                     }
 
@@ -112,55 +122,17 @@ namespace LootLocker
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(ObfuscateJsonStringForLogging(webRequest.downloadHandler.text));
                     }
 
-                    LootLockerResponse response = new LootLockerResponse();
-                    response.statusCode = (int)webRequest.responseCode;
-#if UNITY_2020_1_OR_NEWER
-                    if (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError || !string.IsNullOrEmpty(webRequest.error))
-#else
-                    if (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error))
-#endif
-
+                    if(WebRequestSucceeded(webRequest))
                     {
-                        switch (webRequest.responseCode)
-                        {
-                            case 200:
-                                response.Error = "";
-                                break;
-                            case 400:
-                                response.Error = "Bad Request -- Your request has an error";
-                                break;
-                            case 402:
-                                response.Error = "Payment Required -- Payment failed. Insufficient funds, etc.";
-                                break;
-                            case 401:
-                                response.Error = "Unauthorized -- Your session_token is invalid";
-                                break;
-                            case 403:
-                                response.Error = "Forbidden -- You do not have access";
-                                break;
-                            case 404:
-                                response.Error = "Not Found";
-                                break;
-                            case 405:
-                                response.Error = "Method Not Allowed";
-                                break;
-                            case 406:
-                                response.Error = "Not Acceptable -- Purchasing is disabled";
-                                break;
-                            case 409:
-                                response.Error = "Conflict -- Your state is most likely not aligned with the servers.";
-                                break;
-                            case 429:
-                                response.Error = "Too Many Requests -- You're being limited for sending too many requests too quickly.";
-                                break;
-                            case 500:
-                                response.Error = "Internal Server Error -- We had a problem with our server. Try again later.";
-                                break;
-                            case 503:
-                                response.Error = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
-                                break;
-                        }
-                        
+                        LootLockerResponse response = new LootLockerResponse();
+                        response.statusCode = (int)webRequest.responseCode;
+                        response.success = true;
+                        response.text = webRequest.downloadHandler.text;
+                        response.errorData = null;
+                        OnServerResponse?.Invoke(response);
+                    }
+                    else
+                    {                        
                         if ((webRequest.responseCode == 401 || webRequest.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && tries < maxRetry) 
                         {
                             tries++;
@@ -170,23 +142,75 @@ namespace LootLocker
                         else
                         {
                             tries = 0;
-                            response.Error += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
+                            LootLockerResponse response = new LootLockerResponse();
                             response.statusCode = (int)webRequest.responseCode;
                             response.success = false;
-                            response.hasError = true;
                             response.text = webRequest.downloadHandler.text;
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.Error);
+
+                            LootLockerErrorData errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
+                            // Check if the error uses the "new" error style (https://docs.lootlocker.com/reference/error-codes)
+                            if (errorData != null && !string.IsNullOrEmpty(errorData.code))
+                            {
+                                response.errorData = errorData;
+                            }
+                            else 
+                            {
+                                errorData = new LootLockerErrorData();
+                                switch (webRequest.responseCode)
+                                {
+                                    case 400:
+                                        errorData.message = "Bad Request -- Your request has an error.";
+                                        errorData.code = "bad_request";
+                                        break;
+                                    case 401:
+                                        errorData.message = "Unauthorized -- Your session_token is invalid.";
+                                        errorData.code = "unauthorized";
+                                        break;
+                                    case 402:
+                                        errorData.message = "Payment Required -- Payment failed. Insufficient funds, etc.";
+                                        errorData.code = "payment_required";
+                                        break;
+                                    case 403:
+                                        errorData.message = "Forbidden -- You do not have access to this resource.";
+                                        errorData.code = "forbidden";
+                                        break;
+                                    case 404:
+                                        errorData.message = "Not Found -- The requested resource could not be found.";
+                                        errorData.code = "not_found";
+                                        break;
+                                    case 405:
+                                        errorData.message = "Method Not Allowed -- The selected http method is invalid for this resource.";
+                                        errorData.code = "method_not_allowed";
+                                        break;
+                                    case 406:
+                                        errorData.message = "Not Acceptable -- Purchasing is disabled.";
+                                        errorData.code = "not_acceptable";
+                                        break;
+                                    case 409:
+                                        errorData.message = "Conflict -- Your state is most likely not aligned with the servers.";
+                                        errorData.code = "conflict";
+                                        break;
+                                    case 429:
+                                        errorData.message = "Too Many Requests -- You're being limited for sending too many requests too quickly.";
+                                        errorData.code = "too_many_requests";
+                                        break;
+                                    case 500:
+                                        errorData.message = "Internal Server Error -- We had a problem with our server. Try again later.";
+                                        errorData.code = "internal_server_error";
+                                        break;
+                                    case 503:
+                                        errorData.message = "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
+                                        errorData.code = "service_unavailable";
+                                        break;
+                                    default:
+                                        errorData.message = "Unknown error.";
+                                        break;
+                                }
+                            }
+                            errorData.message += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
+                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(errorData.message);
                             OnServerResponse?.Invoke(response);
                         }
-
-                    }
-                    else
-                    {
-                        response.success = true;
-                        response.hasError = false;
-                        response.statusCode = (int)webRequest.responseCode;
-                        response.text = webRequest.downloadHandler.text;
-                        OnServerResponse?.Invoke(response);
                     }
 
                 }
@@ -278,7 +302,7 @@ namespace LootLocker
                         // Set the content type - NO QUOTES around the boundary
                         string contentType = String.Concat("multipart/form-data; boundary=--", Encoding.UTF8.GetString(boundary));
                         
-                        // Make my request object and add the raw body. Set anything else you need here
+                        // Make my request object and add the raw text. Set anything else you need here
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
                         webRequest.uri = new Uri(url);
