@@ -107,7 +107,7 @@ namespace LootLocker
                     if (!webRequest.isDone && timedOut)
                     {
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
-                        OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>(request.endpoint + " Timed out."));
+                        OnServerResponse?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>(request.endpoint + " Timed out.", 408));
                         yield break;
                     }
 
@@ -206,9 +206,9 @@ namespace LootLocker
                                         errorData.message = "Unknown error.";
                                         break;
                                 }
+                                errorData.message += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
                             }
-                            errorData.message += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(errorData.message);
+                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(errorData.message + (!string.IsNullOrEmpty(errorData.doc_url) ? " -- " + errorData.doc_url : ""));
                             OnServerResponse?.Invoke(response);
                         }
                     }
