@@ -2409,8 +2409,9 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// 
+        /// Equip the specified Asset Variation to the specified Hero that the current player owns
         /// </summary>
+        /// 
         /// <param name="heroID">Id of the hero</param>
         /// <param name="assetID">Id of the asset</param>
         /// <param name="assetInstanceID">Id of the asset instance to give</param>
@@ -2432,6 +2433,13 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AddAssetVariationToHeroLoadout(data, onComplete);
         }
 
+        /// <summary>
+        /// Unequip the specified Asset Instance to the specified Hero that the current player owns
+        /// </summary>
+        /// 
+        /// <param name="assetID">Id of the asset</param>
+        /// <param name="heroID">Id of the hero</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
         public static void RemoveAssetFromHeroLoadout(string assetID, string heroID, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -2491,6 +2499,10 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListCharacterTypes(onComplete);
         }
 
+        /// <summary>
+        /// Get list of Characters to a player
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerCharacterListResponse</param>
         public static void ListPlayerCharacters(Action<LootLockerPlayerCharacterListResponse> onComplete)
         {
             if (!CheckInitialized())
