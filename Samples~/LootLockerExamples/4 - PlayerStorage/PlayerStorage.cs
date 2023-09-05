@@ -36,7 +36,7 @@ public class PlayerStorage : MonoBehaviour
             }
             else
             {
-                informationText.text = "Error" + response.Error;
+                informationText.text = "Error" + response.errorData.message;
             }
         });
     }
@@ -52,7 +52,7 @@ public class PlayerStorage : MonoBehaviour
             }
             else
             {
-                informationText.text = "Error" + response.Error;
+                informationText.text = "Error" + response.errorData.message;
             }
         });
     }
@@ -69,7 +69,7 @@ public class PlayerStorage : MonoBehaviour
             }
             else
             {
-                informationText.text = "Error" + response.Error;
+                informationText.text = "Error" + response.errorData.message;
             }
         });
     }
@@ -86,7 +86,7 @@ public class PlayerStorage : MonoBehaviour
             }
             else
             {
-                informationText.text = "Error" + response.Error;
+                informationText.text = "Error" + response.errorData.message;
             }
         });
     }

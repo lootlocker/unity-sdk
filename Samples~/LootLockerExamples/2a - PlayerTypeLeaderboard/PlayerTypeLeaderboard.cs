@@ -54,7 +54,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    infoText.text = "Error" + response.Error;
+                    infoText.text = "Error" + response.errorData.message;
                 }
             });
         }
@@ -83,7 +83,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    infoText.text = "Error submitting score:" + response.Error;
+                    infoText.text = "Error submitting score:" + response.errorData.message;
                 }
             });
         }
@@ -148,13 +148,13 @@ namespace LootLocker
                         }
                         else
                         {
-                            infoText.text = "Could not update centered scores:" + scoreResponse.Error;
+                            infoText.text = "Could not update centered scores:" + scoreResponse.errorData.message;
                         }
                     });
                 }
                 else
                 {
-                    infoText.text = "Could not get member rank:" + memberResponse.Error;
+                    infoText.text = "Could not get member rank:" + memberResponse.errorData.message;
                 }
             });
         }

@@ -32,7 +32,7 @@ public class WhiteLabelLogin : MonoBehaviour
             if (!loginResponse.success)
             {
                 // Error
-                infoText.text = "Error logging in:" + loginResponse.Error;
+                infoText.text = "Error logging in:" + loginResponse.errorData.message;
                 return;
             }
             else
@@ -59,7 +59,7 @@ public class WhiteLabelLogin : MonoBehaviour
                 else
                 {
                     // Error
-                    infoText.text = "Error starting LootLocker session:" + startSessionResponse.Error;
+                    infoText.text = "Error starting LootLocker session:" + startSessionResponse.errorData.message;
                 }
             });
         });
@@ -75,7 +75,7 @@ public class WhiteLabelLogin : MonoBehaviour
         {
             if (!response.success)
             {
-                infoText.text = "Error signing up:"+response.Error;
+                infoText.text = "Error signing up:"+response.errorData.message;
                 return;
             }
             else
@@ -99,7 +99,7 @@ public class WhiteLabelLogin : MonoBehaviour
             }
             else
             {
-                Debug.Log("Error sending verification email:" + response.Error);
+                Debug.Log("Error sending verification email:" + response.errorData.message);
             }
 
         });
@@ -116,7 +116,7 @@ public class WhiteLabelLogin : MonoBehaviour
             }
             else
             {
-                Debug.Log("Error sending password-reset-link:" + response.Error);
+                Debug.Log("Error sending password-reset-link:" + response.errorData.message);
             }
         });
     }

@@ -43,7 +43,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    informationText.text = "Error" + response.Error + "\n";
+                    informationText.text = "Error" + response.errorData.message + "\n";
                 }
             });
         }
@@ -69,7 +69,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    informationText.text += "Error" + response.Error + "\n";
+                    informationText.text += "Error" + response.errorData.message + "\n";
                 }
             });
         }
@@ -94,7 +94,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    informationText.text += "Error" + response.Error + "\n";
+                    informationText.text += "Error" + response.errorData.message + "\n";
                 }
             });
         }
@@ -149,7 +149,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        informationText.text += "Error" + response.Error + "\n";
+                        informationText.text += "Error" + response.errorData.message + "\n";
                     }
                     GetPlayerFiles();
                 });
@@ -166,7 +166,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        informationText.text += "Error" + response.Error + "\n";
+                        informationText.text += "Error" + response.errorData.message + "\n";
                     }
                     GetPlayerFiles();
                 });
@@ -193,7 +193,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        informationText.text += "Error" + response.Error + "\n";
+                        informationText.text += "Error" + response.errorData.message + "\n";
                     }
                     GetPlayerFiles();
                 });
@@ -211,7 +211,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        informationText.text += "Error" + response.Error + "\n";
+                        informationText.text += "Error" + response.errorData.message + "\n";
                     }
                     GetPlayerFiles();
                 });
@@ -231,7 +231,7 @@ namespace LootLocker
                 }
                 else
                 {
-                    informationText.text += "Error" + response.Error + "\n";
+                    informationText.text += "Error" + response.errorData.message + "\n";
                 }
             });
         }
