@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using LootLocker.Requests;
 using System.Linq;
-using UnityEngine.UI;
 
 namespace LootLocker.LootLockerEnums
 {
