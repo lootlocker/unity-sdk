@@ -227,7 +227,7 @@ namespace LootLocker
             return new T()
             {
                 success = false,
-                text = errorMessage,
+                text = "{ \"message\": \"" + errorMessage + "\"}",
                 statusCode = statusCode,
                 errorData = new LootLockerErrorData() { message = errorMessage }
             };
@@ -254,7 +254,7 @@ namespace LootLocker
         /// </summary>
         public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit) where T : LootLockerResponse, new()
         {
-            return Error<T>(string.Format("Your request to {0} was not sent. You are sending too many requests and are being rate limited for {1} seconds", method, secondsLeftOfRateLimit));
+            return Error<T>($"Your request to {method} was not sent. You are sending too many requests and are being rate limited for {secondsLeftOfRateLimit} seconds");
         }
     }
 
