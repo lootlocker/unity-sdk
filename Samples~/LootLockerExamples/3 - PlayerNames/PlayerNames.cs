@@ -34,7 +34,7 @@ public class PlayerNames : MonoBehaviour
             }
             else
             {
-                informationText.text = "Error" + response.Error;
+                informationText.text = "Error" + response.errorData.message;
             }
         });
     }
@@ -50,7 +50,7 @@ public class PlayerNames : MonoBehaviour
             }
             else
             {
-                informationText.text = "Could not set player name:"+response.Error;
+                informationText.text = "Could not set player name:"+response.errorData.message;
             }
         });
     }
@@ -66,7 +66,7 @@ public class PlayerNames : MonoBehaviour
             }
             else
             {
-                informationText.text = "Could not set player name:"+response.Error;
+                informationText.text = "Could not set player name:"+response.errorData.message;
             }
         });
     }

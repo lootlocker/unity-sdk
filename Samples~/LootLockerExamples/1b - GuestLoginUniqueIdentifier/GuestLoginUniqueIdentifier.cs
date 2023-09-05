@@ -30,7 +30,7 @@ public class GuestLoginUniqueIdentifier : MonoBehaviour
             }
             else
             {
-                loginInformationText.text = "Error" + response.Error;
+                loginInformationText.text = "Error" + response.errorData.message;
             }
         });
     }
