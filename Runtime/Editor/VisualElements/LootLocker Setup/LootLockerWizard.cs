@@ -1,11 +1,10 @@
-using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker.Admin;
-using LootLocker.Requests;
 using LootLocker;
-#if UNITY_2021_3_OR_NEWER
+#if (UNITY_EDITOR) && UNITY_2021_3_OR_NEWER
+using LootLocker.Admin;
+
 public class LootLockerWizard : EditorWindow
 {
     [SerializeField]
@@ -52,7 +51,10 @@ public class LootLockerWizard : EditorWindow
             Debug.Log("SDK Not initialized");
             return;
         }
-                
+
+        EditorApplication.update += OnEditorUpdate;
+
+
         LootLockerAdminManager.AdminLogin(i_email.value, i_password.value, (onComplete) =>
         {
             if (onComplete.success)
@@ -76,8 +78,14 @@ public class LootLockerWizard : EditorWindow
                 }
 
             }
+            EditorApplication.update -= OnEditorUpdate;
+
         });
     }
-    
+
+    private void OnEditorUpdate()
+    {
+        EditorApplication.QueuePlayerLoopUpdate();
+    }
 }
 #endif

@@ -1,11 +1,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker.Admin;
 using LootLocker.Extension.Requests;
 using LootLocker;
 using System.Linq;
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using LootLocker.Admin;
 
 public class LootLockerMainWindow : EditorWindow
 {
@@ -29,7 +29,6 @@ public class LootLockerMainWindow : EditorWindow
     }
 
     Page currentPage;
-    ContentType currentContent;
 
     private User activeUser;
     private Organisation activeOrganisation;
@@ -39,35 +38,28 @@ public class LootLockerMainWindow : EditorWindow
     [SerializeField]
     private VisualTreeAsset m_VisualTreeAsset = default;
 
-    private VisualElement tabWindow;
+    private VisualElement tabWindow, root;
+    
+    private StyleSheet sheet;
 
-    private ScrollView optionList;
-
-    private Label listHeader, gameTitle, userName;
-
-    private Label activeWindowLabel;
-
+    private Label listHeader, gameTitle, userName, activeWindowLabel;
 
     private DropdownField keyEnvironment, gameEnvironment;
 
     private TextField keyName;
 
-    private ScrollView keyList;
+    private ScrollView keyList, optionList;
 
-    private Button createKeyButton;
+    private Button createKeyButton, returnBtn;
+    
+    [MenuItem("LootLocker/Logout", priority = 10)]
+    public static void Logout()
+    {
+        EditorPrefs.DeleteAll();
+        StoredUser.current.RemoveUser();
+    }
 
-
-
-
-    bool writeUpdates = false;
-
-    private VisualElement root;
-
-    private Button returnBtn;
-
-    StyleSheet sheet;
-
-    [MenuItem("LootLocker/Settings")]
+    [MenuItem("LootLocker/Settings", priority = 1)]
     public static void OpenMenu()
     {
 
@@ -81,7 +73,6 @@ public class LootLockerMainWindow : EditorWindow
         else
         {
             LootLockerWizard.LoadLogin();
-
         }
 
     }
@@ -116,12 +107,10 @@ public class LootLockerMainWindow : EditorWindow
         if (user.organisations.Length <= 1 || hasOrganisationBeenConfigured)
         {
             PopulateList(ContentType.Games);
-            currentContent = ContentType.Games;
         }
         else
         {
             PopulateList(ContentType.Organisations);
-            currentContent = ContentType.Organisations;
         }
     }
 
@@ -167,16 +156,12 @@ public class LootLockerMainWindow : EditorWindow
         root.styleSheets.Add(sheet);
     }
 
+
+
     private void Update()
     {
         returnBtn.style.display = currentPage == Page.OrganisationPage ? DisplayStyle.None : DisplayStyle.Flex;
 
-        if (writeUpdates)
-        {
-            keyList.Clear();
-            OpenMenu();
-            writeUpdates = false;
-        }
     }
 
     void Return(EventBase e)
@@ -222,7 +207,7 @@ public class LootLockerMainWindow : EditorWindow
         activeWindowLabel.style.display = DisplayStyle.Flex;
         activeWindowLabel.text = " - API Keys";
 
-        writeUpdates = true;
+        EditorApplication.update += OnEditorUpdate;
         LootLockerAdminManager.GetAllKeys(activeGame.id.ToString(), (onComplete) =>
         {
             if (onComplete.success)
@@ -232,6 +217,7 @@ public class LootLockerMainWindow : EditorWindow
                     CreateAPIKeyTemplate(key);
                 }
             }
+            EditorApplication.update -= OnEditorUpdate;
         });
     }
 
@@ -243,6 +229,8 @@ public class LootLockerMainWindow : EditorWindow
         {
             gameEnv = activeGame.development.id;
         }
+
+        EditorApplication.update += OnEditorUpdate;
         
         LootLockerAdminManager.GenerateKey(gameEnv.ToString(), keyName.value, keyEnvironment.value.ToLower(), (onComplete) =>
         {
@@ -251,9 +239,14 @@ public class LootLockerMainWindow : EditorWindow
                 CreateAPIKeyTemplate(onComplete);
                 Repaint();
             }
+            EditorApplication.update -= OnEditorUpdate;
         });
     }
 
+    void OnEditorUpdate()
+    {
+        EditorApplication.QueuePlayerLoopUpdate();
+    }
 
     public void ApplyKeyClicked(EventBase e)
     {
@@ -490,6 +483,8 @@ public class LootLockerMainWindow : EditorWindow
 
     public void GetUserRole()
     {
+        EditorApplication.update += OnEditorUpdate;
+
         LootLockerAdminManager.GetUserRole(activeUser.id.ToString(), (onComplete) =>
         {
             if (onComplete.success)
@@ -499,6 +494,8 @@ public class LootLockerMainWindow : EditorWindow
                     userName.text += "\n" + " - " + perm;
                 }
             }
+            EditorApplication.update -= OnEditorUpdate;
+
         });
     }
 }

@@ -1,9 +1,10 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker.Admin;
 using LootLocker;
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && UNITY_EDITOR
+using LootLocker.Admin;
+
 public class LootLockerMFA : EditorWindow
 {
     [SerializeField]
@@ -36,6 +37,8 @@ public class LootLockerMFA : EditorWindow
 
     public void RunMFA(EventBase e)
     {
+        EditorApplication.update = OnEditorUpdate;
+
         LootLockerAdminManager.MFAAuthenticate(EditorPrefs.GetString("LootLocker.mfaKey"), i_secretcode.value, (onComplete) =>
         {
             if (onComplete.success)
@@ -49,7 +52,15 @@ public class LootLockerMFA : EditorWindow
                 EditorPrefs.DeleteKey("LootLocker.mfaKey");
                 Close();
             }
+            EditorApplication.update -= OnEditorUpdate;
+
         });
     }
+    
+    private void OnEditorUpdate()
+    {
+        EditorApplication.QueuePlayerLoopUpdate();
+    }
+    
 }
 #endif

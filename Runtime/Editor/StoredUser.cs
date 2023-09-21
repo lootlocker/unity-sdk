@@ -3,9 +3,11 @@ using LootLocker.Extension.Requests;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-
+#if (UNITY_EDITOR) 
 public class StoredUser : ScriptableObject
 {
+
+    
     [HideInInspector]
     public User user = null;
 
@@ -18,7 +20,6 @@ public class StoredUser : ScriptableObject
         {
             user = LootLockerJson.DeserializeObject<User>(serializedUser);
         }
-
     }
 
     private void Serialize()
@@ -37,7 +38,7 @@ public class StoredUser : ScriptableObject
         {
             return _current;
         }
-        _current = Resources.Load<StoredUser>("Config/LootLockerUser");
+        _current = Resources.Load<StoredUser>("/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser");
 
 #if UNITY_EDITOR
 
@@ -45,17 +46,19 @@ public class StoredUser : ScriptableObject
         {
             StoredUser newUser = CreateInstance<StoredUser>();
 
-            string dir = Application.dataPath + "/LootLockerSDK/Resources/Config";
+            string dir = Application.dataPath + "/LootLockerSDK/Runtime/Editor/Resources/Config";
 
             // If directory does not exist, create it
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
-            string configAssetPath = "Assets/LootLockerSDK/Resources/Config/LootLockerUser.asset";
+            string configAssetPath = "Assets/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser.asset";
             AssetDatabase.CreateAsset(newUser, configAssetPath);
             EditorApplication.delayCall += AssetDatabase.SaveAssets;
             AssetDatabase.Refresh();
+
+            _current = newUser;
         }
 #endif
         _current.Deserialize();
@@ -77,6 +80,26 @@ public class StoredUser : ScriptableObject
         }
     }
 
+    public bool RemoveUser()
+    {
+        _current.serializedUser = null;
+        _current.user = null;
+        _current = null;
+        string configAssetPath =  Application.dataPath + "/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser.asset";
+        string configAssetMetaPath =  Application.dataPath + "/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser.asset.meta";
+
+        if (Directory.Exists(configAssetPath))
+        {
+            File.Delete(configAssetPath);
+        } 
+        if (Directory.Exists(configAssetMetaPath))
+        {
+            File.Delete(configAssetMetaPath);
+        }
+        AssetDatabase.Refresh();
+
+        return true;
+    }
     public static bool CreateNewUser(User _user)
     {
         current.user = _user;
@@ -85,3 +108,4 @@ public class StoredUser : ScriptableObject
     }
 
 }
+#endif
