@@ -1,7 +1,7 @@
 :root {
   --green: #00c152;
   --forestgreen: #052714;
-  --unity-metrics-single_line-height: 500px;
+  --unity-metrics-single_line-height: 10px;
 }
 
 #footer {
