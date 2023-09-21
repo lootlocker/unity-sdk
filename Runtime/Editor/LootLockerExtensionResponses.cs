@@ -92,7 +92,6 @@ namespace LootLocker.Extension.Requests
     {
         public string[] permissions { get; set; }
         public bool self { get; set; }
-        public bool success { get; set; }
     }
 
     //API Keys
