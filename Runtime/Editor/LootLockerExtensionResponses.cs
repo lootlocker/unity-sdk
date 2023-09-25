@@ -1,10 +1,8 @@
+using LootLocker.Extension.DataTypes;
 using System.Collections.Generic;
 
 namespace LootLocker.Extension.Requests
 {
-    //Login
-
-
     public class MfaAdminLoginRequest
     {
         public string mfa_key { get; set; }
@@ -17,9 +15,15 @@ namespace LootLocker.Extension.Requests
         public string password { get; set; }
     }
 
+    public class KeyCreationRequest
+    {
+        public string name { get; set; }
+        public string api_type { get; set; }
+    }
+}
 
-    //Games
-    [System.Serializable]
+namespace LootLocker.Extension.DataTypes
+{
     public class Game
     {
         public int id { get; set; }
@@ -30,8 +34,6 @@ namespace LootLocker.Extension.Requests
         public Game development { get; set; }
     }
 
-    //Organization
-    [System.Serializable]
     public class Organisation
     {
         public int id { get; set; }
@@ -51,15 +53,13 @@ namespace LootLocker.Extension.Requests
         }
     }
 
-    //User
-    [System.Serializable]
     public class User
     {
         public int id { get; set; }
         public string name { get; set; }
         public string email { get; set; }
         public long signed_up { get; set; }
-        public  Organisation[] organisations { get; set; }
+        public Organisation[] organisations { get; set; }
         private Dictionary<int, int> organisationIndexByID { get; set; }
 
         public Organisation GetOrganisationByID(int id)
@@ -74,7 +74,10 @@ namespace LootLocker.Extension.Requests
             return null;
         }
     }
+}
 
+namespace LootLocker.Extension.Responses
+{
     public class LoginResponse : LootLockerResponse
     {
 
@@ -83,20 +86,17 @@ namespace LootLocker.Extension.Requests
         public User user { get; set; }
     }
 
-    //Roles
-    public class Permissions
-    {
-        public string permission { get; set; }
-    }
     public class UserRoleResponse : LootLockerResponse
     {
         public string[] permissions { get; set; }
         public bool self { get; set; }
     }
 
-    //API Keys
-
-    public class Key : LootLockerResponse
+    public class KeysResponse : LootLockerResponse
+    {
+        public KeyResponse[] api_keys { get; set; }
+    }
+    public class KeyResponse : LootLockerResponse
     {
         public int id { get; set; }
         public int game_id { get; set; }
@@ -105,18 +105,5 @@ namespace LootLocker.Extension.Requests
         public string name { get; set; }
         public string created_at { get; set; }
         public string updated_at { get; set; }
-
     }
-
-    public class KeysResponse : LootLockerResponse
-    {
-        public Key[] api_keys { get; set; }
-    }
-
-    public class KeyCreationRequest
-    {
-        public string name { get; set; }
-        public string api_type { get; set; }
-    }
-
 }

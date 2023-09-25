@@ -1,11 +1,12 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker.Extension.Requests;
 using LootLocker;
 using System.Linq;
+using LootLocker.Extension.Responses;
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Admin;
+using LootLocker.Extension.DataTypes;
 
 public class LootLockerMainWindow : EditorWindow
 {
@@ -72,12 +73,10 @@ public class LootLockerMainWindow : EditorWindow
         {
             LootLockerWizard.LoadLogin();
         }
-
     }
 
     public void LoadLootLockerMainMenu(User user)
     {
-
         LootLockerConfig.current.adminToken = EditorPrefs.GetString("LootLocker.AdminToken");
     
         LootLockerServerManager.CheckInit();
@@ -86,7 +85,20 @@ public class LootLockerMainWindow : EditorWindow
         StoredUser.CreateNewUser(activeUser);
 
         userName.text = activeUser.name;
-        GetUserRole();
+        
+        EditorApplication.update += OnEditorUpdate;
+
+        LootLockerAdminManager.GetUserRole(activeUser.id.ToString(), (onComplete) =>
+        {
+            if (onComplete.success)
+            {
+                foreach (var perm in onComplete.permissions)
+                {
+                    userName.text += "\n" + " - " + perm;
+                }
+            }
+            EditorApplication.update -= OnEditorUpdate;
+        });
 
         activeOrganisation = activeUser.GetOrganisationByID(EditorPrefs.GetInt("LootLocker.ActiveOrgID"));
         bool hasOrganisationBeenConfigured = activeOrganisation != null;
@@ -140,6 +152,7 @@ public class LootLockerMainWindow : EditorWindow
         tabWindow.style.display = DisplayStyle.None;
 
         returnBtn = root.Q<Button>("returnBtn");
+        returnBtn.style.display = DisplayStyle.Flex;
         returnBtn.clickable.clickedWithEventInfo += Return;
 
         keyList = root.Q<ScrollView>("KeyList");
@@ -158,13 +171,6 @@ public class LootLockerMainWindow : EditorWindow
         root.styleSheets.Add(sheet);
     }
 
-
-
-    private void Update()
-    {
-        returnBtn.style.display = currentPage == Page.OrganisationPage ? DisplayStyle.None : DisplayStyle.Flex;
-    }
-
     void Return(EventBase e)
     {
         if (e.propagationPhase != PropagationPhase.AtTarget)
@@ -179,17 +185,17 @@ public class LootLockerMainWindow : EditorWindow
                 break;
             case Page.GameOptionPage:
                 optionList.Clear();
-                PopulateList(ContentType.Games);
                 optionList.style.display = DisplayStyle.Flex;
                 tabWindow.style.display = DisplayStyle.None;
+                PopulateList(ContentType.Games);
                 break;
             case Page.ApiPage:
                 optionList.Clear();
-                PopulateList(ContentType.Games);
                 gameTitle.text = "";
                 optionList.style.display = DisplayStyle.Flex;
                 tabWindow.style.display = DisplayStyle.None;
                 activeWindowLabel.style.display = DisplayStyle.None;
+                PopulateList(ContentType.Games);
                 break;
             default:
                 target.style.display = DisplayStyle.None;
@@ -230,6 +236,12 @@ public class LootLockerMainWindow : EditorWindow
             gameEnv = activeGame.development.id;
         }
 
+        if(keyName.value == string.Empty)
+        {
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("You must give a name to your API Key!");
+            return;
+        }
+
         EditorApplication.update += OnEditorUpdate;
         
         LootLockerAdminManager.GenerateKey(gameEnv.ToString(), keyName.value, keyEnvironment.value.ToLower(), (onComplete) =>
@@ -237,7 +249,6 @@ public class LootLockerMainWindow : EditorWindow
             if (onComplete.success)
             {
                 CreateAPIKeyTemplate(onComplete);
-                Repaint();
             }
             EditorApplication.update -= OnEditorUpdate;
         });
@@ -268,7 +279,7 @@ public class LootLockerMainWindow : EditorWindow
                 button.style.borderRightColor =
                     button.style.borderLeftColor =
                         button.style.borderBottomColor =
-                            button.style.borderTopColor = new Color(0.10980392156862745f, 0.9098039215686274f, 0.42745098039215684f);
+                            button.style.borderTopColor = LLGreen;
             }
             else
             {
@@ -276,13 +287,12 @@ public class LootLockerMainWindow : EditorWindow
                 button.style.borderRightColor =
                     button.style.borderLeftColor =
                         button.style.borderBottomColor =
-                            button.style.borderTopColor = new Color(0.0196078431372549f, 0.15294117647058825f, 0.0784313725490196f);
+                            button.style.borderTopColor = LLForestGreen;
             }
         }
     }
 
-
-    public void CreateAPIKeyTemplate(Key key)
+    public void CreateAPIKeyTemplate(KeyResponse key)
     {
         foreach(var existingKey in keyList.Children())
         {
@@ -313,7 +323,7 @@ public class LootLockerMainWindow : EditorWindow
             keyApply.style.borderRightColor =
                 keyApply.style.borderLeftColor =
                 keyApply.style.borderBottomColor =
-                keyApply.style.borderTopColor = new Color(0.10980392156862745f, 0.9098039215686274f, 0.42745098039215684f);
+                keyApply.style.borderTopColor = LLGreen;
         }
         else
         {
@@ -321,7 +331,7 @@ public class LootLockerMainWindow : EditorWindow
             keyApply.style.borderRightColor =
             keyApply.style.borderLeftColor =
             keyApply.style.borderBottomColor =
-            keyApply.style.borderTopColor = new Color(0.0196078431372549f, 0.15294117647058825f, 0.0784313725490196f);
+            keyApply.style.borderTopColor = LLForestGreen;
         }
         keyApply.clickable.clickedWithEventInfo += ApplyKeyClicked;
         keyTemplate.Add(keyApply);
@@ -337,47 +347,49 @@ public class LootLockerMainWindow : EditorWindow
         {
             case ContentType.Organisations:
                 currentPage = Page.OrganisationPage;
+                returnBtn.style.display = DisplayStyle.None;
                 listHeader.text = "Organisations:";
                 foreach (var org in activeUser.organisations)
                 {
-                    var btn = GenerateButton(org);
-
-                    btn.clickable.clickedWithEventInfo += OrgButtonClicked;
-
+                    var btn = GenerateOrganisationButton(org);
                     optionList.Add(btn);
                 }
                 break;
             case ContentType.Games:
-
                 currentPage = Page.GamePage;
                 listHeader.text = "Games:";
                 foreach (var game in activeOrganisation.games)
                 {
-                    var btn = GenerateButton(game, true);
-                    btn.clickable.clickedWithEventInfo += GameButtonClicked;
+                    var btn = GenerateGameButton(game);
                     optionList.Add(btn);
                 }
-
+                returnBtn.style.display = DisplayStyle.Flex;
                 returnBtn.text = "Change Organisation";
                 break;
             case ContentType.GameOptions:
-
                 currentPage = Page.GameOptionPage;
-
-                Button apikeybtn = new Button();
-                apikeybtn.text = "API Keys";
-                apikeybtn.clickable.clicked += OpenAPIKeyTab;
-                apikeybtn.style.flexGrow = 1;
-                apikeybtn.style.flexDirection = FlexDirection.Row;
-                apikeybtn.style.width = 200;
-                apikeybtn.style.height = 50;
-                apikeybtn.AddToClassList("optionbtn");
+                Button apikeybtn = GenerateGameOptionButtons();
                 optionList.Add(apikeybtn);
+                returnBtn.style.display = DisplayStyle.Flex;
+                returnBtn.text = "Change Game";
                 break;
         }
     }
 
-    public Button GenerateButton(Game game, bool caret)
+    public Button GenerateGameOptionButtons()
+    {
+        Button button = new Button();
+        button.text = "API Keys";
+        button.clickable.clicked += OpenAPIKeyTab;
+        button.style.flexGrow = 1;
+        button.style.flexDirection = FlexDirection.Row;
+        button.style.width = 200;
+        button.style.height = 50;
+        button.AddToClassList("optionbtn");
+        return button;
+    }
+
+    public Button GenerateGameButton(Game game)
     {
         Button newButton = new Button();
         newButton.style.flexGrow = 1;
@@ -394,24 +406,22 @@ public class LootLockerMainWindow : EditorWindow
         newButton.Add(buttonLabel);
         buttonLabel.AddToClassList("optiontext");
 
-        if (caret)
-        {
-            Label buttonImage = new Label();
+        Label buttonImage = new Label();
 
-            buttonImage.style.backgroundImage = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/LootLockerSDK/Runtime/Editor/Icons/caret.png");
+        buttonImage.style.backgroundImage = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/LootLockerSDK/Runtime/Editor/Icons/caret.png");
 
-            newButton.style.justifyContent = Justify.SpaceBetween;
+        newButton.style.justifyContent = Justify.SpaceBetween;
 
-            newButton.Add(buttonImage);
-            buttonImage.AddToClassList("caret");
+        newButton.Add(buttonImage);
+        buttonImage.AddToClassList("caret");
 
-        }
         newButton.AddToClassList("gamebtn");
+        newButton.clickable.clickedWithEventInfo += GameButtonClicked;
 
         return newButton;
     }
 
-    public Button GenerateButton(Organisation org)
+    public Button GenerateOrganisationButton(Organisation org)
     {
         Button newButton = new Button();
         newButton.style.flexGrow = 1;
@@ -429,9 +439,11 @@ public class LootLockerMainWindow : EditorWindow
         buttonLabel.AddToClassList("optiontext");
 
         newButton.AddToClassList("orgbtn");
+        newButton.clickable.clickedWithEventInfo += OrgButtonClicked;
 
         return newButton;
     }
+
     public void OrgButtonClicked(EventBase e)
     {
         if (e.propagationPhase != PropagationPhase.AtTarget)
@@ -446,10 +458,7 @@ public class LootLockerMainWindow : EditorWindow
                 EditorPrefs.SetInt("LootLocker.ActiveOrgID", activeOrganisation.id);
             }
         }
-
         PopulateList(ContentType.Games);
-
-        returnBtn.text = "Change Organisation";
     }
 
     public void GameButtonClicked(EventBase e)
@@ -468,26 +477,8 @@ public class LootLockerMainWindow : EditorWindow
         }
 
         gameTitle.text = target.Q<Label>("name").text;
-        returnBtn.text = "Change Game";
         PopulateList(ContentType.GameOptions);
         OpenAPIKeyTab();
-    }
-
-    public void GetUserRole()
-    {
-        EditorApplication.update += OnEditorUpdate;
-
-        LootLockerAdminManager.GetUserRole(activeUser.id.ToString(), (onComplete) =>
-        {
-            if (onComplete.success)
-            {
-                foreach (var perm in onComplete.permissions)
-                {
-                    userName.text += "\n" + " - " + perm;
-                }
-            }
-            EditorApplication.update -= OnEditorUpdate;
-        });
     }
 }
 #endif
