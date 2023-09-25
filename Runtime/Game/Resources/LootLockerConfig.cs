@@ -147,7 +147,9 @@ namespace LootLocker
         [HideInInspector]
         public string token;
         [HideInInspector]
+#if UNITY_EDITOR
         public string adminToken;
+#endif
         [HideInInspector]
         public string refreshToken;
         [HideInInspector]

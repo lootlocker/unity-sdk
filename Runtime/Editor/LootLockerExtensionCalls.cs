@@ -31,7 +31,7 @@ namespace LootLocker.Admin
 
         public static void AdminLogin(AdminLoginRequest data, Action<LoginResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.adminExtensionLogin;
+            EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionLogin;
 
             string json = LootLockerJson.SerializeObject(data);
 
@@ -58,7 +58,7 @@ namespace LootLocker.Admin
 
         public static void MFAAuthenticate(MfaAdminLoginRequest data, Action<LoginResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.adminExtensionMFA;
+            EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionMFA;
 
             string json = LootLockerJson.SerializeObject(data);
             
@@ -79,7 +79,7 @@ namespace LootLocker.Admin
 
         public static void GetAllKeys(LootLockerGetRequest lootLockerGetRequest, Action<KeysResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.adminExtensionGetAllKeys;
+            EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetAllKeys;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -105,7 +105,7 @@ namespace LootLocker.Admin
 
         public static void GenerateKey(KeyCreationRequest data, LootLockerGetRequest lootLockerGetRequest, Action<Key> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.adminExtensionCreateKey;
+            EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionCreateKey;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
@@ -128,7 +128,7 @@ namespace LootLocker.Admin
 
         public static void GetUserRole(LootLockerGetRequest lootLockerGetRequest, Action<UserRoleResponse> onComplete)
         {
-            EndPointClass endPoint = LootLockerEndPoints.adminExtensionGetUserRole;
+            EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetUserRole;
 
             string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
 
