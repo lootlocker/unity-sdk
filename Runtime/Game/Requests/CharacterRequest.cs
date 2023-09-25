@@ -117,6 +117,7 @@ namespace LootLocker.Requests
         public int id { get; set; }
         public string type { get; set; }
         public string name { get; set; }
+        public string ulid { get; set; }
         public bool is_default { get; set; }
     }
 

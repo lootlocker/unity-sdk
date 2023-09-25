@@ -147,7 +147,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus() instead")]
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus instead")]
         public static void PollingOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
@@ -166,7 +166,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ActivateRentalAsset() instead")]
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function ActivateRentalAsset instead")]
         public static void ActivatingARentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateARentalAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;

@@ -1,6 +1,7 @@
 ﻿using LootLocker.LootLockerEnums;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -159,6 +160,15 @@ namespace LootLocker.Requests
          * The unique identyfing id of this asset.
          */
         public string id { get; set; }
+        /*
+         * The thumbnail for this asset
+         */
+        public string thumbnail { get; set; }
+        /*
+         * The grouping key for this asset detail
+         */
+        public string grouping_key { get; set; }
+
     }
 
     /*
@@ -182,6 +192,10 @@ namespace LootLocker.Requests
          * The unique id of the progression that this refers to
          */
         public string id { get; set; }
+        /*
+         * The grouping key for this progression point detail
+         */
+        public string grouping_key { get; set; }
     }
 
     /*
@@ -190,7 +204,7 @@ namespace LootLocker.Requests
     public class LootLockerProgressionResetDetails
     {
         /*
-         * The unique key of the pogression that this refers to
+         * The unique key of the progression that this refers to
          */
         public string key { get; set; }
         /*
@@ -201,6 +215,10 @@ namespace LootLocker.Requests
          * The unique id of the progression that this refers to
          */
         public string id { get; set; }
+        /*
+         * The grouping key for this progression reset detail
+         */
+        public string grouping_key { get; set; }
     }
 
     /*
@@ -224,63 +242,11 @@ namespace LootLocker.Requests
          * The unique id of the currency that this refers to
          */
         public string id { get; set; }
+        /*
+         * The grouping key for this currency detail
+         */
+        public string grouping_key { get; set; }
     }
-
-#if UNITY_2020_2_OR_NEWER
-    /*
-     *
-     */
-    public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
-    {
-        /*
-         * Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
-         */
-        public LootLockerAssetDetails? asset_details { get; set; }
-        /*
-         * Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
-         */
-        public LootLockerProgressionPointDetails? progression_point_details { get; set; }
-        /*
-         * Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
-         */
-        public LootLockerProgressionResetDetails? progression_reset_details { get; set; }
-        /*
-         * Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
-         */
-        public LootLockerCurrencyDetails? currency_details { get; set; }
-        public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, Dictionary<string, LootLockerAssetDetails> assetDetails, Dictionary<string, LootLockerProgressionPointDetails> progressionPointDetails, Dictionary<string, LootLockerProgressionResetDetails> progressionResetDetails, Dictionary<string, LootLockerCurrencyDetails> currencyDetails) 
-        {
-            created_at = entry.created_at;
-            entity_kind = entry.entity_kind;
-            entity_name = entry.entity_name;
-            entity_id = entry.entity_id;
-            prices = entry.prices;
-            grouping_key = entry.grouping_key;
-            purchasable = entry.purchasable;
-            asset_details = null;
-            progression_point_details = null;
-            progression_reset_details = null;
-            currency_details = null;
-            switch(entity_kind)
-            {
-                case LootLockerCatalogEntryEntityKind.asset:
-                    asset_details = assetDetails[grouping_key];
-                    break;
-                case LootLockerCatalogEntryEntityKind.progression_points:
-                    progression_point_details = progressionPointDetails[grouping_key];
-                    break;
-                case LootLockerCatalogEntryEntityKind.progression_reset:
-                    progression_reset_details = progressionResetDetails[grouping_key];
-                    break;
-                case LootLockerCatalogEntryEntityKind.currency:
-                    currency_details = currencyDetails[grouping_key];
-                    break;
-                default:
-                    break;
-            };
-        }
-    }
-#endif
 
     //==================================================
     // Response Definitions
@@ -292,7 +258,7 @@ namespace LootLocker.Requests
     public class LootLockerListCatalogsResponse : LootLockerResponse 
     {
         /*
-         * A list of the catalogs for the game
+         * A list of the prices for the game
          */
         public LootLockerCatalog[] catalogs { get; set; }
     }
@@ -300,8 +266,13 @@ namespace LootLocker.Requests
     /*
      *
      */
-    public class LootLockerListCatalogItemsResponse : LootLockerResponse
+    public class LootLockerListCatalogPricesResponse : LootLockerResponse
     {
+        /*
+         * Details about the catalog that the prices is in
+         */
+        public LootLockerCatalog catalog { get; set; }
+
         /*
          * A list of entries available in this catalog
          */
@@ -327,47 +298,40 @@ namespace LootLocker.Requests
          */
         public LootLockerCatalogPagination pagination { get; set; }
 
-        public void AppendCatalogItems(LootLockerListCatalogItemsResponse catalogItems)
+        public void AppendCatalogItems(LootLockerListCatalogPricesResponse catalogPrices)
         {
-            var concatenatedArray = new LootLockerCatalogEntry[entries.Length + catalogItems.entries.Length];
+            var concatenatedArray = new LootLockerCatalogEntry[entries.Length + catalogPrices.entries.Length];
             entries.CopyTo(concatenatedArray, 0);
-            catalogItems.entries.CopyTo(concatenatedArray, entries.Length);
+            catalogPrices.entries.CopyTo(concatenatedArray, entries.Length);
+            pagination.total = catalogPrices.pagination.total;
+            pagination.cursor = catalogPrices.pagination.cursor;
 
-            foreach (var assetDetail in catalogItems.asset_details)
+            foreach (var assetDetail in catalogPrices.asset_details)
             {
                 asset_details.Add(assetDetail.Key, assetDetail.Value);                
             }
-            foreach (var progressionPointDetail in catalogItems.progression_points_details)
+            foreach (var progressionPointDetail in catalogPrices.progression_points_details)
             {
                 progression_points_details.Add(progressionPointDetail.Key, progressionPointDetail.Value);
             }
-            foreach (var progressionResetDetail in catalogItems.progression_resets_details)
+            foreach (var progressionResetDetail in catalogPrices.progression_resets_details)
             {
                 progression_resets_details.Add(progressionResetDetail.Key, progressionResetDetail.Value);
             }
-            foreach (var currencyDetail in catalogItems.currency_details)
+            foreach (var currencyDetail in catalogPrices.currency_details)
             {
                 currency_details.Add(currencyDetail.Key, currencyDetail.Value);
             }
         }
 
-#if UNITY_2020_2_OR_NEWER
-        public LootLockerInlinedCatalogEntry[] GetLootLockerInlinedCatalogEntries()
+        public LootLockerListCatalogPricesResponse()
         {
-            LootLockerInlinedCatalogEntry[] inlinedEntries = new LootLockerInlinedCatalogEntry[entries.Length];
-            for(int i = 0; i < entries.Length; i++)
-            {
-                inlinedEntries[i] = new LootLockerInlinedCatalogEntry(entries[i], asset_details, progression_points_details, progression_resets_details, currency_details);
-            }
-            return inlinedEntries;
         }
-#endif
-    }
 
-    public class LootLockerCatalogRequestUtils
-    {
+        // This is the way that the response actually looks, but we don't want to expose it, hence the conversion
         private class LootLockerListCatalogItemsWithArraysResponse : LootLockerResponse
         {
+            public LootLockerCatalog catalog { get; set; }
             public LootLockerCatalogEntry[] entries { get; set; }
             public LootLockerAssetDetails[] asset_details { get; set; }
             public LootLockerProgressionPointDetails[] progression_points_details { get; set; }
@@ -376,31 +340,108 @@ namespace LootLocker.Requests
             public LootLockerCatalogPagination pagination { get; set; }
         }
 
-        public static void ParseLootLockerListCatalogItemsResponse(Action<LootLockerListCatalogItemsResponse> onComplete, LootLockerResponse serverResponse)
+        public LootLockerListCatalogPricesResponse(LootLockerResponse serverResponse)
         {
-            Action<LootLockerListCatalogItemsWithArraysResponse> internalOnComplete = (internalServerResponse) => 
+            LootLockerListCatalogItemsWithArraysResponse parsedResponse = Deserialize<LootLockerListCatalogItemsWithArraysResponse>(serverResponse);
+            catalog = parsedResponse.catalog;
+            entries = parsedResponse.entries;
+
+            if (parsedResponse.asset_details != null && parsedResponse.asset_details.Length > 0)
             {
-                LootLockerListCatalogItemsResponse parsedCatalog = new LootLockerListCatalogItemsResponse();
-                parsedCatalog.entries = internalServerResponse.entries;
-                foreach (var assetDetail in internalServerResponse.asset_details)
+                asset_details = new Dictionary<string, LootLockerAssetDetails>();
+                foreach (var assetDetail in parsedResponse.asset_details)
                 {
-                    parsedCatalog.asset_details.Add(assetDetail.id, assetDetail);
+                    asset_details.Add(assetDetail.id, assetDetail);
                 }
-                foreach (var progressionPointDetail in internalServerResponse.progression_points_details)
+            }
+
+            if (parsedResponse.progression_points_details != null && parsedResponse.progression_points_details.Length > 0)
+            {
+                progression_points_details = new Dictionary<string, LootLockerProgressionPointDetails>();
+                foreach (var detail in parsedResponse.progression_points_details)
                 {
-                    parsedCatalog.progression_points_details.Add(progressionPointDetail.id, progressionPointDetail);
+                    progression_points_details.Add(detail.id, detail);
                 }
-                foreach (var progressionResetDetail in internalServerResponse.progression_resets_details)
+            }
+
+            if (parsedResponse.progression_resets_details != null && parsedResponse.progression_resets_details.Length > 0)
+            {
+                progression_resets_details = new Dictionary<string, LootLockerProgressionResetDetails>();
+                foreach (var detail in parsedResponse.progression_resets_details)
                 {
-                    parsedCatalog.progression_resets_details.Add(progressionResetDetail.id, progressionResetDetail);
+                    progression_resets_details.Add(detail.id, detail);
                 }
-                foreach (var currencyDetail in internalServerResponse.currency_details)
+            }
+
+            if (parsedResponse.currency_details != null && parsedResponse.currency_details.Length > 0)
+            {
+                currency_details = new Dictionary<string, LootLockerCurrencyDetails>();
+                foreach (var detail in parsedResponse.currency_details)
                 {
-                    parsedCatalog.currency_details.Add(currencyDetail.id, currencyDetail);
+                    currency_details.Add(detail.id, detail);
                 }
-                onComplete?.Invoke(parsedCatalog);
-            };
-            LootLockerResponse.Deserialize(internalOnComplete, serverResponse);
+            }
         }
+
+#if UNITY_2020_2_OR_NEWER
+        /*
+         *
+         */
+        public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
+        {
+            /*
+             * Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
+             */
+            public LootLockerAssetDetails? asset_details { get; set; }
+            /*
+             * Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
+             */
+            public LootLockerProgressionPointDetails? progression_point_details { get; set; }
+            /*
+             * Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
+             */
+            public LootLockerProgressionResetDetails? progression_reset_details { get; set; }
+            /*
+             * Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
+             */
+            public LootLockerCurrencyDetails? currency_details { get; set; }
+
+            public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails) 
+            {
+                created_at = entry.created_at;
+                entity_kind = entry.entity_kind;
+                entity_name = entry.entity_name;
+                entity_id = entry.entity_id;
+                prices = entry.prices;
+                grouping_key = entry.grouping_key;
+                purchasable = entry.purchasable;
+                asset_details = assetDetails;
+                progression_point_details = progressionPointDetails;
+                progression_reset_details = progressionResetDetails;
+                currency_details = currencyDetails;
+            }
+        }
+
+        /*
+         * Get all the entries with details inlined into the entries themselves
+         */
+        public LootLockerInlinedCatalogEntry[] GetLootLockerInlinedCatalogEntries()
+        {
+            List<LootLockerInlinedCatalogEntry> inlinedEntries = new List<LootLockerInlinedCatalogEntry>();
+            foreach (var lootLockerCatalogEntry in entries)
+            {
+                var groupingKey = lootLockerCatalogEntry.grouping_key;
+                var entityKind = lootLockerCatalogEntry.entity_kind;
+                inlinedEntries.Add(new LootLockerInlinedCatalogEntry(
+                    lootLockerCatalogEntry, 
+                    LootLockerCatalogEntryEntityKind.asset == entityKind && asset_details.ContainsKey(groupingKey) ? asset_details[groupingKey] : null, 
+                    LootLockerCatalogEntryEntityKind.progression_points == entityKind && progression_points_details.ContainsKey(groupingKey) ? progression_points_details[groupingKey] : null, 
+                    LootLockerCatalogEntryEntityKind.progression_reset == entityKind && progression_resets_details.ContainsKey(groupingKey) ? progression_resets_details[groupingKey] : null, 
+                    LootLockerCatalogEntryEntityKind.currency == entityKind && currency_details.ContainsKey(groupingKey) ? currency_details[groupingKey] : null
+                ));
+            }
+            return inlinedEntries.ToArray();
+        }
+#endif
     }
 }
