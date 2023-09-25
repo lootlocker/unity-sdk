@@ -5,7 +5,7 @@
     //==================================================
 
     /*
-     * Information about a particular currency
+     * Details about a particular currency
      */
     public class LootLockerCurrency
     {
@@ -21,6 +21,18 @@
          * The unique short code of the currency
          */
         public string code { get; set; }
+        /*
+         * True if this currency can be awarded to the player from the game api
+         */
+        public bool game_api_writes_enabled { get; set; }
+        /*
+         * The time that this currency was created
+         */
+        public string created_at { get; set; }
+        /*
+         * The time that this currency was published
+         */
+        public string published_at { get; set; }
     };
 
     /*
@@ -44,30 +56,15 @@
          * The value of this denomination in units of the currency
          */
         public int value { get; set; }
+        /*
+         * The time that this denomination was created
+         */
+        public string created_at { get; set; }
     };
 
     //==================================================
     // Response Definitions
     //==================================================
-
-    /*
-     *
-     */
-    public class LootLockerGetCurrencyByCodeResponse : LootLockerResponse
-    {
-        /*
-         * The unique id of the currency
-         */
-        public string id { get; set; }
-        /*
-         * The name of the currency
-         */
-        public string name { get; set; }
-        /*
-         * The unique short code of the currency
-         */
-        public string code { get; set; }
-    };
 
     /*
      *

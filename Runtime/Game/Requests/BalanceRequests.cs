@@ -35,6 +35,52 @@ namespace LootLocker.Requests
          * The id of the wallet holding this balance
          */
         public string wallet_id { get; set; }
+        /*
+         * The time that this balance was created
+         */
+        public string created_at { get; set; }
+    };
+
+    //==================================================
+    // Request Definitions
+    //==================================================
+
+    /*
+     *
+     */
+    public class LootLockerCreditRequest
+    {
+        /*
+         * Amount of the given currency to debit/credit to/from the given wallet
+         */
+        public string amount { get; set; }
+        /*
+         * The id of the currency that the amount is given in
+         */
+        public string currency_id { get; set; }
+        /*
+         * The id of the wallet to credit/debit to/from
+         */
+        public string wallet_id { get; set; }
+    };
+
+    /*
+     *
+     */
+    public class LootLockerDebitRequest
+    {
+        /*
+         * Amount of the given currency to debit/credit to/from the given wallet
+         */
+        public string amount { get; set; }
+        /*
+         * The id of the currency that the amount is given in
+         */
+        public string currency_id { get; set; }
+        /*
+         * The id of the wallet to credit/debit to/from
+         */
+        public string wallet_id { get; set; }
     };
 
     //==================================================
@@ -50,6 +96,17 @@ namespace LootLocker.Requests
          * List of balances in different currencies in the requested wallet
          */
         public LootLockerBalance[] balances { get; set; }
+    };
+
+    /*
+     *
+     */
+    public class LootLockerBalanceForWalletResponse : LootLockerResponse
+    {
+        /*
+         * The balance of the wallet
+         */
+        public LootLockerBalance balance { get; set; }
     };
 
     /*
