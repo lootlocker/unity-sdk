@@ -35,12 +35,10 @@ public class LootLockerWizard : EditorWindow
         l_signup = root.Q<Label>("hyperlinksignup");
         l_forgotpassword = root.Q<Label>("hyperlinkforgotpass");
         
-        
         l_signup.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://lootlocker.com/sign-up"));
         l_forgotpassword.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL(("https://console.lootlocker.com/forgot-password")));
         
         btn_login.clickable.clickedWithEventInfo += AdminExtensionLogin;
-
     }
     
     
@@ -53,7 +51,6 @@ public class LootLockerWizard : EditorWindow
         }
 
         EditorApplication.update += OnEditorUpdate;
-
 
         LootLockerAdminManager.AdminLogin(i_email.value, i_password.value, (onComplete) =>
         {
@@ -68,7 +65,6 @@ public class LootLockerWizard : EditorWindow
                     LootLockerMFA.LoadMFAWindow();
                     Close();
                 }
-
                 else
                 {
                     LootLockerMainWindow wnd = GetWindow<LootLockerMainWindow>();
@@ -76,10 +72,8 @@ public class LootLockerWizard : EditorWindow
                     wnd.LoadLootLockerMainMenu(onComplete.user);
                     Close();
                 }
-
             }
             EditorApplication.update -= OnEditorUpdate;
-
         });
     }
 

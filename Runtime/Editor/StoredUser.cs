@@ -3,11 +3,9 @@ using LootLocker.Extension.Requests;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-#if (UNITY_EDITOR) 
+#if (UNITY_EDITOR)
 public class StoredUser : ScriptableObject
 {
-
-    
     [HideInInspector]
     public User user = null;
 
@@ -40,8 +38,6 @@ public class StoredUser : ScriptableObject
         }
         _current = Resources.Load<StoredUser>("/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser");
 
-#if UNITY_EDITOR
-
         if (_current == null)
         {
             StoredUser newUser = CreateInstance<StoredUser>();
@@ -60,7 +56,7 @@ public class StoredUser : ScriptableObject
 
             _current = newUser;
         }
-#endif
+
         _current.Deserialize();
         return _current;
     }
@@ -82,9 +78,12 @@ public class StoredUser : ScriptableObject
 
     public bool RemoveUser()
     {
+        DeleteLootLockerPrefs();
+
         _current.serializedUser = null;
         _current.user = null;
         _current = null;
+
         string configAssetPath =  Application.dataPath + "/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser.asset";
         string configAssetMetaPath =  Application.dataPath + "/LootLockerSDK/Runtime/Editor/Resources/Config/LootLockerUser.asset.meta";
 
@@ -100,12 +99,20 @@ public class StoredUser : ScriptableObject
 
         return true;
     }
+
+    public void DeleteLootLockerPrefs()
+    {
+        EditorPrefs.DeleteKey("LootLocker.AdminToken");
+        EditorPrefs.DeleteKey("LootLocker.mfaKey");
+        EditorPrefs.DeleteKey("LootLocker.ActiveOrgID");
+        EditorPrefs.DeleteKey("LootLocker.ActiveGameID");
+    }
+
     public static bool CreateNewUser(User _user)
     {
         current.user = _user;
         current.Serialize();
         return true;
     }
-
 }
 #endif

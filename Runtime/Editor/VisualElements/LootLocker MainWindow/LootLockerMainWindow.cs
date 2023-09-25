@@ -55,14 +55,12 @@ public class LootLockerMainWindow : EditorWindow
     [MenuItem("LootLocker/Logout", priority = 10)]
     public static void Logout()
     {
-        EditorPrefs.DeleteAll();
         StoredUser.current.RemoveUser();
     }
 
     [MenuItem("LootLocker/Settings", priority = 1)]
     public static void OpenMenu()
     {
-
         LootLockerMainWindow wnd = GetWindow<LootLockerMainWindow>();
         wnd.titleContent = new GUIContent("LootLocker");
         if (StoredUser.current.user != null)
@@ -76,8 +74,12 @@ public class LootLockerMainWindow : EditorWindow
         }
 
     }
+
     public void LoadLootLockerMainMenu(User user)
     {
+
+        LootLockerConfig.current.adminToken = EditorPrefs.GetString("LootLocker.AdminToken");
+    
         LootLockerServerManager.CheckInit();
 
         activeUser = user;
@@ -161,7 +163,6 @@ public class LootLockerMainWindow : EditorWindow
     private void Update()
     {
         returnBtn.style.display = currentPage == Page.OrganisationPage ? DisplayStyle.None : DisplayStyle.Flex;
-
     }
 
     void Return(EventBase e)
@@ -194,7 +195,6 @@ public class LootLockerMainWindow : EditorWindow
                 target.style.display = DisplayStyle.None;
                 break;
         }
-
     }
 
     private void OpenAPIKeyTab()
@@ -277,16 +277,13 @@ public class LootLockerMainWindow : EditorWindow
                     button.style.borderLeftColor =
                         button.style.borderBottomColor =
                             button.style.borderTopColor = new Color(0.0196078431372549f, 0.15294117647058825f, 0.0784313725490196f);
-
             }
         }
-
     }
 
 
     public void CreateAPIKeyTemplate(Key key)
     {
-
         foreach(var existingKey in keyList.Children())
         {
             if(key.name == existingKey.name)
@@ -377,8 +374,6 @@ public class LootLockerMainWindow : EditorWindow
                 apikeybtn.AddToClassList("optionbtn");
                 optionList.Add(apikeybtn);
                 break;
-
-
         }
     }
 
@@ -390,7 +385,6 @@ public class LootLockerMainWindow : EditorWindow
         newButton.name = game.id.ToString();
         newButton.style.width = 200;
         newButton.style.height = 50;
-
 
         Label buttonLabel = new Label();
         buttonLabel.name = "name";
@@ -450,7 +444,6 @@ public class LootLockerMainWindow : EditorWindow
             {
                 activeOrganisation = org;
                 EditorPrefs.SetInt("LootLocker.ActiveOrgID", activeOrganisation.id);
-
             }
         }
 
@@ -478,7 +471,6 @@ public class LootLockerMainWindow : EditorWindow
         returnBtn.text = "Change Game";
         PopulateList(ContentType.GameOptions);
         OpenAPIKeyTab();
-
     }
 
     public void GetUserRole()
@@ -495,9 +487,7 @@ public class LootLockerMainWindow : EditorWindow
                 }
             }
             EditorApplication.update -= OnEditorUpdate;
-
         });
     }
 }
-
 #endif
