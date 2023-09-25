@@ -148,12 +148,8 @@ namespace LootLocker
                             response.text = webRequest.downloadHandler.text;
 
                             LootLockerErrorData errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
-                            // Check if the error uses the "new" error style (https://docs.lootlocker.com/reference/error-codes)
-                            if (errorData != null && !string.IsNullOrEmpty(errorData.code))
-                            {
-                                response.errorData = errorData;
-                            }
-                            else 
+                            // Check if the error uses the "old" error style, not the "new" (https://docs.lootlocker.com/reference/error-codes)
+                            if (errorData == null || string.IsNullOrEmpty(errorData.code))
                             {
                                 errorData = new LootLockerErrorData();
                                 switch (webRequest.responseCode)
@@ -208,7 +204,8 @@ namespace LootLocker
                                 }
                                 errorData.message += " " + ObfuscateJsonStringForLogging(webRequest.downloadHandler.text);
                             }
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(errorData.message + (!string.IsNullOrEmpty(errorData.doc_url) ? " -- " + errorData.doc_url : ""));
+                            response.errorData = errorData;
+                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.message + (!string.IsNullOrEmpty(response.errorData.doc_url) ? " -- " + response.errorData.doc_url : ""));
                             OnServerResponse?.Invoke(response);
                         }
                     }
