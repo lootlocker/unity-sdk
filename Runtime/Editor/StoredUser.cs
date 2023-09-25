@@ -3,7 +3,9 @@ using LootLocker.Extension.Requests;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-#if (UNITY_EDITOR)
+
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using LootLocker.Extension.DataTypes;
 public class StoredUser : ScriptableObject
 {
     [HideInInspector]
