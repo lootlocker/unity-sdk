@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
 using System.Linq;
-using LootLocker.Extension.Responses;
+
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Admin;
 using LootLocker.Extension.DataTypes;
+using LootLocker.Extension.Responses;
 
 public class LootLockerMainWindow : EditorWindow
 {
