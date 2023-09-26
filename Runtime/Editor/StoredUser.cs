@@ -6,7 +6,10 @@ using UnityEngine;
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Extension.DataTypes;
-public class StoredUser : ScriptableObject
+
+namespace LootLocker.Extension
+{
+    public class StoredUser : ScriptableObject
 {
     [HideInInspector]
     public User user = null;
@@ -117,4 +120,6 @@ public class StoredUser : ScriptableObject
         return true;
     }
 }
+}
+
 #endif

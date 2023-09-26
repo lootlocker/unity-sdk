@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
 #if UNITY_2021_3_OR_NEWER && UNITY_EDITOR
-using LootLocker.Admin;
 
+namespace LootLocker.Extension 
+{
 public class LootLockerMFA : EditorWindow
 {
     [SerializeField]
@@ -62,5 +63,6 @@ public class LootLockerMFA : EditorWindow
         EditorApplication.QueuePlayerLoopUpdate();
     }
     
+}
 }
 #endif
