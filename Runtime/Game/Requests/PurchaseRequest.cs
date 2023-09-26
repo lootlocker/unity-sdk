@@ -43,33 +43,33 @@ namespace LootLocker.Requests
 
     }
 
-    /*
-     * 
-     */
+    /// <summary>
+     /// 
+     /// </summary>
     public class LootLockerCatalogItemAndQuantityPair
     {
-        /*
-         * The unique id of the catalog item to purchase
-         */
+        /// <summary>
+         /// The unique id of the catalog item to purchase
+         /// </summary>
         public string catalog_item_id { get; set; }
-        /*
-         * The quantity of the specified item to purchase
-         */
+        /// <summary>
+         /// The quantity of the specified item to purchase
+         /// </summary>
         public int quantity { get; set; }
     }
 
-    /*
-     * 
-     */
+    /// <summary>
+     /// 
+     /// </summary>
     public class LootLockerPurchaseCatalogItemRequest
     {
-        /*
-         * The id of the wallet to be used for the purchase
-         */
+        /// <summary>
+         /// The id of the wallet to be used for the purchase
+         /// </summary>
         public string wallet_id { get; set; }
-        /*
-         * A list of items to purchase
-         */
+        /// <summary>
+         /// A list of items to purchase
+         /// </summary>
         public LootLockerCatalogItemAndQuantityPair[] items { get; set; }
     }
 }

@@ -5,9 +5,9 @@ using JetBrains.Annotations;
 
 namespace LootLocker.LootLockerEnums
 {
-    /*
-     * Possible entity kinds that catalog entries can have
-     */
+    /// <summary>
+    /// Possible entity kinds that catalog entries can have
+    /// </summary>
     public enum LootLockerCatalogEntryEntityKind
     {
         asset = 0,
@@ -23,228 +23,220 @@ namespace LootLocker.Requests
     // Data Definitions
     //==================================================
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerCatalog
     {
-        /*
-         * The time when this catalog was created
-         */
+        /// <summary>
+        /// The time when this catalog was created
+        /// </summary>
         public string created_at { get; set; }
-        /*
-         * The name of the catalog
-         */
+        /// <summary>
+        /// The name of the catalog
+        /// </summary>
         public string name { get; set; }
-        /*
-         * The unique identifying key of the catalog
-         */
+        /// <summary>
+        /// The unique identifying key of the catalog
+        /// </summary>
         public string key { get; set; }
-        /*
-         * The id of the catalog
-         */
+        /// <summary>
+        /// The id of the catalog
+        /// </summary>
         public string id { get; set; }
-        /*
-         * The time when this catalog was deleted, should normally be null
-         */
+        /// <summary>
+        /// The time when this catalog was deleted, should normally be null
+        /// </summary>
         public string deleted_at { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerCatalogPagination
     {
-        /*
-         * The total available items in this catalog
-         */
+        /// <summary>
+        /// The total available items in this catalog
+        /// </summary>
         public int total { get; set; }
-        /*
-         * The cursor that points to the next item in the catalog list. Use this in subsequent requests to get additional items from the catalog.
-         */
+        /// <summary>
+        /// The cursor that points to the next item in the catalog list. Use this in subsequent requests to get additional items from the catalog.
+        /// </summary>
         public string cursor { get; set; }
-        /*
-         * The cursor that points to the first item in this batch of items.
-         */
+        /// <summary>
+        /// The cursor that points to the first item in this batch of items.
+        /// </summary>
         public string previous_cursor { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerCatalogEntryPrice
     {
-        /*
-         * The amount (cost) set for this price
-         */
+        /// <summary>
+       /// The amount (cost) set for this price
+       /// </summary>
         public int amount { get; set; }
-        /*
-         * A prettyfied version of the amount to use for display
-         */
+        /// <summary>
+       /// A prettyfied version of the amount to use for display
+       /// </summary>
         public string display_amount { get; set; }
-        /*
-         * The short code for the currency this price is in
-         */
+        /// <summary>
+       /// The short code for the currency this price is in
+       /// </summary>
         public string currency_code { get; set; }
-        /*
-         * The name of the currency this price is in
-         */
+        /// <summary>
+       /// The name of the currency this price is in
+       /// </summary>
         public string currency_name { get; set; }
-        /*
-         * The unique id of this price
-         */
+        /// <summary>
+       /// The unique id of this price
+       /// </summary>
         public string price_id { get; set; }
-        /*
-         * The unique id of the currency this price is in
-         */
+        /// <summary>
+       /// The unique id of the currency this price is in
+       /// </summary>
         public string currency_id { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerCatalogEntry
     {
-        /*
-         * The time when this catalog entry was created
-         */
+        /// <summary>
+       /// The time when this catalog entry was created
+       /// </summary>
         public string created_at { get; set; }
-        /*
-         * The kind of entity that this entry is. This signifies in which lookup structure to find the details of this entry by using the grouping_key.
-         */
+        /// <summary>
+       /// The kind of entity that this entry is. This signifies in which lookup structure to find the details of this entry by using the grouping_key.
+       /// </summary>
         public LootLockerCatalogEntryEntityKind entity_kind { get; set; }
-        /*
-         * The name of this entity
-         */
+        /// <summary>
+       /// The name of this entity
+       /// </summary>
         public string entity_name { get; set; }
-        /*
-         * A list of prices for this catalog entry
-         */
+        /// <summary>
+       /// A list of prices for this catalog entry
+       /// </summary>
         public LootLockerCatalogEntryPrice[] prices { get; set; }
-        /*
-         * The unique id of the entity that this entry refers to.
-         */
+        /// <summary>
+       /// The unique id of the entity that this entry refers to.
+       /// </summary>
         public string entity_id { get; set; }
-        /*
-         * A unique id for this entry in this catalog grouping the entity and the prices. This is the key you use to look up details about the entity in the structure signified by the entity_kind.
-         */
+        /// <summary>
+       /// A unique id for this entry in this catalog grouping the entity and the prices. This is the key you use to look up details about the entity in the structure signified by the entity_kind.
+       /// </summary>
         public string grouping_key { get; set; }
-        /*
-         * Whether this entry is currently purchasable
-         */
+        /// <summary>
+       /// Whether this entry is currently purchasable
+       /// </summary>
         public bool purchasable { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerAssetDetails
     {
-        /*
-         * The name of this asset
-         */
+        /// <summary>
+       /// The name of this asset
+       /// </summary>
         public string name { get; set; }
-        /*
-         * The id of the specific variation of this asset that this refers to
-         */
+        /// <summary>
+       /// The id of the specific variation of this asset that this refers to
+       /// </summary>
         public string variation_id { get; set; }
-        /*
-         * The id of the specific rental option of this asset that this refers to
-         */
+        /// <summary>
+       /// The id of the specific rental option of this asset that this refers to
+       /// </summary>
         public string rental_option_id { get; set; }
-        /*
-         * The legacy id of this asset
-         */
+        /// <summary>
+       /// The legacy id of this asset
+       /// </summary>
         public int legacy_id { get; set; }
-        /*
-         * The unique identyfing id of this asset.
-         */
+        /// <summary>
+       /// The unique identyfing id of this asset.
+       /// </summary>
         public string id { get; set; }
-        /*
-         * The thumbnail for this asset
-         */
+        /// <summary>
+       /// The thumbnail for this asset
+       /// </summary>
         public string thumbnail { get; set; }
-        /*
-         * The grouping key for this asset detail
-         */
+        /// <summary>
+       /// The grouping key for this asset detail
+       /// </summary>
         public string grouping_key { get; set; }
 
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerProgressionPointDetails
     {
-        /*
-         * The unique key of the pogression that this refers to
-         */
+        /// <summary>
+       /// The unique key of the pogression that this refers to
+       /// </summary>
         public string key { get; set; }
-        /*
-         * The name of the progression that this refers to
-         */
+        /// <summary>
+       /// The name of the progression that this refers to
+       /// </summary>
         public string name { get; set; }
-        /*
-         * The amount of points to be added to the progression in question
-         */
+        /// <summary>
+       /// The amount of points to be added to the progression in question
+       /// </summary>
         public int amount { get; set; }
-        /*
-         * The unique id of the progression that this refers to
-         */
+        /// <summary>
+       /// The unique id of the progression that this refers to
+       /// </summary>
         public string id { get; set; }
-        /*
-         * The grouping key for this progression point detail
-         */
+        /// <summary>
+       /// The grouping key for this progression point detail
+       /// </summary>
         public string grouping_key { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerProgressionResetDetails
     {
-        /*
-         * The unique key of the progression that this refers to
-         */
+        /// <summary>
+       /// The unique key of the progression that this refers to
+       /// </summary>
         public string key { get; set; }
-        /*
-         * The name of the progression that this refers to
-         */
+        /// <summary>
+       /// The name of the progression that this refers to
+       /// </summary>
         public string name { get; set; }
-        /*
-         * The unique id of the progression that this refers to
-         */
+        /// <summary>
+       /// The unique id of the progression that this refers to
+       /// </summary>
         public string id { get; set; }
-        /*
-         * The grouping key for this progression reset detail
-         */
+        /// <summary>
+       /// The grouping key for this progression reset detail
+       /// </summary>
         public string grouping_key { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerCurrencyDetails
     {
-        /*
-         * The name of the currency that this refers to
-         */
+        /// <summary>
+       /// The name of the currency that this refers to
+       /// </summary>
         public string name { get; set; }
-        /*
-         * The unique code of the currency that this refers to
-         */
+        /// <summary>
+       /// The unique code of the currency that this refers to
+       /// </summary>
         public string code { get; set; }
-        /*
-         * The amount of this currency to be awarded
-         */
+        /// <summary>
+       /// The amount of this currency to be awarded
+       /// </summary>
         public string amount { get; set; }
-        /*
-         * The unique id of the currency that this refers to
-         */
+        /// <summary>
+       /// The unique id of the currency that this refers to
+       /// </summary>
         public string id { get; set; }
-        /*
-         * The grouping key for this currency detail
-         */
+        /// <summary>
+       /// The grouping key for this currency detail
+       /// </summary>
         public string grouping_key { get; set; }
     }
 
@@ -252,50 +244,48 @@ namespace LootLocker.Requests
     // Response Definitions
     //==================================================
 
-    /*
-     * 
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerListCatalogsResponse : LootLockerResponse 
     {
-        /*
-         * A list of the prices for the game
-         */
+        /// <summary>
+       /// A list of the prices for the game
+       /// </summary>
         public LootLockerCatalog[] catalogs { get; set; }
     }
 
-    /*
-     *
-     */
+    /// <summary>
+   /// </summary>
     public class LootLockerListCatalogPricesResponse : LootLockerResponse
     {
-        /*
-         * Details about the catalog that the prices is in
-         */
+        /// <summary>
+       /// Details about the catalog that the prices is in
+       /// </summary>
         public LootLockerCatalog catalog { get; set; }
 
-        /*
-         * A list of entries available in this catalog
-         */
+        /// <summary>
+       /// A list of entries available in this catalog
+       /// </summary>
         public LootLockerCatalogEntry[] entries { get; set; }
-        /*
-         * Lookup map for details about entities of entity type assets
-         */
+        /// <summary>
+       /// Lookup map for details about entities of entity type assets
+       /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerAssetDetails> asset_details { get; set; }
-        /*
-         * Lookup map for details about entities of entity type progression_points
-         */
+        /// <summary>
+       /// Lookup map for details about entities of entity type progression_points
+       /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerProgressionPointDetails> progression_points_details { get; set; }
-        /*
-         * Lookup map for details about entities of entity type progression_reset
-         */
+        /// <summary>
+       /// Lookup map for details about entities of entity type progression_reset
+       /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerProgressionResetDetails> progression_resets_details { get; set; }
-        /*
-         * Lookup map for details about entities of entity type currency
-         */
+        /// <summary>
+       /// Lookup map for details about entities of entity type currency
+       /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerCurrencyDetails> currency_details { get; set; }
-        /*
-         * Pagination data to use for subsequent requests
-         */
+        /// <summary>
+       /// Pagination data to use for subsequent requests
+       /// </summary>
         public LootLockerCatalogPagination pagination { get; set; }
 
         public void AppendCatalogItems(LootLockerListCatalogPricesResponse catalogPrices)
@@ -328,7 +318,7 @@ namespace LootLocker.Requests
         {
         }
 
-        // This is the way that the response actually looks, but we don't want to expose it, hence the conversion
+       /// This is the way that the response actually looks, but we don't want to expose it, hence the conversion
         private class LootLockerListCatalogItemsWithArraysResponse : LootLockerResponse
         {
             public LootLockerCatalog catalog { get; set; }
@@ -384,26 +374,25 @@ namespace LootLocker.Requests
         }
 
 #if UNITY_2020_2_OR_NEWER
-        /*
-         *
-         */
+        /// <summary>
+       /// </summary>
         public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
         {
-            /*
-             * Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
-             */
+            /// <summary>
+           /// Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
+           /// </summary>
             public LootLockerAssetDetails? asset_details { get; set; }
-            /*
-             * Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
-             */
+            /// <summary>
+           /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
+           /// </summary>
             public LootLockerProgressionPointDetails? progression_point_details { get; set; }
-            /*
-             * Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
-             */
+            /// <summary>
+           /// Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
+           /// </summary>
             public LootLockerProgressionResetDetails? progression_reset_details { get; set; }
-            /*
-             * Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
-             */
+            /// <summary>
+           /// Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
+           /// </summary>
             public LootLockerCurrencyDetails? currency_details { get; set; }
 
             public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails) 
@@ -422,9 +411,9 @@ namespace LootLocker.Requests
             }
         }
 
-        /*
-         * Get all the entries with details inlined into the entries themselves
-         */
+        /// <summary>
+       /// Get all the entries with details inlined into the entries themselves
+       /// </summary>
         public LootLockerInlinedCatalogEntry[] GetLootLockerInlinedCatalogEntries()
         {
             List<LootLockerInlinedCatalogEntry> inlinedEntries = new List<LootLockerInlinedCatalogEntry>();

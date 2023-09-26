@@ -2,9 +2,8 @@
 
 namespace LootLocker.LootLockerEnums
 {
-    /*
-     * Possible account linking process statuses. Undefined means that the object couldn't be constructed correctly
-     */
+    /// <summary> Possible account linking process statuses. Undefined means that the object couldn't be constructed correctly
+    /// </summary>
     public enum LootLockerWalletHolderTypes
     {
         Character = 0,
@@ -18,26 +17,25 @@ namespace LootLocker.Requests
     // Data Definitions
     //==================================================
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerBalance
     {
-        /*
-         * Current amount of the given currency in this wallet
-         */
+        /// <summary>
+        /// Current amount of the given currency in this wallet
+        /// </summary>
         public string amount { get; set; }
-        /*
-         * Information about the currency that this balance is in
-         */
+        /// <summary>
+        /// Information about the currency that this balance is in
+        /// </summary>
         public LootLockerCurrency currency { get; set; }
-        /*
-         * The id of the wallet holding this balance
-         */
+        /// <summary>
+        /// The id of the wallet holding this balance
+        /// </summary>
         public string wallet_id { get; set; }
-        /*
-         * The time that this balance was created
-         */
+        /// <summary>
+        /// The time that this balance was created
+        /// </summary>
         public string created_at { get; set; }
     };
 
@@ -45,41 +43,35 @@ namespace LootLocker.Requests
     // Request Definitions
     //==================================================
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerCreditRequest
     {
-        /*
-         * Amount of the given currency to debit/credit to/from the given wallet
-         */
+        /// <summary> Amount of the given currency to debit/credit to/from the given wallet
+        /// </summary>
         public string amount { get; set; }
-        /*
-         * The id of the currency that the amount is given in
-         */
+        /// <summary>
+        /// The id of the currency that the amount is given in
+        /// </summary>
         public string currency_id { get; set; }
-        /*
-         * The id of the wallet to credit/debit to/from
-         */
+        /// <summary> The id of the wallet to credit/debit to/from
+        /// </summary>
         public string wallet_id { get; set; }
     };
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerDebitRequest
     {
-        /*
-         * Amount of the given currency to debit/credit to/from the given wallet
-         */
+        /// <summary> Amount of the given currency to debit/credit to/from the given wallet
+        /// </summary>
         public string amount { get; set; }
-        /*
-         * The id of the currency that the amount is given in
-         */
+        /// <summary>
+        /// The id of the currency that the amount is given in
+        /// </summary>
         public string currency_id { get; set; }
-        /*
-         * The id of the wallet to credit/debit to/from
-         */
+        /// <summary> The id of the wallet to credit/debit to/from
+        /// </summary>
         public string wallet_id { get; set; }
     };
 
@@ -87,44 +79,41 @@ namespace LootLocker.Requests
     // Response Definitions
     //==================================================
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerListBalancesForWalletResponse : LootLockerResponse
     {
-        /*
-         * List of balances in different currencies in the requested wallet
-         */
+        /// <summary>
+        /// List of balances in different currencies in the requested wallet
+        /// </summary>
         public LootLockerBalance[] balances { get; set; }
     };
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerBalanceForWalletResponse : LootLockerResponse
     {
-        /*
-         * The balance of the wallet
-         */
+        /// <summary>
+        /// The balance of the wallet
+        /// </summary>
         public LootLockerBalance balance { get; set; }
     };
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerGetWalletResponse : LootLockerResponse
     {
-        /*
-         * The unique id of the holder of this wallet
-         */ 
+        /// <summary>
+        /// The unique id of the holder of this wallet
+        /// </summary>
         public string holder_id { get; set; }
-        /*
-         * The unique id of this wallet
-         */
+        /// <summary>
+        /// The unique id of this wallet
+        /// </summary>
         public string id { get; set; }
-        /*
-         * The type of entity that holds this wallet
-         */
+        /// <summary>
+        /// The type of entity that holds this wallet
+        /// </summary>
         public LootLockerWalletHolderTypes type { get; set;}
     };
 
