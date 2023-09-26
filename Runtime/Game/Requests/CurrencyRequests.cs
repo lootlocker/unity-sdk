@@ -4,61 +4,61 @@
     // Data Definitions
     //==================================================
 
-    /*
-     * Details about a particular currency
-     */
+    /// <summary>
+    /// Details about a particular currency
+    /// </summary>
     public class LootLockerCurrency
     {
-        /*
-         * The unique id of the currency
-         */
+        /// <summary>
+        /// The unique id of the currency
+        /// </summary>
         public string id { get; set; }
-        /*
-         * The name of the currency
-         */
+        /// <summary>
+        /// The name of the currency
+        /// </summary>
         public string name { get; set; }
-        /*
-         * The unique short code of the currency
-         */
+        /// <summary>
+        /// The unique short code of the currency
+        /// </summary>
         public string code { get; set; }
-        /*
-         * True if this currency can be awarded to the player from the game api
-         */
+        /// <summary>
+        /// True if this currency can be awarded to the player from the game api
+        /// </summary>
         public bool game_api_writes_enabled { get; set; }
-        /*
-         * The time that this currency was created
-         */
+        /// <summary>
+        /// The time that this currency was created
+        /// </summary>
         public string created_at { get; set; }
-        /*
-         * The time that this currency was published
-         */
+        /// <summary>
+        /// The time that this currency was published
+        /// </summary>
         public string published_at { get; set; }
     };
 
-    /*
-     * Represents a denomination of a currency
-     */
+    /// <summary>
+    /// Represents a denomination of a currency
+    /// </summary>
     public class LootLockerDenomination
     {
-        /*
-         * The unique id of the denomination
-         */
+        /// <summary>
+        /// The unique id of the denomination
+        /// </summary>
         public string id { get; set; }
-        /*
-         * The id of the currency this is a denomination of
-         */
+        /// <summary>
+        /// The id of the currency this is a denomination of
+        /// </summary>
         public string currency { get; set; }
-        /*
-         * The name of this denomination
-         */
+        /// <summary>
+        /// The name of this denomination
+        /// </summary>
         public string name { get; set; }
-        /*
-         * The value of this denomination in units of the currency
-         */
+        /// <summary>
+        /// The value of this denomination in units of the currency
+        /// </summary>
         public int value { get; set; }
-        /*
-         * The time that this denomination was created
-         */
+        /// <summary>
+        /// The time that this denomination was created
+        /// </summary>
         public string created_at { get; set; }
     };
 
@@ -66,25 +66,23 @@
     // Response Definitions
     //==================================================
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerListCurrenciesResponse : LootLockerResponse
     {
-        /*
-         * List of available currencies
-         */
+        /// <summary>
+        /// List of available currencies
+        /// </summary>
         public LootLockerCurrency[] currencies { get; set; }
     };
 
-    /*
-     *
-     */
+    /// <summary>
+    /// </summary>
     public class LootLockerListDenominationsResponse : LootLockerResponse
     {
-        /*
-         * List of available denominations
-         */
+        /// <summary>
+        /// List of available denominations
+        /// </summary>
         public LootLockerDenomination[] denominations { get; set; }
     };
 
