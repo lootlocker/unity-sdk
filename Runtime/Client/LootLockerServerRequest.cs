@@ -428,7 +428,7 @@ namespace LootLocker
 
         /// <summary>
         /// Query parameters to append to the end of the request URI
-        /// <para>Example: If you include a dictionary with a key of "page" and a value of "42" (as a string) then the url would become "https: //mydomain.com/endpoint?page=42"</para>
+        /// Example: If you include a dictionary with a key of "page" and a value of "42" (as a string) then the url would become "https://mydomain.com/endpoint?page=42"
         /// </summary>
         public Dictionary<string, string> queryParams;
 
