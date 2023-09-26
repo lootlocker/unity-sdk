@@ -56,8 +56,7 @@ public class LootLockerWizard : EditorWindow
         {
             if (onComplete.success)
             {
-                //LootLockerConfig.current.adminToken = onComplete.auth_token;
-                Debug.Log("THIS IS WIZARD: " + onComplete.auth_token);
+                LootLockerConfig.current.adminToken = onComplete.auth_token;
                 EditorPrefs.SetString("LootLocker.AdminToken", onComplete.auth_token);
 
                 if (onComplete.mfa_key != null)
