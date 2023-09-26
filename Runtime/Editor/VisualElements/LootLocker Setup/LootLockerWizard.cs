@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
 #if (UNITY_EDITOR) && UNITY_2021_3_OR_NEWER
-using LootLocker.Admin;
 
+namespace LootLocker.Extension
+{
 public class LootLockerWizard : EditorWindow
 {
     [SerializeField]
@@ -81,5 +82,8 @@ public class LootLockerWizard : EditorWindow
     {
         EditorApplication.QueuePlayerLoopUpdate();
     }
+}    
+    
 }
+
 #endif

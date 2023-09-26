@@ -4,7 +4,7 @@ using LootLocker.Extension.Responses;
 using UnityEngine;
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
-namespace LootLocker.Admin
+namespace LootLocker.Extension
 {
     public partial class LootLockerAdminManager
     {
