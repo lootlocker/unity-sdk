@@ -247,6 +247,7 @@ namespace LootLocker
         public static EndPointClass getWalletByHolderId = new EndPointClass("wallet/holder/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass creditBalanceToWallet = new EndPointClass("balances/credit", LootLockerHTTPMethod.POST);
         public static EndPointClass debitBalanceToWallet = new EndPointClass("balances/debit", LootLockerHTTPMethod.POST);
+        public static EndPointClass createWallet = new EndPointClass("wallet", LootLockerHTTPMethod.POST);
 
         // Catalogs
         [Header("Catalogs")]
