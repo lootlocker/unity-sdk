@@ -42,12 +42,27 @@ namespace LootLocker.Requests
     //==================================================
     // Request Definitions
     //==================================================
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerCreateWalletRequest
+    {
+        /// <summary>
+        /// ULID of the holder you want to create a wallet for
+        /// </summary>
+        public string holder_id { get; set; }
+        /// <summary>
+        /// The type of holder that this holder id refers to
+        /// </summary>
+        public LootLockerWalletHolderTypes holder_type { get; set; }
+    };
 
     /// <summary>
     /// </summary>
     public class LootLockerCreditRequest
     {
-        /// <summary> Amount of the given currency to debit/credit to/from the given wallet
+        /// <summary>
+        /// Amount of the given currency to debit/credit to/from the given wallet
         /// </summary>
         public string amount { get; set; }
         /// <summary>
@@ -63,7 +78,8 @@ namespace LootLocker.Requests
     /// </summary>
     public class LootLockerDebitRequest
     {
-        /// <summary> Amount of the given currency to debit/credit to/from the given wallet
+        /// <summary>
+        /// Amount of the given currency to debit/credit to/from the given wallet
         /// </summary>
         public string amount { get; set; }
         /// <summary>

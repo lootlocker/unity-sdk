@@ -5058,18 +5058,52 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get information about a wallet for a specified holder
         /// </summary>
-        /// <param name="holderId">Ulid of the holder of the wallet you want to get information for</param>
+        /// <param name="holderUlid">ULID of the holder of the wallet you want to get information for</param>
+        /// <param name="holderType">The type of the holder to get the wallet for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void GetWalletByHolderId(string holderId, Action<LootLockerGetWalletResponse> onComplete)
+        public static void GetWalletByHolderId(string holderUlid, LootLockerWalletHolderTypes holderType, Action<LootLockerGetWalletResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderId);
+            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderUlid);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete:
+                (serverResponse) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerGetWalletResponse>(serverResponse);
+                    if (!parsedResponse.success && parsedResponse.statusCode == 404)
+                    {
+                        LootLockerCreateWalletRequest request = new LootLockerCreateWalletRequest()
+                        {
+                            holder_id = holderUlid,
+                            holder_type = holderType
+                        };
+                        LootLockerServerRequest.CallAPI(LootLockerEndPoints.createWallet.endPoint,
+                            LootLockerEndPoints.createWallet.httpMethod, LootLockerJson.SerializeObject(request),
+                            createWalletResponse =>
+                            {
+                                if (createWalletResponse.success)
+                                {
+                                    LootLockerServerRequest.CallAPI(endpoint,
+                                        LootLockerEndPoints.getWalletByHolderId.httpMethod, null,
+                                        secondResponse =>
+                                        {
+                                            LootLockerResponse.Deserialize(onComplete, secondResponse);
+                                        });
+                                    return;
+                                }
+
+                                onComplete?.Invoke(parsedResponse);
+                            });
+                        return;
+                    }
+
+                    onComplete?.Invoke(parsedResponse);
+                }
+            );
         }
 
         /// <summary>
