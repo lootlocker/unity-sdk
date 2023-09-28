@@ -18,6 +18,11 @@ namespace LootLocker.Requests
         public string summary { get; set; }
         public string category { get; set; }
         public bool alert { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("new")]
+#else
+        [Json(Name = "new")]
+#endif
         public bool _new { get; set; }
         public string action { get; set; }
         public string image { get; set; }
