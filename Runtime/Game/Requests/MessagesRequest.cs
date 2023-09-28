@@ -1,4 +1,9 @@
-﻿using LootLocker.Requests;
+﻿#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+#else
+using LLlibs.ZeroDepJson;
+#endif
+using LootLocker.Requests;
 using System;
 
 namespace LootLocker.Requests
