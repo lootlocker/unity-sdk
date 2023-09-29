@@ -43,7 +43,6 @@ namespace LootLocker
             	return;
             }
             string json = LootLockerJson.SerializeObject(data);
-            LootLockerConfig.AddDevelopmentModeFieldToJsonStringIfNeeded(ref json); // TODO: Deprecated, remove in version 1.2.0
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, false);

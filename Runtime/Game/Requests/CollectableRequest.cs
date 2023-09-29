@@ -11,12 +11,6 @@ namespace LootLocker.Requests
         public LootLockerCollectable[] collectables { get; set; }
     }
 
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerGetCollectablesResponse instead")]
-    public class LootLockerGettingCollectablesResponse : LootLockerResponse
-    {
-        public LootLockerCollectable[] collectables { get; set; }
-    }
-
     public class LootLockerCollectable
     {
         public string name { get; set; }
@@ -62,19 +56,6 @@ namespace LootLocker.Requests
         public string slug { get; set; }
     }
 
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerCollectItemResponse instead")]
-    public class LootLockerCollectingAnItemResponse : LootLockerResponse
-    {
-        public LootLockerCollectable[] collectables { get; set; }
-
-        public LootLockerCollectable mainCollectable { get; set; }
-
-        public LootLockerGroup mainGroup { get; set; }
-
-        public LootLockerItem mainItem { get; set; }
-
-    }
-
     public class LootLockerCollectItemResponse : LootLockerResponse
     {
         public LootLockerCollectable[] collectables { get; set; }
@@ -103,17 +84,6 @@ namespace LootLocker
             });
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCollectables() instead")]
-        public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
-            {
-                onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerGettingCollectablesResponse>(serverResponse));
-            }, true);
-        }
-
         public static void CollectItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectItemResponse> onComplete)
         {
             if(data == null)
@@ -132,44 +102,6 @@ namespace LootLocker
                 if (serverResponse.success)
                 {
                     response = LootLockerJson.DeserializeObject<LootLockerCollectItemResponse>(serverResponse.text);
-                    string[] collectableStrings = data.slug.Split('.');
-
-                    string collectable = collectableStrings[0];
-                    string group = collectableStrings[1];
-                    string item = collectableStrings[2];
-
-                    response.mainCollectable = response.collectables?.FirstOrDefault(x => x.name == collectable);
-                    response.mainGroup = response.mainCollectable?.groups?.FirstOrDefault(x => x.name == group);
-                    response.mainItem = response.mainGroup?.items?.FirstOrDefault(x => x.name == item);
-                }
-
-                response.text = serverResponse.text;
-                response.success = serverResponse.success;
-                response.errorData = serverResponse.errorData;
-                response.statusCode = serverResponse.statusCode;
-                onComplete?.Invoke(response);
-            }, true);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function CollectItem() instead")]
-        public static void CollectingAnItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectingAnItemResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCollectingAnItemResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                LootLockerCollectingAnItemResponse response = new LootLockerCollectingAnItemResponse();
-                if (serverResponse.success)
-                {
-                    response = LootLockerJson.DeserializeObject<LootLockerCollectingAnItemResponse>(serverResponse.text);
                     string[] collectableStrings = data.slug.Split('.');
 
                     string collectable = collectableStrings[0];
