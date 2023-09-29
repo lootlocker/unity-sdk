@@ -25,9 +25,6 @@ namespace LootLocker.Requests
     public class LootLockerWhiteLabelSignupResponse : LootLockerResponse
     {
         public int ID { get; set; }
-
-        [Obsolete("GameID is deprecated and will be removed soon")]
-        public int GameID { get; set; }
         public string Email { get; set; }
         public string CreatedAt { get; set; }
 

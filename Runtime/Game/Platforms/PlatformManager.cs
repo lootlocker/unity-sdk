@@ -125,30 +125,6 @@ namespace LootLocker.Requests
             };
         }
 
-        // TODO: Deprecated, remove in version 1.2.0
-        public static void Set(LootLockerConfig.platformType platform)
-        {
-            switch (platform)
-            {
-                case LootLockerConfig.platformType.Android:
-                    Set(Platforms.Android);
-                    break;
-                case LootLockerConfig.platformType.iOS:
-                    Set(Platforms.AppleSignIn);
-                    break;
-                case LootLockerConfig.platformType.Steam:
-                    Set(Platforms.Steam);
-                    break;
-                case LootLockerConfig.platformType.PlayStationNetwork:
-                    Set(Platforms.PlayStationNetwork);
-                    break;
-                case LootLockerConfig.platformType.Unused:
-                default:
-                    Set(Platforms.None);
-                    break;
-            }
-        }
-
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]

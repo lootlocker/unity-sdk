@@ -183,12 +183,6 @@ namespace LootLocker.Requests
         public int[] favourites { get; set; }
     }
 
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerActivateRentalAssetResponse instead")]
-    public class LootLockerActivateARentalAssetResponse : LootLockerResponse
-    {
-        public int time_left { get; set; }
-    }
-
     public class LootLockerActivateRentalAssetResponse : LootLockerResponse
     {
         public int time_left { get; set; }
