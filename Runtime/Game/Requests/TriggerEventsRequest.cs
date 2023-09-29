@@ -4,26 +4,9 @@ using System.Collections.Generic;
 
 namespace LootLocker.Requests
 {
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerRequest instead")]
-    public class LootLockerTriggerAnEventRequest
-    {
-        public string name { get; set; }
-    }
-
-
     public class LootLockerExecuteTriggerRequest : LootLockerResponse
     {
         public string name { get; set; }
-    }
-
-
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerExecuteTriggerResponse instead")]
-    public class LootLockerTriggerAnEventResponse : LootLockerResponse
-    {
-        public bool check_grant_notifications { get; set; }
-        public LootLockerXp xp { get; set; }
-        public LootLockerLevel[] levels { get; set; }
-        public LootLockerGrantedAssets[] granted_assets { get; set; }
     }
 
     public class LootLockerExecuteTriggerResponse : LootLockerResponse
@@ -32,12 +15,6 @@ namespace LootLocker.Requests
         public LootLockerXp xp { get; set; }
         public LootLockerLevel[] levels { get; set; }
         public LootLockerGrantedAssets[] granted_assets { get; set; }
-    }
-
-    [Obsolete("This class is deprecated and will be removed at a later stage. Please use LootLockerListAllTriggersResponse instead")]
-    public class LootLockerListingAllTriggersResponse : LootLockerResponse
-    {
-        public string[] triggers { get; set; }
     }
 
     public class LootLockerListAllTriggersResponse : LootLockerResponse
@@ -112,31 +89,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ExecuteTrigger() instead")]
-        public static void TriggeringAnEvent(LootLockerTriggerAnEventRequest data, Action<LootLockerTriggerAnEventResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerTriggerAnEventResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.triggeringAnEvent;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
         public static void ListAllExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListExecutedTriggers() instead")]
-        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingTriggeredTriggerEvents;
 

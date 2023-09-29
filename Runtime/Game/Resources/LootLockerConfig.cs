@@ -32,7 +32,6 @@ namespace LootLocker
             {
                 // Create a new Config
                 LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
-                newConfig.platform = platformType.Unused;
 
                 // Folder needs to exist for Unity to be able to create an asset in it
                 string dir = Application.dataPath+ "/LootLockerSDK/Resources/Config";
@@ -80,38 +79,17 @@ namespace LootLocker
             }
         }
 #endif
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, bool onDevelopmentMode = false, platformType platform = platformType.Unused, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
-            if(platform != platformType.Unused) {
-                _current.platform = platform;
-            }
-            _current.developmentMode = onDevelopmentMode;
             _current.currentDebugLevel = debugLevel;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
             _current.ConstructUrls();
             return true;
-        }
-
-        // TODO: Deprecated, remove in version 1.2.0
-        public bool IsPrefixedApiKey()
-        {
-            return !string.IsNullOrEmpty(apiKey) && (apiKey.StartsWith("dev_") || apiKey.StartsWith("prod_"));
-        }
-
-        // TODO: Deprecated, remove in version 1.2.0
-        public static void AddDevelopmentModeFieldToJsonStringIfNeeded(ref string json)
-        {
-            if (!current.IsPrefixedApiKey())
-            {
-                json = json.Remove(json.Length - 1, 1); // Remove '}'
-                string devModeJsonString = ", \"development_mode\": " + current.developmentMode;
-                json = json + devModeJsonString.ToLower() + "}";
-            }
         }
 
         private void ConstructUrls()
@@ -159,11 +137,6 @@ namespace LootLocker
         public string game_version = "1.0.0.0";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
-        [HideInInspector]
-        public platformType platform; // TODO: Deprecated, remove in version 1.2.0
-        public enum platformType { Android, iOS, Steam, PlayStationNetwork, Unused }
-        [HideInInspector]
-        public bool developmentMode = true;
 
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";

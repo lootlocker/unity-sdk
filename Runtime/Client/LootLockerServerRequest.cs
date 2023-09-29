@@ -144,24 +144,6 @@ namespace LootLocker
         public LootLockerErrorData errorData { get; set; }
 
         /// <summary>
-        /// TRUE if http error OR server returns an error status
-        /// </summary>
-        [Obsolete("This property is deprecated, use success instead")]
-        public bool hasError { get { return !success; } }
-
-        /// <summary>
-        /// If the request was not a success this property will hold any error messages
-        /// </summary>
-        [Obsolete("This property is deprecated, replaced by the errorData.message property")]
-        public string Error { get { return errorData?.message; } }
-
-        /// <summary>
-        /// A texture downloaded in the webrequest, if applicable, otherwise this will be null.
-        /// </summary>
-        [Obsolete("This property is deprecated")]
-        public Texture2D texture { get; set; }
-
-        /// <summary>
         /// inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events 
         /// of the same type makes use unable to identify each one
         /// </summary>
@@ -497,7 +479,7 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("domain-key", LootLockerConfig.current.domainKey);
 
-            if((!LootLockerConfig.current.IsPrefixedApiKey() && LootLockerConfig.current.developmentMode) || LootLockerConfig.current.apiKey.StartsWith("dev_"))
+            if(LootLockerConfig.current.apiKey.StartsWith("dev_"))
             {
                 headers.Add("is-development", "true");
             }

@@ -57,24 +57,6 @@ namespace LootLocker.Requests
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
 
-        /// <summary>
-        /// Manually initialize the SDK.
-        /// </summary>
-        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
-        /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
-        /// <param name="platform">DEPRECATED: What platform you are using, only used for purchases, use Android if you are unsure</param>
-        /// <param name="onDevelopmentMode">DEPRECATED: Reflecting stage/live on the LootLocker webconsole</param>
-        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
-        /// <returns>True if initialized successfully, false otherwise</returns>
-        [Obsolete("DEPRECATED: Initializing with a platform is deprecated, use Init(string apiKey, string gameVersion, string domainKey)")]
-        public static bool Init(string apiKey, string gameVersion, platformType platform, bool onDevelopmentMode, string domainKey)
-        {
-            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
-            LootLockerServerManager.CheckInit();
-            initialized = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, onDevelopmentMode, platform);
-            return initialized;
-        }
-
         static bool LoadConfig()
         {
             initialized = false;
@@ -182,38 +164,6 @@ namespace LootLocker.Requests
             }
             LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(deviceId);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Start a session with the platform used in the platform selected in Project Settings -> Platform.
-        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
-        /// </summary>
-        /// <param name="deviceId">The ID of the current device the player is on</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        [Obsolete("DEPRECATED: Please use the StartSession method for the platform you're on. For Android use Guest Session. For iOS use Apple Session. If you are unsure of what to use, use Guest Session.")]
-        public static void StartSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            if (LootLockerConfig.current.platform != platformType.Unused)
-            {
-                CurrentPlatform.Set(LootLockerConfig.current.platform);
-            }
-
-            LootLockerConfig.current.deviceID = deviceId;
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
         }
 
         /// <summary>
@@ -838,13 +788,6 @@ namespace LootLocker.Requests
             });
         }
 
-        [Obsolete("Calling this method with devideId is deprecated")]
-        public static void EndSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
-        {
-            EndSession(onComplete);
-        }
-
-
         /// <summary>
         /// Clears client session data. WARNING: This does not end the session in LootLocker servers.
         /// </summary>
@@ -1088,13 +1031,6 @@ namespace LootLocker.Requests
             StartWhiteLabelSession(sessionRequest, onComplete);
         }
 
-        [ObsoleteAttribute("This function is deprecated and will be removed soon, please use StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete) instead.")]
-        public static void StartWhiteLabelSession(string email, string password, Action<LootLockerSessionResponse> onComplete)
-        {
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = email, password = password };
-            StartWhiteLabelSession(sessionRequest, onComplete);
-        }
-
         /// <summary>
         /// Start a LootLocker Session using the provided White Label request.
         /// White Label platform must be enabled in the web console for this to work.
@@ -1120,6 +1056,16 @@ namespace LootLocker.Requests
             });
         }
 
+        /// <summary>
+        /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session. If that succeeds, then also start a LootLocker Session.
+        /// The response is nested. The top properties will give the complete success condition and eventual error data. Nested inside the response you can also find the specific responses of the two composite calls using LoginResponse and SessionResponse respectively
+        /// Set remember=true to prolong the session lifetime
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="email">E-mail for an existing user</param>
+        /// <param name="password">Password for an existing user</param>
+        /// <param name="rememberMe">Set remember=true to prolong the session lifetime</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void WhiteLabelLoginAndStartSession(string email, string password, bool rememberMe, Action<LootLockerWhiteLabelLoginAndStartSessionResponse> onComplete)
         {
             WhiteLabelLogin(email, password, rememberMe, loginResponse =>
@@ -3998,16 +3944,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Missions
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMissions() instead")]
-        public static void GettingAllMissions(Action<LootLockerGettingAllMissionsResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingAllMissionsResponse>());
-                return;
-            }
-            LootLockerAPIManager.GettingAllMissions(onComplete);
-        }
 
         /// <summary>
         /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
@@ -4021,19 +3957,6 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerAPIManager.GetAllMissions(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetMission() instead")]
-        public static void GettingASingleMission(int missionId, Action<LootLockerGettingASingleMissionResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingASingleMissionResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.GettingASingleMission(data, onComplete);
         }
 
         /// <summary>
@@ -4053,19 +3976,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetMission(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function StartMission() instead")]
-        public static void StartingAMission(int missionId, Action<LootLockerStartingAMissionResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartingAMissionResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.StartingAMission(data, onComplete);
-        }
-
         /// <summary>
         /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
@@ -4081,34 +3991,6 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
             LootLockerAPIManager.StartMission(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function FinishMission() instead")]
-        public static void FinishingAMission(int missionId, string startingMissionSignature, string playerId,
-            LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishingAMissionResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishingAMissionResponse>());
-                return;
-            }
-
-            string source = LootLockerJson.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
-            string hash;
-            using (SHA1 sha1Hash = SHA1.Create())
-            {
-                byte[] sourceBytes = Encoding.UTF8.GetBytes(source);
-                byte[] hashBytes = sha1Hash.ComputeHash(sourceBytes);
-                hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
-            }
-
-            LootLockerFinishingAMissionRequest data = new LootLockerFinishingAMissionRequest()
-            {
-                signature = hash,
-                payload = finishingPayload
-            };
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.FinishingAMission(data, onComplete);
         }
 
         /// <summary>
@@ -4147,16 +4029,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Maps
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetAllMaps() instead.")]
-        public static void GettingAllMaps(Action<LootLockerMapsResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>());
-                return;
-            }
-            LootLockerAPIManager.GettingAllMaps(onComplete);
-        }
         /// <summary>
         /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
         /// </summary>
@@ -4244,19 +4116,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus() instead")]
-        public static void PollingOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            LootLockerAPIManager.PollingOrderStatus(data, onComplete);
-        }
-
         /// <summary>
         /// This will give you the current status of a purchase. These statuses can be returned;
         /// open - The order is being processed
@@ -4277,19 +4136,6 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
             LootLockerAPIManager.PollOrderStatus(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ActivateRentalAsset() instead")]
-        public static void ActivatingARentalAsset(int assetInstanceID, Action<LootLockerActivateARentalAssetResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateARentalAssetResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.ActivatingARentalAsset(data, onComplete);
         }
 
         /// <summary>
@@ -4334,17 +4180,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Collectables
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCollectables() instead")]
-        public static void GettingCollectables(Action<LootLockerGettingCollectablesResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGettingCollectablesResponse>());
-                return;
-            }
-            LootLockerAPIManager.GettingCollectables(onComplete);
-        }
-
         /// <summary>
         /// Get all collectables for the game.
         /// </summary>
@@ -4357,19 +4192,6 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerAPIManager.GetCollectables(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function CollectItem() instead")]
-        public static void CollectingAnItem(string slug, Action<LootLockerCollectingAnItemResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectingAnItemResponse>());
-                return;
-            }
-            LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
-            data.slug = slug;
-            LootLockerAPIManager.CollectingAnItem(data, onComplete);
         }
 
         /// <summary>
@@ -4410,18 +4232,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region TriggerEvents
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ExecuteTrigger() instead")]
-        public static void TriggeringAnEvent(string eventName, Action<LootLockerTriggerAnEventResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerTriggerAnEventResponse>());
-                return;
-            }
-            LootLockerTriggerAnEventRequest data = new LootLockerTriggerAnEventRequest { name = eventName };
-            LootLockerAPIManager.TriggeringAnEvent(data, onComplete);
-        }
-
         /// <summary>
         /// Execute a trigger. This will grant the player any items that are attached to the trigger.
         /// </summary>
@@ -4436,17 +4246,6 @@ namespace LootLocker.Requests
             }
             LootLockerExecuteTriggerRequest data = new LootLockerExecuteTriggerRequest { name = triggerName };
             LootLockerAPIManager.ExecuteTrigger(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListExecutedTriggers() instead")]
-        public static void ListingTriggeredTriggerEvents(Action<LootLockerListingAllTriggersResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAllTriggersResponse>());
-                return;
-            }
-            LootLockerAPIManager.ListingTriggeredTriggerEvents(onComplete);
         }
 
         /// <summary>
@@ -4485,54 +4284,6 @@ namespace LootLocker.Requests
             lootLockerGetMemberRankRequest.member_id = member_id;
 
             LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard</param>
-        /// <param name="member_id">ID of the player as a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
-        public static void GetMemberRank(int leaderboardId, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
-        {
-            GetMemberRank(leaderboardId.ToString(), member_id, onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard as an int</param>
-        /// <param name="member_id">ID of the player as an int</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
-        public static void GetMemberRank(int leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
-        {
-            GetMemberRank(leaderboardId.ToString(), member_id.ToString(), onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the current ranking for a specific player on a leaderboard.
-        /// </summary>
-        /// <param name="leaderboardId">ID or key of the leaderboard as a string</param>
-        /// <param name="member_id">ID of the player as an int</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete) instead.")]
-        public static void GetMemberRank(string leaderboardId, int member_id, Action<LootLockerGetMemberRankResponse> onComplete)
-        {
-            GetMemberRank(leaderboardId, member_id.ToString(), onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the current ranking for several members on a specific leaderboard.
-        /// </summary>
-        /// <param name="members">List of members to get as string</param>
-        /// <param name="leaderboardId">ID of the leaderboard as an int</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetByListOfMembersResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete) instead.")]
-        public static void GetByListOfMembers(string[] members, int leaderboardId, Action<LootLockerGetByListOfMembersResponse> onComplete)
-        {
-            GetByListOfMembers(members, leaderboardId.ToString(), onComplete);
         }
 
         /// <summary>
@@ -4650,37 +4401,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllMemberRanks(request, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList instead.")]
-        public static void GetScoreListMain(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            GetScoreList(leaderboardId, count, after, onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the entries for a specific leaderboard.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
-        /// <param name="count">How many entries to get</param>
-        /// <param name="after">How many after the last entry to receive</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
-        public static void GetScoreList(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            GetScoreList(leaderboardId.ToString(), count, after, onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the entries for a specific leaderboard.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
-        /// <param name="count">How many entries to get</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
-        public static void GetScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            GetScoreList(leaderboardId, count, -1, onComplete);
-        }
-
         /// <summary>
         /// Get the entries for a specific leaderboard.
         /// </summary>
@@ -4725,18 +4445,6 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// DEPRECATED: Get the next entries for a specific leaderboard. Can be called after GetScoreList.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
-        /// <param name="count">How many entries to get</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
-        public static void GetNextScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            GetScoreList(leaderboardId.ToString(), count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
-        }
-
-        /// <summary>
         /// Get the next entries for a specific leaderboard. Can be called after GetScoreList.
         /// </summary>
         /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
@@ -4745,18 +4453,6 @@ namespace LootLocker.Requests
         public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
         {
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Get the previous entries for a specific leaderboard. Can be called after GetScoreList or GetNextScoreList.
-        /// </summary>
-        /// <param name="leaderboardId">ID of the leaderboard to get entries for</param>
-        /// <param name="count">How many entries to get</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete) instead.")]
-        public static void GetPrevScoreList(int leaderboardId, int count, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            GetScoreList(leaderboardId.ToString(), count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
         }
 
         /// <summary>
@@ -4776,49 +4472,6 @@ namespace LootLocker.Requests
         public static void ResetScoreCalls()
         {
             LootLockerGetScoreListRequest.Reset();
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use GetScoreList instead.")]
-        public static void GetScoreListOriginal(int leaderboardId, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>());
-                return;
-            }
-            LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
-            request.leaderboardKey = leaderboardId.ToString();
-            request.count = count;
-            request.after = after > 0 ? after.ToString() : null;
-
-            LootLockerAPIManager.GetScoreList(request, onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Submit a score to a leaderboard.
-        /// </summary>
-        /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
-        /// <param name="score">The score to upload</param>
-        /// <param name="leaderboardId">ID of the leaderboard to submit score to</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete) instead.")]
-        public static void SubmitScore(string memberId, int score, int leaderboardId, Action<LootLockerSubmitScoreResponse> onComplete)
-        {
-            SubmitScore(memberId, score, leaderboardId.ToString(), "", onComplete);
-        }
-
-        /// <summary>
-        /// DEPRECATED: Submit a score to a leaderboard with additional metadata.
-        /// </summary>
-        /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise an identifier for the player</param>
-        /// <param name="score">The score to upload</param>
-        /// <param name="leaderboardId">ID of the leaderboard to submit score to</param>
-        /// <param name="metadata">Additional metadata to add to the score</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
-        [Obsolete("This function is deprecated and will be removed soon. Please use (string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) instead.")]
-        public static void SubmitScore(string memberId, int score, int leaderboardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
-        {
-            SubmitScore(memberId, score, leaderboardId.ToString(), metadata, onComplete);
         }
 
         /// <summary>
