@@ -2,12 +2,13 @@
 
 namespace LootLocker.LootLockerEnums
 {
-    /// <summary> Possible account linking process statuses. Undefined means that the object couldn't be constructed correctly
+    /// <summary>
+    /// Possible account linking process statuses. Undefined means that the object couldn't be constructed correctly
     /// </summary>
     public enum LootLockerWalletHolderTypes
     {
-        Character = 0,
-        Player = 1,
+        character = 0,
+        player = 1,
     };
 }
 
@@ -54,7 +55,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The type of holder that this holder id refers to
         /// </summary>
-        public LootLockerWalletHolderTypes holder_type { get; set; }
+        public string holder_type { get; set; }
+        /// <summary>
+        /// The id of the created wallet
+        /// </summary>
+        public string id { get; set; }
     };
 
     /// <summary>
@@ -131,6 +136,60 @@ namespace LootLocker.Requests
         /// The type of entity that holds this wallet
         /// </summary>
         public LootLockerWalletHolderTypes type { get; set;}
+    };
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerCreditWalletResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Current amount of the given currency in this wallet
+        /// </summary>
+        public string amount { get; set; }
+        /// <summary>
+        /// Information about the currency that this balance is in
+        /// </summary>
+        public LootLockerCurrency currency { get; set; }
+        /// <summary>
+        /// The id of the wallet holding this balance
+        /// </summary>
+        public string wallet_id { get; set; }
+        /// <summary>
+        /// The time that this balance was created
+        /// </summary>
+        public string created_at { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerDebitWalletResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Current amount of the given currency in this wallet
+        /// </summary>
+        public string amount { get; set; }
+        /// <summary>
+        /// Information about the currency that this balance is in
+        /// </summary>
+        public LootLockerCurrency currency { get; set; }
+        /// <summary>
+        /// The id of the wallet holding this balance
+        /// </summary>
+        public string wallet_id { get; set; }
+        /// <summary>
+        /// The time that this balance was created
+        /// </summary>
+        public string created_at { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerCreateWalletResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// The unique id of this wallet
+        /// </summary>
+        public string wallet_id { get; set; }
     };
 
 }
