@@ -255,37 +255,50 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
-   /// </summary>
+    /// </summary>
     public class LootLockerListCatalogPricesResponse : LootLockerResponse
     {
         /// <summary>
-       /// Details about the catalog that the prices is in
-       /// </summary>
+        /// Details about the catalog that the prices is in
+        /// </summary>
         public LootLockerCatalog catalog { get; set; }
 
         /// <summary>
-       /// A list of entries available in this catalog
-       /// </summary>
+        /// A list of entries available in this catalog
+        /// </summary>
         public LootLockerCatalogEntry[] entries { get; set; }
+
         /// <summary>
-       /// Lookup map for details about entities of entity type assets
-       /// </summary>
+        /// Lookup map for details about entities of entity type assets
+        /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerAssetDetails> asset_details { get; set; }
+
         /// <summary>
-       /// Lookup map for details about entities of entity type progression_points
-       /// </summary>
-        public Dictionary<string /*grouping_key*/, LootLockerProgressionPointDetails> progression_points_details { get; set; }
+        /// Lookup map for details about entities of entity type progression_points
+        /// </summary>
+        public Dictionary<string /*grouping_key*/, LootLockerProgressionPointDetails> progression_points_details
+        {
+            get;
+            set;
+        }
+
         /// <summary>
-       /// Lookup map for details about entities of entity type progression_reset
-       /// </summary>
-        public Dictionary<string /*grouping_key*/, LootLockerProgressionResetDetails> progression_resets_details { get; set; }
+        /// Lookup map for details about entities of entity type progression_reset
+        /// </summary>
+        public Dictionary<string /*grouping_key*/, LootLockerProgressionResetDetails> progression_resets_details
+        {
+            get;
+            set;
+        }
+
         /// <summary>
-       /// Lookup map for details about entities of entity type currency
-       /// </summary>
+        /// Lookup map for details about entities of entity type currency
+        /// </summary>
         public Dictionary<string /*grouping_key*/, LootLockerCurrencyDetails> currency_details { get; set; }
+
         /// <summary>
-       /// Pagination data to use for subsequent requests
-       /// </summary>
+        /// Pagination data to use for subsequent requests
+        /// </summary>
         public LootLockerCatalogPagination pagination { get; set; }
 
         public void AppendCatalogItems(LootLockerListCatalogPricesResponse catalogPrices)
@@ -298,32 +311,33 @@ namespace LootLocker.Requests
 
             foreach (var assetDetail in catalogPrices.asset_details)
             {
-                asset_details.Add(assetDetail.Key, assetDetail.Value);                
+                asset_details.Add(assetDetail.Key, assetDetail.Value);
             }
+
             foreach (var progressionPointDetail in catalogPrices.progression_points_details)
             {
                 progression_points_details.Add(progressionPointDetail.Key, progressionPointDetail.Value);
             }
+
             foreach (var progressionResetDetail in catalogPrices.progression_resets_details)
             {
                 progression_resets_details.Add(progressionResetDetail.Key, progressionResetDetail.Value);
             }
+
             foreach (var currencyDetail in catalogPrices.currency_details)
             {
                 currency_details.Add(currencyDetail.Key, currencyDetail.Value);
             }
         }
 
-        public LootLockerListCatalogPricesResponse()
-        {
-        }
+        public LootLockerListCatalogPricesResponse() {}
 
-       /// This is the way that the response actually looks, but we don't want to expose it, hence the conversion
+        /// This is the way that the response actually looks, but we don't want to expose it, hence the conversion
         private class LootLockerListCatalogItemsWithArraysResponse : LootLockerResponse
         {
             public LootLockerCatalog catalog { get; set; }
             public LootLockerCatalogEntry[] entries { get; set; }
-            public LootLockerAssetDetails[] asset_details { get; set; }
+            public LootLockerAssetDetails[] assets_details { get; set; }
             public LootLockerProgressionPointDetails[] progression_points_details { get; set; }
             public LootLockerProgressionResetDetails[] progression_resets_details { get; set; }
             public LootLockerCurrencyDetails[] currency_details { get; set; }
@@ -332,34 +346,47 @@ namespace LootLocker.Requests
 
         public LootLockerListCatalogPricesResponse(LootLockerResponse serverResponse)
         {
-            LootLockerListCatalogItemsWithArraysResponse parsedResponse = Deserialize<LootLockerListCatalogItemsWithArraysResponse>(serverResponse);
+            LootLockerListCatalogItemsWithArraysResponse parsedResponse =
+                Deserialize<LootLockerListCatalogItemsWithArraysResponse>(serverResponse);
+            success = parsedResponse.success;
+            statusCode = parsedResponse.statusCode;
+            text = parsedResponse.text;
+            errorData = parsedResponse.errorData;
+            if (!success)
+            {
+                return;
+            }
+
             catalog = parsedResponse.catalog;
             entries = parsedResponse.entries;
+            pagination = parsedResponse.pagination;
 
-            if (parsedResponse.asset_details != null && parsedResponse.asset_details.Length > 0)
+            if (parsedResponse.assets_details != null && parsedResponse.assets_details.Length > 0)
             {
                 asset_details = new Dictionary<string, LootLockerAssetDetails>();
-                foreach (var assetDetail in parsedResponse.asset_details)
+                foreach (var assetDetail in parsedResponse.assets_details)
                 {
-                    asset_details.Add(assetDetail.id, assetDetail);
+                    asset_details[assetDetail.grouping_key] = assetDetail;
                 }
             }
 
-            if (parsedResponse.progression_points_details != null && parsedResponse.progression_points_details.Length > 0)
+            if (parsedResponse.progression_points_details != null &&
+                parsedResponse.progression_points_details.Length > 0)
             {
                 progression_points_details = new Dictionary<string, LootLockerProgressionPointDetails>();
                 foreach (var detail in parsedResponse.progression_points_details)
                 {
-                    progression_points_details.Add(detail.id, detail);
+                    progression_points_details[detail.grouping_key] = detail;
                 }
             }
 
-            if (parsedResponse.progression_resets_details != null && parsedResponse.progression_resets_details.Length > 0)
+            if (parsedResponse.progression_resets_details != null &&
+                parsedResponse.progression_resets_details.Length > 0)
             {
                 progression_resets_details = new Dictionary<string, LootLockerProgressionResetDetails>();
                 foreach (var detail in parsedResponse.progression_resets_details)
                 {
-                    progression_resets_details.Add(detail.id, detail);
+                    progression_resets_details[detail.grouping_key] = detail;
                 }
             }
 
@@ -368,31 +395,31 @@ namespace LootLocker.Requests
                 currency_details = new Dictionary<string, LootLockerCurrencyDetails>();
                 foreach (var detail in parsedResponse.currency_details)
                 {
-                    currency_details.Add(detail.id, detail);
+                    currency_details[detail.grouping_key] = detail;
                 }
             }
         }
 
 #if UNITY_2020_2_OR_NEWER
         /// <summary>
-       /// </summary>
+        /// </summary>
         public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
         {
             /// <summary>
-           /// Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
-           /// </summary>
+            /// Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
+            /// </summary>
             public LootLockerAssetDetails? asset_details { get; set; }
             /// <summary>
-           /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
-           /// </summary>
+            /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
+            /// </summary>
             public LootLockerProgressionPointDetails? progression_point_details { get; set; }
             /// <summary>
-           /// Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
-           /// </summary>
+            /// Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
+            /// </summary>
             public LootLockerProgressionResetDetails? progression_reset_details { get; set; }
             /// <summary>
-           /// Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
-           /// </summary>
+            /// Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
+            /// </summary>
             public LootLockerCurrencyDetails? currency_details { get; set; }
 
             public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails) 
@@ -412,8 +439,8 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-       /// Get all the entries with details inlined into the entries themselves
-       /// </summary>
+        /// Get all the entries with details inlined into the entries themselves
+        /// </summary>
         public LootLockerInlinedCatalogEntry[] GetLootLockerInlinedCatalogEntries()
         {
             List<LootLockerInlinedCatalogEntry> inlinedEntries = new List<LootLockerInlinedCatalogEntry>();
