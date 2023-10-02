@@ -4990,7 +4990,6 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete)
         {
-            LootLockerCurrency cur;
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>());
@@ -5079,7 +5078,7 @@ namespace LootLocker.Requests
                         LootLockerCreateWalletRequest request = new LootLockerCreateWalletRequest()
                         {
                             holder_id = holderUlid,
-                            holder_type = holderType
+                            holder_type = holderType.ToString()
                         };
                         LootLockerServerRequest.CallAPI(LootLockerEndPoints.createWallet.endPoint,
                             LootLockerEndPoints.createWallet.httpMethod, LootLockerJson.SerializeObject(request),
@@ -5113,11 +5112,11 @@ namespace LootLocker.Requests
         /// <param name="currencyId">Unique ID of the currency to credit</param>
         /// <param name="amount">The amount of the given currency to credit to the given wallet</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerBalanceForWalletResponse> onComplete)
+        public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerCreditWalletResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceForWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreditWalletResponse>());
                 return;
             }
 
@@ -5133,11 +5132,11 @@ namespace LootLocker.Requests
         /// <param name="currencyId">Unique ID of the currency to debit</param>
         /// <param name="amount">The amount of the given currency to debit from the given wallet</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerBalanceForWalletResponse> onComplete)
+        public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerDebitWalletResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceForWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDebitWalletResponse>());
                 return;
             }
 
