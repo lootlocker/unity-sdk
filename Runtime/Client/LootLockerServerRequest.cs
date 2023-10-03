@@ -452,11 +452,16 @@ namespace LootLocker
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                if (callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin && !string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+                if (callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin)
                 {
-                    headers.Add("x-auth-token", LootLockerConfig.current.adminToken);
+#if UNITY_EDITOR
+                    if (!string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+                    {
+                        headers.Add("x-auth-token", LootLockerConfig.current.adminToken);
+                    }
+#endif
                 }
-                else if (callerRole != LootLocker.LootLockerEnums.LootLockerCallerRole.Admin && !string.IsNullOrEmpty(LootLockerConfig.current.token))
+                else if (!string.IsNullOrEmpty(LootLockerConfig.current.token))
                 {
                     headers.Add("x-session-token", LootLockerConfig.current.token);
                 }
