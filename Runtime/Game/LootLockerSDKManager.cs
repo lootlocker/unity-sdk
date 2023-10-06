@@ -127,7 +127,6 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("You cannot call this method before an active LootLocker session is started");
                 return false;
             }
 
