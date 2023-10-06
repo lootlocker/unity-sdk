@@ -112,16 +112,6 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
-    public class LootLockerBalanceForWalletResponse : LootLockerResponse
-    {
-        /// <summary>
-        /// The balance of the wallet
-        /// </summary>
-        public LootLockerBalance balance { get; set; }
-    };
-
-    /// <summary>
-    /// </summary>
     public class LootLockerGetWalletResponse : LootLockerResponse
     {
         /// <summary>
