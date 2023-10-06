@@ -239,7 +239,7 @@ namespace LootLocker
         /// </summary>
         public static T SDKNotInitializedError<T>() where T : LootLockerResponse, new()
         {
-            return Error<T>("SDK not initialized");
+            return Error<T>("The LootLocker SDK has not been initialized, please start a session to call this method");
         }
 
         /// <summary>
