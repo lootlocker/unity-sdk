@@ -1,6 +1,7 @@
 using LootLocker;
 using LootLocker.Extension.Requests;
 using System.IO;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -58,7 +59,8 @@ namespace LootLocker.Extension
                     Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow");
 
                     FileUtil.CopyFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss", "Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss");
-
+                    EditorApplication.delayCall += AssetDatabase.SaveAssets;
+                    AssetDatabase.Refresh();
                 }
 
                 EditorPrefs.SetBool(configFileEditorPref, true);
