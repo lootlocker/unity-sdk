@@ -35,6 +35,37 @@ namespace LootLocker.Extension
         serializedUser = LootLockerJson.SerializeObject(user);
     }
 
+        [InitializeOnLoadMethod]
+        private static void FirstLoad()
+        {
+            EditorPrefs.DeleteAll();
+
+            string projectPath = Application.dataPath;
+
+            DateTime creationTime = Directory.GetCreationTime(projectPath);
+            string configFileEditorPref = "StoredUserCreated" + creationTime.GetHashCode().ToString();
+
+            if (EditorPrefs.GetBool(configFileEditorPref) == false)
+            {
+
+                if (Directory.Exists("Packages/com.lootlocker.lootlockersdk")) 
+                {
+                    if (Directory.Exists("Assets/LootLockerSDK/Runtime/Editor/VisualElements"))
+                    {
+                        Directory.Delete("Assets/LootLockerSDK/Runtime/Editor/VisualElements", recursive: true);
+                    }
+
+                    Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow");
+
+                    FileUtil.CopyFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss", "Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss");
+
+                }
+
+                EditorPrefs.SetBool(configFileEditorPref, true);
+            }
+
+        }    
+
     private static StoredUser Get()
     {
         if (_current != null)
