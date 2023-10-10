@@ -5,7 +5,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-//#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Extension.DataTypes;
 
 namespace LootLocker.Extension
@@ -166,4 +166,4 @@ namespace LootLocker.Extension
 }
 }
 
-//#endif
+#endif
