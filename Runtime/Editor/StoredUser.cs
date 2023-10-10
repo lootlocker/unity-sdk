@@ -59,26 +59,6 @@ namespace LootLocker.Extension
                     Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow");
 
                     FileUtil.CopyFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss", "Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss");
-                    //EditorApplication.delayCall += AssetDatabase.SaveAssets;
-                    //AssetDatabase.Refresh();
-
-                    if(Directory.Exists("Assets/LootLockerSDK/Runtime/Editor/Icons"))
-                    {
-                        Directory.Delete("Assets/LootLockerSDK/Runtime/Editor/Icons", recursive: true);
-                    }
-                    Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/Icons");
-
-                    if(File.Exists("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/Hector_512x512g.png") && File.Exists("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/Hector_512x512g.png.meta"))
-                    {
-                        FileUtil.MoveFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/Hector_512x512g.png", "Assets/LootLockerSDK/Runtime/Editor/Icons/Hector_512x512g.png");
-                        FileUtil.MoveFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/Hector_512x512g.png.meta", "Assets/LootLockerSDK/Runtime/Editor/Icons/Hector_512x512g.png.meta");
-                    }
-                    if(File.Exists("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/caret.png") && File.Exists("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/caret.png.meta"))
-                    {
-                        FileUtil.MoveFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/caret.png","Assets/LootLockerSDK/Runtime/Editor/Icons/caret.png");
-                        FileUtil.MoveFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Icons/caret.png.meta","Assets/LootLockerSDK/Runtime/Editor/Icons/caret.png.meta");
-                    }
-
 
                     EditorApplication.delayCall += AssetDatabase.SaveAssets;
                     AssetDatabase.Refresh();
