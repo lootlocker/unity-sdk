@@ -1,6 +1,7 @@
 using LootLocker;
 using LootLocker.Extension.Requests;
 using System.IO;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,7 +35,6 @@ namespace LootLocker.Extension
         }
         serializedUser = LootLockerJson.SerializeObject(user);
     }
-
 
         [InitializeOnLoadMethod]
         private static void FirstLoad()
