@@ -195,6 +195,7 @@ namespace LootLocker
         public static EndPointClass androidPurchaseVerification = new EndPointClass("v1/purchase", LootLockerHTTPMethod.POST);
         public static EndPointClass pollingOrderStatus = new EndPointClass("v1/purchase/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass activatingARentalAsset = new EndPointClass("v1/asset/instance/{0}/activate", LootLockerHTTPMethod.POST);
+        public static EndPointClass purchaseCatalogItem = new EndPointClass("purchase", LootLockerHTTPMethod.POST);
 
         // EventTrigger
         [Header("EventTrigger")]
@@ -233,6 +234,25 @@ namespace LootLocker
         [Header("Drop Tables")]
         public static EndPointClass ComputeAndLockDropTable = new EndPointClass("v1/player/droptables/{0}/compute?asset_details={1}", LootLockerHTTPMethod.POST);
         public static EndPointClass PickDropsFromDropTable = new EndPointClass("v1/player/droptables/{0}/pick", LootLockerHTTPMethod.POST);
+
+        // Currencies
+        [Header("Currencies")]
+        public static EndPointClass listCurrencies = new EndPointClass("currencies", LootLockerHTTPMethod.GET);
+        public static EndPointClass getCurrencyDenominationsByCode = new EndPointClass("currency/code/{0}/denominations", LootLockerHTTPMethod.GET);
+
+        // Balances
+        [Header("Balances")]
+        public static EndPointClass listBalancesInWallet = new EndPointClass("balances/wallet/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getWalletByWalletId = new EndPointClass("wallet/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getWalletByHolderId = new EndPointClass("wallet/holder/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass creditBalanceToWallet = new EndPointClass("balances/credit", LootLockerHTTPMethod.POST);
+        public static EndPointClass debitBalanceToWallet = new EndPointClass("balances/debit", LootLockerHTTPMethod.POST);
+        public static EndPointClass createWallet = new EndPointClass("wallet", LootLockerHTTPMethod.POST);
+
+        // Catalogs
+        [Header("Catalogs")]
+        public static EndPointClass listCatalogs = new EndPointClass("catalogs", LootLockerHTTPMethod.GET);
+        public static EndPointClass listCatalogItemsByKey = new EndPointClass("catalog/key/{0}/prices", LootLockerHTTPMethod.GET);
 
         // Misc
         [Header("Misc")]

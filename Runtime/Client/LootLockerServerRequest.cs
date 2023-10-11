@@ -207,6 +207,7 @@ namespace LootLocker
             return response;
         }
     }
+
     public class LootLockerPaginationResponse<TKey>
     {
         public int total { get; set; }
@@ -238,7 +239,7 @@ namespace LootLocker
         /// </summary>
         public static T SDKNotInitializedError<T>() where T : LootLockerResponse, new()
         {
-            return Error<T>("SDK not initialized");
+            return Error<T>("The LootLocker SDK has not been initialized, please start a session to call this method");
         }
 
         /// <summary>
@@ -427,7 +428,7 @@ namespace LootLocker
 
         /// <summary>
         /// Query parameters to append to the end of the request URI
-        /// <para>Example: If you include a dictionary with a key of "page" and a value of "42" (as a string) then the url would become "https: //mydomain.com/endpoint?page=42"</para>
+        /// Example: If you include a dictionary with a key of "page" and a value of "42" (as a string) then the url would become "https://mydomain.com/endpoint?page=42"
         /// </summary>
         public Dictionary<string, string> queryParams;
 

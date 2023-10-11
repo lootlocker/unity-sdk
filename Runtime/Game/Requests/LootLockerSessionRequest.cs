@@ -69,6 +69,7 @@ namespace LootLocker.Requests
         public int player_id { get; set; }
         public bool seen_before { get; set; }
         public string public_uid { get; set; }
+        public string player_ulid { get; set; }
         public DateTime player_created_at { get; set; }
         public bool check_grant_notifications { get; set; }
         public bool check_deactivation_notifications { get; set; }

@@ -13,6 +13,7 @@ namespace LootLocker.Requests
         public int? account_balance { get; set; }
         public int? xp { get; set; }
         public int? level { get; set; }
+        public string ulid { get; set; }
         public LootLockerLevel_Thresholds level_thresholds { get; set; }
     }
 
@@ -98,10 +99,11 @@ namespace LootLocker.Requests
         public PlayerNameWithIDs[] players { get; set; }
     }
 
-    public class PlayerNameWithIDs : LootLockerResponse
+    public class PlayerNameWithIDs
     {
         public uint player_id { get; set; }
         public string player_public_uid { get; set; }
+        public string player_ulid { get; set; }
         public string name { get; set; }
         public string last_active_platform { get; set; }
         public string platform_player_id { get; set; }

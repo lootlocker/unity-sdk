@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using System.Security.Cryptography;
 using System.Text;
 using LootLocker.LootLockerEnums;
 using static LootLocker.LootLockerConfig;
 using System.Linq;
 using File = System.IO.File;
+using System.Security.Cryptography;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -127,7 +127,6 @@ namespace LootLocker.Requests
 
             if (!skipSessionCheck && !CheckActiveSession())
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("You cannot call this method before an active LootLocker session is started");
                 return false;
             }
 
@@ -4309,6 +4308,29 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.ActivateRentalAsset(data, onComplete);
         }
+
+        /// <summary>
+        /// Purchase one or more catalog items using a specified wallet
+        /// </summary>
+        /// <param name="walletId">The id of the wallet to use for the purchase</param>
+        /// <param name="itemsToPurchase">A list of items to purchase along with the quantity of each item to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void LootLockerPurchaseCatalogItems(string walletId, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action<LootLockerPurchaseCatalogItemResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseCatalogItemResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerPurchaseCatalogItemRequest
+            {
+                wallet_id = walletId,
+                items = itemsToPurchase
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.purchaseCatalogItem.endPoint, LootLockerEndPoints.purchaseCatalogItem.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         #endregion
 
         #region Collectables
@@ -4958,6 +4980,213 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
         }
 
+        #endregion
+
+        #region Currency
+        /// <summary>
+        /// Get a list of available currencies for the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCurrencies.endPoint, LootLockerEndPoints.listCurrencies.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get a list of the denominations available for a specific currency
+        /// </summary>
+        /// <param name="currencyCode">The code of the currency to fetch denominations for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetCurrencyDenominationsByCode(string currencyCode, Action<LootLockerListDenominationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListDenominationsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDenominationsByCode.endPoint, currencyCode);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDenominationsByCode.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        #endregion
+
+        #region Balances
+        /// <summary>
+        /// Get a list of balances in a specified wallet
+        /// </summary>
+        /// <param name="walletId">Unique ID of the wallet to get balances for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListBalancesInWallet(string walletId, Action<LootLockerListBalancesForWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.listBalancesInWallet.endPoint, walletId);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get information about a specified wallet
+        /// </summary>
+        /// <param name="walletId">Unique ID of the wallet to get information for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetWalletByWalletId(string walletId, Action<LootLockerGetWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.getWalletByWalletId.endPoint, walletId);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get information about a wallet for a specified holder
+        /// </summary>
+        /// <param name="holderUlid">ULID of the holder of the wallet you want to get information for</param>
+        /// <param name="holderType">The type of the holder to get the wallet for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetWalletByHolderId(string holderUlid, LootLockerWalletHolderTypes holderType, Action<LootLockerGetWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderUlid);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete:
+                (serverResponse) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerGetWalletResponse>(serverResponse);
+                    if (!parsedResponse.success && parsedResponse.statusCode == 404)
+                    {
+                        LootLockerCreateWalletRequest request = new LootLockerCreateWalletRequest()
+                        {
+                            holder_id = holderUlid,
+                            holder_type = holderType.ToString()
+                        };
+                        LootLockerServerRequest.CallAPI(LootLockerEndPoints.createWallet.endPoint,
+                            LootLockerEndPoints.createWallet.httpMethod, LootLockerJson.SerializeObject(request),
+                            createWalletResponse =>
+                            {
+                                if (createWalletResponse.success)
+                                {
+                                    LootLockerServerRequest.CallAPI(endpoint,
+                                        LootLockerEndPoints.getWalletByHolderId.httpMethod, null,
+                                        secondResponse =>
+                                        {
+                                            LootLockerResponse.Deserialize(onComplete, secondResponse);
+                                        });
+                                    return;
+                                }
+
+                                onComplete?.Invoke(parsedResponse);
+                            });
+                        return;
+                    }
+
+                    onComplete?.Invoke(parsedResponse);
+                }
+            );
+        }
+
+        /// <summary>
+        /// Credit (increase) the specified amount of the provided currency to the provided wallet
+        /// </summary>
+        /// <param name="walletId">Unique ID of the wallet to credit the given amount of the given currency to</param>
+        /// <param name="currencyId">Unique ID of the currency to credit</param>
+        /// <param name="amount">The amount of the given currency to credit to the given wallet</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerCreditWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreditWalletResponse>());
+                return;
+            }
+
+            var json = LootLockerJson.SerializeObject(new LootLockerCreditRequest() { amount = amount, currency_id = currencyId, wallet_id = walletId });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.creditBalanceToWallet.endPoint, LootLockerEndPoints.creditBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Debit (decrease) the specified amount of the provided currency to the provided wallet
+        /// </summary>
+        /// <param name="walletId">Unique ID of the wallet to debit the given amount of the given currency from</param>
+        /// <param name="currencyId">Unique ID of the currency to debit</param>
+        /// <param name="amount">The amount of the given currency to debit from the given wallet</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerDebitWalletResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDebitWalletResponse>());
+                return;
+            }
+
+            var json = LootLockerJson.SerializeObject(new LootLockerDebitRequest() { amount = amount, currency_id = currencyId, wallet_id = walletId });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.debitBalanceToWallet.endPoint, LootLockerEndPoints.debitBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        #endregion
+
+        #region Catalog
+        /// <summary>
+        /// List the catalogs available for the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCatalogs(Action<LootLockerListCatalogsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCatalogs.endPoint, LootLockerEndPoints.listCatalogs.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List the items available in a specific catalog
+        /// </summary>
+        /// <param name="catalogKey">Unique Key of the catalog that you want to get items for</param>
+        /// <param name="count">Amount of catalog items to receive. Use null to simply get the default amount.</param>
+        /// <param name="after">Used for pagination, this is the cursor to start getting items from. Use null to get items from the beginning. Use the cursor from a previous call to get the next count of items in the list.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogPricesResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>());
+                return;
+            }
+            var endpoint = string.Format(LootLockerEndPoints.listCatalogItemsByKey.endPoint, catalogKey); 
+            
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"per_page={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"cursor={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
+        }
         #endregion
 
         #region Misc
