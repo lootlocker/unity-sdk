@@ -49,9 +49,9 @@ namespace LootLocker.Requests
     public class LootLockerCatalogItemAndQuantityPair
     {
         /// <summary>
-         /// The unique id of the catalog item to purchase
+         /// The unique listing id of the catalog item to purchase
          /// </summary>
-        public string catalog_item_id { get; set; }
+        public string catalog_listing_id { get; set; }
         /// <summary>
          /// The quantity of the specified item to purchase
          /// </summary>
