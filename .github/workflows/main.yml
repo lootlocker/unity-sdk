@@ -31,8 +31,9 @@ jobs:
           #- editmode
         unityVersion:
           - 2019.4.40f1
-          - 2020.3.38f1
-          - 2021.3.8f1
+          - 2020.3.48f1
+          - 2021.3.29f1
+          - 2022.3.7f1
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v2
