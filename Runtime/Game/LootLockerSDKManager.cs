@@ -808,83 +808,33 @@ namespace LootLocker.Requests
 
         #region Remote Sessions
         /// <summary>
-        /// Start a lease request for a remote session
-        /// If you want to let your local user sign in using another device then you use this method to get the lease code that the secondary device can use to authenticate.
-        /// While the process is ongoing, poll StartRemoteSession until the status is AUTHORIZED. When it is, a valid session to use locally will be in the response.
+        /// Start a remote session
+        /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
+        /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently to update you on the status of the process.
+        /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaseRemoteSessionResponse>());
-                return;
-            }
-
-            LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest = new LootLockerLeaseRemoteSessionRequest();
-
-            EndPointClass endPoint = LootLockerEndPoints.leaseRemoteSession;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, 
-                endPoint.httpMethod, 
-                LootLockerJson.SerializeObject(leaseRemoteSessionRequest), 
-                (serverResponse) => onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse)), 
-                false);
-        }
-
-        /// <summary>
-        /// Create a new session authorized remotely from a previously constructed lease
-        /// If the session has not yet been remotely authorized, the response will contain only the status of the lease process
-        /// </summary>
-        /// <param name="remoteSessionLeaseResponse">TODO: Document</param>
-        /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartRemoteSession(LootLockerLeaseRemoteSessionResponse remoteSessionLeaseResponse, Action<LootLockerStartRemoteSessionResponse> onComplete)
-        {
-            StartRemoteSession(remoteSessionLeaseResponse.code, remoteSessionLeaseResponse.nonce, onComplete);
-        }
-
-        /// <summary>
-        /// Create a new session authorized remotely from a previously constructed lease
-        /// If the session has not yet been remotely authorized, the response will contain only the status of the lease process
-        /// </summary>
-        /// <param name="leaseCode">The lease code returned in the LeaseRemoteSession response</param>
-        /// <param name="nonce">The nonce returned in the LeaseRemoteSession response</param>
-        /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartRemoteSession(string leaseCode, string nonce, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
+        /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
+        /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
+        public static Guid StartRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
-                return;
+                return Guid.Empty;
             }
 
-            CurrentPlatform.Set(Platforms.Remote);
-            LootLockerStartRemoteSessionRequest remoteSessionRequest = new LootLockerStartRemoteSessionRequest
-            {
-                lease_code = leaseCode,
-                nonce = nonce,
-            };
-
-            EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(remoteSessionRequest), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerStartRemoteSessionResponse>(serverResponse);
-                if (!response.success)
-                {
-                    CurrentPlatform.Reset();
-                    onComplete?.Invoke(response);
-                    return;
-                }
-
-                if (response.lease_status == LootLockerRemoteSessionLeaseStatus.Authorized)
-                {
-                    LootLockerConfig.current.token = response.session_token;
-                    LootLockerConfig.current.refreshToken = response.refresh_token;
-                    LootLockerConfig.current.deviceID = response.player_identifier;
-                }
-                onComplete?.Invoke(response);
-            }, false);
+            return LootLockerAPIManager.StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete);
         }
 
+        /// <summary>
+        /// Cancel an ongoing remote session process
+        /// </summary>
+        /// <param name="guid">The guid of the remote session process that you want to cancel</param>
+        public static void CancelRemoteSessionProcess(Guid guid)
+        {
+            LootLockerAPIManager.CancelRemoteSessionProcess(guid);
+        }
         #endregion
 
         #region White Label
