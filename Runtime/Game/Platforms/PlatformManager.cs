@@ -22,6 +22,7 @@ namespace LootLocker.Requests
         ,Google
         ,Epic
         ,Meta
+        ,Remote
     }
 
     public class CurrentPlatform
@@ -55,6 +56,7 @@ namespace LootLocker.Requests
             ,"google_sign_in" // Google
             ,"epic_games" // Epic Online Services / Epic Games
             ,"meta" // Meta
+            ,"remote" // Remote (leased) session
         };
 
         private static readonly string[] PlatformFriendlyStrings = new[]
@@ -73,6 +75,7 @@ namespace LootLocker.Requests
             ,"Google" // Google
             ,"Epic Online Services" // Epic Online Services / Epic Games
             ,"Meta" // Meta
+            ,"Remote" // Remote (leased) session
         };
 
         public struct PlatformRepresentation
