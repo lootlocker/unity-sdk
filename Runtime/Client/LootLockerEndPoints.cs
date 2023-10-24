@@ -23,6 +23,11 @@ namespace LootLocker
         public static EndPointClass appleGameCenterSessionRequest = new EndPointClass("session/apple/game-center", LootLockerHTTPMethod.POST);
         public static EndPointClass googleSessionRequest = new EndPointClass("session/google", LootLockerHTTPMethod.POST);
 
+        // Remote Sessions
+        [Header("Remote Sessions")]
+        public static EndPointClass leaseRemoteSession = new EndPointClass("session/remote/lease", LootLockerHTTPMethod.POST);
+        public static EndPointClass startRemoteSession = new EndPointClass("session/remote", LootLockerHTTPMethod.POST);
+
         // White Label Login
         [Header("White Label Login")]
         public static EndPointClass whiteLabelSignUp = new EndPointClass("white-label-login/sign-up", LootLockerHTTPMethod.POST);

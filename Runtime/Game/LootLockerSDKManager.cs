@@ -4,10 +4,8 @@ using System.IO;
 using UnityEngine;
 using System.Text;
 using LootLocker.LootLockerEnums;
-using static LootLocker.LootLockerConfig;
 using System.Linq;
 using System.Security.Cryptography;
-using static LootLocker.Requests.CurrentPlatform;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -806,6 +804,83 @@ namespace LootLocker.Requests
             LootLockerConfig.current.deviceID = "";
             LootLockerConfig.current.refreshToken = "";
         }
+        #endregion
+
+        #region Remote Sessions
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaseRemoteSessionResponse>());
+                return;
+            }
+
+            LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest = new LootLockerLeaseRemoteSessionRequest();
+
+            EndPointClass endPoint = LootLockerEndPoints.leaseRemoteSession;
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, 
+                endPoint.httpMethod, 
+                LootLockerJson.SerializeObject(leaseRemoteSessionRequest), 
+                (serverResponse) => onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse)), 
+                false);
+        }
+
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        /// <param name="remoteSessionLeaseResponse">TODO: Document</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartRemoteSession(LootLockerLeaseRemoteSessionResponse remoteSessionLeaseResponse, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        {
+            StartRemoteSession(remoteSessionLeaseResponse.code, remoteSessionLeaseResponse.nonce, onComplete);
+        }
+
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        /// <param name="leaseCode">TODO: Document</param>
+        /// <param name="nonce">TODO: Document </param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartRemoteSession(string leaseCode, string nonce, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Remote);
+            LootLockerStartRemoteSessionRequest remoteSessionRequest = new LootLockerStartRemoteSessionRequest
+            {
+                lease_code = leaseCode,
+                nonce = nonce,
+            };
+
+            EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(remoteSessionRequest), (serverResponse) =>
+            {
+                var response = LootLockerResponse.Deserialize<LootLockerStartRemoteSessionResponse>(serverResponse);
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                    onComplete?.Invoke(response);
+                    return;
+                }
+
+                if (response.lease_status == LootLockerRemoteSessionLeaseStatus.Authorized)
+                {
+                    LootLockerConfig.current.token = response.session_token;
+                    LootLockerConfig.current.refreshToken = response.refresh_token;
+                    LootLockerConfig.current.deviceID = response.player_identifier;
+                }
+                onComplete?.Invoke(response);
+            }, false);
+        }
+
         #endregion
 
         #region White Label
