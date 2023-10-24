@@ -36,38 +36,48 @@ namespace LootLocker.Extension
         serializedUser = LootLockerJson.SerializeObject(user);
     }
 
-        [InitializeOnLoadMethod]
-        private static void FirstLoad()
+    [InitializeOnLoadMethod]
+    private static void FirstLoad()
+    {
+        string projectPath = Application.dataPath;
+        DateTime creationTime = Directory.GetCreationTime(projectPath);
+        string configFileEditorPref = "StoredUserCreated" + creationTime.GetHashCode().ToString();
+        EditorPrefs.DeleteKey(configFileEditorPref);
+
+        if (EditorPrefs.GetBool(configFileEditorPref) == false)
         {
-            EditorPrefs.DeleteAll();
 
-            string projectPath = Application.dataPath;
-
-            DateTime creationTime = Directory.GetCreationTime(projectPath);
-            string configFileEditorPref = "StoredUserCreated" + creationTime.GetHashCode().ToString();
-
-            if (EditorPrefs.GetBool(configFileEditorPref) == false)
+            if (Directory.Exists("Packages/com.lootlocker.lootlockersdk")) 
             {
-
-                if (Directory.Exists("Packages/com.lootlocker.lootlockersdk")) 
+                if (Directory.Exists("Assets/LootLockerSDK/Runtime/Editor/VisualElements"))
                 {
-                    if (Directory.Exists("Assets/LootLockerSDK/Runtime/Editor/VisualElements"))
-                    {
-                        Directory.Delete("Assets/LootLockerSDK/Runtime/Editor/VisualElements", recursive: true);
-                    }
-
-                    Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow");
-
-                    FileUtil.CopyFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss", "Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss");
-
-                    EditorApplication.delayCall += AssetDatabase.SaveAssets;
-                    AssetDatabase.Refresh();
+                    Directory.Delete("Assets/LootLockerSDK/Runtime/Editor/VisualElements", recursive: true);
                 }
 
-                EditorPrefs.SetBool(configFileEditorPref, true);
-            }
+                Directory.CreateDirectory("Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow");
 
-        }    
+                FileUtil.CopyFileOrDirectory("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss", "Assets/LootLockerSDK/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uss");
+
+                string[] UxmlFilesToReplaceReferencesIn = new[]
+                {
+                    "Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MainWindow/LootLockerMainWindow.uxml",
+                    "Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker MFA/LootLockerMFA.uxml",
+                    "Packages/com.lootlocker.lootlockersdk/Runtime/Editor/VisualElements/LootLocker Setup/LootLockerWizard.uxml"
+                };
+                foreach (string UxmlFile in UxmlFilesToReplaceReferencesIn)
+                {
+                    string content = File.ReadAllText(UxmlFile);
+                    string fixedContent = content.Replace("project://database/Assets/LootLockerSDK",
+                        "project://database/Packages/com.lootlocker.lootlockersdk");
+                    File.WriteAllText(UxmlFile, fixedContent);
+                }
+
+                EditorApplication.delayCall += AssetDatabase.SaveAssets;
+                AssetDatabase.Refresh();
+            }
+            EditorPrefs.SetBool(configFileEditorPref, true);
+        }
+    }    
 
     private static StoredUser Get()
     {
