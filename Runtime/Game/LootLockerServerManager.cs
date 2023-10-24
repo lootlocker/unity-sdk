@@ -21,7 +21,12 @@ namespace LootLocker
         {
             if (i == null)
             {
-                var existingObj = GameObject.FindObjectOfType<LootLockerServerManager>();
+                var existingObj =
+#if UNITY_2021_3_OR_NEWER
+                    GameObject.FindAnyObjectByType<LootLockerServerManager>();
+#else
+                    GameObject.FindObjectOfType<LootLockerServerManager>();
+#endif
 
                 if (existingObj != null)
                 {
