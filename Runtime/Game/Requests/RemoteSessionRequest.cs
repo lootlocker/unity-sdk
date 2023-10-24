@@ -3,7 +3,7 @@ using LootLocker.LootLockerEnums;
 namespace LootLocker.LootLockerEnums
 {
     /// <summary>
-    /// TODO: Document
+    /// The status of the remote session leasing process
     /// </summary>
     public enum LootLockerRemoteSessionLeaseStatus
     {
@@ -26,11 +26,11 @@ namespace LootLocker.Requests
     public class LootLockerLeaseRemoteSessionRequest
     {
         /// <summary>
-        /// TODO: Document
+        /// The Game Key configured for the game
         /// </summary>
         public string game_key { get; set; } = LootLockerConfig.current.apiKey;
         /// <summary>
-        /// TODO: Document
+        /// The Game Version configured for the game
         /// </summary>
         public string game_version { get; set; } = LootLockerConfig.current.game_version;
     }
@@ -40,19 +40,19 @@ namespace LootLocker.Requests
     public class LootLockerStartRemoteSessionRequest
     {
         /// <summary>
-        /// TODO: Document
+        /// The Game Key configured for the game
         /// </summary>
         public string game_key { get; set; } = LootLockerConfig.current.apiKey;
         /// <summary>
-        /// TODO: Document
+        /// The Game Version configured for the game
         /// </summary>
         public string game_version { get; set; } = LootLockerConfig.current.game_version;
         /// <summary>
-        /// TODO: Document
+        /// The lease code returned with the response when starting a lease process
         /// </summary>
         public string lease_code { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The nonce returned with the response when starting a lease process
         /// </summary>
         public string nonce { get; set; }
     }
@@ -66,33 +66,29 @@ namespace LootLocker.Requests
     public class LootLockerLeaseRemoteSessionResponse : LootLockerResponse
     {
         /// <summary>
-        /// TODO: Document
+        /// The unique code for this leasing process, this is what identifies the leasing process and that is used to interact with it
         /// </summary>
         public string code { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The nonce used to sign usage of the lease code
         /// </summary>
         public string nonce { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// A url with the code and nonce baked in that can be used to immediately start the remote authentication process on the device that uses it
         /// </summary>
         public string redirect_url { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// A QR code representation of the redirect_url encoded in Base64
         /// </summary>
         public string redirect_url_qr_base64 { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// A clean version of the redirect_url without the code visible that you can use in your UI 
         /// </summary>
         public string display_url { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The status of this lease process
         /// </summary>
-        public string status { get; set; }
-        /// <summary>
-        /// TODO: Document
-        /// </summary>
-        public string ip { get; set; }
+        public LootLockerRemoteSessionLeaseStatus status { get; set; }
     }
 
     /// <summary>
@@ -100,15 +96,15 @@ namespace LootLocker.Requests
     public class LootLockerStartRemoteSessionResponse : LootLockerSessionResponse
     {
         /// <summary>
-        /// TODO: Document
+        /// The current status of this lease process. If this is not of the status Authorized, the rest of the fields in this object will be empty.
         /// </summary>
         public LootLockerRemoteSessionLeaseStatus lease_status { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// A refresh token that can be used to refresh the remote session instead of signing in each time the session token expires
         /// </summary>
         public string refresh_token { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The player identifier of the player
         /// </summary>
         public string player_identifier { get; set; }
     }

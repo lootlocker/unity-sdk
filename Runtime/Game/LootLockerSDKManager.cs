@@ -808,7 +808,9 @@ namespace LootLocker.Requests
 
         #region Remote Sessions
         /// <summary>
-        /// TODO: Document
+        /// Start a lease request for a remote session
+        /// If you want to let your local user sign in using another device then you use this method to get the lease code that the secondary device can use to authenticate.
+        /// While the process is ongoing, poll StartRemoteSession until the status is AUTHORIZED. When it is, a valid session to use locally will be in the response.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
@@ -830,7 +832,8 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// TODO: Document
+        /// Create a new session authorized remotely from a previously constructed lease
+        /// If the session has not yet been remotely authorized, the response will contain only the status of the lease process
         /// </summary>
         /// <param name="remoteSessionLeaseResponse">TODO: Document</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
@@ -840,10 +843,11 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// TODO: Document
+        /// Create a new session authorized remotely from a previously constructed lease
+        /// If the session has not yet been remotely authorized, the response will contain only the status of the lease process
         /// </summary>
-        /// <param name="leaseCode">TODO: Document</param>
-        /// <param name="nonce">TODO: Document </param>
+        /// <param name="leaseCode">The lease code returned in the LeaseRemoteSession response</param>
+        /// <param name="nonce">The nonce returned in the LeaseRemoteSession response</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void StartRemoteSession(string leaseCode, string nonce, Action<LootLockerStartRemoteSessionResponse> onComplete)
         {
