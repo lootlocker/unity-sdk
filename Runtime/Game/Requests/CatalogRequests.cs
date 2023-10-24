@@ -408,19 +408,23 @@ namespace LootLocker.Requests
             /// <summary>
             /// Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
             /// </summary>
-            public LootLockerAssetDetails? asset_details { get; set; }
+            [CanBeNull]
+            public LootLockerAssetDetails asset_details { get; set; }
             /// <summary>
             /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
             /// </summary>
-            public LootLockerProgressionPointDetails? progression_point_details { get; set; }
+            [CanBeNull]
+            public LootLockerProgressionPointDetails progression_point_details { get; set; }
             /// <summary>
             /// Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
             /// </summary>
-            public LootLockerProgressionResetDetails? progression_reset_details { get; set; }
+            [CanBeNull]
+            public LootLockerProgressionResetDetails progression_reset_details { get; set; }
             /// <summary>
             /// Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
             /// </summary>
-            public LootLockerCurrencyDetails? currency_details { get; set; }
+            [CanBeNull]
+            public LootLockerCurrencyDetails currency_details { get; set; }
 
             public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails) 
             {
