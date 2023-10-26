@@ -101,6 +101,7 @@ namespace LootLocker
                     if (package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
+                        break;
                     }
                 }
             }
@@ -162,7 +163,8 @@ namespace LootLocker
         [HideInInspector]
         public int gameID;
         public string game_version = "1.0.0.0";
-        [HideInInspector] public string sdk_version = "";
+        [HideInInspector] 
+        public string sdk_version = "";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
 
