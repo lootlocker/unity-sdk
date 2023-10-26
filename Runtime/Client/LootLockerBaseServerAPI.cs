@@ -350,6 +350,11 @@ namespace LootLocker
                 }
             }
 
+            if (!string.IsNullOrEmpty(LootLockerConfig.current?.sdk_version))
+            {
+                webRequest.SetRequestHeader("SDK-Version", LootLockerConfig.current.sdk_version);
+            }
+
             if (request.extraHeaders != null)
             {
                 foreach (KeyValuePair<string, string> pair in request.extraHeaders)
