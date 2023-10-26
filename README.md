@@ -25,8 +25,7 @@ Full documentation is available here https://docs.lootlocker.io/getting-started/
 
 ### Using Git
 
-Before you start, Git should be installed on your PC.
-We recommend using [Git for Windows](https://gitforwindows.org/) 
+Before you start, Git should be installed on your computer, Mac users should have this automatically, for windows you can use for example [Git for Windows](https://gitforwindows.org/). Quick note: You might need to restart Unity and/or your computer before Unity recognizes you’ve installed Git.
 
 - In the Unity Editor go to `Window > Package Manager`
 - Click the + at the top left of the Package Manager window
