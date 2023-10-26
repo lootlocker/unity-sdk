@@ -1,6 +1,7 @@
-using LootLocker.Extension.DataTypes;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && LOOTLOCKER_ENABLE_EXTENSION
+using LootLocker.Extension.DataTypes;
 namespace LootLocker.Extension.Requests
 {
     public class MfaAdminLoginRequest
@@ -107,3 +108,4 @@ namespace LootLocker.Extension.Responses
         public string updated_at { get; set; }
     }
 }
+#endif

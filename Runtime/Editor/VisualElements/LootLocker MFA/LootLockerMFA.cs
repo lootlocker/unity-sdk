@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
-#if UNITY_2021_3_OR_NEWER && UNITY_EDITOR
+#if UNITY_2021_3_OR_NEWER && UNITY_EDITOR && LOOTLOCKER_ENABLE_EXTENSION
 
 namespace LootLocker.Extension 
 {

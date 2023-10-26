@@ -1,9 +1,10 @@
 using System;
-using LootLocker.Extension.Requests;
-using LootLocker.Extension.Responses;
 using UnityEngine;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && LOOTLOCKER_ENABLE_EXTENSION
+using LootLocker.Extension.Requests;
+using LootLocker.Extension.Responses;
+
 namespace LootLocker.Extension
 {
     public partial class LootLockerAdminManager
