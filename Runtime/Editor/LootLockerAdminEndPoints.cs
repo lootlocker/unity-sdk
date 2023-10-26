@@ -1,6 +1,6 @@
 using UnityEngine;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && LOOTLOCKER_ENABLE_EXTENSION
 namespace LootLocker
 {
     public class LootLockerAdminEndPoints

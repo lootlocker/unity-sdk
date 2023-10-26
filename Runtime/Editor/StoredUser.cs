@@ -1,11 +1,11 @@
 using LootLocker;
-using LootLocker.Extension.Requests;
 using System.IO;
 using System;
 using UnityEditor;
 using UnityEngine;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && LOOTLOCKER_ENABLE_EXTENSION
+using LootLocker.Extension.Requests;
 using LootLocker.Extension.DataTypes;
 
 namespace LootLocker.Extension
