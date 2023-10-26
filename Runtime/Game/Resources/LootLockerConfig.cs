@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+using UnityEditor.PackageManager.Requests;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.PackageManager.UI;
+using UnityEditor.PackageManager;
 #endif
 using UnityEngine;
 
@@ -78,8 +81,32 @@ namespace LootLocker
                 EditorPrefs.SetBool(configFileEditorPref, true);
             }
         }
+
+        protected static ListRequest ListInstalledPackagesRequest;
+
+        [InitializeOnLoadMethod]
+        static void StoreSDKVersion()
+        {
+            ListInstalledPackagesRequest = Client.List();
+            EditorApplication.update += ListRequestProgress;
+        }
+
+        static void ListRequestProgress()
+        {
+            if (ListInstalledPackagesRequest.IsCompleted)
+            {
+                EditorApplication.update -= ListRequestProgress;
+                foreach (var package in ListInstalledPackagesRequest.Result)
+                {
+                    if (package.name.Equals("com.lootlocker.lootlockersdk"))
+                    {
+                        LootLockerConfig.current.sdk_version = package.version;
+                    }
+                }
+            }
+        }
 #endif
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerConfig.DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
         {
             _current = Get();
 
@@ -135,6 +162,7 @@ namespace LootLocker
         [HideInInspector]
         public int gameID;
         public string game_version = "1.0.0.0";
+        [HideInInspector] public string sdk_version = "";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
 
