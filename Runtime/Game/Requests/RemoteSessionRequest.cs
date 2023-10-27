@@ -105,7 +105,7 @@ namespace LootLocker.Requests
     public class LootLockerRemoteSessionStatusPollingResponse : LootLockerResponse
     {
         /// <summary>
-        /// The current status of this lease process. If this is not of the status Authorized, the rest of the fields in this object will be empty.
+        /// The current status of this lease process.
         /// </summary>
         public LootLockerRemoteSessionLeaseStatus lease_status { get; set; }
     }
@@ -166,8 +166,6 @@ namespace LootLocker
             }
 #endif
 
-            private static readonly double _leasingProcessTimeoutLimitInMinutes = 5.0d;
-            private static readonly float _leasingProcessPollingIntervalSeconds = 1.0f;
             private static readonly int _leasingProcessPollingRetryLimit = 5;
 
             private class LootLockerRemoteSessionProcess
@@ -176,6 +174,7 @@ namespace LootLocker
                 public string LeaseNonce;
                 public LootLockerRemoteSessionLeaseStatus LastUpdatedStatus;
                 public DateTime LeasingProcessTimeoutTime;
+                public float PollingIntervalSeconds = 1.0f;
                 public DateTime LastUpdatedAt;
                 public int Retries = 0;
                 public bool ShouldCancel;
@@ -202,7 +201,11 @@ namespace LootLocker
 
             protected IEnumerator ContinualPollingAction(Guid processGuid)
             {
-                yield return new WaitForSeconds(_leasingProcessPollingIntervalSeconds);
+                if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var preProcess))
+                {
+                    yield break;
+                }
+                yield return new WaitForSeconds(preProcess.PollingIntervalSeconds);
                 while (_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                 {
                     // Check if we should continue the polling
@@ -221,6 +224,7 @@ namespace LootLocker
                     {
                         LootLockerStartRemoteSessionResponse canceledResponse = new LootLockerStartRemoteSessionResponse
                         {
+                            success = false,
                             lease_status = LootLockerRemoteSessionLeaseStatus.Cancelled
                         };
                         process.ProcessCompletedCallbackAction?.Invoke(canceledResponse);
@@ -246,7 +250,7 @@ namespace LootLocker
                         {
                             // Recoverable error
                             processAfterStatusCheck.Retries++;
-                            yield return new WaitForSeconds(_leasingProcessPollingIntervalSeconds);
+                            yield return new WaitForSeconds(processAfterStatusCheck.PollingIntervalSeconds);
                             continue;
                         }
 
@@ -256,6 +260,7 @@ namespace LootLocker
                         yield break;
                     }
 
+                    // Authorized = We're done
                     if (startSessionResponse.lease_status == LootLockerRemoteSessionLeaseStatus.Authorized)
                     {
                         processAfterStatusCheck.ProcessCompletedCallbackAction?.Invoke(startSessionResponse);
@@ -269,16 +274,19 @@ namespace LootLocker
                             startSessionResponse);
                     processAfterStatusCheck.UpdateCallbackAction?.Invoke(pollingResponse);
                     processAfterStatusCheck.LastUpdatedAt = DateTime.UtcNow;
+                    processAfterStatusCheck.LastUpdatedStatus = pollingResponse.lease_status;
 
                     // Sleep for a bit before checking again
-                    yield return new WaitForSeconds(_leasingProcessPollingIntervalSeconds);
+                    yield return new WaitForSeconds(processAfterStatusCheck.PollingIntervalSeconds);
                 }
             }
 
             public Guid StartRemoteSessionWithContinualPolling(
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
-                Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted)
+                Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
+                float pollingIntervalSeconds = 1.0f,
+                float timeOutAfterMinutes = 5.0f)
             {
                 if (_remoteSessionsProcesses.Count > 0)
                 {
@@ -292,7 +300,8 @@ namespace LootLocker
                 LootLockerRemoteSessionProcess lootLockerRemoteSessionProcess = new LootLockerRemoteSessionProcess()
                 {
                     LastUpdatedAt = DateTime.UtcNow,
-                    LeasingProcessTimeoutTime = DateTime.UtcNow.AddMinutes(_leasingProcessTimeoutLimitInMinutes),
+                    LeasingProcessTimeoutTime = DateTime.UtcNow.AddMinutes(timeOutAfterMinutes),
+                    PollingIntervalSeconds = pollingIntervalSeconds,
                     UpdateCallbackAction = remoteSessionLeaseStatusUpdateCallback,
                     ProcessCompletedCallbackAction = remoteSessionCompleted
                 };
@@ -310,6 +319,7 @@ namespace LootLocker
                         remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
                         return;
                     }
+                    remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
 
                     process.LeaseCode = leaseRemoteSessionResponse.code;
                     process.LeaseNonce = leaseRemoteSessionResponse.nonce;
@@ -365,7 +375,7 @@ namespace LootLocker
                         CurrentPlatform.Set(Platforms.Remote);
                         LootLockerConfig.current.token = response.session_token;
                         LootLockerConfig.current.refreshToken = response.refresh_token;
-                        LootLockerConfig.current.deviceID = response.player_identifier;
+                        LootLockerConfig.current.deviceID = response.player_ulid;
                     }
 
                     onComplete?.Invoke(response);

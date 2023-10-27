@@ -807,6 +807,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Remote Sessions
+
         /// <summary>
         /// Start a remote session
         /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
@@ -816,7 +817,9 @@ namespace LootLocker.Requests
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
-        public static Guid StartRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
+        public static Guid StartRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
         {
             if (!CheckInitialized(true))
             {
@@ -824,7 +827,7 @@ namespace LootLocker.Requests
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.GetInstance().StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete);
+            return LootLockerAPIManager.RemoteSessionPoller.GetInstance().StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
         }
 
         /// <summary>
