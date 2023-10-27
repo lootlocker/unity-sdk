@@ -810,7 +810,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a remote session
         /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
-        /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently to update you on the status of the process.
+        /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
         /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>

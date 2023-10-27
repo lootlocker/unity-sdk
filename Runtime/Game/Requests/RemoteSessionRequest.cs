@@ -167,7 +167,8 @@ namespace LootLocker
 #endif
 
             private static readonly double _leasingProcessTimeoutLimitInMinutes = 5.0d;
-            private static readonly int _leasingProcessPollingIntervalSeconds = 1;
+            private static readonly float _leasingProcessPollingIntervalSeconds = 1.0f;
+            private static readonly int _leasingProcessPollingRetryLimit = 5;
 
             private class LootLockerRemoteSessionProcess
             {
@@ -176,6 +177,7 @@ namespace LootLocker
                 public LootLockerRemoteSessionLeaseStatus LastUpdatedStatus;
                 public DateTime LeasingProcessTimeoutTime;
                 public DateTime LastUpdatedAt;
+                public int Retries = 0;
                 public bool ShouldCancel;
                 public Action<LootLockerRemoteSessionStatusPollingResponse> UpdateCallbackAction;
                 public Action<LootLockerStartRemoteSessionResponse> ProcessCompletedCallbackAction;
@@ -238,8 +240,16 @@ namespace LootLocker
                         yield break;
                     }
 
-                    if (!startSessionResponse.success) //TODO: auto recover on 500s
+                    if (!startSessionResponse.success)
                     {
+                        if (startSessionResponse.statusCode >= 500 && startSessionResponse.statusCode <= 599 && processAfterStatusCheck.Retries <= _leasingProcessPollingRetryLimit)
+                        {
+                            // Recoverable error
+                            processAfterStatusCheck.Retries++;
+                            yield return new WaitForSeconds(_leasingProcessPollingIntervalSeconds);
+                            continue;
+                        }
+
                         startSessionResponse.lease_status = LootLockerRemoteSessionLeaseStatus.Failed;
                         processAfterStatusCheck.ProcessCompletedCallbackAction?.Invoke(startSessionResponse);
                         RemoveRemoteSessionProcess(processGuid);
