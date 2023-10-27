@@ -418,7 +418,7 @@ namespace LootLocker
 
         #region Make ServerRequest and call send (3 functions)
 
-        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
+        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
             if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
             {
@@ -452,6 +452,14 @@ namespace LootLocker
 
             if (LootLockerConfig.current != null)
                 headers.Add(LootLockerConfig.current.dateVersion.key, LootLockerConfig.current.dateVersion.value);
+
+            if (additionalHeaders != null)
+            {
+                foreach (var additionalHeader in additionalHeaders)
+                {
+                    headers.Add(additionalHeader.Key, additionalHeader.Value);
+                }
+            }
 
             LootLockerBaseServerAPI.I.SwitchURL(callerRole);
 
