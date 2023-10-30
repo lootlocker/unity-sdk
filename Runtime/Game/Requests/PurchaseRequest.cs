@@ -43,9 +43,14 @@ namespace LootLocker.Requests
 
     }
 
+    public class LootLockerPurchaseOrderStatus : LootLockerResponse
+    {
+        public string status { get; set; }
+    }
+
     /// <summary>
-     /// 
-     /// </summary>
+    /// 
+    /// </summary>
     public class LootLockerCatalogItemAndQuantityPair
     {
         /// <summary>
@@ -138,7 +143,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void PollOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        public static void PollOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerPurchaseOrderStatus> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
 
