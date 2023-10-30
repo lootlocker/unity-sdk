@@ -4228,12 +4228,12 @@ namespace LootLocker.Requests
         /// failed - The order failed
         /// </summary>
         /// <param name="assetId">The ID of the asset to check the status for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void PollOrderStatus(int assetId, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseOrderStatus</param>
+        public static void PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseOrderStatus>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
