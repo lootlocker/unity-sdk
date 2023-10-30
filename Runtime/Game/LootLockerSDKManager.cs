@@ -2403,327 +2403,430 @@ namespace LootLocker.Requests
 
         #endregion
 
-        #region Character
+        #region Base Classes
+
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function CreateClass() instead")]
+        public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            CreateClass(characterTypeId, newCharacterName, isDefault, onComplete);
+        }
 
         /// <summary>
-        /// Create a character with the provided type and name. The character will be owned by the currently active player.
-        /// Use ListCharacterTypes() to get a list of available character types for your game.
+        /// Create a Class with the provided type and name. The Class will be owned by the currently active player.
+        /// Use ListClassTypes() to get a list of available Class types for your game.
         /// </summary>
-        /// <param name="characterTypeId">Use ListCharacterTypes() to get a list of available character types for your game.</param>
-        /// <param name="newCharacterName">The new name for the character</param>
-        /// <param name="isDefault">Should this character be the default character?</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="classTypeID">Use ListClassTypes() to get a list of available class types for your game.</param>
+        /// <param name="newClassName">The new name for the class</param>
+        /// <param name="isDefault">Should this class be the default class?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void CreateClass(string classTypeID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
                 return;
             }
 
-            LootLockerCreateCharacterRequest data = new LootLockerCreateCharacterRequest();
+            LootLockerCreateClassRequest data = new LootLockerCreateClassRequest();
 
-            data.name = newCharacterName;
+            data.name = newClassName;
             data.is_default = isDefault;
-            data.character_type_id = characterTypeId;
+            data.character_type_id = classTypeID;
 
-            LootLockerAPIManager.CreateCharacter(data, onComplete);
+            LootLockerAPIManager.CreateClass(data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListClassTypes() instead")]
+        public static void ListCharacterTypes(Action<LootLockerListClassTypesResponse> onComplete)
+        {
+            ListClassTypes(onComplete);
         }
 
         /// <summary>
-        /// List all available character types for your game.
+        /// List all available Class types for your game.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListCharacterTypesResponse</param>
-        public static void ListCharacterTypes(Action<LootLockerListCharacterTypesResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListClassTypesResponse</param>
+        public static void ListClassTypes(Action<LootLockerListClassTypesResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCharacterTypesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListClassTypesResponse>());
                 return;
             }
-            LootLockerAPIManager.ListCharacterTypes(onComplete);
+            LootLockerAPIManager.ListClassTypes(onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListPlayerClasses() instead")]
+        public static void ListPlayerCharacters(Action<LootLockerPlayerClassListResponse> onComplete)
+        {
+            ListPlayerClasses(onComplete);
         }
 
         /// <summary>
-        /// Get list of Characters to a player
+        /// Get list of classes to a player
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerCharacterListResponse</param>
-        public static void ListPlayerCharacters(Action<LootLockerPlayerCharacterListResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerClassListResponse</param>
+        public static void ListPlayerClasses(Action<LootLockerPlayerClassListResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerCharacterListResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerClassListResponse>());
                 return;
             }
-            LootLockerAPIManager.ListPlayerCharacters(onComplete);
+            LootLockerAPIManager.ListPlayerClasses(onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetClassLoadout() instead")]
+        public static void GetCharacterLoadout(Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            GetClassLoadout(onComplete);
         }
 
         /// <summary>
-        /// Get all character loadouts for your game.
+        /// Get all class loadouts for your game.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void GetCharacterLoadout(Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void GetClassLoadout(Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
                 return;
             }
-            LootLockerAPIManager.GetCharacterLoadout(onComplete);
+            LootLockerAPIManager.GetClassLoadout(onComplete);
+
         }
 
-        /// <summary>
-        /// Get a character loadout from a specific player on the current platform.
-        /// </summary>
-        /// <param name="player_id">ID of the player</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
+        public static void GetOtherPlayersCharacterLoadout(string player_id, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             GetOtherPlayersCharacterLoadout(player_id, CurrentPlatform.Get(), onComplete);
         }
 
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
+        public static void GetOtherPlayersCharacterLoadout(string player_id, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            GetOtherPlayersClassLoadout(player_id, platform, onComplete);
+        }
+
         /// <summary>
-        /// Get a character loadout from a specific player and platform
+        /// Get a class loadout from a specific player and platform
         /// </summary>
-        /// <param name="player_id">ID of the player</param>
+        /// <param name="playerID">ID of the player</param>
         /// <param name="platform">The platform that the ID of the player is for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Platforms platform, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void GetOtherPlayersClassLoadout(string playerID, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
 
-            data.getRequests.Add(player_id);
+            data.getRequests.Add(playerID);
             data.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
-            LootLockerAPIManager.GetOtherPlayersCharacterLoadout(data, onComplete);
+            LootLockerAPIManager.GetOtherPlayersClassLoadout(data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function UpdateClass() instead")]
+        public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            UpdateClass(characterID, newCharacterName, isDefault, onComplete);
         }
 
         /// <summary>
-        /// Update information about the character. The character must be owned by the currently active player.
+        /// Update information about the class. The class must be owned by the currently active player.
         /// </summary>
-        /// <param name="characterID">ID of the character</param>
-        /// <param name="newCharacterName">New name for the character</param>
-        /// <param name="isDefault">Should the character be the default character?</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="classID">ID of the class</param>
+        /// <param name="newClassName">New name for the class</param>
+        /// <param name="isDefault">Should the class be the default class?</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void UpdateClass(string classID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
                 return;
             }
 
-            LootLockerUpdateCharacterRequest data = new LootLockerUpdateCharacterRequest();
+            LootLockerUpdateClassRequest data = new LootLockerUpdateClassRequest();
 
-            data.name = newCharacterName;
+            data.name = newClassName;
             data.is_default = isDefault;
 
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
-            lootLockerGetRequest.getRequests.Add(characterID);
+            lootLockerGetRequest.getRequests.Add(classID);
 
-            LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
+            LootLockerAPIManager.UpdateClass(lootLockerGetRequest, data, onComplete);
+
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function SetDefaultClass() instead")]
+        public static void SetDefaultCharacter(string characterID, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            SetDefaultClass(characterID, onComplete);
         }
 
         /// <summary>
-        /// Set the character with characterID as the default character for the currently active player. The character must be owned by the currently active player.
+        /// Set the class with classID as the default class for the currently active player. The class must be owned by the currently active player.
         /// </summary>
-        /// <param name="characterID">ID of the character</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterLoadoutResponse</param>
-        public static void SetDefaultCharacter(string characterID, Action<LootLockerCharacterLoadoutResponse> onComplete)
+        /// <param name="classID">ID of the class</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void SetDefaultClass(string classID, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
                 return;
             }
 
-            LootLockerUpdateCharacterRequest data = new LootLockerUpdateCharacterRequest();
+            LootLockerUpdateClassRequest data = new LootLockerUpdateClassRequest();
 
             data.is_default = true;
 
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
-            lootLockerGetRequest.getRequests.Add(characterID);
+            lootLockerGetRequest.getRequests.Add(classID);
 
-            LootLockerAPIManager.UpdateCharacter(lootLockerGetRequest, data, onComplete);
+            LootLockerAPIManager.UpdateClass(lootLockerGetRequest, data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToDefaultClass() instead")]
+        public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            EquipIdAssetToDefaultClass(assetInstanceId, onComplete);
         }
 
         /// <summary>
-        /// Equip an asset to the players default character.
+        /// Equip an asset to the players default class.
         /// </summary>
-        /// <param name="assetInstanceId">ID of the asset instance to equip</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="assetInstanceID">ID of the asset instance to equip</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
+        public static void EquipIdAssetToDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
-            data.instance_id = int.Parse(assetInstanceId);
-            LootLockerAPIManager.EquipIdAssetToDefaultCharacter(data, onComplete);
+            data.instance_id = int.Parse(assetInstanceID);
+            LootLockerAPIManager.EquipIdAssetToDefaultClass(data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToDefaultClass() instead")]
+        public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            EquipGlobalAssetToDefaultClass(assetId, assetVariationId, onComplete);
         }
 
         /// <summary>
-        /// Equip a global asset to the players default character.
+        /// Equip a global asset to the players default class.
         /// </summary>
-        /// <param name="assetId">ID of the asset instance to equip</param>
-        /// <param name="assetVariationId">ID of the asset variation to use</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="assetID">ID of the asset instance to equip</param>
+        /// <param name="assetVariationID">ID of the asset variation to use</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
+        public static void EquipGlobalAssetToDefaultClass(string assetID, string assetVariationID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
-            data.asset_id = int.Parse(assetId);
-            data.asset_variation_id = int.Parse(assetVariationId);
-            LootLockerAPIManager.EquipGlobalAssetToDefaultCharacter(data, onComplete);
+            data.asset_id = int.Parse(assetID);
+            data.asset_variation_id = int.Parse(assetVariationID);
+            LootLockerAPIManager.EquipGlobalAssetToDefaultClass(data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToClass() instead")]
+        public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            EquipIdAssetToClass(characterID, assetInstanceId, onComplete);
         }
 
         /// <summary>
-        /// Equip an asset to a specific character. The character must be owned by the currently active player.
+        /// Equip an asset to a specific class. The class must be owned by the currently active player.
         /// </summary>
-        /// <param name="characterID">ID of the character</param>
-        /// <param name="assetInstanceId">ID of the asset instance to equip</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="classID">ID of the class</param>
+        /// <param name="assetInstanceID">ID of the asset instance to equip</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToclassLoadoutResponse</param>
+        public static void EquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
-            data.instance_id = int.Parse(assetInstanceId);
+            data.instance_id = int.Parse(assetInstanceID);
 
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-            lootLockerGetRequest.getRequests.Add(characterID);
-            LootLockerAPIManager.EquipIdAssetToCharacter(lootLockerGetRequest, data, onComplete);
+            lootLockerGetRequest.getRequests.Add(classID);
+            LootLockerAPIManager.EquipIdAssetToClass(lootLockerGetRequest, data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToClass() instead")]
+        public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            EquipGlobalAssetToClass(assetId, assetVariationId, characterID, onComplete);
         }
 
         /// <summary>
-        /// Equip a global asset to a specific character. The character must be owned by the currently active player.
+        /// Equip a global asset to a specific class. The class must be owned by the currently active player.
         /// </summary>
-        /// <param name="assetId">ID of the asset to equip</param>
-        /// <param name="assetVariationId">ID of the variation to use</param>
-        /// <param name="characterID">ID of the character to equip the asset to</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="assetID">ID of the asset to equip</param>
+        /// <param name="assetVariationID">ID of the variation to use</param>
+        /// <param name="classID">ID of the class to equip the asset to</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
+        public static void EquipGlobalAssetToClass(string assetID, string assetVariationID, string classID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
-            data.asset_id = int.Parse(assetId);
-            data.asset_variation_id = int.Parse(assetVariationId);
+            data.asset_id = int.Parse(assetID);
+            data.asset_variation_id = int.Parse(assetVariationID);
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-            lootLockerGetRequest.getRequests.Add(characterID);
-            LootLockerAPIManager.EquipGlobalAssetToCharacter(lootLockerGetRequest, data, onComplete);
+            lootLockerGetRequest.getRequests.Add(classID);
+            LootLockerAPIManager.EquipGlobalAssetToClass(lootLockerGetRequest, data, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
+        public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            UnEquipIdAssetToClass(assetId, onComplete);
         }
 
         /// <summary>
-        /// Unequip an asset from the players default character.
+        /// Unequip an asset from the players default class.
         /// </summary>
-        /// <param name="assetId">ID of the asset to unequip</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="assetID">ID of the asset to unequip</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
+        public static void UnEquipIdAssetToClass(string assetID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
-            lootLockerGetRequest.getRequests.Add(assetId);
-            LootLockerAPIManager.UnEquipIdAssetToCharacter(lootLockerGetRequest, onComplete);
+            lootLockerGetRequest.getRequests.Add(assetID);
+            LootLockerAPIManager.UnEquipIdAssetToClass(lootLockerGetRequest, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
+        public static void UnEquipIdAssetToCharacter(int characterID, int assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        {
+            UnEquipIdAssetToClass(characterID.ToString(), assetInstanceId.ToString(), onComplete);
         }
 
         /// <summary>
-        /// Unequip an asset from a specific character. The character must be owned by the currently active player.
+        /// Unequip an asset from a specific class. The class must be owned by the currently active player.
         /// </summary>
-        /// <param name="characterID">ID of the character to unequip</param>
-        /// <param name="assetId">Asset instance ID of the asset to unequip</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToCharacterLoadoutResponse</param>
-        public static void UnEquipIdAssetToCharacter(int characterID, int assetInstanceId, Action<EquipAssetToCharacterLoadoutResponse> onComplete)
+        /// <param name="classID">ID of the class to unequip</param>
+        /// <param name="assetInstanceID">Asset instance ID of the asset to unequip</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
+        public static void UnEquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToCharacterLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-            lootLockerGetRequest.getRequests.Add(characterID.ToString());
-            lootLockerGetRequest.getRequests.Add(assetInstanceId.ToString());
-            LootLockerAPIManager.UnEquipIdAssetToCharacter(lootLockerGetRequest, onComplete);
+            lootLockerGetRequest.getRequests.Add(classID);
+            lootLockerGetRequest.getRequests.Add(assetInstanceID);
+            LootLockerAPIManager.UnEquipIdAssetToClass(lootLockerGetRequest, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToDefaultClass() instead")]
+        public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        {
+            voidGetCurrentLoadoutToDefaultClass(onComplete);
         }
 
         /// <summary>
-        /// Get the loadout for the players default character.
+        /// Get the loadout for the players default class.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadouttoDefaultCharacterResponse</param>
-        public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
+        public static void voidGetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadouttoDefaultCharacterResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>());
                 return;
             }
-            LootLockerAPIManager.GetCurrentLoadOutToDefaultCharacter(onComplete);
+            LootLockerAPIManager.GetCurrentLoadoutToDefaultClass(onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
+        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        {
+            GetCurrentLoadoutToOtherClass(playerID, onComplete);
         }
 
         /// <summary>
-        /// Get the current loadout for the default character of the specified player on the current platform
+        /// Get the current loadout for the default class of the specified player on the current platform
         /// </summary>
         /// <param name="playerID">ID of the player to get the loadout for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadouttoDefaultCharacterResponse</param>
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
+        public static void GetCurrentLoadoutToOtherClass(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
         {
-            GetCurrentLoadOutToOtherCharacter(playerID, CurrentPlatform.Get(), onComplete);
+            GetCurrentLoadoutToOtherClass(playerID, CurrentPlatform.Get(), onComplete);
+
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
+        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        {
+            GetCurrentLoadoutToOtherClass(playerID, platform, onComplete);
         }
 
         /// <summary>
-        /// Get the current loadout for the default character of the specified player and platform
+        /// Get the current loadout for the default class of the specified player and platform
         /// </summary>
         /// <param name="playerID">ID of the player to get the loadout for</param>
         /// <param name="platform">The platform that the ID of the player is for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadouttoDefaultCharacterResponse</param>
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadouttoDefaultCharacterResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
+        public static void GetCurrentLoadoutToOtherClass(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadouttoDefaultCharacterResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>());
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(playerID);
             lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
-            LootLockerAPIManager.GetCurrentLoadOutToOtherCharacter(lootLockerGetRequest, onComplete);
+            LootLockerAPIManager.GetCurrentLoadoutToOtherClass(lootLockerGetRequest, onComplete);
+        }
+
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetEquipableContextToDefaultClass() instead")]
+        public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
+        {
+            GetEquipableContextToDefaultClass(onComplete);
         }
 
         /// <summary>
-        /// Get the equippable contexts for the players default character.
+        /// Get the equippable contexts for the players default class.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerContextResponse</param>
-        public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
+        public static void GetEquipableContextToDefaultClass(Action<LootLockerContextResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>());
                 return;
             }
-            LootLockerAPIManager.GetEquipableContextToDefaultCharacter(onComplete);
+            LootLockerAPIManager.GetEquipableContextToDefaultClass(onComplete);
         }
+
         #endregion
 
         #region Character progressions
