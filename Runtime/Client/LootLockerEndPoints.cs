@@ -72,25 +72,25 @@ namespace LootLocker
         public static EndPointClass subtractPointsFromPlayerProgression = new EndPointClass("player/progressions/{0}/points/subtract", LootLockerHTTPMethod.POST);
         public static EndPointClass resetPlayerProgression = new EndPointClass("player/progressions/{0}/reset", LootLockerHTTPMethod.POST);
         public static EndPointClass deletePlayerProgression = new EndPointClass("player/progressions/{0}", LootLockerHTTPMethod.DELETE);
-        
-        // Character
-        [Header("Character")]
-        public static EndPointClass characterLoadouts = new EndPointClass("v1/player/character/loadout", LootLockerHTTPMethod.GET);
-        public static EndPointClass getOtherPlayersCharacterLoadouts = new EndPointClass("v1/player/character/loadout/{0}?platform={1}", LootLockerHTTPMethod.GET);
-        public static EndPointClass updateCharacter = new EndPointClass("v1/player/character/{0}", LootLockerHTTPMethod.PUT);
-        public static EndPointClass equipIDAssetToDefaultCharacter = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);
-        public static EndPointClass equipGlobalAssetToDefaultCharacter = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);
-        public static EndPointClass equipIDAssetToCharacter = new EndPointClass("v1/player/character/{0}/equip", LootLockerHTTPMethod.POST);
-        public static EndPointClass equipGlobalAssetToCharacter = new EndPointClass("v1/player/character/{0}/equip", LootLockerHTTPMethod.POST);
-        public static EndPointClass unEquipIDAssetToDefaultCharacter = new EndPointClass("v1/player/equip/{0}", LootLockerHTTPMethod.DELETE);
-        public static EndPointClass unEquipIDAssetToCharacter = new EndPointClass("v1/player/character/{0}/equip/{1}", LootLockerHTTPMethod.DELETE);
-        public static EndPointClass getCurrentLoadoutToDefaultCharacter = new EndPointClass("v1/player/loadout", LootLockerHTTPMethod.GET);
-        public static EndPointClass getOtherPlayersLoadoutToDefaultCharacter = new EndPointClass("v1/player/loadout/{0}?platform={1}", LootLockerHTTPMethod.GET);
-        public static EndPointClass getEquipableContextToDefaultCharacter = new EndPointClass("v1/player/character/contexts", LootLockerHTTPMethod.GET);
-        public static EndPointClass getEquipableContextbyCharacter = new EndPointClass("v1/player/character/{0}/contexts", LootLockerHTTPMethod.GET);
-        public static EndPointClass createCharacter = new EndPointClass("v1/player/character", LootLockerHTTPMethod.POST);
-        public static EndPointClass listCharacterTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
-        public static EndPointClass listPlayerCharacters = new EndPointClass("v1/player/character/list", LootLockerHTTPMethod.GET);
+
+        // Class
+        [Header("Class")]
+        public static EndPointClass classLoadouts = new EndPointClass("v1/player/character/loadout", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersClassLoadouts = new EndPointClass("v1/player/character/loadout/{0}?platform={1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass updateClass = new EndPointClass("v1/player/character/{0}", LootLockerHTTPMethod.PUT);
+        public static EndPointClass equipIDAssetToDefaultClass = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);
+        public static EndPointClass equipGlobalAssetToDefaultClass = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);
+        public static EndPointClass equipIDAssetToClass = new EndPointClass("v1/player/character/{0}/equip", LootLockerHTTPMethod.POST);
+        public static EndPointClass equipGlobalAssetToClass = new EndPointClass("v1/player/character/{0}/equip", LootLockerHTTPMethod.POST);
+        public static EndPointClass unEquipIDAssetToDefaultClass = new EndPointClass("v1/player/equip/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass unEquipIDAssetToClass = new EndPointClass("v1/player/character/{0}/equip/{1}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass getCurrentLoadoutToDefaultClass = new EndPointClass("v1/player/loadout", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersLoadoutToDefaultClass = new EndPointClass("v1/player/loadout/{0}?platform={1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getEquipableContextToDefaultClass = new EndPointClass("v1/player/character/contexts", LootLockerHTTPMethod.GET);
+        public static EndPointClass getEquipableContextbyClass = new EndPointClass("v1/player/character/{0}/contexts", LootLockerHTTPMethod.GET);
+        public static EndPointClass createClass = new EndPointClass("v1/player/character", LootLockerHTTPMethod.POST);
+        public static EndPointClass listClassTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerClasses = new EndPointClass("v1/player/character/list", LootLockerHTTPMethod.GET);
 
         // Hero
         [Header("Hero")]
