@@ -2514,6 +2514,16 @@ namespace LootLocker.Requests
         /// Get a class loadout from a specific player and platform
         /// </summary>
         /// <param name="playerID">ID of the player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        public static void GetOtherPlayersClassLoadout(string playerID, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            GetOtherPlayersClassLoadout(player_id, CurrentPlatform.Get(), onComplete);
+        }
+
+        /// <summary>
+        /// Get a class loadout from a specific player and platform
+        /// </summary>
+        /// <param name="playerID">ID of the player</param>
         /// <param name="platform">The platform that the ID of the player is for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
         public static void GetOtherPlayersClassLoadout(string playerID, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
