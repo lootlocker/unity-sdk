@@ -72,7 +72,6 @@ namespace LootLocker.Requests
     {
         public bool is_default { get; set; }
         public string name { get; set; }
-        public string type { get; set; }
     }
 
     public class LootLockerEquipByIDRequest
