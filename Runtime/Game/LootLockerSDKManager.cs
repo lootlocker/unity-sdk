@@ -2517,7 +2517,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
         public static void GetOtherPlayersClassLoadout(string playerID, Action<LootLockerClassLoadoutResponse> onComplete)
         {
-            GetOtherPlayersClassLoadout(player_id, CurrentPlatform.Get(), onComplete);
+            GetOtherPlayersClassLoadout(playerID, CurrentPlatform.Get(), onComplete);
         }
 
         /// <summary>
