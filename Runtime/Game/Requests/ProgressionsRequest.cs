@@ -159,11 +159,19 @@ namespace LootLocker.Requests
         public string progression_name { get; set; }
     }
 
+    public class LootLockerCurrencyReward
+    {
+        public string currency_name { get; set; }
+        public string currency_code { get; set; }
+        public string amount { get; set; }
+    }
+
     public class LootLockerRewards
     {
         public List<LootLockerProgressionPointsReward> progression_points_rewards { get; set; }
         public List<LootLockerProgressionResetReward> progression_reset_rewards { get; set; }
         public List<LootLockerAssetReward> asset_rewards { get; set; }
+        public List<LootLockerCurrencyReward> currency_rewards { get; set; }
     }
 
     public class LootLockerPaginatedProgressionTiersResponse : LootLockerResponse
