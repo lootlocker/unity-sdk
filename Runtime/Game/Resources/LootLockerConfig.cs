@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using UnityEditor.PackageManager.Requests;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
+using UnityEditor.PackageManager.UI;
 #endif
 using UnityEngine;
 
