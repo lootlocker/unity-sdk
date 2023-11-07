@@ -4174,6 +4174,18 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
         }
 
+        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete) instead")]
+        public static void PollOrderStatus(int assetId, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            PollOrderStatus(assetId, (LootLockerPurchaseOrderStatus orderStatus) => onComplete(new LootLockerClassLoadoutResponse
+            {
+                errorData = orderStatus.errorData,
+                statusCode = orderStatus.statusCode,
+                success = orderStatus.success,
+                text = orderStatus.text
+            }));
+        }
+
         /// <summary>
         /// This will give you the current status of a purchase. These statuses can be returned;
         /// open - The order is being processed
