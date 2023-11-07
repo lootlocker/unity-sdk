@@ -435,7 +435,7 @@ namespace LootLocker
             if (useAuthToken)
             {
                 headers = new Dictionary<string, string>();
-                if (callerRole == LootLocker.LootLockerEnums.LootLockerCallerRole.Admin)
+                if (callerRole == LootLockerCallerRole.Admin)
                 {
 #if UNITY_EDITOR
                     if (!string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
