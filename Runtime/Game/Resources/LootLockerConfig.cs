@@ -50,6 +50,7 @@ namespace LootLocker
                 AssetDatabase.CreateAsset(newConfig, configAssetPath);
                 EditorApplication.delayCall += AssetDatabase.SaveAssets;
                 AssetDatabase.Refresh();
+                settingsInstance = newConfig;
             }
 
 #else
