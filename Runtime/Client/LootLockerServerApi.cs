@@ -33,14 +33,6 @@ namespace LootLocker
             return _instance;
         }
 
-        private void Awake()
-        {
-            if (_instance != null)
-            {
-                DontDestroyOnLoad(_instance.gameObject);
-            }
-        }
-
         private static void DestroyInstance()
         {
             if (_instance == null) return;
