@@ -2704,14 +2704,14 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToDefaultClass() instead")]
         public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
         {
-            voidGetCurrentLoadoutToDefaultClass(onComplete);
+            GetCurrentLoadoutToDefaultClass(onComplete);
         }
 
         /// <summary>
         /// Get the loadout for the players default class.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
-        public static void voidGetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        public static void GetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
         {
             if (!CheckInitialized())
             {
