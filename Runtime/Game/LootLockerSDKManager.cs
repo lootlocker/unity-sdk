@@ -18,7 +18,6 @@ namespace LootLocker.Requests
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is resetting for entering Playmode");
             initialized = false;
         }
 #endif
@@ -36,8 +35,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is Initializing");
-            LootLockerServerManager.CheckInit();
+            LootLockerServerApi.GetInstance();
             return LoadConfig();
         }
 
@@ -50,8 +48,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
-            LootLockerLogger.GetForLogLevel()("SDK is Initializing");
-            LootLockerServerManager.CheckInit();
+            LootLockerServerApi.GetInstance();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
 
@@ -68,8 +65,7 @@ namespace LootLocker.Requests
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
                 return false;
             }
-
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("SDK is Initialized");
+            
             initialized = true;
             return initialized;
         }
