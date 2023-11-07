@@ -400,7 +400,7 @@ namespace LootLocker
         public byte[] upload { get; set; }
         public string uploadName { get; set; }
         public string uploadType { get; set; }
-        public LootLocker.LootLockerEnums.LootLockerCallerRole adminCall { get; set; }
+        public LootLockerCallerRole callerRole { get; set; }
         public WWWForm form { get; set; }
 
         /// <summary>
@@ -461,8 +461,6 @@ namespace LootLocker
                 }
             }
 
-            LootLockerBaseServerAPI.I.SwitchURL(callerRole);
-
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
 
@@ -491,9 +489,7 @@ namespace LootLocker
             {
                 headers.Add("is-development", "true");
             }
-
-            LootLockerBaseServerAPI.I.SwitchURL(LootLockerCallerRole.Base);
-
+            
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: LootLockerCallerRole.Base).Send((response) => { onComplete?.Invoke(response); });
         }
 
@@ -519,9 +515,7 @@ namespace LootLocker
 
                 headers.Add(callerRole == LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token", LootLockerConfig.current.token);
             }
-
-            LootLockerBaseServerAPI.I.SwitchURL(callerRole);
-
+            
             new LootLockerServerRequest(endPoint, httpMethod, file, fileName, fileContentType, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
         
@@ -548,7 +542,7 @@ namespace LootLocker
             this.jsonPayload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = null;
-            this.adminCall = callerRole;
+            this.callerRole = callerRole;
             this.form = new WWWForm();
 
             foreach (var kvp in body)
@@ -579,7 +573,7 @@ namespace LootLocker
             this.jsonPayload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = callerRole;
+            this.callerRole = callerRole;
             bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
             this.form = null;
             if (this.payload != null && isNonPayloadMethod)
@@ -601,7 +595,7 @@ namespace LootLocker
             this.payload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
-            this.adminCall = callerRole;
+            this.callerRole = callerRole;
             bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
             this.form = null;
             if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
@@ -617,7 +611,7 @@ namespace LootLocker
         /// </summary>
         public void Send(System.Action<LootLockerResponse> OnServerResponse)
         {
-            LootLockerBaseServerAPI.I.SendRequest(this, (response) => { OnServerResponse?.Invoke(response); });
+            LootLockerServerApi.SendRequest(this, (response) => { OnServerResponse?.Invoke(response); });
         }
     }
 }
