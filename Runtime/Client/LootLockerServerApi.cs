@@ -21,7 +21,7 @@ namespace LootLocker
         private const int MaxRetries = 3;
         private int _tries;
 
-        public static LootLockerServerApi GetInstance()
+        public static void Instantiate()
         {
             if (_instance == null)
             {
@@ -30,10 +30,9 @@ namespace LootLocker
                 if (Application.isPlaying)
                     DontDestroyOnLoad(_instance.gameObject);
             }
-            return _instance;
         }
 
-        private static void DestroyInstance()
+        public static void Reset()
         {
             if (_instance == null) return;
             Destroy(_instance.gameObject);
@@ -44,13 +43,18 @@ namespace LootLocker
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
-            DestroyInstance();
+            Reset();
         }
 #endif
 
         public static void SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
         {
-            GetInstance()._SendRequest(request, OnServerResponse);
+            if (_instance == null)
+            {
+                Instantiate();
+            }
+
+            _instance._SendRequest(request, OnServerResponse);
         }
 
         private void _SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
