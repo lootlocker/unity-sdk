@@ -4415,6 +4415,25 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Purchase one catalog item using a specified wallet
+        /// </summary>
+        /// <param name="walletID">The id of the wallet to use for the purchase</param>
+        /// <param name="itemID">The id of the item that you want to purchase</param>
+        /// <param name="quantity">The amount that you want to purchase the item </param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void LootLockerPurchaseSingleCatalogItem(string walletID, string itemID, int quantity, Action<LootLockerPurchaseCatalogItemResponse> onComplete)
+        {
+            LootLockerCatalogItemAndQuantityPair item = new LootLockerCatalogItemAndQuantityPair();
+
+            item.catalog_listing_id = itemID;
+            item.quantity = quantity;
+
+            LootLockerCatalogItemAndQuantityPair[] items = { item };
+
+            LootLockerPurchaseCatalogItems(walletID, items, onComplete);
+        }
+
+        /// <summary>
         /// Purchase one or more catalog items using a specified wallet
         /// </summary>
         /// <param name="walletId">The id of the wallet to use for the purchase</param>
