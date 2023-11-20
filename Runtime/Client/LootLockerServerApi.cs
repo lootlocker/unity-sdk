@@ -35,7 +35,11 @@ namespace LootLocker
         public static void Reset()
         {
             if (_instance == null) return;
+#if UNITY_EDITOR
+            DestroyImmediate(_instance.gameObject);
+#else
             Destroy(_instance.gameObject);
+#endif
             _instance = null;
         }
 
