@@ -823,7 +823,7 @@ namespace LootLocker.Requests
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.GetInstance().StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
         }
 
         /// <summary>
@@ -832,7 +832,7 @@ namespace LootLocker.Requests
         /// <param name="guid">The guid of the remote session process that you want to cancel</param>
         public static void CancelRemoteSessionProcess(Guid guid)
         {
-            LootLockerAPIManager.RemoteSessionPoller.GetInstance().CancelRemoteSessionProcess(guid);
+            LootLockerAPIManager.RemoteSessionPoller.CancelRemoteSessionProcess(guid);
         }
 
         /// <summary>
@@ -840,7 +840,7 @@ namespace LootLocker.Requests
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshRemoteSession(Action<LootLockerStartRemoteSessionResponse> onComplete)
+        public static void RefreshRemoteSession(Action<LootLockerRefreshRemoteSessionResponse> onComplete)
         {
             RefreshRemoteSession("", onComplete);
         }
@@ -852,18 +852,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="refreshToken">Token received in response from StartRemoteSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshRemoteSession(string refreshToken, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        public static void RefreshRemoteSession(string refreshToken, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerRefreshRemoteSessionResponse>());
                 return;
             }
 
             CurrentPlatform.Set(Platforms.Remote);
 
             LootLockerRefreshRemoteSessionRequest sessionRequest = new LootLockerRefreshRemoteSessionRequest(string.IsNullOrEmpty(refreshToken) ? LootLockerConfig.current.refreshToken : refreshToken);
-            LootLockerAPIManager.RemoteSessionPoller.GetInstance().RefreshRemoteSession(sessionRequest, response =>
+            LootLockerAPIManager.RemoteSessionPoller.RefreshRemoteSession(sessionRequest, response =>
             {
                 if (!response.success)
                 {
