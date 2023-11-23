@@ -66,6 +66,29 @@ namespace LootLocker.Requests
         public string nonce { get; set; }
     }
 
+    /// <summary>
+    /// </summary>
+    public class LootLockerRefreshRemoteSessionRequest : LootLockerGetRequest
+    {
+        /// <summary>
+        /// The api key configured for this game
+        /// </summary>
+        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        /// <summary>
+        /// The refresh token used to refresh this session
+        /// </summary>
+        public string refresh_token { get; set; }
+        /// <summary>
+        /// The game version configured in LootLocker settings
+        /// </summary>
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerRefreshRemoteSessionRequest(string refreshToken)
+        {
+            this.refresh_token = refreshToken;
+        }
+    }
+
     //==================================================
     // Response Definitions
     //==================================================
@@ -336,6 +359,30 @@ namespace LootLocker
                 {
                     process.ShouldCancel = true;
                 }
+            }
+
+            public void RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerStartRemoteSessionResponse> onComplete)
+            {
+                if (data == null)
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerStartRemoteSessionResponse>());
+                    return;
+                }
+
+                string json = LootLockerJson.SerializeObject(data);
+                if (string.IsNullOrEmpty(json))
+                {
+                    return;
+                }
+                EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
+                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerStartRemoteSessionResponse>(serverResponse);
+                    LootLockerConfig.current.token = response.session_token;
+                    LootLockerConfig.current.deviceID = response.player_identifier;
+                    LootLockerConfig.current.refreshToken = response.refresh_token;
+                    onComplete?.Invoke(response);
+                }, false);
             }
 
             private void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
