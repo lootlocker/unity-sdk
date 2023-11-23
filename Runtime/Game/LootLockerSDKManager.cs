@@ -428,7 +428,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="googlePlatform">Google OAuth2 ClientID platform</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -459,7 +459,7 @@ namespace LootLocker.Requests
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete)
         {
             RefreshGoogleSession("", onComplete);
@@ -472,7 +472,7 @@ namespace LootLocker.Requests
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
         public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -833,6 +833,44 @@ namespace LootLocker.Requests
         public static void CancelRemoteSessionProcess(Guid guid)
         {
             LootLockerAPIManager.RemoteSessionPoller.GetInstance().CancelRemoteSessionProcess(guid);
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in remotely.
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void RefreshRemoteSession(Action<LootLockerStartRemoteSessionResponse> onComplete)
+        {
+            RefreshRemoteSession("", onComplete);
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in remotely.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshRemoteSession(Action<LootLockerRemoteSessionResponse> onComplete) method.
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// </summary>
+        /// <param name="refreshToken">Token received in response from StartRemoteSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void RefreshRemoteSession(string refreshToken, Action<LootLockerStartRemoteSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                return;
+            }
+
+            CurrentPlatform.Set(Platforms.Remote);
+
+            LootLockerRefreshRemoteSessionRequest sessionRequest = new LootLockerRefreshRemoteSessionRequest(string.IsNullOrEmpty(refreshToken) ? LootLockerConfig.current.refreshToken : refreshToken);
+            LootLockerAPIManager.RemoteSessionPoller.GetInstance().RefreshRemoteSession(sessionRequest, response =>
+            {
+                if (!response.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+                onComplete(response);
+            });
         }
         #endregion
 

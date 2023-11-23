@@ -359,6 +359,20 @@ namespace LootLocker
                     onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
                     return;
                 }
+                case Platforms.Remote:
+                {
+                    if (ShouldRefreshUsingRefreshToken(cachedRequest))
+                    {
+                        LootLockerSDKManager.RefreshRemoteSession(response =>
+                        {
+                            CompleteCall(cachedRequest, response, onComplete);
+                        });
+                        return;
+                    }
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerResponse>("Token Expired", 401));
+                    return;
+                }
                 case Platforms.NintendoSwitch:
                 case Platforms.Steam:
                 {
