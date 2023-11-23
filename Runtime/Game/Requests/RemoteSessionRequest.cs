@@ -150,6 +150,20 @@ namespace LootLocker.Requests
         /// </summary>
         public string player_identifier { get; set; }
     }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerRefreshRemoteSessionResponse : LootLockerSessionResponse
+    {
+        /// <summary>
+        /// A refresh token that can be used to refresh the remote session instead of signing in each time the session token expires
+        /// </summary>
+        public string refresh_token { get; set; }
+        /// <summary>
+        /// The player identifier of the player
+        /// </summary>
+        public string player_identifier { get; set; }
+    }
 }
 
 namespace LootLocker
@@ -158,8 +172,9 @@ namespace LootLocker
     {
         public class RemoteSessionPoller : MonoBehaviour
         {
+            #region Singleton Setup
             private static RemoteSessionPoller _instance;
-            public static RemoteSessionPoller GetInstance()
+            protected static RemoteSessionPoller GetInstance()
             {
                 if (_instance == null)
                 {
@@ -172,7 +187,7 @@ namespace LootLocker
                 return _instance;
             }
 
-            public static bool DestroyInstance()
+            protected static bool DestroyInstance()
             {
                 if (_instance == null)
                     return false;
@@ -189,6 +204,33 @@ namespace LootLocker
             }
 #endif
 
+            #endregion
+
+            #region Public Methods
+            public static Guid StartRemoteSessionWithContinualPolling(
+                Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
+                Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
+                Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
+                float pollingIntervalSeconds = 1.0f,
+                float timeOutAfterMinutes = 5.0f)
+            {
+                return GetInstance()._StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation,
+                    remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
+                    timeOutAfterMinutes);
+            }
+
+            public static void CancelRemoteSessionProcess(Guid processGuid)
+            {
+                GetInstance()._CancelRemoteSessionProcess(processGuid);
+            }
+
+            public static void RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
+            {
+                GetInstance()._RefreshRemoteSession(data, onComplete);
+            }
+            #endregion
+
+            #region Internal Workings
             private static readonly int _leasingProcessPollingRetryLimit = 5;
 
             private class LootLockerRemoteSessionProcess
@@ -304,7 +346,7 @@ namespace LootLocker
                 }
             }
 
-            public Guid StartRemoteSessionWithContinualPolling(
+            private Guid _StartRemoteSessionWithContinualPolling(
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
@@ -353,7 +395,7 @@ namespace LootLocker
                 return processGuid;
             }
 
-            public void CancelRemoteSessionProcess(Guid processGuid)
+            private void _CancelRemoteSessionProcess(Guid processGuid)
             {
                 if (_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                 {
@@ -361,11 +403,11 @@ namespace LootLocker
                 }
             }
 
-            public void RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerStartRemoteSessionResponse> onComplete)
+            private void _RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
             {
                 if (data == null)
                 {
-                    onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerStartRemoteSessionResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerRefreshRemoteSessionResponse>());
                     return;
                 }
 
@@ -377,7 +419,7 @@ namespace LootLocker
                 EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
                 LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
                 {
-                    var response = LootLockerResponse.Deserialize<LootLockerStartRemoteSessionResponse>(serverResponse);
+                    var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
                     LootLockerConfig.current.token = response.session_token;
                     LootLockerConfig.current.deviceID = response.player_identifier;
                     LootLockerConfig.current.refreshToken = response.refresh_token;
@@ -428,6 +470,7 @@ namespace LootLocker
                     onComplete?.Invoke(response);
                 }, false);
             }
+            #endregion
         }
     }
 }
