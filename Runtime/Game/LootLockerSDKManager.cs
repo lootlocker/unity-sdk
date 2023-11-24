@@ -3304,6 +3304,38 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAssetsById(data, onComplete);
         }
 
+        /// <summary>
+        /// Grant an Asset Instance to the Player's Inventory.
+        /// </summary>
+        /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
+        public static void GrantAssetToPlayerInventory(int assetID, Action<LootLockerGrantAssetResponse> onComplete)
+        {
+            GrantAssetToPlayerInventory(assetID, null, null, onComplete);
+        }
+
+        /// <summary>
+        /// Grant an Asset Instance to the Player's Inventory.
+        /// </summary>
+        /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
+        /// <param name="assetVariationID">The id of the Asset Variation you want to grant</param>
+        /// <param name="assetRentalOptionID">the rental option id you want to give the Asset Instance</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGrantAssetResponse</param>
+        public static void GrantAssetToPlayerInventory(int assetID, int? assetVariationID, int? assetRentalOptionID, Action<LootLockerGrantAssetResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGrantAssetResponse>());
+                return;
+            }
+
+            LootLockerGrantAssetRequest data = new LootLockerGrantAssetRequest();
+            data.asset_id = assetID;
+            data.asset_variation_id = assetVariationID;
+            data.asset_rental_option_id = assetRentalOptionID;
+
+            LootLockerAPIManager.GrantAssetToPlayerInventory(data, onComplete);
+        }
+
         #endregion
 
         #region AssetInstance
@@ -3523,6 +3555,24 @@ namespace LootLocker.Requests
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
             LootLockerAPIManager.OpenALootBox(data, onComplete);
+        }
+
+        /// <summary>
+        /// Delete an Asset Instance from the current Player's Inventory.
+        /// </summary>
+        /// <param name="assetInstanceID">The asset instance ID of the you want to delete from the Players Inventory</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void DeleteAssetInstanceFromPlayerInventory(int assetInstanceID, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            LootLockerGetRequest data = new LootLockerGetRequest();
+            data.getRequests.Add(assetInstanceID.ToString());
+            LootLockerAPIManager.DeleteAssetInstanceFromPlayerInventory(data, onComplete);
         }
         #endregion
         
@@ -4760,7 +4810,6 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.PickDropsFromDropTable(data, tableInstanceId, onComplete);
         }
-
 
         #region Reports
 

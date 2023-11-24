@@ -68,6 +68,13 @@ namespace LootLocker.Requests
         }
     }
 
+    public class LootLockerGrantAssetRequest
+    {
+        public int asset_id { get; set; }
+        public int? asset_variation_id { get; set; }
+        public int? asset_rental_option_id { get; set; }
+    }
+
     public class LootLockerAssetResponse : LootLockerResponse
     {
         public LootLockerCommonAsset[] assets { get; set; }
@@ -186,6 +193,17 @@ namespace LootLocker.Requests
     public class LootLockerActivateRentalAssetResponse : LootLockerResponse
     {
         public int time_left { get; set; }
+    }
+
+    public class LootLockerGrantAssetResponse : LootLockerResponse
+    {
+        public int id { get; set; }
+        public int asset_id { get; set; }
+        public int asset_variation_id { get; set; }
+        public int asset_rental_option_id { get; set; }
+        public string asset_ulid { get; set; }
+        public string acquisition_source { get; set; }
+        public string acquisition_date { get; set; }
     }
 }
 
@@ -368,5 +386,15 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+
+        public static void GrantAssetToPlayerInventory(LootLockerGrantAssetRequest data, Action<LootLockerGrantAssetResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.grantAssetToPlayerInventory;
+
+            string json = LootLockerJson.SerializeObject(data);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
     }
 }

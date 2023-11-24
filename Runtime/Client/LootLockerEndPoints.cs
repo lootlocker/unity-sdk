@@ -135,7 +135,8 @@ namespace LootLocker
         public static EndPointClass listingFavouriteAssets = new EndPointClass("v1/asset/favourites", LootLockerHTTPMethod.GET);
         public static EndPointClass addingFavouriteAssets = new EndPointClass("v1/asset/{0}/favourite", LootLockerHTTPMethod.POST);
         public static EndPointClass removingFavouriteAssets = new EndPointClass("v1/asset/{0}/favourite", LootLockerHTTPMethod.DELETE);
-
+        public static EndPointClass grantAssetToPlayerInventory = new EndPointClass("player/inventory/grant", LootLockerHTTPMethod.POST);
+        
         // Asset storage 
         [Header("Asset Instances")]
         public static EndPointClass getAllKeyValuePairs = new EndPointClass("v1/asset/instance/storage", LootLockerHTTPMethod.GET);
@@ -147,7 +148,8 @@ namespace LootLocker
         public static EndPointClass deleteKeyValuePair = new EndPointClass("v1/asset/instance/{0}/storage/{1}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass inspectALootBox = new EndPointClass("v1/asset/instance/{0}/inspect", LootLockerHTTPMethod.GET);
         public static EndPointClass openALootBox = new EndPointClass("v1/asset/instance/{0}/open", LootLockerHTTPMethod.PUT);
-        
+        public static EndPointClass deleteAssetInstanceFromPlayerInventory = new EndPointClass("player/inventory/{0}", LootLockerHTTPMethod.DELETE);
+
         // Asset instance progressions
         [Header("Asset instance progressions")]
         public static EndPointClass getAllAssetInstanceProgressions = new EndPointClass("player/assets/instances/{0}/progressions", LootLockerHTTPMethod.GET);
