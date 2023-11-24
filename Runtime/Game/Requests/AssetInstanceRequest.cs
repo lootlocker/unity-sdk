@@ -181,5 +181,15 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+
+        public static void DeleteAssetInstanceFromPlayerInventory(LootLockerGetRequest data, Action<LootLockerResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.deleteAssetInstanceFromPlayerInventory;
+
+            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
     }
 }
