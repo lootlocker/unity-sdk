@@ -128,10 +128,10 @@ namespace LootLocker
             {
                 startOfUrl += domainKey + ".";
             }
-            adminUrl = startOfUrl + UrlCore + AdminUrlAppendage;
-            playerUrl = startOfUrl + UrlCore + PlayerUrlAppendage;
-            userUrl = startOfUrl + UrlCore + UserUrlAppendage;
-            baseUrl = startOfUrl + UrlCore;
+            adminUrl = startOfUrl + GetUrlCore() + AdminUrlAppendage;
+            playerUrl = startOfUrl + GetUrlCore() + PlayerUrlAppendage;
+            userUrl = startOfUrl + GetUrlCore() + UserUrlAppendage;
+            baseUrl = startOfUrl + GetUrlCore();
         }
 
         private static LootLockerConfig _current;
@@ -171,17 +171,24 @@ namespace LootLocker
 
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";
+        [HideInInspector] private static readonly string UrlCoreOverride =
+#if LOOTLOCKER_TARGET_STAGE_ENV
+           "api.stage.internal.dev.lootlocker.cloud";
+#else
+            null;
+#endif
+        private static string GetUrlCore() { return string.IsNullOrEmpty(UrlCoreOverride) ? UrlCore : UrlCoreOverride; }
         [HideInInspector] private static readonly string UrlAppendage = "/v1";
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
         [HideInInspector] private static readonly string UserUrlAppendage = "/game";
 
-        [HideInInspector] public string url = UrlProtocol + UrlCore + UrlAppendage;
+        [HideInInspector] public string url = UrlProtocol + GetUrlCore() + UrlAppendage;
 
-        [HideInInspector] public string adminUrl = UrlProtocol + UrlCore + AdminUrlAppendage;
-        [HideInInspector] public string playerUrl = UrlProtocol + UrlCore + PlayerUrlAppendage;
-        [HideInInspector] public string userUrl = UrlProtocol + UrlCore + UserUrlAppendage;
-        [HideInInspector] public string baseUrl = UrlProtocol + UrlCore;
+        [HideInInspector] public string adminUrl = UrlProtocol + GetUrlCore() + AdminUrlAppendage;
+        [HideInInspector] public string playerUrl = UrlProtocol + GetUrlCore() + PlayerUrlAppendage;
+        [HideInInspector] public string userUrl = UrlProtocol + GetUrlCore() + UserUrlAppendage;
+        [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 5f;
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
         public DebugLevel currentDebugLevel = DebugLevel.All;
