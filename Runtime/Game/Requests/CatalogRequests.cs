@@ -51,24 +51,6 @@ namespace LootLocker.Requests
 
     /// <summary>
    /// </summary>
-    public class LootLockerCatalogPagination
-    {
-        /// <summary>
-        /// The total available items in this catalog
-        /// </summary>
-        public int total { get; set; }
-        /// <summary>
-        /// The cursor that points to the next item in the catalog list. Use this in subsequent requests to get additional items from the catalog.
-        /// </summary>
-        public string cursor { get; set; }
-        /// <summary>
-        /// The cursor that points to the first item in this batch of items.
-        /// </summary>
-        public string previous_cursor { get; set; }
-    }
-
-    /// <summary>
-   /// </summary>
     public class LootLockerCatalogEntryPrice
     {
         /// <summary>
@@ -299,7 +281,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Pagination data to use for subsequent requests
         /// </summary>
-        public LootLockerCatalogPagination pagination { get; set; }
+        public LootLockerPaginationResponse<string> pagination { get; set; }
 
         public void AppendCatalogItems(LootLockerListCatalogPricesResponse catalogPrices)
         {
@@ -307,7 +289,7 @@ namespace LootLocker.Requests
             entries.CopyTo(concatenatedArray, 0);
             catalogPrices.entries.CopyTo(concatenatedArray, entries.Length);
             pagination.total = catalogPrices.pagination.total;
-            pagination.cursor = catalogPrices.pagination.cursor;
+            pagination.next_cursor = catalogPrices.pagination.next_cursor;
 
             foreach (var assetDetail in catalogPrices.asset_details)
             {
@@ -341,7 +323,7 @@ namespace LootLocker.Requests
             public LootLockerProgressionPointDetails[] progression_points_details { get; set; }
             public LootLockerProgressionResetDetails[] progression_resets_details { get; set; }
             public LootLockerCurrencyDetails[] currency_details { get; set; }
-            public LootLockerCatalogPagination pagination { get; set; }
+            public LootLockerPaginationResponse<string> pagination { get; set; }
         }
 
         public LootLockerListCatalogPricesResponse(LootLockerResponse serverResponse)
