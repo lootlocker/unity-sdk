@@ -192,8 +192,17 @@ namespace LootLocker
 
     public class LootLockerPaginationResponse<TKey>
     {
+        /// <summary>
+        /// The total available items in this list
+        /// </summary>
         public int total { get; set; }
+        /// <summary>
+        /// The cursor that points to the next item in the list. Use this in subsequent requests to get additional items from the list.
+        /// </summary>
         public TKey next_cursor { get; set; }
+        /// <summary>
+        /// The cursor that points to the first item in this batch of items.
+        /// </summary>
         public TKey previous_cursor { get; set; }
     }
 
