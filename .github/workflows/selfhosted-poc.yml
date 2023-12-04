@@ -1,38 +1,21 @@
-name: POC k8s runner
-run-name: poc-k8s-runner
+name: Selfhosted Runner Proof of Concept
+run-name: selfhosted-poc
 on:
-  pull_request:
-    branches: # Made towards the following
-      - main
-      - dev*
-      - ci/dev
-    types: # Only on the following activity
-      - opened
-      - synchronize # Changes to the branch like new commits, ammends, etc.
-      - reopened
-      - unlocked
-  push:
-    branches: # Made towards the following
-      - main
-      - dev
-      - ci/dev
-    tags:
-      - v**
   workflow_dispatch: {}
 
 jobs:
-  test:
-    name: POC-k8s-ping
+  ping-stage-test:
+    name: Ping stage backend
     runs-on: [k8s]
     container:
       image: ubuntu:22.04
-
     steps:
       - name: Setup git
         run: |
           apt update
           apt-get install -y git
           git config --global --add safe.directory /__w/unity-sdk/unity-sdk
+          
       - name: Setup curl
         run: |
           apt update
@@ -46,7 +29,7 @@ jobs:
 
       - name: Check branch
         run: git branch
-
+        
       - name: Ping stage
         run: |
           curl -X POST "${{ SECRETS.LL_STAGE_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"dev_dc52acb52a8b49be81761e709f1df9fd\", \"game_version\": \"0.10.0.0\", \"player_identifier\": \"k8s-runner-guest\"}"
