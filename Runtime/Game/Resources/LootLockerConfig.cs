@@ -23,6 +23,7 @@ namespace LootLocker
             if (settingsInstance != null)
             {
                 settingsInstance.ConstructUrls();
+                settingsInstance?.CheckForSettingOverrides();
                 return settingsInstance;
             }
 
@@ -60,7 +61,35 @@ namespace LootLocker
             }
 #endif
             settingsInstance?.ConstructUrls();
+            settingsInstance?.CheckForSettingOverrides();
             return settingsInstance;
+        }
+
+        private void CheckForSettingOverrides()
+        {
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+            string[] args = System.Environment.GetCommandLineArgs();
+            string _apiKey = null;
+            string _domainKey = null;
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "-apikey")
+                {
+                    _apiKey = args[i + 1];
+                }
+                else if (args[i] == "-domainkey")
+                {
+                    _domainKey = args[i + 1];
+                }
+            }
+
+            if (string.IsNullOrEmpty(_apiKey) || string.IsNullOrEmpty(_domainKey))
+            {
+                return;
+            }
+            apiKey = _apiKey;
+            domainKey = _domainKey;
+#endif
         }
 
 #if UNITY_EDITOR
