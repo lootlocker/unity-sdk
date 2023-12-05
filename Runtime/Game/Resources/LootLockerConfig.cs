@@ -92,6 +92,11 @@ namespace LootLocker
             EditorApplication.update += ListRequestProgress;
         }
 
+        private class LLPackageDescription
+        {
+            public string version;
+        }
+
         static void ListRequestProgress()
         {
             if (ListInstalledPackagesRequest.IsCompleted)
@@ -104,6 +109,11 @@ namespace LootLocker
                         LootLockerConfig.current.sdk_version = package.version;
                         break;
                     }
+                }
+
+                if (string.IsNullOrEmpty(LootLockerConfig.current.sdk_version))
+                {
+                    LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
                 }
             }
         }
