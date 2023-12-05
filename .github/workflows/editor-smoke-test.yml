@@ -98,9 +98,11 @@ jobs:
           sed -i 's/NO_LOOTLOCKER_TARGET_STAGE_ENV/LOOTLOCKER_TARGET_STAGE_ENV/' unity-sdk-smoketest-project/ProjectSettings/ProjectSettings.asset
       - uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}
-          restore-keys: Library-
+          path: unity-sdk-smoketest-project/Library
+          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
+          restore-keys: |
+            ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
+            Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}
         id: editor-smoke-tests-gameci
         uses: game-ci/unity-test-runner@v4
