@@ -42,7 +42,7 @@ jobs:
           #- 2023.2.1f1
         targetPlatform:
           - StandaloneLinux64
-          #- WebGL
+          - WebGL
     steps:
       - name: Setup commandline dependencies (if on self-hosted runner)
         if: ${{ env.LL_USE_STAGE == 'true' }}
@@ -127,14 +127,16 @@ jobs:
           buildName: smokeTest
           projectPath: unity-sdk-smoketest-project
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
-      - name: Run the built game
+      - name: Run the built game (valid for Linux)
+        if: ${{ matrix.targetPlatform == 'StandaloneLinux64' }}
         run: |
           sudo chmod 777 ./builds
           sudo chmod 777 ./builds/${{ matrix.targetPlatform }}/
           sudo chmod 777 ./builds/${{ matrix.targetPlatform }}/*
           ./builds/${{ matrix.targetPlatform }}/smokeTest -batchmode -nographics -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
           while [ ! -f "./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt" ]; do sleep 10; ls -als ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/; done
-      - name: Test the output of the run
+      - name: Test the output of the run (valid for Linux)
+        if: ${{ matrix.targetPlatform == 'StandaloneLinux64' }}
         run: |
           cat ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt
           grep -q "Run Succeeded" ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt
