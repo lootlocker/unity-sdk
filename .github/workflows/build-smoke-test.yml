@@ -108,9 +108,11 @@ jobs:
           git commit -m "Temporary changes for build"
       - uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
-          restore-keys: Library-
+          path: unity-sdk-smoketest-project/Library
+          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
+          restore-keys: |
+            ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
+            Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
         id: build-smoke-tests-gameci
         uses: game-ci/unity-builder@v4
