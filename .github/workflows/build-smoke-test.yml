@@ -36,10 +36,10 @@ jobs:
           - playmode
         unityVersion:
           - 2019.4.40f1
-          #- 2020.3.48f1
-          #- 2021.3.32f1
-          #- 2022.3.14f1
-          #- 2023.2.1f1
+          - 2020.3.48f1
+          - 2021.3.32f1
+          - 2022.3.14f1
+          - 2023.2.1f1
         targetPlatform:
           - StandaloneLinux64
           - WebGL
