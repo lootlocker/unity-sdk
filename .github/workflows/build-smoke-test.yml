@@ -123,11 +123,9 @@ jobs:
         with:
           unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: ${{ matrix.targetPlatform }}
-          artifactsPath: build-smoke-tests-gameci-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}-artifacts
           buildsPath: builds
           buildName: smokeTest
           projectPath: unity-sdk-smoketest-project
-          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
       - name: Run the built game
         run: |
