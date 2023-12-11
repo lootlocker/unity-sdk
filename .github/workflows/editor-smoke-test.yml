@@ -5,17 +5,12 @@ on:
     branches: # Made towards the following
       - main
       - dev*
-      - ci/dev
     types: # Only on the following activity
       - opened
       - synchronize # Changes to the branch like new commits, ammends, etc.
-      - reopened
-      - unlocked
   push:
     branches: # Made towards the following
       - main
-      - dev
-      - ci/dev
     tags:
       - v**
   workflow_dispatch: {}
