@@ -70,6 +70,20 @@ jobs:
           restore-keys: |
             ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
             Library-
+      - name: Compile and run all sample scenes ${{ matrix.unityVersion }}
+        id: run-sdk-samples
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          checkName: Sample Scene ${{ matrix.unityVersion }} Test Results
+          artifactsPath: run-sdk-samples-${{ matrix.unityVersion }}-artifacts
+          projectPath: unity-sdk-packager
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
       - name: Package SDK for ${{ matrix.unityVersion }}
         id: package-sdk-gameci
         uses: game-ci/unity-test-runner@v4
@@ -79,8 +93,8 @@ jobs:
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
           testMode: playmode
-          checkName: ${{ matrix.unityVersion }} Test Results
-          artifactsPath: package-sdk-gameci-${{ matrix.unityVersion }}-artifacts
+          checkName: SDK Packaging ${{ matrix.unityVersion }} Test Results
+          artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
           projectPath: unity-sdk-packager
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
