@@ -88,33 +88,57 @@ namespace LootLocker
         [InitializeOnLoadMethod]
         static void StoreSDKVersion()
         {
+            if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) &&
+                 !LootLockerConfig.current.sdk_version.Equals("N/A")) || ListInstalledPackagesRequest != null)
+            {
+                return;
+            }
             ListInstalledPackagesRequest = Client.List();
-            EditorApplication.update += ListRequestProgress;
+            EditorApplication.update += ListInstalledPackagesRequestProgress;
         }
 
+        [Serializable]
         private class LLPackageDescription
         {
-            public string version;
+            public string name { get; set; }
+            public string version { get; set; }
         }
 
-        static void ListRequestProgress()
+        static void ListInstalledPackagesRequestProgress()
         {
             if (ListInstalledPackagesRequest.IsCompleted)
             {
-                EditorApplication.update -= ListRequestProgress;
+                EditorApplication.update -= ListInstalledPackagesRequestProgress;
                 foreach (var package in ListInstalledPackagesRequest.Result)
                 {
                     if (package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
-                        break;
+                        return;
                     }
                 }
 
-                if (string.IsNullOrEmpty(LootLockerConfig.current.sdk_version))
+                if (File.Exists("Assets/LootLockerSDK/package.json"))
                 {
                     LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
+                    return;
                 }
+
+
+                foreach (var assetPath in AssetDatabase.GetAllAssetPaths())
+                {
+                    if (assetPath.EndsWith("package.json"))
+                    {
+                        var packageDescription = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(assetPath));
+                        if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
+                        {
+                            LootLockerConfig.current.sdk_version = packageDescription.version;
+                            return;
+                        }
+                    }
+                }
+
+                LootLockerConfig.current.sdk_version = "N/A";
             }
         }
 #endif
