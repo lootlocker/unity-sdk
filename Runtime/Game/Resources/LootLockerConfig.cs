@@ -23,7 +23,9 @@ namespace LootLocker
             if (settingsInstance != null)
             {
                 settingsInstance.ConstructUrls();
-                settingsInstance?.CheckForSettingOverrides();
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+                settingsInstance.CheckForSettingOverrides();
+#endif
                 return settingsInstance;
             }
 
@@ -60,8 +62,10 @@ namespace LootLocker
                 throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
             }
 #endif
-            settingsInstance?.ConstructUrls();
-            settingsInstance?.CheckForSettingOverrides();
+            settingsInstance.ConstructUrls();
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+            settingsInstance.CheckForSettingOverrides();
+#endif
             return settingsInstance;
         }
 
