@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 #pragma warning disable IDE0063 // Use simple 'using' statement
@@ -3064,6 +3065,15 @@ namespace ZeroDepJson
             return string.Compare(str, text, StringComparison.OrdinalIgnoreCase) == 0 || /*Recover from different casing (Snake_Case to CamelCase)*/ string.Compare(str, text.Replace("_", ""), StringComparison.OrdinalIgnoreCase) == 0;
         }
 
+        private static string ConvertToSnakeCase(string str)
+        {
+            str = Regex.Replace(str, @"([a-z])([A-Z])", "$1_$2");
+            str = Regex.Replace(str, @"([a-z])([0-9])", "$1_$2");
+            str = Regex.Replace(str, @"([0-9])([A-Za-z])", "$1_$2");
+            str = Regex.Replace(str, @"([A-Z]{2,})([a-z])", "$1_$2");
+            return str.ToLowerInvariant();
+        }
+
         private static string Nullify(this string str)
         {
             if (str == null)
@@ -3274,14 +3284,15 @@ namespace ZeroDepJson
                     }
                     else
                     {
+                        string nameToWrite = options.SerializationOptions.HasFlag(JsonSerializationOptions.ConvertToSnakeCase) ? ConvertToSnakeCase(member.EscapedWireName) : member.EscapedWireName; ;
                         if (options.SerializationOptions.HasFlag(JsonSerializationOptions.WriteKeysWithoutQuotes))
                         {
-                            writer.Write(member.EscapedWireName);
+                            writer.Write(nameToWrite);
                         }
                         else
                         {
                             writer.Write('"');
-                            writer.Write(member.EscapedWireName);
+                            writer.Write(nameToWrite);
                             writer.Write('"');
                         }
 
@@ -5499,9 +5510,14 @@ namespace ZeroDepJson
         SkipGetOnly = 0x800000,
 
         /// <summary>
+        /// Convert field names to snake case.
+        /// </summary>
+        ConvertToSnakeCase = 0x1000000,
+
+        /// <summary>
         /// The default value.
         /// </summary>
-        Default = UseXmlIgnore | UseScriptIgnore | SerializeFields | AutoParseDateTime | UseJsonAttribute | SkipGetOnly | SkipNullPropertyValues | SkipNullDateTimeValues,
+        Default = UseXmlIgnore | UseScriptIgnore | SerializeFields | AutoParseDateTime | UseJsonAttribute | SkipGetOnly | SkipNullPropertyValues | SkipNullDateTimeValues | ConvertToSnakeCase,
         }
 
     /// <summary>
