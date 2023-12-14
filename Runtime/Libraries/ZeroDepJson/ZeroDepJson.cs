@@ -536,6 +536,33 @@ namespace ZeroDepJson
             return false;
         }
 
+        private static bool TryGetObjectConditionalSerialization(Type type, MemberDefinition memberDefinition, out MethodInfo conditionalSerializationMethodInfo)
+        {
+            conditionalSerializationMethodInfo = null;
+            List<string> potentialConditionalSerializationMethodNames = new List<string>
+            {
+                "ShouldSerialize" + memberDefinition.EscapedWireName,
+                "ShouldSerialize" + memberDefinition.WireName,
+                "ShouldSerialize" + memberDefinition.Name
+            };
+            foreach (string methodName in potentialConditionalSerializationMethodNames)
+            {
+                try
+                {
+                    MethodInfo methodInfo = type.GetMethod(methodName);
+                    if (methodInfo != null && methodInfo.ReturnType == typeof(bool) && methodInfo.GetParameters().Length == 0)
+                    {
+                        conditionalSerializationMethodInfo = methodInfo;
+                        break;
+                    }
+                }
+                catch (AmbiguousMatchException) { }
+                catch (ArgumentNullException) { }
+            }
+
+            return conditionalSerializationMethodInfo != null;
+        }
+
         private static string GetObjectName(PropertyDescriptor pd, string defaultName)
         {
             foreach (var att in pd.Attributes.Cast<Attribute>())
@@ -1648,6 +1675,22 @@ namespace ZeroDepJson
             /// The default value.
             /// </value>
             public virtual object DefaultValue { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether this instance has conditional serialization.
+            /// </summary>
+            /// <value>
+            /// <c>true</c> if this instance has conditional serialization; otherwise, <c>false</c>.
+            /// </value>
+            public virtual bool HasConditionalSerialization { get; set; }
+
+            /// <summary>
+            /// Gets or sets conditional serialization method info
+            /// </summary>
+            /// <value>
+            /// The info of the method on the type that tells whether this property should be serialized
+            /// </value>
+            public virtual MethodInfo ConditionalSerializationMethod { get; set; }
 
             /// <summary>
             /// Gets or sets the accessor.
@@ -3208,6 +3251,14 @@ namespace ZeroDepJson
                             continue;
                     }
 
+                    if (member.HasConditionalSerialization && member.ConditionalSerializationMethod != null)
+                    {
+                        if (!(bool)member.ConditionalSerializationMethod.Invoke(component, new object[] { }))
+                        {
+                            continue;
+                        }
+                    }
+
                     if (!first)
                     {
                         writer.Write(',');
@@ -3400,6 +3451,8 @@ namespace ZeroDepJson
 
                     ma.HasDefaultValue = TryGetObjectDefaultValue(info, out var defaultValue);
                     ma.DefaultValue = defaultValue;
+                    ma.HasConditionalSerialization = TryGetObjectConditionalSerialization(type, ma, out MethodInfo conditionalSerializationMethodInfo);
+                    ma.ConditionalSerializationMethod = conditionalSerializationMethodInfo;
                     ma.Accessor = (IMemberAccessor)Activator.CreateInstance(typeof(PropertyInfoAccessor<,>).MakeGenericType(info.DeclaringType, info.PropertyType), info);
                     yield return ma;
                 }
@@ -3452,6 +3505,8 @@ namespace ZeroDepJson
 
                         ma.HasDefaultValue = TryGetObjectDefaultValue(info, out var defaultValue);
                         ma.DefaultValue = defaultValue;
+                        ma.HasConditionalSerialization = TryGetObjectConditionalSerialization(type, ma, out MethodInfo conditionalSerializationMethodInfo);
+                        ma.ConditionalSerializationMethod = conditionalSerializationMethodInfo;
                         ma.Accessor = (IMemberAccessor)Activator.CreateInstance(typeof(FieldInfoAccessor), info);
                         yield return ma;
                     }
@@ -3509,6 +3564,8 @@ namespace ZeroDepJson
 
                     ma.HasDefaultValue = TryGetObjectDefaultValue(descriptor, out var defaultValue);
                     ma.DefaultValue = defaultValue;
+                    ma.HasConditionalSerialization = TryGetObjectConditionalSerialization(type, ma, out MethodInfo conditionalSerializationMethodInfo);
+                    ma.ConditionalSerializationMethod = conditionalSerializationMethodInfo;
                     ma.Accessor = (IMemberAccessor)Activator.CreateInstance(typeof(PropertyDescriptorAccessor), descriptor);
                     yield return ma;
                 }

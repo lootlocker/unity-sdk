@@ -1,7 +1,12 @@
-using LLlibs.ZeroDepJson;
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 
 namespace LootLocker
 {
