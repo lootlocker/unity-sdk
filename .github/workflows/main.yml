@@ -54,7 +54,7 @@ jobs:
           key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}
           restore-keys: Library-
 
-      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}
+      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }} with ZeroDepJSON
         uses: game-ci/unity-test-runner@v2
         id: tests
         env:
@@ -65,6 +65,24 @@ jobs:
           testMode: ${{ matrix.testMode }}
           checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Test Results
           artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-artifacts
+          projectPath: tests~/
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
+      - name: Configure LootLocker to use Newtonsoft JSON
+        run: |
+          sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
+      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }} with Newtonsoft JSON
+        uses: game-ci/unity-test-runner@v2
+        id: tests2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: ${{ matrix.testMode }}
+          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Newtonsoft Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-newtonsoft-artifacts
           projectPath: tests~/
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
