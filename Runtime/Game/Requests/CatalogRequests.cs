@@ -1,5 +1,8 @@
-using LootLocker.LootLockerEnums;
+﻿using LootLocker.LootLockerEnums;
 using System.Collections.Generic;
+#if UNITY_2020_2_OR_NEWER
+using JetBrains.Annotations;
+#endif
 
 namespace LootLocker.LootLockerEnums
 {
@@ -75,6 +78,40 @@ namespace LootLocker.Requests
        /// The unique id of the currency this price is in
        /// </summary>
         public string currency_id { get; set; }
+    }
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerCatalogAppleAppStoreListing
+    {
+        /// <summary>
+        /// The id of the product in Apple App Store that can be purchased and then used to redeem this catalog entry
+        /// </summary>
+        public string product_id { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerCatalogGooglePlayStoreListing
+    {
+        /// <summary>
+        /// The id of the product in Google Play Store that can be purchased and then used to redeem this catalog entry
+        /// </summary>
+        public string product_id { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerCatalogEntryListings
+    {
+        /// <summary>
+        /// The listing information (if configured) for Apple App Store
+        /// </summary>
+        public LootLockerCatalogAppleAppStoreListing apple_app_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Google Play Store
+        /// </summary>
+        public LootLockerCatalogGooglePlayStoreListing google_play_store { get; set; }
     }
 
     /// <summary>
@@ -416,6 +453,7 @@ namespace LootLocker.Requests
                 entity_kind = entry.entity_kind;
                 entity_name = entry.entity_name;
                 entity_id = entry.entity_id;
+                listings = entry.listings;
                 prices = entry.prices;
                 catalog_listing_id = entry.catalog_listing_id;
                 purchasable = entry.purchasable;
