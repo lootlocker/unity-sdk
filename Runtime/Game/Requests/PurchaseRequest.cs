@@ -1,5 +1,10 @@
 ﻿using LootLocker.Requests;
 using System;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 
 namespace LootLocker.Requests
 {
@@ -102,12 +107,17 @@ namespace LootLocker.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class LootLockerRedeemAppleAppStorePurchaseForCharacterRequest : LootLockerRedeemAppleAppStorePurchaseForPlayerRequest
+    public class LootLockerRedeemAppleAppStorePurchaseForClassRequest : LootLockerRedeemAppleAppStorePurchaseForPlayerRequest
     {
         /// <summary>
-        /// The id of the character to redeem this transaction for
+        /// The id of the class to redeem this transaction for
         /// </summary>
-        public int character_id { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id { get; set; }
     }
 
     /// <summary>
@@ -128,12 +138,17 @@ namespace LootLocker.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class LootLockerRedeemGooglePlayStorePurchaseForCharacterRequest : LootLockerRedeemGooglePlayStorePurchaseForPlayerRequest
+    public class LootLockerRedeemGooglePlayStorePurchaseForClassRequest : LootLockerRedeemGooglePlayStorePurchaseForPlayerRequest
     {
         /// <summary>
-        /// The id of the character to redeem this purchase for
+        /// The id of the class to redeem this purchase for
         /// </summary>
-        public int character_id { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id { get; set; }
     }
 }
 
