@@ -1,8 +1,16 @@
 ﻿using LootLocker.Requests;
 using System;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 
 namespace LootLocker.Requests
 {
+    #region Legacy Purchasing
+    //TODO: Deprecate legacy purchasing
+
     public class LootLockerPurchaseRequests
     {
     }
@@ -47,6 +55,7 @@ namespace LootLocker.Requests
     {
         public string status { get; set; }
     }
+    #endregion
 
     /// <summary>
     /// 
@@ -77,12 +86,76 @@ namespace LootLocker.Requests
          /// </summary>
         public LootLockerCatalogItemAndQuantityPair[] items { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemAppleAppStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// Whether or not to use the app store sandbox for this redemption
+        /// </summary>
+        public bool sandboxed { get; set; } = false;
+        /// <summary>
+        /// The id of the transaction successfully made towards the Apple App Store
+        /// </summary>
+        public string transaction_id { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemAppleAppStorePurchaseForClassRequest : LootLockerRedeemAppleAppStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The id of the class to redeem this transaction for
+        /// </summary>
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemGooglePlayStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The id of the product that this redemption refers to
+        /// </summary>
+        public string product_id { get; set; }
+        /// <summary>
+        /// The token from the purchase successfully made towards the Google Play Store
+        /// </summary>
+        public string purchase_token { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemGooglePlayStorePurchaseForClassRequest : LootLockerRedeemGooglePlayStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The id of the class to redeem this purchase for
+        /// </summary>
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id { get; set; }
+    }
 }
 
 namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
+#region Legacy Purchasing
+// TODO: Deprecate legacy purchasing
         public static void NormalPurchaseCall(LootLockerNormalPurchaseRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
         {
             if(data == null)
@@ -160,5 +233,6 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+#endregion
     }
 }
