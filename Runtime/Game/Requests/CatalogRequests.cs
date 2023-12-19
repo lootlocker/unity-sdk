@@ -1,7 +1,5 @@
-﻿using LootLocker.LootLockerEnums;
-using System;
+using LootLocker.LootLockerEnums;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -80,36 +78,40 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
-   /// </summary>
+    /// </summary>
     public class LootLockerCatalogEntry
     {
         /// <summary>
-       /// The time when this catalog entry was created
-       /// </summary>
+        /// The time when this catalog entry was created
+        /// </summary>
         public string created_at { get; set; }
         /// <summary>
-       /// The kind of entity that this entry is. This signifies in which lookup structure to find the details of this entry by using the catalog_listing_id.
-       /// </summary>
+        /// All the listings configured for this catalog entry
+        /// </summary>
+        public LootLockerCatalogEntryListings listings { get; set; }
+        /// <summary>
+        /// The kind of entity that this entry is. This signifies in which lookup structure to find the details of this entry by using the catalog_listing_id.
+        /// </summary>
         public LootLockerCatalogEntryEntityKind entity_kind { get; set; }
         /// <summary>
-       /// The name of this entity
-       /// </summary>
+        /// The name of this entity
+        /// </summary>
         public string entity_name { get; set; }
         /// <summary>
-       /// A list of prices for this catalog entry
-       /// </summary>
+        /// A list of prices for this catalog entry
+        /// </summary>
         public LootLockerCatalogEntryPrice[] prices { get; set; }
         /// <summary>
-       /// The unique id of the entity that this entry refers to.
-       /// </summary>
+        /// The unique id of the entity that this entry refers to.
+        /// </summary>
         public string entity_id { get; set; }
         /// <summary>
         /// A unique listing id for this entry in this catalog, grouping the entity and the prices. This is the key you use to look up details about the entity in the structure signified by the entity_kind.
         /// </summary>
         public string catalog_listing_id { get; set; }
         /// <summary>
-       /// Whether this entry is currently purchasable
-       /// </summary>
+        /// Whether this entry is currently purchasable
+        /// </summary>
         public bool purchasable { get; set; }
     }
 
@@ -153,7 +155,7 @@ namespace LootLocker.Requests
     public class LootLockerProgressionPointDetails
     {
         /// <summary>
-       /// The unique key of the pogression that this refers to
+       /// The unique key of the progression that this refers to
        /// </summary>
         public string key { get; set; }
         /// <summary>
