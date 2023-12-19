@@ -4302,22 +4302,22 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Redeem a purchase that was made successfully towards the Apple App Store for a character that the current player owns
+        /// Redeem a purchase that was made successfully towards the Apple App Store for a class that the current player owns
         /// </summary>
         /// <param name="transactionId">The id of the transaction successfully made towards the Apple App Store</param>
-        /// <param name="characterId">The id of the character to redeem this transaction for</param>
+        /// <param name="classId">The id of the class to redeem this transaction for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemAppleAppStorePurchaseForCharacter(string transactionId, int characterId, Action<LootLockerResponse> onComplete)
+        public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
             }
-            var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForCharacterRequest()
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForClassRequest()
             {
                 transaction_id = transactionId,
-                character_id = characterId
+                class_id = classId
             });
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -4346,24 +4346,24 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Redeem a purchase that was made successfully towards the Google Play Store for a character that the current player owns
+        /// Redeem a purchase that was made successfully towards the Google Play Store for a class that the current player owns
         /// </summary>
         /// <param name="productId">The id of the product that this redemption refers to</param>
         /// <param name="purchaseToken">The token from the purchase successfully made towards the Google Play Store</param>
-        /// <param name="characterId">The id of the character to redeem this purchase for</param>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemGooglePlayStorePurchaseForCharacter(string productId, string purchaseToken, int characterId, Action<LootLockerResponse> onComplete)
+        public static void RedeemGooglePlayStorePurchaseForClass(string productId, string purchaseToken, int classId, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
                 return;
             }
-            var body = LootLockerJson.SerializeObject(new LootLockerRedeemGooglePlayStorePurchaseForCharacterRequest()
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemGooglePlayStorePurchaseForClassRequest()
             {
                 product_id = productId,
                 purchase_token = purchaseToken,
-                character_id = characterId
+                class_id = classId
             });
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
