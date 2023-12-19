@@ -92,12 +92,10 @@ namespace LootLocker.Requests
     /// </summary>
     public class LootLockerRedeemAppleAppStorePurchaseForPlayerRequest
     {
-#if LOOTLOCKER_SANDBOX_APPLE_APP_STORE
         /// <summary>
         /// Whether or not to use the app store sandbox for this redemption
         /// </summary>
-        public string sandboxed { get; set; } = true;
-#endif
+        public bool sandboxed { get; set; } = false;
         /// <summary>
         /// The id of the transaction successfully made towards the Apple App Store
         /// </summary>

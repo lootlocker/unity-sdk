@@ -4286,7 +4286,8 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="transactionId">The id of the transaction successfully made towards the Apple App Store</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemAppleAppStorePurchaseForPlayer(string transactionId, Action<LootLockerResponse> onComplete)
+        /// <param name="sandboxed">Optional: Should this redemption be made towards sandbox App Store</param>
+        public static void RedeemAppleAppStorePurchaseForPlayer(string transactionId, Action<LootLockerResponse> onComplete, bool sandboxed = false)
         {
             if (!CheckInitialized())
             {
@@ -4295,7 +4296,8 @@ namespace LootLocker.Requests
             }
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForPlayerRequest()
             {
-                transaction_id = transactionId
+                transaction_id = transactionId,
+                sandboxed = sandboxed
             });
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -4307,7 +4309,8 @@ namespace LootLocker.Requests
         /// <param name="transactionId">The id of the transaction successfully made towards the Apple App Store</param>
         /// <param name="classId">The id of the class to redeem this transaction for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete)
+        /// <param name="sandboxed">Optional: Should this redemption be made towards sandbox App Store</param>
+        public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete, bool sandboxed = false)
         {
             if (!CheckInitialized())
             {
@@ -4317,7 +4320,8 @@ namespace LootLocker.Requests
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForClassRequest()
             {
                 transaction_id = transactionId,
-                class_id = classId
+                class_id = classId,
+                sandboxed = sandboxed
             });
 
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
