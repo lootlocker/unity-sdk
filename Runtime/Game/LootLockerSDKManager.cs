@@ -3305,7 +3305,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Grant an Asset Instance to the Player's Inventory.
+        /// Grant an Asset to the Player's Inventory.
         /// </summary>
         /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
         public static void GrantAssetToPlayerInventory(int assetID, Action<LootLockerGrantAssetResponse> onComplete)
@@ -3318,7 +3318,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
         /// <param name="assetVariationID">The id of the Asset Variation you want to grant</param>
-        /// <param name="assetRentalOptionID">the rental option id you want to give the Asset Instance</param>
+        /// <param name="assetRentalOptionID">The rental option id you want to give the Asset Instance</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGrantAssetResponse</param>
         public static void GrantAssetToPlayerInventory(int assetID, int? assetVariationID, int? assetRentalOptionID, Action<LootLockerGrantAssetResponse> onComplete)
         {
@@ -3560,7 +3560,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Delete an Asset Instance from the current Player's Inventory.
         /// </summary>
-        /// <param name="assetInstanceID">The asset instance ID of the you want to delete from the Players Inventory</param>
+        /// <param name="assetInstanceID">The asset instance ID of the asset instance you want to delete from the current Players Inventory</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
         public static void DeleteAssetInstanceFromPlayerInventory(int assetInstanceID, Action<LootLockerResponse> onComplete)
         {
