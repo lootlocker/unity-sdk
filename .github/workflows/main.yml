@@ -1,6 +1,4 @@
 name: Test SDK with Unity
-
-
 on:
   pull_request:
     branches: # Made towards the following
@@ -15,7 +13,6 @@ on:
     tags:
       - v**
   workflow_dispatch: {}
-
 jobs:
   test:
     name: ${{ matrix.unityVersion }}-${{ matrix.testMode }}
