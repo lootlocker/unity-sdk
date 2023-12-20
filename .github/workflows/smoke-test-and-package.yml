@@ -23,7 +23,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: []
-    timeout-minutes: 20
+    timeout-minutes: 10
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -122,7 +122,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: []
-    timeout-minutes: 20
+    timeout-minutes: 10
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -241,7 +241,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: []
-    timeout-minutes: 30
+    timeout-minutes: 20
     if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || startsWith(github.ref, 'refs/tags/v') || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main'))
     env: 
       LL_USE_STAGE: false
@@ -349,7 +349,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: [editor-smoke-test, linux-build-smoke-test]
-    timeout-minutes: 20
+    timeout-minutes: 8
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -425,7 +425,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: [editor-smoke-test, linux-build-smoke-test]
-    timeout-minutes: 20
+    timeout-minutes: 8
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -501,7 +501,7 @@ jobs:
     #container:
     #  image: ubuntu-latest
     needs: [test-samples, validate-sdk]
-    timeout-minutes: 10
+    timeout-minutes: 5
     # if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main')) || startsWith(github.ref, 'refs/tags/v')
     env: 
       LL_USE_STAGE: false
@@ -565,7 +565,7 @@ jobs:
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
-          testMode: playmode
+          testMode: editmode
           checkName: SDK Packaging ${{ matrix.unityVersion }} Test Results
           artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
           projectPath: unity-sdk-packager
