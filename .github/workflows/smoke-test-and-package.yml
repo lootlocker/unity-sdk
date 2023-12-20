@@ -342,8 +342,8 @@ jobs:
           buildName: smokeTest
           projectPath: unity-sdk-smoketest-project
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
-  test-samples-and-validate-sdk:
-    name: Test Samples and Validate SDK
+  test-samples:
+    name: Test Samples
     runs-on: [ubuntu-latest]
     #runs-on: [k8s]
     #container:
@@ -388,24 +388,24 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: unity-sdk
-      - name: Checkout unity-sdk-packager-project repository
+      - name: Checkout unity-sdk-sample-tester repository
         uses: actions/checkout@v3
         with:
-          repository: lootlocker/unity-sdk-packager
-          path: unity-sdk-packager
+          repository: lootlocker/unity-sdk-sample-tester
+          path: unity-sdk-sample-tester
           token: ${{ SECRETS.LL_PERSONAL_ACCESS_TOKEN }}
       - name: Add LootLockerSDK as asset folder
         run: |
-          cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
+          cp -r unity-sdk unity-sdk-sample-tester/Assets/LootLockerSDK
       - uses: actions/cache@v3
         with:
-          path: unity-sdk-packager/Library
-          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
+          path: unity-sdk-sample-tester/Library
+          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-sample-tester
           restore-keys: |
-            ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
+            ${{ matrix.targetPlatform }}-Library-unity-sdk-sample-tester
             Library-
-      - name: Compile and run all sample scenes ${{ matrix.unityVersion }} and validate SDK using asset store tools
-        id: test-samples-and-validate
+      - name: Compile and run all sample scenes ${{ matrix.unityVersion }}
+        id: test-samples
         uses: game-ci/unity-test-runner@v4
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
@@ -414,8 +414,84 @@ jobs:
         with:
           testMode: editmode
           checkName: Sample Scene ${{ matrix.unityVersion }} Test Results
-          artifactsPath: test-samples-and-validate-${{ matrix.unityVersion }}-artifacts
-          projectPath: unity-sdk-packager
+          artifactsPath: test-samples-${{ matrix.unityVersion }}-artifacts
+          projectPath: unity-sdk-sample-tester
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
+  validate-sdk:
+    name: Validate SDK
+    runs-on: [ubuntu-latest]
+    #runs-on: [k8s]
+    #container:
+    #  image: ubuntu-latest
+    needs: [editor-smoke-test, linux-build-smoke-test]
+    timeout-minutes: 20
+    env: 
+      LL_USE_STAGE: false
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2019.4.40f1
+          - 2020.3.48f1
+          - 2021.3.32f1
+          - 2022.3.14f1
+          - 2023.2.1f1
+    steps:
+      - name: Setup commandline dependencies (if on self-hosted runner)
+        if: ${{ env.LL_USE_STAGE == 'true' }}
+        run: |
+          apt update
+          apt-get install -y git
+          git config --global --add safe.directory unity-sdk
+          git config --global --add safe.directory unity-sdk-packager
+          apt-get install -y jq
+          apt-get install -y sed
+          apt-get install -y docker
+          apt-get install -y curl
+          apt-get update
+          apt-get install ca-certificates curl gnupg
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          chmod a+r /etc/apt/keyrings/docker.gpg
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update
+          apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      - name: Checkout unity-sdk repository
+        uses: actions/checkout@v3
+        with:
+          path: unity-sdk
+      - name: Checkout unity-sdk-package-validator repository
+        uses: actions/checkout@v3
+        with:
+          repository: lootlocker/unity-sdk-package-validator
+          path: unity-sdk-package-validator
+          token: ${{ SECRETS.LL_PERSONAL_ACCESS_TOKEN }}
+      - name: Add LootLockerSDK as asset folder
+        run: |
+          cp -r unity-sdk unity-sdk-package-validator/Assets/LootLockerSDK
+      - uses: actions/cache@v3
+        with:
+          path: unity-sdk-package-validator/Library
+          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-package-validator
+          restore-keys: |
+            ${{ matrix.targetPlatform }}-Library-unity-sdk-package-validator
+            Library-
+      - name: Validate SDK using asset store tools
+        id: validate-sdk
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          checkName: Validate SDK ${{ matrix.unityVersion }} Test Results
+          artifactsPath: validate-sdk-${{ matrix.unityVersion }}-artifacts
+          projectPath: unity-sdk-package-validator
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
   package-sdk:
@@ -424,7 +500,7 @@ jobs:
     #runs-on: [k8s]
     #container:
     #  image: ubuntu-latest
-    needs: [test-samples-and-validate-sdk]
+    needs: [test-samples, validate-sdk]
     timeout-minutes: 10
     # if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main')) || startsWith(github.ref, 'refs/tags/v')
     env: 
