@@ -22,34 +22,35 @@ jobs:
       matrix:
         testMode:
           - playmode
-          # No tests yet, commented out for efficiency
-          #- editmode
         unityVersion:
           - 2019.4.40f1
           - 2020.3.48f1
           - 2021.3.29f1
           - 2022.3.7f1
+        jsonLibrary:
+          - zerodep
+          - newtonsoft
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v2
-
       - name: Checkout test repository
         uses: actions/checkout@v2
         with:
           repository: LootLocker/unity-sdk-tests
           path: ./tests~ # Unity ignores folders with ~ from inclusion
-
       - name: Set SDK path in test repo
         run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
-
       - name: Cache Libraries
         uses: actions/cache@v2
         with:
           path: tests~/Library
-          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}
+          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
           restore-keys: Library-
-
-      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }} with ZeroDepJSON
+      - name: Configure LootLocker to use Newtonsoft JSON
+        if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
+        run: |
+          sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
+      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
         uses: game-ci/unity-test-runner@v2
         id: tests
         env:
@@ -58,33 +59,9 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           testMode: ${{ matrix.testMode }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Test Results
-          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-artifacts
+          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
           projectPath: tests~/
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
-      - name: Configure LootLocker to use Newtonsoft JSON
-        run: |
-          sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
-      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }} with Newtonsoft JSON
-        uses: game-ci/unity-test-runner@v2
-        id: tests2
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          testMode: ${{ matrix.testMode }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Newtonsoft Test Results
-          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-newtonsoft-artifacts
-          projectPath: tests~/
-          unityVersion: ${{ matrix.unityVersion }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
-
-      # Commented out because as of right now it doesn't expand the test results, just repeat pass/fail
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: Test results for ${{ matrix.unityVersion }}-${{ matrix.testMode }}
-      #    path: ${{ steps.tests.outputs.artifactsPath }}
