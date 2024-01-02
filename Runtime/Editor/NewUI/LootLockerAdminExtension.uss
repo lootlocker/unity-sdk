@@ -1,0 +1,67 @@
+:root {
+    --green: rgb(0, 193, 82);
+    --stage: rgb(28, 232, 109);
+    --live:  rgb(245, 106, 32);
+    --ButtonColor: rgb(94, 94, 94);
+    --unity-metrics-single_line-height: 10px;
+}
+
+#Topbar {
+    min-height: 60px;
+}
+
+#Footer {
+    min-height: 60px;
+}
+
+.gameButton {
+    border-bottom-width: 10px;
+    background-color: var(--ButtonColor);
+    margin-bottom: 10px;
+    align-items: flex-start;
+}
+
+.gameButtonTitle {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 200px;
+    font-size: 16px;
+    margin-left: 7px;
+    margin-top: 4px;
+}
+
+.gameButtonOrgTitle {
+    font-size: 14px;
+    margin-left: 7px;
+}
+
+.apikey {
+    flex-direction: row;
+    width: 300px;
+    height: 40px;
+}
+
+.clickable {
+    cursor: link;
+}
+
+.apikeyName {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.apikeyKey {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 90px;
+}
+
+.menuButton {
+    min-height: 35px;
+    opacity: 1;
+    display: flex;
+}
