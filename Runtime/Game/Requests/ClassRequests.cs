@@ -142,9 +142,9 @@ namespace LootLocker.Requests
     public class LootLockerPlayerClassListResponse : LootLockerResponse
     {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
-        [JsonProperty("characters")]
+        [JsonProperty("items")]
 #else
-        [Json(Name = "characters")]
+        [Json(Name = "items")]
 #endif
         public LootLockerClass[] classes { get; set; }
     }
