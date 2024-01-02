@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && LOOTLOCKER_ENABLE_EXTENSION
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Extension.DataTypes;
 namespace LootLocker.Extension.Requests
 {
@@ -107,5 +107,6 @@ namespace LootLocker.Extension.Responses
         public string created_at { get; set; }
         public string updated_at { get; set; }
     }
+
 }
 #endif
