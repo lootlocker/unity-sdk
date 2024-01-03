@@ -4,7 +4,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+//#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using LootLocker.Extension.Requests;
 using LootLocker.Extension.DataTypes;
 
@@ -126,6 +126,7 @@ namespace LootLocker.Extension
         public void DeleteLootLockerPrefs()
         {
             EditorPrefs.DeleteKey("LootLocker.AdminToken");
+            EditorPrefs.DeleteKey("LootLocker.FirstTimeWelcome");
 
         }
 
@@ -138,4 +139,4 @@ namespace LootLocker.Extension
     }
 }
 
-#endif
+//#endif

@@ -1,8 +1,9 @@
 :root {
     --green: rgb(0, 193, 82);
     --stage: rgb(28, 232, 109);
-    --live:  rgb(245, 106, 32);
+    --live: rgb(245, 106, 32);
     --ButtonColor: rgb(94, 94, 94);
+    --ButtonHover: rgb(124, 124, 124);
     --unity-metrics-single_line-height: 10px;
 }
 
@@ -19,6 +20,22 @@
     background-color: var(--ButtonColor);
     margin-bottom: 10px;
     align-items: flex-start;
+}
+
+.gameButton:hover {
+    background-color: var(--ButtonHover);
+    cursor: link;
+}
+
+
+.menuBtn {
+    height: 30px;
+    
+}
+
+.menuBtn:hover {
+    color: var(--ButtonHover);
+    cursor: link;
 }
 
 .gameButtonTitle {
@@ -64,4 +81,7 @@
     min-height: 35px;
     opacity: 1;
     display: flex;
+}
+
+.menuBtn {
 }
