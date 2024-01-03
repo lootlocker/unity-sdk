@@ -1,14 +1,12 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
-using LootLocker.Requests;
-
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 
 using LootLocker.Extension;
 using LootLocker.Extension.DataTypes;
 using LootLocker.Extension.Responses;
+
+using UnityEditor;
 
 public class LootLockerAdminExtension : EditorWindow
 {
@@ -17,6 +15,13 @@ public class LootLockerAdminExtension : EditorWindow
 
     StyleColor stage;
     StyleColor live;
+    StyleColor defaultButton;
+
+    private VisualElement environmentBackground, environmentHandle;
+
+    private VisualElement environmentElement;
+
+    private Label environmentTitle;
 
     User activeUser;
 
@@ -26,30 +31,28 @@ public class LootLockerAdminExtension : EditorWindow
 
     private VisualElement loginFlow, mfaFlow, gameSelectorFlow, apiKeyFlow;
 
-    private Button changeGameBtn;
-
-    private VisualElement environmentBackground, environmentHandle;
 
     private Label gameName;
     private Label activeKey;
 
-    private Foldout menu;
-    private VisualElement menuPop;
+    private VisualElement menu;
+    private Button menuAPIKeyBtn;
+    private Button menuChangeGameBtn;
+    private Button menuLogoutBtn;
 
     private VisualElement popup;
 
     private Label popupTitle, popupMessage;
 
     private Button popupBtn;
-    private Button menuAPIKeyBtn;
-    private Button menuChangeGameBtn;
-    private Button menuLogoutBtn;
+
 
     private Label infoText;
 
     private Label newApiKeyCancel;
     private VisualElement newApiKeyWindow;
     private TextField newApiKeyName;
+    private VisualElement createApiKeyWindow;
 
     private Button createNewApiKeyBtn;
 
@@ -57,7 +60,7 @@ public class LootLockerAdminExtension : EditorWindow
 
     //Login Flow Start
     private TextField emailField, passwordField;
-    private Label signupLink, introGuideLink, gettingStartedLink, forgotPasswordLink;
+    private Label signupLink, gettingStartedLink, forgotPasswordLink;
     private Button loginBtn;
     //Login Flow End
 
@@ -78,22 +81,43 @@ public class LootLockerAdminExtension : EditorWindow
 
     bool isStage = true;
 
-    [MenuItem("Window/LootLocker Extension")]
+    [MenuItem("Window/LootLocker")]
     public static void ShowExample()
     {
         LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
-        wnd.titleContent = new GUIContent("LootLockerAdminExtension");
+        wnd.titleContent = new GUIContent("LootLocker");
+    }
+
+    [InitializeOnLoadMethod]
+    public static void LoadFirstTime()
+    {
+        bool firstTimeWelcome = false;
+        firstTimeWelcome = EditorPrefs.GetBool("LootLocker.FirstTimeWelcome", false);
+        LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
+        wnd.titleContent = new GUIContent("LootLocker");
+        EditorPrefs.SetBool("LootLocker.FirstTimeWelcome", true);
     }
 
     public void CreateGUI()
     {
+
         VisualElement root = rootVisualElement;
 
         VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
+
+        var styleLength = new StyleLength();
+        var current = styleLength.value;
+        current.unit = LengthUnit.Percent;
+
+        current.value = 100;
+
+        labelFromUXML.style.height = current;
+
         root.Add(labelFromUXML);
 
         live.value = new Color(0.749f, 0.325f, 0.098f, 1);
         stage.value = new Color(0.094f, 0.749f, 0.352f, 1);
+        defaultButton.value = new Color(0.345f, 0.345f, 0.345f, 1);
 
         menuLogoutBtn = root.Q<Button>("LogoutBtn");
 
@@ -109,49 +133,43 @@ public class LootLockerAdminExtension : EditorWindow
 
         environmentBackground.tooltip = "Stage";
 
+        environmentElement = root.Q<VisualElement>("Environment");
+
+        environmentTitle = root.Q<Label>("EnvironmentTitle");
+
         gameName = root.Q<Label>("GameName");
 
         activeKey = root.Q<Label>("ActiveKey");
 
         if(LootLockerConfig.current.apiKey != null || LootLockerConfig.current.apiKey != "")
         {
-            activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
+            //activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
         } else
         {
             activeKey.text = "Active Key: Not selected";
         }
 
-        menu = root.Q<Foldout>("Menu");
-        menuPop = root.Q<VisualElement>("MenuOut");
-
-        changeGameBtn = root.Q<Button>("ChangeGameBtn");
+        menu = root.Q<VisualElement>("MenuBar");
 
         infoText = root.Q<Label>("LearnMore");
 
         infoText.style.display = DisplayStyle.None;
 
-        changeGameBtn.clickable.clicked += () =>
+        menuChangeGameBtn = root.Q<Button>("ChangeGameBtn");
+
+        menuAPIKeyBtn = root.Q<Button>("APIKeyBtn");
+
+        menuLogoutBtn = root.Q<Button>("LogoutBtn");
+
+        menuLogoutBtn.clickable.clicked += () =>
         {
-            menu.style.display = DisplayStyle.None;
-            menuPop.style.display = DisplayStyle.None;
-            SwapFlows(activeFlow, gameSelectorFlow);
+            Logout();
         };
 
-        menuPop.style.display = DisplayStyle.None;
-
-        menu.style.display = DisplayStyle.None;
-
-        menu.RegisterValueChangedCallback(e =>
+        menuChangeGameBtn.clickable.clicked += () =>
         {
-            if (menu.value)
-            {
-                menuPop.style.display = DisplayStyle.Flex;
-            }
-            else
-            {
-                menuPop.style.display = DisplayStyle.None;
-            }
-        });
+            SwapFlows(activeFlow, gameSelectorFlow);
+        };
 
         popup = root.Q<VisualElement>("PopUp");
 
@@ -162,8 +180,6 @@ public class LootLockerAdminExtension : EditorWindow
 
         popupBtn.clickable.clickedWithEventInfo += ClosePopup;
 
-        menuAPIKeyBtn = root.Q<Button>("APIKeyBtn");
-        menuChangeGameBtn = root.Q<Button>("ChangeGameBtn");
 
         //Login Flow Start
 
@@ -172,9 +188,16 @@ public class LootLockerAdminExtension : EditorWindow
         emailField = root.Q<TextField>("EmailField");
         passwordField = root.Q<TextField>("PasswordField");
 
-        signupLink = root.Q <Label>("newUserLink");
+        passwordField.RegisterCallback<KeyDownEvent>((evt) => {
+
+            if (evt.keyCode == KeyCode.Return)
+            {
+                Login();
+            }
+        });
+
+            signupLink = root.Q <Label>("newUserLink");
         gettingStartedLink = root.Q<Label>("gettingStartedLink");
-        introGuideLink = root.Q<Label>("introGuideLink");
         forgotPasswordLink = root.Q<Label>("forgotPasswordLink");
 
         loginBtn = root.Q<Button>("LoginBtn");
@@ -182,9 +205,8 @@ public class LootLockerAdminExtension : EditorWindow
         signupLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://lootlocker.com/sign-up"));
         forgotPasswordLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://console.lootlocker.com/forgot-password"));
         gettingStartedLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://docs.lootlocker.com/the-basics/readme"));
-        introGuideLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://lootlocker.com")); ; //TODO
 
-        loginBtn.clickable.clickedWithEventInfo += Login;
+        loginBtn.clickable.clicked += Login;
 
         loginFlow.style.display = DisplayStyle.Flex;
         //Login Flow End
@@ -218,6 +240,10 @@ public class LootLockerAdminExtension : EditorWindow
 
         apiKeyFlow.style.display = DisplayStyle.None;
 
+        createApiKeyWindow = root.Q<VisualElement>("InfoandCreate");
+
+        createApiKeyWindow.style.display = DisplayStyle.None;
+
         apiKeyList = root.Q<VisualElement>("APIKeyList");
 
         newApiKeyWindow = root.Q<VisualElement>("CreateAPIKeyWindow");
@@ -246,13 +272,10 @@ public class LootLockerAdminExtension : EditorWindow
 
         createNewApiKeyBtn.clickable.clicked += () =>
         {
-            menuPop.style.display = DisplayStyle.None;
-            menu.value = false;
             newApiKeyWindow.style.display = DisplayStyle.Flex;
         };
 
         //API Key Flow End
-
 
         if (StoredUser.current.user != null)
         {
@@ -263,6 +286,11 @@ public class LootLockerAdminExtension : EditorWindow
             menuLogoutBtn.style.display = DisplayStyle.Flex;
             SetAPIKeys(activeGame.development.id);
             SwapFlows(loginFlow, apiKeyFlow);
+        }
+        else
+        {
+            SwapFlows(mfaFlow, loginFlow);
+            menu.style.display = DisplayStyle.None;
         }
 
     }
@@ -275,14 +303,14 @@ public class LootLockerAdminExtension : EditorWindow
         {
             environmentHandle.style.alignSelf = Align.FlexStart;
             environmentBackground.style.backgroundColor = stage;
-            environmentBackground.tooltip = "Stage";
+            environmentTitle.text = "Environment: Stage";
             SetAPIKeys(activeGame.development.id);
         }
         else
         {
             environmentHandle.style.alignSelf = Align.FlexEnd;
             environmentBackground.style.backgroundColor = live;
-            environmentBackground.tooltip = "Live";
+            environmentTitle.text = "Environment: Live";
             SetAPIKeys(activeGame.id);
         }
     }
@@ -296,8 +324,6 @@ public class LootLockerAdminExtension : EditorWindow
         old.style.display = DisplayStyle.None;
         New.style.display = DisplayStyle.Flex;
 
-        menu.value = false;
-
         if(old == apiKeyFlow)
         {
             apiKeyList.Clear();
@@ -309,6 +335,13 @@ public class LootLockerAdminExtension : EditorWindow
             menuAPIKeyBtn.style.display = DisplayStyle.None;
             menuChangeGameBtn.style.display = DisplayStyle.None;
             infoText.style.display = DisplayStyle.None;
+            environmentElement.style.display = DisplayStyle.None;
+            createApiKeyWindow.style.display = DisplayStyle.None;
+            menu.style.display = DisplayStyle.Flex;
+            menuLogoutBtn.style.display = DisplayStyle.Flex;
+            menuAPIKeyBtn.style.display = DisplayStyle.None;
+            menuChangeGameBtn.style.display = DisplayStyle.None;
+
             CreateGameButtons();
 
         }
@@ -318,13 +351,21 @@ public class LootLockerAdminExtension : EditorWindow
             menuAPIKeyBtn.style.display = DisplayStyle.Flex;
             menuChangeGameBtn.style.display = DisplayStyle.Flex;
             infoText.style.display = DisplayStyle.Flex;
+            environmentElement.style.display = DisplayStyle.Flex;
+            createApiKeyWindow.style.display = DisplayStyle.Flex;
+            menu.style.display = DisplayStyle.Flex;
+            menuLogoutBtn.style.display = DisplayStyle.Flex;
+            menuAPIKeyBtn.style.display = DisplayStyle.Flex;
+            menuChangeGameBtn.style.display = DisplayStyle.Flex;
         }
 
-    }
+        if (activeFlow == loginFlow)
+        {
+            environmentElement.style.display = DisplayStyle.None;
 
-    void CheckMenuItems()
-    {
-        
+        }
+
+
     }
 
     private void OnEditorUpdate()
@@ -346,7 +387,7 @@ public class LootLockerAdminExtension : EditorWindow
     }
 
     //Login Flow Start
-    public void Login(EventBase e)
+    public void Login()
     {
 
         if (string.IsNullOrEmpty(emailField.value) || string.IsNullOrEmpty(passwordField.value))
@@ -561,22 +602,23 @@ public class LootLockerAdminExtension : EditorWindow
 
         button.name = key.api_key;
 
+        if(button.name == LootLockerConfig.current.apiKey)
+        {
+            button.style.backgroundColor = stage;
+        }
+
         button.AddToClassList("apikey");
 
         Label keyName = new Label();
         keyName.text = key.name;
-        if(!string.IsNullOrEmpty(key.name))
+        if(string.IsNullOrEmpty(key.name))
         {
-            keyName.text += "  -  ";
+            keyName.text += "Unnamed API Key";
         }
         keyName.AddToClassList("apikeyName");
 
-        Label apiKey = new Label();
-        apiKey.text = key.api_key;
-        apiKey.AddToClassList("apikeyKey");
     
         button.Add(keyName); 
-        button.Add(apiKey);
 
         button.clickable.clickedWithEventInfo += OnAPIKeySelected;
 
@@ -593,10 +635,39 @@ public class LootLockerAdminExtension : EditorWindow
 
         LootLockerConfig.current.apiKey = target.name;
 
-        activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
-
+        //activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
+        SwapNewSelectedKey();
 
     }
 
+    void SwapNewSelectedKey()
+    {
+        foreach(var element in apiKeyList.Children())
+        {
+
+            var key = element as Button;
+
+            if(key.name == LootLockerConfig.current.apiKey)
+            {
+                key.style.backgroundColor = stage;
+
+            }
+            else
+            {
+                key.style.backgroundColor = defaultButton;
+            }
+        }
+    }
+
+    void Logout()
+    {
+        if (!StoredUser.current.RemoveUser())
+        {
+            Debug.Log("Could not remove User!");
+        }
+        SwapFlows(activeFlow, loginFlow);
+        Close();
+    }
+
 }
-#endif
+//#endif
