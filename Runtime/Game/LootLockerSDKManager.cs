@@ -802,6 +802,105 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Connected Accounts
+        /// <summary>
+        /// List identity providers (like Apple, Google, etc.) that are connected to the currently logged in account
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListConnectedAccounts(Action<LootLockerListConnectedAccountsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listConnectedAccounts.endPoint, LootLockerEndPoints.listConnectedAccounts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Disconnect account from the currently logged in account
+        ///
+        /// Use this to disconnect an account (like a Google or Apple account) that can be used to start sessions for this LootLocker account so that it is no longer allowed to do that
+        /// </summary>
+        /// <param name="accountToDisconnect">What account to disconnect from this LootLocker Account</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            string endpoint = string.Format(LootLockerEndPoints.disconnectAccount.endPoint, accountToDisconnect);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Google Account to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// </summary>
+        /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ConnectGoogleAccount(string idToken, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountRequest{id_token = idToken });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player 
+        /// </summary>
+        /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="platform">Google OAuth2 ClientID platform</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountWithPlatformRequest() { id_token = idToken, platform = platform });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an Apple Account (authorized by Rest Sign In) to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// </summary>
+        /// <param name="authorizationCode">Authorization code, provided by apple during Sign In</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+
+            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "apple-rest");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectAppleRestProviderToAccountRequest() { authorization_code = authorizationCode });
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        #endregion
+
         #region Remote Sessions
 
         /// <summary>
