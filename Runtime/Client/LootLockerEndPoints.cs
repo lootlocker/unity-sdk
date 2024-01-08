@@ -23,6 +23,12 @@ namespace LootLocker
         public static EndPointClass appleGameCenterSessionRequest = new EndPointClass("session/apple/game-center", LootLockerHTTPMethod.POST);
         public static EndPointClass googleSessionRequest = new EndPointClass("session/google", LootLockerHTTPMethod.POST);
 
+        // Connected Accounts
+        [Header("Connected Accounts")]
+        public static EndPointClass listConnectedAccounts = new EndPointClass("connected-accounts", LootLockerHTTPMethod.GET);
+        public static EndPointClass disconnectAccount = new EndPointClass("connected-accounts/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass connectProviderToAccount = new EndPointClass("connected-accounts/{0}", LootLockerHTTPMethod.PUT);
+
         // Remote Sessions
         [Header("Remote Sessions")]
         public static EndPointClass leaseRemoteSession = new EndPointClass("session/remote/lease", LootLockerHTTPMethod.POST);
