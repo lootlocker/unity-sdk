@@ -197,8 +197,8 @@ namespace LootLocker
         public static EndPointClass activatingARentalAsset = new EndPointClass("v1/asset/instance/{0}/activate", LootLockerHTTPMethod.POST);
 
         public static EndPointClass purchaseCatalogItem = new EndPointClass("purchase", LootLockerHTTPMethod.POST);
-        public static EndPointClass redeemAppleAppStorePurchase = new EndPointClass("redeem/store/apple", LootLockerHTTPMethod.POST);
-        public static EndPointClass redeemGooglePlayStorePurchase = new EndPointClass("redeem/store/google", LootLockerHTTPMethod.POST);
+        public static EndPointClass redeemAppleAppStorePurchase = new EndPointClass("store/apple/redeem", LootLockerHTTPMethod.POST);
+        public static EndPointClass redeemGooglePlayStorePurchase = new EndPointClass("store/google/redeem", LootLockerHTTPMethod.POST);
 
         // EventTrigger
         [Header("EventTrigger")]
