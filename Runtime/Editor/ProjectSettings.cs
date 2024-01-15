@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -104,6 +105,13 @@ namespace LootLocker.Admin
             }
             EditorGUILayout.Space();
 
+            if (!IsSemverString(m_CustomSettings.FindProperty("game_version").stringValue))
+            {
+                EditorGUILayout.HelpBox(
+                    "Game version needs to follow a numeric Semantic Versioning pattern: X.Y.Z.B with the sections denoting MAJOR.MINOR.PATCH.BUILD and the last two being optional. Read more at https://docs.lootlocker.com/the-basics/core-concepts/glossary#game-version",
+                    MessageType.Warning, false);
+            }
+
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("currentDebugLevel"));
 
@@ -121,6 +129,12 @@ namespace LootLocker.Admin
                 gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
             EditorGUILayout.Space();
+        }
+
+        private static bool IsSemverString(string str)
+        {
+            return Regex.IsMatch(str,
+                @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
 
         [SettingsProvider]
