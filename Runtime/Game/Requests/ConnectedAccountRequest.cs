@@ -3,7 +3,7 @@ using LootLocker.LootLockerEnums;
 namespace LootLocker.LootLockerEnums
 {
     /// <summary>
-    /// TODO: Document
+    /// Account providers possible to use for connected accounts
     /// </summary>
     public enum LootLockerAccountProvider
     {
@@ -13,7 +13,7 @@ namespace LootLocker.LootLockerEnums
     }
 
     /// <summary>
-    /// TODO: Document
+    /// Google OAuth2 Client platform
     /// </summary>
     public enum GoogleAccountProviderPlatform
     {
@@ -32,11 +32,11 @@ namespace LootLocker.Requests
     public class LootLockerConnectedAccountProvider
     {
         /// <summary>
-        /// TODO: Document
+        /// The account provider
         /// </summary>
         public LootLockerAccountProvider provider { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// Decorated name of this provider to use for displaying
         /// </summary>
         public string provider_name { get; set; }
     }
