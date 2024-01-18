@@ -25,9 +25,9 @@ namespace LootLocker
 
         // Connected Accounts
         [Header("Connected Accounts")]
-        public static EndPointClass listConnectedAccounts = new EndPointClass("connected-accounts", LootLockerHTTPMethod.GET);
-        public static EndPointClass disconnectAccount = new EndPointClass("connected-accounts/{0}", LootLockerHTTPMethod.DELETE);
-        public static EndPointClass connectProviderToAccount = new EndPointClass("connected-accounts/{0}", LootLockerHTTPMethod.PUT);
+        public static EndPointClass listConnectedAccounts = new EndPointClass("v1/connected-accounts", LootLockerHTTPMethod.GET);
+        public static EndPointClass disconnectAccount = new EndPointClass("v1/connected-accounts/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass connectProviderToAccount = new EndPointClass("v1/connected-accounts/{0}", LootLockerHTTPMethod.PUT);
 
         // Remote Sessions
         [Header("Remote Sessions")]
