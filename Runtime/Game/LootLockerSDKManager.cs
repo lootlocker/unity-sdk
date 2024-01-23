@@ -861,7 +861,7 @@ namespace LootLocker.Requests
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountRequest{id_token = idToken });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
@@ -882,7 +882,7 @@ namespace LootLocker.Requests
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountWithPlatformRequest() { id_token = idToken, platform = platform });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
@@ -902,7 +902,7 @@ namespace LootLocker.Requests
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectAppleRestProviderToAccountRequest() { authorization_code = authorizationCode });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         #endregion
