@@ -112,6 +112,7 @@ namespace LootLocker.Requests
     public class LootLockerCommonAsset : LootLockerResponse
     {
         public int id { get; set; }
+        public string uuid { get; set; }
         public string name { get; set; }
         public bool active { get; set; }
         public bool purchasable { get; set; }
