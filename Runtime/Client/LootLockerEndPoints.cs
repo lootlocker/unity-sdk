@@ -206,6 +206,10 @@ namespace LootLocker
         public static EndPointClass redeemAppleAppStorePurchase = new EndPointClass("store/apple/redeem", LootLockerHTTPMethod.POST);
         public static EndPointClass redeemGooglePlayStorePurchase = new EndPointClass("store/google/redeem", LootLockerHTTPMethod.POST);
 
+        public static EndPointClass beginSteamPurchaseRedemption = new EndPointClass("store/steam/redeem/begin", LootLockerHTTPMethod.POST);
+        public static EndPointClass querySteamPurchaseRedemptionStatus = new EndPointClass("store/steam/redeem/query", LootLockerHTTPMethod.POST);
+        public static EndPointClass finalizeSteamPurchaseRedemption = new EndPointClass("store/steam/redeem/finalise", LootLockerHTTPMethod.POST);
+
         // EventTrigger
         [Header("EventTrigger")]
         public static EndPointClass triggeringAnEvent = new EndPointClass("v1/player/trigger", LootLockerHTTPMethod.POST);
