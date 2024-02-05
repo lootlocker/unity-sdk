@@ -6,6 +6,12 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
 using System.Security.Cryptography;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -4394,7 +4400,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Activate a rental asset. This will grant the asset to the player and start the rental timer on the server.
         /// </summary>
-        /// <param name="assetId">The asset instance ID of the asset to activate</param>
+        /// <param name="assetInstanceID">The asset instance ID of the asset to activate</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerActivateARentalAssetResponse</param>
         public static void ActivateRentalAsset(int assetInstanceID, Action<LootLockerActivateRentalAssetResponse> onComplete)
         {
@@ -4522,7 +4528,210 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        #endregion
+        /// <summary>
+        /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
+        /// 
+        /// Steam in-app purchases need to be configured for this to work
+        /// Steam in-app purchases works slightly different from other platforms, you begin a purchase with this call which initiates it in Steams backend
+        /// While your app is waiting for the user to finalize that purchase you can use QuerySteamPurchaseRedemptionStatus to get the status, when that tells you that the purchase is Approved you can finalize the purchase using FinalizeSteamPurchaseRedemption
+        /// </summary>
+        /// <param name="steamId">Id of the Steam User that is making the purchase</param>
+        /// <param name="currency">The currency to use for the purchase</param>
+        /// <param name="language">The language to use for the purchase</param>
+        /// <param name="catalogItemId">The LootLocker Catalog Item Id for the item you wish to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void BeginSteamPurchaseRedemption(string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerBeginSteamPurchaseRedemptionRequest()
+            {
+                steam_id = steamId,
+                currency = currency,
+                language = language,
+                catalog_item_id = catalogItemId
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete:
+                (serverResponse) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
+                    if (!parsedResponse.success)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+                    JObject jsonObject;
+                    try
+                    {
+                        jsonObject = JObject.Parse(serverResponse.text);
+                    }
+                    catch (JsonReaderException)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+                    if (jsonObject != null && jsonObject.TryGetValue("success", StringComparison.OrdinalIgnoreCase, out var successObj))
+                    {
+                        if (successObj.ToObject(typeof(bool)) is bool isSuccess)
+                        {
+                            parsedResponse.isSuccess = isSuccess;
+                        }
+                    }
+#else
+                    Dictionary<string, object> jsonObject = null;
+                    try
+                    {
+                        jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
+                    }
+                    catch (JsonException)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+                    if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
+                    {
+                        if (successObj is bool isSuccess)
+                        {
+                            parsedResponse.isSuccess = isSuccess;
+                        }
+                    }
+#endif
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item for the specified class
+        /// 
+        /// Steam in-app purchases need to be configured for this to work
+        /// Steam in-app purchases works slightly different from other platforms, you begin a purchase with this call which initiates it in Steams backend
+        /// While your app is waiting for the user to finalize that purchase you can use QuerySteamPurchaseRedemptionStatus to get the status, when that tells you that the purchase is Approved you can finalize the purchase using FinalizeSteamPurchaseRedemption
+        /// </summary>
+        /// <param name="classId">Id of the class to make the purchase for</param>
+        /// <param name="steamId">Id of the Steam User that is making the purchase</param>
+        /// <param name="currency">The currency to use for the purchase</param>
+        /// <param name="language">The language to use for the purchase</param>
+        /// <param name="catalogItemId">The LootLocker Catalog Item Id for the item you wish to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void BeginSteamPurchaseRedemptionForClass(int classId, string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerBeginSteamPurchaseRedemptionForClassRequest()
+            {
+                class_id = classId,
+                steam_id = steamId,
+                currency = currency,
+                language = language,
+                catalog_item_id = catalogItemId
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete:
+                (serverResponse) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
+                    if (!parsedResponse.success)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+                    JObject jsonObject;
+                    try
+                    {
+                        jsonObject = JObject.Parse(serverResponse.text);
+                    }
+                    catch (JsonReaderException)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+                    if (jsonObject != null && jsonObject.TryGetValue("success", StringComparison.OrdinalIgnoreCase, out var successObj))
+                    {
+                        if (successObj.ToObject(typeof(bool)) is bool isSuccess)
+                        {
+                            parsedResponse.isSuccess = isSuccess;
+                        }
+                    }
+#else
+                    Dictionary<string, object> jsonObject = null;
+                    try
+                    {
+                        jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
+                    }
+                    catch (JsonException)
+                    {
+                        onComplete?.Invoke(parsedResponse);
+                        return;
+                    }
+                    if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
+                    {
+                        if (successObj is bool isSuccess)
+                        {
+                            parsedResponse.isSuccess = isSuccess;
+                        }
+                    }
+#endif
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// Check the Steam Purchase status for a given entitlement
+        /// 
+        /// Use this to check the status of an ongoing purchase to know when it's ready to finalize or has been aborted
+        /// or use this to get information for a completed purchase
+        /// </summary>
+        /// <param name="entitlementId">The id of the entitlement to check the status for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerQuerySteamPurchaseRedemptionStatusResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerQuerySteamPurchaseRedemptionStatusRequest()
+            {
+                entitlement_id = entitlementId
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.querySteamPurchaseRedemptionStatus.endPoint, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Finalize a started Steam Purchase and subsequently redeem the catalog items that the entitlement refers to
+        /// 
+        /// The steam purchase needs to be in status Approved for this call to work
+        /// </summary>
+        /// <param name="entitlementId">The id of the entitlement to finalize the purchase for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void FinalizeSteamPurchaseRedemption(string entitlementId, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerFinalizeSteamPurchaseRedemptionRequest()
+            {
+                entitlement_id = entitlementId
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+#endregion
 
         #region Collectables
         /// <summary>
