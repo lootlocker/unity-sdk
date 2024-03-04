@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 using LootLocker;
 using LootLocker.Extension;
 using LootLocker.Extension.Responses;
+using LootLocker.Extension.DataTypes;
 
 public class LootLockerAdminExtension : EditorWindow
 {
