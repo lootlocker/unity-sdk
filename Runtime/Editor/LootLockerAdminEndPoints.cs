@@ -1,6 +1,6 @@
 using UnityEngine;
 
-//#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 namespace LootLocker
 {
     public class LootLockerAdminEndPoints
@@ -17,4 +17,4 @@ namespace LootLocker
         public static EndPointClass adminExtensionGetUserRole = new EndPointClass("roles/{0}", LootLockerHTTPMethod.GET);
     }
 }
-//#endif
+#endif
