@@ -1,12 +1,13 @@
+using System;
+using System.Collections.Generic;
+
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using LootLocker;
-
 using LootLocker.Extension;
-using LootLocker.Extension.DataTypes;
 using LootLocker.Extension.Responses;
-
-using UnityEditor;
 
 public class LootLockerAdminExtension : EditorWindow
 {
@@ -46,7 +47,6 @@ public class LootLockerAdminExtension : EditorWindow
 
     private Button popupBtn;
 
-
     private Label infoText;
 
     private Label newApiKeyCancel;
@@ -58,25 +58,16 @@ public class LootLockerAdminExtension : EditorWindow
 
     private Button createApiKeyBtn;
 
-    //Login Flow Start
     private TextField emailField, passwordField;
     private Label signupLink, gettingStartedLink, forgotPasswordLink;
     private Button loginBtn;
-    //Login Flow End
-
-    //MFA Flow Begin
 
     private TextField codeField;
     private Button signInBtn;
     private string mfaKey;
-    //MFA Flow End
-
-    //Game Selector Flow Begin
 
     VisualElement gameSelectorList;
-    //Game Selector Flow End
 
-    //API Key Flow Begin
     VisualElement apiKeyList;
 
     bool isStage = true;
@@ -143,7 +134,7 @@ public class LootLockerAdminExtension : EditorWindow
 
         if(LootLockerConfig.current.apiKey != null || LootLockerConfig.current.apiKey != "")
         {
-            //activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
+            activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
         } else
         {
             activeKey.text = "Active Key: Not selected";
@@ -181,8 +172,6 @@ public class LootLockerAdminExtension : EditorWindow
         popupBtn.clickable.clickedWithEventInfo += ClosePopup;
 
 
-        //Login Flow Start
-
         loginFlow = root.Q<VisualElement>("LoginFlow");
 
         emailField = root.Q<TextField>("EmailField");
@@ -196,7 +185,7 @@ public class LootLockerAdminExtension : EditorWindow
             }
         });
 
-            signupLink = root.Q <Label>("newUserLink");
+        signupLink = root.Q <Label>("newUserLink");
         gettingStartedLink = root.Q<Label>("gettingStartedLink");
         forgotPasswordLink = root.Q<Label>("forgotPasswordLink");
 
@@ -209,9 +198,6 @@ public class LootLockerAdminExtension : EditorWindow
         loginBtn.clickable.clicked += Login;
 
         loginFlow.style.display = DisplayStyle.Flex;
-        //Login Flow End
-
-        //MFA Flow Begin
 
         mfaFlow = root.Q<VisualElement>("MFAFlow");
 
@@ -222,10 +208,6 @@ public class LootLockerAdminExtension : EditorWindow
         signInBtn.clickable.clickedWithEventInfo += SignIn;
 
         mfaFlow.style.display = DisplayStyle.None;
-        //MFA Flow End
-
-
-        //Game Selector Flow Begin
 
         gameSelectorFlow = root.Q<VisualElement>("GameSelectorFlow");
 
@@ -233,9 +215,6 @@ public class LootLockerAdminExtension : EditorWindow
 
         gameSelectorFlow.style.display = DisplayStyle.None;
 
-        //Game Selector Flow End
-
-        //API Key Flow Begin
         apiKeyFlow = root.Q<VisualElement>("APIKeyFlow");
 
         apiKeyFlow.style.display = DisplayStyle.None;
@@ -274,8 +253,6 @@ public class LootLockerAdminExtension : EditorWindow
         {
             newApiKeyWindow.style.display = DisplayStyle.Flex;
         };
-
-        //API Key Flow End
 
         if (StoredUser.current.user != null)
         {
@@ -386,7 +363,6 @@ public class LootLockerAdminExtension : EditorWindow
         popup.style.display = DisplayStyle.None;
     }
 
-    //Login Flow Start
     public void Login()
     {
 
@@ -432,10 +408,6 @@ public class LootLockerAdminExtension : EditorWindow
         });
     }
 
-    //Login Flow End
-
-    //MFA Flow Start
-
     public void SignIn(EventBase e)
     {
         EditorApplication.update += OnEditorUpdate;
@@ -458,9 +430,7 @@ public class LootLockerAdminExtension : EditorWindow
         });
 
     }
-    //MFA Flow End
 
-    //Game Selector Flow Start
     public void CreateGameButtons()
     {
     
@@ -476,7 +446,6 @@ public class LootLockerAdminExtension : EditorWindow
 
     public void GameButtonTemplate(Game game, string orgName)
     {
-        //Parent
         Button button = new Button();
 
         button.style.flexDirection = FlexDirection.Column;
@@ -484,13 +453,11 @@ public class LootLockerAdminExtension : EditorWindow
 
         button.AddToClassList("gameButton");
 
-        //Game title
         Label gameTitle = new Label();
         gameTitle.text = game.name;
 
         gameTitle.AddToClassList("gameButtonTitle");
 
-        //Org title
         Label gameOrg = new Label();
         gameOrg.text = orgName;
 
@@ -534,11 +501,6 @@ public class LootLockerAdminExtension : EditorWindow
         }
 
     }
-
-    //Game Selector Flow End
-
-    //API Key Flow Start
-
 
     void CreateNewAPIKey()
     {
@@ -635,7 +597,7 @@ public class LootLockerAdminExtension : EditorWindow
 
         LootLockerConfig.current.apiKey = target.name;
 
-        //activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
+        activeKey.text = "Active Key: " + LootLockerConfig.current.apiKey;
         SwapNewSelectedKey();
 
     }
@@ -670,4 +632,4 @@ public class LootLockerAdminExtension : EditorWindow
     }
 
 }
-//#endif
+#endif
