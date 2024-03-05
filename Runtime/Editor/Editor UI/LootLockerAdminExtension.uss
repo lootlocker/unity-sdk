@@ -16,8 +16,6 @@
 }
 
 .gameButton {
-    border-bottom-width: 10px;
-    background-color: var(--ButtonColor);
     margin-bottom: 10px;
     align-items: flex-start;
 }
