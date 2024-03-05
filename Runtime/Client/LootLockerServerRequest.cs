@@ -116,6 +116,15 @@ namespace LootLocker
         /// If the request was not a success this property will hold any error messages
         /// </summary>
         public string message { get; set; }
+
+        /// <summary>
+        /// An easy way of debugging LootLockerErrorData class, example: Debug.Log(onComplete.errorData);
+        /// </summary>
+        /// <returns>string used to debug errors</returns>
+        public override string ToString()
+        {
+            return $"We encountered an unexpected server error. Please try again later.\n If the issue persists, please contact LootLocker support and reference the following error details:\n trace ID - {trace_id},\n request ID - {request_id},\n message - {message}.";
+        }
     }
 
     /// <summary>
@@ -174,9 +183,12 @@ namespace LootLocker
             {
                 return LootLockerResponseFactory.Error<T>("Unknown error, please check your internet connection.");
             }
-            else if (serverResponse.errorData != null && !string.IsNullOrEmpty(serverResponse.errorData.code))
+            else if (serverResponse.errorData != null)
             {
-                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
+                if(!string.IsNullOrEmpty(serverResponse.errorData.code)) {
+                    return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
+                }
+                return new T() { success = false, errorData = serverResponse.errorData };
             }
 
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();

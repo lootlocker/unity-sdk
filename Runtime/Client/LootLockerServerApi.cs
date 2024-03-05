@@ -131,14 +131,7 @@ namespace LootLocker
                         text = webRequest.downloadHandler.text
                     };
 
-                    LootLockerErrorData errorData =
-                        LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
-                    if (ErrorIsPreErrorCodes(errorData))
-                    {
-                        errorData = ExpandErrorInformation(webRequest.responseCode, webRequest.downloadHandler.text);
-                    }
-
-                    response.errorData = errorData;
+                    response.errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.message +
                         (!string.IsNullOrEmpty(response.errorData.doc_url) ? " -- " + response.errorData.doc_url : ""));
                     OnServerResponse?.Invoke(response);
@@ -148,76 +141,6 @@ namespace LootLocker
         }
 
 #region Private Methods
-
-        private static LootLockerErrorData ExpandErrorInformation(long statusCode, string responseBody)
-        {
-            var errorData = new LootLockerErrorData();
-            switch (statusCode)
-            {
-                case 400:
-                    errorData.message = "Bad Request -- Your request has an error.";
-                    errorData.code = "bad_request";
-                    break;
-                case 401:
-                    errorData.message = "Unauthorized -- Your session_token is invalid.";
-                    errorData.code = "unauthorized";
-                    break;
-                case 402:
-                    errorData.message = "Payment Required -- Payment failed. Insufficient funds, etc.";
-                    errorData.code = "payment_required";
-                    break;
-                case 403:
-                    errorData.message = "Forbidden -- You do not have access to this resource.";
-                    errorData.code = "forbidden";
-                    break;
-                case 404:
-                    errorData.message = "Not Found -- The requested resource could not be found.";
-                    errorData.code = "not_found";
-                    break;
-                case 405:
-                    errorData.message =
-                        "Method Not Allowed -- The selected http method is invalid for this resource.";
-                    errorData.code = "method_not_allowed";
-                    break;
-                case 406:
-                    errorData.message = "Not Acceptable -- Purchasing is disabled.";
-                    errorData.code = "not_acceptable";
-                    break;
-                case 409:
-                    errorData.message =
-                        "Conflict -- Your state is most likely not aligned with the servers.";
-                    errorData.code = "conflict";
-                    break;
-                case 429:
-                    errorData.message =
-                        "Too Many Requests -- You're being limited for sending too many requests too quickly.";
-                    errorData.code = "too_many_requests";
-                    break;
-                case 500:
-                    errorData.message =
-                        "Internal Server Error -- We had a problem with our server. Try again later.";
-                    errorData.code = "internal_server_error";
-                    break;
-                case 503:
-                    errorData.message =
-                        "Service Unavailable -- We're either offline for maintenance, or an error that should be solvable by calling again later was triggered.";
-                    errorData.code = "service_unavailable";
-                    break;
-                default:
-                    errorData.message = "Unknown error.";
-                    break;
-            }
-
-            errorData.message +=
-                " " + LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody);
-            return errorData;
-        }
-
-        private static bool ErrorIsPreErrorCodes(LootLockerErrorData errorData)
-        {
-            // Check if the error uses the "old" error style, not the "new" (https://docs.lootlocker.com/reference/error-codes)
-            return errorData == null || string.IsNullOrEmpty(errorData.code);
-        }
 
         private static bool ShouldRetryRequest(long statusCode, int timesRetried)
         {
