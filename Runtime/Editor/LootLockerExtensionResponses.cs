@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
@@ -32,7 +33,14 @@ namespace LootLocker.Extension.DataTypes
         public string name { get; set; }
         public string badge_url { get; set; }
         public string logo_url { get; set; }
-        public Game development { get; set; }
+        public DevelopmentGame development { get; set; }
+        public string organisation_name { get; set; }
+    }
+
+    public class DevelopmentGame
+    {
+        public int id { get; set; }
+
     }
 
     public class Organisation
@@ -58,7 +66,7 @@ namespace LootLocker.Extension.DataTypes
     {
         public int id { get; set; }
         public string name { get; set; }
-        public string email { get; set; }
+        //public string email { get; set; }
         public long signed_up { get; set; }
         public Organisation[] organisations { get; set; }
         private Dictionary<int, int> organisationIndexByID { get; set; }
@@ -79,6 +87,33 @@ namespace LootLocker.Extension.DataTypes
 
 namespace LootLocker.Extension.Responses
 {
+
+    public class GameResponse : LootLockerResponse
+    {
+        public Game game { get; set; }
+    }
+
+    public class Game : LootLockerResponse
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public bool active { get; set; }
+        public bool block_purchases { get; set; }
+        public string domain_key { get; set; }
+        public bool player_progression { get; set; }
+        public bool sandbox_mode { get; set; }
+        public bool soft_currency { get; set; }
+        public string soft_currency_name { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime updated_at { get; set; }
+        public int max_player_message_title_length { get; set; }
+        public int max_player_message_summary_length { get; set; }
+        public bool unique_player_names { get; set; }
+        public object logo_url { get; set; }
+        public object badge_url { get; set; }
+        public int genre { get; set; }
+    }
+
     public class LoginResponse : LootLockerResponse
     {
 
