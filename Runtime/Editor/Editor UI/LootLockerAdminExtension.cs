@@ -9,6 +9,8 @@ using LootLocker;
 using LootLocker.Extension;
 using LootLocker.Extension.Responses;
 
+namespace LootLocker.Extension {
+
 public class LootLockerAdminExtension : EditorWindow
 {
     [SerializeField]
@@ -759,5 +761,6 @@ public class LootLockerAdminExtension : EditorWindow
         SwapFlows(activeFlow, loginFlow);
     }
 
+}
 }
 #endif
