@@ -188,7 +188,7 @@ namespace LootLocker
                 if(!string.IsNullOrEmpty(serverResponse.errorData.code)) {
                     return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
                 }
-                return new T() { success = false, errorData = serverResponse.errorData };
+                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
             }
 
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
