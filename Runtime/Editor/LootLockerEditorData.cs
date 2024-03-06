@@ -1,6 +1,8 @@
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using UnityEditor;
+namespace LootLocker.Extension {
+
 
 public class LootLockerEditorData
 {
@@ -69,5 +71,6 @@ public class LootLockerEditorData
         EditorPrefs.SetBool(prefix + newSession, false);
         return result;
     }
+}
 }
 #endif
