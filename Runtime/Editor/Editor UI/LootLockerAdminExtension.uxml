@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/LootLockerSDK/Editor/NewUI/LootLockerAdminExtension.uss?fileID=7433441132597879392&amp;guid=f1130e18dfb99e04cbd54f3fac00ff15&amp;type=3#LootLockerAdminExtension" />
+    <Style src="project://database/Assets/LootLockerSDK/Editor/Editor%20UI/LootLockerAdminExtension.uss?fileID=7433441132597879392&amp;guid=f1130e18dfb99e04cbd54f3fac00ff15&amp;type=3#LootLockerAdminExtension" />
     <ui:VisualElement style="align-self: stretch; justify-content: center; align-items: stretch; height: 100%;">
         <ui:VisualElement name="Topbar" style="flex-grow: 1; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: stretch; flex-wrap: wrap;">
             <ui:Label tabindex="-1" text="LootLocker" display-tooltip-when-elided="true" name="GameName" style="align-items: flex-start; align-self: center; font-size: 28px; -unity-text-align: middle-left; text-overflow: clip; width: auto; white-space: nowrap; max-width: 750px; margin-left: 24px; justify-content: flex-start;" />
@@ -40,7 +40,7 @@
                     <ui:Label tabindex="-1" text="Getting started guide" display-tooltip-when-elided="true" name="gettingStartedLink" class="clickable" style="font-size: 16px; align-items: auto; justify-content: space-evenly; align-self: center; color: rgb(81, 171, 255);" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="MFAFlow" style="flex-grow: 1; flex-direction: row; display: flex; height: 100%;">
+            <ui:VisualElement name="MFAFlow" style="flex-grow: 1; flex-direction: row; display: none; height: 100%;">
                 <ui:VisualElement name="Verify" style="flex-grow: 1; align-self: stretch; align-items: center; justify-content: flex-start; -unity-text-align: middle-center; flex-direction: column;">
                     <ui:Label tabindex="-1" text="MFA Code" display-tooltip-when-elided="true" name="Title" style="font-size: 24px; align-items: auto; justify-content: space-evenly; align-self: center;" />
                     <ui:VisualElement name="Form" style="flex-direction: column; flex-wrap: nowrap; flex-grow: 1; align-self: center; align-items: flex-start;">
@@ -53,7 +53,7 @@
             <ui:VisualElement name="GameSelectorFlow" style="flex-grow: 1; flex-direction: row; display: none; height: 100%;">
                 <ui:VisualElement name="Games" style="flex-grow: 1; align-self: stretch; align-items: center; justify-content: flex-start; -unity-text-align: middle-center; flex-direction: column;">
                     <ui:Label tabindex="-1" text="Select Game" display-tooltip-when-elided="true" name="Title" style="font-size: 24px; align-items: auto; justify-content: space-evenly; align-self: center; margin-bottom: 10px;" />
-                    <ui:ScrollView name="GamesList" style="min-width: 300px; overflow: visible;" />
+                    <ui:ScrollView name="GamesList" style="min-width: 300px; overflow: visible; margin-bottom: 24px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="APIKeyFlow" style="flex-grow: 1; flex-direction: column; display: none; justify-content: flex-end; height: 100%;">
@@ -63,13 +63,9 @@
                     <ui:ScrollView name="APIKeyList" style="background-color: rgb(53, 53, 53); flex-direction: column-reverse;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Footer" style="transform-origin: center; align-self: center; position: relative; display: flex; flex-direction: column-reverse; justify-content: flex-end; flex-grow: 1; flex-shrink: 0; min-height: auto;">
-                <ui:Label tabindex="-1" text="Learn more about &lt;color=#51ABFF&gt;&#10;API Keys" display-tooltip-when-elided="true" name="LearnMore" class="clickable" style="-unity-text-align: upper-center; display: flex; position: relative; flex-direction: column-reverse; align-self: center; align-items: center; justify-content: flex-end; margin-bottom: 12px; margin-top: 12px;" />
-            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="InfoandCreate" style="flex-grow: 1; align-self: center; align-items: auto; justify-content: flex-start; -unity-text-align: middle-center; flex-direction: column; margin-right: 15px; margin-left: 0; padding-left: 0; min-width: 81px; max-width: 167px; position: absolute; right: 0; top: 109px; bottom: 0;">
-        <ui:Label tabindex="-1" text="Active Key: Not selected" display-tooltip-when-elided="true" name="ActiveKey" style="font-size: 10px; align-items: flex-end; justify-content: space-evenly; align-self: flex-end; margin-bottom: 8px; padding-bottom: 0; margin-right: 10px; text-overflow: ellipsis; max-width: 250px;" />
         <ui:Button text="Create new API Key" display-tooltip-when-elided="true" name="CreateKeyBtn" style="margin-right: 10px; min-height: 30px;" />
     </ui:VisualElement>
     <ui:VisualElement name="PopUp" style="flex-grow: 1; position: absolute; right: 0; left: 0; bottom: 0; top: 0; color: rgb(27, 27, 27); align-self: center; align-items: center; justify-content: space-around; display: none; background-color: rgba(0, 0, 0, 0.75);">
@@ -99,7 +95,7 @@
             <ui:Label tabindex="-1" text="Cancel" display-tooltip-when-elided="true" name="APINewKeyCancel" class="clickable" style="align-items: flex-start; align-self: center; justify-content: flex-start; font-size: 13px; margin-bottom: 0; padding-bottom: 0; color: rgb(135, 135, 135); margin-top: 8px; padding-top: 0; -unity-font-style: bold-and-italic;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="LoadingBackground" style="flex-grow: 1; position: absolute; right: 0; left: 0; bottom: 0; top: 0; color: rgb(27, 27, 27); align-self: center; align-items: center; justify-content: center; display: flex; background-color: rgba(0, 0, 0, 0.75); rotate: 0;">
+    <ui:VisualElement name="LoadingBackground" style="flex-grow: 1; position: absolute; right: 0; left: 0; bottom: 0; top: 0; color: rgb(27, 27, 27); align-self: center; align-items: center; justify-content: center; display: none; background-color: rgba(0, 0, 0, 0.75); rotate: 0;">
         <ui:VisualElement name="LoadingIcon" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0); align-self: center; align-items: center; justify-content: flex-end; width: 50px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); min-width: 50px; min-height: 50px; max-height: 50px; display: flex; position: relative; max-width: 50px; flex-shrink: 0; height: 50px; bottom: 0; right: 0; top: 0; left: 0; rotate: 0; translate: 0 0; transform-origin: center;" />
     </ui:VisualElement>
 </ui:UXML>
