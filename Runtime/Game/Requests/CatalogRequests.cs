@@ -102,6 +102,34 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
+    public class LootLockerCatalogSteamStoreListingPrice
+    {
+        /// <summary>
+        /// Currency code of the currency to be used for purchasing this listing
+        /// </summary>
+        public string currency { get; set; }
+        /// <summary>
+        /// Amount of the base value of the specified currency that this listing costs to purchase
+        /// </summary>
+        public int amount { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerCatalogSteamStoreListing
+    {
+        /// <summary>
+        /// Description of this listing
+        /// </summary>
+        public string description { get; set; }
+        /// <summary>
+        /// List of prices for this listing
+        /// </summary>
+        public LootLockerCatalogSteamStoreListingPrice[] prices { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
     public class LootLockerCatalogEntryListings
     {
         /// <summary>
@@ -112,6 +140,10 @@ namespace LootLocker.Requests
         /// The listing information (if configured) for Google Play Store
         /// </summary>
         public LootLockerCatalogGooglePlayStoreListing google_play_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Steam Store
+        /// </summary>
+        public LootLockerCatalogSteamStoreListing steam_store { get; set; }
     }
 
     /// <summary>
