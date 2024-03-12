@@ -4705,6 +4705,22 @@ namespace LootLocker.Requests
                 });
         }
 
+        [Obsolete("This function will be removed on a later date. Use QuerrySteamPurchaseRedemption instead.")]
+        public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerQuerySteamPurchaseRedemptionStatusResponse>());
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerQuerySteamPurchaseRedemptionStatusRequest()
+            {
+                entitlement_id = entitlementId
+            });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.querySteamPurchaseRedemptionStatus.endPoint, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         /// <summary>
         /// Check the Steam Purchase status for a given entitlement
         /// 
@@ -4713,7 +4729,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement to check the status for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
+        public static void QuerrySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
         {
             if (!CheckInitialized())
             {
