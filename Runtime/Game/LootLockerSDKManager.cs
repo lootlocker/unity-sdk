@@ -301,7 +301,7 @@ namespace LootLocker.Requests
 
             if (identifier.Length == 0)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.Error<LootLockerGuestSessionResponse>("identifier cannot be empty"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerGuestSessionResponse>("Identifier cannot be empty when calling StartGuestSession (if you want an identifier to be generated for you, please use StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)"));
                 return;
             }
             CurrentPlatform.Set(Platforms.Guest);
@@ -1187,14 +1187,14 @@ namespace LootLocker.Requests
             string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
             if (string.IsNullOrEmpty(existingSessionToken))
             {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session token found"));
+                onComplete(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>("No White Label Session Token found"));
                 return;
             }
 
             string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
             if (string.IsNullOrEmpty(existingSessionEmail))
             {
-                onComplete(LootLockerResponseFactory.Error<LootLockerSessionResponse>("no session email found"));
+                onComplete(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>("No White Label Session Email found"));
                 return;
             }
 
@@ -1692,12 +1692,12 @@ namespace LootLocker.Requests
             {
                 if (name.ToLower().Contains("player"))
                 {
-                    onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
                     return;
 
                 } else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
                 {
-                    onComplete?.Invoke(LootLockerResponseFactory.Error<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
                     return;
                 }
             }
