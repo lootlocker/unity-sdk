@@ -101,10 +101,17 @@ namespace LootLocker.Extension
         [InitializeOnLoadMethod]
         public static void LoadFirstTime()
         {
+
             if (LootLockerEditorData.ShouldAutoShowWindow())
             {
-                LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
-                wnd.titleContent = new GUIContent("LootLocker");
+                EditorApplication.delayCall = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.delayCall, (EditorApplication.CallbackFunction)delegate
+                {
+                    LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
+                    wnd.titleContent = new GUIContent("LootLocker");
+                    wnd.ShowUtility();
+                });
+
+                return;
             }
 
         }
@@ -145,11 +152,15 @@ namespace LootLocker.Extension
 
             environmentElement = root.Q<VisualElement>("Environment");
 
+            environmentElement.style.display = DisplayStyle.None;
+
             environmentTitle = root.Q<Label>("EnvironmentTitle");
 
             gameName = root.Q<Label>("GameName");
 
             menu = root.Q<VisualElement>("MenuBar");
+
+            menu.style.display = DisplayStyle.None;
 
             menuChangeGameBtn = root.Q<Button>("ChangeGameBtn");
 
@@ -177,6 +188,8 @@ namespace LootLocker.Extension
             popupBtn.clickable.clickedWithEventInfo += ClosePopup;
 
             loginFlow = root.Q<VisualElement>("LoginFlow");
+
+            loginFlow.style.display = DisplayStyle.Flex;
 
             emailField = root.Q<TextField>("EmailField");
             passwordField = root.Q<TextField>("PasswordField");

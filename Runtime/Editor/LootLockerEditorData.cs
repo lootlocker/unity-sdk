@@ -73,7 +73,9 @@ namespace LootLocker.Extension
 
         public static bool ShouldAutoShowWindow()
         {
-            return EditorPrefs.GetBool(prefix + firstTimeWelcome);
+            var result = EditorPrefs.GetBool(prefix + firstTimeWelcome, true);
+            EditorPrefs.SetBool(prefix + firstTimeWelcome, false);
+            return result;
         }
 
         public static bool IsNewSession()
