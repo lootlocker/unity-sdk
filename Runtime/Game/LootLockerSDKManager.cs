@@ -4705,7 +4705,7 @@ namespace LootLocker.Requests
                 });
         }
 
-        [Obsolete("This function will be removed on a later date. Use QuerrySteamPurchaseRedemption instead.")]
+        [Obsolete("This function will be removed on a later date. Use QuerySteamPurchaseRedemption instead.")]
         public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4729,7 +4729,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement to check the status for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void QuerrySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
+        public static void QuerySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
         {
             if (!CheckInitialized())
             {
