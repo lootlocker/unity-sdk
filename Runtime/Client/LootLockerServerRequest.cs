@@ -142,7 +142,7 @@ namespace LootLocker
             string prettyError = $"LootLocker Error: \"{message}\"";
 
             // Look for intermittent, non user errors
-            if (code.StartsWith("HTTP5"))
+            if (!string.IsNullOrEmpty(code) && code.StartsWith("HTTP5"))
             {
                 prettyError +=
                     $"\nTry again later. If the issue persists, please contact LootLocker support and provide the following error details:\n trace ID - \"{trace_id}\",\n request ID - \"{request_id}\",\n message - \"{message}\".";
