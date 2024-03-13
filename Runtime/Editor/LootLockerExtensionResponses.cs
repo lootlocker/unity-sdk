@@ -66,7 +66,6 @@ namespace LootLocker.Extension.DataTypes
     {
         public int id { get; set; }
         public string name { get; set; }
-        //public string email { get; set; }
         public long signed_up { get; set; }
         public Organisation[] organisations { get; set; }
         private Dictionary<int, int> organisationIndexByID { get; set; }

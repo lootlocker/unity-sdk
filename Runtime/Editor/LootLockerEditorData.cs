@@ -8,80 +8,80 @@ namespace LootLocker.Extension
     {
         private static string prefix = PlayerSettings.productGUID.ToString() + ".LootLocker.";
 
-        private static string adminToken = "AdminToken";
-        private static string selectedGameID = "SelectedGameID";
-        private static string selectedGameName = "SelectedGameName";
-        private static string environment = "Environment";
-        private static string firstTimeWelcome = "FirstTimeWelcome";
-        private static string newSession = "NewSession";
+        private static string adminToken = prefix + "AdminToken";
+        private static string selectedGameID = prefix + "SelectedGameID";
+        private static string selectedGameName = prefix + "SelectedGameName";
+        private static string environment = prefix + "Environment";
+        private static string firstTimeWelcome = prefix + "FirstTimeWelcome";
+        private static string newSession = prefix + "NewSession";
 
         public static void ClearLootLockerPrefs()
         {
-            EditorPrefs.DeleteKey(prefix + adminToken);
-            EditorPrefs.DeleteKey(prefix + selectedGameID);
-            EditorPrefs.DeleteKey(prefix + selectedGameName);
-            EditorPrefs.DeleteKey(prefix + environment);
-            EditorPrefs.DeleteKey(prefix + firstTimeWelcome);
-            EditorPrefs.DeleteKey(prefix + newSession);
+            EditorPrefs.DeleteKey(adminToken);
+            EditorPrefs.DeleteKey(selectedGameID);
+            EditorPrefs.DeleteKey(selectedGameName);
+            EditorPrefs.DeleteKey(environment);
+            EditorPrefs.DeleteKey(firstTimeWelcome);
+            EditorPrefs.DeleteKey(newSession);
         }
 
         public static void SetAdminToken(string _adminToken)
         {
-            EditorPrefs.SetString(prefix + adminToken, _adminToken);
-            EditorPrefs.SetBool(prefix + firstTimeWelcome, false);
-            EditorPrefs.SetBool(prefix + newSession, true);
+            EditorPrefs.SetString(adminToken, _adminToken);
+            EditorPrefs.SetBool(firstTimeWelcome, false);
+            EditorPrefs.SetBool(newSession, true);
         }
 
         public static string GetAdminToken()
         {
-            return EditorPrefs.GetString(prefix + adminToken);
+            return EditorPrefs.GetString(adminToken);
         }
 
         public static void SetSelectedGame(string _selectedGame)
         {
-            EditorPrefs.SetInt(prefix + selectedGameID, int.Parse(_selectedGame));
+            EditorPrefs.SetInt(selectedGameID, int.Parse(_selectedGame));
         }
         public static void SetSelectedGameName(string _selectedGameName)
         {
-            EditorPrefs.SetString(prefix + selectedGameName, _selectedGameName);
+            EditorPrefs.SetString(selectedGameName, _selectedGameName);
         }
 
         public static int GetSelectedGame()
         {
-            return EditorPrefs.GetInt(prefix + selectedGameID);
+            return EditorPrefs.GetInt(selectedGameID);
         }
 
         public static string GetSelectedGameName()
         {
-            return EditorPrefs.GetString(prefix + selectedGameName);
+            return EditorPrefs.GetString(selectedGameName);
         }
 
         public static void SetEnvironmentStage()
         {
-            EditorPrefs.SetString(prefix + environment, "Stage");
+            EditorPrefs.SetString(environment, "Stage");
         }
 
         public static void SetEnvironmentLive()
         {
-            EditorPrefs.SetString(prefix + environment, "Live");
+            EditorPrefs.SetString(environment, "Live");
         }
 
         public static bool IsEnvironmentStage()
         {
-            return EditorPrefs.GetString(prefix + environment).Equals("Stage");
+            return EditorPrefs.GetString(environment).Equals("Stage");
         }
 
         public static bool ShouldAutoShowWindow()
         {
-            var result = EditorPrefs.GetBool(prefix + firstTimeWelcome, true);
-            EditorPrefs.SetBool(prefix + firstTimeWelcome, false);
+            var result = EditorPrefs.GetBool(firstTimeWelcome, true);
+            EditorPrefs.SetBool(firstTimeWelcome, false);
             return result;
         }
 
         public static bool IsNewSession()
         {
-            bool result = EditorPrefs.GetBool(prefix + newSession, false);
-            EditorPrefs.SetBool(prefix + newSession, false);
+            bool result = EditorPrefs.GetBool(newSession, false);
+            EditorPrefs.SetBool(newSession, false);
             return result;
         }
     }
