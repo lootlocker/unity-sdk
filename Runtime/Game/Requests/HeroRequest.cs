@@ -4,15 +4,10 @@ using LootLocker.Requests;
 namespace LootLocker.Requests
 {
 
-    public class LootLockerHeroResponse : LootLockerResponse
-    {
-        LootLockerHero hero;
-    }
-
 
     public class LootLockerPlayerHeroResponse : LootLockerResponse
     {
-        LootLockerPlayerHero hero;
+        public LootLockerPlayerHero hero;
     }
 
     public class LootLockerGameHeroResponse : LootLockerResponse
