@@ -4298,6 +4298,7 @@ namespace LootLocker.Requests
         /// <param name="assetID">The ID of the asset to purchase</param>
         /// <param name="variationID">The variation ID of the asset to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
+        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
         public static void NormalPurchaseCall(int assetID, int variationID, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4318,6 +4319,7 @@ namespace LootLocker.Requests
         /// <param name="variationID">The variation ID of the asset to purchase</param>
         /// <param name="rentalOptionID">The rental option ID of the asset to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
+        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
         public static void RentalPurchaseCall(int assetID, int variationID, int rentalOptionID, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4334,6 +4336,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="receipt_data">Receipt that is received when a purchase goes through with apple</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
+        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
         public static void IosPurchaseVerification(string receipt_data, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4351,6 +4354,7 @@ namespace LootLocker.Requests
         /// <param name="purchase_token">The token that is received when a purchase has been made</param>
         /// <param name="asset_id">The ID of the asset to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
+        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
         public static void AndroidPurchaseVerification(string purchase_token, int asset_id, Action<LootLockerPurchaseResponse> onComplete)
         {
             if (!CheckInitialized())

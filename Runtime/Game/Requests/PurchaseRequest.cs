@@ -26,7 +26,6 @@ namespace LootLocker.LootLockerEnums
 namespace LootLocker.Requests
 {
     #region Legacy Purchasing
-    //TODO: Deprecate legacy purchasing
 
     public class LootLockerPurchaseRequests
     {
@@ -254,7 +253,6 @@ namespace LootLocker
     public partial class LootLockerAPIManager
     {
 #region Legacy Purchasing
-// TODO: Deprecate legacy purchasing
         public static void NormalPurchaseCall(LootLockerNormalPurchaseRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
         {
             if(data == null)
