@@ -32,7 +32,7 @@ namespace LootLocker
             }
         }
 
-        public static void Reset()
+        public static void ResetInstance()
         {
             if (_instance == null) return;
 #if UNITY_EDITOR
@@ -47,7 +47,7 @@ namespace LootLocker
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
-            Reset();
+            ResetInstance();
         }
 #endif
 
