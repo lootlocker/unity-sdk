@@ -590,9 +590,21 @@ namespace LootLocker.Extension
             gameSelectorList.Add(button);
         }
 
+        bool AtTarget(EventBase eventBase)
+        {
+#if UNITY_2023_1_OR_NEWER
+            if(eventBase.propagationPhase == PropagationPhase.BubbleUp) 
+                return true;
+#else
+            if(eventBase.propagationPhase == PropagationPhase.AtTarget) 
+                return true;
+#endif
+            return false;
+        }
+
         void OnGameSelected(EventBase e)
         {
-            if (e.propagationPhase != PropagationPhase.AtTarget)
+            if (!AtTarget(e))
                 return;
 
             var target = e.target as Button;
@@ -707,7 +719,6 @@ namespace LootLocker.Extension
             if (button.name == LootLockerConfig.current.apiKey)
             {
                 button.style.borderRightColor = button.style.borderLeftColor = button.style.borderTopColor = button.style.borderBottomColor = stage;
-                keyName.style.color = stage;
             }
 
             button.AddToClassList("apikey");
@@ -725,7 +736,7 @@ namespace LootLocker.Extension
 
         void OnAPIKeySelected(EventBase e)
         {
-            if (e.propagationPhase != PropagationPhase.AtTarget)
+            if (!AtTarget(e))
                 return;
 
             var target = e.target as Button;
@@ -744,8 +755,7 @@ namespace LootLocker.Extension
 
                 if (key.name == LootLockerConfig.current.apiKey)
                 {
-                    key.style.backgroundColor = stage;
-
+                    key.style.borderRightColor = key.style.borderLeftColor = key.style.borderTopColor = key.style.borderBottomColor = stage;
                 }
                 else
                 {
@@ -753,7 +763,6 @@ namespace LootLocker.Extension
                 }
             }
         }
-
         void Logout()
         {
             loadingPage.style.display = DisplayStyle.Flex;
@@ -764,6 +773,10 @@ namespace LootLocker.Extension
             gameSelectorList.Clear();
             loadingPage.style.display = DisplayStyle.None;
             SwapFlows(activeFlow, loginFlow);
+        }
+        private void OnDestroy()
+        {
+            LootLockerServerApi.ResetInstance();
         }
 
     }
