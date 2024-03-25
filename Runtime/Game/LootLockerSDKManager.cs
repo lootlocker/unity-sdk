@@ -5092,7 +5092,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SubmitScore(request, leaderboardKey, onComplete);
         }
-        public static void GetLeaderboardData(id leaderboard_id, Action<LootLockerLeaderboardDetailResponse> onComplete)
+        public static void GetLeaderboardData(int leaderboard_id, Action<LootLockerLeaderboardDetailResponse> onComplete)
         {
             if (!CheckInitialized())
             {
