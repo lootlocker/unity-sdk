@@ -5092,6 +5092,24 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SubmitScore(request, leaderboardKey, onComplete);
         }
+        public static void GetLeaderboardData(id leaderboard_id, Action<LootLockerLeaderboardDetailResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>());
+                return;
+            }
+            GetLeaderboardData(leaderboard_id.ToString(), onComplete);
+        }
+        public static void GetLeaderboardData(string leaderboard_key, Action<LootLockerLeaderboardDetailResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>());
+                return;
+            }
+            LootLockerAPIManager.GetLeaderboardData(leaderboard_key, onComplete);
+        }
 
         #endregion
 
