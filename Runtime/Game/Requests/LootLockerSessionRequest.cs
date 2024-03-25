@@ -102,6 +102,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
     {
+        public string player_name { get; set; }
         public string player_identifier { get; set; }
     }
 
