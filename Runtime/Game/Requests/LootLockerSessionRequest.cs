@@ -47,6 +47,10 @@ namespace LootLocker.Requests
     public class LootLockerSessionResponse : LootLockerResponse
     {
         /// <summary>
+        /// The player's name if it has been set by using SetPlayerName().
+        /// </summary>
+        public string player_name { get; set; }
+        /// <summary>
         /// The session token that can now be used to use further LootLocker functionality. We store and use this for you.
         /// </summary>
         public string session_token { get; set; }
@@ -102,7 +106,6 @@ namespace LootLocker.Requests
 
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
     {
-        public string player_name { get; set; }
         public string player_identifier { get; set; }
     }
 
@@ -123,7 +126,6 @@ namespace LootLocker.Requests
     [System.Serializable]
     public class LootLockerAppleGameCenterSessionResponse : LootLockerSessionResponse
     {
-        public string player_name { get; set; }
         public string refresh_token { get; set; }
     }
 
