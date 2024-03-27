@@ -92,11 +92,9 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardAssetDetails
     {
         public string name { get; set; }
-#nullable enable
         public string thumbnail { get; set; }
         public string variation_name { get; set; }
         public string rental_option_name { get; set; }
-#nullable disable
         public int? variation_id { get; set; }
         public int? rental_option_id { get; set; }
         public int legacy_id { get; set; }
