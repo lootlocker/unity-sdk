@@ -5115,6 +5115,42 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.ListLeaderboardArchive(leaderboard_key, onComplete);
         }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            GetLeaderboardArchive(key, -1, null, onComplete);
+        }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="count"> Amount of entries to read </param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            GetLeaderboardArchive(key, count, null, onComplete);
+        }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="count"> Amount of entries to read </param>
+        /// <param name="after"> Return after specified index </param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardHistoryDetailsResponse>());
+                return;
+            }
+            
+            LootLockerAPIManager.GetLeaderboardArchive(key, count, after, onComplete);
+        }
 
         #endregion
 
