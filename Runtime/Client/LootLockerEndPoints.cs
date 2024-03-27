@@ -237,7 +237,7 @@ namespace LootLocker
         public static EndPointClass submitScore = new EndPointClass("leaderboards/{0}/submit", LootLockerHTTPMethod.POST);
         public static EndPointClass getLeaderboardData = new EndPointClass("leaderboards/{0}/info", LootLockerHTTPMethod.GET);
         public static EndPointClass listLeaderboardArchive = new EndPointClass("leaderboards/{0}/archive/list", LootLockerHTTPMethod.GET);
-        ublic static EndPointClass getLeaderboardArchive = new EndPointClass("leaderboards/archive/read", LootLockerHTTPMethod.GET);
+        public static EndPointClass getLeaderboardArchive = new EndPointClass("leaderboards/archive/read", LootLockerHTTPMethod.GET);
         
         // Progressions
         [Header("Progressions")]
