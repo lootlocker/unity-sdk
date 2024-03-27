@@ -105,10 +105,10 @@ namespace LootLocker.Requests
     {
         public string reward_kind { get; set; }
         public LootLockerLeaderboardRewardPredicates predicates { get; set; }
-        public LootLockerLeaderboardRewardCurrency? currency { get; set; }
-        public LootLockerLeaderboardRewardProgressionReset? progression_reset { get; set; }
-        public LootLockerLeaderboardRewardProgression? progression_points { get; set; }
-        public LootLockerLeaderboardRewardAsset? asset { get; set; }
+        public LootLockerLeaderboardRewardCurrency currency { get; set; }
+        public LootLockerLeaderboardRewardProgressionReset progression_reset { get; set; }
+        public LootLockerLeaderboardRewardProgression progression_points { get; set; }
+        public LootLockerLeaderboardRewardAsset asset { get; set; }
 
     }
 
