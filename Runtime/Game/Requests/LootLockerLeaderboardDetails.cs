@@ -81,8 +81,8 @@ namespace LootLocker.Requests
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public LootLockerLeaderboardRewardAssetDetails details { get; set; }
-        public string? asset_variation_id { get; set; }
-        public string? asset_rental_option_id { get; set; }
+        public string asset_variation_id { get; set; }
+        public string asset_rental_option_id { get; set; }
         public int asset_id { get; set; }
         public string reward_id { get; set; }
         public string asset_ulid { get; set; }
@@ -93,9 +93,9 @@ namespace LootLocker.Requests
     {
         public string name { get; set; }
 #nullable enable
-        public string? thumbnail { get; set; }
-        public string? variation_name { get; set; }
-        public string? rental_option_name { get; set; }
+        public string thumbnail { get; set; }
+        public string variation_name { get; set; }
+        public string rental_option_name { get; set; }
 #nullable disable
         public int? variation_id { get; set; }
         public int? rental_option_id { get; set; }
