@@ -5093,16 +5093,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SubmitScore(request, leaderboardKey, onComplete);
         }
         /// <summary>
-        /// List the leaderboard archive.
-        /// </summary>
-        /// <param name="leaderboard_id">ID of the Leaderboard</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardHistoryResponse</param>
-        public static void ListLeaderboardArchive(int leaderboard_id, Action<LootLockerLeaderboardHistoryResponse> onComplete)
-        {
-            ListLeaderboardArchive(leaderboard_id.ToString(), onComplete);
-        }
-        /// <summary>
-        /// List the leaderboard archive.
+        /// List the archived versions of a leaderboard, containing past rewards, ranks, etc.
         /// </summary>
         /// <param name="leaderboard_key">Key of the Leaderboard</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardHistoryResponse</param>
@@ -5113,8 +5104,57 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardHistoryResponse>());
                 return;
             }
-            LootLockerAPIManager.ListLeaderboardArchive(leaderboard_key, onComplete);
+
+            EndPointClass endPoint = LootLockerEndPoints.listLeaderboardArchive;
+            string tempEndpoint = string.Format(endPoint.endPoint, leaderboard_key);
+            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            GetLeaderboardArchive(key, -1, null, onComplete);
+        }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="count"> Amount of entries to read </param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            GetLeaderboardArchive(key, count, null, onComplete);
+        }
+        /// <summary>
+        /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
+        /// </summary>
+        /// <param name="key"> Key of the json archive to read</param>
+        /// <param name="count"> Amount of entries to read </param>
+        /// <param name="after"> Return after specified index </param>
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardHistoryDetailsResponse>());
+                return;
+            }
+            
+            EndPointClass endPoint = LootLockerEndPoints.getLeaderboardArchive;
+
+            string tempEndpoint = string.Format(endPoint.endPoint, key);
+
+            if (count > 0)
+                tempEndpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                tempEndpoint += $"after={after}&";
+
+
+            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));        }
 
         #endregion
 
