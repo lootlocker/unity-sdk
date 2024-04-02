@@ -5092,15 +5092,11 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.SubmitScore(request, leaderboardKey, onComplete);
         }
-        public static void GetLeaderboardData(int leaderboard_id, Action<LootLockerLeaderboardDetailResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>());
-                return;
-            }
-            GetLeaderboardData(leaderboard_id.ToString(), onComplete);
-        }
+        /// <summary>
+        /// Get data on a leaderboard, check rewards and when it will reset and the last reset time.
+        /// </summary>
+        /// <param name="leaderboard_key">Key of the leaderboard to get data from</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardDetailResponse</param>
         public static void GetLeaderboardData(string leaderboard_key, Action<LootLockerLeaderboardDetailResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -5108,7 +5104,10 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>());
                 return;
             }
-            LootLockerAPIManager.GetLeaderboardData(leaderboard_key, onComplete);
+            
+            EndPointClass endPoint = LootLockerEndPoints.getLeaderboardData;
+            string formatedEndPoint = string.Format(endPoint.endPoint, leaderboard_key);
+            LootLockerServerRequest.CallAPI(formatedEndPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
