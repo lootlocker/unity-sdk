@@ -32,10 +32,6 @@ namespace LootLocker.Requests
         /// </summary>
         public string type { get; set; }
         /// <summary>
-        /// The id of the Leaderboard.
-        /// </summary>
-        public int id { get; set; }
-        /// <summary>
         /// Will the score be overwritten even if it was less than the original score.
         /// </summary>
         public bool overwrite_score_on_submit { get; set; }
@@ -48,7 +44,7 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerLeaderboardSchedule schedule { get; set; }
         /// <summary>
-        /// List of rewards tied to the Leaderboard.
+        /// A List of rewards tied to the Leaderboard.
         /// </summary>
         public LootLockerLeaderboardReward[] rewards { get; set; }
     }
@@ -56,11 +52,11 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardCurrency
     {
         /// <summary>
-        /// The date the Leaderboard was created.
+        /// The date the Currency reward was created.
         /// </summary>
         public string created_at { get; set; }
         /// <summary>
-        /// The date the Leaderboard was last updated.
+        /// The date the Currency reward was last updated.
         /// </summary>
         public string updated_at { get; set; }
         /// <summary>
@@ -68,15 +64,15 @@ namespace LootLocker.Requests
         /// </summary>
         public string amount { get; set; }
         /// <summary>
-        /// Details on the Currency.
+        /// The details on the Currency.
         /// </summary>
         public LootLockerLeaderboardRewardCurrencyDetails details { get; set; }
         /// <summary>
-        /// ID of a reward.
+        /// The ID of a reward.
         /// </summary>
         public string reward_id { get; set; }
         /// <summary>
-        /// ID of the Currency.
+        /// The ID of the Currency.
         /// </summary>
         public string currency_id { get; set; }
     }
@@ -84,19 +80,19 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardCurrencyDetails
     {
         /// <summary>
-        /// Name of the Currency.
+        /// The name of the Currency.
         /// </summary>
         public string name { get; set; }
         /// <summary>
-        /// Code of the Currency.
+        /// The code of the Currency.
         /// </summary>
         public string code { get; set; }
         /// <summary>
-        /// Amount of the Currency.
+        /// The amount of the Currency.
         /// </summary>
         public string amount { get; set; }
         /// <summary>
-        /// ID of the Currency.
+        /// The ID of the Currency.
         /// </summary>
         public string id { get; set; }
     }
@@ -112,19 +108,19 @@ namespace LootLocker.Requests
         /// </summary>
         public string updated_at { get; set; }
         /// <summary>
-        /// Details of the Progression.
+        /// The details of the Progression.
         /// </summary>
         public LootLockerLeaderboardRewardProgressionDetails details { get; set; }
         /// <summary>
-        /// Amount of Progression Points to be rewarded.
+        /// The amount of Progression Points to be rewarded.
         /// </summary>
         public int amount { get; set; }
         /// <summary>
-        /// ID of the Progression.
+        /// The ID of the Progression.
         /// </summary>
         public string progression_id { get; set; }
         /// <summary>
-        /// ID of the reward.
+        /// The ID of the reward.
         /// </summary>
         public string reward_id { get; set; }
     }
@@ -132,19 +128,19 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardProgressionDetails
     {
         /// <summary>
-        /// Key of the Progression.
+        /// The key of the Progression.
         /// </summary>
         public string key { get; set; }
         /// <summary>
-        /// Name of the Progression.
+        /// The name of the Progression.
         /// </summary>
         public string name { get; set; }
         /// <summary>
-        /// Amount of Progression Points to be rewarded.
+        /// The amount of Progression Points to be rewarded.
         /// </summary>
         public int amount { get; set; }
         /// <summary>
-        /// ID of the Progression.
+        /// The ID of the Progression.
         /// </summary>
         public string id { get; set; }
     }
@@ -176,15 +172,15 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardProgressionResetDetails
     {
         /// <summary>
-        /// Key of the Progression.
+        /// The key of the Progression.
         /// </summary>
         public string key { get; set; }
         /// <summary>
-        /// Name of the Progression.
+        /// The name of the Progression.
         /// </summary>
         public string name { get; set; }
         /// <summary>
-        /// ID of the Progression.
+        /// The ID of the Progression.
         /// </summary>
         public string id { get; set; }
     }
@@ -292,15 +288,15 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardRewardPredicates
     {
         /// <summary>
-        /// ID of the reward predicate.
+        /// The ID of the reward predicate.
         /// </summary>
         public string id { get; set; }
         /// <summary>
-        /// Type of reward predicate.
+        /// The type of reward predicate.
         /// </summary>
         public string type { get; set; }
         /// <summary>
-        /// Details on predicate.
+        /// The details on predicate.
         /// </summary>
         public LootLockerLeaderboardRewardPredicatesArgs args { get; set; }
     }
