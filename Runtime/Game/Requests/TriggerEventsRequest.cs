@@ -54,7 +54,7 @@ namespace LootLocker.Requests
         public LootLockerFilter [] filters { get; set; }
         public LootLockerFile [] files { get; set; }
         public List<object> data_entities { get; set; }
-        public LootLockerHeroEquipExceptions hero_equip_exceptions { get; set; }
+        public LootLockerHeroEquipExceptions[] hero_equip_exceptions { get; set; }
         public object asset_candidate { get; set; }
         public int? drop_table_max_picks { get; set; }
     }
