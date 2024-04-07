@@ -57,6 +57,14 @@
     height: 40px;
 }
 
+.legacyApikey {
+    flex-direction: row;
+    width: 300px;
+    height: 40px;
+    background-color: #885555;
+    opacity: 0.5;
+}
+
 .clickable {
     cursor: link;
 }

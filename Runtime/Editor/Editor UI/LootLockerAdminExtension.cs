@@ -708,6 +708,7 @@ namespace LootLocker.Extension
         {
             Button button = new Button();
 
+            bool isLegacyKey = !(key.api_key.StartsWith("prod_") || key.api_key.StartsWith("dev_"));
             button.name = key.api_key;
 
             Label keyName = new Label();
@@ -721,7 +722,15 @@ namespace LootLocker.Extension
                 button.style.borderRightColor = button.style.borderLeftColor = button.style.borderTopColor = button.style.borderBottomColor = stage;
             }
 
-            button.AddToClassList("apikey");
+            if (isLegacyKey)
+            {
+                keyName.text = "Legacy key: " + keyName.text;
+                button.AddToClassList("legacyApikey");
+            }
+            else
+            {
+                button.AddToClassList("apikey");
+            }
 
 
             keyName.AddToClassList("apikeyName");
@@ -729,7 +738,10 @@ namespace LootLocker.Extension
 
             button.Add(keyName);
 
-            button.clickable.clickedWithEventInfo += OnAPIKeySelected;
+            if (!isLegacyKey)
+            {
+                button.clickable.clickedWithEventInfo += OnAPIKeySelected;
+            }
 
             apiKeyList.Add(button);
         }
