@@ -137,9 +137,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
-        /// <param name="ticket"></param>
-        /// <param name="ticketSize"></param>
-        /// <returns>A converted SteamSessionTicket as a string for use with StartSteamSession.</returns>
+        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
+        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
         public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
         {
             Array.Resize(ref ticket, (int)ticketSize);
@@ -325,6 +325,33 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="steamId64">Steam ID as a string</param>
+        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
+        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void VerifyPlayerAndStartSteamSession(string steamId64, ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
+        {
+            VerifySteamID(SteamSessionTicket(ref ticket, ticketSize), (LootLockerVerifyResponse verifyResponse) =>
+            {
+                if (!verifyResponse.success)
+                {
+                    onComplete?.Invoke(new LootLockerSessionResponse
+                    {
+                        success = verifyResponse.success,
+                        statusCode = verifyResponse.statusCode,
+                        errorData = verifyResponse.errorData,
+                        text = verifyResponse.text
+                    });
+                    return;
+                }
+                StartSteamSession(steamId64, onComplete);
+            });
+        }
+
+        /// <summary>
+        /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// Note: Steam requires that you verify the player using the VerifyPlayer method before starting a session
         /// </summary>
         /// <param name="steamId64">Steam ID ass a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
