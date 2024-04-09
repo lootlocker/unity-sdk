@@ -5124,12 +5124,12 @@ namespace LootLocker.Requests
         /// List the archived versions of a leaderboard, containing past rewards, ranks, etc.
         /// </summary>
         /// <param name="leaderboard_key">Key of the Leaderboard</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardHistoryResponse</param>
-        public static void ListLeaderboardArchive(string leaderboard_key, Action<LootLockerLeaderboardHistoryResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardArchiveResponse</param>
+        public static void ListLeaderboardArchive(string leaderboard_key, Action<LootLockerLeaderboardArchiveResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardHistoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveResponse>());
                 return;
             }
 
@@ -5142,8 +5142,8 @@ namespace LootLocker.Requests
         /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
         /// </summary>
         /// <param name="key"> Key of the json archive to read</param>
-        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
         {
             GetLeaderboardArchive(key, -1, null, onComplete);
         }
@@ -5153,24 +5153,24 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="key"> Key of the json archive to read</param>
         /// <param name="count"> Amount of entries to read </param>
-        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
         {
             GetLeaderboardArchive(key, count, null, onComplete);
         }
-        
+
         /// <summary>
         /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
         /// </summary>
         /// <param name="key"> Key of the json archive to read</param>
         /// <param name="count"> Amount of entries to read </param>
         /// <param name="after"> Return after specified index </param>
-        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardHistoryDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardHistoryDetailsResponse> onComplete)
+        /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
+        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardHistoryDetailsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveDetailsResponse>());
                 return;
             }
             
