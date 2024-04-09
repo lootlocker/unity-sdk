@@ -73,7 +73,7 @@ namespace LootLocker.Requests
         public string metadata { get; set; }
     }
 
-    public class LootLockerLeaderboardHistoryResponse : LootLockerResponse
+    public class LootLockerLeaderboardArchiveResponse : LootLockerResponse
     {
         /// <summary>
         /// A List of past Leaderboards.
@@ -100,7 +100,7 @@ namespace LootLocker.Requests
         /// </summary>
         public int content_length { get; set; }
     }
-    public class LootLockerLeaderboardHistoryDetailsResponse : LootLockerResponse
+    public class LootLockerLeaderboardArchiveDetailsResponse : LootLockerResponse
     {
         /// <summary>
         /// Pagination.
@@ -109,9 +109,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// A list of players and details from the archived Leaderboard.
         /// </summary>
-        public LootLockerLeaderboardHistoryDetails[] items { get; set; }
+        public LootLockerLeaderboardArchiveDetails[] items { get; set; }
     }
-    public class LootLockerLeaderboardHistoryDetails
+    public class LootLockerLeaderboardArchiveDetails
     {
         /// <summary>
         /// The Player on the archived Leaderboard.
