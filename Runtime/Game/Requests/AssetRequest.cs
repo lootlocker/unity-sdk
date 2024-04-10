@@ -201,8 +201,8 @@ namespace LootLocker.Requests
     {
         public int id { get; set; }
         public int asset_id { get; set; }
-        public int asset_variation_id { get; set; }
-        public int asset_rental_option_id { get; set; }
+        public int? asset_variation_id { get; set; }
+        public int? asset_rental_option_id { get; set; }
         public string asset_ulid { get; set; }
         public string acquisition_source { get; set; }
         public string acquisition_date { get; set; }
