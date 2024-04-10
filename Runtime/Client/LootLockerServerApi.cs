@@ -208,7 +208,7 @@ namespace LootLocker
             { "Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time" },
             { "Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS, HEAD" },
             { "Access-Control-Allow-Origin", "*" },
-            { "User-Instance-Identifier", System.Guid.NewGuid().ToString() }
+            { "LL-Instance-Identifier", System.Guid.NewGuid().ToString() }
         };
 
         private void RefreshTokenAndCompleteCall(LootLockerServerRequest cachedRequest, Action<LootLockerResponse> onComplete)
@@ -440,7 +440,7 @@ namespace LootLocker
 
             if (!string.IsNullOrEmpty(LootLockerConfig.current?.sdk_version))
             {
-                webRequest.SetRequestHeader("SDK-Version", LootLockerConfig.current.sdk_version);
+                webRequest.SetRequestHeader("LL-SDK-Version", LootLockerConfig.current.sdk_version);
             }
 
             if (request.extraHeaders != null)
