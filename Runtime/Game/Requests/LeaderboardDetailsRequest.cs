@@ -202,11 +202,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The Asset variation ID, will be null if its not a variation.
         /// </summary>
-        public int asset_variation_id { get; set; }
+        public int? asset_variation_id { get; set; }
         /// <summary>
         /// The Asset rental option ID, will be null if its not a rental.
         /// </summary>
-        public int asset_rental_option_id { get; set; }
+        public int? asset_rental_option_id { get; set; }
         /// <summary>
         /// The ID of the Asset.
         /// </summary>
