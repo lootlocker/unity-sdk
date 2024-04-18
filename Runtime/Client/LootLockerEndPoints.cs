@@ -281,5 +281,8 @@ namespace LootLocker
         public static EndPointClass reportsCreatePlayer = new EndPointClass("reports/player", LootLockerHTTPMethod.POST);
         public static EndPointClass reportsCreateAsset = new EndPointClass("reports/asset", LootLockerHTTPMethod.POST);
 
+        // Entitlements
+        [Header("Entitlements")]
+        public static EndPointClass listEntitlementHistory = new EndPointClass("entitlements", LootLockerHTTPMethod.GET);
     }
 }

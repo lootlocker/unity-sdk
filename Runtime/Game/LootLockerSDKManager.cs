@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #else
 using LLlibs.ZeroDepJson;
+using Ionic.Zlib;
+using System.Net;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
@@ -5537,6 +5539,67 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Entitlements
+        /// <summary>
+        /// List this player's historical entitlements
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="count">Optional: Amount of historical entries to fetch</param>
+        /// <param name="after">Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListEntitlements(int count, string after, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEntitlementHistoryResponse>());
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.listEntitlementHistory.endPoint;
+
+            if(count > 0 || !string.IsNullOrEmpty(after)) 
+                endpoint += endpoint.Contains("?") ? "&" : "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List this player's historical entitlements
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="count">Optional: Amount of historical entries to fetch</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListEntitlements(int count, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        {
+            ListEntitlements(count, null, onComplete);
+        }
+
+        /// <summary>
+        /// List this player's historical entitlements
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="after">Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListEntitlements(string after, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        {
+            ListEntitlements(-1, after, onComplete);
+        }
+
+        /// <summary>
+        /// List this player's historical entitlements
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListEntitlements(Action<LootLockerEntitlementHistoryResponse> onComplete)
+        {
+            ListEntitlements(-1, null, onComplete);
+        }
+        #endregion
+
         #region Misc
 
         /// <summary>
@@ -5572,13 +5635,5 @@ namespace LootLocker.Requests
 
 
         #endregion
-    }
-
-    public class ResponseError
-    {
-        public bool success { get; set; }
-        public string error { get; set; }
-        public string[] messages { get; set; }
-        public string error_id { get; set; }
     }
 }
