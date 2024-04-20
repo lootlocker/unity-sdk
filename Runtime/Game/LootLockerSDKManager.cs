@@ -5560,9 +5560,9 @@ namespace LootLocker.Requests
             if(count > 0 || !string.IsNullOrEmpty(after)) 
                 endpoint += endpoint.Contains("?") ? "&" : "?";
             if (count > 0)
-                endpoint += $"count={count}&";
+                endpoint += $"per_page={count}&";
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                endpoint += $"cursor={after}&";
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
