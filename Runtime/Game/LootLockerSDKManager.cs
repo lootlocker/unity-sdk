@@ -11,8 +11,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #else
 using LLlibs.ZeroDepJson;
-using Ionic.Zlib;
-using System.Net;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
