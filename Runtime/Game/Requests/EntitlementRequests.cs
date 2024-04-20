@@ -120,36 +120,16 @@ namespace LootLocker.Requests
         public string Id { get; set; }
     }
 
-    //==================================================
-    // Response Definitions
-    //==================================================
-
-    /// <summary>
-    /// </summary>
-    public class LootLockerEntitlementHistoryResponse : LootLockerResponse
-    {
-
-        /// <summary>
-        /// List of entitlement history entries
-        /// </summary>
-        public LootLockerEntitlementListing[] Listings { get; set; }
-
-        /// <summary>
-        /// Pagination data to use for subsequent requests
-        /// </summary>
-        public LootLockerPaginationResponse<string> Pagination { get; set; }
-    }
-    
     /// <summary>
     /// </summary>
     public class LootLockerEntitlementListing
     {
-        
+
         /// <summary>
         /// When this entitlement listing was created
         /// </summary>
         public string Created_at { get; set; }
-        
+
         /// <summary>
         /// The unique identifier of this entitlement listing
         /// </summary>
@@ -185,5 +165,25 @@ namespace LootLocker.Requests
         /// Which type this entitlement listing is
         /// </summary>
         public LootLockerEntitlementHistoryListingType Type { get; set; } = LootLockerEntitlementHistoryListingType.Undefined;
+    }
+
+    //==================================================
+    // Response Definitions
+    //==================================================
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerEntitlementHistoryResponse : LootLockerResponse
+    {
+
+        /// <summary>
+        /// List of entitlement history entries
+        /// </summary>
+        public LootLockerEntitlementListing[] Listings { get; set; }
+
+        /// <summary>
+        /// Pagination data to use for subsequent requests
+        /// </summary>
+        public LootLockerPaginationResponse<string> Pagination { get; set; }
     }
 }
