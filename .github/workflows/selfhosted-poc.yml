@@ -16,7 +16,7 @@ jobs:
         with:
           oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
-          tags: tag:unitysdk-ci
+          tags: tag:ci
       #- name: Setup git
       #  run: |
       #    apt update
