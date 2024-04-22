@@ -1,25 +1,32 @@
-name: Selfhosted Runner Proof of Concept
-run-name: selfhosted-poc
+name: Tailscale Connected Runner Proof of Concept
+run-name: tailscale-poc
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - ci/*
 
 jobs:
   ping-stage-test:
     name: Ping stage backend
-    runs-on: [k8s]
-    container:
-      image: ubuntu:22.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Setup git
-        run: |
-          apt update
-          apt-get install -y git
-          git config --global --add safe.directory /__w/unity-sdk/unity-sdk
-          
-      - name: Setup curl
-        run: |
-          apt update
-          apt-get install -y curl
+      - name: Setup tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:unitysdk-ci
+      #- name: Setup git
+      #  run: |
+      #    apt update
+      #    apt-get install -y git
+      #    git config --global --add safe.directory /__w/unity-sdk/unity-sdk
+      #    
+      #- name: Setup curl
+      #  run: |
+      #    apt update
+      #    apt-get install -y curl
 
       - name: Checkout this repository
         uses: actions/checkout@v3
