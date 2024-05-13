@@ -19,6 +19,7 @@ namespace LootLocker.Requests
         public int id { get; set; }
         public string public_uid { get; set; }
         public string name { get; set; }
+        public string ulid { get; set; }
     }
 
 
