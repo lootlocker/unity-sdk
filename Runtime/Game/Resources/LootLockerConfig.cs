@@ -40,9 +40,10 @@ namespace LootLocker
         {
             if (settingsInstance != null)
             {
+#if UNITY_EDITOR
                 if (string.IsNullOrEmpty(settingsInstance.apiKey))
                 {
-                    string filePath = "Assets/LootLockerSDK/Resources/Config/Editor/DiskLootLockerConfig.txt";
+                    string filePath = "Assets/LootLockerSDK/Resources/Config/Editor/PersistedLootLockerConfig.txt";
 
                     if (File.Exists(filePath) && EditorPrefs.GetBool("LootLocker.HasWrittenConfigFirstTime", false))
                     {
@@ -51,6 +52,7 @@ namespace LootLocker
                         settingsInstance.deviceID = File.ReadLines(filePath).ElementAt(2);
                     }
                 }
+#endif
                 settingsInstance.ConstructUrls();
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
                 settingsInstance.CheckForSettingOverrides();
@@ -90,7 +92,7 @@ namespace LootLocker
                 if (!Directory.Exists(diskConfigPath))
                 {
                     Directory.CreateDirectory(diskConfigPath);
-                    File.Create(diskConfigPath + "DiskLootLockerConfig.txt").Close();
+                    File.Create(diskConfigPath + "PersistedLootLockerConfig.txt").Close();
                 }
             }
 
@@ -152,12 +154,12 @@ namespace LootLocker
                 EditorPrefs.SetBool(configFileEditorPref, true);
             }
         }
-
+#if UNITY_EDITOR
         static void WriteConfigToDisk()
         {
             //Check for an already existing persistent config file
             string fileDirectory = "Assets/LootLockerSDK/Resources/Config/Editor/";
-            string filePath = fileDirectory + "DiskLootLockerConfig.txt";
+            string filePath = fileDirectory + "PersistedLootLockerConfig.txt";
    
             if(!Directory.Exists(fileDirectory))
             {
@@ -214,6 +216,7 @@ namespace LootLocker
                 EditorPrefs.SetBool("LootLocker.HasWrittenDiskFirstTime", true);
             }
         }
+#endif
 
         protected static ListRequest ListInstalledPackagesRequest;
 
