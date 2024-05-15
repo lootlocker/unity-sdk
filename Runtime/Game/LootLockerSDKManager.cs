@@ -119,7 +119,27 @@ namespace LootLocker.Requests
 
         #region Authentication
         /// <summary>
-        /// Verify the player's steam identity with the server. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// Verify the player's steam identity with the server for the specified steam app id.
+        ///
+        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
+        /// <param name="steamAppId">The steam app id to verify this player for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
+        public static void VerifySteamID(string steamSessionTicket, int steamAppId, Action<LootLockerVerifyResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
+                return;
+            }
+            LootLockerAPIManager.VerifyWithAppId(steamSessionTicket, steamAppId, onComplete);
+        }
+
+        /// <summary>
+        /// Verify the player's steam identity with the server.
+        ///
+        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
