@@ -1,10 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.PackageManager.UI;
+using LootLocker.Admin;
+using System.Text.RegularExpressions;
 #endif
 using UnityEngine;
 
@@ -12,25 +16,54 @@ namespace LootLocker
 {
 
     public class LootLockerConfig : ScriptableObject
+
     {
 
         private static LootLockerConfig settingsInstance;
 
         public virtual string SettingName { get { return "LootLockerConfig"; } }
 
+#if UNITY_EDITOR
+        private void OnEnable()
+        {
+            ProjectSettings.APIKeyEnteredEvent += WriteConfigToDisk;
+            ProjectSettings.DomainKeyEnteredEvent += WriteConfigToDisk;
+        }
+
+        private void OnDisable()
+        {
+            ProjectSettings.APIKeyEnteredEvent -= WriteConfigToDisk;
+            ProjectSettings.DomainKeyEnteredEvent -= WriteConfigToDisk;
+        }
+#endif
         public static LootLockerConfig Get()
         {
             if (settingsInstance != null)
             {
+#if UNITY_EDITOR
+                if (string.IsNullOrEmpty(settingsInstance.apiKey))
+                {
+                    string filePath = "Assets/LootLockerSDK/Resources/Config/Editor/PersistedLootLockerConfig.txt";
+
+                    if (File.Exists(filePath) && EditorPrefs.GetBool("LootLocker.HasWrittenConfigFirstTime", false))
+                    {
+                        settingsInstance.apiKey = File.ReadLines(filePath).ElementAt(0);
+                        settingsInstance.domainKey = File.ReadLines(filePath).ElementAt(1); //Gets domainkey
+                        settingsInstance.deviceID = File.ReadLines(filePath).ElementAt(2);
+                    }
+                }
+#endif
                 settingsInstance.ConstructUrls();
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
                 settingsInstance.CheckForSettingOverrides();
 #endif
+
                 return settingsInstance;
             }
 
             //Try to load it
             settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
+
 
 #if UNITY_EDITOR
             // Could not be loaded, create it
@@ -40,7 +73,7 @@ namespace LootLocker
                 LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
 
                 // Folder needs to exist for Unity to be able to create an asset in it
-                string dir = Application.dataPath+ "/LootLockerSDK/Resources/Config";
+                string dir = Application.dataPath + "/LootLockerSDK/Resources/Config";
 
                 // If directory does not exist, create it
                 if (!Directory.Exists(dir))
@@ -54,6 +87,13 @@ namespace LootLocker
                 EditorApplication.delayCall += AssetDatabase.SaveAssets;
                 AssetDatabase.Refresh();
                 settingsInstance = newConfig;
+
+                string diskConfigPath = "Asset/LootLockerSDK/Resources/Config/Editor/";
+                if (!Directory.Exists(diskConfigPath))
+                {
+                    Directory.CreateDirectory(diskConfigPath);
+                    File.Create(diskConfigPath + "PersistedLootLockerConfig.txt").Close();
+                }
             }
 
 #else
@@ -100,7 +140,6 @@ namespace LootLocker
         [InitializeOnLoadMethod]
         static void CreateConfigFile()
         {
-
             // Get the path to the project directory
             string projectPath = Application.dataPath;
 
@@ -115,6 +154,69 @@ namespace LootLocker
                 EditorPrefs.SetBool(configFileEditorPref, true);
             }
         }
+#if UNITY_EDITOR
+        static void WriteConfigToDisk()
+        {
+            //Check for an already existing persistent config file
+            string fileDirectory = "Assets/LootLockerSDK/Resources/Config/Editor/";
+            string filePath = fileDirectory + "PersistedLootLockerConfig.txt";
+   
+            if(!Directory.Exists(fileDirectory))
+            {
+                Directory.CreateDirectory(fileDirectory);
+                File.Create(filePath).Close();
+            } 
+            else if(!File.Exists(filePath))
+            {
+                File.Create(filePath).Close();
+
+            }
+
+            var tempConfig = Get();
+
+            List<string> config = new List<string>();
+
+            if (!string.IsNullOrEmpty(tempConfig.apiKey))
+            {
+                config.Add(tempConfig.apiKey);
+            }
+
+            if (!string.IsNullOrEmpty(tempConfig.domainKey))
+            {
+                string pattern = @"(?<=https://)\w+(?=\.api\.lootlocker\.io/)";
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(tempConfig.domainKey);
+
+                if (match.Success)
+                {
+                    string domainkey = match.Value;
+                    Debug.LogWarning("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + domainkey);
+                    tempConfig.domainKey = domainkey;
+                    config.Add(domainkey);
+                }
+                else
+                {
+                    config.Add(tempConfig.domainKey);
+                }
+            } 
+            if(!string.IsNullOrEmpty(tempConfig.deviceID))
+            {
+                config.Add(tempConfig.deviceID);
+            }
+
+            if (config.Count > 1)
+            {
+                using(StreamWriter sw = new StreamWriter(filePath))
+                {
+                    foreach (var s in config)
+                    {
+                        sw.WriteLine(s);
+                    }
+                }
+                EditorPrefs.SetBool("LootLocker.HasWrittenDiskFirstTime", true);
+            }
+        }
+#endif
 
         protected static ListRequest ListInstalledPackagesRequest;
 
@@ -267,6 +369,7 @@ namespace LootLocker
         {
             _current = null;
         }
+
 #endif
     }
 }

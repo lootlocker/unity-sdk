@@ -68,6 +68,7 @@ namespace LootLocker.Requests
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
+                LootLockerConfig.Get(); 
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
                 return false;
             }

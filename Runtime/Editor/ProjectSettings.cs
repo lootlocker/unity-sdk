@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -9,11 +10,13 @@ namespace LootLocker.Admin
 {
     public class ProjectSettings : SettingsProvider
     {
+
         private static LootLockerConfig gameSettings;
         private SerializedObject m_CustomSettings;
 
         public delegate void SendAttributionDelegate();
         public static event SendAttributionDelegate APIKeyEnteredEvent;
+        public static event SendAttributionDelegate DomainKeyEnteredEvent;
         internal static SerializedObject GetSerializedSettings()
         {
             if (gameSettings == null)
@@ -78,6 +81,7 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue;
+                APIKeyEnteredEvent?.Invoke();
             }
 
             var content = new GUIContent();
@@ -91,6 +95,8 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.domainKey = m_CustomSettings.FindProperty("domainKey").stringValue;
+                DomainKeyEnteredEvent?.Invoke();
+                m_CustomSettings.FindProperty("domainKey").stringValue = gameSettings.domainKey;
             }
             var domainContent = new GUIContent();
             domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
