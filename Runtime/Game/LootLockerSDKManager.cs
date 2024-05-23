@@ -5617,16 +5617,21 @@ namespace LootLocker.Requests
             ListEntitlements(-1, null, onComplete);
         }
 
-        public static void GetSingleEntitlementHistory(string entitlementId, Action<LootLockerSingleEntitlementHistoryResponse> onComplete)
+        /// <summary>
+        /// Get a single entitlement
+        /// </summary>
+        /// <param name="entitlementId"></param>
+        /// <param name="onComplete"></param>
+        public static void GetSingleEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementHistoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementResponse>());
                 return;
             }
             
-            var endpoint = string.Format(LootLockerEndPoints.getSingleEntitlementHistory.endPoint, entitlementId);
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var endpoint = string.Format(LootLockerEndPoints.getSingleEntitlement.endPoint, entitlementId);
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
