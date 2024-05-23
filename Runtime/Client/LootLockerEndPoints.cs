@@ -284,5 +284,7 @@ namespace LootLocker
         // Entitlements
         [Header("Entitlements")]
         public static EndPointClass listEntitlementHistory = new EndPointClass("entitlements", LootLockerHTTPMethod.GET);
+        public static EndPointClass getSingleEntitlementHistory = new EndPointClass("entitlements/{0}", LootLockerHTTPMethod.GET);
+
     }
 }
