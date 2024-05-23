@@ -186,4 +186,73 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerPaginationResponse<string> Pagination { get; set; }
     }
+
+    /// <summary>
+    /// Response body of the entitlement history of a single entitlement id
+    /// </summary>
+    public class LootLockerSingleEntitlementHistoryResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// When this entitlement listing was created
+        /// </summary>
+        public string created_at { get; set; }
+        /// <summary>
+        /// The type this entitlement is example is a one time purchase
+        /// </summary>
+        public string type { get; set; }
+        /// <summary>
+        /// The status of the entitlement, (pending, active, canceled)
+        /// </summary>
+        public string status { get; set; }
+        /// <summary>
+        /// The store connected to the entitlement
+        /// </summary>
+        public string store { get; set; }
+        /// <summary>
+        /// An array of the items connected to this entitlement
+        /// </summary>
+        public LootLockerSingleEntitlementItem[] items { get; set; }
+        /// <summary>
+        /// Metadata of the entitlement
+        /// </summary>
+        public MetadataEntry[] metadata { get; set; }
+
+    }
+
+    public class MetadataEntry
+    {
+        public string key { get; set; }
+        public string value { get; set; }
+    }
+    /// <summary>
+    /// Details of the entitlement item
+    /// </summary>
+    public class LootLockerSingleEntitlementItem
+    {
+        /// <summary>
+        /// When this entitlement item listing was created
+        /// </summary>
+        public string created_at { get; set; }
+        /// <summary>
+        /// What type of reward (currency, asset, progression points, progression reset, etc.)
+        /// </summary>
+        public string reward_kind { get; set; }
+        /// <summary>
+        /// The id of the entitlement item
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The reward id of the entitlement item
+        /// </summary>
+        public string reward_id { get; set; }
+        /// <summary>
+        /// The id of the catalog which contains the item
+        /// </summary>
+        public string catalog_id { get; set; }
+        /// <summary>
+        /// If the item is purchasable
+        /// </summary>
+        public bool purchasable { get; set; }
+    }
+
 }
