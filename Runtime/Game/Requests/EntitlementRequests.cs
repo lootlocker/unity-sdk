@@ -188,9 +188,9 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
-    /// Response body of the entitlement history of a single entitlement id
+    /// Response body of a single entitlement, which contains status and more information
     /// </summary>
-    public class LootLockerSingleEntitlementHistoryResponse : LootLockerResponse
+    public class LootLockerSingleEntitlementResponse : LootLockerResponse
     {
         /// <summary>
         /// When this entitlement listing was created
