@@ -195,64 +195,27 @@ namespace LootLocker.Requests
         /// <summary>
         /// When this entitlement listing was created
         /// </summary>
-        public string created_at { get; set; }
+        public string Created_at { get; set; }
         /// <summary>
         /// The type this entitlement is example is a one time purchase
         /// </summary>
-        public string type { get; set; }
+        public LootLockerEntitlementHistoryListingType Type { get; set; } = LootLockerEntitlementHistoryListingType.Undefined;
         /// <summary>
         /// The status of the entitlement, (pending, active, canceled)
         /// </summary>
-        public string status { get; set; }
+        public LootLockerEntitlementHistoryListingStatus Status { get; set; } = LootLockerEntitlementHistoryListingStatus.None;
         /// <summary>
         /// The store connected to the entitlement
         /// </summary>
-        public string store { get; set; }
+        public LootLockerEntitlementHistoryListingStore Store { get; set; } = LootLockerEntitlementHistoryListingStore.None;
         /// <summary>
         /// An array of the items connected to this entitlement
         /// </summary>
-        public LootLockerSingleEntitlementItem[] items { get; set; }
+        public LootLockerEntitlementHistoryItem[] Items { get; set; }
         /// <summary>
         /// Metadata of the entitlement
         /// </summary>
-        public MetadataEntry[] metadata { get; set; }
+        public LootLockerEntitlementHistoryMetadata[] Metadata { get; set; }
 
     }
-
-    public class MetadataEntry
-    {
-        public string key { get; set; }
-        public string value { get; set; }
-    }
-    /// <summary>
-    /// Details of the entitlement item
-    /// </summary>
-    public class LootLockerSingleEntitlementItem
-    {
-        /// <summary>
-        /// When this entitlement item listing was created
-        /// </summary>
-        public string created_at { get; set; }
-        /// <summary>
-        /// What type of reward (currency, asset, progression points, progression reset, etc.)
-        /// </summary>
-        public string reward_kind { get; set; }
-        /// <summary>
-        /// The id of the entitlement item
-        /// </summary>
-        public string id { get; set; }
-        /// <summary>
-        /// The reward id of the entitlement item
-        /// </summary>
-        public string reward_id { get; set; }
-        /// <summary>
-        /// The id of the catalog which contains the item
-        /// </summary>
-        public string catalog_id { get; set; }
-        /// <summary>
-        /// If the item is purchasable
-        /// </summary>
-        public bool purchasable { get; set; }
-    }
-
 }

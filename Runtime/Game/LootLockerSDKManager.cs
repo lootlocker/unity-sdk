@@ -5618,11 +5618,12 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get a single entitlement
+        /// Get a single entitlement, with information about its current status
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
         /// </summary>
         /// <param name="entitlementId"></param>
         /// <param name="onComplete"></param>
-        public static void GetSingleEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete)
+        public static void GetEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete)
         {
             if (!CheckInitialized())
             {
