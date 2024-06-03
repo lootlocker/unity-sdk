@@ -91,6 +91,26 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.domainKey = m_CustomSettings.FindProperty("domainKey").stringValue;
+
+                string domainkey = m_CustomSettings.FindProperty("domainKey").stringValue;
+
+                string pattern = @"(?<=https://)\w+(?=\.api\.lootlocker\.io/)";
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(domainkey);
+
+                if (match.Success)
+                {
+                    string regexKey = match.Value;
+                    Debug.LogWarning("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + regexKey);
+                    gameSettings.domainKey = regexKey;
+                    m_CustomSettings.FindProperty("domainKey").stringValue = regexKey;
+                }
+                else
+                {
+                    gameSettings.domainKey = domainkey;
+                    m_CustomSettings.FindProperty("domainKey").stringValue = domainkey;
+                }
+
             }
             var domainContent = new GUIContent();
             domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
