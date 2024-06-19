@@ -239,6 +239,16 @@ namespace LootLocker
                 return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode, text = serverResponse.text };
             }
 
+            /*
+             * Turborilla:
+             * Patched based on conversation with LootLocker. I suspect that some users are getting login pages for wifi or something else instead of the intended response from LootLocker servers.
+             * We have similar checks in our other projects.
+             */
+            if (serverResponse.text.StartsWith("<"))
+            {
+                LootLockerLogger.GetForLogLevel()("JSON Starts with <, info: \n    statusCode: " + serverResponse.statusCode + "\n    body: " + serverResponse.text);
+                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode };
+            }
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
 
             response.text = serverResponse.text;
