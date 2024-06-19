@@ -1,0 +1,34 @@
+name: Integration Tests
+run-name: Run Integration Test for commit ${{ github.sha }}
+on:
+  push:
+    branches:
+      - ci/*
+  workflow_dispatch: {}
+
+jobs:
+  ping-environment:
+    name: Ping the configured environment
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v2
+      - name: Configure variables
+        run: |
+          if [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" >> $GITHUB_ENV; fi
+          if [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_API_KEY=${{ SECRETS.INTEGRATION_TESTS_STAGE_API_KEY }}" >> $GITHUB_ENV; else echo "LOOTLOCKER_API_KEY=${{ SECRETS.INTEGRATION_TESTS_PRODUCTION_API_KEY }}" >> $GITHUB_ENV; fi
+          if [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_DOMAIN_KEY=${{ SECRETS.INTEGRATION_TESTS_STAGE_DOMAIN_KEY }}" >> $GITHUB_ENV; else echo "LOOTLOCKER_DOMAIN_KEY=${{ SECRETS.INTEGRATION_TESTS_PRODUCTION_DOMAIN_KEY }}" >> $GITHUB_ENV; fi
+          if [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; fi
+          git log -1 --pretty=format:"%s"
+      - name: Setup Tailscale
+        if: ${{ vars.LL_USE_STAGE == 'true' }}
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Login as guest in ${{ ENV.TARGET_ENVIRONMENT }} environment
+        run: |
+          curl -X POST "${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"${{ ENV.LOOTLOCKER_API_KEY }}\", \"game_version\": \"0.10.0.0\" }"
