@@ -186,4 +186,36 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerPaginationResponse<string> Pagination { get; set; }
     }
+
+    /// <summary>
+    /// Response body of a single entitlement, which contains status and more information
+    /// </summary>
+    public class LootLockerSingleEntitlementResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// When this entitlement listing was created
+        /// </summary>
+        public string Created_at { get; set; }
+        /// <summary>
+        /// The type this entitlement is example is a one time purchase
+        /// </summary>
+        public LootLockerEntitlementHistoryListingType Type { get; set; } = LootLockerEntitlementHistoryListingType.Undefined;
+        /// <summary>
+        /// The status of the entitlement, (pending, active, canceled)
+        /// </summary>
+        public LootLockerEntitlementHistoryListingStatus Status { get; set; } = LootLockerEntitlementHistoryListingStatus.None;
+        /// <summary>
+        /// The store connected to the entitlement
+        /// </summary>
+        public LootLockerEntitlementHistoryListingStore Store { get; set; } = LootLockerEntitlementHistoryListingStore.None;
+        /// <summary>
+        /// An array of the items connected to this entitlement
+        /// </summary>
+        public LootLockerEntitlementHistoryItem[] Items { get; set; }
+        /// <summary>
+        /// Metadata of the entitlement
+        /// </summary>
+        public LootLockerEntitlementHistoryMetadata[] Metadata { get; set; }
+
+    }
 }

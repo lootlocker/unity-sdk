@@ -5616,6 +5616,25 @@ namespace LootLocker.Requests
         {
             ListEntitlements(-1, null, onComplete);
         }
+
+        /// <summary>
+        /// Get a single entitlement, with information about its current status
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="entitlementId"></param>
+        /// <param name="onComplete"></param>
+        public static void GetEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementResponse>());
+                return;
+            }
+            
+            var endpoint = string.Format(LootLockerEndPoints.getSingleEntitlement.endPoint, entitlementId);
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         #endregion
 
         #region Misc

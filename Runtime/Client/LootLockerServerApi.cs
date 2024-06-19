@@ -131,8 +131,18 @@ namespace LootLocker
                         text = webRequest.downloadHandler.text
                     };
 
-                    response.errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
-
+                    try 
+                    {
+                        response.errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(webRequest.downloadHandler.text);
+                    }
+                    catch (Exception)
+                    {
+                        if (webRequest.downloadHandler.text.StartsWith("<"))
+                        {
+                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("JSON Starts with <, info: \n    statusCode: " + response.statusCode + "\n    body: " + response.text);
+                        }
+                        response.errorData = null;
+                    }
                     // Error data was not parseable, populate with what we know
                     if (response.errorData == null)
                     {
@@ -332,7 +342,7 @@ namespace LootLocker
         private static bool ShouldRefreshUsingRefreshToken(LootLockerServerRequest cachedRequest)
         {
             // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
-            return !cachedRequest.jsonPayload.Contains("refresh_token") && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
+            return (string.IsNullOrEmpty(cachedRequest.jsonPayload) || !cachedRequest.jsonPayload.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
         }
 
         private void CompleteCall(LootLockerServerRequest cachedRequest, LootLockerSessionResponse sessionRefreshResponse, Action<LootLockerResponse> onComplete)
@@ -480,4 +490,3 @@ namespace LootLocker
 #endregion
     }
 }
-
