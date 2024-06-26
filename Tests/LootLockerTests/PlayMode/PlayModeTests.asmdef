@@ -1,10 +1,11 @@
 {
-    "name": "PlayModeTests",
+    "name": "LootLockerTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "LootLockerTestUtils"
+        "LootLockerTestUtils",
+        "lootlocker.lootlockersdk.runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -44,7 +44,7 @@ jobs:
       - name: Set SDK path in test repo
         run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
       - name: Cache Libraries
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: tests~/Library
           key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace LootLockerTestConfigurationUtils
 {
-    public class ApiKeyUtil
+    public class ApiKey
     {
         public class CreateApiKeyRequest
         {
@@ -19,7 +19,7 @@ namespace LootLockerTestConfigurationUtils
 
         public static void CreateKey(string keyName, int gameId, Action<CreateApiKeyResponse> onComplete)
         {
-            if (!string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+            if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
                 // Not signed in
                 onComplete?.Invoke(new CreateApiKeyResponse { success = false, errorData = new LootLockerErrorData{message = "Not logged in"}});

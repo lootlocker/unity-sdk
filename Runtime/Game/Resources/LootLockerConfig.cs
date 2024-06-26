@@ -7,6 +7,7 @@ using UnityEditor.PackageManager.Requests;
 using UnityEditor.PackageManager.UI;
 #endif
 using UnityEngine;
+using static LootLocker.LootLockerConfig;
 
 namespace LootLocker
 {
@@ -22,10 +23,10 @@ namespace LootLocker
         {
             if (settingsInstance != null)
             {
-                settingsInstance.ConstructUrls();
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
                 settingsInstance.CheckForSettingOverrides();
 #endif
+                settingsInstance.ConstructUrls();
                 return settingsInstance;
             }
 
@@ -62,10 +63,10 @@ namespace LootLocker
                 throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
             }
 #endif
-            settingsInstance.ConstructUrls();
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             settingsInstance.CheckForSettingOverrides();
 #endif
+            settingsInstance.ConstructUrls();
             return settingsInstance;
         }
 
@@ -73,26 +74,21 @@ namespace LootLocker
         {
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             string[] args = System.Environment.GetCommandLineArgs();
-            string _apiKey = null;
-            string _domainKey = null;
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-apikey")
                 {
-                    _apiKey = args[i + 1];
+                    apiKey = args[i + 1];
                 }
                 else if (args[i] == "-domainkey")
                 {
-                    _domainKey = args[i + 1];
+                    domainKey = args[i + 1];
+                }
+                else if (args[i] == "-lootlockerurl")
+                {
+                    UrlCoreOverride = args[i + 1];
                 }
             }
-
-            if (string.IsNullOrEmpty(_apiKey) || string.IsNullOrEmpty(_domainKey))
-            {
-                return;
-            }
-            apiKey = _apiKey;
-            domainKey = _domainKey;
 #endif
         }
 
@@ -184,7 +180,30 @@ namespace LootLocker
             _current.currentDebugLevel = debugLevel;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
+            _current.token = null;
+            _current.adminToken = null;
+            _current.refreshToken = null;
+            _current.gameID = 0;
+            _current.deviceID = null;
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+            _current.CheckForSettingOverrides();
+#endif
             _current.ConstructUrls();
+            return true;
+        }
+
+        public static bool ClearSettings()
+        {
+            _current.apiKey = null;
+            _current.game_version = null;
+            _current.currentDebugLevel = DebugLevel.All;
+            _current.allowTokenRefresh = true;
+            _current.domainKey = null;
+            _current.token = null;
+            _current.adminToken = null;
+            _current.refreshToken = null;
+            _current.gameID = 0;
+            _current.deviceID = null;
             return true;
         }
 
@@ -222,7 +241,7 @@ namespace LootLocker
         public string token;
 #if UNITY_EDITOR
         [HideInInspector]
-        public string adminToken;
+        public string adminToken = null;
 #endif
         [HideInInspector]
         public string refreshToken;
@@ -238,7 +257,7 @@ namespace LootLocker
 
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.io";
-        [HideInInspector] private static readonly string UrlCoreOverride =
+        [HideInInspector] private static string UrlCoreOverride =
 #if LOOTLOCKER_TARGET_STAGE_ENV
            "api.stage.internal.dev.lootlocker.cloud";
 #else
