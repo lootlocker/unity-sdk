@@ -267,7 +267,7 @@ namespace LootLocker
 
         public static bool IsTargetingProductionEnvironment()
         {
-            return string.IsNullOrEmpty(UrlCoreOverride);
+            return string.IsNullOrEmpty(UrlCoreOverride) || UrlCoreOverride.Equals(UrlCore);
 
         }
         [HideInInspector] private static readonly string UrlAppendage = "/v1";

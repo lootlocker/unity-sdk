@@ -14,6 +14,7 @@ jobs:
   ping-environment:
     name: Ping the configured environment
     runs-on: ubuntu-latest
+    if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'false' }}
     strategy:
       fail-fast: false
     steps:
