@@ -14,6 +14,7 @@ namespace LootLockerTests.PlayMode
         private LootLockerTestGame gameUnderTest = null;
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
+        private static readonly string TestClassName = "PingTest";
         private bool SetupFailed = false;
 
         [UnitySetUp]
@@ -28,7 +29,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "PingTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: TestClassName + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {

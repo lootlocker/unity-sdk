@@ -264,6 +264,12 @@ namespace LootLocker
             null;
 #endif
         private static string GetUrlCore() { return string.IsNullOrEmpty(UrlCoreOverride) ? UrlCore : UrlCoreOverride; }
+
+        public static bool IsTargetingProductionEnvironment()
+        {
+            return string.IsNullOrEmpty(UrlCoreOverride);
+
+        }
         [HideInInspector] private static readonly string UrlAppendage = "/v1";
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";

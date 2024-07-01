@@ -75,6 +75,16 @@ jobs:
           echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
           mkdir TestProject/Assets/
           cp -r sdk/Samples~/LootLockerExamples TestProject/Assets/
+      - name: Setup Tailscale
+        if: ${{ ENV.USE_TAILSCALE  == 'true' }}
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        run: |
+          curl -X POST "https://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
       - name: Set the project to use zerodep json
         if: ${{ matrix.jsonLibrary == 'zerodep' }}
         run: |
@@ -85,16 +95,10 @@ jobs:
         run: |
           mkdir TestProject/ProjectSettings
           echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_USE_NEWTONSOFTJSON;LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
-      - name: Setup Tailscale
-        if: ${{ ENV.USE_TAILSCALE  == 'true' }}
-        uses: tailscale/github-action@v2
-        with:
-          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
-          tags: tag:ci
-      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+      - name: Set user information command line arguments
+        if: ${{ ENV.USE_TAILSCALE != 'true' }}
         run: |
-          curl -X POST "https://z9ypuz8m.${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
+          echo "USER_COMMANDLINE_ARGUMENTS=-adminemail ${{ SECRETS.UNITY_CI_ADMIN_EMAIL }} -adminpassword ${{ SECRETS.UNITY_CI_ADMIN_PASSWORD }}" >> $GITHUB_ENV
       - name: Cache Libraries
         if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
         uses: actions/cache@v4
@@ -117,5 +121,5 @@ jobs:
           checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
           artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
           useHostNetwork: true

@@ -38,25 +38,52 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
+            listeners.Add(signInComplete);
+
             // A sign in process is already in progress, simply listen for that result (this is to maybe lazy deal with concurrency)
             if (isSignInInProgress && signInComplete != null)
             {
-                listeners.Add(signInComplete);
                 return;
             }
 
-            // We are the primary sign in process, but listen the same way as the secondaries
+            // We are the primary sign in process
             isSignInInProgress = true;
-            if (signInComplete != null)
-            {
-                listeners.Add(signInComplete);
-            }
 
             // Generate the user info
             var userDate = DateTime.Now.ToString("yyyy-MM-dd-HH") + "h";
             var userName = "testrun+" + userDate;
             var password = userName;
             var userEmail = "sdk+ci-" + userName + "@lootlocker.com";
+
+            bool isTargetingProduction = LootLockerConfig.IsTargetingProductionEnvironment();
+            if (isTargetingProduction)
+            {
+                // Don't create new users in Production
+                //TODO: Set these if you want to run towards production locally
+                userEmail = "";
+                password = "";
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+                string[] args = System.Environment.GetCommandLineArgs();
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == "-adminemail")
+                    {
+                        userEmail = args[i + 1];
+                    }
+                    else if (args[i] == "-adminpassword")
+                    {
+                        password = args[i + 1];
+                    }
+                }
+#endif
+            }
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(password))
+            {
+                InvokeListenersAndClear(false, "No account information supplied");
+                isSignInInProgress = false;
+                return;
+            }
 
             // Try to log in, if the user exists great, if not then signup and log in
             Login(userEmail, password, loginResponse =>
@@ -136,7 +163,7 @@ namespace LootLockerTestConfigurationUtils
 
         public override string ToString()
         {
-            return "User with id " + id + " and name " + name;
+            return "User with email "+ userEmail +", id " + id + ", and name " + name;
         }
 
         public class Organisation
