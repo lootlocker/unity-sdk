@@ -1,9 +1,18 @@
 name: Integration Tests
 run-name: Run Integration Test for commit ${{ github.sha }}
 on:
+  pull_request:
+    branches: # Made towards the following
+      - main
+      - dev*
+    types: # Only on the following activity
+      - opened
+      - synchronize # Changes to the branch like new commits, ammends, etc.
   push:
-    branches:
-      - ci/*
+    branches: # Made towards the following
+      - main
+    tags:
+      - v**
   workflow_dispatch: 
     inputs:
       LL_URL:
