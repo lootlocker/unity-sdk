@@ -193,11 +193,11 @@ namespace LootLockerTests.PlayMode
             LootLockerGuestSessionResponse actualResponse = null;
             string expectedIdentifier = null;
             bool firstSessionCompleted = false;
-            LootLockerSDKManager.StartGuestSession((response) =>
+            LootLockerSDKManager.StartGuestSession((startSessionResponse) =>
             {
-                expectedIdentifier = response.player_identifier;
+                expectedIdentifier = startSessionResponse.player_identifier;
 
-                LootLockerSDKManager.EndSession((response) =>
+                LootLockerSDKManager.EndSession((endSessionResponse) =>
                 {
                     firstSessionCompleted = true;
                 });
