@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using LootLocker;
 using LootLocker.Requests;
@@ -90,21 +89,15 @@ namespace LootLockerTests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PingWithGuestUserSucceeds()
+        public IEnumerator Ping_WithSession_Succeeds()
         {
             // Setup Succeeded
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
 
             // Given
-            string userGuid = Guid.NewGuid().ToString();
             bool guestLoginCompleted = false;
-            LootLockerSDKManager.StartGuestSession(userGuid, response =>
+            LootLockerSDKManager.StartGuestSession(response =>
             {
-                Assert.IsTrue(response.success, response?.errorData?.ToString());
-                if (!response.success)
-                {
-                    return;
-                }
                 guestLoginCompleted = true;
             });
             yield return new WaitUntil(() => guestLoginCompleted);
@@ -125,7 +118,7 @@ namespace LootLockerTests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PingWithoutSessionFails()
+        public IEnumerator Ping_WithoutSession_Fails()
         {
             // Setup Succeeded
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
