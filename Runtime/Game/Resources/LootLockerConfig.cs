@@ -181,7 +181,9 @@ namespace LootLocker
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
             _current.token = null;
+#if UNITY_EDITOR
             _current.adminToken = null;
+#endif //UNITY_EDITOR
             _current.refreshToken = null;
             _current.gameID = 0;
             _current.deviceID = null;
@@ -200,7 +202,9 @@ namespace LootLocker
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
             _current.token = null;
+#if UNITY_EDITOR
             _current.adminToken = null;
+#endif //UNITY_EDITOR
             _current.refreshToken = null;
             _current.gameID = 0;
             _current.deviceID = null;
