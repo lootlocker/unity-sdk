@@ -11,9 +11,14 @@ on:
   push:
     branches: # Made towards the following
       - main
+      - ci/*
     tags:
       - v**
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      LL_URL:
+        description: Use a custom url for tests
+        type: string
 
 jobs:
   functional-tests:
@@ -377,6 +382,88 @@ jobs:
           buildName: smokeTest
           projectPath: unity-sdk-smoketest-project
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
+  run-integration-tests:
+    name: Run the integration tests
+    runs-on: ubuntu-latest
+    if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+    needs: [editor-smoke-test, linux-build-smoke-test]
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - playmode
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
+        jsonLibrary:
+          - zerodep
+          - newtonsoft
+    steps:
+      - name: Configure variables
+        run: |
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "LOOTLOCKER_URL=${{ INPUTS.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: ./sdk
+      - name: Create Test Project
+        run: |
+          mkdir TestProject
+          mkdir TestProject/Packages
+          DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk"'
+          if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.0.2"'; fi
+          DEPENDENCY_STRING=$DEPENDENCY_STRING$'\n  },\n  "testables": ["com.lootlocker.lootlockersdk"]\n}'
+          echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
+          mkdir TestProject/Assets/
+          cp -r sdk/Samples~/LootLockerExamples TestProject/Assets/
+      - name: Setup Tailscale
+        if: ${{ ENV.USE_TAILSCALE  == 'true' }}
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        run: |
+          curl -X POST "https://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
+      - name: Set the project to use zerodep json
+        if: ${{ matrix.jsonLibrary == 'zerodep' }}
+        run: |
+          mkdir TestProject/ProjectSettings
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set the project to use Newtonsoft json
+        if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
+        run: |
+          mkdir TestProject/ProjectSettings
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_USE_NEWTONSOFTJSON;LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set user information command line arguments
+        if: ${{ ENV.USE_TAILSCALE != 'true' }}
+        run: |
+          echo "USER_COMMANDLINE_ARGUMENTS=-adminemail ${{ SECRETS.UNITY_CI_ADMIN_EMAIL }} -adminpassword ${{ SECRETS.UNITY_CI_ADMIN_PASSWORD }}" >> $GITHUB_ENV
+      - name: Cache Libraries
+        if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+        uses: actions/cache@v4
+        with:
+          path: tests~/Library
+          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
+          restore-keys: Library-
+      - name: Run tests in ${{ matrix.unityVersion }} ${{ matrix.testMode }} towards ${{ ENV.TARGET_ENVIRONMENT }} with json library ${{ matrix.jsonLibrary }}
+        uses: game-ci/unity-test-runner@v4
+        if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: TestProject/
+          testMode: ${{ matrix.testMode }}
+          unityVersion: ${{ matrix.unityVersion }}
+          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
+          useHostNetwork: true
   test-samples:
     name: Test Samples
     runs-on: [ubuntu-latest]
