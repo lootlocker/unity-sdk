@@ -35,9 +35,9 @@ jobs:
           - newtonsoft
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Checkout test repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: LootLocker/unity-sdk-tests
           path: ./tests~ # Unity ignores folders with ~ from inclusion
@@ -54,7 +54,7 @@ jobs:
         run: |
           sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
       - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
-        uses: game-ci/unity-test-runner@v2
+        uses: game-ci/unity-test-runner@v4
         id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -123,11 +123,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -145,7 +145,7 @@ jobs:
         if: ${{ env.LL_USE_STAGE == 'true' }}
         run: |
           sed -i 's/NO_LOOTLOCKER_TARGET_STAGE_ENV/LOOTLOCKER_TARGET_STAGE_ENV/' unity-sdk-smoketest-project/ProjectSettings/ProjectSettings.asset
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -224,11 +224,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -253,7 +253,7 @@ jobs:
           cd unity-sdk-smoketest-project
           git add -A
           git commit -m "Temporary changes for build"
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -344,11 +344,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -373,7 +373,7 @@ jobs:
           cd unity-sdk-smoketest-project
           git add -A
           git commit -m "Temporary changes for build"
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -437,11 +437,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-sample-tester repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-sample-tester
           path: unity-sdk-sample-tester
@@ -449,7 +449,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-sample-tester/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-sample-tester/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-sample-tester
@@ -513,11 +513,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-package-validator repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-package-validator
           path: unity-sdk-package-validator
@@ -525,7 +525,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-package-validator/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-package-validator/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-package-validator
@@ -590,11 +590,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-packager-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-packager
           path: unity-sdk-packager
@@ -602,7 +602,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-packager/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
@@ -624,7 +624,7 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
       - name: Expose packaged SDK as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: LootLockerSDK-${{ matrix.unityVersion }}.zip
           path: unity-sdk-packager/LootLockerSDK*.unitypackage
