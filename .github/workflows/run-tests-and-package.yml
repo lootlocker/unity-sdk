@@ -17,8 +17,10 @@ on:
 
 jobs:
   functional-tests:
-    name: Functional tests with config ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
+    name: DISABLED Functional tests with config ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
     runs-on: ubuntu-latest
+    #Disable for now, replaced by "Integraton tests"
+    if: ${{ true == false }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
