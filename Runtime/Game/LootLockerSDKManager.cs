@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #else
 using LLlibs.ZeroDepJson;
-using System.Net;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
