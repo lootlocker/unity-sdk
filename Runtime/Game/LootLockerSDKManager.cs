@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #else
 using LLlibs.ZeroDepJson;
+using System.Net;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
@@ -5346,6 +5347,115 @@ namespace LootLocker.Requests
             }
 
             LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
+        }
+
+        #endregion
+
+        #region Feedback
+
+        public static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>());
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.listFeedbackCategories;
+
+            var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
+
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+
+        }
+
+        public static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
+
+            var request = new LootLockerFeedbackRequest
+            {
+                entity = type.ToString(),
+                entity_id = ulid,
+                description = description,
+                category_id = category_id
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+
+        public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
+
+            var request = new LootLockerFeedbackRequest
+            {
+                entity = LootLockerFeedbackTypes.player.ToString(),
+                entity_id = ulid,
+                description = description,
+                category_id = category_id
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void SendGameFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
+
+            var request = new LootLockerFeedbackRequest
+            {
+                entity = LootLockerFeedbackTypes.game.ToString(),
+                entity_id = ulid,
+                description = description,
+                category_id = category_id
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
+
+            var request = new LootLockerFeedbackRequest
+            {
+                entity = LootLockerFeedbackTypes.ugc.ToString(),
+                entity_id = ulid,
+                description = description,
+                category_id = category_id
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
