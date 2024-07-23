@@ -1,5 +1,6 @@
 ﻿using LootLocker.LootLockerEnums;
 using System.Collections.Generic;
+using Unity.Plastic.Antlr3.Runtime;
 #if UNITY_2020_2_OR_NEWER
 using JetBrains.Annotations;
 #endif
@@ -15,6 +16,7 @@ namespace LootLocker.LootLockerEnums
         currency = 1,
         progression_points = 2,
         progression_reset = 3,
+        group = 4,
     };
 }
 
@@ -293,6 +295,59 @@ namespace LootLocker.Requests
         public string catalog_listing_id { get; set; }
     }
 
+    public class LootLockerGroupAssociations
+    {
+        /// <summary>
+        /// The kind of reward, (asset / currency / group / progression points / progression reset).
+        /// </summary>
+        public LootLockerCatalogEntryEntityKind kind { get; set; }
+        /// <summary>
+        /// The unique id of the group that this refers to
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The catalog listing id for this group detail.
+        /// </summary>
+        public string catalog_listing_id { get; set; }
+    }
+
+    public class LootLockerGroupMetadata
+    {
+        /// <summary>
+        /// The Key of a metadata
+        /// </summary>
+        public string key { get; set; }
+        /// <summary>
+        /// the Value of a metadata
+        /// </summary>
+        public string value { get; set; }
+    }
+
+    public class LootLockerGroupDetails
+    {
+        /// <summary>
+        /// The name of the Group.
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The description of the Group.
+        /// </summary>
+        public string description { get; set; }
+        /// <summary>
+        /// Associations for the Group reward.
+        /// </summary>
+        public LootLockerGroupMetadata[] metadata { get; set; }
+        /// <summary>
+        /// The ID of the reward.
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// Associations for the Group reward.
+        /// </summary>
+        public LootLockerGroupAssociations[] associations { get; set; }
+
+    }
+
     //==================================================
     // Response Definitions
     //==================================================
@@ -349,6 +404,8 @@ namespace LootLocker.Requests
         /// </summary>
         public Dictionary<string /*catalog_listing_id*/, LootLockerCurrencyDetails> currency_details { get; set; }
 
+        public Dictionary<string /*catalog_listing_id*/, LootLockerGroupDetails> group_details { get; set; }
+
         /// <summary>
         /// Pagination data to use for subsequent requests
         /// </summary>
@@ -394,6 +451,7 @@ namespace LootLocker.Requests
             public LootLockerProgressionPointDetails[] progression_points_details { get; set; }
             public LootLockerProgressionResetDetails[] progression_resets_details { get; set; }
             public LootLockerCurrencyDetails[] currency_details { get; set; }
+            public LootLockerGroupDetails[] group_details { get; set; }
             public LootLockerPaginationResponse<string> pagination { get; set; }
         }
 
@@ -413,6 +471,7 @@ namespace LootLocker.Requests
             catalog = parsedResponse.catalog;
             entries = parsedResponse.entries;
             pagination = parsedResponse.pagination;
+            
 
             if (parsedResponse.assets_details != null && parsedResponse.assets_details.Length > 0)
             {
@@ -451,6 +510,16 @@ namespace LootLocker.Requests
                     currency_details[detail.catalog_listing_id] = detail;
                 }
             }
+
+            if(parsedResponse.group_details != null && parsedResponse.group_details.Length > 0)
+            {
+                group_details = new Dictionary<string, LootLockerGroupDetails>();
+                foreach (var detail in parsedResponse.group_details)
+                {
+                    group_details[detail.id] = detail;
+                }
+            }
+
         }
 
 #if UNITY_2020_2_OR_NEWER
@@ -479,7 +548,9 @@ namespace LootLocker.Requests
             [CanBeNull]
             public LootLockerCurrencyDetails currency_details { get; set; }
 
-            public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails) 
+            public LootLockerGroupDetails group_details { get; set; }
+
+            public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, [CanBeNull] LootLockerAssetDetails assetDetails, [CanBeNull] LootLockerProgressionPointDetails progressionPointDetails, [CanBeNull] LootLockerProgressionResetDetails progressionResetDetails, [CanBeNull] LootLockerCurrencyDetails currencyDetails, LootLockerGroupDetails groupDetails) 
             {
                 created_at = entry.created_at;
                 entity_kind = entry.entity_kind;
@@ -493,6 +564,7 @@ namespace LootLocker.Requests
                 progression_point_details = progressionPointDetails;
                 progression_reset_details = progressionResetDetails;
                 currency_details = currencyDetails;
+                group_details = groupDetails;
             }
         }
 
@@ -511,7 +583,8 @@ namespace LootLocker.Requests
                     LootLockerCatalogEntryEntityKind.asset == entityKind && asset_details.ContainsKey(catalogListingID) ? asset_details[catalogListingID] : null, 
                     LootLockerCatalogEntryEntityKind.progression_points == entityKind && progression_points_details.ContainsKey(catalogListingID) ? progression_points_details[catalogListingID] : null, 
                     LootLockerCatalogEntryEntityKind.progression_reset == entityKind && progression_resets_details.ContainsKey(catalogListingID) ? progression_resets_details[catalogListingID] : null, 
-                    LootLockerCatalogEntryEntityKind.currency == entityKind && currency_details.ContainsKey(catalogListingID) ? currency_details[catalogListingID] : null
+                    LootLockerCatalogEntryEntityKind.currency == entityKind && currency_details.ContainsKey(catalogListingID) ? currency_details[catalogListingID] : null,
+                    LootLockerCatalogEntryEntityKind.group == entityKind && group_details.ContainsKey(catalogListingID) ? group_details[catalogListingID] : null
                 ));
             }
             return inlinedEntries.ToArray();
