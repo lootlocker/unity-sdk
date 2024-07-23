@@ -260,7 +260,7 @@ namespace LootLocker.Requests
     public class LootLockerLeaderboardReward
     {
         /// <summary>
-        /// The kind of reward, (asset / currency / progression points / progression reset).
+        /// The kind of reward, (asset / currency / group / progression points / progression reset).
         /// </summary>
         public string reward_kind { get; set; }
         /// <summary>
@@ -283,6 +283,10 @@ namespace LootLocker.Requests
         /// The Asset reward, will be null if the reward is of another type.
         /// </summary>
         public LootLockerLeaderboardRewardAsset asset { get; set; }
+        /// <summary>
+        /// The Group reward, will be null if the reward is of another type.
+        /// </summary>
+        public LootLockerLeaderboardRewardGroup group { get; set; }
     }
 
     public class LootLockerLeaderboardRewardPredicates
@@ -319,6 +323,81 @@ namespace LootLocker.Requests
         /// The direction of the predicate (asc / desc).
         /// </summary>
         public string direction { get; set; }
+    }
+
+    public class LootLockerLeaderboardRewardGroup
+    {
+        /// <summary>
+        /// The date the Group reward was created.
+        /// </summary>
+        public string created_at { get; set; }
+        
+        /// <summary>
+        /// The name of the Group.
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// The description of the Group.
+        /// </summary>
+        public string description { get; set; }
+
+        /// <summary>
+        /// Metadata for the Group reward.
+        /// </summary>
+        public LootLockerLeaderboardGroupRewardMetadata[] metadata { get; set; }
+
+        /// <summary>
+        /// Associations for the Group reward.
+        /// </summary>
+        public LootLockerLeaderboardGroupRewardAssociations[] associations { get; set; }
+
+        /// <summary>
+        /// The ID of the reward.
+        /// </summary>
+        public string reward_id { get; set; }
+    }
+
+   public class LootLockerLeaderboardGroupRewardMetadata
+    {
+        /// <summary>
+        /// The Key of a metadata
+        /// </summary>
+        public string key { get; set; }
+        /// <summary>
+        /// the Value of a metadata
+        /// </summary>
+        public string value { get; set; }
+    }
+
+
+    public class LootLockerLeaderboardGroupRewardAssociations
+    {
+        /// <summary>
+        /// The kind of reward, (asset / currency / group / progression points / progression reset).
+        /// </summary>
+        public string kind { get; set; }
+
+        /// <summary>
+        /// The details on the Asset.
+        /// </summary>
+        public LootLockerLeaderboardRewardAssetDetails asset { get; set; }
+
+        /// <summary>
+        /// The details on the Currency.
+        /// </summary>
+        public LootLockerLeaderboardRewardCurrencyDetails currency { get; set; }
+
+        /// <summary>
+        /// The Progression Points reward, will be null if the reward is of another type.
+        /// </summary>
+        public LootLockerLeaderboardRewardProgression progression_points { get; set; }
+
+        /// <summary>
+        /// The Progression Reset reward, will be null if the reward is of another type.
+        /// </summary>
+        public LootLockerLeaderboardRewardProgressionReset progression_reset { get; set; }
+
     }
 
     public class LootLockerLeaderboardSchedule
