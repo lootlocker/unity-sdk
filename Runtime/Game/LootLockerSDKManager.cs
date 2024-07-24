@@ -5468,7 +5468,6 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-    }
 
         /// <summary>
         /// Sends a feedback with the given data, will return 204 upon successful request.
