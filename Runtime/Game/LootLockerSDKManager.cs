@@ -5352,6 +5352,11 @@ namespace LootLocker.Requests
 
         #region Feedback
 
+        /// <summary>
+        /// Returns a list of categories to be used for giving feedback.
+        /// </summary>
+        /// <param name="type">Type of feedback (player, game, ugc)</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
         public static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -5364,11 +5369,45 @@ namespace LootLocker.Requests
 
             var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
 
-
             LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-
         }
 
+
+        /// <summary>
+        /// Returns a list of categories to be used for giving feedback about a certain player.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
+        public static void ListPlayerFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        {
+            ListFeedbackCategories(LootLockerFeedbackTypes.player, onComplete);
+        }
+
+        /// <summary>
+        /// Returns a list of categories to be used for giving feedback about the game.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
+        public static void ListGameFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        {
+            ListFeedbackCategories(LootLockerFeedbackTypes.game, onComplete);
+        }
+
+        /// <summary>
+        /// Returns a list of categories to be used for giving feedback about a certain ugc asset.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
+        public static void ListUgcFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        {
+            ListFeedbackCategories(LootLockerFeedbackTypes.ugc, onComplete);
+        }
+
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="type">Type of feedback (player, game, ugc)</param>
+        /// <param name="ulid">Ulid of what you're giving feedback about</param>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
         public static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -5391,30 +5430,25 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="ulid">Ulid of who you're giving feedback about</param>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
         public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
-                return;
-            }
-            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
-
-            var request = new LootLockerFeedbackRequest
-            {
-                entity = LootLockerFeedbackTypes.player.ToString(),
-                entity_id = ulid,
-                description = description,
-                category_id = category_id
-            };
-
-            string json = LootLockerJson.SerializeObject(request);
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete);
         }
 
-        public static void SendGameFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void SendGameFeedback(string description, string category_id, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -5426,7 +5460,6 @@ namespace LootLocker.Requests
             var request = new LootLockerFeedbackRequest
             {
                 entity = LootLockerFeedbackTypes.game.ToString(),
-                entity_id = ulid,
                 description = description,
                 category_id = category_id
             };
@@ -5435,26 +5468,18 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+    }
+
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="ulid">Ulid of which asset you're giving feedback about</param>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
         public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
-                return;
-            }
-            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
-
-            var request = new LootLockerFeedbackRequest
-            {
-                entity = LootLockerFeedbackTypes.ugc.ToString(),
-                entity_id = ulid,
-                description = description,
-                category_id = category_id
-            };
-
-            string json = LootLockerJson.SerializeObject(request);
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete);
         }
 
         #endregion
