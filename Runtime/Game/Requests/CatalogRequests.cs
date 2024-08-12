@@ -588,13 +588,6 @@ namespace LootLocker.Requests
                 asset_details = new Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails>();
                 foreach (var detail in parsedResponse.assets_details)
                 {
-                    UnityEngine.Debug.Log(detail.GetItemDetailsKey().catalog_listing_id);
-                    UnityEngine.Debug.Log(detail.GetItemDetailsKey().item_id);
-
-                    UnityEngine.Debug.Log(detail.catalog_listing_id);
-                    UnityEngine.Debug.Log(detail.id);
-
-
                     asset_details[detail.GetItemDetailsKey()] = detail;
                 }
             }
