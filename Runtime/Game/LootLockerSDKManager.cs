@@ -5403,12 +5403,39 @@ namespace LootLocker.Requests
         /// <summary>
         /// Sends a feedback with the given data, will return 204 upon successful request.
         /// </summary>
-        /// <param name="type">Type of feedback (player, game, ugc)</param>
-        /// <param name="ulid">Ulid of what you're giving feedback about</param>
+        /// <param name="ulid">Ulid of who you're giving feedback about</param>
         /// <param name="description">Reason behind the report</param>
         /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete);
+        }
+
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void SendGameFeedback(string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            SendFeedback(LootLockerFeedbackTypes.game, "", description, category_id, onComplete);
+        }
+
+        /// <summary>
+        /// Sends a feedback with the given data, will return 204 upon successful request.
+        /// </summary>
+        /// <param name="ulid">Ulid of which asset you're giving feedback about</param>
+        /// <param name="description">Reason behind the report</param>
+        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        {
+            SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete);
+        }
+
+        private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -5428,57 +5455,6 @@ namespace LootLocker.Requests
             string json = LootLockerJson.SerializeObject(request);
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Sends a feedback with the given data, will return 204 upon successful request.
-        /// </summary>
-        /// <param name="ulid">Ulid of who you're giving feedback about</param>
-        /// <param name="description">Reason behind the report</param>
-        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
-        {
-            SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete);
-        }
-
-        /// <summary>
-        /// Sends a feedback with the given data, will return 204 upon successful request.
-        /// </summary>
-        /// <param name="description">Reason behind the report</param>
-        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendGameFeedback(string description, string category_id, Action<LootLockerResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
-                return;
-            }
-            EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
-
-            var request = new LootLockerFeedbackRequest
-            {
-                entity = LootLockerFeedbackTypes.game.ToString(),
-                description = description,
-                category_id = category_id
-            };
-
-            string json = LootLockerJson.SerializeObject(request);
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Sends a feedback with the given data, will return 204 upon successful request.
-        /// </summary>
-        /// <param name="ulid">Ulid of which asset you're giving feedback about</param>
-        /// <param name="description">Reason behind the report</param>
-        /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
-        {
-            SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete);
         }
 
         #endregion
