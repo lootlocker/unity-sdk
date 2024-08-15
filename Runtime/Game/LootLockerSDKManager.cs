@@ -5353,27 +5353,6 @@ namespace LootLocker.Requests
         #region Feedback
 
         /// <summary>
-        /// Returns a list of categories to be used for giving feedback.
-        /// </summary>
-        /// <param name="type">Type of feedback (player, game, ugc)</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
-        public static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>());
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.listFeedbackCategories;
-
-            var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
-
-            LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-
-        /// <summary>
         /// Returns a list of categories to be used for giving feedback about a certain player.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
@@ -5398,6 +5377,21 @@ namespace LootLocker.Requests
         public static void ListUgcFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
         {
             ListFeedbackCategories(LootLockerFeedbackTypes.ugc, onComplete);
+        }
+
+        private static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>());
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.listFeedbackCategories;
+
+            var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
