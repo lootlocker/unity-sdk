@@ -127,6 +127,11 @@ namespace LootLocker
         public string message { get; set; }
 
         /// <summary>
+        /// If the request was rate limited (status code 429) or the servers were temporarily unavailable (status code 503) you can use this value to determine how many seconds to wait before retrying
+        /// </summary>
+        public int? retry_after_seconds { get; set; } = null;
+
+        /// <summary>
         /// An easy way of debugging LootLockerErrorData class, example: Debug.Log(onComplete.errorData);
         /// </summary>
         /// <returns>string used to debug errors</returns>
@@ -331,7 +336,9 @@ namespace LootLocker
         /// </summary>
         public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit) where T : LootLockerResponse, new()
         {
-            return ClientError<T>($"Your request to {method} was not sent. You are sending too many requests and are being rate limited for {secondsLeftOfRateLimit} seconds");
+            var error = ClientError<T>($"Your request to {method} was not sent. You are sending too many requests and are being rate limited for {secondsLeftOfRateLimit} seconds");
+            error.errorData.retry_after_seconds = secondsLeftOfRateLimit;
+            return error;
         }
     }
 

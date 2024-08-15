@@ -149,6 +149,12 @@ namespace LootLocker
                         response.errorData = new LootLockerErrorData((int)webRequest.responseCode, webRequest.downloadHandler.text);
                     }
 
+                    string RetryAfterHeader = webRequest.GetResponseHeader("Retry-After");
+                    if (!string.IsNullOrEmpty(RetryAfterHeader))
+                    {
+                        response.errorData.retry_after_seconds = Int32.Parse(RetryAfterHeader);
+                    }
+
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
                     OnServerResponse?.Invoke(response);
                 }
