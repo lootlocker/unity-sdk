@@ -5440,7 +5440,7 @@ namespace LootLocker.Requests
 
             var request = new LootLockerFeedbackRequest
             {
-                entity = type.ToString(),
+                entity = type,
                 entity_id = ulid,
                 description = description,
                 category_id = category_id

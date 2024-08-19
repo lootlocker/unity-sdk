@@ -49,9 +49,9 @@ namespace LootLocker.Requests
     public class LootLockerFeedbackRequest
     {
         /// <summary>
-        /// A string representation of the type of feedback, use LootLockerFeedbackTypes.x.ToString()
+        /// A string representation of the type of feedback
         /// </summary>
-        public string entity { get; set; }
+        public LootLockerFeedbackTypes entity { get; set; }
 
         /// <summary>
         /// The Ulid of what you're sending feedback about
