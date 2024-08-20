@@ -7,6 +7,50 @@ namespace LootLocker.Requests
     //==================================================
     // Data Definitions
     //==================================================
+    public class LootLockerLeaderboardDetails
+    {
+        /// <summary>
+        /// The date the Leaderboard was created.
+        /// </summary>
+        public string created_at { get; set; }
+        /// <summary>
+        /// The date the Leaderboard was last updated.
+        /// </summary>
+        public string updated_at { get; set; }
+        /// <summary>
+        /// The Leaderboards Key.
+        /// </summary>
+        public string key { get; set; }
+        /// <summary>
+        /// The direction of the Leaderboard (Ascending / Descending).
+        /// </summary>
+        public string direction_method { get; set; }
+        /// <summary>
+        /// The name of the Leaderboard.
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The type of the Leaderboard (Player / Generic).
+        /// </summary>
+        public string type { get; set; }
+        /// <summary>
+        /// Will the score be overwritten even if it was less than the original score.
+        /// </summary>
+        public bool overwrite_score_on_submit { get; set; }
+        /// <summary>
+        /// Does the Leaderboard have metadata.
+        /// </summary>
+        public bool has_metadata { get; set; }
+        /// <summary>
+        /// Schedule of the Leaderboard.
+        /// </summary>
+        public LootLockerLeaderboardSchedule schedule { get; set; }
+        /// <summary>
+        /// A List of rewards tied to the Leaderboard.
+        /// </summary>
+        public LootLockerLeaderboardReward[] rewards { get; set; }
+    }
+
     public class LootLockerPlayer
     {
         public int id { get; set; }
@@ -179,6 +223,21 @@ namespace LootLocker.Requests
     //==================================================
     // Response Definitions
     //==================================================
+
+    // <summary>
+    // </summary>
+    public class LootLockerListLeaderboardsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Pagination data to use for subsequent requests
+        /// </summary>
+        LootLockerPaginationResponse<int> pagination;
+
+        // <summary>
+        // List of details for the requested leaderboards
+        // </summary>
+        LootLockerLeaderboardDetails[] items;
+    }
 
     public class LootLockerGetMemberRankResponse : LootLockerResponse
     {

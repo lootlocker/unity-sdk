@@ -4896,6 +4896,32 @@ namespace LootLocker.Requests
 
         #region Leaderboard
         /// <summary>
+        /// List leaderboards with details on each leaderboard
+        /// </summary>
+        /// <param name="count">How many leaderboards to get in one request</param>
+        /// <param name="after">Return leaderboards after this specified index</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
+        public static void ListLeaderboards(int count, int after, Action<LootLockerListLeaderboardsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListLeaderboardsResponse>());
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.listLeaderboards.endPoint;
+
+            if(count > 0 || after > 0) 
+                endpoint += endpoint.Contains("?") ? "&" : "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+            if (after > 0)
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listLeaderboards.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get the current ranking for a specific player on a leaderboard.
         /// </summary>
         /// <param name="leaderboardKey">Key of the leaderboard as a string</param>
