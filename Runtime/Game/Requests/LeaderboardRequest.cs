@@ -4,28 +4,15 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
-    public class LootLockerGetMemberRankResponse : LootLockerResponse
-    {
-        // we are doing thisfor legacy reasons, since it is no longer being set on the backend
-        public string member_id { get; set; }
-        public int rank { get; set; }
-        public int score { get; set; }
-        public LootLockerPlayer player { get; set; }
-        public string metadata { get; set; }
-    }
-
+    //==================================================
+    // Data Definitions
+    //==================================================
     public class LootLockerPlayer
     {
         public int id { get; set; }
         public string public_uid { get; set; }
         public string name { get; set; }
         public string ulid { get; set; }
-    }
-
-
-    public class LootLockerGetByListOfMembersResponse : LootLockerResponse
-    {
-        public LootLockerLeaderboardMember[] members { get; set; }
     }
 
     public class LootLockerLeaderboardMember
@@ -37,49 +24,11 @@ namespace LootLocker.Requests
         public string metadata { get; set; }
     }
 
-    public class LootLockerGetScoreListResponse : LootLockerResponse
-    {
-        public LootLockerPagination pagination { get; set; }
-        public LootLockerLeaderboardMember[] items { get; set; }
-    }
-
-
-    public class LootLockerGetAllMemberRanksResponse : LootLockerResponse
-    {
-        public LootLockerLeaderboard[] leaderboards { get; set; }
-        public LootLockerPagination pagination { get; set; }
-    }
-
     public class LootLockerLeaderboard
     {
         public LootLockerLeaderboardMember rank { get; set; }
         public int leaderboard_id { get; set; }
         public string leaderboard_key { get; set; }
-    }
-
-    public class LootLockerPagination
-    {
-        public int total { get; set; }
-        public int? next_cursor { get; set; }
-        public int? previous_cursor { get; set; }
-        public bool allowNext { get; set; }
-        public bool allowPrev { get; set; }
-    }
-
-    public class LootLockerSubmitScoreResponse : LootLockerResponse
-    {
-        public string member_id { get; set; }
-        public int rank { get; set; }
-        public int score { get; set; }
-        public string metadata { get; set; }
-    }
-
-    public class LootLockerLeaderboardArchiveResponse : LootLockerResponse
-    {
-        /// <summary>
-        /// A List of past Leaderboards.
-        /// </summary>
-        public LootLockerLeaderboardArchive[] archives { get; set; }
     }
     
     public class LootLockerLeaderboardArchive
@@ -101,17 +50,7 @@ namespace LootLocker.Requests
         /// </summary>
         public int content_length { get; set; }
     }
-    public class LootLockerLeaderboardArchiveDetailsResponse : LootLockerResponse
-    {
-        /// <summary>
-        /// Pagination.
-        /// </summary>
-        public LootLockerPaginationResponse<string> pagination { get; set; }
-        /// <summary>
-        /// A list of players and details from the archived Leaderboard.
-        /// </summary>
-        public LootLockerLeaderboardArchiveDetails[] items { get; set; }
-    }
+
     public class LootLockerLeaderboardArchiveDetails
     {
         /// <summary>
@@ -134,8 +73,17 @@ namespace LootLocker.Requests
         /// The Player's Score on the archived Leaderboard.
         /// </summary>
         public int score { get; set; }
-
     }
+
+    public class LootLockerPagination
+    {
+        public int total { get; set; }
+        public int? next_cursor { get; set; }
+        public int? previous_cursor { get; set; }
+        public bool allowNext { get; set; }
+        public bool allowPrev { get; set; }
+    }
+
     public class LootLockerLeaderBoardPlayer
     {
         /// <summary>
@@ -156,6 +104,24 @@ namespace LootLocker.Requests
         public string player_ulid { get; set; }
 
     }
+
+
+    //==================================================
+    // Request Definitions
+    //==================================================
+    public class LootLockerGetRequests
+    {
+        public int count { get; set; }
+        public string after { get; set; }
+    }
+
+    public class LootLockerSubmitScoreRequest
+    {
+        public string member_id { get; set; }
+        public int score { get; set; }
+        public string metadata { get; set; }
+    }
+
     [Serializable]
     public class LootLockerLeaderboardArchiveRequest
     {
@@ -171,14 +137,6 @@ namespace LootLocker.Requests
         /// After specified index.
         /// </summary>
         public string after { get; set; }
-
-    }
-
-    public class LootLockerSubmitScoreRequest
-    {
-        public string member_id { get; set; }
-        public int score { get; set; }
-        public string metadata { get; set; }
     }
 
     public class LootLockerGetMemberRankRequest
@@ -213,15 +171,69 @@ namespace LootLocker.Requests
         }
     }
 
-    public class LootLockerGetRequests
-    {
-        public int count { get; set; }
-        public string after { get; set; }
-    }
-
     public class LootLockerGetByListMembersRequest
     {
         public string[] members { get; set; }
+    }
+
+    //==================================================
+    // Response Definitions
+    //==================================================
+
+    public class LootLockerGetMemberRankResponse : LootLockerResponse
+    {
+        // we are doing thisfor legacy reasons, since it is no longer being set on the backend
+        public string member_id { get; set; }
+        public int rank { get; set; }
+        public int score { get; set; }
+        public LootLockerPlayer player { get; set; }
+        public string metadata { get; set; }
+    }
+
+
+    public class LootLockerGetByListOfMembersResponse : LootLockerResponse
+    {
+        public LootLockerLeaderboardMember[] members { get; set; }
+    }
+
+    public class LootLockerGetScoreListResponse : LootLockerResponse
+    {
+        public LootLockerPagination pagination { get; set; }
+        public LootLockerLeaderboardMember[] items { get; set; }
+    }
+
+    public class LootLockerGetAllMemberRanksResponse : LootLockerResponse
+    {
+        public LootLockerLeaderboard[] leaderboards { get; set; }
+        public LootLockerPagination pagination { get; set; }
+    }
+
+    public class LootLockerSubmitScoreResponse : LootLockerResponse
+    {
+        public string member_id { get; set; }
+        public int rank { get; set; }
+        public int score { get; set; }
+        public string metadata { get; set; }
+    }
+
+    public class LootLockerLeaderboardArchiveResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// A List of past Leaderboards.
+        /// </summary>
+        public LootLockerLeaderboardArchive[] archives { get; set; }
+    }
+
+    public class LootLockerLeaderboardArchiveDetailsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Pagination.
+        /// </summary>
+        public LootLockerPaginationResponse<string> pagination { get; set; }
+        /// <summary>
+        /// A list of players and details from the archived Leaderboard.
+        /// </summary>
+        public LootLockerLeaderboardArchiveDetails[] items { get; set; }
     }
 }
 
