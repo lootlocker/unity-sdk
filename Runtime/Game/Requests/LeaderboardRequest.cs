@@ -231,12 +231,12 @@ namespace LootLocker.Requests
         /// <summary>
         /// Pagination data to use for subsequent requests
         /// </summary>
-        LootLockerPaginationResponse<int> pagination;
+        public LootLockerPaginationResponse<int> pagination { get; set; }
 
         // <summary>
         // List of details for the requested leaderboards
         // </summary>
-        LootLockerLeaderboardDetails[] items;
+        public LootLockerLeaderboardDetails[] items { get; set; }
     }
 
     public class LootLockerGetMemberRankResponse : LootLockerResponse
