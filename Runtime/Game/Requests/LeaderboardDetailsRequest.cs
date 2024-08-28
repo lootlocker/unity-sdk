@@ -266,7 +266,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The Predicates of the reward.
         /// </summary>
-        public LootLockerLeaderboardRewardPredicates predicates { get; set; }
+        public LootLockerLeaderboardRewardPredicates[] predicates { get; set; }
         /// <summary>
         /// The currency reward, will be null if the reward is of another type.
         /// </summary>
