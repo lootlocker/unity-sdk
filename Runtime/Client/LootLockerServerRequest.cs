@@ -47,10 +47,28 @@ namespace LootLocker
             return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
         }
 
-
         public static T DeserializeObject<T>(string json, JsonSerializerSettings settings)
         {
             return JsonConvert.DeserializeObject<T>(json, settings ?? LootLockerJsonSettings.Default);
+        }
+
+        public static bool TryDeserializeObject<T>(string json, out T output)
+        {
+            return TryDeserializeObject<T>(json, LootLockerJsonSettings.Default, out output);
+        }
+
+        public static bool TryDeserializeObject<T>(string json, JsonSerializerSettings options, out T output)
+        {
+            try
+            {
+                output = JsonConvert.DeserializeObject<T>(json, options ?? LootLockerJsonSettings.Default);
+                return true;
+            }
+            catch (Exception)
+            {
+                output = default(T);
+                return false;
+            }
         }
 #else //LOOTLOCKER_USE_NEWTONSOFTJSON
         public static string SerializeObject(object obj)
@@ -71,6 +89,24 @@ namespace LootLocker
         public static T DeserializeObject<T>(string json, JsonOptions options)
         {
             return Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
+        }
+
+        public static bool TryDeserializeObject<T>(string json, out T output)
+        {
+            return TryDeserializeObject<T>(json, LootLockerJsonSettings.Default, out output);
+        }
+
+        public static bool TryDeserializeObject<T>(string json, JsonOptions options, out T output)
+        {
+            try
+            {
+                output = Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
+                return true;
+            } catch (Exception)
+            {
+                output = default(T);
+                return false;
+            }
         }
 #endif //LOOTLOCKER_USE_NEWTONSOFTJSON
     }
