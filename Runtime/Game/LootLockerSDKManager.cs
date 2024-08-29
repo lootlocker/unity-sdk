@@ -5254,6 +5254,8 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Drop Tables
+
         /// <summary>
         /// Lock a drop table and return information about the assets that were computed.
         /// </summary>
@@ -5306,6 +5308,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.PickDropsFromDropTable(data, tableInstanceId, onComplete);
         }
+#endregion //Drop Tables
 
         #region Reports
 
