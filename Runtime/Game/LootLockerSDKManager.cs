@@ -5769,6 +5769,89 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Metadata
+
+        /// <summary>
+        /// List Metadata for the specified source with default pagination
+        /// </summary>
+        /// <param name="Source> The source type for which to request metadata</param>
+        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        {
+            ListMetadata(Source, SourceID, 0, 0, onComplete, IgnoreFiles);
+        }
+
+        /// <summary>
+        /// List the requested page of Metadata for the specified source
+        /// </summary>
+        /// <param name="Source> The source type for which to request metadata</param>
+        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Page> Used together with PerPage to apply pagination to this request.Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListMetadataResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.ListMetadata(Source, SourceID, Page, PerPage, null, IgnoreFiles, onComplete);
+        }
+
+        /// <summary>
+        /// List Metadata for the specified source that has all of the provided tags, use default pagination
+        /// </summary>
+        /// <param name="Source> The source type for which to request metadata</param>
+        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Tags"> The tags that the requested metadata should have, only metadata matching *all of* the given tags will be returned </param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        {
+            ListMetadataWithTags(Source, SourceID, Tags, 0, 0, onComplete, IgnoreFiles);
+        }
+
+        /// <summary>
+        /// List the requested page of Metadata for the specified source that has all of the provided tags
+        /// </summary>
+        /// <param name="Source> The source type for which to request metadata</param>
+        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Tags"> The tags that the requested metadata should have, only metadata matching *all of* the given tags will be returned </param>
+        /// <param name="Page> Used together with PerPage to apply pagination to this request.Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListMetadataResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.ListMetadata(Source, SourceID, Page, PerPage, Tags, IgnoreFiles, onComplete);
+        }
+
+        /// <summary>
+        /// Get Metadata for the specified source with the given key
+        /// </summary>
+        /// <param name="Source> The source type for which to request metadata</param>
+        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Key> The key of the metadata to fetch, use this to fetch a specific key for the specified source.This takes precedence over pagination and tags</param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void GetMetadata(LootLockerMetadataSources Source, string SourceID, string Key, Action<LootLockerGetMetadataResponse> onComplete, bool IgnoreFiles=false)
+        {
+            LootLockerAPIManager.GetMetadata(Source, SourceID, Key, IgnoreFiles, onComplete);
+        }
+
+        #endregion
+
         #region Misc
 
         /// <summary>

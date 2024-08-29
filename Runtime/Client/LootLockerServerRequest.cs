@@ -5,6 +5,8 @@ using LootLocker.LootLockerEnums;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using LLlibs.ZeroDepJson;
+
 #else
 using LLlibs.ZeroDepJson;
 #endif
@@ -305,6 +307,54 @@ namespace LootLocker
         /// The cursor that points to the first item in this batch of items.
         /// </summary>
         public TKey previous_cursor { get; set; }
+    }
+
+    public class LootLockerExtendedPaginationError
+    {
+        /// <summary>
+        /// Which field in the pagination that this error relates to
+        /// </summary>
+        public string field { get; set; }
+        /// <summary>
+        /// The error message in question
+        /// </summary>
+        public string message { get; set; }
+    }
+
+    public class LootLockerExtendedPagination
+    {
+        /// <summary>
+        /// How many entries in total exists in the paginated list
+        /// </summary>
+        public int total { get; set; }
+        /// <summary>
+        /// How many entries (counting from the beginning of the paginated list) from the first entry that the current page starts at
+        /// </summary>
+        public int offset { get; set; }
+        /// <summary>
+        /// Number of entries on each page
+        /// </summary>
+        public int per_page { get; set; }
+        /// <summary>
+        /// The page index to use for fetching the last page of entries
+        /// </summary>
+        public int last_page { get; set; }
+        /// <summary>
+        /// The page index used for fetching this page of entries
+        /// </summary>
+        public int current_page { get; set; }
+        /// <summary>
+        /// The page index to use for fetching the page of entries immediately succeeding this page of entries
+        /// </summary>
+        public string next_page { get; set; }
+        /// <summary>
+        /// The page index to use for fetching the page of entries immediately preceding this page of entries
+        /// </summary>
+        public string prev_page { get; set; }
+        /// <summary>
+        /// List of pagination errors (if any). These are errors specifically related to the pagination of the entry set.
+        /// </summary>
+        public LootLockerExtendedPaginationError[] errors { get; set; }
     }
 
     /// <summary>
