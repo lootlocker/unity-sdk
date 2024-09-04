@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using UnityEngine;
 
 #pragma warning disable IDE0063 // Use simple 'using' statement
 #pragma warning disable IDE0057 // Use range operator
@@ -274,6 +275,10 @@ namespace ZeroDepJson
                 {
                     var elementType = type.GetElementType();
                     return Array.CreateInstance(elementType, elementsCount);
+                }
+                if(typeof(String) == type)
+                {
+                        return String.Empty;
                 }
                 return Activator.CreateInstance(type);
             }
@@ -1797,6 +1802,14 @@ namespace ZeroDepJson
 
                 if (value is IDictionary dic)
                 {
+                    // If the Type (the member field type inside of the encapsulating object) is a generic object then it won't have mappable fields to parse to. 
+                    // Instead we simply set it to the parsed value
+                    if (Type == typeof(object))
+                    {
+                        var oValue = ChangeType(target, value, Type, options);
+                        Accessor.Set(target, oValue);
+                        return;
+                    }
                     var targetValue = GetOrCreateInstance(target, dic.Count, options);
                     Apply(dic, targetValue, options);
                     return;
@@ -5116,7 +5129,7 @@ namespace ZeroDepJson
                 throw new ArgumentNullException(nameof(error));
 
             if (_exceptions.Count >= MaximumExceptionsCount)
-                throw new JsonException("JSO0015: Two many JSON errors detected (" + _exceptions.Count + ").", error);
+                throw new JsonException("JSO0015: Too many JSON errors detected (" + _exceptions.Count + ").", error);
 
             _exceptions.Add(error);
         }
