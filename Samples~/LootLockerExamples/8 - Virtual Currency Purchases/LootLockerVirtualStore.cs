@@ -53,8 +53,8 @@ namespace LootLocker
                 }
 
                 walletID = response.id;
-                GetPlayerGold();
                 GiveGold();
+
             });
         }
 
@@ -68,6 +68,12 @@ namespace LootLocker
                     return;
                 }
 
+                //Default to hard coded variables
+                if(response.balances.Length <= 0)
+                {
+                    currencyCode = "GLD: ";
+                    return;
+                }
                 currencyCode = response.balances[0].currency.code.ToUpper() + ": ";
 
                 goldAmount.text = currencyCode + response.balances[0].amount;
@@ -85,21 +91,8 @@ namespace LootLocker
                     return;
                 }
 
-
                 foreach (var item in response.entries)
-                {
-
-                    switch(item.entity_kind){
-                        case LootLockerEnums.LootLockerCatalogEntryEntityKind.asset:
-                            var something = response.asset_details[item.GetItemDetailsKey()];
-                            Debug.Log(something.name);
-                            break;
-
-                    }
-
-
-
-                   
+                {                   
                     Debug.Log("Item: " + item.entity_name + " | " + item.prices[0].display_amount);
                     var obj = Instantiate(virtualPurchaseProductPrefab, storeUI);
                     obj.GetComponent<VirtualPurchaseProduct>().CreateProduct(item.entity_name,
@@ -120,6 +113,7 @@ namespace LootLocker
                 }
 
                 goldAmount.text = currencyCode + response.amount;
+                GetPlayerGold();
             });
         }
     }
