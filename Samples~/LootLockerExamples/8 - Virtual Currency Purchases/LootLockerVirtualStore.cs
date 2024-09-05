@@ -16,7 +16,13 @@ namespace LootLocker
         public string catalogKey = "";
         public string walletID = "";
 
-        private string currencyCode;
+        private string playerUlid = "";
+
+        private string currencyCode = "gld";
+        private string currencyDisplayCode = "";
+        private string currencyIdentifier = "";
+
+        private string grantCurrencyAmount = "200";
 
         public void Awake()
         {
@@ -33,12 +39,37 @@ namespace LootLocker
             {
                 if (!response.success)
                 {
-                    Debug.Log("Could not start guest session");
+                    Debug.Log("Could not start guest session\nError: " + response.errorData.ToString());
                     return;
                 }
-                FetchPlayerWallet(response.player_ulid);
-                FetchVirtualProductsFromCatalog();
 
+                playerUlid = response.player_ulid;
+
+                FetchGameCurrencies();  
+            });
+        }
+
+        public void FetchGameCurrencies()
+        {
+            LootLockerSDKManager.ListCurrencies((response) =>
+            {
+
+                if (!response.success)
+                {
+                    Debug.Log("Could not find Currencies\nError: " + response.errorData.ToString());
+                    return;
+                }
+
+                foreach (var currency in response.currencies)
+                {
+                    if (currency.code == currencyCode)
+                    {
+                        currencyIdentifier = currency.id;
+                        currencyDisplayCode = currency.code.ToUpper() + ": ";
+                    }
+                }
+
+                FetchPlayerWallet(playerUlid);
             });
         }
 
@@ -48,13 +79,15 @@ namespace LootLocker
             {
                 if (!response.success)
                 {
-                    Debug.Log("Could not start guest session");
+                    Debug.Log("Could not Get Players Wallet\nError: " + response.errorData.ToString());
                     return;
                 }
 
                 walletID = response.id;
-                GiveGold();
 
+                FetchVirtualProductsFromCatalog();
+
+                GiveGold();
             });
         }
 
@@ -64,22 +97,14 @@ namespace LootLocker
             {
                 if (!response.success)
                 {
-                    Debug.Log("Could not list balances");
+                    Debug.Log("Could not list balances\nError: " + response.errorData.ToString());
                     return;
                 }
 
-                //Default to hard coded variables
-                if(response.balances.Length <= 0)
-                {
-                    currencyCode = "GLD: ";
-                    return;
-                }
-                currencyCode = response.balances[0].currency.code.ToUpper() + ": ";
+                goldAmount.text = currencyDisplayCode + response.balances[0].amount;
 
-                goldAmount.text = currencyCode + response.balances[0].amount;
             });
         }
-
 
         public void FetchVirtualProductsFromCatalog()
         {
@@ -87,13 +112,12 @@ namespace LootLocker
             {
                 if (!response.success)
                 {
-                    Debug.Log("Could not fetch Catalog Items");
+                    Debug.Log("Could not fetch Catalog Items\nError: " + response.errorData.ToString());
                     return;
                 }
 
                 foreach (var item in response.entries)
                 {                   
-                    Debug.Log("Item: " + item.entity_name + " | " + item.prices[0].display_amount);
                     var obj = Instantiate(virtualPurchaseProductPrefab, storeUI);
                     obj.GetComponent<VirtualPurchaseProduct>().CreateProduct(item.entity_name,
                                                                                 item.prices[0].amount,
@@ -104,15 +128,15 @@ namespace LootLocker
 
         public void GiveGold()
         {
-            LootLockerSDKManager.CreditBalanceToWallet(walletID, "01J3MK8BTC6JC9850YTXGXP1H5", "200", (response) =>
+            LootLockerSDKManager.CreditBalanceToWallet(walletID, currencyIdentifier, grantCurrencyAmount, (response) =>
             {
                 if (!response.success)
                 {
-                    Debug.Log("Could not Credit gold");
+                    Debug.Log("Could not Credit gold\nError: " + response.errorData.ToString());
                     return;
                 }
 
-                goldAmount.text = currencyCode + response.amount;
+                goldAmount.text = currencyDisplayCode + response.amount;
                 GetPlayerGold();
             });
         }
