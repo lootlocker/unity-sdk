@@ -25,7 +25,7 @@ public class VirtualPurchaseProduct : MonoBehaviour
         {
             if (!response.success)
             {
-                Debug.Log("Could not buy catalog item");
+                LootLockerVirtualStoreWarner.Instance.ShowText(response.errorData.message);
                 return;
             }
 
