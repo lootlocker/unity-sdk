@@ -5843,7 +5843,7 @@ namespace LootLocker.Requests
         {
             LootLockerAPIManager.ListMetadata(Source, SourceID, 0, 0, Key, null, IgnoreFiles, (ListResponse) =>
             {
-                onComplete(new()
+                onComplete(new LootLockerGetMetadataResponse()
                 {
                     success = ListResponse.success,
                     statusCode = ListResponse.statusCode,
