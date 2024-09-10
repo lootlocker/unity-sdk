@@ -5836,7 +5836,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="Source> The source type for which to request metadata</param>
         /// <param name="SourceID> The specific source id for which to request metadata</param>
-        /// <param name="Key> The key of the metadata to fetch, use this to fetch a specific key for the specified source.This takes precedence over pagination and tags</param>
+        /// <param name="Key> The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</param>
         /// <param name="OnComplete> delegate for handling the server response</param>
         /// <param name="IgnoreFiles> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void GetMetadata(LootLockerMetadataSources Source, string SourceID, string Key, Action<LootLockerGetMetadataResponse> onComplete, bool IgnoreFiles=false)
