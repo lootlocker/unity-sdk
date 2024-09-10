@@ -175,6 +175,11 @@ namespace LootLocker.Requests
         ///</summary>
         public bool TryGetValueAsJsonArray(out object[] output)
         {
+            if (value.GetType() == typeof(object[]))
+            {
+                output = (object[])value;
+                return true;
+            }
             return LootLockerJson.TryDeserializeObject<object[]>(value.ToString(), out output);
         }
 #endif
