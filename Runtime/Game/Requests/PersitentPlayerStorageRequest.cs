@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LootLocker.Requests;
 using System;
+using LLlibs.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
@@ -36,6 +37,12 @@ namespace LootLocker.Requests
         public string key { get; set; }
         public string value { get; set; }
         public int order { get; set; }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("public")]
+#else
+        [Json(Name = "public")]
+#endif
         public bool is_public { get; set; }
     }
 }
