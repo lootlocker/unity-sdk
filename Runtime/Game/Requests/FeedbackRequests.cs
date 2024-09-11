@@ -51,7 +51,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// A string representation of the type of feedback
         /// </summary>
-        public LootLockerFeedbackTypes entity { get; set; }
+        public string entity { get; set; }
 
         /// <summary>
         /// The Ulid of what you're sending feedback about
