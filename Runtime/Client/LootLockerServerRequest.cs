@@ -498,6 +498,12 @@ namespace LootLocker
 
         public virtual bool AddRequestAndCheckIfRateLimitHit()
         {
+            //Disable local ratelimiter when not targeting production
+            if (!LootLockerConfig.IsTargetingProductionEnvironment())
+            {
+                return false;
+            }
+
             DateTime now = GetTimeNow();
             var currentBucket = MoveCurrentBucket(now);
 

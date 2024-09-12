@@ -63,4 +63,18 @@ If you have any issues or just wanna chat you can reach us on our [Discord Serve
 ### Testing the SDK
 Status: [![Test SDK with Unity](https://github.com/LootLocker/unity-sdk/actions/workflows/run-tests-and-package.yml/badge.svg?branch=main)](https://github.com/LootLocker/unity-sdk/actions/workflows/run-tests-and-package.yml?query=branch%3Amain)
 
-There is a Test Suite for the SDK, but it is in an [external repo](https://github.com/LootLocker/unity-sdk-tests) to keep the size of this one down. It is run automatically on any pull requests towards or updates to main. You can also run it locally, just follow the steps in the test repo.
+To set up the tests, you must add our package to the manifest.json `testables` underneath `dependencies`. Your manifest.json should look something like this:
+
+```json
+{
+  "dependencies": {
+    "com.lootlocker.lootlockersdk": "https://github.com/lootlocker/unity-sdk.git",
+    many more dependencies...
+  },
+  "testables": ["com.lootlocker.lootlockersdk"]
+}
+```
+
+Once you have done this, you can go into Unity and go to `Window` -> `General` -> `Test Runner`. This will open a new window which should already include all the tests available, Then all you have to do is press `Run All` and the tests will begin.
+
+If you are running the tests towards the LootLocker production environment you will need to provide a username and password to an existing user either by setting the values directly in LootLockerTestConfigurationUser::GetProductionUser or via command line arguments -adminemail and -adminpassword. Bear in mind that your tests will be rate limited when running towards production (and in general this is a bad idea).

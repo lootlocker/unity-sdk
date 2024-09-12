@@ -11,9 +11,14 @@ on:
   push:
     branches: # Made towards the following
       - main
+      - ci/*
     tags:
       - v**
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      LL_URL:
+        description: Use a custom url for tests
+        type: string
 
 jobs:
   functional-tests:
@@ -27,26 +32,22 @@ jobs:
       matrix:
         testMode:
           - playmode
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.29f1
-          - 2022.3.7f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
         jsonLibrary:
           - zerodep
           - newtonsoft
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Checkout test repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: LootLocker/unity-sdk-tests
           path: ./tests~ # Unity ignores folders with ~ from inclusion
       - name: Set SDK path in test repo
         run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
       - name: Cache Libraries
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: tests~/Library
           key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
@@ -56,7 +57,7 @@ jobs:
         run: |
           sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
       - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
-        uses: game-ci/unity-test-runner@v2
+        uses: game-ci/unity-test-runner@v4
         id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -85,12 +86,7 @@ jobs:
       matrix:
         testMode:
           - playmode
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
     steps:
       - name: Setup commandline dependencies (if on self-hosted runner)
         if: ${{ env.LL_USE_STAGE == 'true' }}
@@ -125,11 +121,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -147,7 +143,7 @@ jobs:
         if: ${{ env.LL_USE_STAGE == 'true' }}
         run: |
           sed -i 's/NO_LOOTLOCKER_TARGET_STAGE_ENV/LOOTLOCKER_TARGET_STAGE_ENV/' unity-sdk-smoketest-project/ProjectSettings/ProjectSettings.asset
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -184,12 +180,7 @@ jobs:
       matrix:
         testMode:
           - playmode
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
         targetPlatform:
           - StandaloneLinux64
     steps:
@@ -226,11 +217,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -255,7 +246,7 @@ jobs:
           cd unity-sdk-smoketest-project
           git add -A
           git commit -m "Temporary changes for build"
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -304,12 +295,7 @@ jobs:
       matrix:
         testMode:
           - playmode
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
         targetPlatform:
           - WebGL
     steps:
@@ -346,11 +332,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -375,7 +361,7 @@ jobs:
           cd unity-sdk-smoketest-project
           git add -A
           git commit -m "Temporary changes for build"
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
@@ -396,6 +382,88 @@ jobs:
           buildName: smokeTest
           projectPath: unity-sdk-smoketest-project
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
+  run-integration-tests:
+    name: Run the integration tests
+    runs-on: ubuntu-latest
+    if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+    needs: [editor-smoke-test, linux-build-smoke-test]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - playmode
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
+        jsonLibrary:
+          - zerodep
+          - newtonsoft
+    steps:
+      - name: Configure variables
+        run: |
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "LOOTLOCKER_URL=${{ INPUTS.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: ./sdk
+      - name: Create Test Project
+        run: |
+          mkdir TestProject
+          mkdir TestProject/Packages
+          DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk"'
+          if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.0.2"'; fi
+          DEPENDENCY_STRING=$DEPENDENCY_STRING$'\n  },\n  "testables": ["com.lootlocker.lootlockersdk"]\n}'
+          echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
+          mkdir TestProject/Assets/
+          cp -r sdk/Samples~/LootLockerExamples TestProject/Assets/
+      - name: Setup Tailscale
+        if: ${{ ENV.USE_TAILSCALE  == 'true' }}
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        run: |
+          curl -X POST "https://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
+      - name: Set the project to use zerodep json
+        if: ${{ matrix.jsonLibrary == 'zerodep' }}
+        run: |
+          mkdir TestProject/ProjectSettings
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set the project to use Newtonsoft json
+        if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
+        run: |
+          mkdir TestProject/ProjectSettings
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_USE_NEWTONSOFTJSON;LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set user information command line arguments
+        if: ${{ ENV.USE_TAILSCALE != 'true' }}
+        run: |
+          echo "USER_COMMANDLINE_ARGUMENTS=-adminemail ${{ SECRETS.UNITY_CI_ADMIN_EMAIL }} -adminpassword ${{ SECRETS.UNITY_CI_ADMIN_PASSWORD }}" >> $GITHUB_ENV
+      - name: Cache Libraries
+        if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+        uses: actions/cache@v4
+        with:
+          path: tests~/Library
+          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
+          restore-keys: Library-
+      - name: Run tests in ${{ matrix.unityVersion }} ${{ matrix.testMode }} towards ${{ ENV.TARGET_ENVIRONMENT }} with json library ${{ matrix.jsonLibrary }}
+        uses: game-ci/unity-test-runner@v4
+        if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: TestProject/
+          testMode: ${{ matrix.testMode }}
+          unityVersion: ${{ matrix.unityVersion }}
+          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
+          useHostNetwork: true
   test-samples:
     name: Test Samples
     runs-on: [ubuntu-latest]
@@ -409,12 +477,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
     steps:
       - name: Setup commandline dependencies (if on self-hosted runner)
         if: ${{ env.LL_USE_STAGE == 'true' }}
@@ -439,11 +502,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-sample-tester repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-sample-tester
           path: unity-sdk-sample-tester
@@ -451,7 +514,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-sample-tester/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-sample-tester/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-sample-tester
@@ -485,12 +548,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
     steps:
       - name: Setup commandline dependencies (if on self-hosted runner)
         if: ${{ env.LL_USE_STAGE == 'true' }}
@@ -515,11 +573,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-package-validator repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-package-validator
           path: unity-sdk-package-validator
@@ -527,7 +585,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-package-validator/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-package-validator/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-package-validator
@@ -562,12 +620,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unityVersion:
-          - 2019.4.40f1
-          - 2020.3.48f1
-          - 2021.3.32f1
-          - 2022.3.14f1
-          - 2023.2.1f1
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
     steps:
       - name: Setup commandline dependencies (if on self-hosted runner)
         if: ${{ env.LL_USE_STAGE == 'true' }}
@@ -592,11 +645,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-packager-project repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lootlocker/unity-sdk-packager
           path: unity-sdk-packager
@@ -604,7 +657,7 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: unity-sdk-packager/Library
           key: ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
@@ -626,7 +679,7 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
       - name: Expose packaged SDK as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: LootLockerSDK-${{ matrix.unityVersion }}.zip
           path: unity-sdk-packager/LootLockerSDK*.unitypackage
