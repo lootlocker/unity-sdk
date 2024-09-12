@@ -125,7 +125,7 @@ namespace LootLocker
         // Persistentplayer storage 
         [Header("Persitent Player Storage")]
         public static EndPointClass getEntirePersistentStorage = new EndPointClass("v1/player/storage", LootLockerHTTPMethod.GET);
-        public static EndPointClass getSingleKeyFromPersitenctStorage = new EndPointClass("v1/player/storage?key={0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getSingleKeyFromPersistentStorage = new EndPointClass("v1/player/storage?key={0}", LootLockerHTTPMethod.GET);
         public static EndPointClass updateOrCreateKeyValue = new EndPointClass("v1/player/storage", LootLockerHTTPMethod.POST);
         public static EndPointClass deleteKeyValue = new EndPointClass("v1/player/storage?key={0}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass getOtherPlayersPublicKeyValuePairs = new EndPointClass("v1/player/{0}/storage", LootLockerHTTPMethod.GET);

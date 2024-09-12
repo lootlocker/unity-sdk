@@ -3127,12 +3127,12 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the player storage for the currently active player (key/values).
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
@@ -3140,12 +3140,12 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the player storage as a Dictionary<string, string> for the currently active player (key/values).
         /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponseDictionary</param>
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStoragResponseDictionary> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponseDictionary</param>
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponseDictionary>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponseDictionary>());
                 return;
             }
             LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
@@ -3173,12 +3173,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="key">Name of the key</param>
         /// <param name="value">Value of the key</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
@@ -3192,12 +3192,12 @@ namespace LootLocker.Requests
         /// <param name="key">Name of the key</param>
         /// <param name="value">Value of the key</param>
         /// <param name="isPublic">Is the key public?</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
@@ -3209,12 +3209,12 @@ namespace LootLocker.Requests
         /// Update or create multiple key/value pairs in the player storage for the currently active player.
         /// </summary>
         /// <param name="data">A LootLockerGetPersistentStorageRequest with multiple keys</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
@@ -3224,12 +3224,12 @@ namespace LootLocker.Requests
         /// Delete a key from the player storage for the currently active player.
         /// </summary>
         /// <param name="keyToDelete">The key/value key(name) to delete</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -3241,13 +3241,13 @@ namespace LootLocker.Requests
         /// Get the public player storage(key/values) for a specific player.
         /// </summary>
         /// <param name="otherPlayerId">The ID of the player to retrieve the public ley/values for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStoragResponse</param>
-        public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStoragResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
+        public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
 
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStoragResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
