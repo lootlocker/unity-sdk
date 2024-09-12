@@ -122,8 +122,8 @@ namespace LootLocker
         public static EndPointClass resetCharacterProgression = new EndPointClass("player/characters/{0}/progressions/{1}/reset", LootLockerHTTPMethod.POST);
         public static EndPointClass deleteCharacterProgression = new EndPointClass("player/characters/{0}/progressions/{1}", LootLockerHTTPMethod.DELETE);
 
-        // Persistentplayer storage 
-        [Header("Persitent Player Storage")]
+        // Persistent player storage 
+        [Header("Persistent Player Storage")]
         public static EndPointClass getEntirePersistentStorage = new EndPointClass("v1/player/storage", LootLockerHTTPMethod.GET);
         public static EndPointClass getSingleKeyFromPersistentStorage = new EndPointClass("v1/player/storage?key={0}", LootLockerHTTPMethod.GET);
         public static EndPointClass updateOrCreateKeyValue = new EndPointClass("v1/player/storage", LootLockerHTTPMethod.POST);
