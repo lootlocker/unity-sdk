@@ -5769,8 +5769,8 @@ namespace LootLocker.Requests
 
         #endregion
 
-        #region Metadata
-
+#region Metadata
+#if LOOTLOCKER_PRE_RELEASE
         /// <summary>
         /// List Metadata for the specified source with default pagination
         /// </summary>
@@ -5854,8 +5854,8 @@ namespace LootLocker.Requests
                 });
             });
         }
-
-        #endregion
+#endif
+#endregion
 
         #region Misc
 
