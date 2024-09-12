@@ -102,7 +102,8 @@ namespace LootLocker
                         yield break;
                     }
 
-                    LogResponse(request, webRequest.responseCode, webRequest.downloadHandler.text, startTime);
+
+                    LogResponse(request, webRequest.responseCode, webRequest.downloadHandler.text, startTime, webRequest.error);
 
                     if (WebRequestSucceeded(webRequest))
                     {
@@ -168,8 +169,17 @@ namespace LootLocker
             return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
         }
 
-        private static void LogResponse(LootLockerServerRequest request, long statusCode, string responseBody, float startTime)
+        private static void LogResponse(LootLockerServerRequest request, long statusCode, string responseBody, float startTime, string unityWebRequestError)
         {
+            if (statusCode == 0 && string.IsNullOrEmpty(responseBody) && !string.IsNullOrEmpty(unityWebRequestError))
+            {
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Unity Web request failed, request to " +
+                    request.endpoint + " completed in " +
+                    (Time.time - startTime).ToString("n4") +
+                    " secs.\nWeb Request Error: " + unityWebRequestError);
+                return;
+            }
+
             try
             {
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " +
@@ -184,8 +194,7 @@ namespace LootLocker
             {
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.httpMethod.ToString());
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.endpoint);
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(
-                    LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody));
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody));
             }
         }
 
