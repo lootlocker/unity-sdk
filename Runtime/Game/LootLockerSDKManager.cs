@@ -5403,7 +5403,7 @@ namespace LootLocker.Requests
         /// Returns a list of categories to be used for giving feedback about a certain ugc asset.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
-        public static void ListUgcFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        public static void ListUGCFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
         {
             ListFeedbackCategories(LootLockerFeedbackTypes.ugc, onComplete);
         }
