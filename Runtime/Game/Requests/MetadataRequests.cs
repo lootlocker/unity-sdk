@@ -1,6 +1,6 @@
-﻿using LootLocker.LootLockerEnums;
+﻿using System;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
-using System;
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json.Linq;
@@ -192,9 +192,55 @@ namespace LootLocker.Requests
         }
     }
 
+    /// <summary>
+    /// </summary>
+    public class LootLockerMetadataSourceAndKeys
+    {
+        /// <summary>
+        /// The type of source that the source id refers to
+        /// </summary>
+        public LootLockerMetadataSources source { get; set; }
+        /// <summary>
+        /// The id of the specific source that the set operation was taken on
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// A list of keys existing on the specified source
+        /// </summary>
+        public string[] keys { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerMetadataSourceAndEntries
+    {
+        /// <summary>
+        /// The type of source that the source id refers to
+        /// </summary>
+        public LootLockerMetadataSources source { get; set; }
+        /// <summary>
+        /// The id of the specific source that the set operation was taken on
+        /// </summary>
+        public string source_id { get; set; }
+        /// <summary>
+        /// A list of keys existing on the specified source
+        /// </summary>
+        public LootLockerMetadataEntry[] entries { get; set; }
+    }
+
     //==================================================
     // Request Definitions
     //==================================================
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerGetMultisourceMetadataRequest
+    {
+        /// <summary>
+        /// The source & key combos to get
+        /// </summary>
+        public LootLockerMetadataSourceAndKeys[] sources { get; set; }
+    }
 
     //==================================================
     // Response Definitions
@@ -221,6 +267,16 @@ namespace LootLocker.Requests
         /// The requested metadata entry
         /// </summary>
         public LootLockerMetadataEntry entry { get; set; }
+    };
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerGetMultisourceMetadataResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// The requested sources with the requested entries for each source
+        /// </summary>
+        public LootLockerMetadataSourceAndEntries[] Metadata { get; set; }
     };
 }
 
@@ -258,6 +314,33 @@ namespace LootLocker
                 (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(onComplete, serverResponse);
+                });
+        }
+        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, bool ignoreFiles, Action<LootLockerGetMultisourceMetadataResponse> onComplete)
+        {
+            if (SourcesAndKeysToGet == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetMultisourceMetadataResponse>());
+                return;
+            }
+            string endpoint = LootLockerEndPoints.getMultisourceMetadata.endPoint;
+
+            string queryParams = "";
+            if (ignoreFiles) { queryParams += $"ignore_files=true"; } else { queryParams += $"ignore_files=false"; }
+
+            if (!string.IsNullOrEmpty(queryParams))
+            {
+                queryParams = $"?{queryParams}";
+                endpoint += queryParams;
+            }
+
+            LootLockerGetMultisourceMetadataRequest request = new LootLockerGetMultisourceMetadataRequest { sources = SourcesAndKeysToGet };
+
+            string json = LootLockerJson.SerializeObject(request);
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getMultisourceMetadata.httpMethod, json, onComplete:
+                (serverResponse) =>
+                {
+                    LootLockerResponse.Deserialize<LootLockerGetMultisourceMetadataResponse>(onComplete, serverResponse);
                 });
         }
     }
