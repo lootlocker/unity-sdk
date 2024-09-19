@@ -5854,8 +5854,25 @@ namespace LootLocker.Requests
                 });
             });
         }
+
+        /// <summary>
+        /// List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings
+        /// </summary>
+        /// <param name="SourcesAndKeysToGet> The combination of sources to get keys for, and the keys to get for those sources </param>
+        /// <param name="OnComplete> delegate for handling the server response</param>
+        /// <param name="IgnoreFiles> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool ignoreFiles = false)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMultisourceMetadataResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.GetMultisourceMetadata(SourcesAndKeysToGet, ignoreFiles, onComplete);
+        }
 #endif
-#endregion
+        #endregion
 
         #region Misc
 
