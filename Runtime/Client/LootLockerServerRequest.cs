@@ -5,6 +5,7 @@ using LootLocker.LootLockerEnums;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
 #else
 using LLlibs.ZeroDepJson;
 #endif
@@ -22,10 +23,11 @@ namespace LootLocker
         public static readonly JsonSerializerSettings Default = new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
+            Converters = {new StringEnumConverter()},
             Formatting = Formatting.None
         };
 #else
-        public static readonly JsonOptions Default = new JsonOptions(JsonSerializationOptions.Default & ~JsonSerializationOptions.SkipGetOnly);
+        public static readonly JsonOptions Default = new JsonOptions((JsonSerializationOptions.Default | JsonSerializationOptions.EnumAsText) & ~JsonSerializationOptions.SkipGetOnly);
 #endif
     }
 
