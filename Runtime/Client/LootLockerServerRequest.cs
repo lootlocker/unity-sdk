@@ -617,7 +617,7 @@ namespace LootLocker
             }
 
 #if UNITY_EDITOR
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Caller Type: " + callerRole);
+            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Debug)("Caller Type: " + callerRole);
 #endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
