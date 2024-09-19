@@ -9,7 +9,8 @@ namespace LootLocker
     {
         public enum LogLevel
         {
-            Verbose
+            Debug
+            , Verbose
             , Info
             , Warning
             , Error
@@ -81,7 +82,7 @@ namespace LootLocker
                     if (LootLockerConfig.current == null ||
                         (new List<LootLockerConfig.DebugLevel>
                         {
-                            LootLockerConfig.DebugLevel.All, 
+                            LootLockerConfig.DebugLevel.All,
                             LootLockerConfig.DebugLevel.AllAsNormal
                         })
                         .Contains(LootLockerConfig.current.currentDebugLevel))
@@ -90,6 +91,10 @@ namespace LootLocker
                     }
 
                     break;
+                }
+                case LogLevel.Debug:
+                {
+                    return false;
                 }
                 case LogLevel.Info:
                 default:
