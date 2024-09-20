@@ -3,8 +3,6 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
-
-
     public class LootLockerPlayerHeroResponse : LootLockerResponse
     {
         public LootLockerPlayerHero hero;
@@ -86,6 +84,7 @@ namespace LootLocker.Requests
         public int asset_variation_id { get; set; }
     }
 
+    [Obsolete("LootLockerHeroLoadout is deprecated as it's not used in the SDK")]
     public class LootLockerHeroLoadout
     {
         public int variation_id { get; set; }
@@ -95,11 +94,13 @@ namespace LootLocker.Requests
         public LootLockerRental rental { get; set; }
     }
 
+    [Obsolete("LootLockerHeroAssetInstance is deprecated as it's not used in the SDK")]
     public class LootLockerHeroAssetInstance
     {
         public int instance_id { get; set; }
     }
 
+    [Obsolete("LootLockerHeroAsset is deprecated as it's not used in the SDK")]
     public class LootLockerHeroAsset
     {
         public int asset_id { get; set; }

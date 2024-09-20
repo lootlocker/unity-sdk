@@ -95,7 +95,7 @@ namespace LootLocker.Requests
             try
             {
                 string doubleAsString = value.ToString();
-                return double.TryParse(doubleAsString, out output); ;
+                return double.TryParse(doubleAsString, out output);
             }
             catch (InvalidCastException)
             {
@@ -111,7 +111,7 @@ namespace LootLocker.Requests
             try
             {
                 string intAsString = value.ToString();
-                return int.TryParse(intAsString, out output); ;
+                return int.TryParse(intAsString, out output);
             }
             catch (InvalidCastException)
             {
@@ -127,7 +127,7 @@ namespace LootLocker.Requests
             try
             {
                 string boolAsString = value.ToString();
-                return bool.TryParse(boolAsString, out output); ;
+                return bool.TryParse(boolAsString, out output);
             }
             catch (InvalidCastException)
             {
