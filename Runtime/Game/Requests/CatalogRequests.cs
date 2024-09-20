@@ -238,7 +238,7 @@ namespace LootLocker.Requests
         /// </summary>
         public int legacy_id { get; set; }
         /// <summary>
-        /// The unique identifying id of this asset
+        /// The unique identifying ulid of this asset
         /// </summary>
         public string id { get; set; }
         /// <summary>
