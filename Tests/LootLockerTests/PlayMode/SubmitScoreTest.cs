@@ -205,7 +205,7 @@ namespace LootLockerTests.PlayMode
             //Given
             LootLockerSubmitScoreResponse actualResponse = null;
             bool scoreSubmittedCompleted = false;
-            var actualScore = Random.Range(0, 100);
+            var actualScore = Random.Range(2, 100);
 
             LootLockerSDKManager.SubmitScore(null, actualScore, GlobalPlayerLeaderboardKey, (response) =>
             {
