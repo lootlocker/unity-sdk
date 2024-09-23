@@ -107,6 +107,7 @@ namespace LootLocker.Requests
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
+        public string wallet_id { get; set; }
     }
 
     [Serializable]
