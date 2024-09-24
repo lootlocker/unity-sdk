@@ -47,6 +47,10 @@ namespace LootLocker.Requests
         /// A List of rewards tied to the Leaderboard.
         /// </summary>
         public LootLockerLeaderboardReward[] rewards { get; set; }
+        /// <summary>
+        /// The ulid for this leaderboard
+        /// </summary>
+        public string ulid { get; set; }
     }
 
     public class LootLockerLeaderboardRewardCurrency
