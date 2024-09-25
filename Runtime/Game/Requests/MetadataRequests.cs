@@ -197,6 +197,15 @@ namespace LootLocker.Requests
     /// </summary>
     public class LootLockerMetadataSourceAndKeys
     {
+        /// /// <summary>
+        /// Constructor for LootLockerMetadataSourceAndKeys
+        /// </summary>
+        public LootLockerMetadataSourceAndKeys(LootLockerMetadataSources source, string id, string[] keys)
+        {
+            this.source = source;
+            this.id = id;
+            this.keys = keys;
+        }
         /// <summary>
         /// The type of source that the source id refers to
         /// </summary>
