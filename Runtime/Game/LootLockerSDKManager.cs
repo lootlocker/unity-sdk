@@ -5770,7 +5770,6 @@ namespace LootLocker.Requests
         #endregion
 
 #region Metadata
-#if LOOTLOCKER_PRE_RELEASE
         /// <summary>
         /// List Metadata for the specified source with default pagination
         /// </summary>
@@ -5871,7 +5870,6 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.GetMultisourceMetadata(SourcesAndKeysToGet, ignoreFiles, onComplete);
         }
-#endif
         #endregion
 
         #region Misc
