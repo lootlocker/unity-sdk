@@ -90,7 +90,7 @@ namespace LootLockerTestConfigurationUtils
 
         [Header("LootLocker Admin API Asset Operations")]
         public static EndPointClass getAssetContexts = new EndPointClass("/v1/game/#GAMEID#/assets/contexts", LootLockerHTTPMethod.GET);
-        public static EndPointClass createAsset = new EndPointClass("/v1/asset", LootLockerHTTPMethod.POST);
+        public static EndPointClass createAsset = new EndPointClass("/v1/game/#GAMEID#/asset", LootLockerHTTPMethod.POST);
         public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST);
     }
     #endregion
