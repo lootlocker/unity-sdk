@@ -1,5 +1,10 @@
 ﻿using System;
 using LootLocker.Requests;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 
 namespace LootLocker.Requests
 {
@@ -46,6 +51,11 @@ namespace LootLocker.Requests
         public int instance_id { get; set; }
         public string hero_name { get; set; }
         public string character_name { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
         public LootLockerCommonAsset asset { get; set; }
     }
@@ -54,6 +64,11 @@ namespace LootLocker.Requests
     {
         public int hero_id { get; set; }
         public string name { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
     }
 
@@ -62,12 +77,22 @@ namespace LootLocker.Requests
         public int hero_id { get; set; }
         public string name { get; set; }
         public int asset_variation_id { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
     }
 
     public class LootLockerUpdateHeroRequest
     {
         public string name { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
     }
 
