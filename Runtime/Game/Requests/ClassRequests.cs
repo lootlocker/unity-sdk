@@ -48,6 +48,11 @@ namespace LootLocker.Requests
     public class LootLockerClassTypes
     {
         public int id { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
         public string name { get; set; }
         public LootLockerStorage[] storage { get; set; }
@@ -63,6 +68,11 @@ namespace LootLocker.Requests
 
     public class LootLockerCreateClassRequest
     {
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
         public string name { get; set; }
         public string character_type_id { get; set; }
@@ -70,6 +80,11 @@ namespace LootLocker.Requests
 
     public class LootLockerUpdateClassRequest
     {
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
         public string name { get; set; }
     }
@@ -107,6 +122,11 @@ namespace LootLocker.Requests
         public string type { get; set; }
         public string name { get; set; }
         public string ulid { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("default")]
+#else
+        [Json(Name = "default")]
+#endif
         public bool is_default { get; set; }
     }
 
