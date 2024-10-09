@@ -24,7 +24,7 @@ namespace LootLocker.Requests
     public class LootLockerSuccessfulKey
     {
         /// <summary>
-        /// The key that was successfully executed
+        /// The key that was successfully invoked
         /// </summary>
         public string Key { get; set; }
     };
@@ -34,11 +34,11 @@ namespace LootLocker.Requests
     public class LootLockerFailedKey
     {
         /// <summary>
-        /// The key that was successfully executed
+        /// The key of the trigger that failed invocation
         /// </summary>
         public string Key { get; set; }
         /// <summary>
-        /// The key that was successfully executed
+        /// The reason that the trigger failed invocation
         /// </summary>
         public string LootLockerTriggerFailureReasons { get; set; }
     };
