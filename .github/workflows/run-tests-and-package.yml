@@ -21,56 +21,6 @@ on:
         type: string
 
 jobs:
-  functional-tests:
-    name: DISABLED Functional tests with config ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
-    runs-on: ubuntu-latest
-    #Disable for now, will be replaced by "Integraton tests"
-    if: ${{ true == false }}
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        testMode:
-          - playmode
-        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
-        jsonLibrary:
-          - zerodep
-          - newtonsoft
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v4
-      - name: Checkout test repository
-        uses: actions/checkout@v4
-        with:
-          repository: LootLocker/unity-sdk-tests
-          path: ./tests~ # Unity ignores folders with ~ from inclusion
-      - name: Set SDK path in test repo
-        run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
-      - name: Cache Libraries
-        uses: actions/cache@v4
-        with:
-          path: tests~/Library
-          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
-          restore-keys: Library-
-      - name: Configure LootLocker to use Newtonsoft JSON
-        if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
-        run: |
-          sed -i 's/NO_LOOTLOCKER_USE_NEWTONSOFTJSON/LOOTLOCKER_USE_NEWTONSOFTJSON/' tests~/ProjectSettings/ProjectSettings.asset
-      - name: Run tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
-        uses: game-ci/unity-test-runner@v4
-        id: tests
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          testMode: ${{ matrix.testMode }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
-          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
-          projectPath: tests~/
-          unityVersion: ${{ matrix.unityVersion }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -apikey ${{ secrets.LOOTLOCKER_API_KEY }} -domainkey ${{ secrets.LOOTLOCKER_DOMAIN_KEY }}
   editor-smoke-test:
     name: Test SDK in Editor
     runs-on: [ubuntu-latest]
