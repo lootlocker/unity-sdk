@@ -4894,6 +4894,31 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Triggers
+
+        /// <summary>
+        /// Invoke a set of triggers by key
+        ///
+        /// Note that the response contains two lists:
+        /// - One listing the keys of the triggers that were successfully executed
+        /// - One listing the triggers that failed as well as the reason they did so
+        ///
+        /// This means that the request can "succeed" but still contain triggers that failed. So make sure to check the inner results.
+        /// </summary>
+        /// <param name="KeysToInvoke">List of keys of the triggers to invoke</param>
+        /// <param name="onComplete">onComplete Action for handling the server response</param>
+        public static void InvokeTriggersByKey(string[] KeysToInvoke, Action<LootLockerInvokeTriggersByKeyResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInvokeTriggersByKeyResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.InvokeTriggers.endPoint, LootLockerEndPoints.InvokeTriggers.httpMethod, LootLockerJson.SerializeObject(new LootLockerInvokeTriggersByKeyRequest { Keys = KeysToInvoke }), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        #endregion
+
         #region Leaderboard
         /// <summary>
         /// List leaderboards with details on each leaderboard

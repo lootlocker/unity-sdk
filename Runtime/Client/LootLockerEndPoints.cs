@@ -215,6 +215,9 @@ namespace LootLocker
         public static EndPointClass triggeringAnEvent = new EndPointClass("v1/player/trigger", LootLockerHTTPMethod.POST);
         public static EndPointClass listingTriggeredTriggerEvents = new EndPointClass("v1/player/triggers", LootLockerHTTPMethod.GET);
 
+        // Triggers
+        public static EndPointClass InvokeTriggers = new EndPointClass("triggers/v2", LootLockerHTTPMethod.POST);
+
         // Maps
         [Header("Collectables")]
         public static EndPointClass gettingCollectables = new EndPointClass("v1/collectable", LootLockerHTTPMethod.GET);
