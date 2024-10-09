@@ -4867,6 +4867,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="eventName">Name of the trigger to execute</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
+        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
         public static void ExecuteTrigger(string triggerName, Action<LootLockerExecuteTriggerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4882,6 +4883,7 @@ namespace LootLocker.Requests
         ///  Lists the triggers that a player have already executed.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAllTriggersResponse</param>
+        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
         public static void ListExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4891,7 +4893,6 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.ListAllExecutedTriggers(onComplete);
         }
-
         #endregion
 
         #region Triggers
