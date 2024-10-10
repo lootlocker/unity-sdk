@@ -5898,6 +5898,136 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Notifications
+
+        /// <summary>
+        /// List notifications without filters and with default pagination settings
+        /// </summary>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void ListNotifications(Action<LootLockerListNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ListNotifications.endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
+                (response) =>
+                {
+
+                    LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
+                    if (parsedResponse != null)
+                    {
+                        foreach (var notification in parsedResponse.Notifications)
+                        {
+                            notification.Content.ContextAsDictionary = new Dictionary<string, string>();
+                            foreach (var contextEntry in notification.Content.Context)
+                            {
+                                notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
+                            }
+                        }
+                    }
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// List notifications according to specified filters and with pagination settings
+        /// </summary>
+        /// <param name="WithPriorityEqualToOrHigherThan">Do not return notifications with priority lower than the specified priority</param>
+        /// <param name="ShowAcknowledged">Return previously acknowledged notifications</param>
+        /// <param name="OfType">Return only notifications with the specified type</param>
+        /// <param name="WithSource">Return only notifications with the specified source</param>
+        /// <param name="Page">Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage">Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page"</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void ListNotifications(LootLockerNotificationPriority WithPriorityEqualToOrHigherThan, bool ShowAcknowledged, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                return;
+            }
+
+            string queryParams = $"?priority={WithPriorityEqualToOrHigherThan.ToString()}&";
+            if (ShowAcknowledged) { queryParams += $"acknowledged=true"; } else { queryParams += $"acknowledged=false"; }
+            if (Page > 0) queryParams += $"page={Page}&";
+            if (PerPage > 0) queryParams += $"per_page={PerPage}&";
+            if (!string.IsNullOrEmpty(OfType)) queryParams += $"notification_type={OfType}&";
+            if (!string.IsNullOrEmpty(WithSource)) queryParams += $"source={WithSource}&";
+
+            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications + queryParams;
+
+            LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
+                (response) =>
+                {
+
+                    LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
+                    if (parsedResponse != null)
+                    {
+                        foreach (var notification in parsedResponse.Notifications)
+                        {
+                            notification.Content.ContextAsDictionary = new Dictionary<string, string>();
+                            foreach (var contextEntry in notification.Content.Context)
+                            {
+                                notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
+                            }
+                        }
+                    }
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// Mark the specified notification as acknowledged
+        /// </summary>
+        /// <param name="NotificationId">The id of the notification you wish to acknowledge</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void AcknowledgeNotification(string NotificationId, Action<LootLockerAcknowledgeNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAcknowledgeNotificationsResponse>());
+                return;
+            }
+
+            string endpoint = string.Format(LootLockerEndPoints.AcknowledgeNotification.endPoint, NotificationId);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.AcknowledgeNotification.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Dismiss all notifications
+        /// </summary>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void DismissAllNotifications(Action<LootLockerDismissNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDismissNotificationsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.DismissAllNotifications.endPoint, LootLockerEndPoints.DismissAllNotifications.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Dismiss the specified notifications
+        /// </summary>
+        /// <param name="NotificationsToDismiss">List of ids of notifications to dismiss</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void DismissAllNotifications(string[] NotificationsToDismiss, Action<LootLockerDismissNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDismissNotificationsResponse>());
+                return;
+            }
+            
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.DismissMultipleNotifications.endPoint, LootLockerEndPoints.DismissMultipleNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerDismissNotificationsRequest{ Notifications = NotificationsToDismiss }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+        #endregion
         #region Misc
 
         /// <summary>
