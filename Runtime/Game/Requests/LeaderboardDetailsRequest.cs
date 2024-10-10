@@ -347,11 +347,6 @@ namespace LootLocker.Requests
         public string description { get; set; }
 
         /// <summary>
-        /// Metadata for the Group reward.
-        /// </summary>
-        public LootLockerLeaderboardGroupRewardMetadata[] metadata { get; set; }
-
-        /// <summary>
         /// Associations for the Group reward.
         /// </summary>
         public LootLockerLeaderboardGroupRewardAssociations[] associations { get; set; }
@@ -360,18 +355,6 @@ namespace LootLocker.Requests
         /// The ID of the reward.
         /// </summary>
         public string reward_id { get; set; }
-    }
-
-   public class LootLockerLeaderboardGroupRewardMetadata
-    {
-        /// <summary>
-        /// The Key of a metadata
-        /// </summary>
-        public string key { get; set; }
-        /// <summary>
-        /// the Value of a metadata
-        /// </summary>
-        public string value { get; set; }
     }
 
 
