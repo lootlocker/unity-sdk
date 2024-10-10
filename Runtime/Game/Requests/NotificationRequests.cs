@@ -414,7 +414,7 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerNotificationContent Content { get; set; }
         /// <summary>
-        /// The id of the notification, use this when acknowledging and dismissing
+        /// The id of the notification, use this when acknowledging
         /// </summary>
         public string Id { get; set; }
         /// <summary>
@@ -433,10 +433,10 @@ namespace LootLocker.Requests
     
     /// <summary>
     /// </summary>
-    public class LootLockerDismissNotificationsRequest
+    public class LootLockerAcknowledgeMultipleNotificationsRequest
     {
         /// <summary>
-        /// List of ids of the notifications to dismiss
+        /// List of ids of the notifications to acknowledge
         /// </summary>
         public string[] Notifications { get; set; }
     };
@@ -462,13 +462,6 @@ namespace LootLocker.Requests
     /// <summary>
     /// </summary>
     public class LootLockerAcknowledgeNotificationsResponse : LootLockerResponse
-    {
-        // Empty unless there are errors
-    };
-
-    /// <summary>
-    /// </summary>
-    public class LootLockerDismissNotificationsResponse : LootLockerResponse
     {
         // Empty unless there are errors
     };
