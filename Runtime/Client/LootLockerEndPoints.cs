@@ -300,5 +300,12 @@ namespace LootLocker
         public static EndPointClass listMetadata = new EndPointClass("metadata/source/{0}/id/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass getMultisourceMetadata = new EndPointClass("metadata/multisource", LootLockerHTTPMethod.POST);
 
+        // Notifications
+        [Header("Notifications")]
+        public static EndPointClass ListNotifications = new EndPointClass("notifications", LootLockerHTTPMethod.GET);
+        public static EndPointClass AcknowledgeNotification = new EndPointClass("notifications/{0}/acknowledge", LootLockerHTTPMethod.PUT);
+        public static EndPointClass DismissAllNotifications = new EndPointClass("notifications/dismiss/all", LootLockerHTTPMethod.PUT);
+        public static EndPointClass DismissMultipleNotifications = new EndPointClass("notifications/dismiss/multiple", LootLockerHTTPMethod.PUT);
+
     }
 }
