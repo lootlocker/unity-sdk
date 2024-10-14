@@ -102,6 +102,10 @@ namespace LootLocker.Requests
         /// The current balance in this account
         /// </summary>
         public int account_balance { get; set; }
+        /// <summary>
+        /// The id of the wallet for this account
+        /// </summary>
+        public string wallet_id { get; set; }
     }
 
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
@@ -110,10 +114,6 @@ namespace LootLocker.Requests
         /// The unique player identifier for this account
         /// </summary>
         public string player_identifier { get; set; }
-        /// <summary>
-        /// The automatically created wallet for this account
-        /// </summary>
-        public string wallet_id { get; set; }
     }
 
     [Serializable]
