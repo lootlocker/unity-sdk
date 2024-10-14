@@ -394,9 +394,9 @@ namespace LootLocker.Requests
         /// </summary>
         public string Expiration_date { get; set; }
         /// <summary>
-        /// The time that this notification was acknowledged. Will be empty if the notification has not been acknowledged
+        /// The time that this notification was read. Will be empty if the notification has not been read
         /// </summary>
-        public string Acknowledged_at { get; set; }
+        public string Read_at { get; set; }
         /// <summary>
         /// The type of this notification
         /// </summary>
@@ -414,7 +414,7 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerNotificationContent Content { get; set; }
         /// <summary>
-        /// The id of the notification, use this when acknowledging
+        /// The id of the notification, use this when marking as read
         /// </summary>
         public string Id { get; set; }
         /// <summary>
@@ -422,9 +422,9 @@ namespace LootLocker.Requests
         /// </summary>
         public string Player_id { get; set; }
         /// <summary>
-        /// Whether this notification has been acknowledged or not
+        /// Whether this notification has been read or not
         /// </summary>
-        public bool Acknowledged { get; set; }
+        public bool Read { get; set; }
     };
 
     //==================================================
@@ -433,10 +433,10 @@ namespace LootLocker.Requests
     
     /// <summary>
     /// </summary>
-    public class LootLockerAcknowledgeMultipleNotificationsRequest
+    public class LootLockerReadNotificationsRequest
     {
         /// <summary>
-        /// List of ids of the notifications to acknowledge
+        /// List of ids of the notifications to mark as read
         /// </summary>
         public string[] Notifications { get; set; }
     };
@@ -461,7 +461,7 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
-    public class LootLockerAcknowledgeNotificationsResponse : LootLockerResponse
+    public class LootLockerReadNotificationsResponse : LootLockerResponse
     {
         // Empty unless there are errors
     };
