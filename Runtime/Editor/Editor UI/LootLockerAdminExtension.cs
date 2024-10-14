@@ -13,6 +13,14 @@ namespace LootLocker.Extension
 {
     public class LootLockerAdminExtension : EditorWindow
     {
+        // State Variables
+        bool isStage = true;
+        bool isLoadingKeys = false;
+        Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
+        private Label gameName;
+        DateTime gameDataRefreshTime;
+        readonly int gameDataCacheExpirationTimeMinutes = 1;
+
         [SerializeField]
         private VisualTreeAsset m_VisualTreeAsset = default;
 
@@ -69,10 +77,6 @@ namespace LootLocker.Extension
         VisualElement loadingIcon;
         int rotateIndex = 0;
 
-        private Label gameName;
-
-        bool isStage = true;
-
         [MenuItem("Window/LootLocker")]
         public static void Run()
         {
@@ -101,7 +105,6 @@ namespace LootLocker.Extension
         [InitializeOnLoadMethod]
         public static void LoadFirstTime()
         {
-
             if (LootLockerEditorData.ShouldAutoShowWindow())
             {
                 EditorApplication.delayCall = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.delayCall, (EditorApplication.CallbackFunction)delegate
@@ -303,13 +306,10 @@ namespace LootLocker.Extension
                 EditorApplication.update -= OnEditorUpdate;
 
             }).Every(1);
-
-
         }
 
         void SwapEnvironment()
         {
-
             if (isLoadingKeys)
             {
                 ShowPopup("Error", "Please wait...");
@@ -492,9 +492,6 @@ namespace LootLocker.Extension
             });
         }
 
-        Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
-        DateTime gameDataRefreshTime;
-        int gameDataCacheExpirationTimeMinutes = 1;
         public void RefreshUserInformation(Action onComplete)
         {
             gameData.Clear();
@@ -671,8 +668,6 @@ namespace LootLocker.Extension
             newApiKeyName.value = "";
         }
 
-        bool isLoadingKeys = false;
-
         void RefreshAPIKeys()
         {
             apiKeyList.Clear();
@@ -775,6 +770,7 @@ namespace LootLocker.Extension
                 }
             }
         }
+
         void Logout()
         {
             loadingPage.style.display = DisplayStyle.Flex;
@@ -786,6 +782,7 @@ namespace LootLocker.Extension
             loadingPage.style.display = DisplayStyle.None;
             SwapFlows(activeFlow, loginFlow);
         }
+
         private void OnDestroy()
         {
             LootLockerServerApi.ResetInstance();
