@@ -48,9 +48,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Manually initialize the SDK.
         /// </summary>
-        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.com/settings/game and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
-        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.com/settings/game and click on the API-tab</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
