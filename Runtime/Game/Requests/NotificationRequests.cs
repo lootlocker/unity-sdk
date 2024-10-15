@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LootLocker.LootLockerEnums;
 
 namespace LootLocker.LootLockerEnums
@@ -54,11 +55,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The date the Currency reward was created.
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
         /// <summary>
         /// The date the Currency reward was last updated.
         /// </summary>
-        public string Updated_at { get; set; }
+        public DateTime Updated_at { get; set; }
         /// <summary>
         /// The amount of Currency to be rewarded.
         /// </summary>
@@ -106,11 +107,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The date the Progression Points reward was created.
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
         /// <summary>
         /// The date the Progression Points was last updated.
         /// </summary>
-        public string Updated_at { get; set; }
+        public DateTime Updated_at { get; set; }
         /// <summary>
         /// The details of the Progression.
         /// </summary>
@@ -158,11 +159,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The date the Progression Reset reward was created.
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
         /// <summary>
         /// The date the Progression Reset reward was last updated.
         /// </summary>
-        public string Updated_at { get; set; }
+        public DateTime Updated_at { get; set; }
         /// <summary>
         /// The details of the Progression reward.
         /// </summary>
@@ -202,11 +203,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The date the Asset reward was created.
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
         /// <summary>
         /// The date the Asset reward was last updated.
         /// </summary>
-        public string Updated_at { get; set; }
+        public DateTime Updated_at { get; set; }
         /// <summary>
         /// The details on the Asset.
         /// </summary>
@@ -278,7 +279,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The date the Group reward was created.
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
 
         /// <summary>
         /// The name of the Group.
@@ -388,7 +389,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The time that this notification was created
         /// </summary>
-        public string Created_at { get; set; }
+        public DateTime Created_at { get; set; }
         /// <summary>
         /// At what time that this notification expires, after this time, the notification is no longer returned
         /// </summary>
@@ -396,7 +397,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The time that this notification was read. Will be empty if the notification has not been read
         /// </summary>
-        public string Read_at { get; set; }
+        public DateTime Read_at { get; set; }
         /// <summary>
         /// The type of this notification
         /// </summary>
