@@ -451,7 +451,7 @@ namespace LootLocker.Requests
     public class LootLockerListNotificationsResponse : LootLockerResponse
     {
         /// <summary>
-        /// List of the requested notifications according to pagination settins
+        /// List of the requested notifications according to pagination settings
         /// </summary>
         public LootLockerNotification[] Notifications { get; set; }
         /// <summary>

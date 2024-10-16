@@ -5962,7 +5962,6 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
                 {
-
                     LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
                     if (parsedResponse != null && parsedResponse.Notifications != null)
                     {
