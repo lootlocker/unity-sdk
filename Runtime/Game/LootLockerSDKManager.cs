@@ -5904,7 +5904,7 @@ namespace LootLocker.Requests
         /// List notifications without filters and with default pagination settings
         /// </summary>
         /// <param name="OnComplete">Delegate for handling the server response</param>
-        public static void ListNotifications(Action<LootLockerListNotificationsResponse> onComplete)
+        public static void ListUnreadNotifications(Action<LootLockerListNotificationsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -5942,7 +5942,7 @@ namespace LootLocker.Requests
         /// <param name="Page">Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
         /// <param name="PerPage">Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page"</param>
         /// <param name="OnComplete">Delegate for handling the server response</param>
-        public static void ListNotifications(LootLockerNotificationPriority WithPriority, bool ShowRead, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
+        public static void ListNotifications(LootLockerNotificationPriority? WithPriority, bool ShowRead, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -5950,14 +5950,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string queryParams = $"?priority={WithPriority.ToString()}&";
+            string queryParams = "?";
+            if (WithPriority != null) { queryParams += $"priority={WithPriority.ToString()}&"; }
             if (ShowRead) { queryParams += $"read=true"; } else { queryParams += $"read=false"; }
             if (Page > 0) queryParams += $"page={Page}&";
             if (PerPage > 0) queryParams += $"per_page={PerPage}&";
             if (!string.IsNullOrEmpty(OfType)) queryParams += $"notification_type={OfType}&";
             if (!string.IsNullOrEmpty(WithSource)) queryParams += $"source={WithSource}&";
 
-            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications + queryParams;
+            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications.endpoint + queryParams;
 
             LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
