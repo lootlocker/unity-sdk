@@ -48,9 +48,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Manually initialize the SDK.
         /// </summary>
-        /// <param name="apiKey">Find the Game API-key at https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="apiKey">Find the Game API-key at https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
-        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://my.lootlocker.io/settings/game and click on the API-tab</param>
+        /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
@@ -4867,6 +4867,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="eventName">Name of the trigger to execute</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
+        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
         public static void ExecuteTrigger(string triggerName, Action<LootLockerExecuteTriggerResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4882,6 +4883,7 @@ namespace LootLocker.Requests
         ///  Lists the triggers that a player have already executed.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAllTriggersResponse</param>
+        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
         public static void ListExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -4891,7 +4893,31 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.ListAllExecutedTriggers(onComplete);
         }
+        #endregion
 
+        #region Triggers
+
+        /// <summary>
+        /// Invoke a set of triggers by key
+        ///
+        /// Note that the response contains two lists:
+        /// - One listing the keys of the triggers that were successfully executed
+        /// - One listing the triggers that failed as well as the reason they did so
+        ///
+        /// This means that the request can "succeed" but still contain triggers that failed. So make sure to check the inner results.
+        /// </summary>
+        /// <param name="KeysToInvoke">List of keys of the triggers to invoke</param>
+        /// <param name="onComplete">onComplete Action for handling the server response</param>
+        public static void InvokeTriggersByKey(string[] KeysToInvoke, Action<LootLockerInvokeTriggersByKeyResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInvokeTriggersByKeyResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.InvokeTriggers.endPoint, LootLockerEndPoints.InvokeTriggers.httpMethod, LootLockerJson.SerializeObject(new LootLockerInvokeTriggersByKeyRequest { Keys = KeysToInvoke }), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
         #endregion
 
         #region Leaderboard
@@ -5769,14 +5795,14 @@ namespace LootLocker.Requests
 
         #endregion
 
-#region Metadata
+        #region Metadata
         /// <summary>
         /// List Metadata for the specified source with default pagination
         /// </summary>
-        /// <param name="Source> The source type for which to request metadata</param>
-        /// <param name="SourceID> The specific source id for which to request metadata</param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="Source"> The source type for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
         {
             ListMetadata(Source, SourceID, 0, 0, onComplete, IgnoreFiles);
@@ -5785,12 +5811,12 @@ namespace LootLocker.Requests
         /// <summary>
         /// List the requested page of Metadata for the specified source with the specified pagination
         /// </summary>
-        /// <param name="Source> The source type for which to request metadata</param>
-        /// <param name="SourceID> The specific source id for which to request metadata</param>
-        /// <param name="Page> Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
-        /// <param name="PerPage> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="Source"> The source type for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata</param>
+        /// <param name="Page"> Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage"> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
         {
             ListMetadataWithTags(Source, SourceID, null, Page, PerPage, onComplete, IgnoreFiles);
@@ -5799,11 +5825,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// List Metadata for the specified source that has all of the provided tags, use default pagination
         /// </summary>
-        /// <param name="Source> The source type for which to request metadata</param>
-        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Source"> The source type for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata</param>
         /// <param name="Tags"> The tags that the requested metadata should have, only metadata matching *all of* the given tags will be returned </param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
         {
             ListMetadataWithTags(Source, SourceID, Tags, 0, 0, onComplete, IgnoreFiles);
@@ -5812,13 +5838,13 @@ namespace LootLocker.Requests
         /// <summary>
         /// List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings
         /// </summary>
-        /// <param name="Source> The source type for which to request metadata</param>
-        /// <param name="SourceID> The specific source id for which to request metadata</param>
+        /// <param name="Source"> The source type for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata</param>
         /// <param name="Tags"> The tags that the requested metadata should have, only metadata matching *all of* the given tags will be returned </param>
-        /// <param name="Page> Used together with PerPage to apply pagination to this request.Page designates which "page" of items to fetch</param>
-        /// <param name="PerPage> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="Page"> Used together with PerPage to apply pagination to this request.Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage"> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
         {
             if (!CheckInitialized())
@@ -5833,11 +5859,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get Metadata for the specified source with the given key
         /// </summary>
-        /// <param name="Source> The source type for which to request metadata</param>
-        /// <param name="SourceID> The specific source id for which to request metadata</param>
-        /// <param name="Key> The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="Source"> The source type for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata</param>
+        /// <param name="Key"> The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void GetMetadata(LootLockerMetadataSources Source, string SourceID, string Key, Action<LootLockerGetMetadataResponse> onComplete, bool IgnoreFiles=false)
         {
             LootLockerAPIManager.ListMetadata(Source, SourceID, 0, 0, Key, null, IgnoreFiles, (ListResponse) =>
@@ -5857,9 +5883,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings
         /// </summary>
-        /// <param name="SourcesAndKeysToGet> The combination of sources to get keys for, and the keys to get for those sources </param>
-        /// <param name="OnComplete> delegate for handling the server response</param>
-        /// <param name="IgnoreFiles> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
+        /// <param name="SourcesAndKeysToGet"> The combination of sources to get keys for, and the keys to get for those sources </param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
         public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool ignoreFiles = false)
         {
             if (!CheckInitialized())
@@ -5872,6 +5898,112 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Notifications
+
+        /// <summary>
+        /// List notifications without filters and with default pagination settings
+        /// </summary>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void ListNotifications(Action<LootLockerListNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ListNotifications.endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
+                (response) =>
+                {
+
+                    LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
+                    if (parsedResponse != null && parsedResponse.Notifications != null)
+                    {
+                        foreach (var notification in parsedResponse.Notifications)
+                        {
+                            notification.Content.ContextAsDictionary = new Dictionary<string, string>();
+                            foreach (var contextEntry in notification.Content.Context)
+                            {
+                                notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
+                            }
+                        }
+                    }
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// List notifications according to specified filters and with pagination settings
+        /// </summary>
+        /// <param name="WithPriority">Return only notifications with the specified priority</param>
+        /// <param name="ShowRead">Return previously read notifications</param>
+        /// <param name="OfType">Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use.</param>
+        /// <param name="WithSource">Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use.</param>
+        /// <param name="Page">Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
+        /// <param name="PerPage">Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page"</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void ListNotifications(LootLockerNotificationPriority WithPriority, bool ShowRead, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                return;
+            }
+
+            string queryParams = $"?priority={WithPriority.ToString()}&";
+            if (ShowRead) { queryParams += $"read=true"; } else { queryParams += $"read=false"; }
+            if (Page > 0) queryParams += $"page={Page}&";
+            if (PerPage > 0) queryParams += $"per_page={PerPage}&";
+            if (!string.IsNullOrEmpty(OfType)) queryParams += $"notification_type={OfType}&";
+            if (!string.IsNullOrEmpty(WithSource)) queryParams += $"source={WithSource}&";
+
+            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications.endPoint + queryParams;
+
+            LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
+                (response) =>
+                {
+                    LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
+                    if (parsedResponse != null && parsedResponse.Notifications != null)
+                    {
+                        parsedResponse.PopulateConvenienceStructures();
+                    }
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
+
+        /// <summary>
+        /// Mark all unread notifications as read
+        ///
+        /// Warning: This will mark ALL unread notifications as read, so if you have listed notifications but due to filters and/or pagination not pulled all of them you may have unviewed unread notifications
+        /// </summary>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void MarkAllNotificationsAsRead(Action<LootLockerReadNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ReadAllNotifications.endPoint, LootLockerEndPoints.ReadAllNotifications.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Mark the specified notifications as read
+        /// </summary>
+        /// <param name="NotificationIds">List of ids of notifications to mark as read</param>
+        /// <param name="OnComplete">Delegate for handling the server response</param>
+        public static void MarkNotificationsAsRead(string[] NotificationIds, Action<LootLockerReadNotificationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>());
+                return;
+            }
+            
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ReadNotifications.endPoint, LootLockerEndPoints.ReadNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerReadNotificationsRequest{ Notifications = NotificationIds }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+        #endregion
         #region Misc
 
         /// <summary>
