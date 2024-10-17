@@ -5965,14 +5965,7 @@ namespace LootLocker.Requests
                     LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
                     if (parsedResponse != null && parsedResponse.Notifications != null)
                     {
-                        foreach (var notification in parsedResponse.Notifications)
-                        {
-                            notification.Content.ContextAsDictionary = new Dictionary<string, string>();
-                            foreach (var contextEntry in notification.Content.Context)
-                            {
-                                notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
-                            }
-                        }
+                        parsedResponse.PopulateConvenienceStructures();
                     }
                     onComplete?.Invoke(parsedResponse);
                 });
