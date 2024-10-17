@@ -5937,8 +5937,8 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="WithPriority">Return only notifications with the specified priority</param>
         /// <param name="ShowRead">Return previously read notifications</param>
-        /// <param name="OfType">Return only notifications with the specified type</param>
-        /// <param name="WithSource">Return only notifications with the specified source</param>
+        /// <param name="OfType">Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use.</param>
+        /// <param name="WithSource">Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use.</param>
         /// <param name="Page">Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
         /// <param name="PerPage">Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page"</param>
         /// <param name="OnComplete">Delegate for handling the server response</param>
@@ -5957,7 +5957,7 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(OfType)) queryParams += $"notification_type={OfType}&";
             if (!string.IsNullOrEmpty(WithSource)) queryParams += $"source={WithSource}&";
 
-            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications + queryParams;
+            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications.endPoint + queryParams;
 
             LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
