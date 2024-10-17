@@ -511,6 +511,14 @@ namespace LootLocker.Requests
         /// Whether this notification has been read or not
         /// </summary>
         public bool Read { get; set; }
+        /// <summary>
+        /// Will mark this notification as read in LootLocker (though remember to check the response if it succeeded)
+        /// </summary>
+        /// <param name="onComplete">Action for handling the server response</param>
+        public void MarkThisNotificationAsRead(Action<LootLockerReadNotificationsResponse> onComplete)
+        {
+            LootLockerSDKManager.MarkNotificationsAsRead(new string[]{Id}, onComplete);
+        }
     };
 
     //==================================================
@@ -543,6 +551,28 @@ namespace LootLocker.Requests
         /// Pagination data for this set of notifications
         /// </summary>
         public LootLockerExtendedPagination Pagination { get; set; }
+        /// <summary>
+        /// Will mark all unread notifications in this response as read in LootLocker (though remember to check the response if it succeeded)
+        /// </summary>
+        /// <param name="onComplete">Action for handling the server response</param>
+        public void MarkUnreadNotificationsAsRead(Action<LootLockerReadNotificationsResponse> onComplete)
+        {
+            List<string> unreadNotifications = new List<string>(); 
+            foreach (LootLockerNotification notification in Notifications)
+            {
+                if (!notification.Read)
+                {
+                    unreadNotifications.Add(notification.Id);
+                }
+            }
+
+            if (unreadNotifications.Count <= 0)
+            {
+                onComplete?.Invoke(new LootLockerReadNotificationsResponse { errorData = null, EventId = "", statusCode = 204, success = true, text = "{}" });
+                return;
+            }
+            LootLockerSDKManager.MarkNotificationsAsRead(unreadNotifications.ToArray(), onComplete);
+        }
     };
 
     /// <summary>
