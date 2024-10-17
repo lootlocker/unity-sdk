@@ -28,6 +28,91 @@ namespace LootLocker.LootLockerEnums
     };
 }
 
+namespace LootLocker.LootLockerStaticStrings
+{
+    /// <summary>
+    /// Possible types of notifications
+    /// </summary>
+    public struct LootLockerNotificationTypes
+    {
+        public static readonly string PullRewardAcquired = "pull.reward.acquired";
+    }
+
+    /// <summary>
+    /// Possible sources for notifications
+    /// </summary>
+    public struct LootLockerNotificationSources
+    {
+        public static readonly string Triggers = "triggers";
+        public struct Purchasing
+        {
+            public static readonly string SteamStore = "purchasing.steam_store";
+            public static readonly string AppleAppStore = "purchasing.apple_app_store";
+            public static readonly string GooglePlayStore = "purchasing.google_play_store";
+            public static readonly string LootLocker = "purchasing.lootlocker";
+        }
+    }
+
+    /// <summary>
+    /// The standard context keys to expect for different notification sources
+    /// </summary>
+    public struct LootLockerStandardContextKeys
+    {
+        /// <summary>
+        /// Standard context keys to expect when source is triggers
+        /// </summary>
+        public struct Triggers
+        {
+            public static readonly string Id = "trigger_id";
+            public static readonly string Key = "trigger_key";
+            public static readonly string Limit = "trigger_limit";
+        }
+
+        /// <summary>
+        /// Standard context keys to expect when source is purchasing
+        /// </summary>
+        public struct Purchasing
+        {
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the Steam store
+            /// </summary>
+            public struct SteamStore
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string EntitlementId = "entitlement_id";
+                public static readonly string CharacterId = "character_id";
+            }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the Apple app store
+            /// </summary>
+            public struct AppleAppStore
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string TransactionId = "transaction_id";
+            }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the GooglePlay store
+            /// </summary>
+            public struct GooglePlayStore
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string ProductId = "product_id";
+            }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from LootLocker
+            /// </summary>
+            public struct LootLocker
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+            }
+        }
+    }
+}
+
 namespace LootLocker.Requests
 {
     //==================================================
@@ -369,11 +454,11 @@ namespace LootLocker.Requests
     public class LootLockerNotificationContent
     {
         /// <summary>
-        /// The context for this content. This is a set of key value pairs that hold additional context information about this notification.
+        /// The context for this content. This is a set of key value pairs that hold additional context information about this notification. Use the static defines in LootLockerStaticStrings.LootLockerStandardContextKeys know what standard values will be in the context depending on the type and source.
         /// </summary>
         public LootLockerNotificationContextEntry[] Context { get; set; }
         /// <summary>
-        /// The context for this content. This is a set of key value pairs that hold additional context information about this notification.
+        /// The context for this content. This is a set of key value pairs that hold additional context information about this notification. Use the static defines in LootLockerStaticStrings.LootLockerStandardContextKeys know what standard values will be in the context depending on the type and source.
         /// </summary>
         public Dictionary<string, string> ContextAsDictionary { get; set; }
         /// <summary>
@@ -399,7 +484,7 @@ namespace LootLocker.Requests
         /// </summary>
         public DateTime Read_at { get; set; }
         /// <summary>
-        /// The type of this notification
+        /// The type of this notification. Use the static defines in LootLockerStaticStrings.LootLockerNotificationTypes know what possible values this can be.
         /// </summary>
         public string Notification_type { get; set; }
         /// <summary>
@@ -407,7 +492,7 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerNotificationPriority Priority { get; set; }
         /// <summary>
-        /// The originating source of this notification (for example, did it originate from a purchase, a leaderboard reward, or a trigger?)
+        /// The originating source of this notification (for example, did it originate from a purchase, a leaderboard reward, or a trigger?). Use the static defines in LootLockerStaticStrings.LootLockerNotificationSources know what possible values this can be
         /// </summary>
         public string Source { get; set; }
         /// <summary>
