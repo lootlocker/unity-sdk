@@ -494,8 +494,6 @@ namespace LootLocker.Extension
 
         public void RefreshUserInformation(Action onComplete)
         {
-            gameData.Clear();
-
             EditorApplication.update += OnEditorUpdate;
             loadingPage.style.display = DisplayStyle.Flex;
 
@@ -509,6 +507,7 @@ namespace LootLocker.Extension
                     Logout();
                     return;
                 }
+                gameData.Clear();
 
                 foreach (var org in response.user.organisations)
                 {
