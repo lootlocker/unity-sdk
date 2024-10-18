@@ -18,6 +18,7 @@ namespace LootLocker
     public class LootLockerServerApi : MonoBehaviour
     {
         private static LootLockerServerApi _instance;
+        private static int _instanceId = 0;
         private const int MaxRetries = 3;
         private int _tries;
 
@@ -25,11 +26,34 @@ namespace LootLocker
         {
             if (_instance == null)
             {
-                _instance = new GameObject("LootLockerServerApi").AddComponent<LootLockerServerApi>();
-
+                var gameObject = new GameObject("LootLockerServerApi");
+#if UNITY_EDITOR
+                UnityEditorInternal.InternalEditorUtility.AddTag("LootLockerServerApiGameObject");
+                gameObject.tag = "LootLockerServerApiGameObject";
+#endif
+                _instanceId = gameObject.GetInstanceID();
+                _instance = gameObject.AddComponent<LootLockerServerApi>();
+                _instance.StartCoroutine(CleanUpOldInstances());
                 if (Application.isPlaying)
                     DontDestroyOnLoad(_instance.gameObject);
             }
+        }
+
+        public static IEnumerator CleanUpOldInstances()
+        {
+            GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("LootLockerServerApiGameObject");
+            foreach (GameObject gameObject in gameObjects)
+            {
+                if (_instanceId != gameObject.GetInstanceID())
+                {
+#if UNITY_EDITOR
+                    DestroyImmediate(gameObject);
+#else
+                    Destroy(gameObject);
+#endif
+                }
+            }
+            yield return null;
         }
 
         public static void ResetInstance()
@@ -41,6 +65,7 @@ namespace LootLocker
             Destroy(_instance.gameObject);
 #endif
             _instance = null;
+            _instanceId = 0;
         }
 
 #if UNITY_EDITOR
@@ -377,7 +402,7 @@ namespace LootLocker
             }
 
             cachedRequest.extraHeaders["x-session-token"] = LootLockerConfig.current.token;
-            _SendRequest(cachedRequest, onComplete);
+            SendRequest(cachedRequest, onComplete);
             cachedRequest.retryCount++;
         }
 
