@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using System.Linq;
 using System.Text;
 using LootLocker.LootLockerEnums;
 using UnityEditor;
 using LootLocker.Requests;
+using UnityEditorInternal;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -17,6 +19,7 @@ namespace LootLocker
 {
     public class LootLockerServerApi : MonoBehaviour
     {
+        private static bool _bTaggedGameObjects = false;
         private static LootLockerServerApi _instance;
         private static int _instanceId = 0;
         private const int MaxRetries = 3;
@@ -27,10 +30,11 @@ namespace LootLocker
             if (_instance == null)
             {
                 var gameObject = new GameObject("LootLockerServerApi");
-#if UNITY_EDITOR
-                UnityEditorInternal.InternalEditorUtility.AddTag("LootLockerServerApiGameObject");
-                gameObject.tag = "LootLockerServerApiGameObject";
-#endif
+                if (_bTaggedGameObjects)
+                {
+                    gameObject.tag = "LootLockerServerApiGameObject";
+                }
+
                 _instanceId = gameObject.GetInstanceID();
                 _instance = gameObject.AddComponent<LootLockerServerApi>();
                 _instance.StartCoroutine(CleanUpOldInstances());
@@ -41,6 +45,10 @@ namespace LootLocker
 
         public static IEnumerator CleanUpOldInstances()
         {
+            if (!_bTaggedGameObjects)
+            {
+                yield break;
+            }
             GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("LootLockerServerApiGameObject");
             foreach (GameObject gameObject in gameObjects)
             {
@@ -70,9 +78,23 @@ namespace LootLocker
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        private static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
             ResetInstance();
+        }
+
+        [InitializeOnLoadMethod]
+        private static void CreateTag()
+        {
+            if (InternalEditorUtility.tags.Contains("LootLockerServerApiGameObject"))
+            {
+                _bTaggedGameObjects = true;
+            }
+            else
+            {
+                InternalEditorUtility.AddTag("LootLockerServerApiGameObject");
+                _bTaggedGameObjects = true;
+            }
         }
 #endif
 
