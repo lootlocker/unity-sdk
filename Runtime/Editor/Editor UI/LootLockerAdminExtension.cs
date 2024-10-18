@@ -192,7 +192,7 @@ namespace LootLocker.Extension
 
             loginFlow = root.Q<VisualElement>("LoginFlow");
 
-            loginFlow.style.display = DisplayStyle.Flex;
+            loginFlow.style.display = DisplayStyle.None;
 
             emailField = root.Q<TextField>("EmailField");
             passwordField = root.Q<TextField>("PasswordField");
@@ -290,7 +290,7 @@ namespace LootLocker.Extension
             }
 
             loadingPage = root.Q<VisualElement>("LoadingBackground");
-            loadingPage.style.display = DisplayStyle.None;
+            loadingPage.style.display = DisplayStyle.Flex;
 
             loadingIcon = root.Q<VisualElement>("LoadingIcon");
 
@@ -306,6 +306,8 @@ namespace LootLocker.Extension
                 EditorApplication.update -= OnEditorUpdate;
 
             }).Every(1);
+
+            Run();
         }
 
         void SwapEnvironment()
