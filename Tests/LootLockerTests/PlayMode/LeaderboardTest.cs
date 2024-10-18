@@ -66,7 +66,7 @@ namespace LootLockerTests.PlayMode
             {
                 yield break;
             }
-            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Failed to initialize LootLocker");
 
             var createLeaderboardRequest = new CreateLootLockerLeaderboardRequest
             {

@@ -28,6 +28,7 @@ namespace LootLockerTestConfigurationUtils
         public LootLockerTestUser User { get; set; }
         public List<LootLockerTestPlatform> EnabledPlatforms { get; set; } = new List<LootLockerTestPlatform>();
         public List<LootLockerTestLeaderboard> Leaderboards { get; set; } = new List<LootLockerTestLeaderboard>();
+        public List<LootLockerTestTrigger> Triggers { get; set; } = new List<LootLockerTestTrigger>();
 
         public static void CreateGame(Action<bool /*success*/, string /*errorMessage*/, LootLockerTestGame /*game*/> onComplete, string testName = "")
         {
@@ -205,6 +206,29 @@ namespace LootLockerTestConfigurationUtils
                     Leaderboards.Add(leaderboardResponse);
                     onComplete?.Invoke(leaderboardResponse);
                 }, true);
+        }
+
+        public void CreateTrigger(string key, string name, int limit, string rewardId, Action<bool /*success*/, string /*errorMessage*/, LootLockerTestTrigger /*createdTrigger*/> onComplete)
+        {
+            LootLockerTestConfigurationTrigger.CreateTrigger(key, name, limit, rewardId, response =>
+            {
+                if (response.success)
+                {
+                    var createdTrigger = new LootLockerTestTrigger
+                    {
+                        key = key,
+                        name = name,
+                        limit = limit,
+                        reward_id = rewardId
+                    };
+                    Triggers.Add(createdTrigger);
+                    onComplete?.Invoke(true, "", createdTrigger);
+                }
+                else
+                {
+                    onComplete?.Invoke(false, response.errorData?.message, null);
+                }
+            });
         }
 
     }

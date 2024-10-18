@@ -92,6 +92,9 @@ namespace LootLockerTestConfigurationUtils
         public static EndPointClass getAssetContexts = new EndPointClass("/v1/game/#GAMEID#/assets/contexts", LootLockerHTTPMethod.GET);
         public static EndPointClass createAsset = new EndPointClass("/v1/game/#GAMEID#/asset", LootLockerHTTPMethod.POST);
         public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST);
+
+        [Header("LootLocker Admin API Trigger Operations")]
+        public static EndPointClass createTrigger = new EndPointClass("game/#GAMEID#/triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST);
     }
     #endregion
 }
