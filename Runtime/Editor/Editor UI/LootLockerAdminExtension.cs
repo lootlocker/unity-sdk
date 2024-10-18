@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker;
-using LootLocker.Extension;
 using LootLocker.Extension.Responses;
 
 namespace LootLocker.Extension
@@ -425,7 +423,6 @@ namespace LootLocker.Extension
 
         public void Login()
         {
-
             if (string.IsNullOrEmpty(emailField.value) || string.IsNullOrEmpty(passwordField.value))
             {
                 ShowPopup("Error", "Email or Password is empty.");
@@ -445,25 +442,21 @@ namespace LootLocker.Extension
                     return;
                 }
 
-                if (onComplete.success)
+                if (onComplete.mfa_key != null)
                 {
+                    mfaKey = onComplete.mfa_key;
+                    menu.style.display = DisplayStyle.Flex;
+                    loadingPage.style.display = DisplayStyle.None;
+                    SwapFlows(loginFlow, mfaFlow);
+                }
+                else
+                {
+                    menu.style.display = DisplayStyle.Flex;
+                    LootLockerConfig.current.adminToken = onComplete.auth_token;
+                    LootLockerEditorData.SetAdminToken(onComplete.auth_token);
+                    loadingPage.style.display = DisplayStyle.None;
 
-                    if (onComplete.mfa_key != null)
-                    {
-                        mfaKey = onComplete.mfa_key;
-                        menu.style.display = DisplayStyle.Flex;
-                        loadingPage.style.display = DisplayStyle.None;
-                        SwapFlows(loginFlow, mfaFlow);
-                    }
-                    else
-                    {
-                        menu.style.display = DisplayStyle.Flex;
-                        LootLockerConfig.current.adminToken = onComplete.auth_token;
-                        LootLockerEditorData.SetAdminToken(onComplete.auth_token);
-                        loadingPage.style.display = DisplayStyle.None;
-
-                        SwapFlows(loginFlow, gameSelectorFlow);
-                    }
+                    SwapFlows(loginFlow, gameSelectorFlow);
                 }
                 menuLogoutBtn.style.display = DisplayStyle.Flex;
                 EditorApplication.update -= OnEditorUpdate;
@@ -632,7 +625,6 @@ namespace LootLocker.Extension
 
         void CreateNewAPIKey()
         {
-
             int gameId = LootLockerEditorData.GetSelectedGame();
 
             if (gameId == 0)
