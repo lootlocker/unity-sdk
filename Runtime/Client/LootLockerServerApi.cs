@@ -8,7 +8,9 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using UnityEditor;
 using LootLocker.Requests;
+#if UNITY_EDITOR
 using UnityEditorInternal;
+#endif
 
 namespace LootLocker.LootLockerEnums
 {
