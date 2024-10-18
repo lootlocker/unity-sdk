@@ -105,8 +105,7 @@ namespace LootLockerTests.PlayMode
                 configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
         }
 
-        private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit,
-            Action<bool, string, LootLockerTestTrigger> onComplete)
+        private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
         {
             string errorMessage = "";
             bool contextRetrieved = false;
@@ -250,6 +249,157 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(0, invokeResponse.Failed_keys?.Length, "Failed Keys was not of expected length");
             Assert.AreEqual(createdTrigger.key, invokeResponse?.Successful_keys[0].Key,
                 "The right key was not successfully executed");
+        }
+
+        [UnityTest]
+        public IEnumerator Triggers_MultipleTriggersWithoutLimitCalledInSameCall_Succeeds()
+        {
+            // Setup Succeeded
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            string triggerKey1 = "test_trigger_no_limit_1";
+            string triggerKey2 = "test_trigger_no_limit_2";
+
+            bool trigger1Created = false;
+            bool trigger2Created = false;
+            string errorMessage1 = null;
+            string errorMessage2 = null;
+
+            yield return CreateTriggerWithReward(triggerKey1, "Test Trigger No Limit 1", 0, (success, error, trigger) =>
+            {
+                trigger1Created = success;
+                errorMessage1 = error;
+            });
+            Assert.IsTrue(trigger1Created, errorMessage1);
+
+            yield return CreateTriggerWithReward(triggerKey2, "Test Trigger No Limit 2", 0, (success, error, trigger) =>
+            {
+                trigger2Created = success;
+                errorMessage2 = error;
+            });
+            Assert.IsTrue(trigger2Created, errorMessage2);
+
+            // When
+            bool invokeCompleted = false;
+            LootLockerInvokeTriggersByKeyResponse invokeResponse = null;
+            LootLockerSDKManager.InvokeTriggersByKey(new string[] { triggerKey1, triggerKey2 }, response =>
+            {
+                invokeResponse = response;
+                invokeCompleted = true;
+            });
+            yield return new WaitUntil(() => invokeCompleted);
+
+            // Then
+            Assert.IsTrue(invokeResponse.success, "Trigger invocation failed");
+            Assert.AreEqual(2, invokeResponse.Successful_keys?.Length, "Successful Keys were not of expected length");
+            Assert.AreEqual(0, invokeResponse.Failed_keys?.Length, "Failed Keys were not of expected length");
+        }
+
+        [UnityTest]
+        public IEnumerator Triggers_InvokeNonExistentTrigger_Fails()
+        {
+            // Setup Succeeded
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            string nonExistentTriggerKey = "non_existent_trigger";
+
+            // When
+            bool invokeCompleted = false;
+            LootLockerInvokeTriggersByKeyResponse invokeResponse = null;
+            LootLockerSDKManager.InvokeTriggersByKey(new string[] { nonExistentTriggerKey }, response =>
+            {
+                invokeResponse = response;
+                invokeCompleted = true;
+            });
+            yield return new WaitUntil(() => invokeCompleted);
+
+            // Then
+            Assert.IsTrue(invokeResponse.success, "Non-existent trigger invocation should fail");
+            Assert.AreEqual(0, invokeResponse.Successful_keys?.Length, "Successful Keys should be empty");
+            Assert.AreEqual(1, invokeResponse.Failed_keys?.Length, "Failed Keys should have one entry");
+            Assert.AreEqual(nonExistentTriggerKey, invokeResponse?.Failed_keys[0].Key, "Failed key was not as expected");
+        }
+
+        [UnityTest]
+        public IEnumerator Triggers_InvokeTriggerOverLimit_Fails()
+        {
+            // Setup Succeeded
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            string triggerKey = "test_trigger_over_limit";
+            bool triggerCreated = false;
+            string errorMessage = null;
+            LootLockerTestTrigger createdTrigger = null;
+            yield return CreateTriggerWithReward(triggerKey, "Test Trigger Over Limit", 1, (success, error, trigger) =>
+            {
+                triggerCreated = success;
+                errorMessage = error;
+                createdTrigger = trigger;
+            });
+            Assert.IsTrue(triggerCreated, errorMessage);
+
+            // Invoke once within limit
+            bool firstInvokeCompleted = false;
+            LootLockerSDKManager.InvokeTriggersByKey(new string[] { triggerKey }, response =>
+            {
+                firstInvokeCompleted = true;
+            });
+            yield return new WaitUntil(() => firstInvokeCompleted);
+
+            // When invoking over the limit
+            bool secondInvokeCompleted = false;
+            LootLockerInvokeTriggersByKeyResponse secondInvokeResponse = null;
+            LootLockerSDKManager.InvokeTriggersByKey(new string[] { triggerKey }, response =>
+            {
+                secondInvokeResponse = response;
+                secondInvokeCompleted = true;
+            });
+            yield return new WaitUntil(() => secondInvokeCompleted);
+
+            // Then
+            Assert.IsTrue(secondInvokeResponse.success, "Trigger invocation should fail when over the limit");
+            Assert.AreEqual(0, secondInvokeResponse.Successful_keys?.Length, "Successful Keys should be empty");
+            Assert.AreEqual(1, secondInvokeResponse.Failed_keys?.Length, "Failed Keys should have one entry");
+            Assert.AreEqual(createdTrigger.key, secondInvokeResponse?.Failed_keys[0].Key, "Failed key was not as expected");
+        }
+
+        [UnityTest]
+        public IEnumerator Triggers_InvokeSameTriggerTwiceInSameCall_InvokesOnlyOnce()
+        {
+            // Setup Succeeded
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            string triggerKey = "test_trigger_single_invocation";
+            bool triggerCreated = false;
+            string errorMessage = null;
+            LootLockerTestTrigger createdTrigger = null;
+            yield return CreateTriggerWithReward(triggerKey, "Test Trigger Single Invocation", 0, (success, error, trigger) =>
+            {
+                triggerCreated = success;
+                errorMessage = error;
+                createdTrigger = trigger;
+            });
+            Assert.IsTrue(triggerCreated, errorMessage);
+
+            // When
+            bool invokeCompleted = false;
+            LootLockerInvokeTriggersByKeyResponse invokeResponse = null;
+            LootLockerSDKManager.InvokeTriggersByKey(new string[] { triggerKey, triggerKey }, response =>
+            {
+                invokeResponse = response;
+                invokeCompleted = true;
+            });
+            yield return new WaitUntil(() => invokeCompleted);
+
+            // Then
+            Assert.IsTrue(invokeResponse.success, "Trigger invocation failed");
+            Assert.AreEqual(1, invokeResponse.Successful_keys?.Length, "Successful Keys should contain only one entry");
+            Assert.AreEqual(0, invokeResponse.Failed_keys?.Length, "Failed Keys should be empty");
+            Assert.AreEqual(createdTrigger.key, invokeResponse?.Successful_keys[0].Key, "The right key was not successfully executed");
         }
     }
 }
