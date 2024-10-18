@@ -73,6 +73,6 @@ namespace LootLocker.Requests
         /// <summary>
         /// A list of keys that were successfully invoked
         /// </summary>
-        public LootLockerFailedKey[] Successful_keys { get; set; }
+        public LootLockerSuccessfulKey[] Successful_keys { get; set; }
     };
 }

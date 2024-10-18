@@ -1,82 +1,9 @@
 using LootLocker;
-using LootLocker.Requests;
 using System;
-using Random = UnityEngine.Random;
+using LootLocker.Requests;
 
 namespace LootLockerTestConfigurationUtils
 {
-    public static class LootLockerTestLeaderboards
-    {
-
-        public static void GetAssetContexts(
-            Action<bool, string, LootLockerTestContextResponse> onComplete /*success*/ /*errorMessage*/ /*context*/)
-        {
-            if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
-            {
-                // Already signed in
-                onComplete?.Invoke(false, "Not logged in", null);
-                return;
-            }
-
-            var endpoint = LootLockerTestConfigurationEndpoints.getAssetContexts;
-
-            LootLockerAdminRequest.Send(endpoint.endPoint, endpoint.httpMethod, null, onComplete: (serverResponse) =>
-            {
-                var contextResponse = LootLockerResponse.Deserialize<LootLockerTestContextResponse>(serverResponse);
-                onComplete?.Invoke(contextResponse.success, contextResponse?.errorData?.message, contextResponse);
-            }, true);
-        }
-
-        public static void CreateAsset(int contextID, Action<LootLockerTestAssetResponse /*asset*/> onComplete)
-        {
-            if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
-            {
-                // Already signed in
-                onComplete?.Invoke(null);
-                return;
-            }
-
-            var assetRequest = new CreateLootLockerTestAsset
-            {
-                context_id = contextID,
-                name = GetRandomAssetName()
-            };
-
-            var endpoint = LootLockerTestConfigurationEndpoints.createAsset;
-
-            string json = LootLockerJson.SerializeObject(assetRequest);
-
-            LootLockerAdminRequest.Send(endpoint.endPoint, endpoint.httpMethod, json, onComplete: (serverResponse) =>
-            {
-                var assetResponse = LootLockerResponse.Deserialize<LootLockerTestAssetResponse>(serverResponse);
-                onComplete?.Invoke(assetResponse);
-            }, true);
-        }
-
-        public static string GetRandomAssetName()
-        {
-            string[] colors = { "Green", "Blue", "Red", "Black" };
-            string[] items = { "Rod", "House", "Wand", "Staff" };
-
-            return colors[Random.Range(0, colors.Length)] + " " + items[Random.Range(0, items.Length)];
-        }
-
-        public static void CreateReward(LootLockerRewardRequest request,
-            Action<LootLockerRewardResponse> onComplete /*reward*/)
-        {
-            EndPointClass endPoint = LootLockerTestConfigurationEndpoints.createReward;
-
-            string json = LootLockerJson.SerializeObject(request);
-
-            LootLockerAdminRequest.Send(endPoint.endPoint, endPoint.httpMethod, json,
-                onComplete: (serverResponse) =>
-                {
-                    var reward = LootLockerResponse.Deserialize<LootLockerRewardResponse>(serverResponse);
-                    onComplete?.Invoke(reward);
-                }, true);
-        }
-    }
-
     public class LootLockerTestLeaderboard : LootLockerResponse
     {
         public int id { get; set; }
@@ -89,7 +16,7 @@ namespace LootLockerTestConfigurationUtils
         public bool has_metadata { get; set; }
         public string type { get; set; }
 
-        public void UpdateLeaderboard(UpdateLootLockerLeaderboardRequest request, Action<bool, string, LootLockerTestLeaderboard> onComplete /*success*/ /*errorMessage*/ /*leaderboard*/)
+        public void UpdateLeaderboard(UpdateLootLockerLeaderboardRequest request, Action<bool, string, LootLockerTestLeaderboard> onComplete)
         {
             EndPointClass endPoint = LootLockerTestConfigurationEndpoints.updateLeaderboard;
             var formattedEndpoint = string.Format(endPoint.endPoint, id);
@@ -104,12 +31,10 @@ namespace LootLockerTestConfigurationUtils
                 }, true);
         }
 
-        public void UpdateLeaderboardSchedule(UpdateLootLockerLeaderboardScheduleRequest request,
-            Action<bool, string, LootLockerTestLeaderboard> onComplete /*success*/ /*errorMessage*/ /*leaderboard*/)
+        public void UpdateLeaderboardSchedule(UpdateLootLockerLeaderboardScheduleRequest request, Action<bool, string, LootLockerTestLeaderboard> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                // Not signed in
                 onComplete?.Invoke(false, "Not logged in", null);
                 return;
             }
@@ -136,14 +61,14 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            LootLockerTestLeaderboards.GetAssetContexts((success, errorMessage, response) =>
+            LootLockerTestAssets.GetAssetContexts((success, errorMessage, response) =>
             {
                 if (!success)
                 {
                     onComplete?.Invoke(null);
                 }
 
-                LootLockerTestLeaderboards.CreateAsset(response.contexts[0].id, (assetResponse) =>
+                LootLockerTestAssets.CreateAsset(response.contexts[0].id, (assetResponse) =>
                 {
                     if (!assetResponse.success)
                     {
@@ -156,7 +81,7 @@ namespace LootLockerTestConfigurationUtils
                         entity_kind = "asset"
                     };
 
-                    LootLockerTestLeaderboards.CreateReward(rewardRequest, (reward) =>
+                    LootLockerTestAssets.CreateReward(rewardRequest, (reward) =>
                     {
                         if (!reward.success)
                         {
