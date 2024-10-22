@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using LootLocker.LootLockerEnums;
 
@@ -482,7 +482,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The time that this notification was read. Will be empty if the notification has not been read
         /// </summary>
-        public DateTime Read_at { get; set; }
+        public DateTime? Read_at { get; set; }
         /// <summary>
         /// The type of this notification. Use the static defines in LootLockerStaticStrings.LootLockerNotificationTypes know what possible values this can be.
         /// </summary>
