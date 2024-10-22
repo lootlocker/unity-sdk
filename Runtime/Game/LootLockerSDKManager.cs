@@ -5935,14 +5935,15 @@ namespace LootLocker.Requests
         /// <summary>
         /// List notifications according to specified filters and with pagination settings
         /// </summary>
-        /// <param name="WithPriority">Return only notifications with the specified priority</param>
-        /// <param name="ShowRead">Return previously read notifications</param>
-        /// <param name="OfType">Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use.</param>
-        /// <param name="WithSource">Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use.</param>
-        /// <param name="Page">Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</param>
-        /// <param name="PerPage">Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page"</param>
+        /// <param name="ShowRead">When set to true, only read notifications will be returned, when set to false only unread notifications will be returned.</param>
+        /// <param name="WithPriority">(Optional) Return only notifications with the specified priority. Set to null to not use this filter.</param>
+        /// <param name="OfType">(Optional) Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use. Set to "" or null to not use this filter.</param>
+        /// <param name="WithSource">(Optional) Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use. Set to "" or null to not use this filter.</param>
+        /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
+        /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
+        /// <param name="onComplete"></param>
         /// <param name="OnComplete">Delegate for handling the server response</param>
-        public static void ListNotifications(LootLockerNotificationPriority WithPriority, bool ShowRead, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
+        public static void ListNotifications(bool ShowRead, LootLockerNotificationPriority? WithPriority, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -5950,16 +5951,21 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string queryParams = $"?priority={WithPriority.ToString()}&";
-            if (ShowRead) { queryParams += $"read=true"; } else { queryParams += $"read=false"; }
+            string queryParams = "";
+            if(WithPriority != null) { queryParams = $"priority={WithPriority?.ToString()}&"; }
+            if (ShowRead) queryParams += $"read=true&"; else queryParams += $"read=false&";
             if (Page > 0) queryParams += $"page={Page}&";
             if (PerPage > 0) queryParams += $"per_page={PerPage}&";
             if (!string.IsNullOrEmpty(OfType)) queryParams += $"notification_type={OfType}&";
             if (!string.IsNullOrEmpty(WithSource)) queryParams += $"source={WithSource}&";
 
-            string endpointWithQueryParams = LootLockerEndPoints.ListNotifications.endPoint + queryParams;
+            string endPoint = LootLockerEndPoints.ListNotifications.endPoint;
+            if (!string.IsNullOrEmpty(queryParams))
+            {
+                endPoint = $"{endPoint}?{queryParams}";
+            }
 
-            LootLockerServerRequest.CallAPI(endpointWithQueryParams, LootLockerEndPoints.ListNotifications.httpMethod, null,
+            LootLockerServerRequest.CallAPI(endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
                 {
                     LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
