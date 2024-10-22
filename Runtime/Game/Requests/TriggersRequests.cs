@@ -40,7 +40,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The reason that the trigger failed invocation
         /// </summary>
-        public string LootLockerTriggerFailureReasons { get; set; }
+        public LootLockerTriggerFailureReasons reason { get; set; }
     };
 
     //==================================================
