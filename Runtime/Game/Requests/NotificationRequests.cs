@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LootLocker.LootLockerEnums;
 
@@ -20,11 +20,11 @@ namespace LootLocker.LootLockerEnums
     /// </summary>
     public enum LootLockerNotificationContentKind
     {
-        group_reward = 0,
-        currency_reward = 1,
-        asset_reward = 2,
-        progression_reset_reward = 3,
-        progression_points_reward = 4,
+        group = 0,
+        currency = 1,
+        asset = 2,
+        progression_reset = 3,
+        progression_points = 4,
     };
 }
 
