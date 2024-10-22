@@ -5904,7 +5904,7 @@ namespace LootLocker.Requests
         /// List notifications without filters and with default pagination settings
         /// </summary>
         /// <param name="OnComplete">Delegate for handling the server response</param>
-        public static void ListNotifications(Action<LootLockerListNotificationsResponse> onComplete)
+        public static void ListNotificationsWithDefaultParameters(Action<LootLockerListNotificationsResponse> onComplete)
         {
             if (!CheckInitialized())
             {
