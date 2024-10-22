@@ -50,8 +50,8 @@ namespace LootLockerTestConfigurationUtils
 
         public static string GetRandomAssetName()
         {
-            string[] colors = { "Green", "Blue", "Red", "Black" };
-            string[] items = { "Rod", "House", "Wand", "Staff" };
+            string[] colors = { "Green", "Blue", "Red", "Black", "Yellow", "Orange", "Purple", "Indigo", "Clear", "White", "Magenta", "Marine", "Crimson", "Teal" };
+            string[] items = { "Rod", "House", "Wand", "Staff", "Car", "Sword", "Shield", "Gun", "Shovel", "Boomstick", "Rifle", "Hut", "Boat", "Bicycle", "Wheelchair" };
 
             return colors[Random.Range(0, colors.Length)] + " " + items[Random.Range(0, items.Length)];
         }
