@@ -6006,6 +6006,12 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>());
                 return;
             }
+
+            if (NotificationIds == null || NotificationIds.Length == 0)
+            {
+                onComplete?.Invoke(new LootLockerReadNotificationsResponse(){errorData = null, EventId = "", statusCode = 204, success = true, text = "{}"});
+                return;
+            }
             
             LootLockerServerRequest.CallAPI(LootLockerEndPoints.ReadNotifications.endPoint, LootLockerEndPoints.ReadNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerReadNotificationsRequest{ Notifications = NotificationIds }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
