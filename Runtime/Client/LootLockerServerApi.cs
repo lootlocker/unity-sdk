@@ -50,7 +50,11 @@ namespace LootLocker
 
         public static IEnumerator CleanUpOldInstances()
         {
+#if UNITY_2020_1_OR_NEWER
             LootLockerServerApi[] serverApis = GameObject.FindObjectsByType<LootLockerServerApi>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+            LootLockerServerApi[] serverApis = GameObject.FindObjectsOfType<LootLockerServerApi>();
+#endif
             foreach (LootLockerServerApi serverApi in serverApis)
             {
                 if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
@@ -58,7 +62,7 @@ namespace LootLocker
 #if UNITY_EDITOR
                     DestroyImmediate(serverApi.HostingGameObject);
 #else
-                    Destroy(gameObject);
+                    Destroy(serverApi.HostingGameObject);
 #endif
                 }
             }
