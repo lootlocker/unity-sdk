@@ -215,6 +215,9 @@ namespace LootLocker
         public static EndPointClass triggeringAnEvent = new EndPointClass("v1/player/trigger", LootLockerHTTPMethod.POST);
         public static EndPointClass listingTriggeredTriggerEvents = new EndPointClass("v1/player/triggers", LootLockerHTTPMethod.GET);
 
+        // Triggers
+        public static EndPointClass InvokeTriggers = new EndPointClass("triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST);
+
         // Maps
         [Header("Collectables")]
         public static EndPointClass gettingCollectables = new EndPointClass("v1/collectable", LootLockerHTTPMethod.GET);
@@ -296,6 +299,12 @@ namespace LootLocker
         [Header("Metadata")]
         public static EndPointClass listMetadata = new EndPointClass("metadata/source/{0}/id/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass getMultisourceMetadata = new EndPointClass("metadata/multisource", LootLockerHTTPMethod.POST);
+
+        // Notifications
+        [Header("Notifications")]
+        public static EndPointClass ListNotifications = new EndPointClass("notifications/v1", LootLockerHTTPMethod.GET);
+        public static EndPointClass ReadNotifications = new EndPointClass("notifications/v1/read", LootLockerHTTPMethod.PUT);
+        public static EndPointClass ReadAllNotifications = new EndPointClass("notifications/v1/read/all", LootLockerHTTPMethod.PUT);
 
     }
 }

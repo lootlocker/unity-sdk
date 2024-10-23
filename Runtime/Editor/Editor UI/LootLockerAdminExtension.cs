@@ -1,18 +1,25 @@
 using System;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LootLocker;
-using LootLocker.Extension;
 using LootLocker.Extension.Responses;
 
 namespace LootLocker.Extension
 {
     public class LootLockerAdminExtension : EditorWindow
     {
+        // State Variables
+        bool isStage = true;
+        bool isLoadingKeys = false;
+        Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
+        private Label gameName;
+        DateTime gameDataRefreshTime;
+        readonly int gameDataCacheExpirationTimeMinutes = 1;
+        private VisualElement currentFlow = null;
+
         [SerializeField]
         private VisualTreeAsset m_VisualTreeAsset = default;
 
@@ -69,10 +76,6 @@ namespace LootLocker.Extension
         VisualElement loadingIcon;
         int rotateIndex = 0;
 
-        private Label gameName;
-
-        bool isStage = true;
-
         [MenuItem("Window/LootLocker")]
         public static void Run()
         {
@@ -86,22 +89,21 @@ namespace LootLocker.Extension
                 {
                     if (LootLockerEditorData.GetSelectedGame() != 0)
                     {
-                        wnd.SwapFlows(wnd.loginFlow, wnd.apiKeyFlow);
+                        wnd.SwapFlows(wnd.apiKeyFlow);
                         return;
                     }
-                    wnd.SwapFlows(null, wnd.gameSelectorFlow);
+                    wnd.SwapFlows(wnd.gameSelectorFlow);
 
                 });
                 return;
             }
 
-            wnd.SwapFlows(null, wnd.loginFlow);
+            wnd.SwapFlows(wnd.loginFlow);
         }
 
         [InitializeOnLoadMethod]
         public static void LoadFirstTime()
         {
-
             if (LootLockerEditorData.ShouldAutoShowWindow())
             {
                 EditorApplication.delayCall = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.delayCall, (EditorApplication.CallbackFunction)delegate
@@ -175,7 +177,7 @@ namespace LootLocker.Extension
 
             menuChangeGameBtn.clickable.clicked += () =>
             {
-                SwapFlows(activeFlow, gameSelectorFlow);
+                SwapFlows(gameSelectorFlow);
             };
 
             popup = root.Q<VisualElement>("PopUp");
@@ -189,14 +191,13 @@ namespace LootLocker.Extension
 
             loginFlow = root.Q<VisualElement>("LoginFlow");
 
-            loginFlow.style.display = DisplayStyle.Flex;
+            loginFlow.style.display = DisplayStyle.None;
 
             emailField = root.Q<TextField>("EmailField");
             passwordField = root.Q<TextField>("PasswordField");
 
             passwordField.RegisterCallback<KeyDownEvent>((evt) =>
             {
-
                 if (evt.keyCode == KeyCode.Return)
                 {
                     Login();
@@ -249,7 +250,6 @@ namespace LootLocker.Extension
 
             newApiKeyCancel.RegisterCallback<MouseDownEvent>(_ =>
             {
-
                 newApiKeyName.value = "";
                 newApiKeyWindow.style.display = DisplayStyle.None;
 
@@ -261,7 +261,6 @@ namespace LootLocker.Extension
             {
                 CreateNewAPIKey();
                 newApiKeyWindow.style.display = DisplayStyle.None;
-
             };
 
             createNewApiKeyBtn = root.Q<Button>("CreateKeyBtn");
@@ -287,7 +286,8 @@ namespace LootLocker.Extension
             }
 
             loadingPage = root.Q<VisualElement>("LoadingBackground");
-            loadingPage.style.display = DisplayStyle.None;
+            loadingPage.style.display = DisplayStyle.Flex;
+            currentFlow = loadingPage;
 
             loadingIcon = root.Q<VisualElement>("LoadingIcon");
 
@@ -304,12 +304,11 @@ namespace LootLocker.Extension
 
             }).Every(1);
 
-
+            Run();
         }
 
         void SwapEnvironment()
         {
-
             if (isLoadingKeys)
             {
                 ShowPopup("Error", "Please wait...");
@@ -337,16 +336,16 @@ namespace LootLocker.Extension
             }
         }
 
-        void SwapFlows(VisualElement old, VisualElement New)
+        void SwapFlows(VisualElement New)
         {
-            if (old == New) return;
+            if (currentFlow == New) return;
 
             activeFlow = New;
 
-            if (old != null)
+            if (currentFlow != null)
             {
-                old.style.display = DisplayStyle.None;
-                if (old == apiKeyFlow)
+                currentFlow.style.display = DisplayStyle.None;
+                if (currentFlow == apiKeyFlow)
                 {
                     apiKeyList.Clear();
                 }
@@ -401,6 +400,8 @@ namespace LootLocker.Extension
                 menuAPIKeyBtn.style.display = DisplayStyle.None;
                 menuChangeGameBtn.style.display = DisplayStyle.None;
             }
+
+            currentFlow = New;
         }
 
         private void OnEditorUpdate()
@@ -423,7 +424,6 @@ namespace LootLocker.Extension
 
         public void Login()
         {
-
             if (string.IsNullOrEmpty(emailField.value) || string.IsNullOrEmpty(passwordField.value))
             {
                 ShowPopup("Error", "Email or Password is empty.");
@@ -443,25 +443,21 @@ namespace LootLocker.Extension
                     return;
                 }
 
-                if (onComplete.success)
+                if (onComplete.mfa_key != null)
                 {
+                    mfaKey = onComplete.mfa_key;
+                    menu.style.display = DisplayStyle.Flex;
+                    loadingPage.style.display = DisplayStyle.None;
+                    SwapFlows(mfaFlow);
+                }
+                else
+                {
+                    menu.style.display = DisplayStyle.Flex;
+                    LootLockerConfig.current.adminToken = onComplete.auth_token;
+                    LootLockerEditorData.SetAdminToken(onComplete.auth_token);
+                    loadingPage.style.display = DisplayStyle.None;
 
-                    if (onComplete.mfa_key != null)
-                    {
-                        mfaKey = onComplete.mfa_key;
-                        menu.style.display = DisplayStyle.Flex;
-                        loadingPage.style.display = DisplayStyle.None;
-                        SwapFlows(loginFlow, mfaFlow);
-                    }
-                    else
-                    {
-                        menu.style.display = DisplayStyle.Flex;
-                        LootLockerConfig.current.adminToken = onComplete.auth_token;
-                        LootLockerEditorData.SetAdminToken(onComplete.auth_token);
-                        loadingPage.style.display = DisplayStyle.None;
-
-                        SwapFlows(loginFlow, gameSelectorFlow);
-                    }
+                    SwapFlows(gameSelectorFlow);
                 }
                 menuLogoutBtn.style.display = DisplayStyle.Flex;
                 EditorApplication.update -= OnEditorUpdate;
@@ -484,7 +480,7 @@ namespace LootLocker.Extension
                 LootLockerEditorData.SetAdminToken(onComplete.auth_token);
                 string projectPrefix = PlayerSettings.productGUID.ToString();
 
-                SwapFlows(mfaFlow, gameSelectorFlow);
+                SwapFlows(gameSelectorFlow);
 
                 EditorApplication.update -= OnEditorUpdate;
                 loadingPage.style.display = DisplayStyle.None;
@@ -492,13 +488,8 @@ namespace LootLocker.Extension
             });
         }
 
-        Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
-        DateTime gameDataRefreshTime;
-        int gameDataCacheExpirationTimeMinutes = 1;
         public void RefreshUserInformation(Action onComplete)
         {
-            gameData.Clear();
-
             EditorApplication.update += OnEditorUpdate;
             loadingPage.style.display = DisplayStyle.Flex;
 
@@ -512,6 +503,7 @@ namespace LootLocker.Extension
                     Logout();
                     return;
                 }
+                gameData.Clear();
 
                 foreach (var org in response.user.organisations)
                 {
@@ -629,12 +621,11 @@ namespace LootLocker.Extension
 
 
 
-            SwapFlows(gameSelectorFlow, apiKeyFlow);
+            SwapFlows(apiKeyFlow);
         }
 
         void CreateNewAPIKey()
         {
-
             int gameId = LootLockerEditorData.GetSelectedGame();
 
             if (gameId == 0)
@@ -670,8 +661,6 @@ namespace LootLocker.Extension
 
             newApiKeyName.value = "";
         }
-
-        bool isLoadingKeys = false;
 
         void RefreshAPIKeys()
         {
@@ -775,6 +764,7 @@ namespace LootLocker.Extension
                 }
             }
         }
+
         void Logout()
         {
             loadingPage.style.display = DisplayStyle.Flex;
@@ -784,8 +774,9 @@ namespace LootLocker.Extension
             apiKeyList.Clear();
             gameSelectorList.Clear();
             loadingPage.style.display = DisplayStyle.None;
-            SwapFlows(activeFlow, loginFlow);
+            SwapFlows(loginFlow);
         }
+
         private void OnDestroy()
         {
             LootLockerServerApi.ResetInstance();

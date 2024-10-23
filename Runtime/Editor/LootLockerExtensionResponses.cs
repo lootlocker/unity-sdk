@@ -133,7 +133,7 @@ namespace LootLocker.Extension.Responses
     }
     public class KeyResponse : LootLockerResponse
     {
-        public int id { get; set; }
+        public string id { get; set; }
         public int game_id { get; set; }
         public string api_key { get; set; }
         public string api_type { get; set; }

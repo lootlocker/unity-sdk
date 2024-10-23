@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using System.Linq;
 using System.Text;
 using LootLocker.LootLockerEnums;
 using UnityEditor;
 using LootLocker.Requests;
+using Object = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditorInternal;
+#endif
 
 namespace LootLocker.LootLockerEnums
 {
@@ -17,19 +22,51 @@ namespace LootLocker
 {
     public class LootLockerServerApi : MonoBehaviour
     {
+        private static bool _bTaggedGameObjects = false;
         private static LootLockerServerApi _instance;
+        private static int _instanceId = 0;
         private const int MaxRetries = 3;
         private int _tries;
+        public GameObject HostingGameObject = null;
 
         public static void Instantiate()
         {
             if (_instance == null)
             {
-                _instance = new GameObject("LootLockerServerApi").AddComponent<LootLockerServerApi>();
+                var gameObject = new GameObject("LootLockerServerApi");
+                if (_bTaggedGameObjects)
+                {
+                    gameObject.tag = "LootLockerServerApiGameObject";
+                }
 
+                _instance = gameObject.AddComponent<LootLockerServerApi>();
+                _instanceId = _instance.GetInstanceID();
+                _instance.HostingGameObject = gameObject;
+                _instance.StartCoroutine(CleanUpOldInstances());
                 if (Application.isPlaying)
                     DontDestroyOnLoad(_instance.gameObject);
             }
+        }
+
+        public static IEnumerator CleanUpOldInstances()
+        {
+#if UNITY_2020_1_OR_NEWER
+            LootLockerServerApi[] serverApis = GameObject.FindObjectsByType<LootLockerServerApi>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+            LootLockerServerApi[] serverApis = GameObject.FindObjectsOfType<LootLockerServerApi>();
+#endif
+            foreach (LootLockerServerApi serverApi in serverApis)
+            {
+                if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
+                {
+#if UNITY_EDITOR
+                    DestroyImmediate(serverApi.HostingGameObject);
+#else
+                    Destroy(serverApi.HostingGameObject);
+#endif
+                }
+            }
+            yield return null;
         }
 
         public static void ResetInstance()
@@ -41,11 +78,12 @@ namespace LootLocker
             Destroy(_instance.gameObject);
 #endif
             _instance = null;
+            _instanceId = 0;
         }
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        private static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
             ResetInstance();
         }
@@ -377,7 +415,7 @@ namespace LootLocker
             }
 
             cachedRequest.extraHeaders["x-session-token"] = LootLockerConfig.current.token;
-            _SendRequest(cachedRequest, onComplete);
+            SendRequest(cachedRequest, onComplete);
             cachedRequest.retryCount++;
         }
 
