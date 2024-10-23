@@ -8,6 +8,7 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using UnityEditor;
 using LootLocker.Requests;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditorInternal;
 #endif
@@ -26,6 +27,7 @@ namespace LootLocker
         private static int _instanceId = 0;
         private const int MaxRetries = 3;
         private int _tries;
+        public GameObject HostingGameObject = null;
 
         public static void Instantiate()
         {
@@ -37,8 +39,9 @@ namespace LootLocker
                     gameObject.tag = "LootLockerServerApiGameObject";
                 }
 
-                _instanceId = gameObject.GetInstanceID();
                 _instance = gameObject.AddComponent<LootLockerServerApi>();
+                _instanceId = _instance.GetInstanceID();
+                _instance.HostingGameObject = gameObject;
                 _instance.StartCoroutine(CleanUpOldInstances());
                 if (Application.isPlaying)
                     DontDestroyOnLoad(_instance.gameObject);
@@ -47,17 +50,13 @@ namespace LootLocker
 
         public static IEnumerator CleanUpOldInstances()
         {
-            if (!_bTaggedGameObjects)
+            LootLockerServerApi[] serverApis = GameObject.FindObjectsByType<LootLockerServerApi>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (LootLockerServerApi serverApi in serverApis)
             {
-                yield break;
-            }
-            GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("LootLockerServerApiGameObject");
-            foreach (GameObject gameObject in gameObjects)
-            {
-                if (_instanceId != gameObject.GetInstanceID())
+                if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
                 {
 #if UNITY_EDITOR
-                    DestroyImmediate(gameObject);
+                    DestroyImmediate(serverApi.HostingGameObject);
 #else
                     Destroy(gameObject);
 #endif
@@ -83,20 +82,6 @@ namespace LootLocker
         private static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
             ResetInstance();
-        }
-
-        [InitializeOnLoadMethod]
-        private static void CreateTag()
-        {
-            if (InternalEditorUtility.tags.Contains("LootLockerServerApiGameObject"))
-            {
-                _bTaggedGameObjects = true;
-            }
-            else
-            {
-                InternalEditorUtility.AddTag("LootLockerServerApiGameObject");
-                _bTaggedGameObjects = true;
-            }
         }
 #endif
 
