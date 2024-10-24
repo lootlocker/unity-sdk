@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using LootLocker;
 using LootLocker.LootLockerEnums;
@@ -36,7 +37,7 @@ public class NotificationTests
         }
 
         bool gameCreationCallCompleted = false;
-        LootLockerTestGame.CreateGame(testName: "NotificationTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+        LootLockerTestGame.CreateGame(testName: "NotificationTest" + TestCounter, onComplete: (success, errorMessage, game) =>
         {
             if (!success)
             {
@@ -552,5 +553,204 @@ public class NotificationTests
             Assert.IsTrue(listUnreadNotificationsAfterMarkAsReadResponse.success, "Listing unread notifications after marking specific as read failed");
             Assert.AreEqual(CreatedTriggers.Count - notificationIdsToMarkAsRead.Length, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
-    }
+
+        [UnityTest]
+        public IEnumerator Notifications_ConvenienceLookupTable_CanLookUpAllNotificationTypes()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            string TriggerIdentifyingValue = "trigger_key";
+            string triggerNotification1Id = GUID.Generate().ToString();
+            string triggerNotification2Id = GUID.Generate().ToString();
+            string triggerNotification3Id = GUID.Generate().ToString();
+            string LootLockerVirtualStorePurchaseIdentifyingValue = "catalog_item_id";
+            string lootLockerVirtualStoreNotification1Id = GUID.Generate().ToString();
+            string AppleAppStorePurchaseIdentifyingValue = "transaction_id";
+            string appleAppStoreNotification1Id = GUID.Generate().ToString();
+            string GooglePlayStoreStorePurchaseIdentifyingValue = "product_id";
+            string googlePlayStoreNotification1Id = GUID.Generate().ToString();
+            var fakeResponse = new LootLockerListNotificationsResponse()
+            {
+                statusCode = 200,
+                success = true,
+                text = "",
+                errorData = null,
+                EventId = "1234",
+                Pagination = new LootLockerExtendedPagination
+                {
+                    errors = null,
+                    current_page = 1,
+                    prev_page = null,
+                    next_page = null,
+                    last_page = 1,
+                    offset = 0,
+                    per_page = 100,
+                    total = 6
+                },
+                Notifications = new LootLockerNotification[]
+                {
+                    GenerateLootLockerNotification(triggerNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, TriggerIdentifyingValue),
+                    GenerateLootLockerNotification(triggerNotification2Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, TriggerIdentifyingValue),
+                    GenerateLootLockerNotification(triggerNotification3Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, "some_other_trigger"),
+                    GenerateLootLockerNotification(lootLockerVirtualStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.LootLocker, LootLockerVirtualStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(appleAppStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, AppleAppStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(googlePlayStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.GooglePlayStore, GooglePlayStoreStorePurchaseIdentifyingValue),
+                }
+            };
+
+            fakeResponse.PopulateConvenienceStructures();
+
+            // When
+            bool triggerLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(TriggerIdentifyingValue, out var triggerNotifications);
+            bool lootLockerVirtualStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(LootLockerVirtualStorePurchaseIdentifyingValue, out var lootLockerVirtualStoreNotifications);
+            bool appleAppStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(AppleAppStorePurchaseIdentifyingValue, out var appleAppStoreNotifications);
+            bool googlePlayStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(GooglePlayStoreStorePurchaseIdentifyingValue, out var googlePlayStoreNotifications);
+
+            // Then
+            Assert.IsTrue(triggerLookupSucceeded, "Trigger notification lookup failed");
+            Assert.IsNotEmpty(triggerNotifications, "Trigger notification lookup array was empty");
+            Assert.AreEqual(2, triggerNotifications.Length, "The right amount of trigger notifications were not retrieved");
+            var retrievedNotificationIds = triggerNotifications.Take(2).Select(notification => notification.Id).ToArray();
+            Assert.Contains(triggerNotification1Id, retrievedNotificationIds, "The retrieved trigger notifications did not contain the expected id");
+            Assert.Contains(triggerNotification2Id, retrievedNotificationIds, "The retrieved trigger notifications did not contain the expected id");
+
+            Assert.IsTrue(lootLockerVirtualStoreLookupSucceeded, "LootLocker Virtual Store notification lookup failed");
+            Assert.IsNotEmpty(lootLockerVirtualStoreNotifications, "LootLocker Virtual Store notification lookup array was empty");
+            Assert.AreEqual(lootLockerVirtualStoreNotification1Id, lootLockerVirtualStoreNotifications[0].Id, "The retrieved lootlocker virtual store notification id was not as expected");
+
+            Assert.IsTrue(appleAppStoreLookupSucceeded, "Apple app store notification lookup failed");
+            Assert.IsNotEmpty(appleAppStoreNotifications, "Apple app store notification lookup array was empty");
+            Assert.AreEqual(appleAppStoreNotification1Id, appleAppStoreNotifications[0].Id, "The retrieved Apple app store notification id was not as expected");
+
+            Assert.IsTrue(googlePlayStoreLookupSucceeded, "Google Play store notification lookup failed");
+            Assert.IsNotEmpty(googlePlayStoreNotifications, "Google Play store notification lookup array was empty");
+            Assert.AreEqual(googlePlayStoreNotification1Id, googlePlayStoreNotifications[0].Id, "The retrieved Google Play store notification id was not as expected");
+
+            yield break;
+        }
+
+        private static LootLockerNotification GenerateLootLockerNotification(string notificationId, string source, string identifyingValue)
+        {
+            LootLockerNotificationContextEntry[] context = null;
+            if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Id,
+                        Value = GUID.Generate().ToString(),
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Limit,
+                        Value = "10"
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.LootLocker, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.LootLocker.CatalogItemId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.LootLocker.CatalogId,
+                        Value = GUID.Generate().ToString(),
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.GooglePlayStore, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore.ProductId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore.CatalogItemId,
+                        Value = GUID.Generate().ToString(),
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore.CatalogId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.TransactionId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.CatalogItemId,
+                        Value = GUID.Generate().ToString(),
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.CatalogId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            return new LootLockerNotification
+            {
+                Id = notificationId,
+                Created_at = DateTime.Now,
+                Expiration_date = DateTime.Now.AddDays(30).ToString(CultureInfo.InvariantCulture),
+                Player_id = GUID.Generate().ToString(),
+                Priority = LootLockerNotificationPriority.medium,
+                Read = false,
+                Read_at = null,
+                Notification_type = LootLocker.LootLockerStaticStrings.LootLockerNotificationTypes.PullRewardAcquired,
+                Source = source,
+                Content = new LootLockerNotificationContent
+                {
+                    Context = context,
+                    Body = new LootLockerNotificationContentBody
+                    {
+                        Kind = LootLockerNotificationContentKind.currency,
+                        Asset = null,
+                        Group = null,
+                        Progression_reset = null,
+                        Progression_points = null,
+                        Currency = new LootLockerNotificationRewardCurrency
+                        {
+                            Amount = "100",
+                            Created_at = DateTime.Now,
+                            Currency_id = GUID.Generate().ToString(),
+                            Reward_id = GUID.Generate().ToString(),
+                            Updated_at = DateTime.Now,
+                            Details = new LootLockerNotificationRewardCurrencyDetails
+                            {
+                                Amount = "100",
+                                Code = "GLD",
+                                Id = GUID.Generate().ToString(),
+                                Name = "Gold"
+                            }
+                        }
+                    }
+                }
+            };
+        }
+}
 }
