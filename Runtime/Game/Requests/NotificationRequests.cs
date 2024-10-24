@@ -552,28 +552,6 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerExtendedPagination Pagination { get; set; }
         /// <summary>
-        /// Populate convenience structures
-        /// </summary>
-        public void PopulateConvenienceStructures()
-        {
-            if (Notifications == null || Notifications.Length <= 0)
-            {
-                return;
-            }
-            foreach (var notification in Notifications)
-            {
-                notification.Content.ContextAsDictionary = new Dictionary<string, string>();
-                if (!notification.Read)
-                {
-                    UnreadNotifications.Add(notification.Id);
-                }
-                foreach (var contextEntry in notification.Content.Context)
-                {
-                    notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
-                }
-            }
-        }
-        /// <summary>
         /// Will mark all unread notifications in this response as read in LootLocker (though remember to check the response if it succeeded)
         /// </summary>
         /// <param name="onComplete">Action for handling the server response</param>
@@ -587,7 +565,103 @@ namespace LootLocker.Requests
             LootLockerSDKManager.MarkNotificationsAsRead(UnreadNotifications.ToArray(), onComplete);
         }
 
+        /// <summary>
+        /// Get notifications by their identifying value. The out is an array because many notifications are not unique. For example triggers that can be triggered multiple times.
+        /// For Triggers the identifying value is the key of the trigger
+        /// For Google Play Store purchases it is the product id
+        /// For Apple App Store purchases it is the transaction id
+        /// For LootLocker virtual purchases it is the catalog item id
+        /// </summary>
+        /// <param name="identifyingValue">The identifying value of the notification you want to fetch.</param>
+        /// <param name="notifications">A list of notifications that were found for the given identifying value or null if none were found.</param>
+        /// <returns>True if notifications were found for the identifying value. False if notifications couldn't be found for this value or if the underlying lookup table is corrupt.</returns>
+        public bool TryGetNotificationsByIdentifyingValue(string identifyingValue, out LootLockerNotification[] notifications)
+        {
+            notifications = null;
+            if (!NotificationLookupTable.TryGetValue(identifyingValue, out var indexes))
+            {
+                return false;
+            }
+
+            var foundNotifications = new List<LootLockerNotification>();
+            foreach (var index in indexes)
+            {
+                if (index < 0 || index >= Notifications.Length)
+                {
+                    // The notifications array is not the same as when the lookup table was populated
+                    return false;
+                }
+                var notification = Notifications[index];
+                if (!notification.Content.ContextAsDictionary.ContainsValue(identifyingValue))
+                {
+                    // The notifications array is not the same as when the lookup table was populated
+                    return false;
+                }
+                foundNotifications.Add(notification);
+            }
+
+            notifications = foundNotifications.ToArray();
+            return true;
+        }
+
+        /// <summary>
+        /// Populate convenience structures
+        /// </summary>
+        public void PopulateConvenienceStructures()
+        {
+            if (Notifications == null || Notifications.Length <= 0)
+            {
+                return;
+            }
+
+            int i = 0;
+            foreach (var notification in Notifications)
+            {
+                notification.Content.ContextAsDictionary = new Dictionary<string, string>();
+                if (!notification.Read)
+                {
+                    UnreadNotifications.Add(notification.Id);
+                }
+                foreach (var contextEntry in notification.Content.Context)
+                {
+                    notification.Content.ContextAsDictionary.Add(contextEntry.Key, contextEntry.Value);
+                }
+
+                string identifyingKey = null;
+                if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Triggers, StringComparison.OrdinalIgnoreCase))
+                {
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.LootLocker, StringComparison.OrdinalIgnoreCase))
+                {
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.LootLocker.CatalogItemId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.GooglePlayStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore.ProductId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.TransactionId;
+                }
+
+                if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)
+                {
+                    if (NotificationLookupTable.TryGetValue(value, out var indexes))
+                    {
+                        indexes.Add(i);
+                    }
+                    else
+                    {
+                        NotificationLookupTable.Add(value, new List<int> { i });
+                    }
+                }
+                ++i;
+            }
+        }
+
         private readonly List<string> UnreadNotifications = new List<string>();
+        private readonly Dictionary<string, List<int>> NotificationLookupTable = new Dictionary<string, List<int>>();
     };
 
     /// <summary>
