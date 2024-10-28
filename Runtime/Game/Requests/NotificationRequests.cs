@@ -551,6 +551,7 @@ namespace LootLocker.Requests
         /// Pagination data for this set of notifications
         /// </summary>
         public LootLockerExtendedPagination Pagination { get; set; }
+
         /// <summary>
         /// Will mark all unread notifications in this response as read in LootLocker (though remember to check the response if it succeeded)
         /// </summary>
@@ -578,21 +579,25 @@ namespace LootLocker.Requests
         public bool TryGetNotificationsByIdentifyingValue(string identifyingValue, out LootLockerNotification[] notifications)
         {
             notifications = null;
-            if (!NotificationLookupTable.TryGetValue(identifyingValue, out var indexes))
+            if (!NotificationLookupTable.TryGetValue(identifyingValue, out var lookupEntries))
             {
                 return false;
             }
 
             var foundNotifications = new List<LootLockerNotification>();
-            foreach (var index in indexes)
+            foreach (var lookupEntry in lookupEntries)
             {
-                if (index < 0 || index >= Notifications.Length)
+                if (lookupEntry.NotificationIndex < 0 || lookupEntry.NotificationIndex >= Notifications.Length)
                 {
                     // The notifications array is not the same as when the lookup table was populated
                     return false;
                 }
-                var notification = Notifications[index];
-                if (!notification.Content.ContextAsDictionary.ContainsValue(identifyingValue))
+                var notification = Notifications[lookupEntry.NotificationIndex];
+                if (notification == null 
+                    || !notification.Id.Equals(lookupEntry.NotificationId, StringComparison.OrdinalIgnoreCase) 
+                    || !notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
+                    || actualContextValue == null 
+                    || !actualContextValue.Equals(identifyingValue, StringComparison.OrdinalIgnoreCase))
                 {
                     // The notifications array is not the same as when the lookup table was populated
                     return false;
@@ -647,13 +652,19 @@ namespace LootLocker.Requests
 
                 if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)
                 {
+                    var lookupEntry = new LootLockerNotificationLookupTableEntry
+                    {
+                        IdentifyingKey = identifyingKey,
+                        NotificationId = notification.Id,
+                        NotificationIndex = i
+                    };
                     if (NotificationLookupTable.TryGetValue(value, out var indexes))
                     {
-                        indexes.Add(i);
+                        indexes.Add(lookupEntry);
                     }
                     else
                     {
-                        NotificationLookupTable.Add(value, new List<int> { i });
+                        NotificationLookupTable.Add(value, new List<LootLockerNotificationLookupTableEntry> { lookupEntry });
                     }
                 }
                 ++i;
@@ -661,7 +672,16 @@ namespace LootLocker.Requests
         }
 
         private readonly List<string> UnreadNotifications = new List<string>();
-        private readonly Dictionary<string, List<int>> NotificationLookupTable = new Dictionary<string, List<int>>();
+
+        /// <summary>
+        /// </summary>
+        private struct LootLockerNotificationLookupTableEntry
+        {
+            public string IdentifyingKey { get; set; }
+            public string NotificationId { get; set; }
+            public int NotificationIndex { get; set; }
+        };
+        private readonly Dictionary<string, List<LootLockerNotificationLookupTableEntry>> NotificationLookupTable = new Dictionary<string, List<LootLockerNotificationLookupTableEntry>>();
     };
 
     /// <summary>
