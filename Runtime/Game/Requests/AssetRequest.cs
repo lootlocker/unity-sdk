@@ -186,6 +186,7 @@ namespace LootLocker.Requests
         public bool detachable { get; set; }
         public bool user_facing { get; set; }
         public object dependent_asset_id { get; set; }
+        public int max_equip_count { get; set; }
     }
 
     public class LootLockerFavouritesListResponse : LootLockerResponse
