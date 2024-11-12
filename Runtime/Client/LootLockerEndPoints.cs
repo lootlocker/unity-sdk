@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -322,6 +323,20 @@ namespace LootLocker
         public static EndPointClass ListNotifications = new EndPointClass("notifications/v1", LootLockerHTTPMethod.GET);
         public static EndPointClass ReadNotifications = new EndPointClass("notifications/v1/read", LootLockerHTTPMethod.PUT);
         public static EndPointClass ReadAllNotifications = new EndPointClass("notifications/v1/read/all", LootLockerHTTPMethod.PUT);
+    }
 
+    [Serializable]
+    public enum LootLockerHTTPMethod
+    {
+        GET = 0,
+        POST = 1,
+        DELETE = 2,
+        PUT = 3,
+        HEAD = 4,
+        CREATE = 5,
+        OPTIONS = 6,
+        PATCH = 7,
+        UPLOAD_FILE = 8,
+        UPDATE_FILE = 9
     }
 }
