@@ -1,3 +1,4 @@
+#if LOOTLOCKER_USE_LEGACY_HTTP
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -182,3 +183,4 @@ namespace LootLocker
         }
     }
 }
+#endif
