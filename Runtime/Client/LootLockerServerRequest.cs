@@ -13,21 +13,6 @@ using UnityEditor;
 
 namespace LootLocker
 {
-    [Serializable]
-    public enum LootLockerHTTPMethod
-    {
-        GET = 0,
-        POST = 1,
-        DELETE = 2,
-        PUT = 3,
-        HEAD = 4,
-        CREATE = 5,
-        OPTIONS = 6,
-        PATCH = 7,
-        UPLOAD_FILE = 8,
-        UPDATE_FILE = 9
-    }
-
     public class LootLockerErrorData
     {
         public LootLockerErrorData(int httpStatusCode, string errorMessage)
