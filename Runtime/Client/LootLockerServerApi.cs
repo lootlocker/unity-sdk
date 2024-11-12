@@ -89,6 +89,10 @@ namespace LootLocker
         }
 #endif
 
+        void Update()
+        {
+        }
+
         public static void SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
         {
             if (_instance == null)
