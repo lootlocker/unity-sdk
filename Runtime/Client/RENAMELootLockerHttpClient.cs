@@ -10,6 +10,7 @@ using LootLocker.Requests;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditorInternal;
+#endif
 
 namespace LootLocker
 {
@@ -22,7 +23,6 @@ namespace LootLocker
     {
         public string endpoint { get; set; }
         public LootLockerHTTPMethod httpMethod { get; set; }
-        public Dictionary<string, object> payload { get; set; }
         public string jsonPayload { get; set; }
         public byte[] upload { get; set; }
         public string uploadName { get; set; }
@@ -133,7 +133,6 @@ namespace LootLocker
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
-            this.payload = null;
             this.upload = upload;
             this.uploadName = uploadName;
             this.uploadType = uploadType;
@@ -151,11 +150,6 @@ namespace LootLocker
             this.form.AddBinaryData("file", upload, uploadName);
 
             bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
-
-            if (this.payload != null && isNonPayloadMethod)
-            {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
-            }
         }
 
         public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null,
@@ -168,7 +162,6 @@ namespace LootLocker
             this.upload = null;
             this.uploadName = null;
             this.uploadType = null;
-            this.payload = null;
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
             this.callerRole = callerRole;
@@ -612,7 +605,7 @@ namespace LootLocker
                 // Defaults are fine for PUT
                 case LootLockerHTTPMethod.PUT:
 
-                    if (request.payload == null && request.upload != null)
+                    if (request.upload != null)
                     {
                         List<IMultipartFormSection> form = new List<IMultipartFormSection>
                         {
@@ -639,11 +632,10 @@ namespace LootLocker
                     }
                     else
                     {
-                        string json = (request.payload != null && request.payload.Count > 0) ? LootLockerJson.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(json));
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(request.jsonPayload));
 #endif
-                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
+                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(request.jsonPayload) ? "{}" : request.jsonPayload);
                         webRequest = UnityWebRequest.Put(url, bytes);
                         webRequest.method = request.httpMethod.ToString();
                     }
