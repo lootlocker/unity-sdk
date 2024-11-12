@@ -6146,7 +6146,7 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(after))
                 endpoint += $"cursor={after}&";
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, new JsonOptions(JsonSerializationOptions.UseXmlIgnore) ); });
         }
 
         /// <summary>
