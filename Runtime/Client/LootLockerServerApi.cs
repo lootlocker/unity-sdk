@@ -13,11 +13,6 @@ using Object = UnityEngine.Object;
 using UnityEditorInternal;
 #endif
 
-namespace LootLocker.LootLockerEnums
-{
-    public enum LootLockerCallerRole { User, Admin, Player, Base };
-}
-
 namespace LootLocker
 {
     public class LootLockerServerApi : MonoBehaviour
