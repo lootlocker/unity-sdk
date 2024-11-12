@@ -1,4 +1,4 @@
-#if !LOOTLOCKER_USE_LEGACY_HTTP
+﻿#if !LOOTLOCKER_USE_LEGACY_HTTP
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -12,8 +12,65 @@ using UnityEditor;
 using UnityEditorInternal;
 #endif
 
+namespace LootLocker.LootLockerEnums
+{
+    public enum LootLockerHttpRequestDataType
+    {
+        EMPTY = 0,
+        BODY = 1,
+        WWW_FORM = 2,
+        FILE = 3,
+    }
+}
+
 namespace LootLocker
 {
+    public class LootLockerRequestContent
+    {
+        public LootLockerRequestContent(LootLockerHttpRequestDataType type = LootLockerHttpRequestDataType.EMPTY)
+        {
+            this.dataType = type;
+        }
+        public LootLockerHttpRequestDataType dataType { get; set; }
+    }
+
+    public class LootLockerJsonBodyRequestContent : LootLockerRequestContent
+    {
+        public LootLockerJsonBodyRequestContent(string jsonBody) : base(LootLockerHttpRequestDataType.BODY)
+        {
+            this.jsonBody = jsonBody;
+        }
+        public string jsonBody { get; set; }
+    }
+
+    public class LootLockerWWWFormRequestContent : LootLockerRequestContent
+    {
+        public LootLockerWWWFormRequestContent(byte[] content, string name, string type) : base(LootLockerHttpRequestDataType.WWW_FORM)
+        {
+            this.content = content;
+            this.name = name;
+            this.type = type;
+        }
+        public byte[] content { get; set; }
+        public string name { get; set; }
+        public string type { get; set; }
+    }
+
+    public class LootLockerFileRequestContent : LootLockerRequestContent
+    {
+        public LootLockerFileRequestContent(byte[] content, string name, Dictionary<string, string> formFields) : base(LootLockerHttpRequestDataType.FILE)
+        {
+            this.fileForm = new WWWForm();
+
+            foreach (var kvp in formFields)
+            {
+                this.fileForm.AddField(kvp.Key, kvp.Value);
+            }
+
+            this.fileForm.AddBinaryData("file", content, name);
+        }
+        public WWWForm fileForm { get; set; }
+    }
 
     /// <summary>
     /// Construct a request to send to the server.
@@ -23,12 +80,8 @@ namespace LootLocker
     {
         public string endpoint { get; set; }
         public LootLockerHTTPMethod httpMethod { get; set; }
-        public string jsonPayload { get; set; }
-        public byte[] upload { get; set; }
-        public string uploadName { get; set; }
-        public string uploadType { get; set; }
         public LootLockerCallerRole callerRole { get; set; }
-        public WWWForm form { get; set; }
+        public LootLockerRequestContent content { get; set; }
 
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -133,23 +186,17 @@ namespace LootLocker
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
-            this.upload = upload;
-            this.uploadName = uploadName;
-            this.uploadType = uploadType;
-            this.jsonPayload = null;
+            if(LootLockerHTTPMethod.PUT == httpMethod && upload != null)
+            {
+                this.content = new LootLockerWWWFormRequestContent(upload, uploadName, uploadType);
+            }
+            else
+            {
+                this.content = new LootLockerFileRequestContent(upload, uploadName, body);
+            }
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = null;
             this.callerRole = callerRole;
-            this.form = new WWWForm();
-
-            foreach (var kvp in body)
-            {
-                this.form.AddField(kvp.Key, kvp.Value);
-            }
-
-            this.form.AddBinaryData("file", upload, uploadName);
-
-            bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
         }
 
         public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null,
@@ -158,19 +205,21 @@ namespace LootLocker
             this.retryCount = 0;
             this.endpoint = endpoint;
             this.httpMethod = httpMethod;
-            this.jsonPayload = payload;
-            this.upload = null;
-            this.uploadName = null;
-            this.uploadType = null;
+            if(this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS)
+            {
+                this.content = new LootLockerRequestContent();
+                if (!string.IsNullOrEmpty(payload))
+                {
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads can not be sent in GET, HEAD, or OPTIONS requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                }
+            }
+            else
+            {
+                this.content = new LootLockerJsonBodyRequestContent(payload);
+            }
             this.extraHeaders = extraHeaders != null && extraHeaders.Count == 0 ? null : extraHeaders; // Force extra headers to null if empty dictionary was supplied
             this.queryParams = queryParams != null && queryParams.Count == 0 ? null : queryParams;
             this.callerRole = callerRole;
-            bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
-            this.form = null;
-            if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
-            {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
-            }
         }
 
         #endregion
@@ -563,7 +612,8 @@ namespace LootLocker
         private static bool ShouldRefreshUsingRefreshToken(LootLockerServerRequest cachedRequest)
         {
             // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
-            return (string.IsNullOrEmpty(cachedRequest.jsonPayload) || !cachedRequest.jsonPayload.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
+            string json = cachedRequest.content.dataType == LootLockerHttpRequestDataType.BODY ? ((LootLockerJsonBodyRequestContent)cachedRequest.content).jsonBody : null;
+            return (string.IsNullOrEmpty(json) || !json.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
         }
 
         private void CompleteCall(LootLockerServerRequest cachedRequest, LootLockerSessionResponse sessionRefreshResponse, Action<LootLockerResponse> onComplete)
@@ -589,15 +639,21 @@ namespace LootLocker
 
         private UnityWebRequest CreateWebRequest(string url, LootLockerServerRequest request)
         {
-            UnityWebRequest webRequest;
+            UnityWebRequest webRequest = null;
             switch (request.httpMethod)
             {
                 case LootLockerHTTPMethod.UPLOAD_FILE:
-                    webRequest = UnityWebRequest.Post(url, request.form);
+                    if(request.content.dataType == LootLockerHttpRequestDataType.FILE)
+                    {
+                        webRequest = UnityWebRequest.Post(url, ((LootLockerFileRequestContent)request.content).fileForm);
+                    }
                     break;
                 case LootLockerHTTPMethod.UPDATE_FILE:
+                    if (request.content.dataType == LootLockerHttpRequestDataType.FILE)
+                    {
+                        webRequest = UnityWebRequest.Post(url, ((LootLockerFileRequestContent)request.content).fileForm);
+                    }
                     // Workaround for UnityWebRequest with PUT HTTP verb not having form fields
-                    webRequest = UnityWebRequest.Post(url, request.form);
                     webRequest.method = UnityWebRequest.kHttpVerbPUT;
                     break;
                 case LootLockerHTTPMethod.POST:
@@ -605,11 +661,12 @@ namespace LootLocker
                 // Defaults are fine for PUT
                 case LootLockerHTTPMethod.PUT:
 
-                    if (request.upload != null)
+                    if (request.content.dataType == LootLockerHttpRequestDataType.WWW_FORM)
                     {
+                        var content = (LootLockerWWWFormRequestContent)request.content;
                         List<IMultipartFormSection> form = new List<IMultipartFormSection>
                         {
-                            new MultipartFormFileSection(request.uploadName, request.upload, System.DateTime.Now.ToString(), request.uploadType)
+                            new MultipartFormFileSection(content.name, content.content, System.DateTime.Now.ToString(), content.type)
                         };
 
                         // generate a boundary then convert the form to byte[]
@@ -633,9 +690,9 @@ namespace LootLocker
                     else
                     {
 #if UNITY_EDITOR
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(request.jsonPayload));
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(((LootLockerJsonBodyRequestContent)request.content).jsonBody));
 #endif
-                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(request.jsonPayload) ? "{}" : request.jsonPayload);
+                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(((LootLockerJsonBodyRequestContent)request.content).jsonBody) ? "{}" : ((LootLockerJsonBodyRequestContent)request.content).jsonBody);
                         webRequest = UnityWebRequest.Put(url, bytes);
                         webRequest.method = request.httpMethod.ToString();
                     }
@@ -662,7 +719,7 @@ namespace LootLocker
             {
                 foreach (KeyValuePair<string, string> pair in BaseHeaders)
                 {
-                    if (pair.Key == "Content-Type" && request.upload != null) continue;
+                    if (pair.Key == "Content-Type" && request.content.dataType != LootLockerHttpRequestDataType.BODY) continue;
 
                     webRequest.SetRequestHeader(pair.Key, pair.Value);
                 }
