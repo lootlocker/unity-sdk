@@ -82,35 +82,6 @@ namespace LootLocker
             new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
 
-        public static void CallDomainAuthAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null)
-        {
-            if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
-                return;
-            }
-            
-            if (LootLockerConfig.current.domainKey.ToString().Length == 0)
-            {
-#if UNITY_EDITOR
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("LootLocker domain key must be set in settings");
-#endif
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings"));
-
-                return;
-            }
-
-            Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("domain-key", LootLockerConfig.current.domainKey);
-
-            if(LootLockerConfig.current.apiKey.StartsWith("dev_"))
-            {
-                headers.Add("is-development", "true");
-            }
-            
-            new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: LootLockerCallerRole.Base).Send((response) => { onComplete?.Invoke(response); });
-        }
-
         public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
             if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
