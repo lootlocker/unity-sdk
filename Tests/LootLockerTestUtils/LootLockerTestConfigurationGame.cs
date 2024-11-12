@@ -59,6 +59,10 @@ namespace LootLockerTestConfigurationUtils
                 var verb = LootLockerTestConfigurationUtilities.GetRandomVerb();
 
                 string gameName = testName + " " + verb + noun + " d-" + DateTime.Now + " " + guid;
+                if(gameName.Length > 99)
+                {
+                    gameName = gameName.Substring(0, 99);
+                }
 
                 CreateGameRequest createGameRequest = new CreateGameRequest
                 { name = gameName, organisation_id = createdGame.OrganisationId };

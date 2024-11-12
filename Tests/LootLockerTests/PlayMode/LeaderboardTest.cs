@@ -92,6 +92,14 @@ namespace LootLockerTests.PlayMode
 
             Assert.IsTrue(leaderboardSuccess, "Failed to create leaderboard");
 
+            // Sign in client
+            bool guestLoginCompleted = false;
+            LootLockerSDKManager.StartGuestSession(GUID.Generate().ToString(), response =>
+            {
+                SetupFailed |= !response.success;
+                guestLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => guestLoginCompleted);
         }
 
         [UnityTearDown]
