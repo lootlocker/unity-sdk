@@ -10,6 +10,7 @@ namespace LootLocker
 
     public class RateLimiter
     {
+        protected bool EnableRateLimiter = LootLockerConfig.IsTargetingProductionEnvironment();
         /* -- Configurable constants -- */
         // Tripwire settings, allow for a max total of n requests per x seconds
         protected const int TripWireTimeFrameSeconds = 60;
@@ -77,7 +78,7 @@ namespace LootLocker
         public virtual bool AddRequestAndCheckIfRateLimitHit()
         {
             //Disable local ratelimiter when not targeting production
-            if (!LootLockerConfig.IsTargetingProductionEnvironment())
+            if (!EnableRateLimiter)
             {
                 return false;
             }
