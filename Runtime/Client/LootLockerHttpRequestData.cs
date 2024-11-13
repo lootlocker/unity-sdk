@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using LootLocker.LootLockerEnums;
 using UnityEngine;
 
+namespace LootLocker.LootLockerEnums
+{
+    public enum LootLockerHTTPRequestDataType
+    {
+        EMPTY = 0,
+        JSON = 1,
+        WWW_FORM = 2,
+        FILE = 3,
+    }
+}
+
 namespace LootLocker.HTTP
 {
     [Serializable]
@@ -40,20 +51,25 @@ namespace LootLocker.HTTP
         /// How many times this request has been retried
         /// </summary>
         public int TimesRetried { get; set; }
+
+        /// <summary>
+        /// The callback action for handling responses
+        /// </summary>
+        public Action<LootLockerResponse> ResponseCallback { get; set; }
     }
 
     public class LootLockerHTTPRequestContent
     {
-        public LootLockerHTTPRequestContent(LootLockerHttpRequestDataType type = LootLockerHttpRequestDataType.EMPTY)
+        public LootLockerHTTPRequestContent(LootLockerHTTPRequestDataType type = LootLockerHTTPRequestDataType.EMPTY)
         {
             this.dataType = type;
         }
-        public LootLockerHttpRequestDataType dataType { get; set; }
+        public LootLockerHTTPRequestDataType dataType { get; set; }
     }
 
     public class LootLockerJsonBodyRequestContent : LootLockerHTTPRequestContent
     {
-        public LootLockerJsonBodyRequestContent(string jsonBody) : base(LootLockerHttpRequestDataType.JSON)
+        public LootLockerJsonBodyRequestContent(string jsonBody) : base(LootLockerHTTPRequestDataType.JSON)
         {
             this.jsonBody = jsonBody;
         }
@@ -62,7 +78,7 @@ namespace LootLocker.HTTP
 
     public class LootLockerWWWFormRequestContent : LootLockerHTTPRequestContent
     {
-        public LootLockerWWWFormRequestContent(byte[] content, string name, string type) : base(LootLockerHttpRequestDataType.WWW_FORM)
+        public LootLockerWWWFormRequestContent(byte[] content, string name, string type) : base(LootLockerHTTPRequestDataType.WWW_FORM)
         {
             this.content = content;
             this.name = name;
@@ -75,7 +91,7 @@ namespace LootLocker.HTTP
 
     public class LootLockerFileRequestContent : LootLockerHTTPRequestContent
     {
-        public LootLockerFileRequestContent(byte[] content, string name, Dictionary<string, string> formFields) : base(LootLockerHttpRequestDataType.FILE)
+        public LootLockerFileRequestContent(byte[] content, string name, Dictionary<string, string> formFields) : base(LootLockerHTTPRequestDataType.FILE)
         {
             this.fileForm = new WWWForm();
 
