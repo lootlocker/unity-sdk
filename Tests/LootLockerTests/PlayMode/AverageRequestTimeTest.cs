@@ -341,4 +341,73 @@ public class AverageRequestTimeTest
         // NOTE: TIME LIMITS ARE SOURCED FROM A BUNCH OF PRE-REFACTORING TEST RUNS
         yield return null;
     }
+
+    [UnityTest]
+    public IEnumerator SimultaneousRequests_GetsIndividualAnswers()
+    {
+        yield return _Setup();
+        Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+        // Given
+        List<string> playerPublicUIDS = new List<string>();
+        string leaderboardKey = null;
+        for(int i = 0; i < 10; i++)
+        {
+            bool guestLoginCompleted = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                playerPublicUIDS.Add(response.public_uid);
+                guestLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => guestLoginCompleted);
+
+            bool listingCompleted = false;
+            LootLockerLeaderboardDetails[] leaderboards = null;
+            LootLockerSDKManager.ListLeaderboards(100, 0, response =>
+            {
+                leaderboards = response.items;
+                listingCompleted = true;
+            });
+            yield return new WaitUntil(() => listingCompleted);
+
+            leaderboardKey = leaderboards[0].key;
+
+            bool submitCompleted = false;
+            LootLockerSDKManager.SubmitScore(null, 100, leaderboardKey, response =>
+            {
+                submitCompleted = true;
+            });
+            yield return new WaitUntil(() => submitCompleted);
+        }
+
+        // When
+        List<bool> fetchesCompleted = new List<bool>();
+        List<LootLockerGetByListOfMembersResponse> fetchResponses = new List<LootLockerGetByListOfMembersResponse>();
+        foreach(var ignored in playerPublicUIDS)
+        {
+            fetchesCompleted.Add(false);
+            fetchResponses.Add(null);
+        }
+
+        int j = 0;
+        foreach(var UID in playerPublicUIDS)
+        {
+            int fetchIndex = j;
+            LootLockerSDKManager.GetByListOfMembers(new string[] { UID }, leaderboardKey, (LootLockerGetByListOfMembersResponse response) =>
+            {
+                fetchResponses[fetchIndex] = response;
+                fetchesCompleted[fetchIndex] = true;
+            });
+            j++;
+        }
+
+        yield return new WaitUntil(() => { foreach (bool completed in fetchesCompleted) { if (!completed) return false; } return true; });
+
+        // Then
+        for(int k = 0; k < fetchResponses.Count; k++)
+        {
+            Assert.AreEqual(playerPublicUIDS[k], fetchResponses[k].members[0].member_id, "The right UID was not here");
+        }
+    }
+
 }
