@@ -343,7 +343,7 @@ public class AverageRequestTimeTest
     }
 
     [UnityTest]
-    public IEnumerator SimultaneousRequests_GetsIndividualAnswers()
+    public IEnumerator SimultaneousSimilarRequests_GetsIndividualAnswers()
     {
         yield return _Setup();
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -351,7 +351,7 @@ public class AverageRequestTimeTest
         // Given
         List<string> playerPublicUIDS = new List<string>();
         string leaderboardKey = null;
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 250; i++)
         {
             bool guestLoginCompleted = false;
             LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
@@ -361,16 +361,19 @@ public class AverageRequestTimeTest
             });
             yield return new WaitUntil(() => guestLoginCompleted);
 
-            bool listingCompleted = false;
-            LootLockerLeaderboardDetails[] leaderboards = null;
-            LootLockerSDKManager.ListLeaderboards(100, 0, response =>
+            if (leaderboardKey == null)
             {
-                leaderboards = response.items;
-                listingCompleted = true;
-            });
-            yield return new WaitUntil(() => listingCompleted);
+                bool listingCompleted = false;
+                LootLockerLeaderboardDetails[] leaderboards = null;
+                LootLockerSDKManager.ListLeaderboards(100, 0, response =>
+                {
+                    leaderboards = response.items;
+                    listingCompleted = true;
+                });
+                yield return new WaitUntil(() => listingCompleted);
 
-            leaderboardKey = leaderboards[0].key;
+                leaderboardKey = leaderboards[0].key;
+            }
 
             bool submitCompleted = false;
             LootLockerSDKManager.SubmitScore(null, 100, leaderboardKey, response =>
@@ -408,6 +411,94 @@ public class AverageRequestTimeTest
         {
             Assert.AreEqual(playerPublicUIDS[k], fetchResponses[k].members[0].member_id, "The right UID was not here");
         }
+    }
+
+    [UnityTest]
+    public IEnumerator SimultaneousSameRequests_AreGrouped()
+    {
+        yield return _Setup();
+        Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+        // Given
+        List<string> playerPublicUIDS = new List<string>();
+        string leaderboardKey = null;
+        for (int i = 0; i < 250; i++)
+        {
+            bool guestLoginCompleted = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                playerPublicUIDS.Add(response.public_uid);
+                guestLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => guestLoginCompleted);
+
+            if (leaderboardKey == null)
+            {
+                bool listingCompleted = false;
+                LootLockerLeaderboardDetails[] leaderboards = null;
+                LootLockerSDKManager.ListLeaderboards(100, 0, response =>
+                {
+                    leaderboards = response.items;
+                    listingCompleted = true;
+                });
+                yield return new WaitUntil(() => listingCompleted);
+
+                leaderboardKey = leaderboards[0].key;
+            }
+
+            bool submitCompleted = false;
+            LootLockerSDKManager.SubmitScore(null, 100, leaderboardKey, response =>
+            {
+                submitCompleted = true;
+            });
+            yield return new WaitUntil(() => submitCompleted);
+        }
+
+        // When
+        List<bool> fetchesCompleted = new List<bool>();
+        List<LootLockerGetByListOfMembersResponse> fetchResponses = new List<LootLockerGetByListOfMembersResponse>();
+        foreach (var ignored in playerPublicUIDS)
+        {
+            fetchesCompleted.Add(false);
+            fetchResponses.Add(null);
+        }
+
+        int j = 0;
+        foreach (var UID in playerPublicUIDS)
+        {
+            int fetchIndex = j;
+            LootLockerSDKManager.GetByListOfMembers(new string[] { playerPublicUIDS[0] }, leaderboardKey, (LootLockerGetByListOfMembersResponse response) =>
+            {
+                fetchResponses[fetchIndex] = response;
+                fetchesCompleted[fetchIndex] = true;
+            });
+            j++;
+        }
+
+        yield return new WaitUntil(() => { foreach (bool completed in fetchesCompleted) { if (!completed) return false; } return true; });
+
+        Dictionary<string, int> eventIdCounts = new Dictionary<string, int>();
+        // Then
+        foreach(var resp in fetchResponses)
+        {
+            if(eventIdCounts.ContainsKey(resp.EventId))
+            {
+                eventIdCounts[resp.EventId]++;
+                continue;
+            }
+            eventIdCounts.Add(resp.EventId, 1);
+        }
+        Assert.AreNotEqual(eventIdCounts.Keys.Count, fetchResponses.Count);
+        int greatest = 0;
+        foreach(var val in eventIdCounts.Values)
+        {
+            if(val > greatest)
+            {
+                greatest = val;
+            }
+        }
+        Assert.Greater(greatest, 1);
+        Debug.Log("Greatest was " + greatest);
     }
 
 }
