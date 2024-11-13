@@ -8,9 +8,6 @@ using System.Text;
 using UnityEngine.Networking;
 using LootLocker.Requests;
 using LootLocker.HTTP;
-using UnityEditor.PackageManager.Requests;
-using System.Threading;
-using System.Net;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditorInternal;
