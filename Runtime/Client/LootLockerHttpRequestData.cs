@@ -63,6 +63,31 @@ namespace LootLocker.HTTP
         /// </summary>
         public Action<LootLockerResponse> ResponseCallback { get; set; }
 
+        /// <summary>
+        /// A generated id for this request, it is a combination of hashes for the endpoint, headers and content
+        /// </summary>
+        public string RequestId { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if(obj != null && obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+            return Equals((LootLockerHTTPRequestData)obj);
+        }
+
+        public bool Equals(LootLockerHTTPRequestData? other)
+        {
+            return other != null && other.Value.RequestId.Equals(RequestId);
+        }
+
+        public override int GetHashCode()
+        {
+            return RequestId.GetHashCode();
+        }
+
+        #region Factory Methods
         public static LootLockerHTTPRequestData MakeFileRequest(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName, string fileContentType, Dictionary<string, string> body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
             return _MakeRequestDataWithContent(
@@ -102,21 +127,30 @@ namespace LootLocker.HTTP
                     headers.Add(additionalHeader.Key, additionalHeader.Value);
                 }
             }
+            if (headers != null && headers.Count == 0)
+            {
+                headers = null; // Force extra headers to null if empty dictionary was supplied
+            }
+
+            string formattedUrl = BuildUrl(endPoint, queryParams, callerRole);
 
             return new LootLockerHTTPRequestData
             {
                 TimesRetried = 0,
                 Endpoint = endPoint,
                 HTTPMethod = httpMethod,
-                ExtraHeaders = headers != null && headers.Count == 0 ? null : headers, // Force extra headers to null if empty dictionary was supplied
+                ExtraHeaders = headers,
                 QueryParams = queryParams,
                 CallerRole = callerRole,
                 Content = content,
                 ResponseCallback = onComplete,
-                FormattedURL = BuildUrl(endPoint, queryParams, callerRole)
+                FormattedURL = formattedUrl,
+                RequestId = $"{formattedUrl}--h--{headers.GetHashCode()}--c--{content.GetHashCode()}"
             };
         }
+        #endregion
 
+        #region Helper Methods
         private static Dictionary<string, string> InitializeHeadersWithSessionToken(LootLockerCallerRole callerRole, bool useAuthToken)
         {
             var headers = new Dictionary<string, string>();
@@ -181,6 +215,7 @@ namespace LootLocker.HTTP
 
             return query;
         }
+        #endregion
     }
 
     public class LootLockerHTTPRequestContent
@@ -190,6 +225,11 @@ namespace LootLocker.HTTP
             this.dataType = type;
         }
         public LootLockerHTTPRequestDataType dataType { get; set; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(dataType, string.Empty.GetHashCode());
+        }
     }
 
     public class LootLockerJsonBodyRequestContent : LootLockerHTTPRequestContent
@@ -199,6 +239,11 @@ namespace LootLocker.HTTP
             this.jsonBody = jsonBody;
         }
         public string jsonBody { get; set; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(dataType, jsonBody.GetHashCode());
+        }
     }
 
     public class LootLockerWWWFormRequestContent : LootLockerHTTPRequestContent
@@ -212,6 +257,11 @@ namespace LootLocker.HTTP
         public byte[] content { get; set; }
         public string name { get; set; }
         public string type { get; set; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(dataType, content.GetHashCode(), name.GetHashCode(), type.GetHashCode());
+        }
     }
 
     public class LootLockerFileRequestContent : LootLockerHTTPRequestContent
@@ -228,5 +278,10 @@ namespace LootLocker.HTTP
             this.fileForm.AddBinaryData("file", content, name);
         }
         public WWWForm fileForm { get; set; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(dataType, fileForm.GetHashCode());
+        }
     }
 }
