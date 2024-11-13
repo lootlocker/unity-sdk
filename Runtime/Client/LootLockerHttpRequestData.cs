@@ -19,7 +19,7 @@ namespace LootLocker.LootLockerEnums
 namespace LootLocker.HTTP
 {
     [Serializable]
-    public struct LootLockerHTTPRequestData
+    public class LootLockerHTTPRequestData
     {
         /// <summary>
         /// The endpoint to send the request to
@@ -59,14 +59,32 @@ namespace LootLocker.HTTP
         public int TimesRetried { get; set; }
 
         /// <summary>
-        /// The callback action for handling responses
+        /// The listeners for handling responses
         /// </summary>
-        public Action<LootLockerResponse> ResponseCallback { get; set; }
+        public List<Action<LootLockerResponse>> Listeners { get; set; }
+
+        /// <summary>
+        /// Whether the listeners have been invoked or not
+        /// </summary>
+        public bool HaveListenersBeenInvoked { get; set; }
 
         /// <summary>
         /// A generated id for this request, it is a combination of hashes for the endpoint, headers and content
         /// </summary>
         public string RequestId { get; set; }
+
+
+        /// <summary>
+        /// Call all listeners with response
+        /// </summary>
+        public void CallListenersWithResult(LootLockerResponse response)
+        {
+            foreach(var listener in Listeners)
+            {
+                listener?.Invoke(response);
+            }
+            HaveListenersBeenInvoked = true;
+        }
 
         public override bool Equals(object obj)
         {
@@ -77,9 +95,9 @@ namespace LootLocker.HTTP
             return Equals((LootLockerHTTPRequestData)obj);
         }
 
-        public bool Equals(LootLockerHTTPRequestData? other)
+        public bool Equals(LootLockerHTTPRequestData other)
         {
-            return other != null && other.Value.RequestId.Equals(RequestId);
+            return other != null && other.RequestId.Equals(RequestId);
         }
 
         public override int GetHashCode()
@@ -143,7 +161,8 @@ namespace LootLocker.HTTP
                 QueryParams = queryParams,
                 CallerRole = callerRole,
                 Content = content,
-                ResponseCallback = onComplete,
+                Listeners = new List<Action<LootLockerResponse>> { onComplete },
+                HaveListenersBeenInvoked = false,
                 FormattedURL = formattedUrl,
                 RequestId = $"{formattedUrl}--h--{headers.GetHashCode()}--c--{content.GetHashCode()}"
             };

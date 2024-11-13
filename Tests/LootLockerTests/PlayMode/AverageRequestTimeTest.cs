@@ -498,7 +498,7 @@ public class AverageRequestTimeTest
             }
         }
         Assert.Greater(greatest, 1);
-        Debug.Log("Greatest was " + greatest);
+        Debug.LogWarning("Greatest was " + greatest);
     }
 
 }
