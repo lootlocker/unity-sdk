@@ -179,7 +179,7 @@ namespace LootLocker
         /// </summary>
         public void Send(System.Action<LootLockerResponse> OnServerResponse)
         {
-            LootLockerServerApi.SendRequest(this, (response) => { OnServerResponse?.Invoke(response); });
+            LootLockerHTTPClient.SendRequest(this, (response) => { OnServerResponse?.Invoke(response); });
         }
     }
 }
