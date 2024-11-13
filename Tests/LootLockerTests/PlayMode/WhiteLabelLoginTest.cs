@@ -47,7 +47,7 @@ namespace LootLockerTests.PlayMode
             }
             gameUnderTest?.SwitchToStageEnvironment();
 
-            // Enable guest platform
+            // Enable Whitelabel platform
             bool enableWLLogin = false;
             gameUnderTest?.EnableWhiteLabelLogin((success, errorMessage) =>
             {
