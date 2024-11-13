@@ -228,10 +228,10 @@ namespace LootLocker
 
         public void SendRequest(LootLockerHTTPRequestData request, Action<LootLockerResponse> OnServerResponse = null)
         {
-            StartCoroutine(coroutine(request, OnServerResponse));
+            StartCoroutine(SendRequestCoroutine(request, OnServerResponse));
         }
 
-        protected IEnumerator coroutine(LootLockerHTTPRequestData request, Action<LootLockerResponse> OnServerResponse = null)
+        protected IEnumerator SendRequestCoroutine(LootLockerHTTPRequestData request, Action<LootLockerResponse> OnServerResponse = null)
         {
             //Always wait 1 frame before starting any request to the server to make sure the requester code has exited the main thread.
             yield return null;
@@ -361,23 +361,6 @@ namespace LootLocker
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.HTTPMethod.ToString());
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.Endpoint);
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody));
-            }
-        }
-
-        private static string GetUrl(LootLockerCallerRole callerRole)
-        {
-            switch (callerRole)
-            {
-                case LootLockerCallerRole.Admin:
-                    return LootLockerConfig.current.adminUrl;
-                case LootLockerCallerRole.User:
-                    return LootLockerConfig.current.userUrl;
-                case LootLockerCallerRole.Player:
-                    return LootLockerConfig.current.playerUrl;
-                case LootLockerCallerRole.Base:
-                    return LootLockerConfig.current.baseUrl;
-                default:
-                    return LootLockerConfig.current.url;
             }
         }
 
@@ -654,9 +637,28 @@ namespace LootLocker
 
         private string BuildUrl(string endpoint, Dictionary<string, string> queryParams = null, LootLockerCallerRole callerRole = LootLockerCallerRole.User)
         {
-            string ep = endpoint.StartsWith("/") ? endpoint.Trim() : "/" + endpoint.Trim();
+            string trimmedEndpoint = endpoint.StartsWith("/") ? endpoint.Trim() : "/" + endpoint.Trim();
+            string urlBase;
+            switch (callerRole)
+            {
+                case LootLockerCallerRole.Admin:
+                    urlBase = LootLockerConfig.current.adminUrl;
+                    break;
+                case LootLockerCallerRole.User:
+                    urlBase = LootLockerConfig.current.userUrl;
+                    break;
+                case LootLockerCallerRole.Player:
+                    urlBase = LootLockerConfig.current.playerUrl;
+                    break;
+                case LootLockerCallerRole.Base:
+                    urlBase = LootLockerConfig.current.baseUrl;
+                    break;
+                default:
+                    urlBase = LootLockerConfig.current.url;
+                    break;
+            }
 
-            return (GetUrl(callerRole) + ep + GetQueryParameterStringFromDictionary(queryParams)).Trim();
+            return (urlBase + trimmedEndpoint + GetQueryParameterStringFromDictionary(queryParams)).Trim();
         }
 
         public string GetQueryParameterStringFromDictionary(Dictionary<string, string> queryDict)
