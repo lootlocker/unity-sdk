@@ -779,7 +779,7 @@ namespace LootLocker.Extension
 
         private void OnDestroy()
         {
-            LootLockerServerApi.ResetInstance();
+            LootLockerHTTPClient.ResetInstance();
         }
 
     }
