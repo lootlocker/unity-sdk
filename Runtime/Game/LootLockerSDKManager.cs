@@ -41,7 +41,7 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerServerApi.Instantiate();
+            LootLockerHTTPClient.Instantiate();
             return LoadConfig();
         }
 
@@ -54,7 +54,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
-            LootLockerServerApi.Instantiate();
+            LootLockerHTTPClient.Instantiate();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
 
