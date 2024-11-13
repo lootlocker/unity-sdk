@@ -25,31 +25,18 @@ namespace LootLocker
 
         public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
-            LootLockerHTTPRequestContent content = null;
             if (httpMethod == LootLockerHTTPMethod.GET || httpMethod == LootLockerHTTPMethod.HEAD || httpMethod == LootLockerHTTPMethod.OPTIONS)
             {
-                content = new LootLockerHTTPRequestContent();
                 if (!string.IsNullOrEmpty(body))
                 {
                     LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads can not be sent in GET, HEAD, or OPTIONS requests. Attempted to send a body to: " + httpMethod.ToString() + " " + endPoint);
                 }
+                LootLockerHTTPClient.Get().SendRequest(LootLockerHTTPRequestData.MakeNoContentRequest(endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
             else
             {
-                if (string.IsNullOrEmpty(body))
-                {
-                    body = "{}";
-                }
-                content = new LootLockerJsonBodyRequestContent(body);
+                LootLockerHTTPClient.Get().SendRequest(LootLockerHTTPRequestData.MakeJsonRequest(endPoint, httpMethod, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
-
-            if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
-                return;
-            }
-
-            MakeAndSendRequest(content, endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders);
         }
 
         public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
@@ -65,73 +52,13 @@ namespace LootLocker
             LootLockerHTTPRequestContent content = (LootLockerHTTPMethod.PUT == httpMethod) ?
                     new LootLockerWWWFormRequestContent(file, fileName, fileContentType)
                     : new LootLockerFileRequestContent(file, fileName, body);
-            MakeAndSendRequest(content, endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders);
+
+            LootLockerHTTPClient.Get().SendRequest(LootLockerHTTPRequestData.MakeFileRequest(endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
         }
         
         public static void UploadFile(EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
             UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole, additionalHeaders);
-        }
-
-        private static void MakeAndSendRequest(LootLockerHTTPRequestContent content, string endPoint, LootLockerHTTPMethod httpMethod, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
-        {
-            if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
-                return;
-            }
-
-#if UNITY_EDITOR
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Debug)("Caller Type: " + callerRole);
-#endif
-            Dictionary<string, string> headers = InitializeHeadersWithSessionToken(callerRole, useAuthToken);
-
-            if (LootLockerConfig.current != null)
-                headers.Add(LootLockerConfig.current.dateVersion.key, LootLockerConfig.current.dateVersion.value);
-
-            if (additionalHeaders != null)
-            {
-                foreach (var additionalHeader in additionalHeaders)
-                {
-                    headers.Add(additionalHeader.Key, additionalHeader.Value);
-                }
-            }
-
-            LootLockerHTTPRequestData requestData = new LootLockerHTTPRequestData
-            {
-                TimesRetried = 0,
-                Endpoint = endPoint,
-                HTTPMethod = httpMethod,
-                ExtraHeaders = headers != null && headers.Count == 0 ? null : headers, // Force extra headers to null if empty dictionary was supplied
-                QueryParams = null,
-                CallerRole = callerRole,
-                Content = content,
-                ResponseCallback = onComplete
-            };
-
-            LootLockerHTTPClient.Get().SendRequest(requestData);
-        }
-
-        private static Dictionary<string, string> InitializeHeadersWithSessionToken(LootLockerCallerRole callerRole, bool useAuthToken)
-        {
-            var headers = new Dictionary<string, string>();
-            if (useAuthToken)
-            {
-                if (callerRole == LootLockerCallerRole.Admin)
-                {
-#if UNITY_EDITOR
-                    if (!string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
-                    {
-                        headers.Add("x-auth-token", LootLockerConfig.current.adminToken);
-                    }
-#endif
-                }
-                else if (!string.IsNullOrEmpty(LootLockerConfig.current.token))
-                {
-                    headers.Add("x-session-token", LootLockerConfig.current.token);
-                }
-            }
-            return headers;
         }
 
         #endregion
@@ -239,12 +166,16 @@ namespace LootLocker
             //Always wait 1 frame before starting any request to the server to make sure the requester code has exited the main thread.
             yield return null;
 
-            //Build the URL that we will hit based on the specified endpoint, query params, etc
-            string url = BuildUrl(request.Endpoint, request.QueryParams, request.CallerRole);
+            if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
+            {
+                request.ResponseCallback?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(request.Endpoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
+                yield break;
+            }
+
 #if UNITY_EDITOR
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest " + request.HTTPMethod + " URL: " + url);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest " + request.HTTPMethod + " URL: " + request.FormattedURL);
 #endif
-            using (UnityWebRequest webRequest = CreateWebRequest(url, request))
+            using (UnityWebRequest webRequest = CreateWebRequest(request))
             {
                 if(webRequest == null)
                 {
@@ -273,7 +204,7 @@ namespace LootLocker
 
                 if (!webRequest.isDone && timedOut)
                 {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.HTTPMethod + " " + url);
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.HTTPMethod + " " + request.FormattedURL);
                     request.ResponseCallback?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>(request.Endpoint + " timed out."));
                     yield break;
                 }
@@ -528,7 +459,7 @@ namespace LootLocker
             cachedRequest.TimesRetried++;
         }
 
-        private UnityWebRequest CreateWebRequest(string url, LootLockerHTTPRequestData request)
+        private UnityWebRequest CreateWebRequest(LootLockerHTTPRequestData request)
         {
             UnityWebRequest webRequest = null;
             switch (request.HTTPMethod)
@@ -536,12 +467,12 @@ namespace LootLocker
                 case LootLockerHTTPMethod.OPTIONS:
                 case LootLockerHTTPMethod.HEAD:
                 case LootLockerHTTPMethod.GET:
-                    webRequest = UnityWebRequest.Get(url);
+                    webRequest = UnityWebRequest.Get(request.FormattedURL);
                     webRequest.method = request.HTTPMethod.ToString();
                     break;
 
                 case LootLockerHTTPMethod.DELETE:
-                    webRequest = UnityWebRequest.Delete(url);
+                    webRequest = UnityWebRequest.Delete(request.FormattedURL);
                     break;
                 case LootLockerHTTPMethod.UPLOAD_FILE:
                 case LootLockerHTTPMethod.UPDATE_FILE:
@@ -550,7 +481,7 @@ namespace LootLocker
                         request.ResponseCallback?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("File request without file content"));
                         return webRequest;
                     }
-                    webRequest = UnityWebRequest.Post(url, ((LootLockerFileRequestContent)request.Content).fileForm);
+                    webRequest = UnityWebRequest.Post(request.FormattedURL, ((LootLockerFileRequestContent)request.Content).fileForm);
                     if(request.HTTPMethod == LootLockerHTTPMethod.UPDATE_FILE)
                     {
                         // Workaround for UnityWebRequest with PUT HTTP verb not having form fields
@@ -562,7 +493,7 @@ namespace LootLocker
                 case LootLockerHTTPMethod.PUT:
                     if (request.Content.dataType == LootLockerHTTPRequestDataType.WWW_FORM)
                     {
-                        webRequest = MakeWWWFormWebRequest(url, request);
+                        webRequest = MakeWWWFormWebRequest(request);
                     }
                     else
                     {
@@ -570,7 +501,7 @@ namespace LootLocker
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(((LootLockerJsonBodyRequestContent)request.Content).jsonBody));
 #endif
                         byte[] bytes = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(((LootLockerJsonBodyRequestContent)request.Content).jsonBody) ? "{}" : ((LootLockerJsonBodyRequestContent)request.Content).jsonBody);
-                        webRequest = UnityWebRequest.Put(url, bytes);
+                        webRequest = UnityWebRequest.Put(request.FormattedURL, bytes);
                         webRequest.method = request.HTTPMethod.ToString();
                     }
                     break;
@@ -605,7 +536,7 @@ namespace LootLocker
             return webRequest;
         }
 
-        private static UnityWebRequest MakeWWWFormWebRequest(string url, LootLockerHTTPRequestData request)
+        private static UnityWebRequest MakeWWWFormWebRequest(LootLockerHTTPRequestData request)
         {
             UnityWebRequest webRequest = new UnityWebRequest();
             var content = (LootLockerWWWFormRequestContent)request.Content;
@@ -622,8 +553,7 @@ namespace LootLocker
 
             // Make my request object and add the raw text. Set anything else you need here
             webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
-            webRequest.uri = new Uri(url);
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)(url);//the url is wrong in some cases
+            webRequest.uri = new Uri(request.FormattedURL);
             webRequest.uploadHandler = new UploadHandlerRaw(formSections);
             webRequest.uploadHandler.contentType = contentType;
             webRequest.useHttpContinue = false;
@@ -631,49 +561,6 @@ namespace LootLocker
             // webRequest.method = "POST";
             webRequest.method = UnityWebRequest.kHttpVerbPOST;
             return webRequest;
-        }
-
-        private string BuildUrl(string endpoint, Dictionary<string, string> queryParams = null, LootLockerCallerRole callerRole = LootLockerCallerRole.User)
-        {
-            string trimmedEndpoint = endpoint.StartsWith("/") ? endpoint.Trim() : "/" + endpoint.Trim();
-            string urlBase;
-            switch (callerRole)
-            {
-                case LootLockerCallerRole.Admin:
-                    urlBase = LootLockerConfig.current.adminUrl;
-                    break;
-                case LootLockerCallerRole.User:
-                    urlBase = LootLockerConfig.current.userUrl;
-                    break;
-                case LootLockerCallerRole.Player:
-                    urlBase = LootLockerConfig.current.playerUrl;
-                    break;
-                case LootLockerCallerRole.Base:
-                    urlBase = LootLockerConfig.current.baseUrl;
-                    break;
-                default:
-                    urlBase = LootLockerConfig.current.url;
-                    break;
-            }
-
-            return (urlBase + trimmedEndpoint + GetQueryParameterStringFromDictionary(queryParams)).Trim();
-        }
-
-        public string GetQueryParameterStringFromDictionary(Dictionary<string, string> queryDict)
-        {
-            if (queryDict == null || queryDict.Count == 0) return string.Empty;
-
-            string query = "?";
-
-            foreach (KeyValuePair<string, string> pair in queryDict)
-            {
-                if (query.Length > 1)
-                    query += "&";
-
-                query += pair.Key + "=" + pair.Value;
-            }
-
-            return query;
         }
         #endregion
     }
