@@ -304,8 +304,7 @@ namespace LootLocker
                     statusCode = (int)executionItem.WebRequest.responseCode,
                     success = true,
                     text = executionItem.WebRequest.downloadHandler.text,
-                    errorData = null,
-                    EventId = Guid.NewGuid().ToString()
+                    errorData = null
                 });
                 return true;
             }
