@@ -149,7 +149,6 @@ namespace LootLocker
 
     public class LootLockerServerApi : MonoBehaviour
     {
-        private static bool _bTaggedGameObjects = false;
         private static LootLockerServerApi _instance;
         private static int _instanceId = 0;
         private const int MaxRetries = 3;
@@ -161,10 +160,6 @@ namespace LootLocker
             if (_instance == null)
             {
                 var gameObject = new GameObject("LootLockerServerApi");
-                if (_bTaggedGameObjects)
-                {
-                    gameObject.tag = "LootLockerServerApiGameObject";
-                }
 
                 _instance = gameObject.AddComponent<LootLockerServerApi>();
                 _instanceId = _instance.GetInstanceID();
