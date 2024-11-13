@@ -473,6 +473,11 @@ public class AverageRequestTimeTest
                 fetchesCompleted[fetchIndex] = true;
             });
             j++;
+
+            if (j % 25 == 0)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
         }
 
         yield return new WaitUntil(() => { foreach (bool completed in fetchesCompleted) { if (!completed) return false; } return true; });
@@ -481,9 +486,9 @@ public class AverageRequestTimeTest
         // Then
         foreach(var resp in fetchResponses)
         {
-            if(eventIdCounts.ContainsKey(resp.EventId))
+            if(eventIdCounts.TryGetValue(resp.EventId, out var val))
             {
-                eventIdCounts[resp.EventId]++;
+                eventIdCounts[resp.EventId] = eventIdCounts[resp.EventId]+1;
                 continue;
             }
             eventIdCounts.Add(resp.EventId, 1);
@@ -497,8 +502,8 @@ public class AverageRequestTimeTest
                 greatest = val;
             }
         }
+        Debug.Log("Largest Request Grouping was " + greatest);
         Assert.Greater(greatest, 1);
-        Debug.LogWarning("Greatest was " + greatest);
     }
 
 }

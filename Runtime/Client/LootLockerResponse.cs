@@ -39,7 +39,7 @@ namespace LootLocker
         /// inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events 
         /// of the same type makes use unable to identify each one
         /// </summary>
-        public string EventId { get; set; }
+        public string EventId { get; set; } = Guid.NewGuid().ToString();
 
         public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse,
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -77,6 +77,7 @@ namespace LootLocker
             response.success = serverResponse.success;
             response.errorData = serverResponse.errorData;
             response.statusCode = serverResponse.statusCode;
+            response.EventId = serverResponse.EventId;
 
             return response;
         }

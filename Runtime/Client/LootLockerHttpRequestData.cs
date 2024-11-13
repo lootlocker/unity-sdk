@@ -149,6 +149,11 @@ namespace LootLocker.HTTP
             {
                 headers = null; // Force extra headers to null if empty dictionary was supplied
             }
+            string headersString = "";
+            foreach(var header in headers)
+            {
+                headersString += $"|{header.Key}:{header.Value}";
+            }
 
             string formattedUrl = BuildUrl(endPoint, queryParams, callerRole);
 
@@ -164,7 +169,7 @@ namespace LootLocker.HTTP
                 Listeners = new List<Action<LootLockerResponse>> { onComplete },
                 HaveListenersBeenInvoked = false,
                 FormattedURL = formattedUrl,
-                RequestId = $"{formattedUrl}--h--{headers.GetHashCode()}--c--{content.GetHashCode()}"
+                RequestId = $"{formattedUrl}--h--{headersString.GetHashCode()}--c--{content.GetHashCode()}"
             };
         }
         #endregion
