@@ -179,7 +179,7 @@ namespace LootLocker
             {
                 if(webRequest == null)
                 {
-                    request.ResponseCallback?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>(request.Endpoint + " timed out."));
+                    request.ResponseCallback?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {request.Endpoint} failed because Unity Web Request could not be created"));
                     yield break;
                 }
 
