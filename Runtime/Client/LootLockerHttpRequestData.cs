@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using LootLocker.LootLockerEnums;
 using UnityEngine;
 
-namespace LootLocker.Http
+namespace LootLocker.HTTP
 {
     [Serializable]
-    public struct LootLockerHttpRequestData
+    public struct LootLockerHTTPRequestData
     {
         /// <summary>
         /// The endpoint to send the request to
@@ -23,7 +23,7 @@ namespace LootLocker.Http
         /// <summary>
         /// The content of the request, check content.dataType to see what type of content it is
         /// </summary>
-        public LootLockerRequestContent Content { get; set; }
+        public LootLockerHTTPRequestContent Content { get; set; }
 
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -42,16 +42,16 @@ namespace LootLocker.Http
         public int TimesRetried { get; set; }
     }
 
-    public class LootLockerRequestContent
+    public class LootLockerHTTPRequestContent
     {
-        public LootLockerRequestContent(LootLockerHttpRequestDataType type = LootLockerHttpRequestDataType.EMPTY)
+        public LootLockerHTTPRequestContent(LootLockerHttpRequestDataType type = LootLockerHttpRequestDataType.EMPTY)
         {
             this.dataType = type;
         }
         public LootLockerHttpRequestDataType dataType { get; set; }
     }
 
-    public class LootLockerJsonBodyRequestContent : LootLockerRequestContent
+    public class LootLockerJsonBodyRequestContent : LootLockerHTTPRequestContent
     {
         public LootLockerJsonBodyRequestContent(string jsonBody) : base(LootLockerHttpRequestDataType.JSON)
         {
@@ -60,7 +60,7 @@ namespace LootLocker.Http
         public string jsonBody { get; set; }
     }
 
-    public class LootLockerWWWFormRequestContent : LootLockerRequestContent
+    public class LootLockerWWWFormRequestContent : LootLockerHTTPRequestContent
     {
         public LootLockerWWWFormRequestContent(byte[] content, string name, string type) : base(LootLockerHttpRequestDataType.WWW_FORM)
         {
@@ -73,7 +73,7 @@ namespace LootLocker.Http
         public string type { get; set; }
     }
 
-    public class LootLockerFileRequestContent : LootLockerRequestContent
+    public class LootLockerFileRequestContent : LootLockerHTTPRequestContent
     {
         public LootLockerFileRequestContent(byte[] content, string name, Dictionary<string, string> formFields) : base(LootLockerHttpRequestDataType.FILE)
         {
