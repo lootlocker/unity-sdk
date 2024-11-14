@@ -155,8 +155,10 @@ namespace LootLocker
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
 
+
         void Update()
         {
+            List<string> ExecutionItemsNeedingRefresh = new List<string>();
             foreach(var executionItem in HTTPExecutionQueue.Values)
             {
                 // Skip completed requests
@@ -183,8 +185,63 @@ namespace LootLocker
                 }
 
                 // Process ongoing
-                ProcessOngoingRequest(executionItem); //TODO: Handle result
+                var Result = ProcessOngoingRequest(executionItem);
 
+                if(Result == HTTPExecutionQueueProcessingResult.NeedsSessionRefresh)
+                {
+                    //Bulk handle session refreshes at the end
+                    ExecutionItemsNeedingRefresh.Add(executionItem.RequestData.RequestId);
+                    continue;
+                }
+                else if(Result == HTTPExecutionQueueProcessingResult.WaitForNextTick || Result == HTTPExecutionQueueProcessingResult.None)
+                {
+                    // Nothing to handle, simply continue
+                    continue;
+                }
+
+                HandleRequestResult(executionItem, Result);                
+            }
+
+            // Bulk session refresh requests
+            if (ExecutionItemsNeedingRefresh.Count > 0)
+            {
+                foreach (string executionItemId in ExecutionItemsNeedingRefresh)
+                {
+                    if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
+                    {
+                        executionItem.IsWaitingForSessionRefresh = true;
+                        executionItem.RequestData.TimesRetried++;
+                    }
+
+                    string tokenBeforeRefresh = LootLockerConfig.current.token;
+                    StartCoroutine(RefreshSession(newSessionResponse =>
+                    {
+                        if (tokenBeforeRefresh.Equals(LootLockerConfig.current.token))
+                        {
+                            // Session refresh failed so abort call chain
+                            CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                        }
+
+                        // Session refresh worked so update the session token header
+                        if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
+                        {
+#if UNITY_EDITOR
+                            executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
+#endif
+                        }
+                        else
+                        {
+                            executionItem.RequestData.ExtraHeaders["x-session-token"] = LootLockerConfig.current.token;
+                        }
+
+                        // Mark request as ready for continuation
+                        executionItem.IsWaitingForSessionRefresh = false;
+                    }));
+
+                    // Unsetting web request fields will make the execution queue retry it
+                    executionItem.AsyncOperation = null;
+                    executionItem.WebRequest = null;
+                }
             }
         }
 
@@ -193,10 +250,8 @@ namespace LootLocker
             // Do Cleanup
             foreach (var CompletedRequestID in CompletedRequestIDs)
             {
-                if(HTTPExecutionQueue.ContainsKey(CompletedRequestID))
+                if(HTTPExecutionQueue.TryGetValue(CompletedRequestID, out var completedRequest))
                 {
-                    HTTPExecutionQueue.TryGetValue(CompletedRequestID, out var completedRequest);
-
                     if(!completedRequest.Done)
                     {
                         continue;
@@ -267,43 +322,28 @@ namespace LootLocker
             return true;
         }
 
-        private bool ProcessOngoingRequest(LootLockerHTTPExecutionQueueItem executionItem)
+        private HTTPExecutionQueueProcessingResult ProcessOngoingRequest(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            //TODO: Give Results
             if (executionItem.AsyncOperation == null)
             {
-                return true;
+                return HTTPExecutionQueueProcessingResult.WaitForNextTick;
             }
 
             bool timedOut = !executionItem.AsyncOperation.isDone && (Time.time - executionItem.RequestStartTime) >= LootLockerConfig.current.clientSideRequestTimeOut;
             if(timedOut)
             {
-                return true;
+                return HTTPExecutionQueueProcessingResult.Completed_TimedOut;
             }
 
             // Not timed out and not done, nothing to do
             if(!executionItem.AsyncOperation.isDone)
             {
-                return false;
+                return HTTPExecutionQueueProcessingResult.WaitForNextTick;
             }
 
-            /* ############################################
-               Request is done, from now on handling result
-             //############################################*/
-
-            LogResponse(executionItem.RequestData, executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestStartTime, executionItem.WebRequest.error);
-
-            // ##### Web request success handling ####
             if (WebRequestSucceeded(executionItem.WebRequest))
             {
-                CallListenersAndMarkDone(executionItem, new LootLockerResponse
-                {
-                    statusCode = (int)executionItem.WebRequest.responseCode,
-                    success = true,
-                    text = executionItem.WebRequest.downloadHandler.text,
-                    errorData = null
-                });
-                return true;
+                return HTTPExecutionQueueProcessingResult.Completed_Success;
             }
 
             if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried))
@@ -314,81 +354,70 @@ namespace LootLocker
                 if (ShouldRefreshSession(executionItem.WebRequest.responseCode) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedData()))
                 {
                     executionItem.IsWaitingForSessionRefresh = true;
-                    string tokenBeforeRefresh = LootLockerConfig.current.token;
-                    StartCoroutine(RefreshSession(newSessionResponse =>
+                    return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
+                }
+                return HTTPExecutionQueueProcessingResult.ShouldBeRetried;
+            }
+
+            
+            return HTTPExecutionQueueProcessingResult.Completed_Failed;
+        }
+
+        private void HandleRequestResult(LootLockerHTTPExecutionQueueItem executionItem, HTTPExecutionQueueProcessingResult result)
+        {
+            switch(result)
+            {
+                case HTTPExecutionQueueProcessingResult.None:
+                case HTTPExecutionQueueProcessingResult.WaitForNextTick:
+                case HTTPExecutionQueueProcessingResult.NeedsSessionRefresh:
+                default:
                     {
-                        if (tokenBeforeRefresh.Equals(LootLockerConfig.current.token))
+                        // Should be handled outside this method, nothing to do
+                        return;
+                    }
+                case HTTPExecutionQueueProcessingResult.Completed_Success:
+                    {
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.Success<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text));
+                    }
+                    break;
+                case HTTPExecutionQueueProcessingResult.ShouldBeRetried:
+                    {
+                        executionItem.RequestData.TimesRetried++;
+                        // Unsetting web request fields will make the execution queue retry it
+                        executionItem.AsyncOperation = null;
+                        executionItem.WebRequest = null;
+                        return;
+                    }
+                case HTTPExecutionQueueProcessingResult.Completed_TimedOut:
+                    {
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RequestTimeOut<LootLockerResponse>());
+                    }
+                    break;
+                case HTTPExecutionQueueProcessingResult.Completed_Failed:
+                    {
+                        LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
+                        response.errorData = ExtractErrorData(response);
+                        if(response.errorData != null)
                         {
-                            // Session refresh failed so abort call chain
-                            CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                            response.errorData.retry_after_seconds = ExtractRetryAfterFromHeader(executionItem);
                         }
 
-                        // Session refresh worked so update the session token header
-                        if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
-                        {
-#if UNITY_EDITOR
-                            executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
-#endif
-                        }
-                        else
-                        {
-                            executionItem.RequestData.ExtraHeaders["x-session-token"] = LootLockerConfig.current.token;
-                        }
-
-                        // Mark request as ready for continuation
-                        executionItem.IsWaitingForSessionRefresh = false;
-                    }));
-                }
-
-                // Unsetting web request fields will make the execution queue retry it
-                executionItem.AsyncOperation = null;
-                executionItem.WebRequest = null;
-                return false;
+                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
+                        CallListenersAndMarkDone(executionItem, response);
+                    }
+                    break;
             }
 
-            // ##### Web request did not succeed and should not be retried = failed ####
-            LootLockerResponse response = new LootLockerResponse
-            {
-                statusCode = (int)executionItem.WebRequest.responseCode,
-                success = false,
-                text = executionItem.WebRequest.downloadHandler.text
-            };
-
-            try
-            {
-                response.errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(executionItem.WebRequest.downloadHandler.text);
-            }
-            catch (Exception)
-            {
-                if (executionItem.WebRequest.downloadHandler.text.StartsWith("<"))
-                {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("JSON Starts with <, info: \n    statusCode: " + response.statusCode + "\n    body: " + response.text);
-                }
-                response.errorData = null;
-            }
-            // Error data was not parseable, populate with what we know
-            if (response.errorData == null)
-            {
-                response.errorData = new LootLockerErrorData((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
-            }
-
-            string RetryAfterHeader = executionItem.WebRequest.GetResponseHeader("Retry-After");
-            if (!string.IsNullOrEmpty(RetryAfterHeader))
-            {
-                response.errorData.retry_after_seconds = int.Parse(RetryAfterHeader);
-            }
-
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
-            CallListenersAndMarkDone(executionItem, response);
-            return true;
+            LogResponse(executionItem);
         }
 
         private void CallListenersAndMarkDone(LootLockerHTTPExecutionQueueItem executionItem, LootLockerResponse response)
         {
+            executionItem.IsWaitingForSessionRefresh = false;
+            executionItem.Done = true;
+            executionItem.Response = response;
             executionItem.RequestData.CallListenersWithResult(response);
             CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
-            executionItem.Done = true;
-            executionItem.IsWaitingForSessionRefresh = false;
         }
 
         private IEnumerator RefreshSession(Action<LootLockerSessionResponse> onSessionRefreshedCallback)
@@ -650,32 +679,71 @@ namespace LootLocker
         #endregion
 
         #region Misc Helper Methods
-        private static void LogResponse(LootLockerHTTPRequestData request, long statusCode, string responseBody, float startTime, string unityWebRequestError)
+
+        private static int ExtractRetryAfterFromHeader(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            if (statusCode == 0 && string.IsNullOrEmpty(responseBody) && !string.IsNullOrEmpty(unityWebRequestError))
+            int retryAfterSeconds = -1;
+            string RetryAfterHeader = executionItem.WebRequest.GetResponseHeader("Retry-After");
+            if (!string.IsNullOrEmpty(RetryAfterHeader))
+            {
+                retryAfterSeconds = int.Parse(RetryAfterHeader);
+            }
+            return retryAfterSeconds;
+        }
+
+        private static LootLockerErrorData ExtractErrorData(LootLockerResponse response)
+        {
+            LootLockerErrorData errorData = null;
+            try
+            {
+                errorData = LootLockerJson.DeserializeObject<LootLockerErrorData>(response.text);
+            }
+            catch (Exception)
+            {
+                if (response.text.StartsWith("<"))
+                {
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Non Json Response body (starts with <), info: \n    statusCode: " + response.statusCode + "\n    body: " + response.text);
+                }
+                errorData = null;
+            }
+            // Error data was not parseable, populate with what we know
+            if (errorData == null)
+            {
+                errorData = new LootLockerErrorData(response.statusCode, response.text);
+            }
+            return errorData;
+        }
+
+        private static void LogResponse(LootLockerHTTPExecutionQueueItem executedItem)
+        {
+            if(!executedItem.Done)
+            {
+                return;
+            }
+            if (executedItem.WebRequest.responseCode == 0 && string.IsNullOrEmpty(executedItem.WebRequest.downloadHandler.text) && !string.IsNullOrEmpty(executedItem.WebRequest.error))
             {
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Unity Web request failed, request to " +
-                    request.FormattedURL + " completed in " +
-                    (Time.time - startTime).ToString("n4") +
-                    " secs.\nWeb Request Error: " + unityWebRequestError);
+                    executedItem.RequestData.FormattedURL + " completed in " +
+                    (Time.time - executedItem.RequestStartTime).ToString("n4") +
+                    " secs.\nWeb Request Error: " + executedItem.WebRequest.error);
                 return;
             }
 
             try
             {
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " +
-                    statusCode + " " +
-                    request.FormattedURL + " completed in " +
-                    (Time.time - startTime).ToString("n4") +
+                    executedItem.WebRequest.responseCode + " " +
+                    executedItem.RequestData.FormattedURL + " completed in " +
+                    (Time.time - executedItem.RequestStartTime).ToString("n4") +
                     " secs.\nResponse: " +
                     LootLockerObfuscator
-                        .ObfuscateJsonStringForLogging(responseBody));
+                        .ObfuscateJsonStringForLogging(executedItem.WebRequest.downloadHandler.text));
             }
             catch
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.HTTPMethod.ToString());
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.FormattedURL);
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody));
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(executedItem.RequestData.HTTPMethod.ToString());
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(executedItem.RequestData.FormattedURL);
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(LootLockerObfuscator.ObfuscateJsonStringForLogging(executedItem.WebRequest.downloadHandler.text));
             }
         }
         #endregion
