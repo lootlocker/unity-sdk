@@ -16,7 +16,7 @@ namespace LootLocker
         [Header("User Information")]
         public static EndPointClass adminExtensionUserInformation = new EndPointClass("v1/user/all", LootLockerHTTPMethod.GET);
         public static EndPointClass adminExtensionGetUserRole = new EndPointClass("roles/{0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass adminExtensionGetGameInformation = new EndPointClass("/game/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass adminExtensionGetGameInformation = new EndPointClass("v1/game/{0}", LootLockerHTTPMethod.GET);
     }
 }
 #endif
