@@ -89,6 +89,34 @@ namespace LootLocker
     public class LootLockerResponseFactory
     {
         /// <summary>
+        /// Construct a success response
+        /// </summary>
+        public static T Success<T>(int statusCode, string responseBody) where T : LootLockerResponse, new()
+        {
+            return new T()
+            {
+                success = true,
+                text = responseBody,
+                statusCode = statusCode,
+                errorData = null
+            };
+        }
+
+        /// <summary>
+        /// Construct a failure response
+        /// </summary>
+        public static T Failure<T>(int statusCode, string responseBody) where T : LootLockerResponse, new()
+        {
+            return new T()
+            {
+                success = false,
+                text = responseBody,
+                statusCode = statusCode,
+                errorData = null
+            };
+        }
+
+        /// <summary>
         /// Construct an error response from a network request to send to the client.
         /// </summary>
         public static T NetworkError<T>(string errorMessage, int httpStatusCode) where T : LootLockerResponse, new()
@@ -125,6 +153,14 @@ namespace LootLocker
         public static T TokenExpiredError<T>() where T : LootLockerResponse, new()
         {
             return NetworkError<T>("Token Expired", 401);
+        }
+
+        /// <summary>
+        /// Construct an error response for the request being timed out client side
+        /// </summary>
+        public static T RequestTimeOut<T>() where T : LootLockerResponse, new()
+        {
+            return NetworkError<T>("The request has timed out", 408);
         }
 
         /// <summary>
