@@ -68,7 +68,7 @@ namespace LootLocker
     {
         #region Configuration
         private const int MaxRetries = 5;
-        private const int IncrementalBackoffFactor = 5;
+        private const int IncrementalBackoffFactor = 2;
         private const int InitialRetryWaitTimeInMs = 50;
         private const int MaxOngoingRequests = 50;
         private const int ChokeWarningThreshold = 500;
@@ -444,7 +444,7 @@ namespace LootLocker
                         else
                         {
                             // Incremental backoff
-                            executionItem.RetryAfter = DateTime.Now.AddMilliseconds(InitialRetryWaitTimeInMs * (executionItem.RequestData.TimesRetried * IncrementalBackoffFactor));
+                            executionItem.RetryAfter = DateTime.Now.AddMilliseconds(InitialRetryWaitTimeInMs + (InitialRetryWaitTimeInMs * executionItem.RequestData.TimesRetried*IncrementalBackoffFactor));
                         }
                         executionItem.RequestData.TimesRetried++;
 
