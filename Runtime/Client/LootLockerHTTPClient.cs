@@ -391,9 +391,6 @@ namespace LootLocker
 
             if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried))
             {
-                // ##### Web request failed but should be retried ####
-                executionItem.RequestData.TimesRetried++;
-
                 if (ShouldRefreshSession(executionItem.WebRequest.responseCode) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedData()))
                 {
                     executionItem.IsWaitingForSessionRefresh = true;
