@@ -70,6 +70,9 @@ namespace LootLocker
         private const int MaxRetries = 5;
         private const int IncrementalBackoffFactor = 5;
         private const int InitialRetryWaitTimeInMs = 50;
+        private const int MaxOngoingRequests = 50;
+        private const int ChokeWarningThreshold = 500;
+        private Dictionary<string, bool> CurrentlyOngoingRequests =  new Dictionary<string, bool>();
 
         private static readonly Dictionary<string, string> BaseHeaders = new Dictionary<string, string>
         {
@@ -187,6 +190,13 @@ namespace LootLocker
                         // Wait for retry
                         continue;
                     }
+
+                    if (CurrentlyOngoingRequests.Count >= MaxOngoingRequests)
+                    {
+                        // Wait for some requests to finish before scheduling more requests
+                        continue;
+                    }
+
                     CreateAndSendRequest(executionItem);
                     continue;
                 }
@@ -216,6 +226,7 @@ namespace LootLocker
                 {
                     if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
                     {
+                        CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
                         executionItem.IsWaitingForSessionRefresh = true;
                         executionItem.RequestData.TimesRetried++;
 
@@ -256,6 +267,11 @@ namespace LootLocker
                     }
                 }));
             }
+
+            if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
+            {
+                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"LootLocker HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'");
+            }
         }
 
         private void LateUpdate()
@@ -287,6 +303,19 @@ namespace LootLocker
                 {
                     CompletedRequestIDs.Add(ExecutionItem.RequestData.RequestId);
                 }
+            }
+
+            List<string> OngoingIdsToCleanUp = new List<string>();
+            foreach(string OngoingId in CurrentlyOngoingRequests.Keys)
+            {
+                if(!HTTPExecutionQueue.TryGetValue(OngoingId, out var executionQueueItem) || executionQueueItem.Done)
+                {
+                    OngoingIdsToCleanUp.Add(OngoingId);
+                }
+            }
+            foreach(string CompletedId in OngoingIdsToCleanUp)
+            {
+                CurrentlyOngoingRequests.Remove(CompletedId);
             }
         }
 
@@ -332,6 +361,7 @@ namespace LootLocker
 
             executionItem.WebRequest = webRequest;
             executionItem.AsyncOperation = executionItem.WebRequest.SendWebRequest();
+            CurrentlyOngoingRequests.Add(executionItem.RequestData.RequestId, true);
             return true;
         }
 
@@ -411,6 +441,8 @@ namespace LootLocker
                         // Unsetting web request fields will make the execution queue retry it
                         executionItem.AsyncOperation = null;
                         executionItem.WebRequest = null;
+
+                        CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
                         return;
                     }
                 case HTTPExecutionQueueProcessingResult.Completed_TimedOut:
@@ -438,6 +470,7 @@ namespace LootLocker
 
         private void CallListenersAndMarkDone(LootLockerHTTPExecutionQueueItem executionItem, LootLockerResponse response)
         {
+            CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
             executionItem.IsWaitingForSessionRefresh = false;
             executionItem.Done = true;
             executionItem.Response = response;
