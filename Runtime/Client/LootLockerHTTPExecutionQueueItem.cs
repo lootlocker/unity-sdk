@@ -1,3 +1,4 @@
+using System;
 using LootLocker;
 using LootLocker.HTTP;
 using UnityEngine.Networking;
@@ -26,6 +27,8 @@ public class LootLockerHTTPExecutionQueueItem
     public UnityWebRequestAsyncOperation AsyncOperation { get; set; } = null;
 
     public float RequestStartTime { get; set; } = float.MinValue;
+
+    public DateTime? RetryAfter { get; set; } = null;
 
     public bool IsWaitingForSessionRefresh { get; set; } = false;
 

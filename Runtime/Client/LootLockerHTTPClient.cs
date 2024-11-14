@@ -67,7 +67,9 @@ namespace LootLocker
     public class LootLockerHTTPClient : MonoBehaviour
     {
         #region Configuration
-        private const int MaxRetries = 3;
+        private const int MaxRetries = 5;
+        private const int IncrementalBackoffFactor = 5;
+        private const int InitialRetryWaitTimeInMs = 50;
 
         private static readonly Dictionary<string, string> BaseHeaders = new Dictionary<string, string>
         {
@@ -180,6 +182,11 @@ namespace LootLocker
                 // Send unsent
                 if (executionItem.AsyncOperation == null && executionItem.WebRequest == null)
                 {
+                    if(executionItem.RetryAfter != null && executionItem.RetryAfter > DateTime.Now)
+                    {
+                        // Wait for retry
+                        continue;
+                    }
                     CreateAndSendRequest(executionItem);
                     continue;
                 }
@@ -211,37 +218,43 @@ namespace LootLocker
                     {
                         executionItem.IsWaitingForSessionRefresh = true;
                         executionItem.RequestData.TimesRetried++;
+
+                        // Unsetting web request fields will make the execution queue retry it
+                        executionItem.AsyncOperation = null;
+                        executionItem.WebRequest = null;
                     }
-
-                    string tokenBeforeRefresh = LootLockerConfig.current.token;
-                    StartCoroutine(RefreshSession(newSessionResponse =>
-                    {
-                        if (tokenBeforeRefresh.Equals(LootLockerConfig.current.token))
-                        {
-                            // Session refresh failed so abort call chain
-                            CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
-                        }
-
-                        // Session refresh worked so update the session token header
-                        if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
-                        {
-#if UNITY_EDITOR
-                            executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
-#endif
-                        }
-                        else
-                        {
-                            executionItem.RequestData.ExtraHeaders["x-session-token"] = LootLockerConfig.current.token;
-                        }
-
-                        // Mark request as ready for continuation
-                        executionItem.IsWaitingForSessionRefresh = false;
-                    }));
-
-                    // Unsetting web request fields will make the execution queue retry it
-                    executionItem.AsyncOperation = null;
-                    executionItem.WebRequest = null;
                 }
+
+                string tokenBeforeRefresh = LootLockerConfig.current.token;
+                StartCoroutine(RefreshSession(newSessionResponse =>
+                {
+                    foreach (string executionItemId in ExecutionItemsNeedingRefresh)
+                    {
+                        if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
+                        {
+                            if (tokenBeforeRefresh.Equals(LootLockerConfig.current.token))
+                            {
+                                // Session refresh failed so abort call chain
+                                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                            }
+
+                            // Session refresh worked so update the session token header
+                            if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
+                            {
+#if UNITY_EDITOR
+                                executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
+#endif
+                            }
+                            else
+                            {
+                                executionItem.RequestData.ExtraHeaders["x-session-token"] = LootLockerConfig.current.token;
+                            }
+
+                            // Mark request as ready for continuation
+                            executionItem.IsWaitingForSessionRefresh = false;
+                        }
+                    }
+                }));
             }
         }
 
@@ -383,6 +396,18 @@ namespace LootLocker
                 case HTTPExecutionQueueProcessingResult.ShouldBeRetried:
                     {
                         executionItem.RequestData.TimesRetried++;
+
+                        int RetryAfterHeader = ExtractRetryAfterFromHeader(executionItem);
+                        if (RetryAfterHeader > 0)
+                        {
+                            executionItem.RetryAfter = DateTime.Now.AddSeconds(RetryAfterHeader);
+                        }
+                        else
+                        {
+                            // Incremental backoff
+                            executionItem.RetryAfter = DateTime.Now.AddMilliseconds(InitialRetryWaitTimeInMs * (executionItem.RequestData.TimesRetried * IncrementalBackoffFactor));
+                        }
+
                         // Unsetting web request fields will make the execution queue retry it
                         executionItem.AsyncOperation = null;
                         executionItem.WebRequest = null;
