@@ -1,4 +1,4 @@
-﻿#if !LOOTLOCKER_USE_LEGACY_HTTP
+#if !LOOTLOCKER_USE_LEGACY_HTTP
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -425,8 +425,6 @@ namespace LootLocker
                     break;
                 case HTTPExecutionQueueProcessingResult.ShouldBeRetried:
                     {
-                        executionItem.RequestData.TimesRetried++;
-
                         int RetryAfterHeader = ExtractRetryAfterFromHeader(executionItem);
                         if (RetryAfterHeader > 0)
                         {
@@ -437,6 +435,7 @@ namespace LootLocker
                             // Incremental backoff
                             executionItem.RetryAfter = DateTime.Now.AddMilliseconds(InitialRetryWaitTimeInMs * (executionItem.RequestData.TimesRetried * IncrementalBackoffFactor));
                         }
+                        executionItem.RequestData.TimesRetried++;
 
                         // Unsetting web request fields will make the execution queue retry it
                         executionItem.AsyncOperation = null;
