@@ -2,6 +2,20 @@ using LootLocker;
 using LootLocker.HTTP;
 using UnityEngine.Networking;
 
+namespace LootLocker.LootLockerEnums
+{
+    public enum HTTPExecutionQueueProcessingResult
+    {
+        None = 0,
+        WaitForNextTick = 1,
+        Completed_Success = 2,
+        Completed_Failed = 3,
+        Completed_TimedOut = 4,
+        ShouldBeRetried = 5,
+        NeedsSessionRefresh = 6
+    }
+}
+
 public class LootLockerHTTPExecutionQueueItem
 {
 
