@@ -609,13 +609,14 @@ namespace LootLocker.Extension
 
             LootLockerAdminManager.GetGameDomainKey(LootLockerEditorData.GetSelectedGame(), (onComplete) =>
             {
-                EditorApplication.update -= OnEditorUpdate;
                 if (!onComplete.success)
                 {
                     ShowPopup("Error", "Could not find Selected game!");
+                    EditorApplication.update -= OnEditorUpdate;
                     return;
                 }
                 LootLockerConfig.current.domainKey = onComplete.game.domain_key;
+                EditorApplication.update -= OnEditorUpdate;
             });
 
 
