@@ -425,6 +425,20 @@ namespace LootLocker
                         int RetryAfterHeader = ExtractRetryAfterFromHeader(executionItem);
                         if (RetryAfterHeader > 0)
                         {
+                            // If the retry after header suggests to retry after we'd have timed out the request then handle it as a failure
+                            if (executionItem.RequestStartTime + RetryAfterHeader > LootLockerConfig.current.clientSideRequestTimeOut)
+                            {
+                                LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
+                                response.errorData = ExtractErrorData(response);
+                                if (response.errorData != null)
+                                {
+                                    response.errorData.retry_after_seconds = RetryAfterHeader;
+                                }
+
+                                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
+                                CallListenersAndMarkDone(executionItem, response);
+                                return;
+                            }
                             executionItem.RetryAfter = DateTime.Now.AddSeconds(RetryAfterHeader);
                         }
                         else
