@@ -106,10 +106,17 @@ namespace LootLocker.HTTP
         #region Factory Methods
         public static LootLockerHTTPRequestData MakeFileRequest(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName, string fileContentType, Dictionary<string, string> body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
+            LootLockerHTTPRequestContent content = null;
+            if (LootLockerHTTPMethod.PUT == httpMethod)
+            {
+                content = new LootLockerWWWFormRequestContent(file, fileName, fileContentType);
+            }
+            else
+            {
+                content = new LootLockerFileRequestContent(file, fileName, body);
+            }
             return _MakeRequestDataWithContent(
-                    (LootLockerHTTPMethod.PUT == httpMethod)
-                        ? new LootLockerWWWFormRequestContent(file, fileName, fileContentType)
-                        : new LootLockerFileRequestContent(file, fileName, body),
+                    content,
                     endPoint,
                     httpMethod,
                     onComplete,
@@ -251,7 +258,17 @@ namespace LootLocker.HTTP
 
         public override int GetHashCode()
         {
+#if UNITY_2021_3_OR_NEWER
             return HashCode.Combine(dataType, string.Empty.GetHashCode());
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + ((int)dataType);
+                hash = hash * 31 + string.Empty.GetHashCode();
+                return hash;
+            }
+#endif
         }
     }
 
@@ -265,7 +282,17 @@ namespace LootLocker.HTTP
 
         public override int GetHashCode()
         {
+#if UNITY_2021_3_OR_NEWER
             return HashCode.Combine(dataType, jsonBody.GetHashCode());
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + ((int)dataType);
+                hash = hash * 31 + jsonBody.GetHashCode();
+                return hash;
+            }
+#endif
         }
     }
 
@@ -283,7 +310,19 @@ namespace LootLocker.HTTP
 
         public override int GetHashCode()
         {
+#if UNITY_2021_3_OR_NEWER
             return HashCode.Combine(dataType, content.GetHashCode(), name.GetHashCode(), type.GetHashCode());
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + ((int)dataType);
+                hash = hash * 31 + content.GetHashCode();
+                hash = hash * 31 + name.GetHashCode();
+                hash = hash * 31 + type.GetHashCode();
+                return hash;
+            }
+#endif
         }
     }
 
@@ -304,7 +343,17 @@ namespace LootLocker.HTTP
 
         public override int GetHashCode()
         {
+#if UNITY_2021_3_OR_NEWER
             return HashCode.Combine(dataType, fileForm.GetHashCode());
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + ((int)dataType);
+                hash = hash * 31 + fileForm.GetHashCode();
+                return hash;
+            }
+#endif
         }
     }
 }

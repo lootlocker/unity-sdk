@@ -49,9 +49,6 @@ namespace LootLocker
                 onComplete(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
                 return;
             }
-            LootLockerHTTPRequestContent content = (LootLockerHTTPMethod.PUT == httpMethod) ?
-                    new LootLockerWWWFormRequestContent(file, fileName, fileContentType)
-                    : new LootLockerFileRequestContent(file, fileName, body);
 
             LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeFileRequest(endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
         }
