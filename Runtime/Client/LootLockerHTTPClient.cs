@@ -1,4 +1,4 @@
-#if !LOOTLOCKER_USE_LEGACY_HTTP
+﻿#if !LOOTLOCKER_USE_LEGACY_HTTP
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -72,6 +72,7 @@ namespace LootLocker
         private const int InitialRetryWaitTimeInMs = 50;
         private const int MaxOngoingRequests = 50;
         private const int ChokeWarningThreshold = 500;
+        private const bool DenyIncomingRequestsWhenBackedUp = true;
         private Dictionary<string, bool> CurrentlyOngoingRequests =  new Dictionary<string, bool>();
 
         private static readonly Dictionary<string, string> BaseHeaders = new Dictionary<string, string>
@@ -159,7 +160,6 @@ namespace LootLocker
 
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
-
 
         void Update()
         {
@@ -270,7 +270,9 @@ namespace LootLocker
 
             if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
             {
+#if UNITY_EDITOR
                 LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"LootLocker HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'");
+#endif
             }
         }
 
@@ -329,6 +331,13 @@ namespace LootLocker
         {
             //Always wait 1 frame before starting any request to the server to make sure the requester code has exited the main thread.
             yield return null;
+
+            if (DenyIncomingRequestsWhenBackedUp && (HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
+            {
+                // Execution queue is backed up, deny request
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request was denied because there are currently too many requests in queue"));
+                yield break;
+            }
 
             if (HTTPExecutionQueue.TryGetValue(request.RequestId, out var executionQueueItem))
             {
