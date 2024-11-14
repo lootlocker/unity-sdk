@@ -156,6 +156,7 @@ namespace LootLocker.HTTP
             }
 
             string formattedUrl = BuildUrl(endPoint, queryParams, callerRole);
+            string requestId = $"{formattedUrl}-h{headersString.GetHashCode()}-c{content.GetHashCode()}-{Guid.NewGuid()}";
 
             return new LootLockerHTTPRequestData
             {
@@ -169,7 +170,7 @@ namespace LootLocker.HTTP
                 Listeners = new List<Action<LootLockerResponse>> { onComplete },
                 HaveListenersBeenInvoked = false,
                 FormattedURL = formattedUrl,
-                RequestId = $"{formattedUrl}--h--{headersString.GetHashCode()}--c--{content.GetHashCode()}"
+                RequestId = requestId
             };
         }
         #endregion
