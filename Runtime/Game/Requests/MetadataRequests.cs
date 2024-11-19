@@ -453,13 +453,13 @@ namespace LootLocker
                 });
         }
 
-        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> operationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
+        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
         {
             if (Source == LootLockerMetadataSources.self)
             {
                 SourceID = "self";
             }
-            if (string.IsNullOrEmpty(SourceID) || operationsToPerform.Count == 0)
+            if (string.IsNullOrEmpty(SourceID) || OperationsToPerform.Count == 0)
             {
                 onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerMetadataOperationsResponse>());
                 return;
@@ -470,7 +470,7 @@ namespace LootLocker
                 self = Source == LootLockerMetadataSources.self,
                 source = Source.ToString().ToLower(),
                 source_id = SourceID,
-                entries = operationsToPerform.ToArray()
+                entries = OperationsToPerform.ToArray()
             };
 
             string json = LootLockerJson.SerializeObject(request);
