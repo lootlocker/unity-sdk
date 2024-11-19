@@ -496,8 +496,8 @@ namespace LootLocker
             LootLockerInternalMetadataOperationRequest request = new LootLockerInternalMetadataOperationRequest
             {
                 self = Source == LootLockerMetadataSources.self,
-                source = Source == LootLockerMetadataSources.self ? LootLockerMetadataSources.player.ToString().ToLower() : Source.ToString().ToLower(),
-                source_id = Source == LootLockerMetadataSources.self ? string.IsNullOrEmpty(LootLockerConfig.current.playerULID) ? "00000000000000000000000000" : LootLockerConfig.current.playerULID : SourceID,
+                source = Source == LootLockerMetadataSources.self ? null : Source.ToString().ToLower(),
+                source_id = Source == LootLockerMetadataSources.self ? null : SourceID,
                 entries = entries.ToArray()
             };
 
