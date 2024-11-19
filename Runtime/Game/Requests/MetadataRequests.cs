@@ -91,7 +91,7 @@ namespace LootLocker.Requests
         ///</summary>
         public string[] tags { get; set; }
         /// <summary>
-        /// The access level set for this metadata entry. Valid values are game_api.read and game_api.write, though no values are required.
+        /// The access level set for this metadata entry. Valid values are game_api.read, game_api.write and player.read (only applicable for player metadata and means that the metadata entry is readable for players except the owner), though no values are required.
         /// Note that different sources can allow or disallow a subset of these values.
         /// </summary>
         public string[] access { get; set; }
@@ -282,7 +282,27 @@ namespace LootLocker.Requests
         /// <summary>
         /// The type of action to perform for this metadata operation
         /// </summary>
-        LootLockerMetadataActions action { get; set; }
+        public LootLockerMetadataActions action { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerInternalMetadataOperationWithStringEnums : LootLockerMetadataOperation
+    {
+        public LootLockerInternalMetadataOperationWithStringEnums(LootLockerMetadataOperation other)
+        {
+            this.key = other.key;
+            this.type = other.type.ToString().ToLower();
+            this.value = other.value;
+            this.tags = other.tags;
+            this.access = other.access;
+            this.action = other.action.ToString().ToLower();
+        }
+
+        public new string type { get; set; }
+        public new string action { get; set; }
+
+
     }
 
     //==================================================
@@ -299,7 +319,9 @@ namespace LootLocker.Requests
         public LootLockerMetadataSourceAndKeys[] sources { get; set; }
     }
 
-    public class LootLockerMetadataOperationRequest
+    /// <summary>
+    /// </summary>
+    public class LootLockerInternalMetadataOperationRequest
     {
         /// <summary>
         /// Whether or not this operation is for metadata on the current player
@@ -316,8 +338,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// List of operations to perform for the given source
         /// </summary>
-        public LootLockerMetadataOperation[] entries { get; set; }
-
+        public LootLockerInternalMetadataOperationWithStringEnums[] entries { get; set; }
     }
 
     //==================================================
@@ -413,7 +434,12 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(formattedEndpoint, LootLockerEndPoints.listMetadata.httpMethod, onComplete:
                 (serverResponse) =>
                 {
-                    LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(onComplete, serverResponse);
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(serverResponse);
+                    if(parsedResponse.entries == null)
+                    {
+                        parsedResponse.entries = new LootLockerMetadataEntry[] {};
+                    }
+                    onComplete?.Invoke(parsedResponse);
                 });
         }
 
@@ -455,22 +481,24 @@ namespace LootLocker
 
         public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
         {
-            if (Source == LootLockerMetadataSources.self)
-            {
-                SourceID = "self";
-            }
             if (string.IsNullOrEmpty(SourceID) || OperationsToPerform.Count == 0)
             {
                 onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerMetadataOperationsResponse>());
                 return;
             }
 
-            LootLockerMetadataOperationRequest request = new LootLockerMetadataOperationRequest
+            List<LootLockerInternalMetadataOperationWithStringEnums> entries = new List<LootLockerInternalMetadataOperationWithStringEnums>();
+            foreach(var op in OperationsToPerform)
+            {
+                entries.Add(new LootLockerInternalMetadataOperationWithStringEnums(op));
+            }
+
+            LootLockerInternalMetadataOperationRequest request = new LootLockerInternalMetadataOperationRequest
             {
                 self = Source == LootLockerMetadataSources.self,
-                source = Source.ToString().ToLower(),
-                source_id = SourceID,
-                entries = OperationsToPerform.ToArray()
+                source = Source == LootLockerMetadataSources.self ? LootLockerMetadataSources.player.ToString().ToLower() : Source.ToString().ToLower(),
+                source_id = Source == LootLockerMetadataSources.self ? string.IsNullOrEmpty(LootLockerConfig.current.playerULID) ? "00000000000000000000000000" : LootLockerConfig.current.playerULID : SourceID,
+                entries = entries.ToArray()
             };
 
             string json = LootLockerJson.SerializeObject(request);
