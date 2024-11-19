@@ -299,6 +299,7 @@ namespace LootLocker
         [Header("Metadata")]
         public static EndPointClass listMetadata = new EndPointClass("metadata/source/{0}/id/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass getMultisourceMetadata = new EndPointClass("metadata/multisource", LootLockerHTTPMethod.POST);
+        public static EndPointClass metadataOperations = new EndPointClass("metadata", LootLockerHTTPMethod.POST);
 
         // Notifications
         [Header("Notifications")]
