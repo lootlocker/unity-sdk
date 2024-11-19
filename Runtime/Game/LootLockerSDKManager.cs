@@ -6,6 +6,7 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
 using System.Security.Cryptography;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -5860,7 +5861,7 @@ namespace LootLocker.Requests
         /// Get Metadata for the specified source with the given key
         /// </summary>
         /// <param name="Source"> The source type for which to request metadata</param>
-        /// <param name="SourceID"> The specific source id for which to request metadata</param>
+        /// <param name="SourceID"> The specific source id for which to request metadata, note that if the source is self then this too should be set to "self"</param>
         /// <param name="Key"> The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
@@ -5886,7 +5887,7 @@ namespace LootLocker.Requests
         /// <param name="SourcesAndKeysToGet"> The combination of sources to get keys for, and the keys to get for those sources </param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool ignoreFiles = false)
+        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool IgnoreFiles = false)
         {
             if (!CheckInitialized())
             {
@@ -5894,7 +5895,26 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetMultisourceMetadata(SourcesAndKeysToGet, ignoreFiles, onComplete);
+            LootLockerAPIManager.GetMultisourceMetadata(SourcesAndKeysToGet, IgnoreFiles, onComplete);
+        }
+
+        /// <summary>
+        /// Perform the specified metadata operations for the specified source
+        /// Note that a subset of the specified operations can fail without the full request failing. Make sure to check the errors array in the response.
+        /// </summary>
+        /// <param name="Source"> The source type that the source id refers to </param>
+        /// <param name="SourceID"> The specific source id for which to set metadata, note that if the source is self then this too should be set to "self" </param>
+        /// <param name="OperationsToPerform"> List of operations to perform for the given source </param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.PerformMetadataOperations(Source, SourceID, OperationsToPerform, onComplete);
         }
         #endregion
 
