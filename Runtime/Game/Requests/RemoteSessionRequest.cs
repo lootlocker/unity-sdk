@@ -422,6 +422,7 @@ namespace LootLocker
                     var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
                     LootLockerConfig.current.token = response.session_token;
                     LootLockerConfig.current.deviceID = response.player_identifier;
+                    LootLockerConfig.current.playerULID = response.player_ulid;
                     LootLockerConfig.current.refreshToken = response.refresh_token;
                     onComplete?.Invoke(response);
                 }, false);
@@ -465,6 +466,7 @@ namespace LootLocker
                         LootLockerConfig.current.token = response.session_token;
                         LootLockerConfig.current.refreshToken = response.refresh_token;
                         LootLockerConfig.current.deviceID = response.player_ulid;
+                        LootLockerConfig.current.playerULID = response.player_ulid;
                     }
 
                     onComplete?.Invoke(response);

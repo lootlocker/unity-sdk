@@ -102,6 +102,7 @@ namespace LootLocker.Requests
                 LootLockerConfig.current.token = "";
                 LootLockerConfig.current.refreshToken = "";
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = null;
                 if (!Init())
                 {
                     return false;
@@ -211,6 +212,7 @@ namespace LootLocker.Requests
                 {
                     CurrentPlatform.Reset();
                 }
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete(response);
             });
         }
@@ -239,6 +241,7 @@ namespace LootLocker.Requests
                 {
                     CurrentPlatform.Reset();
                 }
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete(response);
             });
         }
@@ -267,6 +270,7 @@ namespace LootLocker.Requests
                 {
                     CurrentPlatform.Reset();
                 }
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete(response);
             });
         }
@@ -762,6 +766,7 @@ namespace LootLocker.Requests
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.refreshToken = response.refresh_token;
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -807,6 +812,7 @@ namespace LootLocker.Requests
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.refreshToken = response.refresh_token;
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -852,6 +858,7 @@ namespace LootLocker.Requests
 
             LootLockerConfig.current.token = "";
             LootLockerConfig.current.deviceID = "";
+            LootLockerConfig.current.playerULID = null;
             LootLockerConfig.current.refreshToken = "";
         }
         #endregion
