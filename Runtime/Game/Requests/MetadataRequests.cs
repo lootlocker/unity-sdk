@@ -248,11 +248,11 @@ namespace LootLocker.Requests
     public class LootLockerMetadataOperationErrorKeyTypePair
     {
         /// <summary>
-        /// TODO: Document
+        /// The metadata key that the operation error refers to
         /// </summary>
         public string key { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The type of value that the set operation was for
         /// </summary>
         public LootLockerMetadataTypes type { get; set; }
     }
@@ -262,15 +262,15 @@ namespace LootLocker.Requests
     public class LootLockerMetadataOperationError
     {
         /// <summary>
-        /// TODO: Document
+        /// The type of action that this metadata operation was
         /// </summary>
         public LootLockerMetadataActions action { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The error message describing why this metadata set operation failed
         /// </summary>
         public string error { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The key and type of value that the operation was for
         /// </summary>
         public LootLockerMetadataOperationErrorKeyTypePair entry { get; set; }
     }
@@ -280,7 +280,7 @@ namespace LootLocker.Requests
     public class LootLockerMetadataOperation : LootLockerMetadataEntry
     {
         /// <summary>
-        /// TODO: Document
+        /// The type of action to perform for this metadata operation
         /// </summary>
         LootLockerMetadataActions action { get; set; }
     }
@@ -302,19 +302,19 @@ namespace LootLocker.Requests
     public class LootLockerMetadataOperationRequest
     {
         /// <summary>
-        /// TODO: Document
+        /// Whether or not this operation is for metadata on the current player
         /// </summary>
         public bool self { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The type of source that the source id refers to
         /// </summary>
         public string source { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The id of the specific source that the set operation was taken on, note that if source is set to self then this should also be set to "self"
         /// </summary>
         public string source_id { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// List of operations to perform for the given source
         /// </summary>
         public LootLockerMetadataOperation[] entries { get; set; }
 
@@ -362,15 +362,15 @@ namespace LootLocker.Requests
     public class LootLockerMetadataOperationsResponse : LootLockerResponse
     {
         /// <summary>
-        /// TODO: Document
+        /// The type of source that the source id refers to
         /// </summary>
         public LootLockerMetadataSources source { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// The id of the specific source that the set operation was taken on, note that if source is set to self then this will also be set to "self"
         /// </summary>
         public string source_id { get; set; }
         /// <summary>
-        /// TODO: Document
+        /// A list of errors (if any) that occurred when executing the provided metadata actions
         /// </summary>
         public LootLockerMetadataOperationError[] errors { get; set; }
     }
@@ -483,3 +483,4 @@ namespace LootLocker
         }
     }
 }
+    
