@@ -23,6 +23,8 @@ namespace LootLocker.LootLockerEnums
         catalog_item = 2,
         progression = 3,
         currency = 4,
+        player = 5,
+        self = 6
     };
 
     /// <summary>
@@ -291,6 +293,10 @@ namespace LootLocker
     {
         public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, string Key, string[] Tags, bool ignoreFiles, Action<LootLockerListMetadataResponse> onComplete)
         {
+            if (Source == LootLockerMetadataSources.self)
+            {
+                SourceID = "self";
+            }
             string formattedEndpoint = string.Format(LootLockerEndPoints.listMetadata.endPoint, Source.ToString(), SourceID);
 
             string queryParams = "";
@@ -333,6 +339,14 @@ namespace LootLocker
             {
                 queryParams = $"?{queryParams}";
                 endpoint += queryParams;
+            }
+
+            foreach ( var sourcePair in SourcesAndKeysToGet)
+            {
+                if(sourcePair.source == LootLockerMetadataSources.self)
+                {
+                    sourcePair.id = "self";
+                }
             }
 
             LootLockerGetMultisourceMetadataRequest request = new LootLockerGetMultisourceMetadataRequest { sources = SourcesAndKeysToGet };
