@@ -343,6 +343,7 @@ namespace LootLocker
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = data?.player_identifier;
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -381,6 +382,7 @@ namespace LootLocker
                 var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = (data as LootLockerSessionRequest)?.player_identifier;
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -439,6 +441,7 @@ namespace LootLocker
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -474,6 +477,7 @@ namespace LootLocker
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.refreshToken = response.refresh_token;
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -493,6 +497,7 @@ namespace LootLocker
                 var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = "";
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -531,6 +536,7 @@ namespace LootLocker
                 var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
                 LootLockerConfig.current.token = response.session_token;
                 LootLockerConfig.current.deviceID = response.player_identifier;
+                LootLockerConfig.current.playerULID = response.player_ulid;
                 LootLockerConfig.current.refreshToken = response.refresh_token;
                 onComplete?.Invoke(response);
             }, false);

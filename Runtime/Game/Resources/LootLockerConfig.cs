@@ -260,6 +260,8 @@ namespace LootLocker
         public string sdk_version = "";
         [HideInInspector]
         public string deviceID = "defaultPlayerId";
+        [HideInInspector]
+        public string playerULID = null;
 
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
