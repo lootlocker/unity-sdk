@@ -38,6 +38,16 @@ namespace LootLocker.LootLockerEnums
         Json = 3,
         Base64 = 4,
     };
+
+    /// <summary>
+    /// Possible metadata actions
+    /// </summary>
+    public enum LootLockerMetadataActions
+    {
+        create = 0,
+        update = 1,
+        delete = 2
+    };
 }
 
 namespace LootLocker.Requests
@@ -80,7 +90,11 @@ namespace LootLocker.Requests
         /// List of tags applied to this metadata entry
         ///</summary>
         public string[] tags { get; set; }
-
+        /// <summary>
+        /// The access level set for this metadata entry. Valid values are game_api.read and game_api.write, though no values are required.
+        /// Note that different sources can allow or disallow a subset of these values.
+        /// </summary>
+        public string[] access { get; set; }
         /// <summary>
         /// Get the value as a String. Returns true if value could be parsed in which case output contains the value in string format, returns false if parsing failed.
         ///</summary>
@@ -231,6 +245,46 @@ namespace LootLocker.Requests
         public LootLockerMetadataEntry[] entries { get; set; }
     }
 
+    public class LootLockerMetadataOperationErrorKeyTypePair
+    {
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public string key { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataTypes type { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerMetadataOperationError
+    {
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataActions action { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public string error { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataOperationErrorKeyTypePair entry { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerMetadataOperation : LootLockerMetadataEntry
+    {
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        LootLockerMetadataActions action { get; set; }
+    }
+
     //==================================================
     // Request Definitions
     //==================================================
@@ -243,6 +297,27 @@ namespace LootLocker.Requests
         /// The source & key combos to get
         /// </summary>
         public LootLockerMetadataSourceAndKeys[] sources { get; set; }
+    }
+
+    public class LootLockerMetadataOperationRequest
+    {
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public bool self { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public string source { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public string source_id { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataOperation[] entries { get; set; }
+
     }
 
     //==================================================
@@ -281,6 +356,24 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerMetadataSourceAndEntries[] Metadata { get; set; }
     };
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerMetadataOperationsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataSources source { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public string source_id { get; set; }
+        /// <summary>
+        /// TODO: Document
+        /// </summary>
+        public LootLockerMetadataOperationError[] errors { get; set; }
+    }
 }
 
 //==================================================
@@ -323,6 +416,7 @@ namespace LootLocker
                     LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(onComplete, serverResponse);
                 });
         }
+
         public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, bool ignoreFiles, Action<LootLockerGetMultisourceMetadataResponse> onComplete)
         {
             if (SourcesAndKeysToGet == null)
@@ -341,7 +435,7 @@ namespace LootLocker
                 endpoint += queryParams;
             }
 
-            foreach ( var sourcePair in SourcesAndKeysToGet)
+            foreach (LootLockerMetadataSourceAndKeys sourcePair in SourcesAndKeysToGet)
             {
                 if(sourcePair.source == LootLockerMetadataSources.self)
                 {
@@ -356,6 +450,35 @@ namespace LootLocker
                 (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize<LootLockerGetMultisourceMetadataResponse>(onComplete, serverResponse);
+                });
+        }
+
+        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> operationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
+        {
+            if (Source == LootLockerMetadataSources.self)
+            {
+                SourceID = "self";
+            }
+            if (string.IsNullOrEmpty(SourceID) || operationsToPerform.Count == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerMetadataOperationsResponse>());
+                return;
+            }
+
+            LootLockerMetadataOperationRequest request = new LootLockerMetadataOperationRequest
+            {
+                self = Source == LootLockerMetadataSources.self,
+                source = Source.ToString().ToLower(),
+                source_id = SourceID,
+                entries = operationsToPerform.ToArray()
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.metadataOperations.endPoint, LootLockerEndPoints.metadataOperations.httpMethod, json, onComplete:
+                (serverResponse) =>
+                {
+                    LootLockerResponse.Deserialize<LootLockerMetadataOperationsResponse>(onComplete, serverResponse);
                 });
         }
     }
