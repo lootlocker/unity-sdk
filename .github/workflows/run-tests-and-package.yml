@@ -351,6 +351,8 @@ jobs:
         run: |
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "LOOTLOCKER_URL=${{ INPUTS.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
+          COINFLIP=$(($RANDOM%10))
+          if [[ $COINFLIP -gt 5 ]]; then echo "USE_HTTP_EXECUTION_QUEUE=true" >> $GITHUB_ENV; else echo "USE_HTTP_EXECUTION_QUEUE=false"; fi
       - name: Checkout this repository
         uses: actions/checkout@v4
         with:
@@ -384,7 +386,11 @@ jobs:
         if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
         run: |
           mkdir TestProject/ProjectSettings
-          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_USE_NEWTONSOFTJSON;LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Use HTTP Execution Queue
+        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE != 'true' }}
+        run: |
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_BETA_HTTP_QUEUE;LOOTLOCKER_TARGET_STAGE_ENV/g' TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set user information command line arguments
         if: ${{ ENV.USE_TAILSCALE != 'true' }}
         run: |
