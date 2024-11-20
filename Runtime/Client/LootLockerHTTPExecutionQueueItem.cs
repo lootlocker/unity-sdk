@@ -17,6 +17,8 @@ namespace LootLocker.LootLockerEnums
     }
 }
 
+namespace LootLocker
+{
 public class LootLockerHTTPExecutionQueueItem
 {
 
@@ -36,4 +38,5 @@ public class LootLockerHTTPExecutionQueueItem
 
     public LootLockerResponse Response { get; set; } = null;
 
+}
 }
