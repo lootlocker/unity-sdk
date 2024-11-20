@@ -388,6 +388,7 @@ jobs:
         run: |
           mkdir TestProject/ProjectSettings
           echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON' >> TestProject/ProjectSettings/ProjectSettings.asset
+          sed -i -e 's/"nunit.framework.dll"/"nunit.framework.dll",\n\t\t"Newtonsoft.Json.dll"/g' sdk/Tests/LootLockerTests/PlayMode/PlayModeTests.asmdef
       - name: Use HTTP Execution Queue
         if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE != 'true' }}
         run: |
