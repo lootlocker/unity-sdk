@@ -6,7 +6,6 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
 using System.Security.Cryptography;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
