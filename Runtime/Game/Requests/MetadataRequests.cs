@@ -1,11 +1,10 @@
 ﻿using System;
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
+using System.Collections.Generic;
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json.Linq;
-#else
-using System.Collections.Generic;
 #endif
 
 //==================================================
