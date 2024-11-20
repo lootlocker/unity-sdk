@@ -6146,7 +6146,13 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(after))
                 endpoint += $"cursor={after}&";
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse, new JsonOptions(JsonSerializationOptions.UseXmlIgnore) ); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => {
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
+#else
+                LootLockerResponse.Deserialize(onComplete, serverResponse, new JsonOptions(JsonSerializationOptions.UseXmlIgnore) );
+#endif
+            });
         }
 
         /// <summary>
@@ -6199,7 +6205,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        #endregion
+#endregion
 
         #region Metadata
         /// <summary>
