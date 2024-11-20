@@ -1,4 +1,4 @@
-#if LOOTLOCKER_USE_LEGACY_HTTP
+#if !LOOTLOCKER_BETA_HTTP_QUEUE
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
