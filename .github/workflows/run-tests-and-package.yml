@@ -363,7 +363,7 @@ jobs:
           mkdir TestProject
           mkdir TestProject/Packages
           DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk"'
-          if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.0.2"'; fi
+          if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.2.1"'; fi
           DEPENDENCY_STRING=$DEPENDENCY_STRING$'\n  },\n  "testables": ["com.lootlocker.lootlockersdk"]\n}'
           echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
           mkdir TestProject/Assets/
