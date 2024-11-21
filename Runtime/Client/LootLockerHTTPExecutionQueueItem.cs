@@ -38,5 +38,20 @@ public class LootLockerHTTPExecutionQueueItem
 
     public LootLockerResponse Response { get; set; } = null;
 
+    public void OnDestroy()
+    {
+        AbortRequest();
+    }
+
+    public void AbortRequest()
+    {
+        if(WebRequest != null)
+        {
+            WebRequest.Abort();
+            WebRequest.Dispose();
+        }
+        WebRequest = null;
+        AsyncOperation = null;
+    }
 }
 }

@@ -158,6 +158,17 @@ namespace LootLocker
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
 
+        private void OnDestroy()
+        {
+            foreach(var executionItem in HTTPExecutionQueue.Values)
+            {
+                if(executionItem != null && executionItem.WebRequest != null)
+                {
+                    executionItem.AbortRequest();
+                }
+            }
+        }
+
         void Update()
         {
             List<string> ExecutionItemsNeedingRefresh = new List<string>();
@@ -228,8 +239,7 @@ namespace LootLocker
                         executionItem.RequestData.TimesRetried++;
 
                         // Unsetting web request fields will make the execution queue retry it
-                        executionItem.AsyncOperation = null;
-                        executionItem.WebRequest = null;
+                        executionItem.AbortRequest();
                     }
                 }
 
@@ -455,8 +465,7 @@ namespace LootLocker
                         executionItem.RequestData.TimesRetried++;
 
                         // Unsetting web request fields will make the execution queue retry it
-                        executionItem.AsyncOperation = null;
-                        executionItem.WebRequest = null;
+                        executionItem.AbortRequest();
 
                         CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
                         return;
