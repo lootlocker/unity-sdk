@@ -63,6 +63,3 @@ crashlytics-build.properties
 #IDE generated files
 .idea
 .vscode
-
-#Specific meta files to ignore
-Tests.meta
