@@ -5515,6 +5515,178 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Friends
+#if LOOTLOCKER_BETA_FRIENDS
+        /// <summary>
+        /// List friends for the currently logged in player
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListFriends(Action<LootLockerListFriendsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFriendsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listFriends.endPoint, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List incoming friend requests for the currently logged in player (friend requests made by others for this player)
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListIncomingFriendRequests(Action<LootLockerListIncomingFriendRequestsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListIncomingFriendRequestsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listIncomingFriendReqeusts.endPoint, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List outgoing friend requests for the currently logged in player (friend requests made by this player)
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListOutgoingFriendRequests(Action<LootLockerListOutgoingFriendRequestsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListOutgoingFriendRequestsResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listOutgoingFriendRequests.endPoint, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Send a friend request to the specified player for the currently logged in player
+        /// </summary>
+        /// <param name="playerID">The id of the player to send the friend request to</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void SendFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.sendFriendRequest.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Accept the incoming friend request from the specified player
+        /// </summary>
+        /// <param name="playerID">The id of the player that sent the friend request you wish to accept</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void AcceptFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.acceptFriendRequest.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Decline the incoming friend request from the specified player
+        /// </summary>
+        /// <param name="playerID">The id of the player that sent the friend request you wish to decline</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void DeclineFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.declineFriendRequest.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.declineFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List the players (if any) that are blocked by the currently logged in player
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ListBlockedPlayers(Action<LootLockerListBlockedPlayersResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBlockedPlayersResponse>());
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listBlockedPlayers.endPoint, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Block the specified player (adding them to the currently logged in players block list and removing them the friend list)
+        /// </summary>
+        /// <param name="playerID">The id of the player to block</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void BlockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.blockPlayer.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Unblock the specified player (remove from the currently logged in players block list)
+        /// </summary>
+        /// <param name="playerID">The id of the player to unblock</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void UnblockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.unblockPlayer.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Remove the specified player from the currently logged in player's friends list
+        /// </summary>
+        /// <param name="playerID">The id of the player to delete from the friends list</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void DeleteFriend(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.deleteFriend.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.deleteFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+#endif
+        #endregion
+
         #region Currency
         /// <summary>
         /// Get a list of available currencies for the game
