@@ -104,7 +104,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// A list of the outgoing friend requests for the currently logged in player
         /// </summary>
-        public LootLockerFriendWithOnlineStatus[] outgoing { get; set; }
+        public LootLockerFriend[] outgoing { get; set; }
     }
 
     /// <summary>

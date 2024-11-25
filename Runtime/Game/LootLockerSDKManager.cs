@@ -5581,6 +5581,24 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Cancel the outgoing friend request made to the specified player by the currently logged in player
+        /// </summary>
+        /// <param name="playerID">The id of the player to cancel the friend request for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void CancelFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                return;
+            }
+
+            var formattedEndPoint = string.Format(LootLockerEndPoints.cancelOutgoingFriendRequest.endPoint, playerID);
+
+            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.cancelOutgoingFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Accept the incoming friend request from the specified player
         /// </summary>
         /// <param name="playerID">The id of the player that sent the friend request you wish to accept</param>

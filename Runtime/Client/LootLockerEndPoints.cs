@@ -294,11 +294,12 @@ namespace LootLocker
         [Header("Friends")]
 #if LOOTLOCKER_BETA_FRIENDS
         public static EndPointClass listFriends = new EndPointClass("player/friends", LootLockerHTTPMethod.GET);
-        public static EndPointClass listIncomingFriendReqeusts = new EndPointClass("player/friends/requests/incoming", LootLockerHTTPMethod.GET);
-        public static EndPointClass listOutgoingFriendRequests = new EndPointClass("player/friends/requests/outgoing", LootLockerHTTPMethod.GET);
-        public static EndPointClass sendFriendRequest = new EndPointClass("player/friends/requests", LootLockerHTTPMethod.POST);
-        public static EndPointClass acceptFriendRequest = new EndPointClass("player/friends/requests/incoming/{0}/accept", LootLockerHTTPMethod.POST);
-        public static EndPointClass declineFriendRequest = new EndPointClass("player/friends/requests/incoming/{0}/decline", LootLockerHTTPMethod.POST);
+        public static EndPointClass listIncomingFriendReqeusts = new EndPointClass("player/friends/incoming", LootLockerHTTPMethod.GET);
+        public static EndPointClass listOutgoingFriendRequests = new EndPointClass("player/friends/outgoing", LootLockerHTTPMethod.GET);
+        public static EndPointClass sendFriendRequest = new EndPointClass("player/friends/{player_id}", LootLockerHTTPMethod.POST);
+        public static EndPointClass acceptFriendRequest = new EndPointClass("player/friends/incoming/{0}/accept", LootLockerHTTPMethod.POST);
+        public static EndPointClass declineFriendRequest = new EndPointClass("player/friends/incoming/{0}/decline", LootLockerHTTPMethod.POST);
+        public static EndPointClass cancelOutgoingFriendRequest = new EndPointClass("player/friends/outgoing/{0}/cancel", LootLockerHTTPMethod.GET);
         public static EndPointClass listBlockedPlayers = new EndPointClass("player/friends/blocked", LootLockerHTTPMethod.GET);
         public static EndPointClass blockPlayer = new EndPointClass("player/friends/{0}/block", LootLockerHTTPMethod.POST);
         public static EndPointClass unblockPlayer = new EndPointClass("player/friends/{0}/unblock", LootLockerHTTPMethod.POST);
