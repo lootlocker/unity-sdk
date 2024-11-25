@@ -285,10 +285,25 @@ namespace LootLocker
         public static EndPointClass reportsCreatePlayer = new EndPointClass("reports/player", LootLockerHTTPMethod.POST);
         public static EndPointClass reportsCreateAsset = new EndPointClass("reports/asset", LootLockerHTTPMethod.POST);
 
-        //Feedback
+        // Feedback
         [Header("Feedback")]
         public static EndPointClass listFeedbackCategories = new EndPointClass("feedback/category/entity/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass createFeedbackEntry = new EndPointClass("feedback", LootLockerHTTPMethod.POST);
+
+        // Friends
+        [Header("Friends")]
+#if LOOTLOCKER_BETA_FRIENDS
+        public static EndPointClass listFriends = new EndPointClass("player/friends", LootLockerHTTPMethod.GET);
+        public static EndPointClass listIncomingFriendReqeusts = new EndPointClass("player/friends/requests/incoming", LootLockerHTTPMethod.GET);
+        public static EndPointClass listOutgoingFriendRequests = new EndPointClass("player/friends/requests/outgoing", LootLockerHTTPMethod.GET);
+        public static EndPointClass sendFriendRequest = new EndPointClass("player/friends/requests", LootLockerHTTPMethod.POST);
+        public static EndPointClass acceptFriendRequest = new EndPointClass("player/friends/requests/incoming/{0}/accept", LootLockerHTTPMethod.POST);
+        public static EndPointClass declineFriendRequest = new EndPointClass("player/friends/requests/incoming/{0}/decline", LootLockerHTTPMethod.POST);
+        public static EndPointClass listBlockedPlayers = new EndPointClass("player/friends/blocked", LootLockerHTTPMethod.GET);
+        public static EndPointClass blockPlayer = new EndPointClass("player/friends/{0}/block", LootLockerHTTPMethod.POST);
+        public static EndPointClass unblockPlayer = new EndPointClass("player/friends/{0}/unblock", LootLockerHTTPMethod.POST);
+        public static EndPointClass deleteFriend = new EndPointClass("player/friends/{0}", LootLockerHTTPMethod.DELETE);
+#endif
 
         // Entitlements
         [Header("Entitlements")]
