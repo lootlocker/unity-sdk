@@ -5575,6 +5575,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+            }
+
             var formattedEndPoint = string.Format(LootLockerEndPoints.sendFriendRequest.endPoint, playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -5591,6 +5596,11 @@ namespace LootLocker.Requests
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
                 return;
+            }
+
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
             var formattedEndPoint = string.Format(LootLockerEndPoints.cancelOutgoingFriendRequest.endPoint, playerID);
@@ -5611,6 +5621,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+            }
+
             var formattedEndPoint = string.Format(LootLockerEndPoints.acceptFriendRequest.endPoint, playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -5627,6 +5642,11 @@ namespace LootLocker.Requests
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
                 return;
+            }
+
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
             var formattedEndPoint = string.Format(LootLockerEndPoints.declineFriendRequest.endPoint, playerID);
@@ -5662,6 +5682,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+            }
+
             var formattedEndPoint = string.Format(LootLockerEndPoints.blockPlayer.endPoint, playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -5680,6 +5705,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+            }
+
             var formattedEndPoint = string.Format(LootLockerEndPoints.unblockPlayer.endPoint, playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
@@ -5696,6 +5726,11 @@ namespace LootLocker.Requests
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
                 return;
+            }
+
+            if (string.IsNullOrEmpty(playerID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
             var formattedEndPoint = string.Format(LootLockerEndPoints.deleteFriend.endPoint, playerID);
