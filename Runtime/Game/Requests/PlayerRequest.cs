@@ -33,6 +33,58 @@ namespace LootLocker.Requests
     #endregion
 
 
+    #region DEPRECATED Legacy Progressions
+    [Serializable]
+    public class LootLockerXpSubmitResponse : LootLockerResponse
+    {
+        public LootLockerXp xp { get; set; }
+        public LootLockerLevel[] levels { get; set; }
+        public bool check_grant_notifications { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerXpResponse : LootLockerResponse
+    {
+        public int? xp { get; set; }
+        public int? level { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerXp
+    {
+        public int? previous { get; set; }
+        public int? current { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerLevel
+    {
+        public int? level { get; set; }
+        public int? xp_threshold { get; set; }
+    }
+    [Serializable]
+    public class LootLockerXpSubmitRequest
+    {
+        public int? points;
+
+        public LootLockerXpSubmitRequest(int points)
+        {
+            this.points = points;
+        }
+    }
+
+    [Serializable]
+    public class LootLockerXpRequest : LootLockerGetRequest
+    {
+        public LootLockerXpRequest()
+        {
+            getRequests.Clear();
+            getRequests.Add(LootLockerConfig.current.deviceID);
+            getRequests.Add(CurrentPlatform.GetString());
+        }
+    }
+    #endregion
+
     [Serializable]
     public class LootLockerStandardResponse : LootLockerResponse
     {
@@ -146,35 +198,6 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
-    public class LootLockerXpSubmitResponse : LootLockerResponse
-    {
-        public LootLockerXp xp { get; set; }
-        public LootLockerLevel[] levels { get; set; }
-        public bool check_grant_notifications { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXpResponse : LootLockerResponse
-    {
-        public int? xp { get; set; }
-        public int? level { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXp
-    {
-        public int? previous { get; set; }
-        public int? current { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerLevel
-    {
-        public int? level { get; set; }
-        public int? xp_threshold { get; set; }
-    }
-
-    [Serializable]
     public class LootLockerInventoryResponse : LootLockerResponse
     {
         public LootLockerInventory[] inventory { get; set; }
@@ -238,29 +261,6 @@ namespace LootLocker.Requests
         public string duration { get; set; }
         public string is_active { get; set; }
     }
-
-    [Serializable]
-    public class LootLockerXpSubmitRequest
-    {
-        public int? points;
-
-        public LootLockerXpSubmitRequest(int points)
-        {
-            this.points = points;
-        }
-    }
-
-    [Serializable]
-    public class LootLockerXpRequest : LootLockerGetRequest
-    {
-        public LootLockerXpRequest()
-        {
-            getRequests.Clear();
-            getRequests.Add(LootLockerConfig.current.deviceID);
-            getRequests.Add(CurrentPlatform.GetString());
-        }
-    }
-
     public class LootLockerPlayerAssetNotificationsResponse : LootLockerResponse
     {
         public LootLockerRewardObject[] objects { get; set; }
@@ -294,37 +294,6 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         #endregion
-
-        public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
-        {
-            var endPoint = LootLockerEndPoints.getCurrencyBalance;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void SubmitXp(LootLockerXpSubmitRequest data, Action<LootLockerXpSubmitResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerXpSubmitResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            var endPoint = LootLockerEndPoints.submitXp;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void GetXpAndLevel(LootLockerGetRequest data, Action<LootLockerXpResponse> onComplete)
-        {
-            var endPoint = LootLockerEndPoints.getXpAndLevel;
-
-            var getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
 
         public static void GetPlayerAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
         {
