@@ -1354,6 +1354,7 @@ namespace LootLocker.Requests
         /// Get general information about the current current player, such as the XP, Level information and their account balance.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPlayerInfoResponse</param>
+        [Obsolete("This function is deprecated, use GetCurrentPlayerInfo instead")]
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1370,6 +1371,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerIdentifier">The player identifier for this platform.</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpResponse</param>
+        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
         public static void GetOtherPlayerInfo(string playerIdentifier, Action<LootLockerXpResponse> onComplete)
         {
             GetOtherPlayerInfo(playerIdentifier, CurrentPlatform.GetString(), onComplete);
@@ -1381,6 +1383,7 @@ namespace LootLocker.Requests
         /// <param name="playerIdentifier">The player identifier for this platform.</param>
         /// <param name="platform">The platform that the user is present on as a string.</param>
         /// <param name="onComplete"></param>
+        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
         public static void GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete)
         {
             if (!CheckInitialized())
