@@ -426,6 +426,16 @@ namespace LootLocker
             error.errorData.retry_after_seconds = secondsLeftOfRateLimit;
             return error;
         }
+
+        /// <summary>
+        /// Construct a default constructed successful response of the specified type
+        /// </summary>
+        public static T EmptySuccess<T>() where T : LootLockerResponse, new()
+        {
+            T response = new T();
+            response.text = LootLockerJson.SerializeObject(response);
+            return response;
+        }
     }
 
 

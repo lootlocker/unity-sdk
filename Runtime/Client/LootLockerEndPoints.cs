@@ -46,6 +46,8 @@ namespace LootLocker
 
         // Player
         [Header("Player")]
+        public static EndPointClass getInfoFromSession = new EndPointClass("player/hazy-hammock/v1/info", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerInfo = new EndPointClass("player/hazy-hammock/v1/info", LootLockerHTTPMethod.POST);
         public static EndPointClass getPlayerInfo = new EndPointClass("v1/player/info", LootLockerHTTPMethod.GET);
         public static EndPointClass getInventory = new EndPointClass("v1/player/inventory/list", LootLockerHTTPMethod.GET);
         public static EndPointClass getCurrencyBalance = new EndPointClass("v1/player/balance", LootLockerHTTPMethod.GET);
