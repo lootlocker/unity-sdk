@@ -160,6 +160,33 @@ namespace LootLocker.Requests
         public LootLockerCommonAsset asset { get; set; }
     }
 
+    /// <summary>
+    /// A set of important information about a player
+    /// </summary>
+    public class LootLockerPlayerInfo
+    {
+        /// <summary>
+        /// When this player was first created
+        /// </summary>
+        public DateTime created_at { get; set; }
+        /// <summary>
+        /// The name of the player expressly configured through a SetPlayerName call
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The public uid of the player. This id is in the form of a UID
+        /// </summary>
+        public string public_uid { get; set; }
+        /// <summary>
+        /// The legacy id of the player. This id is in the form of an integer and are sometimes called simply player_id or id
+        /// </summary>
+        public int legacy_id { get; set; }
+        /// <summary>
+        /// The id of the player. This id is in the form a ULID and is sometimes called player_ulid or similar
+        /// </summary>
+        public string id { get; set; }
+    }
+
     //==================================================
     // Request Definitions
     //==================================================
@@ -203,6 +230,24 @@ namespace LootLocker.Requests
     {
         public string purpose { get; set; }
         public string path_to_file { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerListPlayerInfoRequest
+    {
+        /// <summary>
+        /// A list of ULID ids of players to look up. These ids are in the form of ULIDs and are sometimes called player_ulid or similar
+        /// </summary>
+        public string[] player_id { get; set; }
+        /// <summary>
+        /// A list of legacy ids of players to look up. These ids are in the form of integers and are sometimes called simply player_id or id
+        /// </summary>
+        public int[] player_legacy_id { get; set; }
+        /// <summary>
+        /// A list of public uids to look up. These ids are in the form of UIDs
+        /// </summary>
+        public string[] player_public_uid { get; set; }
     }
 
     //==================================================
@@ -282,6 +327,26 @@ namespace LootLocker.Requests
     public class LootLockerPlayerAssetNotificationsResponse : LootLockerResponse
     {
         public LootLockerRewardObject[] objects { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerGetCurrentPlayerInfoResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Important player information for the currently logged in player
+        /// </summary>
+        public LootLockerPlayerInfo info { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerListPlayerInfoResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// A list of important player information for the successfully looked up players
+        /// </summary>
+        public LootLockerPlayerInfo[] info { get; set; }
     }
 }
 
