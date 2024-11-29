@@ -1362,7 +1362,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPlayerInfoResponse>());
                 return;
             }
-            LootLockerAPIManager.GetPlayerInfo(onComplete);
+            var endPoint = LootLockerEndPoints.getPlayerInfo;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1398,7 +1400,10 @@ namespace LootLocker.Requests
             }
 
             LootLockerOtherPlayerInfoRequest infoRequest = new LootLockerOtherPlayerInfoRequest(playerIdentifier, platform);
-            LootLockerAPIManager.GetOtherPlayerInfo(infoRequest, onComplete);
+            var endPoint = LootLockerEndPoints.getXpAndLevel;
+            var getVariable = string.Format(endPoint.endPoint, infoRequest.getRequests[0], infoRequest.getRequests[1]);
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
 
@@ -1530,7 +1535,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerAssetNotificationsResponse>());
                 return;
             }
-            LootLockerAPIManager.GetPlayerAssetNotification(onComplete);
+            var endPoint = LootLockerEndPoints.playerAssetNotifications;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1544,7 +1551,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDeactivatedAssetsResponse>());
                 return;
             }
-            LootLockerAPIManager.GetDeactivatedAssetNotification(onComplete);
+            var endPoint = LootLockerEndPoints.playerAssetDeactivationNotification;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1559,7 +1568,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
                 return;
             }
-            LootLockerAPIManager.InitiateDLCMigration(onComplete);
+            var endPoint = LootLockerEndPoints.initiateDlcMigration;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1573,7 +1584,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
                 return;
             }
-            LootLockerAPIManager.GetDLCMigrated(onComplete);
+            var endPoint = LootLockerEndPoints.getDlcMigration;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1587,7 +1600,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
                 return;
             }
-            LootLockerAPIManager.SetProfilePrivate(onComplete);
+            var endPoint = LootLockerEndPoints.setProfilePrivate;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1601,7 +1616,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
                 return;
             }
-            LootLockerAPIManager.SetProfilePublic(onComplete);
+            var endPoint = LootLockerEndPoints.setProfilePublic;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1615,7 +1632,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
                 return;
             }
-            LootLockerAPIManager.GetPlayerName(onComplete);
+            var endPoint = LootLockerEndPoints.getPlayerName;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1818,8 +1837,17 @@ namespace LootLocker.Requests
 
             PlayerNameRequest data = new PlayerNameRequest();
             data.name = name;
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>());
+                return;
+            }
 
-            LootLockerAPIManager.SetPlayerName(data, onComplete);
+            string json = LootLockerJson.SerializeObject(data);
+
+            var endPoint = LootLockerEndPoints.setPlayerName;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
