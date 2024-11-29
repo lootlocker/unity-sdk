@@ -85,11 +85,84 @@ namespace LootLocker.Requests
     }
     #endregion
 
-    [Serializable]
-    public class LootLockerStandardResponse : LootLockerResponse
+    //==================================================
+    // Data Definitions
+    //==================================================
+
+    public class PlatformIDs
     {
+        public ulong? steam_id { get; set; }
+        public string xbox_id { get; set; }
+        public ulong? psn_id { get; set; }
     }
 
+    public class PlayerWith1stPartyPlatformIDs
+    {
+        public uint player_id { get; set; }
+        public string player_public_uid { get; set; }
+        public string name { get; set; }
+        public string last_active_platform { get; set; }
+        public PlatformIDs platform_ids { get; set; }
+    }
+
+    public class PlayerNameWithIDs
+    {
+        public uint player_id { get; set; }
+        public string player_public_uid { get; set; }
+        public string player_ulid { get; set; }
+        public string name { get; set; }
+        public string last_active_platform { get; set; }
+        public string platform_player_id { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerDeactivatedObjects
+    {
+        public int deactivated_asset_id { get; set; }
+        public int replacement_asset_id { get; set; }
+        public string reason { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerAssetClass
+    {
+        public string Asset { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerRental
+    {
+        public bool is_rental { get; set; }
+        public string time_left { get; set; }
+        public string duration { get; set; }
+        public string is_active { get; set; }
+    }
+
+    public class LootLockerInventory
+    {
+        public int instance_id { get; set; }
+        public int? variation_id { get; set; }
+        public string rental_option_id { get; set; }
+        public string acquisition_source { get; set; }
+        public DateTime? acquisition_date { get; set; }
+        public LootLockerCommonAsset asset { get; set; }
+        public LootLockerRental rental { get; set; }
+
+
+        public float balance { get; set; }
+    }
+
+    public class LootLockerRewardObject
+    {
+        public int instance_id { get; set; }
+        public int? variation_id { get; set; }
+        public string acquisition_source { get; set; }
+        public LootLockerCommonAsset asset { get; set; }
+    }
+
+    //==================================================
+    // Request Definitions
+    //==================================================
     [Serializable]
     public class PlayerNameRequest
     {
@@ -113,7 +186,7 @@ namespace LootLocker.Requests
             xbox_ids = new string[] { };
         }
     }
-    
+
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
         public ulong[] player_ids { get; set; }
@@ -125,6 +198,20 @@ namespace LootLocker.Requests
             player_public_uids = new string[] { };
         }
     }
+
+    public class LootLockerPlayerFileRequest
+    {
+        public string purpose { get; set; }
+        public string path_to_file { get; set; }
+    }
+
+    //==================================================
+    // Response Definitions
+    //==================================================
+    [Serializable]
+    public class LootLockerStandardResponse : LootLockerResponse
+    {
+    }
     
     [Serializable]
     public class Player1stPartyPlatformIDsLookupResponse : LootLockerResponse
@@ -132,36 +219,10 @@ namespace LootLocker.Requests
         public PlayerWith1stPartyPlatformIDs[] players { get; set; }
     }
 
-    public class PlayerWith1stPartyPlatformIDs
-    {
-        public uint player_id { get; set; }
-        public string player_public_uid { get; set; }
-        public string name { get; set; }
-        public string last_active_platform { get; set; }
-        public PlatformIDs platform_ids { get; set; }
-    }
-    
-    public class PlatformIDs
-    {
-        public ulong? steam_id { get; set; }
-        public string xbox_id { get; set; }
-        public ulong? psn_id { get; set; }
-    }
-
     [Serializable]
     public class PlayerNameLookupResponse : LootLockerResponse
     {
         public PlayerNameWithIDs[] players { get; set; }
-    }
-
-    public class PlayerNameWithIDs
-    {
-        public uint player_id { get; set; }
-        public string player_public_uid { get; set; }
-        public string player_ulid { get; set; }
-        public string name { get; set; }
-        public string last_active_platform { get; set; }
-        public string platform_player_id { get; set; }
     }
 
     [Serializable]
@@ -183,15 +244,6 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
-    public class LootLockerDeactivatedObjects
-    {
-        public int deactivated_asset_id { get; set; }
-        public int replacement_asset_id { get; set; }
-        public string reason { get; set; }
-    }
-
-
-    [Serializable]
     public class LootLockerBalanceResponse : LootLockerResponse
     {
         public int? balance { get; set; }
@@ -201,26 +253,6 @@ namespace LootLocker.Requests
     public class LootLockerInventoryResponse : LootLockerResponse
     {
         public LootLockerInventory[] inventory { get; set; }
-    }
-
-    public class LootLockerInventory
-    {
-        public int instance_id { get; set; }
-        public int? variation_id { get; set; }
-        public string rental_option_id { get; set; }
-        public string acquisition_source { get; set; }
-        public DateTime? acquisition_date { get; set; }
-        public LootLockerCommonAsset asset { get; set; }
-        public LootLockerRental rental { get; set; }
-
-
-        public float balance { get; set; }
-    }
-    
-    public class LootLockerPlayerFileRequest
-    {
-        public string purpose { get; set; }
-        public string path_to_file { get; set; }
     }
     
     public class LootLockerPlayerFilesResponse : LootLockerResponse
@@ -247,34 +279,15 @@ namespace LootLocker.Requests
         public DateTime created_at { get; set; }
     }
 
-    [Serializable]
-    public class LootLockerAssetClass
-    {
-        public string Asset { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerRental
-    {
-        public bool is_rental { get; set; }
-        public string time_left { get; set; }
-        public string duration { get; set; }
-        public string is_active { get; set; }
-    }
     public class LootLockerPlayerAssetNotificationsResponse : LootLockerResponse
     {
         public LootLockerRewardObject[] objects { get; set; }
     }
-
-    public class LootLockerRewardObject
-    {
-        public int instance_id { get; set; }
-        public int? variation_id { get; set; }
-        public string acquisition_source { get; set; }
-        public LootLockerCommonAsset asset { get; set; }
-    }
 }
 
+//==================================================
+// API Class Definition
+//==================================================
 namespace LootLocker
 {
     public partial class LootLockerAPIManager
