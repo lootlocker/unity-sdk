@@ -8,6 +8,7 @@ using LLlibs.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
+    #region DEPRECATED Legacy Player Info
     public class LootLockerGetPlayerInfoResponse : LootLockerResponse
     {
         public int? account_balance { get; set; }
@@ -29,6 +30,8 @@ namespace LootLocker.Requests
             }
         }
     }
+    #endregion
+
 
     [Serializable]
     public class LootLockerStandardResponse : LootLockerResponse
@@ -276,6 +279,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
+        #region DEPRECATED Legacy Player Info
         public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.getPlayerInfo;
@@ -289,6 +293,7 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+        #endregion
 
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
         {
