@@ -1471,7 +1471,9 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceResponse>());
                 return;
             }
-            LootLockerAPIManager.GetBalance(onComplete);
+            var endPoint = LootLockerEndPoints.getCurrencyBalance;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1479,6 +1481,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="xpToSubmit">Amount of XP</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpSubmitResponse</param>
+        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
         public static void SubmitXp(int xpToSubmit, Action<LootLockerXpSubmitResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1487,10 +1490,20 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerXpSubmitRequest xpSubmitRequest = new LootLockerXpSubmitRequest(xpToSubmit);
-            LootLockerAPIManager.SubmitXp(xpSubmitRequest, onComplete);
+            if (xpSubmitRequest == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerXpSubmitResponse>());
+                return;
+            }
+
+            string json = LootLockerJson.SerializeObject(xpSubmitRequest);
+
+            var endPoint = LootLockerEndPoints.submitXp;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        [Obsolete("This function will be removed at a later stage, use GetPlayerInfo instead")]
+        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
         public static void GetXpAndLevel(Action<LootLockerXpResponse> onComplete)
         {
             if (!CheckInitialized())
@@ -1499,7 +1512,11 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerXpRequest xpRequest = new LootLockerXpRequest();
-            LootLockerAPIManager.GetXpAndLevel(xpRequest, onComplete);
+            var endPoint = LootLockerEndPoints.getXpAndLevel;
+
+            var getVariable = string.Format(endPoint.endPoint, xpRequest.getRequests[0], xpRequest.getRequests[1]);
+
+            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
