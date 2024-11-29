@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using LootLocker;
 using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
@@ -16,7 +18,6 @@ namespace LootLockerTests.PlayMode
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
         private bool SetupFailed = false;
-        string guestSessionIdentifier = null; 
 
         [UnitySetUp]
         public IEnumerator Setup()
@@ -31,7 +32,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: "PlayerInfoTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -66,18 +67,6 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
-
-            bool guestSessionCompleted = false;
-            LootLockerSDKManager.StartGuestSession((response) =>
-            {
-                if (!response.success)
-                {
-                    SetupFailed = true;
-                }
-                guestSessionIdentifier = response.player_identifier;
-                guestSessionCompleted = true;
-            });
-            yield return new WaitUntil(() => guestSessionCompleted);
         }
 
         [UnityTearDown]
@@ -104,62 +93,148 @@ namespace LootLockerTests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PlayerInfo_GetSelf_Succeeds()
+        public IEnumerator PlayerInfo_GetCurrentPlayerInfo_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
-            //When
-            bool getPlayerInfoCompleted = false;
-            LootLockerGetPlayerInfoResponse actualResponse = null;
-            LootLockerSDKManager.GetPlayerInfo((response) =>
+            //Given
+            DateTime expectedCreatedAt = DateTime.MinValue;
+            string expectedPlayerId = "";
+            string expectedPlayerPublicUid = "";
+            int expectedPlayerLegacyId = -1;
+            bool guestSessionCompleted = false;
+            LootLockerSDKManager.StartGuestSession((response) =>
             {
-                actualResponse = response;
-                getPlayerInfoCompleted = true;
+                if (!response.success)
+                {
+                    guestSessionCompleted = true;
+                    return;
+                }
+                expectedCreatedAt = response.player_created_at;
+                expectedPlayerId = response.player_ulid;
+                expectedPlayerPublicUid = response.public_uid;
+                expectedPlayerLegacyId = response.player_id;
+                guestSessionCompleted = true;
             });
-            yield return new WaitUntil(() => getPlayerInfoCompleted);
+            yield return new WaitUntil(() => guestSessionCompleted);
+            Assert.Greater(expectedCreatedAt, DateTime.MinValue, "Guest Session failed");
+
+            //When
+            bool currentPlayerInfoRequestSucceeded = false;
+            DateTime actualCreatedAt = DateTime.MinValue;
+            string actualPlayerId = "";
+            string actualPlayerPublicUid = "";
+            int actualPlayerLegacyId = -1;
+            bool getCurrentPlayerInfoCompleted = false;
+            LootLockerSDKManager.GetCurrentPlayerInfo((response) =>
+            {
+                currentPlayerInfoRequestSucceeded = response.success;
+                if(currentPlayerInfoRequestSucceeded)
+                {
+                    actualPlayerId = response.info.id;
+                    actualPlayerPublicUid = response.info.public_uid;
+                    actualPlayerLegacyId = response.info.legacy_id;
+                    actualCreatedAt = response.info.created_at;
+                }
+                getCurrentPlayerInfoCompleted = true;
+            });
+            yield return new WaitUntil(() => getCurrentPlayerInfoCompleted);
 
             //Then
-            Assert.IsTrue(actualResponse.success, "Getting PlayerInfo failed");
+            Assert.IsTrue(currentPlayerInfoRequestSucceeded, "GetCurrentPlayerInfo request failed");
+            Assert.AreEqual(expectedCreatedAt, actualCreatedAt, "Player creation time was not the same between session start and player info fetch");
+            Assert.AreEqual(expectedPlayerId, actualPlayerId, "Player id was not the same between session start and player info fetch");
+            Assert.AreEqual(expectedPlayerPublicUid, actualPlayerPublicUid, "Player public uid was not the same between session start and player info fetch");
+            Assert.AreEqual(expectedPlayerLegacyId, actualPlayerLegacyId, "Player legacy id was not the same between session start and player info fetch");
         }
 
         [UnityTest]
-        public IEnumerator PlayerInfo_GetOther_Succeeds()
+        public IEnumerator PlayerInfo_ListPlayerInfoForMultiplePlayersUsingDifferentIds_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
-
-            // Given
-            LootLockerGuestSessionResponse firstSessionResponse = null;
-            bool firstSessionCompleted = false;
-
-            LootLockerSDKManager.EndSession((endSessionResponse) =>
+            //Given
+            int playersToCreate = 15;
+            Dictionary<string, LootLockerPlayerInfo> expectedPlayerInfoToPlayerIdMap = new Dictionary<string, LootLockerPlayerInfo>();
+            Dictionary<string, LootLockerPlayerInfo> expectedPlayerInfoToPlayerPublicUidMap = new Dictionary<string, LootLockerPlayerInfo>();
+            Dictionary<int, LootLockerPlayerInfo> expectedPlayerInfoToPlayerLegacyIdMap = new Dictionary<int, LootLockerPlayerInfo>();
+            for (int playersCreated = 0; playersCreated < playersToCreate; playersCreated++)
             {
-                firstSessionCompleted = true;
-            });
+                bool playerCreateCompleted = false;
+                LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
+                {
+                    Assert.IsTrue(sessionResponse.success, "Guest Session failed");
+                    var playerInfo = new LootLockerPlayerInfo { created_at = sessionResponse.player_created_at, id = sessionResponse.player_ulid, name = sessionResponse.player_name, legacy_id = sessionResponse.player_id, public_uid = sessionResponse.public_uid };
+                    LootLockerSDKManager.SetPlayerName(sessionResponse.public_uid, (setPlayerNameResponse) =>
+                    {
+                        Assert.IsTrue(setPlayerNameResponse.success, "Setting player name failed");
+                        playerInfo.name = setPlayerNameResponse.name;
+                        expectedPlayerInfoToPlayerIdMap.Add(playerInfo.id, playerInfo);
+                        expectedPlayerInfoToPlayerPublicUidMap.Add(playerInfo.public_uid, playerInfo);
+                        expectedPlayerInfoToPlayerLegacyIdMap.Add(playerInfo.legacy_id, playerInfo);
+                        playerCreateCompleted = true;
+                    });
+                });
+                yield return new WaitUntil(() => playerCreateCompleted);
+            }
 
-            yield return new WaitUntil(() => firstSessionCompleted);
-
-            string playerIdentifier = GUID.Generate().ToString();
-            bool secondSessionCompleted = false;
-            LootLockerSDKManager.StartGuestSession(playerIdentifier , (response) =>
+            var guestSessionSucceeded = false;
+            var guestSessionCompleted = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
             {
-                firstSessionResponse = response;
-                secondSessionCompleted = true;
+                guestSessionSucceeded = sessionResponse.success;
+                guestSessionCompleted = true;
             });
-            yield return new WaitUntil(() => secondSessionCompleted);
-
-            //When
-            bool getPlayerInfoCompleted = false;
-            LootLockerXpResponse actualResponse = null;
-            LootLockerSDKManager.GetOtherPlayerInfo(guestSessionIdentifier, (response) =>
-            {
-                actualResponse = response;
-                getPlayerInfoCompleted = true;
-            });
-            yield return new WaitUntil(() => getPlayerInfoCompleted);
+            yield return new WaitUntil(() => guestSessionCompleted);
+            Assert.IsTrue(guestSessionSucceeded, "Guest Session Start failed");
 
             //Then
-            Assert.IsTrue(firstSessionResponse.success, "Getting PlayerInfo failed");
-            Assert.IsFalse(string.IsNullOrEmpty(actualResponse.xp.ToString()), "No xp found in response");
+            List<string> createdPlayerIds = new List<string>(expectedPlayerInfoToPlayerIdMap.Keys);
+            List<string> playerIdsToLookUp = new List<string>();
+            List<string> createdPlayerPublicUids = new List<string>(expectedPlayerInfoToPlayerPublicUidMap.Keys);
+            List<string> playerPublicUidsToLookUp = new List<string>();
+            List<int> createdPlayerLegacyIds = new List<int>(expectedPlayerInfoToPlayerLegacyIdMap.Keys);
+            List<int> playerLegacyIdsToLookUp = new List<int>();
+            for (int i = 0; i < playersToCreate; i++)
+            {
+                if(i < playersToCreate/3)
+                    playerIdsToLookUp.Add(createdPlayerIds[i]);
+                if(i < (playersToCreate / 3) * 2)
+                    playerPublicUidsToLookUp.Add(createdPlayerPublicUids[i]);
+                else
+                    playerLegacyIdsToLookUp.Add(createdPlayerLegacyIds[i]);
+            }
+
+            LootLockerListPlayerInfoResponse actualResponse = null;
+            bool listPlayerInfoCompleted = false;
+            LootLockerSDKManager.ListPlayerInfo(playerIdsToLookUp.ToArray(), playerLegacyIdsToLookUp.ToArray(), playerPublicUidsToLookUp.ToArray(), (response) =>
+            {
+                actualResponse = response;
+                listPlayerInfoCompleted = true;
+            });
+            yield return new WaitUntil(() => listPlayerInfoCompleted);
+
+            Assert.IsTrue(actualResponse?.success, "ListPlayerInfo request failed");
+            Assert.AreEqual(playersToCreate, actualResponse.info.Length, "The same amount of players were not returned as were requested");
+            int j = 0;
+            foreach(var actualPlayerInfo in actualResponse.info)
+            {
+                Assert.IsTrue(playerLegacyIdsToLookUp.Contains(actualPlayerInfo.legacy_id) || playerIdsToLookUp.Contains(actualPlayerInfo.id) || playerPublicUidsToLookUp.Contains(actualPlayerInfo.public_uid), "Found id that was not requested");
+                LootLockerPlayerInfo expectedPlayerInfo = null;
+                if (j%3 == 0)
+                    Assert.IsTrue(expectedPlayerInfoToPlayerIdMap.TryGetValue(actualPlayerInfo.id, out expectedPlayerInfo));
+                else if(j%3 == 1)
+                    Assert.IsTrue(expectedPlayerInfoToPlayerLegacyIdMap.TryGetValue(actualPlayerInfo.legacy_id, out expectedPlayerInfo));
+                else if (j % 3 == 2)
+                    Assert.IsTrue(expectedPlayerInfoToPlayerPublicUidMap.TryGetValue(actualPlayerInfo.public_uid, out expectedPlayerInfo));
+
+                Assert.Greater(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(-5), "Player creation time was not as expected for player " + j);
+                Assert.LessOrEqual(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(5), "Player creation time was not as expected for player " + j);
+                Assert.AreEqual(expectedPlayerInfo.name, actualPlayerInfo.name, "Player name was not as expected for player " + j);
+                Assert.AreEqual(expectedPlayerInfo.id, actualPlayerInfo.id, "Player id was not as expected for player " + j);
+                Assert.AreEqual(expectedPlayerInfo.public_uid, actualPlayerInfo.public_uid, "Player public uid was not as expected for player " + j);
+                Assert.AreEqual(expectedPlayerInfo.legacy_id, actualPlayerInfo.legacy_id, "Player legacy id was not as expected for player " + j);
+                ++j;
+            }
         }
 
 
