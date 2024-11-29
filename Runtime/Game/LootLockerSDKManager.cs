@@ -1351,6 +1351,56 @@ namespace LootLocker.Requests
 
         #region Player
         /// <summary>
+        /// Get information about the currently logged in player such as name and different ids to use for subsequent calls to LootLocker methods
+        /// </summary>
+        /// <param name="onComplete">Action for handling the response</param>
+        public static void GetCurrentPlayerInfo(Action<LootLockerGetCurrentPlayerInfoResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentPlayerInfoResponse>());
+                return;
+            }
+            var endPoint = LootLockerEndPoints.getInfoFromSession;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List information for one or more other players
+        /// </summary>
+        /// <param name="playerIdsToLookUp">A list of ULID ids of players to look up. These ids are in the form of ULIDs and are sometimes called player_ulid or similar</param>
+        /// <param name="playerLegacyIdsToLookUp">A list of legacy ids of players to look up. These ids are in the form of integers and are sometimes called simply player_id or id</param>
+        /// <param name="playerPublicUidsToLookUp">A list of public uids to look up. These ids are in the form of UIDs.</param>
+        /// <param name="onComplete">Action for handling the response</param>
+        public static void ListPlayerInfo(string[] playerIdsToLookUp, int[] playerLegacyIdsToLookUp, string[] playerPublicUidsToLookUp, Action<LootLockerListPlayerInfoResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlayerInfoResponse>());
+                return;
+            }
+            if(playerIdsToLookUp.Length == 0 && playerLegacyIdsToLookUp.Length == 0 && playerPublicUidsToLookUp.Length == 0)
+            {
+                // Nothing to do, early out
+                onComplete?.Invoke(LootLockerResponseFactory.EmptySuccess<LootLockerListPlayerInfoResponse>());
+                return;
+            }
+
+            var endPoint = LootLockerEndPoints.listPlayerInfo;
+
+            LootLockerServerRequest.CallAPI(
+                endPoint.endPoint,
+                endPoint.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerListPlayerInfoRequest {
+                        player_id = playerIdsToLookUp,
+                        player_legacy_id = playerLegacyIdsToLookUp,
+                        player_public_uid = playerPublicUidsToLookUp
+                }),
+                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get general information about the current current player, such as the XP, Level information and their account balance.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPlayerInfoResponse</param>
