@@ -3972,9 +3972,10 @@ namespace LootLocker.Requests
         /// <param name="filters">(Optional) Dictionary<string, string> of key-values that can be used to filter out assets</param>
         /// <param name="data_entities">(Optional) Dictionary<string, string> of data to include in the asset candidate</param>
         /// <param name="context_id">(Optional) ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
+        /// <param name="complete">(Optional) Whether this asset is complete, if set to true this asset candidate will become an asset and can not be edited anymore</param>
         public static void CreatingAnAssetCandidate(string name, Action<LootLockerUserGenerateContentResponse> onComplete,
             Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
-            Dictionary<string, string> data_entities = null, int context_id = -1)
+            Dictionary<string, string> data_entities = null, int context_id = -1, bool complete = false)
         {
             if (!CheckInitialized())
             {
@@ -3991,12 +3992,13 @@ namespace LootLocker.Requests
                 kv_storage = temp_kv.ToArray(),
                 filters = temp_filters.ToArray(),
                 data_entities = temp_data.ToArray(),
-                context_id = context_id,
+                context_id = context_id
             };
 
             LootLockerCreatingOrUpdatingAnAssetCandidateRequest data = new LootLockerCreatingOrUpdatingAnAssetCandidateRequest
             {
                 data = assetData,
+                completed = complete
             };
 
             LootLockerAPIManager.CreatingAnAssetCandidate(data, onComplete);
