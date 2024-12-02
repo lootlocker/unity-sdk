@@ -22,6 +22,7 @@ namespace LootLocker
         public static EndPointClass appleSessionRequest = new EndPointClass("session/apple", LootLockerHTTPMethod.POST);
         public static EndPointClass appleGameCenterSessionRequest = new EndPointClass("session/apple/game-center", LootLockerHTTPMethod.POST);
         public static EndPointClass googleSessionRequest = new EndPointClass("session/google", LootLockerHTTPMethod.POST);
+        public static EndPointClass steamSessionRequest = new EndPointClass("session/steam", LootLockerHTTPMethod.POST);
 
         // Connected Accounts
         [Header("Connected Accounts")]

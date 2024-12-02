@@ -120,59 +120,6 @@ namespace LootLocker.Requests
 
         #region Authentication
         /// <summary>
-        /// Verify the player's steam identity with the server for the specified steam app id.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="steamAppId">The steam app id to verify this player for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        public static void VerifySteamID(string steamSessionTicket, int steamAppId, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerAPIManager.VerifyWithAppId(steamSessionTicket, steamAppId, onComplete);
-        }
-
-        /// <summary>
-        /// Verify the player's steam identity with the server.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerVerifySteamRequest verifyRequest = new LootLockerVerifySteamRequest(steamSessionTicket);
-            LootLockerAPIManager.Verify(verifyRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
-        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
-        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
-        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
-        {
-            Array.Resize(ref ticket, (int)ticketSize);
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < ticketSize; i++)
-            {
-                sb.AppendFormat("{0:x2}", ticket[i]);
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
         /// Verify the player's identity with the server and selected platform.
         /// </summary>
         /// <param name="deviceId"></param>
@@ -350,26 +297,51 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
-        /// <param name="steamId64">Steam ID as a string</param>
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSession(string steamId64, ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
+        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
         {
-            VerifySteamID(SteamSessionTicket(ref ticket, ticketSize), (LootLockerVerifyResponse verifyResponse) =>
+            if (!CheckInitialized(true))
             {
-                if (!verifyResponse.success)
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
+            CurrentPlatform.Set(Platforms.Steam);
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionRequest{ steam_ticket = sessionTicket }), onComplete: (serverResponse) => {
+                if (!serverResponse.success)
                 {
-                    onComplete?.Invoke(new LootLockerSessionResponse
-                    {
-                        success = verifyResponse.success,
-                        statusCode = verifyResponse.statusCode,
-                        errorData = verifyResponse.errorData,
-                        text = verifyResponse.text
-                    });
-                    return;
+                    CurrentPlatform.Reset();
                 }
-                StartSteamSession(steamId64, onComplete);
+
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
+            });
+        }
+
+        /// <summary>
+        /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
+        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <param name="steamAppId">The steam app id to start this steam session for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                return;
+            }
+            var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
+            CurrentPlatform.Set(Platforms.Steam);
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionWithAppIdRequest { steam_ticket = sessionTicket, steam_app_id = steamAppId }), onComplete: (serverResponse) => {
+                if (!serverResponse.success)
+                {
+                    CurrentPlatform.Reset();
+                }
+
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
             });
         }
 
@@ -379,6 +351,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="steamId64">Steam ID ass a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
         public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -398,6 +371,73 @@ namespace LootLocker.Requests
 
                 onComplete(response);
             });
+        }
+
+        /// <summary>
+        /// Verify the player's steam identity with the server for the specified steam app id.
+        ///
+        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
+        /// <param name="steamAppId">The steam app id to verify this player for</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
+        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
+        public static void VerifySteamID(string steamSessionTicket, int steamAppId, Action<LootLockerVerifyResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
+                return;
+            }
+            LootLockerAPIManager.VerifyWithAppId(steamSessionTicket, steamAppId, onComplete);
+        }
+
+        /// <summary>
+        /// Verify the player's steam identity with the server.
+        ///
+        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
+        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
+        public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
+                return;
+            }
+            LootLockerVerifySteamRequest verifyRequest = new LootLockerVerifySteamRequest(steamSessionTicket);
+            LootLockerAPIManager.Verify(verifyRequest, onComplete);
+        }
+
+        /// <summary>
+        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
+        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
+        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
+        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
+        {
+            return _SteamSessionTicket(ref ticket, ticketSize);
+        }
+
+        /// <summary>
+        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// </summary>
+        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
+        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
+        private static string _SteamSessionTicket(ref byte[] ticket, uint ticketSize)
+        {
+            Array.Resize(ref ticket, (int)ticketSize);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < ticketSize; i++)
+            {
+                sb.AppendFormat("{0:x2}", ticket[i]);
+            }
+            return sb.ToString();
         }
 
         /// <summary>
