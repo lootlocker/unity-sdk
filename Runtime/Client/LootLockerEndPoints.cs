@@ -299,7 +299,7 @@ namespace LootLocker
         public static EndPointClass sendFriendRequest = new EndPointClass("player/friends/{0}", LootLockerHTTPMethod.POST);
         public static EndPointClass acceptFriendRequest = new EndPointClass("player/friends/incoming/{0}/accept", LootLockerHTTPMethod.POST);
         public static EndPointClass declineFriendRequest = new EndPointClass("player/friends/incoming/{0}/decline", LootLockerHTTPMethod.POST);
-        public static EndPointClass cancelOutgoingFriendRequest = new EndPointClass("player/friends/outgoing/{0}/cancel", LootLockerHTTPMethod.GET);
+        public static EndPointClass cancelOutgoingFriendRequest = new EndPointClass("player/friends/outgoing/{0}/cancel", LootLockerHTTPMethod.POST);
         public static EndPointClass listBlockedPlayers = new EndPointClass("player/friends/blocked", LootLockerHTTPMethod.GET);
         public static EndPointClass blockPlayer = new EndPointClass("player/friends/{0}/block", LootLockerHTTPMethod.POST);
         public static EndPointClass unblockPlayer = new EndPointClass("player/friends/{0}/unblock", LootLockerHTTPMethod.POST);
