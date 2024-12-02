@@ -4,6 +4,18 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
+    public class LootLockerSteamSessionRequest
+    {
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey?.ToString();
+        public string game_version { get; set; } = LootLockerConfig.current.game_version;
+        public string steam_ticket { get; set; }
+    }
+
+    public class LootLockerSteamSessionWithAppIdRequest : LootLockerSteamSessionRequest
+    {
+        public string steam_app_id { get; set; }
+    }
+
     [Serializable]
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
