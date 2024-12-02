@@ -194,7 +194,7 @@ namespace LootLocker
                         response.errorData.retry_after_seconds = Int32.Parse(RetryAfterHeader);
                     }
 
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
+                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData?.ToString());
                     OnServerResponse?.Invoke(response);
                 }
             }
