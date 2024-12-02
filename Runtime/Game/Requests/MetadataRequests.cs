@@ -23,7 +23,8 @@ namespace LootLocker.LootLockerEnums
         progression = 3,
         currency = 4,
         player = 5,
-        self = 6
+        self = 6,
+        asset = 7,
     };
 
     /// <summary>
