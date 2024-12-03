@@ -182,13 +182,13 @@ namespace LootLocker
             }
 
             //Print the most important info first
-            string prettyError = $"LootLocker Error: \"{message}\"";
+            string prettyError = $"LootLocker Error: \"{message ?? ""}\"";
 
             // Look for intermittent, non user errors
             if (!string.IsNullOrEmpty(code) && code.StartsWith("HTTP5"))
             {
                 prettyError +=
-                    $"\nTry again later. If the issue persists, please contact LootLocker support and provide the following error details:\n trace ID - \"{trace_id}\",\n request ID - \"{request_id}\",\n message - \"{message}\".";
+                    $"\nTry again later. If the issue persists, please contact LootLocker support and provide the following error details:\n trace ID - \"{trace_id ?? ""}\",\n request ID - \"{request_id ?? ""}\",\n message - \"{message ?? ""}\".";
                 if (!string.IsNullOrEmpty(doc_url))
                 {
                     prettyError += $"\nFor more information, see {doc_url} (error code was \"{code}\").";
@@ -199,14 +199,14 @@ namespace LootLocker
             {
                 prettyError +=
                     $"\nThere was a problem with your request. The error message provides information on the problem and will help you fix it.";
-                if (!string.IsNullOrEmpty(doc_url))
+                if (!string.IsNullOrEmpty(doc_url ?? ""))
                 {
-                    prettyError += $"\nFor more information, see {doc_url} (error code was \"{code}\").";
+                    prettyError += $"\nFor more information, see {doc_url ?? ""} (error code was \"{code ?? ""}\").";
                 }
 
                 prettyError +=
                     $"\nIf you are unable to fix the issue, contact LootLocker support and provide the following error details:";
-                if (!string.IsNullOrEmpty(trace_id))
+                if (!string.IsNullOrEmpty(trace_id ?? ""))
                 {
                     prettyError += $"\n     trace ID - \"{trace_id}\"";
                 }
@@ -215,7 +215,7 @@ namespace LootLocker
                     prettyError += $"\n     request ID - \"{request_id}\"";
                 }
 
-                prettyError += $"\n     message - \"{message}\".";
+                prettyError += $"\n     message - \"{message ?? ""}\".";
             }
             return prettyError;
         }
