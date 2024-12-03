@@ -12,15 +12,22 @@ public class GuestLoginUniqueIdentifier : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        StartCoroutine(DoGuestLogin());
+    }
+
+    IEnumerator DoGuestLogin()
+    {
+        // Wait until end of frame to ensure that the UI has been loaded
+        yield return new WaitForEndOfFrame();
         /* 
-         * Override settings to use the Example games setup
-         */
+        * Override settings to use the Example games setup
+        */
         LootLockerSettingsOverrider.OverrideSettings();
 
         /* Start guest session with an unique identifier tied to this device.
-         * So if someone uninstall your game, they will be able to log in again when they reinstall to the 
-         * same account as long as they are using the same device.
-         */
+        * So if someone uninstall your game, they will be able to log in again when they reinstall to the 
+        * same account as long as they are using the same device.
+        */
         LootLockerSDKManager.StartGuestSession(SystemInfo.deviceUniqueIdentifier, (response) =>
         {
             if(response.success)
@@ -30,7 +37,7 @@ public class GuestLoginUniqueIdentifier : MonoBehaviour
             }
             else
             {
-                loginInformationText.text = "Error" + response.errorData.message;
+                loginInformationText.text = "Error" + response.errorData.ToString();
             }
         });
     }

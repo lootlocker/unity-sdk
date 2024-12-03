@@ -45,6 +45,13 @@ namespace LootLocker
         // Start is called before the first frame update
         void Start()
         {
+            StartCoroutine(DoLoginAndSetUp());
+        }
+
+        IEnumerator DoLoginAndSetUp()
+        {
+            // Wait until end of frame to ensure that the UI has been loaded
+            yield return new WaitForEndOfFrame();
             /* 
             * Override settings to use the Example game setup
             */
