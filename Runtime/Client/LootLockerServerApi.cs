@@ -1,3 +1,4 @@
+#if !LOOTLOCKER_BETA_HTTP_QUEUE
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,17 +14,12 @@ using Object = UnityEngine.Object;
 using UnityEditorInternal;
 #endif
 
-namespace LootLocker.LootLockerEnums
-{
-    public enum LootLockerCallerRole { User, Admin, Player, Base };
-}
-
 namespace LootLocker
 {
-    public class LootLockerServerApi : MonoBehaviour
+    public class LootLockerHTTPClient : MonoBehaviour
     {
         private static bool _bTaggedGameObjects = false;
-        private static LootLockerServerApi _instance;
+        private static LootLockerHTTPClient _instance;
         private static int _instanceId = 0;
         private const int MaxRetries = 3;
         private int _tries;
@@ -33,13 +29,13 @@ namespace LootLocker
         {
             if (_instance == null)
             {
-                var gameObject = new GameObject("LootLockerServerApi");
+                var gameObject = new GameObject("LootLockerHTTPClient");
                 if (_bTaggedGameObjects)
                 {
-                    gameObject.tag = "LootLockerServerApiGameObject";
+                    gameObject.tag = "LootLockerHTTPClientGameObject";
                 }
 
-                _instance = gameObject.AddComponent<LootLockerServerApi>();
+                _instance = gameObject.AddComponent<LootLockerHTTPClient>();
                 _instanceId = _instance.GetInstanceID();
                 _instance.HostingGameObject = gameObject;
                 _instance.StartCoroutine(CleanUpOldInstances());
@@ -51,11 +47,11 @@ namespace LootLocker
         public static IEnumerator CleanUpOldInstances()
         {
 #if UNITY_2020_1_OR_NEWER
-            LootLockerServerApi[] serverApis = GameObject.FindObjectsByType<LootLockerServerApi>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsByType<LootLockerHTTPClient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 #else
-            LootLockerServerApi[] serverApis = GameObject.FindObjectsOfType<LootLockerServerApi>();
+            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsOfType<LootLockerHTTPClient>();
 #endif
-            foreach (LootLockerServerApi serverApi in serverApis)
+            foreach (LootLockerHTTPClient serverApi in serverApis)
             {
                 if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
                 {
@@ -88,6 +84,10 @@ namespace LootLocker
             ResetInstance();
         }
 #endif
+
+        void Update()
+        {
+        }
 
         public static void SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
         {
@@ -204,7 +204,7 @@ namespace LootLocker
 
         private static bool ShouldRetryRequest(long statusCode, int timesRetried)
         {
-            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
+            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
         }
 
         private static void LogResponse(LootLockerServerRequest request, long statusCode, string responseBody, float startTime, string unityWebRequestError)
@@ -543,3 +543,4 @@ namespace LootLocker
 #endregion
     }
 }
+#endif

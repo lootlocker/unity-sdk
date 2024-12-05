@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,6 +24,12 @@ namespace LootLocker.Requests
         ,Epic
         ,Meta
         ,Remote
+    }
+
+    public class LootLockerPlatformSettings
+    {
+        public static List<Platforms> PlatformsWithRefreshTokens = new List<Platforms> { Platforms.AppleGameCenter, Platforms.AppleSignIn, Platforms.Epic, Platforms.Google, Platforms.Remote };
+        public static List<Platforms> PlatformsWithStoredAuthData = new List<Platforms> { Platforms.Guest, Platforms.WhiteLabel, Platforms.AmazonLuna, Platforms.PlayStationNetwork, Platforms.XboxOne };
     }
 
     public class CurrentPlatform
