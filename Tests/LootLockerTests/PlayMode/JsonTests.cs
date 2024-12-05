@@ -1,9 +1,9 @@
 ﻿using LootLocker;
 using LootLocker.Requests;
-#if !LOOTLOCKER_USE_NEWTONSOFTJSON
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if !LOOTLOCKER_USE_NEWTONSOFTJSON
 using System.Linq;
 using LLlibs.ZeroDepJson;
 #else
