@@ -362,7 +362,7 @@ jobs:
         run: |
           mkdir TestProject
           mkdir TestProject/Packages
-          DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk"'
+          DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk",\n    "com.unity.jobs": "0.70.0-preview.7"'
           if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.2.1"'; fi
           DEPENDENCY_STRING=$DEPENDENCY_STRING$'\n  },\n  "testables": ["com.lootlocker.lootlockersdk"]\n}'
           echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
