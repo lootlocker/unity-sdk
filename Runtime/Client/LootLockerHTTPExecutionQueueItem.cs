@@ -48,6 +48,8 @@ public class LootLockerHTTPExecutionQueueItem
         if(WebRequest != null)
         {
             WebRequest.Abort();
+            WebRequest.downloadHandler?.Dispose();
+            WebRequest.uploadHandler?.Dispose();
             WebRequest.Dispose();
         }
         WebRequest = null;
