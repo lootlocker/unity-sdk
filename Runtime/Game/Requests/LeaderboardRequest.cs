@@ -22,6 +22,10 @@ namespace LootLocker.Requests
         /// </summary>
         public string key { get; set; }
         /// <summary>
+        /// The Ulid of the leaderboard.
+        /// </summary>
+        public string ulid { get; set; }
+        /// <summary>
         /// The direction of the Leaderboard (Ascending / Descending).
         /// </summary>
         public string direction_method { get; set; }
@@ -73,6 +77,7 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardMember rank { get; set; }
         public int leaderboard_id { get; set; }
         public string leaderboard_key { get; set; }
+        public string ulid { get; set; }
     }
     
     public class LootLockerLeaderboardArchive
