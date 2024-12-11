@@ -299,12 +299,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSteamSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSteamSessionResponse>());
                 return;
             }
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
@@ -325,12 +325,12 @@ namespace LootLocker.Requests
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
         /// <param name="steamAppId">The steam app id to start this steam session for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete)
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSteamSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSteamSessionResponse>());
                 return;
             }
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
