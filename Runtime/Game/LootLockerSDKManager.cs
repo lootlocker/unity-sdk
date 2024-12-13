@@ -2986,15 +2986,15 @@ namespace LootLocker.Requests
         [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
         public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
-            UnEquipIdAssetToClass(assetId, onComplete);
+            UnEquipIdAssetFromDefaultClass(assetId, onComplete);
         }
 
         /// <summary>
         /// Unequip an asset from the players default class.
         /// </summary>
-        /// <param name="assetID">ID of the asset to unequip</param>
+        /// <param name="assetInstanceID">Asset instance ID of the asset to unequip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void UnEquipIdAssetToClass(string assetID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        public static void UnEquipIdAssetFromDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
         {
             if (!CheckInitialized())
             {
@@ -3003,8 +3003,8 @@ namespace LootLocker.Requests
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
-            lootLockerGetRequest.getRequests.Add(assetID);
-            LootLockerAPIManager.UnEquipIdAssetToClass(lootLockerGetRequest, onComplete);
+            lootLockerGetRequest.getRequests.Add(assetInstanceID);
+            LootLockerAPIManager.UnEquipIdAssetToDefaultClass(lootLockerGetRequest, onComplete);
         }
 
         [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]

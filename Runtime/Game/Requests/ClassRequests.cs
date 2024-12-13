@@ -325,15 +325,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.unEquipIDAssetToClass;
 
-            string getVariable = "";
-            if(lootLockerGetRequest.getRequests.Count > 1)
-            {
-                getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
-            }
-            else
-            {
-                getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
-            }
+            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
