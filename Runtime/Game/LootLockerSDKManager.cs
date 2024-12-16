@@ -3271,6 +3271,8 @@ namespace LootLocker.Requests
         #region PlayerStorage
         /// <summary>
         /// Get the player storage for the currently active player (key/values).
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete)
@@ -3284,6 +3286,8 @@ namespace LootLocker.Requests
         }
         /// <summary>
         /// Get the player storage as a Dictionary<string, string> for the currently active player (key/values).
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponseDictionary</param>
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete)
@@ -3298,6 +3302,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get a specific key from the player storage for the currently active player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="key">Name of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentSingle</param>
@@ -3315,6 +3321,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Update or create a key/value pair in the player storage for the currently active player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="key">Name of the key</param>
         /// <param name="value">Value of the key</param>
@@ -3333,6 +3341,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Update or create a key/value pair in the player storage for the currently active player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="key">Name of the key</param>
         /// <param name="value">Value of the key</param>
@@ -3352,6 +3362,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Update or create multiple key/value pairs in the player storage for the currently active player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="data">A LootLockerGetPersistentStorageRequest with multiple keys</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
@@ -3367,6 +3379,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Delete a key from the player storage for the currently active player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="keyToDelete">The key/value key(name) to delete</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
@@ -3384,6 +3398,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get the public player storage(key/values) for a specific player.
+        /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
+        /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="otherPlayerId">The ID of the player to retrieve the public ley/values for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
