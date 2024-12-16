@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,12 +38,12 @@ namespace LootLocker
 
         // White Label Login
         [Header("White Label Login")]
-        public static EndPointClass whiteLabelSignUp = new EndPointClass("white-label-login/sign-up", LootLockerHTTPMethod.POST);
-        public static EndPointClass whiteLabelLogin = new EndPointClass("white-label-login/login", LootLockerHTTPMethod.POST);
-        public static EndPointClass whiteLabelVerifySession = new EndPointClass("white-label-login/verify-session", LootLockerHTTPMethod.POST);
-        public static EndPointClass whiteLabelRequestPasswordReset = new EndPointClass("white-label-login/request-reset-password", LootLockerHTTPMethod.POST);
+        public static EndPointClass whiteLabelSignUp = new EndPointClass("white-label-login/sign-up", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+        public static EndPointClass whiteLabelLogin = new EndPointClass("white-label-login/login", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+        public static EndPointClass whiteLabelVerifySession = new EndPointClass("white-label-login/verify-session", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+        public static EndPointClass whiteLabelRequestPasswordReset = new EndPointClass("white-label-login/request-reset-password", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelRequestAccountVerification = new EndPointClass("white-label-login/request-verification", LootLockerHTTPMethod.POST);
-        public static EndPointClass whiteLabelLoginSessionRequest = new EndPointClass("v2/session/white-label", LootLockerHTTPMethod.POST);
+        public static EndPointClass whiteLabelLoginSessionRequest = new EndPointClass("v2/session/white-label", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
 
         // Player
         [Header("Player")]
@@ -322,6 +323,20 @@ namespace LootLocker
         public static EndPointClass ListNotifications = new EndPointClass("notifications/v1", LootLockerHTTPMethod.GET);
         public static EndPointClass ReadNotifications = new EndPointClass("notifications/v1/read", LootLockerHTTPMethod.PUT);
         public static EndPointClass ReadAllNotifications = new EndPointClass("notifications/v1/read/all", LootLockerHTTPMethod.PUT);
+    }
 
+    [Serializable]
+    public enum LootLockerHTTPMethod
+    {
+        GET = 0,
+        POST = 1,
+        DELETE = 2,
+        PUT = 3,
+        HEAD = 4,
+        CREATE = 5,
+        OPTIONS = 6,
+        PATCH = 7,
+        UPLOAD_FILE = 8,
+        UPDATE_FILE = 9
     }
 }

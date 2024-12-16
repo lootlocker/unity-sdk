@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using LootLocker;
+using LootLocker.LootLockerEnums;
 using UnityEngine;
 
 
@@ -69,32 +70,32 @@ namespace LootLockerTestConfigurationUtils
     public class LootLockerTestConfigurationEndpoints
     {
         [Header("LootLocker Admin API Authentication")]
-        public static EndPointClass LoginEndpoint = new EndPointClass("v1/session", LootLockerHTTPMethod.POST);
-        public static EndPointClass SignupEndpoint = new EndPointClass("v1/signup", LootLockerHTTPMethod.POST);
+        public static EndPointClass LoginEndpoint = new EndPointClass("v1/session", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass SignupEndpoint = new EndPointClass("v1/signup", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Game Operations")]
-        public static EndPointClass CreateGame = new EndPointClass("v1/game", LootLockerHTTPMethod.POST);
-        public static EndPointClass DeleteGame = new EndPointClass("v1/game/#GAMEID#", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass CreateGame = new EndPointClass("v1/game", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass DeleteGame = new EndPointClass("v1/game/#GAMEID#", LootLockerHTTPMethod.DELETE, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Key Operations")]
-        public static EndPointClass CreateKey = new EndPointClass("game/#GAMEID#/api_keys", LootLockerHTTPMethod.POST);
+        public static EndPointClass CreateKey = new EndPointClass("game/#GAMEID#/api_keys", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Platform Operations")]
-        public static EndPointClass UpdatePlatform = new EndPointClass("game/#GAMEID#/platforms/{0}", LootLockerHTTPMethod.PUT);
+        public static EndPointClass UpdatePlatform = new EndPointClass("game/#GAMEID#/platforms/{0}", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Leaderboard Operations")]
-        public static EndPointClass createLeaderboard = new EndPointClass("game/#GAMEID#/leaderboards", LootLockerHTTPMethod.POST);
-        public static EndPointClass updateLeaderboard = new EndPointClass("game/#GAMEID#/leaderboards/{0}", LootLockerHTTPMethod.PUT);
-        public static EndPointClass updateLeaderboardSchedule = new EndPointClass("game/#GAMEID#/leaderboard/{0}/schedule", LootLockerHTTPMethod.POST);
-        public static EndPointClass addLeaderboardReward = new EndPointClass("game/#GAMEID#/leaderboard/{0}/reward", LootLockerHTTPMethod.POST);
+        public static EndPointClass createLeaderboard = new EndPointClass("game/#GAMEID#/leaderboards", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass updateLeaderboard = new EndPointClass("game/#GAMEID#/leaderboards/{0}", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
+        public static EndPointClass updateLeaderboardSchedule = new EndPointClass("game/#GAMEID#/leaderboard/{0}/schedule", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass addLeaderboardReward = new EndPointClass("game/#GAMEID#/leaderboard/{0}/reward", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Asset Operations")]
-        public static EndPointClass getAssetContexts = new EndPointClass("/v1/game/#GAMEID#/assets/contexts", LootLockerHTTPMethod.GET);
-        public static EndPointClass createAsset = new EndPointClass("/v1/game/#GAMEID#/asset", LootLockerHTTPMethod.POST);
-        public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST);
+        public static EndPointClass getAssetContexts = new EndPointClass("/v1/game/#GAMEID#/assets/contexts", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+        public static EndPointClass createAsset = new EndPointClass("/v1/game/#GAMEID#/asset", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Trigger Operations")]
-        public static EndPointClass createTrigger = new EndPointClass("game/#GAMEID#/triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST);
+        public static EndPointClass createTrigger = new EndPointClass("game/#GAMEID#/triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }

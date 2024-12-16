@@ -41,7 +41,12 @@ namespace LootLocker.Requests
         static bool initialized;
         static bool Init()
         {
-            LootLockerServerApi.Instantiate();
+            Unity.Collections.NativeLeakDetection.Mode = Unity.Collections.NativeLeakDetectionMode.EnabledWithStackTrace;
+            Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.Full);
+            Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.Full);
+            Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.Full);
+            Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.Full);  
+            LootLockerHTTPClient.Instantiate();
             return LoadConfig();
         }
 
@@ -54,7 +59,7 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
-            LootLockerServerApi.Instantiate();
+            LootLockerHTTPClient.Instantiate();
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
         }
 
@@ -6146,7 +6151,13 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(after))
                 endpoint += $"cursor={after}&";
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => {
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
+#else
+                LootLockerResponse.Deserialize(onComplete, serverResponse, new JsonOptions(JsonSerializationOptions.UseXmlIgnore) );
+#endif
+            });
         }
 
         /// <summary>
@@ -6199,7 +6210,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        #endregion
+#endregion
 
         #region Metadata
         /// <summary>
