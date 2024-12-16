@@ -5913,6 +5913,24 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get details about the specified currency
+        /// </summary>
+        /// <param name="currencyCode">The code of the currency to get details for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetCurrencyDetails(string currencyCode, Action<GetLootLockerCurrencyDetailsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<GetLootLockerCurrencyDetailsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDetails.endPoint, currencyCode);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDetails.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get a list of the denominations available for a specific currency
         /// </summary>
         /// <param name="currencyCode">The code of the currency to fetch denominations for</param>
