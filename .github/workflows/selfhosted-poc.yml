@@ -6,30 +6,14 @@ on:
 jobs:
   ping-stage-test:
     name: Ping stage backend
-    runs-on: [k8s]
-    container:
-      image: ubuntu:22.04
+    runs-on: [ubuntu-latest]
     steps:
-      - name: Setup git
-        run: |
-          apt update
-          apt-get install -y git
-          git config --global --add safe.directory /__w/unity-sdk/unity-sdk
-          
-      - name: Setup curl
-        run: |
-          apt update
-          apt-get install -y curl
-
-      - name: Checkout this repository
-        uses: actions/checkout@v3
-
-      - name: Cat package.json
-        run: cat package.json
-
-      - name: Check branch
-        run: git branch
-        
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci        
       - name: Ping stage
         run: |
           curl -X POST "${{ SECRETS.LL_STAGE_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"dev_dc52acb52a8b49be81761e709f1df9fd\", \"game_version\": \"0.10.0.0\", \"player_identifier\": \"k8s-runner-guest\"}"
