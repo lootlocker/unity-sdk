@@ -261,6 +261,7 @@ namespace LootLocker
         // Currencies
         [Header("Currencies")]
         public static EndPointClass listCurrencies = new EndPointClass("currencies", LootLockerHTTPMethod.GET);
+        public static EndPointClass getCurrencyDetails = new EndPointClass("currency/code/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass getCurrencyDenominationsByCode = new EndPointClass("currency/code/{0}/denominations", LootLockerHTTPMethod.GET);
 
         // Balances

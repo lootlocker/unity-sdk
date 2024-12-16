@@ -86,4 +86,31 @@
         public LootLockerDenomination[] denominations { get; set; }
     };
 
+    /// <summary>
+    /// Response with details about a particular currency
+    /// </summary>
+    public class GetLootLockerCurrencyDetailsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// The unique id of the currency
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The name of the currency
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The unique short code of the currency
+        /// </summary>
+        public string code { get; set; }
+        /// <summary>
+        /// True if this currency can be awarded to the player from the game api
+        /// </summary>
+        public bool game_api_writes_enabled { get; set; }
+        /// <summary>
+        /// The time that this currency was created
+        /// </summary>
+        public string created_at { get; set; }
+    };
+
 }
