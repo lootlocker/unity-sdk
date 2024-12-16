@@ -230,10 +230,6 @@ namespace LootLocker
         [Header("Messages")]
         public static EndPointClass getMessages = new EndPointClass("v1/messages", LootLockerHTTPMethod.GET);
 
-        // Crashes
-        [Header("Crashes")]
-        public static EndPointClass submittingACrashLog = new EndPointClass("v1/crash", LootLockerHTTPMethod.POST);
-
         // Leaderboards
         [Header("Leaderboards")]
         public static EndPointClass listLeaderboards = new EndPointClass("leaderboards/", LootLockerHTTPMethod.GET);
