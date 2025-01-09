@@ -1,6 +1,7 @@
 using System;
 using LootLocker;
 using LootLocker.HTTP;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace LootLocker.LootLockerEnums
@@ -38,5 +39,27 @@ public class LootLockerHTTPExecutionQueueItem
 
     public LootLockerResponse Response { get; set; } = null;
 
+    public void OnDestroy()
+    {
+        Dispose();
+    }
+
+    public void AbortRequest()
+    {
+        if (WebRequest != null)
+        {
+            WebRequest?.Abort();
+            WebRequest.downloadHandler?.Dispose();
+            WebRequest.uploadHandler?.Dispose();
+            WebRequest.Dispose();
+        }
+        WebRequest = null;
+        AsyncOperation = null;
+    }
+
+    public void Dispose()
+    {
+        AbortRequest();
+    }
 }
 }
