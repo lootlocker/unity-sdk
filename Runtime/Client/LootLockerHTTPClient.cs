@@ -408,7 +408,7 @@ namespace LootLocker
                 return HTTPExecutionQueueProcessingResult.Completed_Success;
             }
 
-            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried))
+            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
                 if (ShouldRefreshSession(executionItem.WebRequest.responseCode) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedData()))
                 {
@@ -613,6 +613,11 @@ namespace LootLocker
         private static bool ShouldRefreshSession(long statusCode)
         {
             return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam;
+        }
+
+        private static bool IsAuthorizedRequest(LootLockerHTTPExecutionQueueItem request)
+        {
+            return !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-session-token")) || !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-auth-token"));
         }
 
         private static bool CanRefreshUsingRefreshToken(LootLockerHTTPRequestData cachedRequest)
