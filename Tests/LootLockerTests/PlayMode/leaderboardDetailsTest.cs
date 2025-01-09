@@ -175,7 +175,7 @@ namespace LootLockerTests.PlayMode
             var leaderboard = gameUnderTest.GetLeaderboardByKey(leaderboardKey);
             leaderboard.AddLeaderboardReward((response) =>
             {
-                leaderboardRewardUpdateSuccess = response.success;
+                leaderboardRewardUpdateSuccess = response != null ? response.success : false;
                 leaderboardRewardUpdateComplete = true;
 
             });
