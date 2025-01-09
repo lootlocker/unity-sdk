@@ -160,7 +160,7 @@ namespace LootLocker.Requests
 
         public override int GetHashCode()
         {
-            return catalog_listing_id.GetHashCode() + item_id.GetHashCode();
+            return catalog_listing_id?.GetHashCode() ?? 0;
         }
 
         public override bool Equals(object obj)
