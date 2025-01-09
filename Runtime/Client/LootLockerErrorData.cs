@@ -92,5 +92,4 @@
             return prettyError;
         }
     }
-    }
 }
