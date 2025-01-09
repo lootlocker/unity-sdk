@@ -1,4 +1,4 @@
-﻿#if LOOTLOCKER_BETA_HTTP_QUEUE
+#if LOOTLOCKER_BETA_HTTP_QUEUE
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -61,6 +61,9 @@ namespace LootLocker
         #endregion
     }
 
+    #if UNITY_EDITOR
+    [ExecuteInEditMode]
+    #endif
     public class LootLockerHTTPClient : MonoBehaviour
     {
         #region Configuration
