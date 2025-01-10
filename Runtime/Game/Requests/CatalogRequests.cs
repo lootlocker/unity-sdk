@@ -160,7 +160,7 @@ namespace LootLocker.Requests
 
         public override int GetHashCode()
         {
-            return catalog_listing_id?.GetHashCode() ?? 0;
+            return catalog_listing_id.GetHashCode() + item_id.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -717,25 +717,25 @@ namespace LootLocker.Requests
                             switch (association.kind)
                             {
                                 case LootLockerCatalogEntryEntityKind.asset:
-                                    if (catalogListing.asset_details.ContainsKey(entry.GetItemDetailsKey()))
+                                    if (catalogListing.asset_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.assetDetails.Add(catalogListing.asset_details[association.GetItemDetailsKey()]);
                                     }
                                     break;
                                 case LootLockerCatalogEntryEntityKind.progression_points:
-                                    if (catalogListing.progression_points_details.ContainsKey(entry.GetItemDetailsKey()))
+                                    if (catalogListing.progression_points_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.progressionPointDetails.Add(catalogListing.progression_points_details[association.GetItemDetailsKey()]);
                                     }
                                     break;
                                 case LootLockerCatalogEntryEntityKind.progression_reset:
-                                    if (catalogListing.progression_resets_details.ContainsKey(entry.GetItemDetailsKey()))
+                                    if (catalogListing.progression_resets_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.progressionResetDetails.Add(catalogListing.progression_resets_details[association.GetItemDetailsKey()]);
                                     }
                                     break;
                                 case LootLockerCatalogEntryEntityKind.currency:
-                                    if (catalogListing.currency_details.ContainsKey(entry.GetItemDetailsKey()))
+                                    if (catalogListing.currency_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.currencyDetails.Add(catalogListing.currency_details[association.GetItemDetailsKey()]);
                                     }
