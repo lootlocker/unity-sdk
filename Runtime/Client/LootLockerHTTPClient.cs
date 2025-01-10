@@ -300,7 +300,25 @@ namespace LootLocker
 
                     if(!completedRequest.RequestData.HaveListenersBeenInvoked)
                     {
-                        completedRequest.RequestData.CallListenersWithResult(completedRequest.Response);
+                        if(completedRequest.Response != null)
+                        {
+                            completedRequest.RequestData.CallListenersWithResult(completedRequest.Response);
+                        }
+                        else if (completedRequest.WebRequest != null)
+                        {
+                            if (WebRequestSucceeded(completedRequest.WebRequest))
+                            {
+                                completedRequest.RequestData.CallListenersWithResult(LootLockerResponseFactory.Success<LootLockerResponse>((int)completedRequest.WebRequest.responseCode, completedRequest.WebRequest.downloadHandler.text));
+                            }
+                            else
+                            {
+                                completedRequest.RequestData.CallListenersWithResult(ExtractFailureResponseFromExecutionItem(completedRequest));
+                            }
+                        }
+                        else
+                        {
+                            completedRequest.RequestData.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request completed but no response was present"));
+                        }
                     }
 
                     HTTPExecutionQueue.Remove(CompletedRequestID);
@@ -480,12 +498,7 @@ namespace LootLocker
                     break;
                 case HTTPExecutionQueueProcessingResult.Completed_Failed:
                     {
-                        LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
-                        response.errorData = ExtractErrorData(response);
-                        if(response.errorData != null)
-                        {
-                            response.errorData.retry_after_seconds = ExtractRetryAfterFromHeader(executionItem);
-                        }
+                        LootLockerResponse response = ExtractFailureResponseFromExecutionItem(executionItem);
 
                         LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData.ToString());
                         CallListenersAndMarkDone(executionItem, response);
@@ -661,6 +674,17 @@ namespace LootLocker
 #else
             (webRequest.isHttpError || webRequest.isNetworkError || !string.IsNullOrEmpty(webRequest.error));
 #endif
+        }
+
+        private LootLockerResponse ExtractFailureResponseFromExecutionItem(LootLockerHTTPExecutionQueueItem executionItem)
+        {
+            LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
+            response.errorData = ExtractErrorData(response);
+            if (response.errorData != null)
+            {
+                response.errorData.retry_after_seconds = ExtractRetryAfterFromHeader(executionItem);
+            }
+            return response;
         }
 
         private UnityWebRequest CreateWebRequest(LootLockerHTTPRequestData request)
