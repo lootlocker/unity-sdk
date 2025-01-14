@@ -43,9 +43,7 @@ namespace LootLocker
         {
             if (file == null || file.Length == 0)
             {
-#if UNITY_EDITOR
-                    LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
-#endif
+                LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
                 onComplete(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
                 return;
             }
@@ -280,9 +278,7 @@ namespace LootLocker
 
             if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log($"LootLocker HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'", LootLockerLogger.LogLevel.Warning);
-#endif
             }
         }
 
@@ -383,9 +379,7 @@ namespace LootLocker
                 return false;
             }
 
-#if UNITY_EDITOR
             LootLockerLogger.Log("ServerRequest " + executionItem.RequestData.HTTPMethod + " URL: " + executionItem.RequestData.FormattedURL, LootLockerLogger.LogLevel.Verbose);
-#endif
 
             UnityWebRequest webRequest = CreateWebRequest(executionItem.RequestData);
             if (webRequest == null)
@@ -725,9 +719,7 @@ namespace LootLocker
                     }
                     else
                     {
-#if UNITY_EDITOR
                         LootLockerLogger.Log("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(((LootLockerJsonBodyRequestContent)request.Content).jsonBody), LootLockerLogger.LogLevel.Verbose);
-#endif
                         byte[] bytes = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(((LootLockerJsonBodyRequestContent)request.Content).jsonBody) ? "{}" : ((LootLockerJsonBodyRequestContent)request.Content).jsonBody);
                         webRequest = UnityWebRequest.Put(request.FormattedURL, bytes);
                         webRequest.method = request.HTTPMethod.ToString();
