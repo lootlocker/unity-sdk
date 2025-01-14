@@ -110,7 +110,7 @@ namespace LootLocker
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildUrl(request.endpoint, request.queryParams, request.callerRole);
 #if UNITY_EDITOR
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("ServerRequest " + request.httpMethod + " URL: " + url);
+                LootLockerLogger.Log("ServerRequest " + request.httpMethod + " URL: " + url, LootLockerLogger.LogLevel.Verbose);
 #endif
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
                 {
@@ -135,7 +135,7 @@ namespace LootLocker
 
                     if (!webRequest.isDone && timedOut)
                     {
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url);
+                        LootLockerLogger.Log("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url, LootLockerLogger.LogLevel.Warning);
                         OnServerResponse?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>(request.endpoint + " timed out."));
                         yield break;
                     }
@@ -178,7 +178,7 @@ namespace LootLocker
                     {
                         if (webRequest.downloadHandler.text.StartsWith("<"))
                         {
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("JSON Starts with <, info: \n    statusCode: " + response.statusCode + "\n    body: " + response.text);
+                            LootLockerLogger.Log("JSON Starts with <, info: \n    statusCode: " + response.statusCode + "\n    body: " + response.text, LootLockerLogger.LogLevel.Warning);
                         }
                         response.errorData = null;
                     }
@@ -194,7 +194,7 @@ namespace LootLocker
                         response.errorData.retry_after_seconds = Int32.Parse(RetryAfterHeader);
                     }
 
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(response.errorData?.ToString());
+                    LootLockerLogger.Log(response.errorData?.ToString(), LootLockerLogger.LogLevel.Error);
                     OnServerResponse?.Invoke(response);
                 }
             }
@@ -211,28 +211,28 @@ namespace LootLocker
         {
             if (statusCode == 0 && string.IsNullOrEmpty(responseBody) && !string.IsNullOrEmpty(unityWebRequestError))
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Unity Web request failed, request to " +
+                LootLockerLogger.Log("Unity Web request failed, request to " +
                     request.endpoint + " completed in " +
                     (Time.time - startTime).ToString("n4") +
-                    " secs.\nWeb Request Error: " + unityWebRequestError);
+                    " secs.\nWeb Request Error: " + unityWebRequestError, LootLockerLogger.LogLevel.Verbose);
                 return;
             }
 
             try
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("Server Response: " +
+                LootLockerLogger.Log("Server Response: " +
                     statusCode + " " +
                     request.endpoint + " completed in " +
                     (Time.time - startTime).ToString("n4") +
                     " secs.\nResponse: " +
                     LootLockerObfuscator
-                        .ObfuscateJsonStringForLogging(responseBody));
+                        .ObfuscateJsonStringForLogging(responseBody), LootLockerLogger.LogLevel.Verbose);
             }
             catch
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.httpMethod.ToString());
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(request.endpoint);
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)(LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody));
+                LootLockerLogger.Log(request.httpMethod.ToString(), LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log(request.endpoint, LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log(LootLockerObfuscator.ObfuscateJsonStringForLogging(responseBody), LootLockerLogger.LogLevel.Error);
             }
         }
 
@@ -304,7 +304,7 @@ namespace LootLocker
                         });
                         return;
                     }
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
@@ -318,7 +318,7 @@ namespace LootLocker
                         });
                         return;
                     }
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
@@ -332,7 +332,7 @@ namespace LootLocker
                         });
                         return;
                     }
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
@@ -346,7 +346,7 @@ namespace LootLocker
                         });
                         return;
                     }
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
@@ -360,14 +360,14 @@ namespace LootLocker
                         });
                         return;
                     }
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired, please refresh it");
+                    LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
                 case Platforms.NintendoSwitch:
                 case Platforms.Steam:
                 {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}");
+                    LootLockerLogger.Log($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}", LootLockerLogger.LogLevel.Warning);
                     onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                     return;
                 }
@@ -385,7 +385,7 @@ namespace LootLocker
                 case Platforms.None:
                 default:
                 {
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported");
+                    LootLockerLogger.Log($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported", LootLockerLogger.LogLevel.Error);
                     onComplete?.Invoke(LootLockerResponseFactory.NetworkError<LootLockerResponse>($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported", 401));
                     return;
                 }
@@ -454,7 +454,7 @@ namespace LootLocker
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
                         webRequest.uri = new Uri(url);
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)(url);//the url is wrong in some cases
+                        LootLockerLogger.Log(url);//the url is wrong in some cas, LootLockerLogger.LogLevel.Verbosees
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
@@ -466,7 +466,7 @@ namespace LootLocker
                     {
                         string json = (request.payload != null && request.payload.Count > 0) ? LootLockerJson.SerializeObject(request.payload) : request.jsonPayload;
 #if UNITY_EDITOR
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(json));
+                        LootLockerLogger.Log("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(json), LootLockerLogger.LogLevel.Verbose);
 #endif
                         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json);
                         webRequest = UnityWebRequest.Put(url, bytes);
