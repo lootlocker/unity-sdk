@@ -55,7 +55,7 @@ namespace LootLocker.Requests
         public static bool Init(string apiKey, string gameVersion, string domainKey)
         {
             LootLockerHTTPClient.Instantiate();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: LootLockerLogger.LogLevel.Info);
         }
 
         static bool LoadConfig()

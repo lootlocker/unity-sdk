@@ -12,10 +12,10 @@ namespace LootLocker.Extension
 
         public static void SendAdminRequest(string endPoint, LootLockerHTTPMethod httpMethod, string json, Action<LootLockerResponse> onComplete, bool useAuthToken)
         {
-            LootLockerConfig.DebugLevel debugLevelSavedState = LootLockerConfig.current.currentDebugLevel;
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.Off;
+            LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.None;
 
-            LootLockerServerRequest.CallAPI(endPoint, httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); LootLockerConfig.current.currentDebugLevel = debugLevelSavedState; },
+            LootLockerServerRequest.CallAPI(endPoint, httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); LootLockerConfig.current.logLevel = logLevelSavedState; },
                 useAuthToken,
                 callerRole: LootLockerEnums.LootLockerCallerRole.Admin);
 

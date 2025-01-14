@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LootLocker
@@ -14,6 +12,7 @@ namespace LootLocker
             , Info
             , Warning
             , Error
+            , None
         }
 
         /// <summary>
@@ -24,19 +23,20 @@ namespace LootLocker
         {
             if (!ShouldLog(logLevel))
             {
-                return ignored => { };
+                return SilentLogger;
             }
-
-            AdjustLogLevelToSettings(ref logLevel);
 
             switch (logLevel)
             {
+                case LogLevel.None:
+                    return SilentLogger;
                 case LogLevel.Error:
-                    return Debug.LogError;
+                    return LootLockerConfig.current.logErrorsAsWarnings ? Debug.LogWarning : Debug.LogError;
                 case LogLevel.Warning:
                     return Debug.LogWarning;
                 case LogLevel.Verbose:
                 case LogLevel.Info:
+                case LogLevel.Debug:
                 default:
                     return Debug.Log;
             }
@@ -45,85 +45,17 @@ namespace LootLocker
         private static bool ShouldLog(LogLevel logLevel)
         {
 #if UNITY_EDITOR
-            switch (logLevel)
+            if(LootLockerConfig.current == null || LootLockerConfig.current.logLevel <= logLevel)
             {
-                case LogLevel.Error:
-                {
-                    if (LootLockerConfig.current == null ||
-                        (new List<LootLockerConfig.DebugLevel>
-                        {
-                            LootLockerConfig.DebugLevel.All, 
-                            LootLockerConfig.DebugLevel.AllAsNormal,
-                            LootLockerConfig.DebugLevel.ErrorOnly
-                        }).Contains(LootLockerConfig.current.currentDebugLevel))
-                    {
-                        return true;
-                    }
-
-                    break;
-                }
-                case LogLevel.Warning:
-                {
-                    if (LootLockerConfig.current == null ||
-                        (new List<LootLockerConfig.DebugLevel>
-                        {
-                            LootLockerConfig.DebugLevel.All,
-                            LootLockerConfig.DebugLevel.AllAsNormal
-                        })
-                        .Contains(LootLockerConfig.current.currentDebugLevel))
-                    {
-                        return true;
-                    }
-
-                    break;
-                }
-                case LogLevel.Verbose:
-                {
-                    if (LootLockerConfig.current == null ||
-                        (new List<LootLockerConfig.DebugLevel>
-                        {
-                            LootLockerConfig.DebugLevel.All,
-                            LootLockerConfig.DebugLevel.AllAsNormal
-                        })
-                        .Contains(LootLockerConfig.current.currentDebugLevel))
-                    {
-                        return true;
-                    }
-
-                    break;
-                }
-                case LogLevel.Debug:
-                {
-                    return false;
-                }
-                case LogLevel.Info:
-                default:
-                {
-                    if (LootLockerConfig.current == null ||
-                        (new List<LootLockerConfig.DebugLevel>
-                        {
-                            LootLockerConfig.DebugLevel.All, 
-                            LootLockerConfig.DebugLevel.AllAsNormal,
-                            LootLockerConfig.DebugLevel.NormalOnly
-                        }).Contains(LootLockerConfig.current.currentDebugLevel))
-                    {
-                        return true;
-                    }
-
-                    break;
-                }
+                return true;
             }
 #endif
-
             return false;
         }
 
-        private static void AdjustLogLevelToSettings(ref LogLevel logLevel)
+        private static void SilentLogger(string ignored)
         {
-            if (LootLockerConfig.current != null && LootLockerConfig.DebugLevel.AllAsNormal == LootLockerConfig.current.currentDebugLevel)
-            {
-                logLevel = LogLevel.Info;
-            }
+            //Intentionally empty
         }
     }
 }
