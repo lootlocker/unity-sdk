@@ -146,7 +146,7 @@ namespace LootLockerTests.PlayMode
             }
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.allowTokenRefresh);
         }
 
         [UnityTest]

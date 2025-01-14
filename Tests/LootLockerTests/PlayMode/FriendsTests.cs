@@ -88,7 +88,7 @@ namespace LootLockerTests.PlayMode
             }
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.allowTokenRefresh);
         }
 
         // This test also tests List Friends, List Outgoing requests, List Incoming requests, Send Friend Request, and Accept Friend Request in passing

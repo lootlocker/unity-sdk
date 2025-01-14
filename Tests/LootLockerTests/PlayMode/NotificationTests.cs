@@ -125,7 +125,7 @@ public class NotificationTests
         }
 
         LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-            configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+            configCopy.logLevel, configCopy.allowTokenRefresh);
     }
 
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
