@@ -5,6 +5,8 @@ namespace LootLocker
 {
     public class LootLockerLogger
     {
+        public static LootLockerLogger _instance = null;
+
         public enum LogLevel
         {
             Debug
@@ -16,41 +18,57 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Get logger for the specified level. Use like: GetForLevel(LogLevel::Info)(message);
+        /// Log message with the specified loglevel
         /// </summary>
+        /// <param name="message">The message to log</param>
         /// <param name="logLevel">What level should this be logged as</param>
-        public static Action<string> GetForLogLevel(LogLevel logLevel = LogLevel.Info)
+        public static void Log(string message, LogLevel logLevel = LogLevel.Info)
         {
             if (!ShouldLog(logLevel))
             {
-                return SilentLogger;
+                return;
             }
 
+            Action<string> logger = null;
             switch (logLevel)
             {
                 case LogLevel.None:
-                    return SilentLogger;
+                    return;
                 case LogLevel.Error:
-                    return LootLockerConfig.current.logErrorsAsWarnings ? Debug.LogWarning : Debug.LogError;
+                    logger = LootLockerConfig.current.logErrorsAsWarnings ? Debug.LogWarning : Debug.LogError;
+                    break;
                 case LogLevel.Warning:
-                    return Debug.LogWarning;
+                    logger = Debug.LogWarning;
+                    break;
                 case LogLevel.Verbose:
                 case LogLevel.Info:
                 case LogLevel.Debug:
                 default:
+                    logger = Debug.Log;
+                    break;
+            }
+
+            if(logger != null)
+            {
+                logger(message);
+            }
                     return Debug.Log;
             }
         }
 
         private static bool ShouldLog(LogLevel logLevel)
         {
-#if UNITY_EDITOR
-            if(LootLockerConfig.current == null || LootLockerConfig.current.logLevel <= logLevel)
+            if(logLevel == LogLevel.None)
             {
-                return true;
+                return false;
+            }
+#if !UNITY_EDITOR
+            if(!LootLockerConfig.current.logInBuilds)
+            {
+                return false;
             }
 #endif
-            return false;
+            return LootLockerConfig.current == null || LootLockerConfig.current.logLevel <= logLevel;
         }
 
         private static void SilentLogger(string ignored)

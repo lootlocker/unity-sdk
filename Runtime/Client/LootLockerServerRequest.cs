@@ -46,7 +46,7 @@ namespace LootLocker
             }
 
 #if UNITY_EDITOR
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Debug)("Caller Type: " + callerRole);
+            LootLockerLogger.Log("Caller Type: " + callerRole, LootLockerLogger.LogLevel.Debug);
 #endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -94,7 +94,7 @@ namespace LootLocker
             if (file.Length == 0)
             {
 #if UNITY_EDITOR
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
+                    LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
 #endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
                 return;
@@ -146,7 +146,7 @@ namespace LootLocker
 
             if (this.payload != null && isNonPayloadMethod)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerLogger.Log("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint, LootLockerLogger.LogLevel.Warning);
             }
         }
 
@@ -168,7 +168,7 @@ namespace LootLocker
             this.form = null;
             if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerLogger.Log("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint, LootLockerLogger.LogLevel.Warning);
             }
         }
 
