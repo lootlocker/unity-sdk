@@ -323,6 +323,7 @@ namespace LootLocker
         public DebugLevel currentDebugLevel = DebugLevel.All;
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
         public bool logErrorsAsWarnings = false;
+        public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
 
 #if UNITY_EDITOR
