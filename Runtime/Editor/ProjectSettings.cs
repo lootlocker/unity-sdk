@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -147,6 +147,15 @@ namespace LootLocker.Admin
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.logErrorsAsWarnings = m_CustomSettings.FindProperty("logErrorsAsWarnings").boolValue;
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logInBuilds"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue;
             }
             EditorGUILayout.Space();
 
