@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace LootLocker
@@ -52,7 +53,16 @@ namespace LootLocker
             {
                 logger(message);
             }
-                    return Debug.Log;
+
+            if (_instance != null && _instance.logListeners.Count > 0)
+            {
+                foreach(var listener in _instance.logListeners.Values)
+                {
+                    if(listener != null)
+                    {
+                        listener.Log(logLevel, message);
+                    }
+                }
             }
         }
 
@@ -71,9 +81,46 @@ namespace LootLocker
             return LootLockerConfig.current == null || LootLockerConfig.current.logLevel <= logLevel;
         }
 
-        private static void SilentLogger(string ignored)
+        public Dictionary<string, LootLockerLogListener> logListeners = new Dictionary<string, LootLockerLogListener>();
+
+        public static string RegisterListener(LootLockerLogListener listener)
         {
-            //Intentionally empty
+            if(listener == null)
+            {
+                return "";
+            }
+
+            if (_instance == null)
+            {
+                _instance = new LootLockerLogger();
+            }
+            string identifier = Guid.NewGuid().ToString();
+            _instance.logListeners.Add(identifier, listener);
+            listener.Log(LogLevel.Verbose, "LootLocker debugger prefab is awake and listening");
+            if(!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && LootLockerConfig.current.sdk_version != "N/A")
+            {
+                listener.Log(LootLockerLogger.LogLevel.Verbose, $"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+            }
+            return identifier;
         }
+
+        public static bool UnregisterListener(string identifier)
+        {
+            if (_instance == null)
+            {
+                _instance = new LootLockerLogger();
+            }
+            bool bRemovedListener = _instance.logListeners.Remove(identifier);
+            if(_instance.logListeners.Count == 0)
+            {
+                _instance = null;
+            }
+            return bRemovedListener;
+        }
+    }
+
+    public interface LootLockerLogListener
+    {
+        public void Log(LootLockerLogger.LogLevel logLevel, string message);
     }
 }
