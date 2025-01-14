@@ -86,9 +86,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelLoginResponse>("LootLocker domain key must be set in settings"));
 
                 return;
@@ -111,9 +109,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelVerifySessionResponse>("LootLocker domain key must be set in settings"));
 
                 return;
@@ -136,9 +132,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelSignupResponse>("LootLocker domain key must be set in settings"));
 
                 return;
@@ -155,9 +149,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings"));
 
                 return;
@@ -173,9 +165,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings"));
 
                 return;
@@ -191,9 +181,7 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.ToString().Length == 0)
             {
-#if UNITY_EDITOR
                 LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-#endif
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings"));
 
                 return;
