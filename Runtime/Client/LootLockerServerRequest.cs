@@ -45,9 +45,7 @@ namespace LootLocker
                 return;
             }
 
-#if UNITY_EDITOR
             LootLockerLogger.Log("Caller Type: " + callerRole, LootLockerLogger.LogLevel.Debug);
-#endif
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -93,9 +91,7 @@ namespace LootLocker
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (file.Length == 0)
             {
-#if UNITY_EDITOR
-                    LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
-#endif
+                LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
                 return;
             }
