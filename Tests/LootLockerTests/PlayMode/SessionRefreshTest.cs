@@ -111,7 +111,7 @@ namespace LootLockerTests.PlayMode
             }
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.allowTokenRefresh);
         }
 
         public string GetRandomName()
@@ -155,7 +155,7 @@ namespace LootLockerTests.PlayMode
 
             // Given
             const string invalidToken = "ThisIsANonExistentToken";
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
             LootLockerConfig.current.token = invalidToken;
             LootLockerConfig.current.allowTokenRefresh = false;
             LootLockerPingResponse actualPingResponse = null;
