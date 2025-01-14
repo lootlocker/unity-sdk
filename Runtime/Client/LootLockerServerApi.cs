@@ -402,14 +402,14 @@ namespace LootLocker
         {
             if (!sessionRefreshResponse.success)
             {
-                LootLockerLogger.GetForLogLevel()("Session refresh failed");
+                LootLockerLogger.Log("Session refresh failed");
                 onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                 return;
             }
 
             if (cachedRequest.retryCount >= 4)
             {
-                LootLockerLogger.GetForLogLevel()("Session refresh failed");
+                LootLockerLogger.Log("Session refresh failed");
                 onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
                 return;
             }
