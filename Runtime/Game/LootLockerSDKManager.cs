@@ -63,12 +63,12 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
+                LootLockerLogger.Log("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
+                LootLockerLogger.Log("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
             
@@ -2012,7 +2012,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
@@ -2063,7 +2063,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
@@ -2149,7 +2149,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
@@ -2183,7 +2183,7 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
