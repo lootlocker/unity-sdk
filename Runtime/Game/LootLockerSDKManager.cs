@@ -314,8 +314,12 @@ namespace LootLocker.Requests
                 {
                     CurrentPlatform.Reset();
                 }
+                var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.token = sessionResponse.session_token;
+                LootLockerConfig.current.playerULID = sessionResponse.player_ulid;
+                LootLockerConfig.current.deviceID = "";
 
-                LootLockerResponse.Deserialize(onComplete, serverResponse);
+                onComplete?.Invoke(sessionResponse);
             });
         }
 
@@ -340,8 +344,12 @@ namespace LootLocker.Requests
                 {
                     CurrentPlatform.Reset();
                 }
+                var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                LootLockerConfig.current.token = sessionResponse.session_token;
+                LootLockerConfig.current.playerULID = sessionResponse.player_ulid;
+                LootLockerConfig.current.deviceID = "";
 
-                LootLockerResponse.Deserialize(onComplete, serverResponse);
+                onComplete?.Invoke(sessionResponse);
             });
         }
 
