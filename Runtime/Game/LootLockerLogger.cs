@@ -30,13 +30,20 @@ namespace LootLocker
                 return;
             }
 
-            Action<string> logger = null;
+            Action<string> logger;
             switch (logLevel)
             {
                 case LogLevel.None:
                     return;
                 case LogLevel.Error:
-                    logger = LootLockerConfig.current.logErrorsAsWarnings ? Debug.LogWarning : Debug.LogError;
+                    if(LootLockerConfig.current.logErrorsAsWarnings)
+                    {
+                        logger = Debug.LogWarning;
+                    }
+                    else
+                    {
+                        logger = Debug.LogError;
+                    }
                     break;
                 case LogLevel.Warning:
                     logger = Debug.LogWarning;
@@ -121,6 +128,6 @@ namespace LootLocker
 
     public interface LootLockerLogListener
     {
-        public void Log(LootLockerLogger.LogLevel logLevel, string message);
+        void Log(LootLockerLogger.LogLevel logLevel, string message);
     }
 }
