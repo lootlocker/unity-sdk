@@ -9,6 +9,7 @@ version=$(echo "$latestRelease" | jq .tag_name)
 version=${version//\"/}
 patchnotes=$(echo "$latestRelease" | jq .body)
 patchnotes=${patchnotes//\\r\\n/\\n}
+patchnotes=${patchnotes//\\\"/\'}
 
 prompt="Condense these patch notes (but dont mention the version number) to a short message (max 255 character) naming the important changes and crucial information in a helpful, informative, but punchy way: $patchnotes"
 prompt=${prompt//\"/}
@@ -33,6 +34,8 @@ jsonResponse=$(curl -s "https://api.openai.com/v1/chat/completions" \
 
 shortPatchNotes=$(echo "$jsonResponse" | jq .choices[0].message.content)
 shortPatchNotes=${shortPatchNotes//\"/}
+
+echo $shortPatchNotes
 
 filename="$sdk-$version"
 filename=${filename//./-}
