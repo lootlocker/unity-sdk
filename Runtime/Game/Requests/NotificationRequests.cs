@@ -51,6 +51,7 @@ namespace LootLocker.LootLockerStaticStrings
             public static readonly string GooglePlayStore = "purchasing.google_play_store";
             public static readonly string LootLocker = "purchasing.lootlocker";
         }
+        public static readonly string TwitchDrop = "twitch_drop";
     }
 
     /// <summary>
@@ -109,6 +110,13 @@ namespace LootLocker.LootLockerStaticStrings
                 public static readonly string CatalogId = "catalog_id";
                 public static readonly string CatalogItemId = "catalog_item_id";
             }
+        }
+        
+        /// <summary>
+        /// Standard context keys to expect when source is twitch drop
+        /// </summary>
+        public struct TwitchDrop
+        {
         }
     }
 }
