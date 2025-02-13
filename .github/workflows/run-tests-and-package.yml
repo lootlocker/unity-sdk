@@ -11,8 +11,6 @@ on:
   push:
     branches: # Made towards the following
       - main
-    tags:
-      - v**
   workflow_dispatch:
     inputs:
       LL_URL:
