@@ -156,6 +156,7 @@ namespace LootLockerTests.PlayMode
             // Given
             const string invalidToken = "ThisIsANonExistentToken";
             LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
+            LootLockerConfig.current.logErrorsAsWarnings = true;
             LootLockerConfig.current.token = invalidToken;
             LootLockerConfig.current.allowTokenRefresh = false;
             LootLockerPingResponse actualPingResponse = null;
