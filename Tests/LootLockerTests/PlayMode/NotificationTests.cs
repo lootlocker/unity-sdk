@@ -38,7 +38,7 @@ public class NotificationTests
         }
 
         bool gameCreationCallCompleted = false;
-        LootLockerTestGame.CreateGame(testName: "NotificationTest" + TestCounter, onComplete: (success, errorMessage, game) =>
+        LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter, onComplete: (success, errorMessage, game) =>
         {
             if (!success)
             {
@@ -125,7 +125,7 @@ public class NotificationTests
         }
 
         LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-            configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+            configCopy.logLevel, configCopy.allowTokenRefresh);
     }
 
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)

@@ -22,8 +22,9 @@ namespace LootLockerTestConfigurationUtils
                 onComplete?.Invoke(new LootLockerResponse{statusCode = 0, success = false, text = "Request exceeded the allowed number of retries", errorData = new LootLockerErrorData{ message = "Request exceeded the allowed number of retries" } });
                 return;
             }
-            LootLockerConfig.DebugLevel debugLevelSavedState = LootLockerConfig.current.currentDebugLevel;
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Verbose;
+            LootLockerConfig.current.logErrorsAsWarnings = true;
             
             endPoint = endPoint.Replace("#GAMEID#", ActiveGameId.ToString());
 
@@ -36,7 +37,7 @@ namespace LootLockerTestConfigurationUtils
                         _retries++;
                         go.Retry(serverResponse.errorData.retry_after_seconds.Value, endPoint, httpMethod, json, onComplete, useAuthToken);
                     }
-                    LootLockerConfig.current.currentDebugLevel = debugLevelSavedState;
+                    LootLockerConfig.current.logLevel = logLevelSavedState;
                 },
                 useAuthToken,
                 callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);

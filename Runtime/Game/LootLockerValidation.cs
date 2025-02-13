@@ -47,13 +47,13 @@ namespace LootLocker
             catch (RegexMatchTimeoutException e)
             {
                 error = "An error has occurred. Please try again.";
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Regex exception: " + e);
+                LootLockerLogger.Log("Regex exception: " + e, LootLockerLogger.LogLevel.Warning);
                 return false;
             }
             catch (ArgumentException e)
             {
                 error = "An error has occurred. Please try again.";
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Argument exception: " + e);
+                LootLockerLogger.Log("Argument exception: " + e, LootLockerLogger.LogLevel.Warning);
                 return false;
             }
 
@@ -72,7 +72,7 @@ namespace LootLocker
             catch (RegexMatchTimeoutException e)
             {
                 error = "The email you entered was invalid.";
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Regex exception: " + e);
+                LootLockerLogger.Log("Regex exception: " + e, LootLockerLogger.LogLevel.Warning);
                 return false;
             }
         }

@@ -51,6 +51,7 @@ namespace LootLocker.LootLockerStaticStrings
             public static readonly string GooglePlayStore = "purchasing.google_play_store";
             public static readonly string LootLocker = "purchasing.lootlocker";
         }
+        public static readonly string TwitchDrop = "twitch_drop";
     }
 
     /// <summary>
@@ -109,6 +110,13 @@ namespace LootLocker.LootLockerStaticStrings
                 public static readonly string CatalogId = "catalog_id";
                 public static readonly string CatalogItemId = "catalog_item_id";
             }
+        }
+        
+        /// <summary>
+        /// Standard context keys to expect when source is twitch drop
+        /// </summary>
+        public struct TwitchDrop
+        {
         }
     }
 }
@@ -572,6 +580,7 @@ namespace LootLocker.Requests
         /// For Google Play Store purchases it is the product id
         /// For Apple App Store purchases it is the transaction id
         /// For LootLocker virtual purchases it is the catalog item id
+        /// Twitch Drops have no uniquely identifying information, so sending in "twitch_drop" returns all twitch drop notifications
         /// </summary>
         /// <param name="identifyingValue">The identifying value of the notification you want to fetch.</param>
         /// <param name="notifications">A list of notifications that were found for the given identifying value or null if none were found.</param>
@@ -595,9 +604,12 @@ namespace LootLocker.Requests
                 var notification = Notifications[lookupEntry.NotificationIndex];
                 if (notification == null 
                     || !notification.Id.Equals(lookupEntry.NotificationId, StringComparison.OrdinalIgnoreCase) 
-                    || !notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
-                    || actualContextValue == null 
-                    || !actualContextValue.Equals(identifyingValue, StringComparison.OrdinalIgnoreCase))
+                    || (!notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase) &&
+                        (!notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
+                        || actualContextValue == null 
+                        || !actualContextValue.Equals(identifyingValue, StringComparison.OrdinalIgnoreCase)
+                        )
+                    ))
                 {
                     // The notifications array is not the same as when the lookup table was populated
                     return false;
@@ -648,6 +660,23 @@ namespace LootLocker.Requests
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, StringComparison.OrdinalIgnoreCase))
                 {
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.TransactionId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase))
+                {
+                    var lookupEntry = new LootLockerNotificationLookupTableEntry
+                    {
+                        IdentifyingKey = LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop,
+                        NotificationId = notification.Id,
+                        NotificationIndex = i
+                    };
+                    if (NotificationLookupTable.TryGetValue(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, out var indexes))
+                    {
+                        indexes.Add(lookupEntry);
+                    }
+                    else
+                    {
+                        NotificationLookupTable.Add(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, new List<LootLockerNotificationLookupTableEntry> { lookupEntry });
+                    }
                 }
 
                 if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)

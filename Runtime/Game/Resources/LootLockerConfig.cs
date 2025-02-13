@@ -142,7 +142,7 @@ namespace LootLocker
                     if (package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                        LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                         return;
                     }
                 }
@@ -150,7 +150,7 @@ namespace LootLocker
                 if (File.Exists("Assets/LootLockerSDK/package.json"))
                 {
                     LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                    LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                     return;
                 }
 
@@ -163,7 +163,7 @@ namespace LootLocker
                         if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
                         {
                             LootLockerConfig.current.sdk_version = packageDescription.version;
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                            LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                             return;
                         }
                     }
@@ -173,13 +173,40 @@ namespace LootLocker
             }
         }
 #endif
+        [Obsolete("This method has been deprecated, please use CreateNewSettings(string, string, string, LootLockerLogger.LogLevel, bool, bool) instead.")]
         public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerConfig.DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+        {
+            bool logErrorsAsWarnings = false;
+            LootLockerLogger.LogLevel logLevel;
+            switch (debugLevel)
+            {
+                case DebugLevel.Off:
+                    logLevel = LootLockerLogger.LogLevel.None;
+                    break;
+                case DebugLevel.ErrorOnly:
+                    logLevel = LootLockerLogger.LogLevel.Error;
+                    break;
+                case DebugLevel.AllAsNormal:
+                    logLevel = LootLockerLogger.LogLevel.Info;
+                    logErrorsAsWarnings = true;
+                    break;
+                case DebugLevel.All:
+                case DebugLevel.NormalOnly:
+                default:
+                    logLevel = LootLockerLogger.LogLevel.Info;
+                    break;
+            }
+            return CreateNewSettings(apiKey, gameVersion, domainKey, logLevel, logErrorsAsWarnings, allowTokenRefresh);
+        }
+
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool errorsAsWarnings = false, bool allowTokenRefresh = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
-            _current.currentDebugLevel = debugLevel;
+            _current.logLevel = logLevel;
+            _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
             _current.token = null;
@@ -200,7 +227,7 @@ namespace LootLocker
         {
             _current.apiKey = null;
             _current.game_version = null;
-            _current.currentDebugLevel = DebugLevel.All;
+            _current.logLevel = LootLockerLogger.LogLevel.Info;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
             _current.token = null;
@@ -290,8 +317,13 @@ namespace LootLocker
         [HideInInspector] public string userUrl = UrlProtocol + GetUrlCore() + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
+        [Obsolete]
         public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
+        [Obsolete]
         public DebugLevel currentDebugLevel = DebugLevel.All;
+        public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
+        public bool logErrorsAsWarnings = false;
+        public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
 
 #if UNITY_EDITOR

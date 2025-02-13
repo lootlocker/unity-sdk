@@ -28,7 +28,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -111,7 +111,7 @@ namespace LootLockerTests.PlayMode
             }
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.allowTokenRefresh);
         }
 
         public string GetRandomName()
@@ -155,7 +155,8 @@ namespace LootLockerTests.PlayMode
 
             // Given
             const string invalidToken = "ThisIsANonExistentToken";
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
+            LootLockerConfig.current.logErrorsAsWarnings = true;
             LootLockerConfig.current.token = invalidToken;
             LootLockerConfig.current.allowTokenRefresh = false;
             LootLockerPingResponse actualPingResponse = null;

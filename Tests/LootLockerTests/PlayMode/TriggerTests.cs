@@ -30,7 +30,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "TriggerTest" + TestCounter + " ",
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ",
                 onComplete: (success, errorMessage, game) =>
                 {
                     if (!success)
@@ -103,7 +103,7 @@ namespace LootLockerTests.PlayMode
             }
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.allowTokenRefresh);
         }
 
         private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
