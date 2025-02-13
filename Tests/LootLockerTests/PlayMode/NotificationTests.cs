@@ -38,7 +38,7 @@ public class NotificationTests
         }
 
         bool gameCreationCallCompleted = false;
-        LootLockerTestGame.CreateGame(testName: "NotificationTest" + TestCounter, onComplete: (success, errorMessage, game) =>
+        LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter, onComplete: (success, errorMessage, game) =>
         {
             if (!success)
             {

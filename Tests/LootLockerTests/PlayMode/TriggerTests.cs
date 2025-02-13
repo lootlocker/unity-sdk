@@ -30,7 +30,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "TriggerTest" + TestCounter + " ",
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ",
                 onComplete: (success, errorMessage, game) =>
                 {
                     if (!success)
