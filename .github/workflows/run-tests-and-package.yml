@@ -379,17 +379,21 @@ jobs:
         if: ${{ matrix.jsonLibrary == 'zerodep' }}
         run: |
           mkdir TestProject/ProjectSettings
-          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_BETA_FRIENDS' >> TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set the project to use Newtonsoft json
         if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
         run: |
           mkdir TestProject/ProjectSettings
-          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON' >> TestProject/ProjectSettings/ProjectSettings.asset
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_BETA_FRIENDS;LOOTLOCKER_USE_NEWTONSOFTJSON' >> TestProject/ProjectSettings/ProjectSettings.asset
           sed -i -e 's/"nunit.framework.dll"/"nunit.framework.dll",\n\t\t"Newtonsoft.Json.dll"/g' sdk/Tests/LootLockerTests/PlayMode/PlayModeTests.asmdef
       - name: Use HTTP Execution Queue
         if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE != 'true' }}
         run: |
-          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_BETA_HTTP_QUEUE;LOOTLOCKER_TARGET_STAGE_ENV/g' TestProject/ProjectSettings/ProjectSettings.asset
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_BETA_HTTP_QUEUE/g' TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Target Stage environment
+        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE != 'true' }}
+        run: |
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_TARGET_STAGE_ENV/g' TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set user information command line arguments
         if: ${{ ENV.USE_TAILSCALE != 'true' }}
         run: |
