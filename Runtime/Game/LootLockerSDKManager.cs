@@ -2391,6 +2391,73 @@ namespace LootLocker.Requests
             AddPointsToPlayerProgression(progressionKey, 0, onComplete);
         }
 
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getAllOtherPlayersProgressions.endPoint, playerUlid);
+
+            endpoint += "?";
+            if (count > 0)
+                endpoint += $"count={count}&";
+
+            if (!string.IsNullOrEmpty(after))
+                endpoint += $"after={after}&";
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        {
+            GetOtherPlayersProgressions(playerUlid, count, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        {
+            GetOtherPlayersProgressions(playerUlid, -1, null, onComplete);
+        }
+
+        /// <summary>
+        /// Returns a single progression that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgression</param>
+        public static void GetOtherPlayersProgression(string playerUlid, string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>());
+                return;
+            }
+
+            var endpoint = string.Format(LootLockerEndPoints.getSingleOtherPlayersProgression.endPoint, progressionKey, playerUlid);
+
+            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         #endregion
 
         #region Hero
