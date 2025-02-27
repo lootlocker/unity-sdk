@@ -73,7 +73,9 @@ namespace LootLocker
         // Player Progressions
         [Header("Player Progressions")]
         public static EndPointClass getAllPlayerProgressions = new EndPointClass("player/progressions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getAllOtherPlayersProgressions = new EndPointClass("player/progressions/player/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass getSinglePlayerProgression = new EndPointClass("player/progressions/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getSingleOtherPlayersProgression = new EndPointClass("player/progressions/{0}/player/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass addPointsToPlayerProgression = new EndPointClass("player/progressions/{0}/points/add", LootLockerHTTPMethod.POST);
         public static EndPointClass subtractPointsFromPlayerProgression = new EndPointClass("player/progressions/{0}/points/subtract", LootLockerHTTPMethod.POST);
         public static EndPointClass resetPlayerProgression = new EndPointClass("player/progressions/{0}/reset", LootLockerHTTPMethod.POST);
