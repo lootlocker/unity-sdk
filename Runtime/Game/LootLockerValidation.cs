@@ -1,10 +1,6 @@
-﻿using LootLocker.Requests;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace LootLocker
 {

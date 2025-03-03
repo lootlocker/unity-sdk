@@ -354,84 +354,6 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// Note: Steam requires that you verify the player using the VerifyPlayer method before starting a session
-        /// </summary>
-        /// <param name="steamId64">Steam ID ass a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            CurrentPlatform.Set(Platforms.Steam);
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    CurrentPlatform.Reset();
-                }
-
-                onComplete(response);
-            });
-        }
-
-        /// <summary>
-        /// Verify the player's steam identity with the server for the specified steam app id.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="steamAppId">The steam app id to verify this player for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void VerifySteamID(string steamSessionTicket, int steamAppId, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerAPIManager.VerifyWithAppId(steamSessionTicket, steamAppId, onComplete);
-        }
-
-        /// <summary>
-        /// Verify the player's steam identity with the server.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerVerifySteamRequest verifyRequest = new LootLockerVerifySteamRequest(steamSessionTicket);
-            LootLockerAPIManager.Verify(verifyRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
-        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
-        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
-        {
-            return _SteamSessionTicket(ref ticket, ticketSize);
-        }
-
-        /// <summary>
         /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
@@ -1409,63 +1331,6 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get general information about the current current player, such as the XP, Level information and their account balance.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPlayerInfoResponse</param>
-        [Obsolete("This function is deprecated, use GetCurrentPlayerInfo instead")]
-        public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPlayerInfoResponse>());
-                return;
-            }
-            var endPoint = LootLockerEndPoints.getPlayerInfo;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Get the players XP and Level information from a playerIdentifier. This uses the same platform as the current session.
-        /// If you are using multiple platforms (White Label + Steam for example), you must use the GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete) method instead.
-        /// </summary>
-        /// <param name="playerIdentifier">The player identifier for this platform.</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpResponse</param>
-        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
-        public static void GetOtherPlayerInfo(string playerIdentifier, Action<LootLockerXpResponse> onComplete)
-        {
-            GetOtherPlayerInfo(playerIdentifier, CurrentPlatform.GetString(), onComplete);
-        }
-
-        /// <summary>
-        /// Get the players XP and Level information from a playerIdentifier.
-        /// </summary>
-        /// <param name="playerIdentifier">The player identifier for this platform.</param>
-        /// <param name="platform">The platform that the user is present on as a string.</param>
-        /// <param name="onComplete"></param>
-        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
-        public static void GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
-                return;
-            }
-
-            if (string.IsNullOrEmpty(platform))
-            {
-                platform = CurrentPlatform.GetString();
-            }
-
-            LootLockerOtherPlayerInfoRequest infoRequest = new LootLockerOtherPlayerInfoRequest(playerIdentifier, platform);
-            var endPoint = LootLockerEndPoints.getXpAndLevel;
-            var getVariable = string.Format(endPoint.endPoint, infoRequest.getRequests[0], infoRequest.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-
-        /// <summary>
         /// Get the players inventory.
         /// </summary>
         /// <param name="count">Amount of assets to retrieve</param>
@@ -1537,49 +1402,6 @@ namespace LootLocker.Requests
             var endPoint = LootLockerEndPoints.getCurrencyBalance;
 
             LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Award XP to the player.
-        /// </summary>
-        /// <param name="xpToSubmit">Amount of XP</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpSubmitResponse</param>
-        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
-        public static void SubmitXp(int xpToSubmit, Action<LootLockerXpSubmitResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpSubmitResponse>());
-                return;
-            }
-            LootLockerXpSubmitRequest xpSubmitRequest = new LootLockerXpSubmitRequest(xpToSubmit);
-            if (xpSubmitRequest == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerXpSubmitResponse>());
-                return;
-            }
-
-            string json = LootLockerJson.SerializeObject(xpSubmitRequest);
-
-            var endPoint = LootLockerEndPoints.submitXp;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
-        public static void GetXpAndLevel(Action<LootLockerXpResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
-                return;
-            }
-            LootLockerXpRequest xpRequest = new LootLockerXpRequest();
-            var endPoint = LootLockerEndPoints.getXpAndLevel;
-
-            var getVariable = string.Format(endPoint.endPoint, xpRequest.getRequests[0], xpRequest.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2688,14 +2510,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Base Classes
-
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function CreateClass() instead")]
-        public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            CreateClass(characterTypeId, newCharacterName, isDefault, onComplete);
-        }
-
         /// <summary>
         /// Create a Class with the provided type and name. The Class will be owned by the currently active player.
         /// Use ListClassTypes() to get a list of available Class types for your game.
@@ -2721,12 +2535,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateClass(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListClassTypes() instead")]
-        public static void ListCharacterTypes(Action<LootLockerListClassTypesResponse> onComplete)
-        {
-            ListClassTypes(onComplete);
-        }
-
         /// <summary>
         /// List all available Class types for your game.
         /// </summary>
@@ -2739,12 +2547,6 @@ namespace LootLocker.Requests
                 return;
             }
             LootLockerAPIManager.ListClassTypes(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListPlayerClasses() instead")]
-        public static void ListPlayerCharacters(Action<LootLockerPlayerClassListResponse> onComplete)
-        {
-            ListPlayerClasses(onComplete);
         }
 
         /// <summary>
@@ -2761,12 +2563,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListPlayerClasses(onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetClassLoadout() instead")]
-        public static void GetCharacterLoadout(Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetClassLoadout(onComplete);
-        }
-
         /// <summary>
         /// Get all class loadouts for your game.
         /// </summary>
@@ -2780,18 +2576,6 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetClassLoadout(onComplete);
 
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetOtherPlayersCharacterLoadout(player_id, CurrentPlatform.Get(), onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetOtherPlayersClassLoadout(player_id, platform, onComplete);
         }
 
         /// <summary>
@@ -2824,12 +2608,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetOtherPlayersClassLoadout(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UpdateClass() instead")]
-        public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            UpdateClass(characterID, newCharacterName, isDefault, onComplete);
-        }
-
         /// <summary>
         /// Update information about the class. The class must be owned by the currently active player.
         /// </summary>
@@ -2858,12 +2636,6 @@ namespace LootLocker.Requests
 
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function SetDefaultClass() instead")]
-        public static void SetDefaultCharacter(string characterID, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            SetDefaultClass(characterID, onComplete);
-        }
-
         /// <summary>
         /// Set the class with classID as the default class for the currently active player. The class must be owned by the currently active player.
         /// </summary>
@@ -2888,12 +2660,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateClass(lootLockerGetRequest, data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToDefaultClass() instead")]
-        public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipIdAssetToDefaultClass(assetInstanceId, onComplete);
-        }
-
         /// <summary>
         /// Equip an asset to the players default class.
         /// </summary>
@@ -2909,12 +2675,6 @@ namespace LootLocker.Requests
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
             data.instance_id = int.Parse(assetInstanceID);
             LootLockerAPIManager.EquipIdAssetToDefaultClass(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToDefaultClass() instead")]
-        public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipGlobalAssetToDefaultClass(assetId, assetVariationId, onComplete);
         }
 
         /// <summary>
@@ -2936,12 +2696,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipGlobalAssetToDefaultClass(data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToClass() instead")]
-        public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipIdAssetToClass(characterID, assetInstanceId, onComplete);
-        }
-
         /// <summary>
         /// Equip an asset to a specific class. The class must be owned by the currently active player.
         /// </summary>
@@ -2961,12 +2715,6 @@ namespace LootLocker.Requests
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(classID);
             LootLockerAPIManager.EquipIdAssetToClass(lootLockerGetRequest, data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToClass() instead")]
-        public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipGlobalAssetToClass(assetId, assetVariationId, characterID, onComplete);
         }
 
         /// <summary>
@@ -2991,12 +2739,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.EquipGlobalAssetToClass(lootLockerGetRequest, data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
-        public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            UnEquipIdAssetFromDefaultClass(assetId, onComplete);
-        }
-
         /// <summary>
         /// Unequip an asset from the players default class.
         /// </summary>
@@ -3013,12 +2755,6 @@ namespace LootLocker.Requests
 
             lootLockerGetRequest.getRequests.Add(assetInstanceID);
             LootLockerAPIManager.UnEquipIdAssetToDefaultClass(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
-        public static void UnEquipIdAssetToCharacter(int characterID, int assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            UnEquipIdAssetToClass(characterID.ToString(), assetInstanceId.ToString(), onComplete);
         }
 
         /// <summary>
@@ -3040,12 +2776,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UnEquipIdAssetToClass(lootLockerGetRequest, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToDefaultClass() instead")]
-        public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToDefaultClass(onComplete);
-        }
-
         /// <summary>
         /// Get the loadout for the players default class.
         /// </summary>
@@ -3060,12 +2790,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetCurrentLoadoutToDefaultClass(onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToOtherClass(playerID, onComplete);
-        }
-
         /// <summary>
         /// Get the current loadout for the default class of the specified player on the current platform
         /// </summary>
@@ -3075,12 +2799,6 @@ namespace LootLocker.Requests
         {
             GetCurrentLoadoutToOtherClass(playerID, CurrentPlatform.Get(), onComplete);
 
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToOtherClass(playerID, platform, onComplete);
         }
 
         /// <summary>
@@ -3099,12 +2817,6 @@ namespace LootLocker.Requests
             lootLockerGetRequest.getRequests.Add(playerID);
             lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
             LootLockerAPIManager.GetCurrentLoadoutToOtherClass(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetEquipableContextToDefaultClass() instead")]
-        public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
-        {
-            GetEquipableContextToDefaultClass(onComplete);
         }
 
         /// <summary>
@@ -3524,19 +3236,6 @@ namespace LootLocker.Requests
             LootLockerAssetRequest.lastId = 0;
         }
 
-        [Obsolete("This function will soon be removed. Use GetAssetInformation(int assetId, Action<LootLockerCommonAsset> onComplete) with int parameter instead")]
-        public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCommonAsset>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId);
-            LootLockerAPIManager.GetAssetInformation(data, onComplete);
-        }
-
         /// <summary>
         /// Get information about a specific asset.
         /// </summary>
@@ -3777,21 +3476,6 @@ namespace LootLocker.Requests
             temp.Add(new LootLockerCreateKeyValuePairRequest { key = key, value = value });
             createKeyValuePairRequest.storage = temp.ToArray();
             LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(request, createKeyValuePairRequest, onComplete);
-        }
-        [ObsoleteAttribute("This function will be removed soon, use this function with 4 parameters instead:\n(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete)")]
-        public static void UpdateKeyValuePairByIdForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
-            createKeyValuePairRequest.key = key;
-            createKeyValuePairRequest.value = value;
-            LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
         }
 
         /// 
@@ -4511,93 +4195,6 @@ namespace LootLocker.Requests
 
         #region Purchasing
         /// <summary>
-        /// Purchase an asset. If your game uses soft currency, it will check the players account balance and grant the assets to the player if there is coverage. For rental Assets use RentalPurchaseCall() instead.
-        /// </summary>
-        /// <param name="assetID">The ID of the asset to purchase</param>
-        /// <param name="variationID">The variation ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void NormalPurchaseCall(int assetID, int variationID, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = assetID, variation_id = variationID };
-            List<LootLockerNormalPurchaseRequest> datas = new List<LootLockerNormalPurchaseRequest>();
-            datas.Add(data);
-            LootLockerAPIManager.NormalPurchaseCall(datas.ToArray(), onComplete);
-        }
-
-        /// <summary>
-        /// Purchase a rental asset. If your game uses soft currency, it will check the players account balance and grant the assets to the player if there is coverage. For non-rental Assets use NormalPurchaseCall() instead.
-        /// </summary>
-        /// <param name="assetID">The ID of the asset to purchase</param>
-        /// <param name="variationID">The variation ID of the asset to purchase</param>
-        /// <param name="rentalOptionID">The rental option ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void RentalPurchaseCall(int assetID, int variationID, int rentalOptionID, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = assetID, variation_id = variationID, rental_option_id = rentalOptionID };
-            LootLockerAPIManager.RentalPurchaseCall(data, onComplete);
-        }
-
-        /// <summary>
-        /// Provide a receipt that you get from Apple to validate the purchase. The item will be granted to the player if the receipt is valid.
-        /// </summary>
-        /// <param name="receipt_data">Receipt that is received when a purchase goes through with apple</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void IosPurchaseVerification(string receipt_data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerIosPurchaseVerificationRequest[] data = new LootLockerIosPurchaseVerificationRequest[] { new LootLockerIosPurchaseVerificationRequest { receipt_data = receipt_data } };
-            LootLockerAPIManager.IosPurchaseVerification(data, onComplete);
-        }
-
-        /// <summary>
-        /// Provide a purchase_token that you get from Google when making an In-App purchase. The item will be granted to the player if the purchase_token is valid.
-        /// </summary>
-        /// <param name="purchase_token">The token that is received when a purchase has been made</param>
-        /// <param name="asset_id">The ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void AndroidPurchaseVerification(string purchase_token, int asset_id, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerAndroidPurchaseVerificationRequest[] data = new LootLockerAndroidPurchaseVerificationRequest[] { new LootLockerAndroidPurchaseVerificationRequest { purchase_token = purchase_token, asset_id = asset_id } };
-
-            LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete) instead")]
-        public static void PollOrderStatus(int assetId, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            PollOrderStatus(assetId, (LootLockerPurchaseOrderStatus orderStatus) => onComplete(new LootLockerClassLoadoutResponse
-            {
-                errorData = orderStatus.errorData,
-                statusCode = orderStatus.statusCode,
-                success = orderStatus.success,
-                text = orderStatus.text
-            }));
-        }
-
-        /// <summary>
         /// This will give you the current status of a purchase. These statuses can be returned;
         /// open - The order is being processed
         /// closed - The order have been processed successfully
@@ -4927,12 +4524,6 @@ namespace LootLocker.Requests
                 });
         }
 
-        [Obsolete("This function will be removed on a later date. Use QuerySteamPurchaseRedemption instead.")]
-        public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
-        {
-            QuerySteamPurchaseRedemption(entitlementId, onComplete);
-        }
-
         /// <summary>
         /// Check the Steam Purchase status for a given entitlement
         /// 
@@ -5030,40 +4621,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetMessages(onComplete);
         }
 
-        #endregion
-
-        #region TriggerEvents
-        /// <summary>
-        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
-        /// </summary>
-        /// <param name="eventName">Name of the trigger to execute</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
-        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
-        public static void ExecuteTrigger(string triggerName, Action<LootLockerExecuteTriggerResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerExecuteTriggerResponse>());
-                return;
-            }
-            LootLockerExecuteTriggerRequest data = new LootLockerExecuteTriggerRequest { name = triggerName };
-            LootLockerAPIManager.ExecuteTrigger(data, onComplete);
-        }
-
-        /// <summary>
-        ///  Lists the triggers that a player have already executed.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAllTriggersResponse</param>
-        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
-        public static void ListExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListAllTriggersResponse>());
-                return;
-            }
-            LootLockerAPIManager.ListAllExecutedTriggers(onComplete);
-        }
         #endregion
 
         #region Triggers
