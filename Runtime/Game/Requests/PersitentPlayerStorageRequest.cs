@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using LootLocker.Requests;
 using System;
-using LLlibs.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
@@ -9,16 +8,11 @@ namespace LootLocker.Requests
     {
         public virtual LootLockerPayload[] payload { get; set; }
     }
-    [Obsolete("This class has been replaced by LootLockerGetPersistentStorageResponse")]
-    public class LootLockerGetPersistentStoragResponse : LootLockerGetPersistentStorageResponse
-    { }
+
     public class LootLockerGetPersistentStorageResponseDictionary : LootLockerResponse
     {
         public virtual Dictionary<string, string> payload { get; set; }
     }
-    [Obsolete("This class has been replaced by LootLockerGetPersistentStorageResponseDictionary")]
-    public class LootLockerGetPersistentStoragResponseDictionary : LootLockerGetPersistentStorageResponseDictionary
-    { }
 
     public class LootLockerGetPersistentStorageRequest
     {

@@ -134,11 +134,6 @@ namespace LootLocker.Requests
         public string error { get; set; }
     }
 
-    public class LootLockerClassAsset
-    {
-        public string Asset { get; set; }
-    }
-
     public class LootLockerPlayerClassListResponse : LootLockerResponse
     {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
