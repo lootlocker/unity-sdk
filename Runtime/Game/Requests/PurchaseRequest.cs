@@ -25,43 +25,6 @@ namespace LootLocker.LootLockerEnums
 
 namespace LootLocker.Requests
 {
-    #region Legacy Purchasing
-
-    public class LootLockerPurchaseRequests
-    {
-    }
-
-    public class LootLockerNormalPurchaseRequest
-    {
-        public int asset_id { get; set; }
-        public int variation_id { get; set; }
-    }
-
-    public class LootLockerRentalPurchaseRequest
-    {
-        public int asset_id { get; set; }
-        public int variation_id { get; set; }
-        public int rental_option_id { get; set; }
-    }
-
-
-    public class LootLockerPurchaseResponse : LootLockerResponse
-    {
-        public bool overlay { get; set; }
-        public int order_id { get; set; }
-    }
-
-    public class LootLockerIosPurchaseVerificationRequest
-    {
-        public string receipt_data { get; set; }
-    }
-
-    public class LootLockerAndroidPurchaseVerificationRequest
-    {
-        public int asset_id { get; set; }
-        public string purchase_token { get; set; }
-    }
-
     public class LootLockerPurchaseCatalogItemResponse : LootLockerResponse
     {
 
@@ -71,7 +34,6 @@ namespace LootLocker.Requests
     {
         public string status { get; set; }
     }
-    #endregion
 
     /// <summary>
     /// 
@@ -252,66 +214,6 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-#region Legacy Purchasing
-        public static void NormalPurchaseCall(LootLockerNormalPurchaseRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.normalPurchaseCall;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void RentalPurchaseCall(LootLockerRentalPurchaseRequest data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.rentalPurchaseCall;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void IosPurchaseVerification(LootLockerIosPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.iosPurchaseVerification;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void AndroidPurchaseVerification(LootLockerAndroidPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.androidPurchaseVerification;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
 
         public static void PollOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerPurchaseOrderStatus> onComplete)
         {
@@ -330,6 +232,5 @@ namespace LootLocker
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-#endregion
     }
 }
