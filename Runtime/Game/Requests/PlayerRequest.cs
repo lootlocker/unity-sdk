@@ -109,7 +109,7 @@ namespace LootLocker.Requests
     {
         public uint player_id { get; set; }
         public string player_public_uid { get; set; }
-        public string player_ulid { get; set; }
+        public string ulid { get; set; }
         public string name { get; set; }
         public string last_active_platform { get; set; }
         public string platform_player_id { get; set; }
@@ -196,7 +196,7 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    public class LookupPlayerNamesRequest
+    /*public class LookupPlayerNamesRequest
     {
         public ulong[] player_ids { get; set; }
         public string[] player_public_uids { get; set; }
@@ -212,7 +212,7 @@ namespace LootLocker.Requests
             psn_ids = new ulong[] { };
             xbox_ids = new string[] { };
         }
-    }
+    }*/
 
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
@@ -224,12 +224,6 @@ namespace LootLocker.Requests
             player_ids = new ulong[] { };
             player_public_uids = new string[] { };
         }
-    }
-
-    public class LootLockerPlayerFileRequest
-    {
-        public string purpose { get; set; }
-        public string path_to_file { get; set; }
     }
 
     /// <summary>
@@ -357,35 +351,15 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void LookupPlayerNames(LookupPlayerNamesRequest lookupPlayerNamesRequest, Action<PlayerNameLookupResponse> onComplete)
+        public static void LookupPlayerNames(string idType, string[] identifiers, Action<PlayerNameLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayerNames;
 
             var getVariable = endPoint.endPoint + "?";
 
-            foreach (var playerID in lookupPlayerNamesRequest.player_ids)
+            foreach (string identifier in identifiers)
             {
-                getVariable += $"player_id={playerID}&";
-            }
-
-            foreach (var playerPublicUID in lookupPlayerNamesRequest.player_public_uids)
-            {
-                getVariable += $"player_public_uid={playerPublicUID}&";
-            }
-
-            foreach (var steamID in lookupPlayerNamesRequest.steam_ids)
-            {
-                getVariable += $"steam_id={steamID}&";
-            }
-
-            foreach (var psnID in lookupPlayerNamesRequest.psn_ids)
-            {
-                getVariable += $"psn_id={psnID}&";
-            }
-
-            foreach (var xboxID in lookupPlayerNamesRequest.xbox_ids)
-            {
-                getVariable += $"xbox_id={xboxID}&";
+                getVariable += $"{idType}={identifier}&";
             }
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
