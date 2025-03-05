@@ -1696,6 +1696,49 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Set the logged in players name. Max length of a name is 255 characters.
+        /// </summary>
+        /// <param name="name">The name to set to the currently logged in player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameResponse</param>
+        public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
+                return;
+            }
+
+            if (CurrentPlatform.Get() == Platforms.Guest)
+            {
+                if (name.ToLower().Contains("player"))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
+                    return;
+
+                }
+                else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
+                    return;
+                }
+            }
+
+            PlayerNameRequest data = new PlayerNameRequest();
+            data.name = name;
+            if (data == null)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>());
+                return;
+            }
+
+            string json = LootLockerJson.SerializeObject(data);
+
+            var endPoint = LootLockerEndPoints.setPlayerName;
+
+            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get players 1st party platform ID's from the provided list of playerID's.
         /// </summary>
         /// <param name="playerIds">A list of multiple player ID's</param>
@@ -1734,7 +1777,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by playerID's.
+        /// Get player names and important ids of a set of players from their last active platform by playerID's.
         /// </summary>
         /// <param name="playerIds">A list of multiple player ID's<</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1746,14 +1789,17 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            List<string> stringPlayerIds = new List<string>();
+            foreach (ulong id in playerIds)
             {
-                player_ids = playerIds
-            }, onComplete);
+                stringPlayerIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("player_public_uid", stringPlayerIds.ToArray(), onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by public playerID's.
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
         /// </summary>
         /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1765,14 +1811,59 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                player_public_uids = playerPublicUIds
-            }, onComplete);
+            LootLockerAPIManager.LookupPlayerNames("player_public_uid", playerPublicUIds, onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerUlids">A list of player ulids</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        public static void LookupPlayerNamesByPlayerUlids(string[] playerUlids, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("player_ulid", playerUlids, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="guestLoginIds">A list of guest login ids</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        public static void LookupPlayerNamesByGuestLoginIds(string[] guestLoginIds, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("player_guest_login_id", guestLoginIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerNames">A list of player names</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        public static void LookupPlayerNamesByPlayerNames(string[] playerNames, Action<PlayerNameLookupResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("player_name", playerNames, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by steam ID's
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1784,14 +1875,17 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            List<string> stringSteamIds = new List<string>();
+            foreach (ulong id in steamIds)
             {
-                steam_ids = steamIds
-            }, onComplete);
+                stringSteamIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("steam_id", stringSteamIds.ToArray(), onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by Steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
+        /// Get player names and important ids of a set of players from their last active platform by Steam ID's
         /// </summary>
         /// <param name="steamIds">A list of multiple player Steam ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1803,14 +1897,11 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                steam_ids = steamIds.Select(steamId => Convert.ToUInt64(steamId)).ToArray()
-            }, onComplete);
+            LootLockerAPIManager.LookupPlayerNames("steam_id", steamIds, onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by PSN ID's.
+        ///Get player names and important ids of a set of players from their last active platform by PSN ID's
         /// </summary>
         /// <param name="psnIds">A list of multiple player PSN ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1822,14 +1913,17 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
+            List<string> stringPsnIds = new List<string>();
+            foreach (ulong id in psnIds)
             {
-                psn_ids = psnIds
-            }, onComplete);
+                stringPsnIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames("psn_id", stringPsnIds.ToArray(), onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by PSN ID's.
+        /// Get player names and important ids of a set of players from their last active platform by PSN ID's
         /// </summary>
         /// <param name="psnIds">A list of multiple player PSN ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1841,14 +1935,11 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                psn_ids = psnIds.Select(psnId => Convert.ToUInt64(psnId)).ToArray()
-            }, onComplete);
+            LootLockerAPIManager.LookupPlayerNames("psn_id", psnIds, onComplete);
         }
 
         /// <summary>
-        /// Get player names of the players from their last active platform by Xbox ID's.
+        /// Get player names and important ids of a set of players from their last active platform by Xbox ID's
         /// </summary>
         /// <param name="xboxIds">A list of multiple player XBOX ID's</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
@@ -1860,52 +1951,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                xbox_ids = xboxIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Set the logged in players name. Max length of a name is 255 characters.
-        /// </summary>
-        /// <param name="name">The name to set to the currently logged in player</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameResponse</param>
-        public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
-                return;
-            }
-
-            if (CurrentPlatform.Get() == Platforms.Guest)
-            {
-                if (name.ToLower().Contains("player"))
-                {
-                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
-                    return;
-
-                } else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
-                {
-                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
-                    return;
-                }
-            }
-
-            PlayerNameRequest data = new PlayerNameRequest();
-            data.name = name;
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>());
-                return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            var endPoint = LootLockerEndPoints.setPlayerName;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerAPIManager.LookupPlayerNames("xbox_id", xboxIds, onComplete);
         }
 
         /// <summary>
