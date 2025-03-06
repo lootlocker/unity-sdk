@@ -13,31 +13,31 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lootlocker/devenv
-          path: /home/runner/work/devenv
+          path: devenv
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout php-backend repository
         uses: actions/checkout@v4
         with:
           repository: lootlocker/php-backend
-          path: /home/runner/work/php-backend
+          path: php-backend
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout gitops-lootlocker repository
         uses: actions/checkout@v4
         with:
           repository: lootlocker/gitops-lootlocker
-          path: /home/runner/work/gitops-lootlocker
+          path: gitops-lootlocker
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout go-backend repository
         uses: actions/checkout@v4
         with:
           repository: lootlocker/go-backend
-          path: /home/runner/work/go-backend
+          path: go-backend
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Install Go
         run: |
           wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz
-          tar -C /home/runner/work/ -xzf go1.24.1.linux-amd64.tar.gz
-          export PATH=$PATH:/home/runner/work/go/bin
+          tar -C /home/runner/work/unity-sdk/unity-sdk -xzf go1.24.1.linux-amd64.tar.gz
+          export PATH=$PATH:/home/runner/work/unity-sdk/unity-sdk/go/bin
       - name: Check go installation
         run: |
           go version
