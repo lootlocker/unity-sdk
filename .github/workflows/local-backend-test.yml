@@ -62,8 +62,8 @@ jobs:
       - name: Launch backend
         run: |
           cd go-backend
-          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} > infrastructure/dev.local.env
-          tail -n 4 infrastructure/dev.local.env
+          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
+          wc -l infrastructure/dev.local.env
 #      - name: Ping local backend
 #        run: |
 #          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
