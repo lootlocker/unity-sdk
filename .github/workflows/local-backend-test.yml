@@ -67,12 +67,22 @@ jobs:
           export GOPRIVATE=github.com/lootlocker/*
           export GONOPROXY=localhost
           export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
-      - name: Launch backend
+      - name: Configure Go backend
         run: |
           cd go-backend
           echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
           go run . jobs migrate
-          go run .
+      - name: Run Go backend
+        uses: JarvusInnovations/background-action@v1
+        with:
+          working-directory: go-backend
+          run: |
+            go run .
+          wait-for: 2m
+          tail: true
+          log-output: stderr,stdout
+          wait-on: |
+            tcp:localhost:8080
       - name: Ping local backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
