@@ -50,15 +50,23 @@ jobs:
         run: |
           docker -v
           docker compose version
-      - name: Launch devenv
+    #  - name: Launch devenv
+    #    run: |
+    #      cd devenv
+    #      mage env:setupsilent dev false false
+    #      mage env:upsilent dev
+    #      mage deps:installsilent dev
+    #  - name: Check that devenv is up
+    #    run: |
+    #      docker inspect dev-php-backend
+      - name: Setup Go to use access token for private repos
+        env:
+          GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
         run: |
-          cd devenv
-          mage env:setupsilent dev false false
-          mage env:upsilent dev
-          mage deps:installsilent dev
-      - name: Check that devenv is up
-        run: |
-          docker inspect dev-php-backend
+          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          export GOPRIVATE=github.com/lootlocker/*
+          export GONOPROXY=localhost
+          export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Launch backend
         run: |
           cd go-backend
