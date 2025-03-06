@@ -1,0 +1,57 @@
+name: Local Backend Test
+on:
+  push:
+    branches: # Made towards the following
+      - ci*
+
+jobs:
+  run-local-backend:
+    name: Set up local backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout devenv repository
+        uses: actions/checkout@v4
+        with:
+          repository: lootlocker/devenv
+          path: devenv
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout php-backend repository
+        uses: actions/checkout@v4
+        with:
+          repository: lootlocker/php-backend
+          path: php-backend
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout gitops-lootlocker repository
+        uses: actions/checkout@v4
+        with:
+          repository: lootlocker/gitops-lootlocker
+          path: gitops-lootlocker
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout go-backend repository
+        uses: actions/checkout@v4
+        with:
+          repository: lootlocker/go-backend
+          path: go-backend
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Install Go
+        run: |
+          wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz
+          tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz
+          export PATH=$PATH:/usr/local/go/bin
+      - name: Check go installation
+        run: |
+          go version
+      - name: Install Mage
+        run: |
+          go install github.com/magefile/mage@latest
+          mage -init
+      - name: Check Mage installation
+        run: |
+          mage --version
+      - name: Install Docker
+        run: |
+          docker -v
+      - name: Ping local backend
+        run: |
+          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
+          
