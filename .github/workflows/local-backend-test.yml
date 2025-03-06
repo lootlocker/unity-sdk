@@ -39,24 +39,16 @@ jobs:
         uses: magefile/mage-action@v3
         with:
           install-only: true
-#      - name: Install Go
-#        run: |
-#          wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz
-#          tar -C /home/runner/work/unity-sdk/unity-sdk -xzf go1.24.1.linux-amd64.tar.gz
-#          export PATH=$PATH:/home/runner/work/unity-sdk/unity-sdk/go/bin
-      - name: Check go installation
+      - name: Check Go version
         run: |
           go version
-#      - name: Install Mage
-#        run: |
-#          go install github.com/magefile/mage@latest
-#          mage -init
-      - name: Check Mage installation
+      - name: Check Mage version
         run: |
           mage --version
-      - name: Install Docker
+      - name: Check docker & docker compose versions
         run: |
           docker -v
+          docker compose version
 #      - name: Ping local backend
 #        run: |
 #          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
