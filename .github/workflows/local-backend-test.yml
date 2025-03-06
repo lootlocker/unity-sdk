@@ -49,6 +49,15 @@ jobs:
         run: |
           docker -v
           docker compose version
+      - name: Launch devenv
+        run: |
+          cd devenv
+          mage env:setupsilent dev false false
+          mage env:upsilent dev
+          mage deps:installsilent dev
+      - name: Check that devenv is up
+        run: |
+          docker inspect dev-php-backend
 #      - name: Ping local backend
 #        run: |
 #          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
