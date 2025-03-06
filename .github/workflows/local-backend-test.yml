@@ -72,19 +72,25 @@ jobs:
           cd go-backend
           echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
           go run . jobs migrate
-      - name: Run Go backend
-        uses: JarvusInnovations/background-action@v1
-        with:
-          run: |
-            go run .
-          working-directory: go-backend
-          wait-for: 2m
-          tail: true
-          log-output: stderr,stdout
-          log-output-resume: stderr
-          log-output-if: failure
-          wait-on: |
-            tcp:localhost:8080
+      - name: Run Go Backend
+        run: |
+          mkdir logs
+          cd go-backend
+          go run . > ../logs/go-backend.log 2>&1 &
+          curl --retry 120 --retry-delay 1 --retry-all-errors http://localhost:9999/__ready/
+      #- name: Run Go backend
+      #  uses: JarvusInnovations/background-action@v1
+      #  with:
+      #    run: |
+      #      go run .
+      #    working-directory: go-backend
+      #    wait-for: 2m
+      #    tail: true
+      #    log-output: stderr,stdout
+      #    log-output-resume: stderr
+      #    log-output-if: failure
+      #    wait-on: |
+      #      tcp:localhost:8080
       - name: Ping local backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
