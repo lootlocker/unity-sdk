@@ -9,25 +9,25 @@ jobs:
     name: Set up local backend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout devenv repository
-        uses: actions/checkout@v4
-        with:
-          repository: lootlocker/devenv
-          path: devenv
-          ref: bailando/ci-tester
-          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
-      - name: Checkout php-backend repository
-        uses: actions/checkout@v4
-        with:
-          repository: lootlocker/php-backend
-          path: php-backend
-          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
-      - name: Checkout gitops-lootlocker repository
-        uses: actions/checkout@v4
-        with:
-          repository: lootlocker/gitops-lootlocker
-          path: gitops-lootlocker
-          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      #- name: Checkout devenv repository
+      #  uses: actions/checkout@v4
+      #  with:
+      #    repository: lootlocker/devenv
+      #    path: devenv
+      #    ref: bailando/ci-tester
+      #    token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      #- name: Checkout php-backend repository
+      #  uses: actions/checkout@v4
+      #  with:
+      #    repository: lootlocker/php-backend
+      #    path: php-backend
+      #    token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      #- name: Checkout gitops-lootlocker repository
+      #  uses: actions/checkout@v4
+      #  with:
+      #    repository: lootlocker/gitops-lootlocker
+      #    path: gitops-lootlocker
+      #    token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout go-backend repository
         uses: actions/checkout@v4
         with:
@@ -50,15 +50,20 @@ jobs:
         run: |
           docker -v
           docker compose version
-      - name: Launch devenv
+      #- name: Launch devenv
+      #  run: |
+      #    cd devenv
+      #    mage env:setupsilent dev false false
+      #    mage env:upsilent dev
+      #    mage deps:installsilent dev
+      #- name: Check that devenv is up
+      #  run: |
+      #    docker inspect dev-php-backend
+      - name: Launch backend
         run: |
-          cd devenv
-          mage env:setupsilent dev false false
-          mage env:upsilent dev
-          mage deps:installsilent dev
-      - name: Check that devenv is up
-        run: |
-          docker inspect dev-php-backend
+          cd go-backend
+          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} > infrastructure/dev.local.env
+          tail -n 4 infrastructure/dev.local.env
 #      - name: Ping local backend
 #        run: |
 #          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
