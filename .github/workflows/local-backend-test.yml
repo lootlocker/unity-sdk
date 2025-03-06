@@ -2,7 +2,7 @@ name: Local Backend Test
 on:
   push:
     branches: # Made towards the following
-      - ci*
+      - ci/*
 
 jobs:
   run-local-backend:
