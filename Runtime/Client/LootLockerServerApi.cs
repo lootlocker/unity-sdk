@@ -452,7 +452,7 @@ namespace LootLocker
                         webRequest = new UnityWebRequest();
                         webRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=--");
                         webRequest.uri = new Uri(url);
-                        LootLockerLogger.Log(url);//the url is wrong in some cas, LootLockerLogger.LogLevel.Verbosees
+                        LootLockerLogger.Log(url); // The url is wrong in some cases
                         webRequest.uploadHandler = new UploadHandlerRaw(formSections);
                         webRequest.uploadHandler.contentType = contentType;
                         webRequest.useHttpContinue = false;
