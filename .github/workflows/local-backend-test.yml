@@ -41,16 +41,16 @@ jobs:
       - name: Check go installation
         run: |
           go version
-#      - name: Install Mage
-#        run: |
-#          go install github.com/magefile/mage@latest
-#          mage -init
-#      - name: Check Mage installation
-#        run: |
-#          mage --version
-#      - name: Install Docker
-#        run: |
-#          docker -v
+      - name: Install Mage
+        run: |
+          go install github.com/magefile/mage@latest
+          mage -init
+      - name: Check Mage installation
+        run: |
+          mage --version
+      - name: Install Docker
+        run: |
+          docker -v
 #      - name: Ping local backend
 #        run: |
 #          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
