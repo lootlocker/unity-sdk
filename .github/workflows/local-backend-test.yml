@@ -75,12 +75,14 @@ jobs:
       - name: Run Go backend
         uses: JarvusInnovations/background-action@v1
         with:
-          working-directory: go-backend
           run: |
             go run .
+          working-directory: go-backend
           wait-for: 2m
           tail: true
           log-output: stderr,stdout
+          log-output-resume: stderr
+          log-output-if: failure
           wait-on: |
             tcp:localhost:8080
       - name: Ping local backend
