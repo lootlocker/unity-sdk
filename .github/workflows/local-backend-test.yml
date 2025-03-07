@@ -108,6 +108,10 @@ jobs:
         if: always()
         run: |
           cat logs/go-backend.log
+      - name: DEBUG STEP cat PHP container logs
+        if: always()
+        run: |
+          docker logs dev-php-backend
       - name: Cat PHP Backend logs
         if: always()
         run: |
