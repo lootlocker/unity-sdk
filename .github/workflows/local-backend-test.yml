@@ -63,7 +63,7 @@ jobs:
         if: always()
         run: |
           docker exec dev-php-backend pwd
-          docker exec dev-php-backend ls -als
+          docker exec dev-php-backend ls -als storage/logs
           docker exec dev-php-backend cat storage/logs/laravel.log
 #      - name: Setup Go to use access token for private repos
 #        env:
