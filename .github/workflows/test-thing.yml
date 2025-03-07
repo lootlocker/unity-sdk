@@ -14,9 +14,11 @@ jobs:
         with:
           path: sdk
       - name: ls
-        run: ls -als sdk/.github/workflows/
+        run: |
+            mv ./sdk/.github/workflows/local-backend-test.yml ./sdk/.github/workflows/action.yml
+            ls -als sdk/.github/workflows/
       - name: Run local backend
-        uses: ./sdk/.github/workflows/local-backend-test.yml
+        uses: ./sdk/.github/workflows/
       - name: Signup to backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
