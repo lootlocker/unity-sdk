@@ -57,10 +57,11 @@ jobs:
           echo "DEV_ENV_REDIS_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_NATS_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo ${{ SECRETS.PHP_BACKEND_CONF_FILE }} | base64 --decode > php-backend/.env
-      - name: Create laravel log file
-        run: |
-          cd php-backend
-          touch storage/logs/laravel.log
+#      - name: Create laravel log file
+#        run: |
+#          cd php-backend
+#          touch storage/logs/laravel.log
+#          chmod -R
       - name: Launch devenv
         run: |
           cd devenv
