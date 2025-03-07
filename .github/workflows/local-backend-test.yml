@@ -77,11 +77,8 @@ jobs:
           mkdir logs
           cd go-backend
           go run . > ../logs/go-backend.log 2>&1 &
-          curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --fail
-      - name: Cat Go Backend logs
-        if: always()
-        run: |
-          cat logs/go-backend.log
+          curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors
+#curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --fail
       #- name: Run Go backend
       #  uses: JarvusInnovations/background-action@v1
       #  with:
@@ -98,4 +95,17 @@ jobs:
       - name: Ping local backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
+      - name: Cat Go Backend logs
+        if: always()
+        run: |
+          cat logs/go-backend.log
+      - name: Bring down Go Backend
+        if: always()
+        run: |
+          kill %1
+      - name: Bring down devenv
+        if: always()
+        run: |
+          cd devenv
+          mage env:downsilent dev
           
