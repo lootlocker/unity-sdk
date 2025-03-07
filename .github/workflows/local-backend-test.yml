@@ -107,6 +107,10 @@ jobs:
         if: always()
         run: |
           docker exec dev-php-backend cat storage/logs/laravel.log
+      - name: DEBUG STEP cat vttestserver logs
+        if: always()
+        run: |
+          docker container logs dev-vttestserver
       - name: Bring down Go Backend
         if: always()
         run: |
