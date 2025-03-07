@@ -1,5 +1,6 @@
 name: Local Backend Test
 on:
+  workflow_dispatch:
 #  push:
 #    branches: # Made towards the following
 #      - ci/*
