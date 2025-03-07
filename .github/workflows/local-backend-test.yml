@@ -40,16 +40,6 @@ jobs:
         uses: magefile/mage-action@v3
         with:
           install-only: true
-      - name: Check Go version
-        run: |
-          go version
-      - name: Check Mage version
-        run: |
-          mage --version
-      - name: Check docker & docker compose versions
-        run: |
-          docker -v
-          docker compose version
       - name: Configure devenv
         run: |
           echo "DEV_ENV_BACKEND_NEW_PHP_PLATFORM=linux/amd64" >> $GITHUB_ENV
@@ -68,13 +58,13 @@ jobs:
           mage env:setupsilent dev false false
           mage env:upsilent dev
           mage deps:installsilent dev
-      - name: Sleep to wait for devenv launch
-        run: |
-            sleep 20s
-      - name: Check that devenv is up
-        run: |
-          docker ps
-          docker inspect dev-php-backend
+#      - name: Sleep to wait for devenv launch
+#        run: |
+#            sleep 20s
+#      - name: Check that devenv is up
+#        run: |
+#          docker ps
+#          docker inspect dev-php-backend
       - name: Setup Go to use access token for private repos
         env:
           GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
@@ -92,40 +82,23 @@ jobs:
         run: |
           mkdir logs
           cd go-backend
-          go run . &> ../logs/go-backend.log &
-#          go run . > ../logs/go-backend.log 2>&1 &
-      - name: Sleep to wait for go backend launch
-        run: |
-            sleep 5s
-      - name: Wait for /node/health healthcheck
-        run: |
-          curl --get http://localhost:8080/node/health --retry 30 --retry-delay 1 --retry-all-errors --fail-with-body --verbose
+          go run . > ../logs/go-backend.log 2>&1 &
+#      - name: Sleep to wait for go backend launch
+#        run: |
+#            sleep 5s
+#      - name: Wait for /node/health healthcheck
+#        run: |
+#          curl --get http://localhost:8080/node/health --retry 30 --retry-delay 1 --retry-all-errors --fail-with-body --verbose
       - name: Wait for Go backend ready healthcheck
         run: |
           curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --fail-with-body --verbose
       - name: Ping local backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
-      - name: Cat Go Backend logs
-        if: always()
-        run: |
-          cat logs/go-backend.log
-      - name: DEBUG STEP cat PHP container logs
-        if: always()
-        run: |
-          docker logs dev-php-backend
-      - name: Cat PHP Backend logs
-        if: always()
-        run: |
-          docker exec dev-php-backend cat storage/logs/laravel.log
-      - name: DEBUG STEP cat proxy access logs
-        if: always()
-        run: |
-          docker exec dev-backend-php-proxy cat /var/log/nginx/ll.access.log
-      - name: DEBUG STEP cat proxy erros logs
-        if: always()
-        run: |
-          docker exec dev-backend-php-proxy cat /var/log/nginx/ll.error.log
+#      - name: Cat Go Backend logs
+#        if: always()
+#        run: |
+#          cat logs/go-backend.log
       - name: Bring down Go Backend
         if: always()
         run: |
