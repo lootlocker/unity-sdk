@@ -460,6 +460,11 @@ jobs:
           oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
           tags: tag:ci
       - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        if: ${{ ENV.TARGET_ENVIRONMENT == 'LOCAL' }}
+        run: |
+          curl -X POST "http://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
+      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        if: ${{ ENV.TARGET_ENVIRONMENT != 'LOCAL' }}
         run: |
           curl -X POST "https://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
       - name: Set the project to use zerodep json
