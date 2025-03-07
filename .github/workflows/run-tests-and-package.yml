@@ -232,7 +232,6 @@ jobs:
   webgl-build-smoke-test:
     name: Test SDK in WebGL build
     runs-on: [ubuntu-latest]
-    if: ( false == true )
     #runs-on: [k8s]
     #container:
     #  image: ubuntu-latest
