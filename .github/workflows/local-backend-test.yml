@@ -59,6 +59,7 @@ jobs:
       - name: Check that devenv is up
         run: |
           docker inspect dev-php-backend
+          docker ps
       - name: Setup Go to use access token for private repos
         env:
           GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
