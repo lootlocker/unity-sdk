@@ -84,7 +84,10 @@ jobs:
       - name: Sleep to wait for devenv launch
         run: |
             sleep 20s
-      - name: Check that Go Backend is up
+      - name: Wait for /node/health healthcheck
+        run: |
+          curl --get http://localhost:8080/node/health --retry 30 --retry-delay 1 --retry-all-errors --verbose
+      - name: Wait for Go backend ready healthcheck
         run: |
           curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --verbose
       - name: Ping local backend
