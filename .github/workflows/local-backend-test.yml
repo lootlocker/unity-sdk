@@ -1,8 +1,9 @@
 name: Local Backend Test
 on:
-  push:
-    branches: # Made towards the following
-      - ci/*
+  workflow_call:
+#  push:
+#    branches: # Made towards the following
+#      - ci/*
 
 jobs:
   run-local-backend:
@@ -92,9 +93,9 @@ jobs:
       - name: Wait for Go backend ready healthcheck
         run: |
           curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --fail-with-body --verbose
-      - name: Ping local backend
-        run: |
-          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
+#      - name: Ping local backend
+#        run: |
+#          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
 #      - name: Cat Go Backend logs
 #        if: always()
 #        run: |
