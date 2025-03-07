@@ -59,42 +59,42 @@ jobs:
       - name: Check that devenv is up
         run: |
           docker inspect dev-php-backend
+      - name: Setup Go to use access token for private repos
+        env:
+          GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+        run: |
+          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          export GOPRIVATE=github.com/lootlocker/*
+          export GONOPROXY=localhost
+          export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Configure Go backend
+        run: |
+          cd go-backend
+          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
+          go run . jobs migrate
+      - name: Run Go Backend
+        run: |
+          mkdir logs
+          cd go-backend
+          go run . > ../logs/go-backend.log 2>&1 &
+          curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --verbose
+      - name: Ping local backend
+        run: |
+          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
+      - name: Cat Go Backend logs
+        if: always()
+        run: |
+          cat logs/go-backend.log
       - name: Cat PHP Backend logs
         if: always()
         run: |
           docker exec dev-php-backend pwd
           docker exec dev-php-backend ls -als storage/logs
           docker exec dev-php-backend cat storage/logs/laravel.log
-#      - name: Setup Go to use access token for private repos
-#        env:
-#          GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
-#        run: |
-#          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-#          export GOPRIVATE=github.com/lootlocker/*
-#          export GONOPROXY=localhost
-#          export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
-#      - name: Configure Go backend
-#        run: |
-#          cd go-backend
-#          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
-#          go run . jobs migrate
-#      - name: Run Go Backend
-#        run: |
-#          mkdir logs
-#          cd go-backend
-#          go run . > ../logs/go-backend.log 2>&1 &
-#          curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --verbose
-#      - name: Ping local backend
-#        run: |
-#          curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
-#      - name: Cat Go Backend logs
-#        if: always()
-#        run: |
-#          cat logs/go-backend.log
-#      - name: Bring down Go Backend
-#        if: always()
-#        run: |
-#          kill $(ps aux | grep '[g]o run .' | awk '{print $2}')
+      - name: Bring down Go Backend
+        if: always()
+        run: |
+          kill $(ps aux | grep '[g]o run .' | awk '{print $2}')
       - name: Bring down devenv
         if: always()
         run: |
