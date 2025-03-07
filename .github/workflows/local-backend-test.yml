@@ -99,6 +99,10 @@ jobs:
         if: always()
         run: |
           cat logs/go-backend.log
+      - name: Cat PHP Backend logs
+        if: always()
+        run: |
+          docker exec -it dev-php-backend cat storage/logs/laravel.log
       - name: Bring down Go Backend
         if: always()
         run: |
