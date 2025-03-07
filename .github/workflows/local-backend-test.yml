@@ -56,6 +56,10 @@ jobs:
           echo "DEV_ENV_PHP_BACKEND_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_REDIS_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_NATS_PLATFORM=linux/amd64" >> $GITHUB_ENV
+      - name: Create laravel log file
+        run: |
+          cd php-backend
+          echo "Hihi" > storage/logs/laravel.log
       - name: Launch devenv
         run: |
           cd devenv
@@ -87,7 +91,7 @@ jobs:
           mkdir logs
           cd go-backend
           go run . > ../logs/go-backend.log 2>&1 &
-      - name: Sleep to wait for devenv launch
+      - name: Sleep to wait for go backend launch
         run: |
             sleep 20s
       - name: Wait for /node/health healthcheck
