@@ -90,7 +90,7 @@ jobs:
         run: |
           mkdir logs
           cd go-backend
-          go run . &> ../logs/go-backend.log
+          go run . &> ../logs/go-backend.log &
 #          go run . > ../logs/go-backend.log 2>&1 &
       - name: Sleep to wait for go backend launch
         run: |
