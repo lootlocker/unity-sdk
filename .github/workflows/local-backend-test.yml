@@ -56,10 +56,13 @@ jobs:
           mage env:setupsilent dev false false
           mage env:upsilent dev
           mage deps:installsilent dev
+      - name: Sleep to wait for devenv launch
+        run: |
+            sleep 20s
       - name: Check that devenv is up
         run: |
-          docker inspect dev-php-backend
           docker ps
+          docker inspect dev-php-backend
       - name: Setup Go to use access token for private repos
         env:
           GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
@@ -78,6 +81,11 @@ jobs:
           mkdir logs
           cd go-backend
           go run . > ../logs/go-backend.log 2>&1 &
+      - name: Sleep to wait for devenv launch
+        run: |
+            sleep 20s
+      - name: Check that Go Backend is up
+        run: |
           curl --get http://localhost:9999/__/ready --retry 30 --retry-delay 1 --retry-all-errors --verbose
       - name: Ping local backend
         run: |
@@ -89,8 +97,6 @@ jobs:
       - name: Cat PHP Backend logs
         if: always()
         run: |
-          docker exec dev-php-backend pwd
-          docker exec dev-php-backend ls -als storage/logs
           docker exec dev-php-backend cat storage/logs/laravel.log
       - name: Bring down Go Backend
         if: always()
