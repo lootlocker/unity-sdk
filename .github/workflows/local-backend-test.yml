@@ -14,7 +14,7 @@ jobs:
         with:
           repository: lootlocker/devenv
           path: devenv
-          ref: bailando/ci-tester
+          ref: fix/create-non-interactive-mage-commands
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout php-backend repository
         uses: actions/checkout@v4
@@ -50,6 +50,12 @@ jobs:
         run: |
           docker -v
           docker compose version
+      - name: Configure devenv
+        run: |
+          echo "DEV_ENV_BACKEND_NEW_PHP_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_PHP_BACKEND_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_REDIS_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_NATS_PLATFORM=linux/amd64" >> $GITHUB_ENV
       - name: Launch devenv
         run: |
           cd devenv
