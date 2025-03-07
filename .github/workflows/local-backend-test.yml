@@ -112,10 +112,14 @@ jobs:
         if: always()
         run: |
           docker exec dev-php-backend cat storage/logs/laravel.log
-      - name: DEBUG STEP cat vttestserver logs
+      - name: DEBUG STEP cat proxy access logs
         if: always()
         run: |
-          docker container logs dev-vttestserver
+          docker exec dev-backend-php-proxy cat /var/logs/nginx/ll.access.log
+      - name: DEBUG STEP cat proxy erros logs
+        if: always()
+        run: |
+          docker exec dev-backend-php-proxy cat /var/logs/nginx/ll.error.log
       - name: Bring down Go Backend
         if: always()
         run: |
