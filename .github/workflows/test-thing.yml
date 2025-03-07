@@ -14,7 +14,7 @@ jobs:
         with:
           path: sdk
       - name: Run local backend
-        uses: ./.github/workflows/local-backend-test.yml
+        uses: ./sdk/.github/workflows/local-backend-test.yml
       - name: Signup to backend
         run: |
           curl --location --request POST "http://localhost:8080/admin/v1/signup" --header "Content-Type: application/json" --data-raw "{ \"organisation\": \"Some Organisation\", \"name\": \"Some One\", \"email\": \"dev@lootlocker.com\", \"password\": \"password\"}"
