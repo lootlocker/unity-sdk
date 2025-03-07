@@ -94,7 +94,7 @@ jobs:
 #          go run . > ../logs/go-backend.log 2>&1 &
       - name: Sleep to wait for go backend launch
         run: |
-            sleep 20s
+            sleep 5s
       - name: Wait for /node/health healthcheck
         run: |
           curl --get http://localhost:8080/node/health --retry 30 --retry-delay 1 --retry-all-errors --fail-with-body --verbose
@@ -115,11 +115,11 @@ jobs:
       - name: DEBUG STEP cat proxy access logs
         if: always()
         run: |
-          docker exec dev-backend-php-proxy cat /var/logs/nginx/ll.access.log
+          docker exec dev-backend-php-proxy cat /var/log/nginx/ll.access.log
       - name: DEBUG STEP cat proxy erros logs
         if: always()
         run: |
-          docker exec dev-backend-php-proxy cat /var/logs/nginx/ll.error.log
+          docker exec dev-backend-php-proxy cat /var/log/nginx/ll.error.log
       - name: Bring down Go Backend
         if: always()
         run: |
