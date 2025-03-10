@@ -16,6 +16,7 @@ namespace LootLockerTests.PlayMode
             public TestRateLimiter() : base()
             {
                 EnableRateLimiter = true;
+                FirstRequestSent = true;
             }
             private DateTime _currentTime;
             protected override DateTime GetTimeNow()
