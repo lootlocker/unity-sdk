@@ -196,24 +196,6 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    /*public class LookupPlayerNamesRequest
-    {
-        public ulong[] player_ids { get; set; }
-        public string[] player_public_uids { get; set; }
-        public ulong[] steam_ids { get; set; }
-        public ulong[] psn_ids { get; set; }
-        public string[] xbox_ids { get; set; }
-
-        public LookupPlayerNamesRequest()
-        {
-            player_ids = new ulong[] { };
-            player_public_uids = new string[] { };
-            steam_ids = new ulong[] { };
-            psn_ids = new ulong[] { };
-            xbox_ids = new string[] { };
-        }
-    }*/
-
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
         public ulong[] player_ids { get; set; }
