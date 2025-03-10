@@ -242,15 +242,16 @@ namespace LootLocker
 
         private void ConstructUrls()
         {
-            string startOfUrl = UrlProtocol;
+            string urlCore = GetUrlCore();
+            string startOfUrl = urlCore.Contains("localhost") ? "http://" : UrlProtocol;
             if (!string.IsNullOrEmpty(domainKey))
             {
                 startOfUrl += domainKey + ".";
             }
-            adminUrl = startOfUrl + GetUrlCore() + AdminUrlAppendage;
-            playerUrl = startOfUrl + GetUrlCore() + PlayerUrlAppendage;
-            userUrl = startOfUrl + GetUrlCore() + UserUrlAppendage;
-            baseUrl = startOfUrl + GetUrlCore();
+            adminUrl = startOfUrl + urlCore + AdminUrlAppendage;
+            playerUrl = startOfUrl + urlCore + PlayerUrlAppendage;
+            userUrl = startOfUrl + urlCore + UserUrlAppendage;
+            baseUrl = startOfUrl + urlCore;
         }
 
         private static LootLockerConfig _current;
