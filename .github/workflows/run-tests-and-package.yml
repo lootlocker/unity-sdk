@@ -338,7 +338,6 @@ jobs:
         with:
           repository: lootlocker/devenv
           path: devenv
-          ref: fix/create-non-interactive-mage-commands
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout php-backend repository
         uses: actions/checkout@v4
