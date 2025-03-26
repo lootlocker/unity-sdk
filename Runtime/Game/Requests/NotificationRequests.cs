@@ -117,6 +117,7 @@ namespace LootLocker.LootLockerStaticStrings
         /// </summary>
         public struct TwitchDrop
         {
+            public static readonly string TwitchRewardId = "twitch_reward_id";
         }
     }
 }
@@ -604,12 +605,11 @@ namespace LootLocker.Requests
                 var notification = Notifications[lookupEntry.NotificationIndex];
                 if (notification == null 
                     || !notification.Id.Equals(lookupEntry.NotificationId, StringComparison.OrdinalIgnoreCase) 
-                    || (!notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase) &&
-                        (!notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
+                    || (!notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
                         || actualContextValue == null 
                         || !actualContextValue.Equals(identifyingValue, StringComparison.OrdinalIgnoreCase)
                         )
-                    ))
+                    )
                 {
                     // The notifications array is not the same as when the lookup table was populated
                     return false;
@@ -663,20 +663,7 @@ namespace LootLocker.Requests
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase))
                 {
-                    var lookupEntry = new LootLockerNotificationLookupTableEntry
-                    {
-                        IdentifyingKey = LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop,
-                        NotificationId = notification.Id,
-                        NotificationIndex = i
-                    };
-                    if (NotificationLookupTable.TryGetValue(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, out var indexes))
-                    {
-                        indexes.Add(lookupEntry);
-                    }
-                    else
-                    {
-                        NotificationLookupTable.Add(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, new List<LootLockerNotificationLookupTableEntry> { lookupEntry });
-                    }
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.TwitchDrop.TwitchRewardId;
                 }
 
                 if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)

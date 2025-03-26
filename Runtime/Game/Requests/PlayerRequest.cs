@@ -8,83 +8,6 @@ using LLlibs.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
-    #region DEPRECATED Legacy Player Info
-    public class LootLockerGetPlayerInfoResponse : LootLockerResponse
-    {
-        public int? account_balance { get; set; }
-        public int? xp { get; set; }
-        public int? level { get; set; }
-        public string ulid { get; set; }
-        public LootLockerLevel_Thresholds level_thresholds { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerOtherPlayerInfoRequest : LootLockerGetRequest
-    {
-        public LootLockerOtherPlayerInfoRequest(string playerID, string platform = "")
-        {
-            getRequests.Add(playerID);
-            if (platform != "")
-            {
-                getRequests.Add(platform);
-            }
-        }
-    }
-    #endregion
-
-
-    #region DEPRECATED Legacy Progressions
-    [Serializable]
-    public class LootLockerXpSubmitResponse : LootLockerResponse
-    {
-        public LootLockerXp xp { get; set; }
-        public LootLockerLevel[] levels { get; set; }
-        public bool check_grant_notifications { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXpResponse : LootLockerResponse
-    {
-        public int? xp { get; set; }
-        public int? level { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXp
-    {
-        public int? previous { get; set; }
-        public int? current { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerLevel
-    {
-        public int? level { get; set; }
-        public int? xp_threshold { get; set; }
-    }
-    [Serializable]
-    public class LootLockerXpSubmitRequest
-    {
-        public int? points;
-
-        public LootLockerXpSubmitRequest(int points)
-        {
-            this.points = points;
-        }
-    }
-
-    [Serializable]
-    public class LootLockerXpRequest : LootLockerGetRequest
-    {
-        public LootLockerXpRequest()
-        {
-            getRequests.Clear();
-            getRequests.Add(LootLockerConfig.current.deviceID);
-            getRequests.Add(CurrentPlatform.GetString());
-        }
-    }
-    #endregion
-
     //==================================================
     // Data Definitions
     //==================================================
@@ -109,7 +32,7 @@ namespace LootLocker.Requests
     {
         public uint player_id { get; set; }
         public string player_public_uid { get; set; }
-        public string player_ulid { get; set; }
+        public string ulid { get; set; }
         public string name { get; set; }
         public string last_active_platform { get; set; }
         public string platform_player_id { get; set; }
@@ -196,24 +119,6 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    public class LookupPlayerNamesRequest
-    {
-        public ulong[] player_ids { get; set; }
-        public string[] player_public_uids { get; set; }
-        public ulong[] steam_ids { get; set; }
-        public ulong[] psn_ids { get; set; }
-        public string[] xbox_ids { get; set; }
-
-        public LookupPlayerNamesRequest()
-        {
-            player_ids = new ulong[] { };
-            player_public_uids = new string[] { };
-            steam_ids = new ulong[] { };
-            psn_ids = new ulong[] { };
-            xbox_ids = new string[] { };
-        }
-    }
-
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
         public ulong[] player_ids { get; set; }
@@ -224,12 +129,6 @@ namespace LootLocker.Requests
             player_ids = new ulong[] { };
             player_public_uids = new string[] { };
         }
-    }
-
-    public class LootLockerPlayerFileRequest
-    {
-        public string purpose { get; set; }
-        public string path_to_file { get; set; }
     }
 
     /// <summary>
@@ -357,35 +256,15 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void LookupPlayerNames(LookupPlayerNamesRequest lookupPlayerNamesRequest, Action<PlayerNameLookupResponse> onComplete)
+        public static void LookupPlayerNames(string idType, string[] identifiers, Action<PlayerNameLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayerNames;
 
             var getVariable = endPoint.endPoint + "?";
 
-            foreach (var playerID in lookupPlayerNamesRequest.player_ids)
+            foreach (string identifier in identifiers)
             {
-                getVariable += $"player_id={playerID}&";
-            }
-
-            foreach (var playerPublicUID in lookupPlayerNamesRequest.player_public_uids)
-            {
-                getVariable += $"player_public_uid={playerPublicUID}&";
-            }
-
-            foreach (var steamID in lookupPlayerNamesRequest.steam_ids)
-            {
-                getVariable += $"steam_id={steamID}&";
-            }
-
-            foreach (var psnID in lookupPlayerNamesRequest.psn_ids)
-            {
-                getVariable += $"psn_id={psnID}&";
-            }
-
-            foreach (var xboxID in lookupPlayerNamesRequest.xbox_ids)
-            {
-                getVariable += $"xbox_id={xboxID}&";
+                getVariable += $"{idType}={identifier}&";
             }
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });

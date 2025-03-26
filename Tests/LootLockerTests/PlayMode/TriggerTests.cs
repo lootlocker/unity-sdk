@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace LootLockerTests.PlayMode
 {
-    [Ignore("Stage can't handle asset creation, check back in 2025 to enable")]
     public class TriggerTests
     {
         private LootLockerTestGame gameUnderTest = null;
