@@ -929,6 +929,25 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// <summary>
+        /// Connect an account (authorized using a remote session) to the currently logged in LootLocker account allowing that authentication method to start sessions for this player
+        /// </summary>
+        /// <param name="Code">The lease code returned with the response when starting a lease process</param>
+        /// <param name="Nonce">The nonce returned with the response when starting a lease process</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerResponse> onComplete)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                return;
+            }
+            
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectRemoteSessionToAccountRequest() { Code = Code, Nonce = Nonce });
+
+            LootLockerServerRequest.CallAPI(LootLockerEndPoints.connectRemoteSessionToAccount.endPoint, LootLockerEndPoints.connectRemoteSessionToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
         #endregion
 
         #region Remote Sessions
@@ -952,7 +971,29 @@ namespace LootLocker.Requests
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.login, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+        }
+
+        /// <summary>
+        /// Start a remote session specifically intended to use for linking accounts together
+        /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
+        /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
+        /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
+        /// </summary>
+        /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
+        /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
+        /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
+        /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
+        public static Guid StartRemoteSessionForLinking(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                return Guid.Empty;
+            }
+
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.link, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
         }
 
         /// <summary>
