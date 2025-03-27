@@ -71,6 +71,20 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
+    public class LootLockerConnectRemoteSessionToAccountRequest
+    {
+        /// <summary>
+        /// The unique code for this leasing process, this is what identifies the leasing process and that is used to interact with it
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// The nonce used to sign usage of the lease code
+        /// </summary>
+        public string Nonce { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
     public class LootLockerConnectAppleRestProviderToAccountRequest
     {
         /// <summary>
