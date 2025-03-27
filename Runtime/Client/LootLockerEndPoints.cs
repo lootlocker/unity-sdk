@@ -25,10 +25,12 @@ namespace LootLocker
         public static EndPointClass listConnectedAccounts = new EndPointClass("v1/connected-accounts", LootLockerHTTPMethod.GET);
         public static EndPointClass disconnectAccount = new EndPointClass("v1/connected-accounts/{0}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass connectProviderToAccount = new EndPointClass("v1/connected-accounts/{0}", LootLockerHTTPMethod.PUT);
+        public static EndPointClass connectRemoteSessionToAccount = new EndPointClass("v1/connected-accounts/attach", LootLockerHTTPMethod.PUT);
 
         // Remote Sessions
         [Header("Remote Sessions")]
         public static EndPointClass leaseRemoteSession = new EndPointClass("session/remote/lease", LootLockerHTTPMethod.POST);
+        public static EndPointClass leaseRemoteSessionForLinking = new EndPointClass("session/remote/link/lease", LootLockerHTTPMethod.POST);
         public static EndPointClass startRemoteSession = new EndPointClass("session/remote", LootLockerHTTPMethod.POST);
 
         // White Label Login

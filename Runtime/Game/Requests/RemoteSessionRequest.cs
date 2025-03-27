@@ -21,6 +21,15 @@ namespace LootLocker.LootLockerEnums
         Timed_out = 5,
         Failed = 6
     };
+
+    /// <summary>
+    /// The intent for a remote session leasing process
+    /// </summary>
+    public enum LootLockerRemoteSessionLeaseIntent
+    {
+        login = 0,
+        link = 1
+    };
 }
 
 namespace LootLocker.Requests
@@ -208,13 +217,14 @@ namespace LootLocker
 
             #region Public Methods
             public static Guid StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent leaseIntent,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
                 float timeOutAfterMinutes = 5.0f)
             {
-                return GetInstance()._StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation,
+                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
                     timeOutAfterMinutes);
             }
@@ -342,7 +352,7 @@ namespace LootLocker
                 }
             }
 
-            private Guid _StartRemoteSessionWithContinualPolling(
+            private Guid _StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent leaseIntent,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
@@ -368,7 +378,7 @@ namespace LootLocker
                 };
                 AddRemoteSessionProcess(processGuid, lootLockerRemoteSessionProcess);
 
-                LeaseRemoteSession(leaseRemoteSessionResponse =>
+                LeaseRemoteSession(leaseIntent, leaseRemoteSessionResponse =>
                 {
                     if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                     {
@@ -399,12 +409,13 @@ namespace LootLocker
                 }
             }
 
-            private void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
+            private void LeaseRemoteSession(LootLockerRemoteSessionLeaseIntent leaseIntent,
+                Action<LootLockerLeaseRemoteSessionResponse> onComplete)
             {
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
                     new LootLockerLeaseRemoteSessionRequest();
 
-                EndPointClass endPoint = LootLockerEndPoints.leaseRemoteSession;
+                EndPointClass endPoint = leaseIntent == LootLockerRemoteSessionLeaseIntent.login ? LootLockerEndPoints.leaseRemoteSession : LootLockerEndPoints.leaseRemoteSessionForLinking;
                 LootLockerServerRequest.CallAPI(null, endPoint.endPoint,
                     endPoint.httpMethod,
                     LootLockerJson.SerializeObject(leaseRemoteSessionRequest),
