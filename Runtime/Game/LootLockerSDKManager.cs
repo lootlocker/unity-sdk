@@ -1409,7 +1409,7 @@ namespace LootLocker.Requests
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
         public static Guid StartRemoteSessionForLinking(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
         {
-            if (!CheckInitialized(true))
+            if (!CheckInitialized())
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
                 return Guid.Empty;
