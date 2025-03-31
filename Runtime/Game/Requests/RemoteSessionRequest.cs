@@ -422,7 +422,7 @@ namespace LootLocker
                     (serverResponse) =>
                         onComplete?.Invoke(
                             LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse)),
-                    false);
+                    leaseIntent == LootLockerRemoteSessionLeaseIntent.link);
             }
             private void StartRemoteSession(string leaseCode, string nonce, Action<LootLockerStartRemoteSessionResponse> onComplete)
             {
