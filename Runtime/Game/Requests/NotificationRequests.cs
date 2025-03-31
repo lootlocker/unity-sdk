@@ -661,6 +661,10 @@ namespace LootLocker.Requests
                 {
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.TransactionId;
                 }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.SteamStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.SteamStore.EntitlementId;
+                }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase))
                 {
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.TwitchDrop.TwitchRewardId;
