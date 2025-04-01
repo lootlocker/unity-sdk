@@ -40,7 +40,7 @@ namespace LootLocker.Extension
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetGameInformation;
 
-            string getVariable = string.Format(endPoint.endPoint, game_id);
+            string getVariable = endPoint.WithPathParameter(game_id);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
                 onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
@@ -68,7 +68,7 @@ namespace LootLocker.Extension
         public static void GetAllKeys(int game_id, Action<KeysResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetAllKeys;
-            string getVariable = string.Format(endPoint.endPoint, game_id);
+            string getVariable = endPoint.WithPathParameter(game_id);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
                 onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
@@ -78,7 +78,7 @@ namespace LootLocker.Extension
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionCreateKey;
 
-            string getVariable = string.Format(endPoint.endPoint, game_id);
+            string getVariable = endPoint.WithPathParameter(game_id);
 
             KeyCreationRequest data = new KeyCreationRequest();
             data.name = key_name;
@@ -102,7 +102,7 @@ namespace LootLocker.Extension
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetUserRole;
 
-            string getVariable = string.Format(endPoint.endPoint, userId);
+            string getVariable = endPoint.WithPathParameter(userId);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
                 onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);

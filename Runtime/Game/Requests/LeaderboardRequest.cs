@@ -308,7 +308,7 @@ namespace LootLocker
         public static void GetMemberRank(LootLockerGetMemberRankRequest data, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getMemberRank;
-            string tempEndpoint = string.Format(endPoint.endPoint, data.leaderboardId, data.member_id);
+            string tempEndpoint = endPoint.WithPathParameters(data.leaderboardId, data.member_id);
             LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
 
@@ -323,7 +323,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, id);
+            string endPoint = requestEndPoint.WithPathParameter(id);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -333,7 +333,7 @@ namespace LootLocker
             EndPointClass requestEndPoint = LootLockerEndPoints.getAllMemberRanks;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.member_id, getRequests.count);
+            string endPoint = requestEndPoint.WithPathParameters(getRequests.member_id, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
@@ -349,7 +349,7 @@ namespace LootLocker
             EndPointClass requestEndPoint = LootLockerEndPoints.getScoreList;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardKey, getRequests.count);
+            string endPoint = requestEndPoint.WithPathParameters(getRequests.leaderboardKey, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
@@ -372,7 +372,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, id);
+            string endPoint = requestEndPoint.WithPathParameter(id);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

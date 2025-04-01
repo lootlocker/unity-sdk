@@ -63,7 +63,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getSingleKeyFromPersistentStorage;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -92,7 +92,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteKeyValue;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -101,7 +101,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersPublicKeyValuePairs;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

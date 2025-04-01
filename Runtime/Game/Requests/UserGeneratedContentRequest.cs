@@ -154,7 +154,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(getRequests.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -163,7 +163,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleAssetCandidate;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(getRequests.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -172,7 +172,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.deletingAnAssetCandidate;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -188,7 +188,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.addingFilesToAssetCandidates;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(getRequests.getRequests[0]);
 
             Dictionary<string, string> formData = new Dictionary<string, string>();
 
@@ -215,7 +215,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.removingFilesFromAssetCandidates;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0], data.getRequests[1]);
+            string endPoint = requestEndPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
