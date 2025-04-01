@@ -517,24 +517,7 @@ namespace LootLocker
         {
             string ep = endpoint.StartsWith("/") ? endpoint.Trim() : "/" + endpoint.Trim();
 
-            return (GetUrl(callerRole) + ep + GetQueryStringFromDictionary(queryParams)).Trim();
-        }
-
-        private string GetQueryStringFromDictionary(Dictionary<string, string> queryDict)
-        {
-            if (queryDict == null || queryDict.Count == 0) return string.Empty;
-
-            string query = "?";
-
-            foreach (KeyValuePair<string, string> pair in queryDict)
-            {
-                if (query.Length > 1)
-                    query += "&";
-
-                query += pair.Key + "=" + pair.Value;
-            }
-
-            return query;
+            return (GetUrl(callerRole) + ep + new LootLocker.Utilities.HTTP.QueryParamaterBuilder(queryParams).ToString()).Trim();
         }
 #endregion
     }

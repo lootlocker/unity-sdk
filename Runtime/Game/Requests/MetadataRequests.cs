@@ -2,6 +2,7 @@
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using System.Collections.Generic;
+using Ionic.Zlib;
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json.Linq;
@@ -413,23 +414,24 @@ namespace LootLocker
             }
             string formattedEndpoint = string.Format(LootLockerEndPoints.listMetadata.endPoint, Source.ToString(), SourceID);
 
-            string queryParams = "";
-            if (Page > 0) queryParams += $"page={Page}&";
-            if (PerPage > 0) queryParams += $"per_page={PerPage}&";
-            if (!string.IsNullOrEmpty(Key)) queryParams += $"key={Key}&";
-            if (Tags?.Length > 0) {
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page);
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage);
+            if (!string.IsNullOrEmpty(Key))
+                queryParams.Add("key", Key);
+            if (Tags?.Length > 0)
+            {
                 foreach (string tag in Tags)
                 {
-                    queryParams += $"tags={tag}&";
+                    queryParams.Add("tags", tag);
                 }
             }
-            if (ignoreFiles) { queryParams += $"ignore_files=true"; } else { queryParams += $"ignore_files=false"; }
 
-            if (!string.IsNullOrEmpty(queryParams))
-            {
-                queryParams = $"?{queryParams}";
-                formattedEndpoint += queryParams;
-            }
+            queryParams.Add("ignore_files", ignoreFiles ? "true" : "false");
+
+            formattedEndpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(formattedEndpoint, LootLockerEndPoints.listMetadata.httpMethod, onComplete:
                 (serverResponse) =>
@@ -452,14 +454,11 @@ namespace LootLocker
             }
             string endpoint = LootLockerEndPoints.getMultisourceMetadata.endPoint;
 
-            string queryParams = "";
-            if (ignoreFiles) { queryParams += $"ignore_files=true"; } else { queryParams += $"ignore_files=false"; }
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
 
-            if (!string.IsNullOrEmpty(queryParams))
-            {
-                queryParams = $"?{queryParams}";
-                endpoint += queryParams;
-            }
+            queryParams.Add("ignore_files", ignoreFiles ? "true" : "false");
+
+            endpoint += queryParams.Build();
 
             foreach (LootLockerMetadataSourceAndKeys sourcePair in SourcesAndKeysToGet)
             {
