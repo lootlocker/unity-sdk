@@ -260,33 +260,32 @@ namespace LootLocker
         {
             var endPoint = LootLockerEndPoints.lookupPlayerNames;
 
-            var getVariable = endPoint.endPoint + "?";
-
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             foreach (string identifier in identifiers)
             {
-                getVariable += $"{idType}={identifier}&";
+                queryParams.Add(idType, identifier);
             }
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
         public static void LookupPlayer1stPartyPlatformIDs(LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayer1stPartyPlatformIDs;
 
-            var getVariable = endPoint.endPoint + "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
 
             foreach (var playerID in lookupPlayer1stPartyPlatformIDsRequest.player_ids)
             {
-                getVariable += $"player_id={playerID}&";
+                queryParams.Add("player_id", playerID);
             }
 
             foreach (var playerPublicUID in lookupPlayer1stPartyPlatformIDsRequest.player_public_uids)
             {
-                getVariable += $"player_public_uid={playerPublicUID}&";
+                queryParams.Add("player_public_uid", playerPublicUID);
             }
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
