@@ -127,7 +127,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingASingleEvent;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -136,7 +136,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.startingEvent;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -153,7 +153,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.finishingEvent;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
