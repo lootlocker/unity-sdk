@@ -70,7 +70,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleMission;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
@@ -79,7 +79,7 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.startingMission;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
@@ -96,7 +96,7 @@ namespace LootLocker
 
             EndPointClass requestEndPoint = LootLockerEndPoints.finishingMission;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, data.getRequests[0]);
+            string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
