@@ -7,7 +7,7 @@ namespace LootLocker.Utilities.HTTP
 {
     public class QueryParamaterBuilder
     {
-        private List<KeyValuePair<string, string>> _queryParams;
+        private List<KeyValuePair<string, string>> _queryParams = null;
 
         public QueryParamaterBuilder()
         {
@@ -16,12 +16,12 @@ namespace LootLocker.Utilities.HTTP
 
         public QueryParamaterBuilder(List<KeyValuePair<string, string>> queryParams)
         {
-            _queryParams = queryParams;
+            _queryParams = queryParams ?? new List<KeyValuePair<string, string>>();
         }
 
         public QueryParamaterBuilder(Dictionary<string, string> queryParams)
         {
-            _queryParams = queryParams.ToList();
+            _queryParams = queryParams != null ? queryParams.ToList() : new List<KeyValuePair<string, string>>();
         }
 
         public void Add(string key, string value)
@@ -30,7 +30,7 @@ namespace LootLocker.Utilities.HTTP
             {
                 return;
             }
-            _queryParams.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode(value)));
+            _queryParams?.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode(value)));
         }
 
         public void Add(string key, int value)
@@ -39,7 +39,7 @@ namespace LootLocker.Utilities.HTTP
             {
                 return;
             }
-            _queryParams.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode($"{value}")));
+            _queryParams?.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode($"{value}")));
         }
 
         public void Add(string key, ulong value)
@@ -48,7 +48,7 @@ namespace LootLocker.Utilities.HTTP
             {
                 return;
             }
-            _queryParams.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode($"{value}")));
+            _queryParams?.Add(new KeyValuePair<string, string>(key, WebUtility.UrlEncode($"{value}")));
         }
 
         public string Build()
