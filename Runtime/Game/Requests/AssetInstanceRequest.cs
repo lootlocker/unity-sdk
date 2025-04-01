@@ -82,7 +82,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairsToAnInstance;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -99,7 +99,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.getAKeyValuePairById;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -116,7 +116,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.createKeyValuePair;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -133,7 +133,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.updateOneOrMoreKeyValuePair;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -150,7 +150,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.updateKeyValuePairById;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -159,7 +159,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -168,7 +168,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.inspectALootBox;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -177,7 +177,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.openALootBox;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -186,7 +186,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteAssetInstanceFromPlayerInventory;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

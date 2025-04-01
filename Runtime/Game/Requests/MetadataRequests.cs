@@ -2,7 +2,6 @@
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using System.Collections.Generic;
-using Ionic.Zlib;
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json.Linq;
@@ -412,7 +411,7 @@ namespace LootLocker
             {
                 SourceID = "self";
             }
-            string formattedEndpoint = string.Format(LootLockerEndPoints.listMetadata.endPoint, Source.ToString(), SourceID);
+            string formattedEndpoint = LootLockerEndPoints.listMetadata.WithPathParameters(Source.ToString(), SourceID);
 
             var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (Page > 0)
