@@ -1,5 +1,6 @@
 using LootLocker.Requests;
 using System;
+using System.Net;
 
 namespace LootLocker.Requests
 {
@@ -44,11 +45,11 @@ namespace LootLocker
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.ComputeAndLockDropTable;
 
-            string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId, AddAssetDetails.ToString().ToLower());
+            string endPoint = requestEndPoint.WithPathParameters(tableInstanceId, AddAssetDetails.ToString().ToLower());
 
             if (!string.IsNullOrEmpty(tag))
             {
-                string tempEndpoint = $"&tag={tag}";
+                string tempEndpoint = $"&tag={WebUtility.UrlEncode(tag)}";
                 endPoint += tempEndpoint;
             }
 
@@ -66,7 +67,7 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, tableInstanceId);
+            string endPoint = requestEndPoint.WithPathParameter(tableInstanceId);
 
             LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }

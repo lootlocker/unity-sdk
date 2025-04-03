@@ -197,7 +197,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersClassLoadouts;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0], data.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -214,7 +214,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.updateClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -265,7 +265,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.equipIDAssetToClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -282,7 +282,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.equipGlobalAssetToClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -291,7 +291,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.unEquipIDAssetToDefaultClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -300,7 +300,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.unEquipIDAssetToClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -318,7 +318,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersLoadoutToDefaultClass;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
+            string getVariable = endPoint.WithPathParameters(lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

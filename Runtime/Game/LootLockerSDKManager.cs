@@ -863,7 +863,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.disconnectAccount.endPoint, accountToDisconnect);
+            string endpoint = LootLockerEndPoints.disconnectAccount.WithPathParameter(accountToDisconnect);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
@@ -881,7 +881,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("google");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountRequest{id_token = idToken });
 
@@ -902,7 +902,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("google");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountWithPlatformRequest() { id_token = idToken, platform = platform });
 
@@ -922,7 +922,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "apple-rest");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("apple-rest");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectAppleRestProviderToAccountRequest() { authorization_code = authorizationCode });
 
@@ -1346,12 +1346,13 @@ namespace LootLocker.Requests
 
             var endpoint = LootLockerEndPoints.getInventory.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
+                queryParams.Add("count", count);
             if (after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -1814,7 +1815,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleplayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.getSingleplayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -1846,7 +1847,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getPlayerFilesByPlayerId.endPoint, playerId);
+            var endpoint = LootLockerEndPoints.getPlayerFilesByPlayerId.WithPathParameter(playerId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2021,7 +2022,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
@@ -2055,7 +2056,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
@@ -2078,7 +2079,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
@@ -2100,7 +2101,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deletePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.deletePlayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2124,12 +2125,13 @@ namespace LootLocker.Requests
 
             var endpoint = LootLockerEndPoints.getAllPlayerProgressions.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2166,7 +2168,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSinglePlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getSinglePlayerProgression.WithPathParameter(progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2185,7 +2187,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToPlayerProgression.WithPathParameter(progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
@@ -2206,7 +2208,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromPlayerProgression.WithPathParameter(progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
@@ -2226,7 +2228,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.resetPlayerProgression.WithPathParameter(progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2244,7 +2246,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deletePlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.deletePlayerProgression.WithPathParameter(progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2274,14 +2276,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getAllOtherPlayersProgressions.endPoint, playerUlid);
+            var endpoint = LootLockerEndPoints.getAllOtherPlayersProgressions.WithPathParameter(playerUlid);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2321,7 +2324,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleOtherPlayersProgression.endPoint, progressionKey, playerUlid);
+            var endpoint = LootLockerEndPoints.getSingleOtherPlayersProgression.WithPathParameters(progressionKey, playerUlid);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -2965,14 +2968,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getAllCharacterProgressions.endPoint, characterId);
+            var endpoint = LootLockerEndPoints.getAllCharacterProgressions.WithPathParameter(characterId);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3012,7 +3016,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3032,7 +3036,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
@@ -3054,7 +3058,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
@@ -3075,7 +3079,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.resetCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3094,7 +3098,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deleteCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.deleteCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3711,14 +3715,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getAllAssetInstanceProgressions.endPoint, assetInstanceId);
+            var endpoint = LootLockerEndPoints.getAllAssetInstanceProgressions.WithPathParameter(assetInstanceId);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3758,7 +3763,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3778,7 +3783,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });  
 
@@ -3800,7 +3805,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
             
             var body = LootLockerJson.SerializeObject(new { amount });
 
@@ -3821,7 +3826,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.resetAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -3840,7 +3845,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deleteAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.deleteAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -4089,12 +4094,13 @@ namespace LootLocker.Requests
 
             var endpoint = LootLockerEndPoints.getAllProgressions.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -4131,7 +4137,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleProgression.WithPathParameter(progressionKey);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -4151,14 +4157,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getProgressionTiers.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getProgressionTiers.WithPathParameter(progressionKey);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (after.HasValue && after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after ?? 0);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -4198,7 +4205,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getProgressionTier.endPoint, progressionKey, step);
+            var endpoint = LootLockerEndPoints.getProgressionTier.WithPathParameters(progressionKey, step);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -4778,12 +4785,13 @@ namespace LootLocker.Requests
 
             string endpoint = LootLockerEndPoints.listLeaderboards.endPoint;
 
-            if(count > 0 || after > 0) 
-                endpoint += endpoint.Contains("?") ? "&" : "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
+                queryParams.Add("count", count);
             if (after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listLeaderboards.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5047,7 +5055,7 @@ namespace LootLocker.Requests
             }
 
             EndPointClass endPoint = LootLockerEndPoints.listLeaderboardArchive;
-            string tempEndpoint = string.Format(endPoint.endPoint, leaderboard_key);
+            string tempEndpoint = endPoint.WithPathParameter(leaderboard_key);
             LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
 
@@ -5089,7 +5097,7 @@ namespace LootLocker.Requests
             
             EndPointClass endPoint = LootLockerEndPoints.getLeaderboardArchive;
 
-            string tempEndpoint = string.Format(endPoint.endPoint, key);
+            string tempEndpoint = endPoint.WithPathParameter(key);
 
             if (count > 0)
                 tempEndpoint += $"count={count}&";
@@ -5115,7 +5123,7 @@ namespace LootLocker.Requests
             }
 
             EndPointClass endPoint = LootLockerEndPoints.getLeaderboardData;
-            string formatedEndPoint = string.Format(endPoint.endPoint, leaderboard_key);
+            string formatedEndPoint = endPoint.WithPathParameter(leaderboard_key);
             LootLockerServerRequest.CallAPI(formatedEndPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
@@ -5285,7 +5293,7 @@ namespace LootLocker.Requests
 
             EndPointClass endPoint = LootLockerEndPoints.listFeedbackCategories;
 
-            var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
+            var formattedEndPoint = endPoint.WithPathParameter(type.ToString());
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5414,7 +5422,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.sendFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.sendFriendRequest.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5437,7 +5445,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.cancelOutgoingFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.cancelOutgoingFriendRequest.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.cancelOutgoingFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5460,7 +5468,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.acceptFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.acceptFriendRequest.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5483,7 +5491,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.declineFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.declineFriendRequest.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.declineFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5521,7 +5529,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.blockPlayer.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.blockPlayer.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5544,7 +5552,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.unblockPlayer.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.unblockPlayer.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5567,7 +5575,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.deleteFriend.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.deleteFriend.WithPathParameter(playerID);
 
             LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.deleteFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5603,7 +5611,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDetails.endPoint, currencyCode);
+            var endpoint = LootLockerEndPoints.getCurrencyDetails.WithPathParameter(currencyCode);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDetails.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5621,7 +5629,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDenominationsByCode.endPoint, currencyCode);
+            var endpoint = LootLockerEndPoints.getCurrencyDenominationsByCode.WithPathParameter(currencyCode);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDenominationsByCode.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5641,7 +5649,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>());
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.listBalancesInWallet.endPoint, walletId);
+            var endpoint = LootLockerEndPoints.listBalancesInWallet.WithPathParameter(walletId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5658,7 +5666,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.getWalletByWalletId.endPoint, walletId);
+            var endpoint = LootLockerEndPoints.getWalletByWalletId.WithPathParameter(walletId);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -5676,7 +5684,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderUlid);
+            var endpoint = LootLockerEndPoints.getWalletByHolderId.WithPathParameter(holderUlid);
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete:
                 (serverResponse) =>
@@ -5786,14 +5794,15 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>());
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.listCatalogItemsByKey.endPoint, catalogKey); 
-            
-            endpoint += "?";
-            if (count > 0)
-                endpoint += $"per_page={count}&";
+            var endpoint = LootLockerEndPoints.listCatalogItemsByKey.WithPathParameter(catalogKey);
 
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (count > 0)
+                queryParams.Add("per_page", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"cursor={after}&";
+                queryParams.Add("cursor", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
         }
@@ -5817,12 +5826,13 @@ namespace LootLocker.Requests
 
             string endpoint = LootLockerEndPoints.listEntitlementHistory.endPoint;
 
-            if(count > 0 || !string.IsNullOrEmpty(after)) 
-                endpoint += endpoint.Contains("?") ? "&" : "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"per_page={count}&";
+                queryParams.Add("per_page", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"cursor={after}&";
+                queryParams.Add("cursor", after);
+
+            endpoint += queryParams.Build();
 
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -5879,7 +5889,7 @@ namespace LootLocker.Requests
                 return;
             }
             
-            var endpoint = string.Format(LootLockerEndPoints.getSingleEntitlement.endPoint, entitlementId);
+            var endpoint = LootLockerEndPoints.getSingleEntitlement.WithPathParameter(entitlementId);
             LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 

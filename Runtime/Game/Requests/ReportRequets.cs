@@ -97,45 +97,25 @@ namespace LootLocker
         public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetRemovedUGCForPlayer;
-            string tempEndpoint = endPoint.endPoint;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
 
             if (!string.IsNullOrEmpty(input.After))
             {
-                tempEndpoint = tempEndpoint + "?after={0}";
-                tempEndpoint = string.Format(tempEndpoint, input.After);
+                queryParams.Add("after", input.After);
             }
 
             if (input.Count > 0)
             {
-                if (tempEndpoint.IndexOf("?") > -1)
-                {
-                    tempEndpoint = tempEndpoint + "&";
-                }
-                else
-                {
-                    tempEndpoint = tempEndpoint + "?";
-                }
-
-                tempEndpoint = tempEndpoint + "count={0}";
-                tempEndpoint = string.Format(tempEndpoint, input.Count);
+                queryParams.Add("count", input.Count);
             }
 
             if (!string.IsNullOrEmpty(input.Since))
             {
-                if (tempEndpoint.IndexOf("?") > -1)
-                {
-                    tempEndpoint = tempEndpoint + "&";
-                }
-                else
-                {
-                    tempEndpoint = tempEndpoint + "?";
-                }
-
-                tempEndpoint = tempEndpoint + "since={0}";
-                tempEndpoint = string.Format(tempEndpoint, input.Since);
+                queryParams.Add("since", input.Since);
             }
 
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void CreatePlayerReport(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)

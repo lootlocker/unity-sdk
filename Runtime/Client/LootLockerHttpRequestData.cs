@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using LootLocker.LootLockerEnums;
 using UnityEngine;
 
@@ -226,24 +228,7 @@ namespace LootLocker.HTTP
                     break;
             }
 
-            return (urlBase + trimmedEndpoint + GetQueryParameterStringFromDictionary(queryParams)).Trim();
-        }
-
-        public static string GetQueryParameterStringFromDictionary(Dictionary<string, string> queryDict)
-        {
-            if (queryDict == null || queryDict.Count == 0) return string.Empty;
-
-            string query = "?";
-
-            foreach (KeyValuePair<string, string> pair in queryDict)
-            {
-                if (query.Length > 1)
-                    query += "&";
-
-                query += pair.Key + "=" + pair.Value;
-            }
-
-            return query;
+            return (urlBase + trimmedEndpoint + new LootLocker.Utilities.HTTP.QueryParamaterBuilder(queryParams).ToString()).Trim();
         }
         #endregion
     }

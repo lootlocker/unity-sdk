@@ -219,7 +219,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
@@ -228,7 +228,7 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
