@@ -41,7 +41,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
+        public static void ComputeAndLockDropTable(string forPlayerWithUlid, int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.ComputeAndLockDropTable;
 
@@ -53,15 +53,15 @@ namespace LootLocker
                 endPoint += tempEndpoint;
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
 
-        public static void PickDropsFromDropTable(PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
+        public static void PickDropsFromDropTable(string forPlayerWithUlid, PickDropsFromDropTableRequest data, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.PickDropsFromDropTable;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPickDropsFromDropTableResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPickDropsFromDropTableResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -69,7 +69,7 @@ namespace LootLocker
 
             string endPoint = requestEndPoint.WithPathParameter(tableInstanceId);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
     }
 }

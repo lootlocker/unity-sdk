@@ -215,14 +215,14 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetContext(Action<LootLockerContextResponse> onComplete)
+        public static void GetContext(string forPlayerWithUlid, Action<LootLockerContextResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingContexts;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
+        public static void GetAssetsOriginal(string forPlayerWithUlid, Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
             int UGCCreatorPlayerID = 0)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
@@ -275,7 +275,7 @@ namespace LootLocker
                 getVariable += tempEndpoint;
             }
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static string GetStringOfEnum(LootLocker.LootLockerEnums.AssetFilter filter)
@@ -306,7 +306,7 @@ namespace LootLocker
             return filterString;
         }
 
-        public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void GetAssetsById(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
 
@@ -319,10 +319,10 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameter(builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAssetById(LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
+        public static void GetAssetById(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
 
@@ -334,7 +334,7 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameter(builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (Action<LootLockerResponse>)((serverResponse) => {
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (Action<LootLockerResponse>)((serverResponse) => {
 
                 LootLockerAssetResponse assetListResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
                 LootLockerSingleAssetResponse singleAssetResponse = new LootLockerSingleAssetResponse();
@@ -350,54 +350,49 @@ namespace LootLocker
             }));
         }
 
-        public void ResetAssetCalls()
-        {
-            LootLockerAssetRequest.lastId = 0;
-        }
-
-        public static void GetAssetInformation(LootLockerGetRequest data, Action<LootLockerCommonAsset> onComplete)
+        public static void GetAssetInformation(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerCommonAsset> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetInformationForOneorMoreAssets;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
+        public static void ListFavouriteAssets(string forPlayerWithUlid, Action<LootLockerFavouritesListResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingFavouriteAssets;
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void AddFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void AddFavouriteAsset(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.addingFavouriteAssets;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void RemoveFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void RemoveFavouriteAsset(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.removingFavouriteAssets;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GrantAssetToPlayerInventory(LootLockerGrantAssetRequest data, Action<LootLockerGrantAssetResponse> onComplete)
+        public static void GrantAssetToPlayerInventory(string forPlayerWithUlid, LootLockerGrantAssetRequest data, Action<LootLockerGrantAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.grantAssetToPlayerInventory;
 
             string json = LootLockerJson.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
     }

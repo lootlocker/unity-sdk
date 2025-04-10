@@ -70,28 +70,28 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetAllKeyValuePairs(Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
+        public static void GetAllKeyValuePairs(string forPlayerWithUlid, Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairs;
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAllKeyValuePairsToAnInstance(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void GetAllKeyValuePairsToAnInstance(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairsToAnInstance;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAKeyValuePairById(LootLockerGetRequest data, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
+        public static void GetAKeyValuePairById(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetSingleKeyValuePairsResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetSingleKeyValuePairsResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -101,14 +101,14 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void CreateKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void CreateKeyValuePair(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -118,14 +118,14 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void UpdateOneOrMoreKeyValuePair(LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateOneOrMoreKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void UpdateOneOrMoreKeyValuePair(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateOneOrMoreKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -135,14 +135,14 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void UpdateKeyValuePairById(LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void UpdateKeyValuePairById(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, LootLockerCreateKeyValuePairRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -152,43 +152,43 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameters(lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void DeleteKeyValuePair(LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
+        public static void DeleteKeyValuePair(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteKeyValuePair;
 
             string getVariable = endPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void InspectALootBox(LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
+        public static void InspectALootBox(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerInspectALootBoxResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.inspectALootBox;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void OpenALootBox(LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
+        public static void OpenALootBox(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerOpenLootBoxResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.openALootBox;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void DeleteAssetInstanceFromPlayerInventory(LootLockerGetRequest data, Action<LootLockerResponse> onComplete)
+        public static void DeleteAssetInstanceFromPlayerInventory(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteAssetInstanceFromPlayerInventory;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
     }

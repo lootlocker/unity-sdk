@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace LootLocker.Requests
 {
-    public enum Platforms
+    public enum LL_AuthPlatforms
     {
         None
         ,Guest
@@ -25,25 +21,31 @@ namespace LootLocker.Requests
         ,Meta
         ,Remote
     }
-
-    public class LootLockerPlatformSettings
+    public struct LL_AuthPlatformRepresentation
     {
-        public static List<Platforms> PlatformsWithRefreshTokens = new List<Platforms> { Platforms.AppleGameCenter, Platforms.AppleSignIn, Platforms.Epic, Platforms.Google, Platforms.Remote };
-        public static List<Platforms> PlatformsWithStoredAuthData = new List<Platforms> { Platforms.Guest, Platforms.WhiteLabel, Platforms.AmazonLuna, Platforms.PlayStationNetwork, Platforms.XboxOne };
+        public LL_AuthPlatforms Platform { get; set; }
+        public string PlatformString { get; set; }
+        public string PlatformFriendlyString { get; set; }
     }
 
-    public class CurrentPlatform
+    public class LootLockerAuthPlatformSettings
     {
-        static CurrentPlatform()
+        public static List<LL_AuthPlatforms> PlatformsWithRefreshTokens = new List<LL_AuthPlatforms> { LL_AuthPlatforms.AppleGameCenter, LL_AuthPlatforms.AppleSignIn, LL_AuthPlatforms.Epic, LL_AuthPlatforms.Google, LL_AuthPlatforms.Remote };
+        public static List<LL_AuthPlatforms> PlatformsWithStoredAuthData = new List<LL_AuthPlatforms> { LL_AuthPlatforms.Guest, LL_AuthPlatforms.WhiteLabel, LL_AuthPlatforms.AmazonLuna, LL_AuthPlatforms.PlayStationNetwork, LL_AuthPlatforms.XboxOne };
+    }
+
+    public class LootLockerAuthPlatform
+    {
+        static LootLockerAuthPlatform()
         {
-            if (PlatformStrings.Length != Enum.GetNames(typeof(Platforms)).Length)
+            if (PlatformStrings.Length != Enum.GetNames(typeof(LL_AuthPlatforms)).Length)
             {
-                throw new ArrayTypeMismatchException($"A Platform is missing a string representation, {PlatformStrings.Length} vs {Enum.GetNames(typeof(Platforms)).Length}");
+                throw new ArrayTypeMismatchException($"A Platform is missing a string representation, {PlatformStrings.Length} vs {Enum.GetNames(typeof(LL_AuthPlatforms)).Length}");
             }
 
-            if (PlatformFriendlyStrings.Length != Enum.GetNames(typeof(Platforms)).Length)
+            if (PlatformFriendlyStrings.Length != Enum.GetNames(typeof(LL_AuthPlatforms)).Length)
             {
-                throw new ArrayTypeMismatchException($"A Platform is missing a friendly name, {PlatformFriendlyStrings.Length} vs {Enum.GetNames(typeof(Platforms)).Length}");
+                throw new ArrayTypeMismatchException($"A Platform is missing a friendly name, {PlatformFriendlyStrings.Length} vs {Enum.GetNames(typeof(LL_AuthPlatforms)).Length}");
             }
         }
 
@@ -85,63 +87,14 @@ namespace LootLocker.Requests
             ,"Remote" // Remote (leased) session
         };
 
-        public struct PlatformRepresentation
+        public static LL_AuthPlatformRepresentation GetPlatformRepresentation(LL_AuthPlatforms platform)
         {
-            public Platforms Platform { get; set; }
-            public string PlatformString { get; set; }
-            public string PlatformFriendlyString { get; set; }
-        }
-
-        private static PlatformRepresentation current;
-
-        public override string ToString()
-        {
-            return current.PlatformString;
-        }
-
-        public static Platforms Get()
-        {
-            return current.Platform;
-        }
-
-        public static string GetString()
-        {
-            return current.PlatformString;
-        }
-
-        public static string GetFriendlyString()
-        {
-            return current.PlatformFriendlyString;
-        }
-
-        public static void Set(Platforms platform)
-        {
-            PlayerPrefs.SetInt("LastActivePlatform", (int)platform);
-            current = GetPlatformRepresentation(platform);
-        }
-
-        public static void Reset()
-        {
-            current = GetPlatformRepresentation(Platforms.None);
-        }
-
-        public static PlatformRepresentation GetPlatformRepresentation(Platforms platform)
-        {
-            return new PlatformRepresentation
+            return new LL_AuthPlatformRepresentation
             {
                 Platform = platform,
                 PlatformString = PlatformStrings[(int)platform],
                 PlatformFriendlyString = PlatformFriendlyStrings[(int)platform]
             };
         }
-
-
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            Reset();
-        }
-#endif
     }
 }

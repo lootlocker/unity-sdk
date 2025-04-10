@@ -4,15 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
-using System.Linq;
 using System.Text;
 using LootLocker.LootLockerEnums;
 using UnityEditor;
 using LootLocker.Requests;
-using Object = UnityEngine.Object;
-#if UNITY_EDITOR
-using UnityEditorInternal;
-#endif
 
 namespace LootLocker
 {
@@ -134,7 +129,7 @@ namespace LootLocker
                     if (!webRequest.isDone && timedOut)
                     {
                         LootLockerLogger.Log("Exceeded maxTimeOut waiting for a response from " + request.httpMethod + " " + url, LootLockerLogger.LogLevel.Warning);
-                        OnServerResponse?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>(request.endpoint + " timed out."));
+                        OnServerResponse?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>(request.endpoint + " timed out.", request.forPlayerWithUlid, request.requestStartTime));
                         yield break;
                     }
 
@@ -148,15 +143,17 @@ namespace LootLocker
                             statusCode = (int)webRequest.responseCode,
                             success = true,
                             text = webRequest.downloadHandler.text,
-                            errorData = null
+                            errorData = null,
+                            requestContext = new LootLockerRequestContext(request.forPlayerWithUlid, request.requestStartTime)
                         });
                         yield break;
                     }
 
-                    if (ShouldRetryRequest(webRequest.responseCode, _tries))
+                    var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(request.forPlayerWithUlid);
+                    if (ShouldRetryRequest(webRequest.responseCode, _tries, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform))
                     {
                         _tries++;
-                        RefreshTokenAndCompleteCall(request, (value) => { _tries = 0; OnServerResponse?.Invoke(value); });
+                        RefreshTokenAndCompleteCall(request, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform, (value) => { _tries = 0; OnServerResponse?.Invoke(value); });
                         yield break;
                     }
 
@@ -165,7 +162,9 @@ namespace LootLocker
                     {
                         statusCode = (int)webRequest.responseCode,
                         success = false,
-                        text = webRequest.downloadHandler.text
+                        text = webRequest.downloadHandler.text,
+                        errorData = null,
+                        requestContext = new LootLockerRequestContext(request.forPlayerWithUlid, request.requestStartTime)
                     };
 
                     try 
@@ -200,9 +199,9 @@ namespace LootLocker
 
 #region Private Methods
 
-        private static bool ShouldRetryRequest(long statusCode, int timesRetried)
+        private static bool ShouldRetryRequest(long statusCode, int timesRetried, LL_AuthPlatforms platform)
         {
-            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
+            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && platform != LL_AuthPlatforms.Steam && timesRetried < MaxRetries;
         }
 
         private static void LogResponse(LootLockerServerRequest request, long statusCode, string responseBody, float startTime, string unityWebRequestError)
@@ -272,119 +271,123 @@ namespace LootLocker
             { "LL-Instance-Identifier", System.Guid.NewGuid().ToString() }
         };
 
-        private void RefreshTokenAndCompleteCall(LootLockerServerRequest cachedRequest, Action<LootLockerResponse> onComplete)
+        private void RefreshTokenAndCompleteCall(LootLockerServerRequest cachedRequest, LL_AuthPlatforms platform, Action<LootLockerResponse> onComplete)
         {
-            switch (CurrentPlatform.Get())
+            switch (platform)
             {
-                case Platforms.Guest:
+                case LL_AuthPlatforms.Guest:
                     {
-                        LootLockerSDKManager.StartGuestSession(response =>
+                        LootLockerSDKManager.StartGuestSessionForPlayer(cachedRequest.forPlayerWithUlid, response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
                         });
                         return;
                     }
-                case Platforms.WhiteLabel:
+                case LL_AuthPlatforms.WhiteLabel:
                     {
                         LootLockerSDKManager.StartWhiteLabelSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
-                case Platforms.AppleGameCenter:
+                case LL_AuthPlatforms.AppleGameCenter:
                 {
                     if (ShouldRefreshUsingRefreshToken(cachedRequest))
                     {
                         LootLockerSDKManager.RefreshAppleGameCenterSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
                     LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
-                }
-                case Platforms.AppleSignIn:
-                {
+                    }
+                case LL_AuthPlatforms.AppleSignIn:
+                    {
                     if (ShouldRefreshUsingRefreshToken(cachedRequest))
                     {
                         LootLockerSDKManager.RefreshAppleSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
                     LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
-                case Platforms.Epic:
+                case LL_AuthPlatforms.Epic:
                 {
                     if (ShouldRefreshUsingRefreshToken(cachedRequest))
                     {
                         LootLockerSDKManager.RefreshEpicSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
                     LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
-                case Platforms.Google:
+                case LL_AuthPlatforms.Google:
                 {
                     if (ShouldRefreshUsingRefreshToken(cachedRequest))
                     {
                         LootLockerSDKManager.RefreshGoogleSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
                     LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
-                case Platforms.Remote:
+                case LL_AuthPlatforms.Remote:
                 {
                     if (ShouldRefreshUsingRefreshToken(cachedRequest))
                     {
                         LootLockerSDKManager.RefreshRemoteSession(response =>
                         {
                             CompleteCall(cachedRequest, response, onComplete);
-                        });
+                        }, cachedRequest.forPlayerWithUlid);
                         return;
                     }
                     LootLockerLogger.Log($"Token has expired, please refresh it", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
-                case Platforms.NintendoSwitch:
-                case Platforms.Steam:
+                case LL_AuthPlatforms.NintendoSwitch:
+                case LL_AuthPlatforms.Steam:
                 {
-                    LootLockerLogger.Log($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}", LootLockerLogger.LogLevel.Warning);
-                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                    LootLockerLogger.Log($"Token has expired and token refresh is not supported for {platform}", LootLockerLogger.LogLevel.Warning);
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
-                case Platforms.PlayStationNetwork:
-                case Platforms.XboxOne:
-                case Platforms.AmazonLuna:
+                case LL_AuthPlatforms.PlayStationNetwork:
+                case LL_AuthPlatforms.XboxOne:
+                case LL_AuthPlatforms.AmazonLuna:
                 {
-                    var sessionRequest = new LootLockerSessionRequest(LootLockerConfig.current.deviceID);
-                    LootLockerAPIManager.Session(sessionRequest, (response) =>
-                    {
-                        CompleteCall(cachedRequest, response, onComplete);
-                    });
+                    LootLockerServerRequest.CallAPI(null, 
+                        LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
+                        LootLockerJson.SerializeObject(new LootLockerSessionRequest(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.forPlayerWithUlid)?.Identifier, LL_AuthPlatforms.AmazonLuna)), 
+                        (serverResponse) =>
+                        {
+                            CompleteCall(cachedRequest, LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse), onComplete);
+                        }, 
+                        false
+                    );
                     return;
                 }
-                case Platforms.None:
+                case LL_AuthPlatforms.None:
                 default:
                 {
-                    LootLockerLogger.Log($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported", LootLockerLogger.LogLevel.Error);
-                    onComplete?.Invoke(LootLockerResponseFactory.NetworkError<LootLockerResponse>($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported", 401));
+                    LootLockerLogger.Log($"Token refresh for platform {platform} not supported", LootLockerLogger.LogLevel.Error);
+                    onComplete?.Invoke(LootLockerResponseFactory.NetworkError<LootLockerResponse>($"Token refresh for platform {platform} not supported", 401, cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                     return;
                 }
             }
@@ -393,7 +396,7 @@ namespace LootLocker
         private static bool ShouldRefreshUsingRefreshToken(LootLockerServerRequest cachedRequest)
         {
             // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
-            return (string.IsNullOrEmpty(cachedRequest.jsonPayload) || !cachedRequest.jsonPayload.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
+            return (string.IsNullOrEmpty(cachedRequest.jsonPayload) || !cachedRequest.jsonPayload.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.forPlayerWithUlid)?.RefreshToken);
         }
 
         private void CompleteCall(LootLockerServerRequest cachedRequest, LootLockerSessionResponse sessionRefreshResponse, Action<LootLockerResponse> onComplete)
@@ -401,18 +404,21 @@ namespace LootLocker
             if (!sessionRefreshResponse.success)
             {
                 LootLockerLogger.Log("Session refresh failed");
-                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                 return;
             }
 
             if (cachedRequest.retryCount >= 4)
             {
                 LootLockerLogger.Log("Session refresh failed");
-                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(cachedRequest.forPlayerWithUlid, cachedRequest.requestStartTime));
                 return;
             }
-
-            cachedRequest.extraHeaders["x-session-token"] = LootLockerConfig.current.token;
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.forPlayerWithUlid);
+            if (playerData != null && !string.IsNullOrEmpty(playerData.SessionToken))
+            {
+                cachedRequest.extraHeaders["x-session-token"] = playerData.SessionToken;
+            }
             SendRequest(cachedRequest, onComplete);
             cachedRequest.retryCount++;
         }

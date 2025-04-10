@@ -15,8 +15,8 @@ namespace LootLocker.Extension
             LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
             LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.None;
 
-            LootLockerServerRequest.CallAPI(endPoint, httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); LootLockerConfig.current.logLevel = logLevelSavedState; },
-                useAuthToken,
+            LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); LootLockerConfig.current.logLevel = logLevelSavedState; },
+                useAuthToken: useAuthToken,
                 callerRole: LootLockerEnums.LootLockerCallerRole.Admin);
 
         }

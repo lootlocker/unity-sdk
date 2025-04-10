@@ -45,34 +45,34 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete)
+        public static void GetEntirePersistentStorage(string forPlayerWithUlid, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getEntirePersistentStorage;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete)
+        public static void GetEntirePersistentStorage(string forPlayerWithUlid, Action<LootLockerGetPersistentStorageResponseDictionary> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getEntirePersistentStorage;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetSingleKeyPersistentStorage(LootLockerGetRequest data, Action<LootLockerGetPersistentSingle> onComplete)
+        public static void GetSingleKeyPersistentStorage(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerGetPersistentSingle> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getSingleKeyFromPersistentStorage;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        public static void UpdateOrCreateKeyValue(string forPlayerWithUlid, LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetPersistentStorageResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -80,30 +80,29 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.updateOrCreateKeyValue;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete:
-                (serverResponse) =>
-                {
-                    serverResponse.text = serverResponse.text.Replace("\"public\"", "\"is_public\"");
-                    LootLockerResponse.Deserialize(onComplete, serverResponse);
-                });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) =>
+            {
+                serverResponse.text = serverResponse.text.Replace("\"public\"", "\"is_public\"");
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
+            });
         }
 
-        public static void DeleteKeyValue(LootLockerGetRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        public static void DeleteKeyValue(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteKeyValue;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetOtherPlayersPublicKeyValuePairs(LootLockerGetRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        public static void GetOtherPlayersPublicKeyValuePairs(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersPublicKeyValuePairs;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

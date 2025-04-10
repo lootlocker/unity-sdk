@@ -41,13 +41,13 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete)
+        public static void GetAllMaps(string forPlayerWithUlid, Action<LootLockerMapsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAllMaps;
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

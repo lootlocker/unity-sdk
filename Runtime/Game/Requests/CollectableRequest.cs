@@ -74,21 +74,21 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete)
+        public static void GetCollectables(string forPlayerWithUlid, Action<LootLockerGetCollectablesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingCollectables;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, "", (serverResponse) =>
             {
                 onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerGetCollectablesResponse>(serverResponse));
             });
         }
 
-        public static void CollectItem(LootLockerCollectingAnItemRequest data, Action<LootLockerCollectItemResponse> onComplete)
+        public static void CollectItem(string forPlayerWithUlid, LootLockerCollectingAnItemRequest data, Action<LootLockerCollectItemResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCollectItemResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCollectItemResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -96,7 +96,7 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.collectingAnItem;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
             {
                 LootLockerCollectItemResponse response = new LootLockerCollectItemResponse();
                 if (serverResponse.success)
