@@ -196,26 +196,28 @@ namespace LootLocker
                     logLevel = LootLockerLogger.LogLevel.Info;
                     break;
             }
-            return CreateNewSettings(apiKey, gameVersion, domainKey, logLevel, logErrorsAsWarnings, allowTokenRefresh);
+            return CreateNewSettings(apiKey, gameVersion, domainKey, logLevel, logErrorsAsWarnings, allowTokenRefresh: allowTokenRefresh);
         }
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool errorsAsWarnings = false, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
             _current.logLevel = logLevel;
+            _current.logInBuilds = logInBuilds;
             _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
+#pragma warning disable CS0618 // Deprecated properties used
             _current.token = null;
+            _current.refreshToken = null;
+            _current.deviceID = null;
+#pragma warning restore CS0618 // Deprecated properties used
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
-            _current.refreshToken = null;
-            _current.gameID = 0;
-            _current.deviceID = null;
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             _current.CheckForSettingOverrides();
 #endif
@@ -230,13 +232,14 @@ namespace LootLocker
             _current.logLevel = LootLockerLogger.LogLevel.Info;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
+#pragma warning disable CS0618 // Deprecated properties used
             _current.token = null;
+            _current.refreshToken = null;
+            _current.deviceID = null;
+#pragma warning restore CS0618 // Deprecated properties used
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
-            _current.refreshToken = null;
-            _current.gameID = 0;
-            _current.deviceID = null;
             return true;
         }
 
@@ -292,7 +295,7 @@ namespace LootLocker
 #if LOOTLOCKER_TARGET_STAGE_ENV
            "api.stage.internal.dev.lootlocker.cloud";
 #else
-            null;
+            "localhost:8080";//null;
 #endif
         private static string GetUrlCore() { return string.IsNullOrEmpty(UrlCoreOverride) ? UrlCore : UrlCoreOverride; }
 

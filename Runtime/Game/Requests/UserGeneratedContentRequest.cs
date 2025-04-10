@@ -128,11 +128,11 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void CreatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void CreatingAnAssetCandidate(string forPlayerWithUlid, LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerUserGenerateContentResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -140,15 +140,15 @@ namespace LootLocker
 
             EndPointClass endPoint = LootLockerEndPoints.creatingAnAssetCandidate;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void UpdatingAnAssetCandidate(LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void UpdatingAnAssetCandidate(string forPlayerWithUlid, LootLockerCreatingOrUpdatingAnAssetCandidateRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.updatingAnAssetCandidate;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerUserGenerateContentResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -156,35 +156,35 @@ namespace LootLocker
 
             string endPoint = requestEndPoint.WithPathParameter(getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GettingASingleAssetCandidate(LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void GettingASingleAssetCandidate(string forPlayerWithUlid, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleAssetCandidate;
 
             string endPoint = requestEndPoint.WithPathParameter(getRequests.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void DeletingAnAssetCandidate(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void DeletingAnAssetCandidate(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.deletingAnAssetCandidate;
 
             string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
+        public static void ListingAssetCandidates(string forPlayerWithUlid, Action<LootLockerListingAssetCandidatesResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.listingAssetCandidates;
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, requestEndPoint.endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void AddingFilesToAssetCandidates(LootLockerAddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void AddingFilesToAssetCandidates(string forPlayerWithUlid, LootLockerAddingFilesToAssetCandidatesRequest data, LootLockerGetRequest getRequests, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.addingFilesToAssetCandidates;
 
@@ -208,16 +208,16 @@ namespace LootLocker
 
             byte[] fileData = System.IO.File.ReadAllBytes(data.filePath);
 
-            LootLockerServerRequest.UploadFile(endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType, formData, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, fileData, data.fileName, data.fileContentType, formData, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void RemovingFilesFromAssetCandidates(LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
+        public static void RemovingFilesFromAssetCandidates(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerUserGenerateContentResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.removingFilesFromAssetCandidates;
 
             string endPoint = requestEndPoint.WithPathParameters(data.getRequests[0], data.getRequests[1]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

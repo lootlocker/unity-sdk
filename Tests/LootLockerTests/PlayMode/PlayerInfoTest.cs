@@ -24,6 +24,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -67,11 +68,14 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -88,8 +92,11 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.logLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
         [UnityTest]
@@ -172,17 +179,19 @@ namespace LootLockerTests.PlayMode
                         expectedPlayerInfoToPlayerPublicUidMap.Add(playerInfo.public_uid, playerInfo);
                         expectedPlayerInfoToPlayerLegacyIdMap.Add(playerInfo.legacy_id, playerInfo);
                         playerCreateCompleted = true;
-                    });
+                    }, sessionResponse.player_ulid);
                 });
                 yield return new WaitUntil(() => playerCreateCompleted);
             }
 
             var guestSessionSucceeded = false;
             var guestSessionCompleted = false;
+            string guestUlid = null;
             LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
             {
-                guestSessionSucceeded = sessionResponse.success;
+                guestSessionSucceeded = sessionResponse?.success ?? false;
                 guestSessionCompleted = true;
+                guestUlid = sessionResponse?.player_ulid ?? string.Empty;
             });
             yield return new WaitUntil(() => guestSessionCompleted);
             Assert.IsTrue(guestSessionSucceeded, "Guest Session Start failed");
@@ -210,7 +219,7 @@ namespace LootLockerTests.PlayMode
             {
                 actualResponse = response;
                 listPlayerInfoCompleted = true;
-            });
+            }, guestUlid);
             yield return new WaitUntil(() => listPlayerInfoCompleted);
 
             Assert.IsTrue(actualResponse?.success, "ListPlayerInfo request failed");
@@ -227,6 +236,7 @@ namespace LootLockerTests.PlayMode
                 else if (j % 3 == 2)
                     Assert.IsTrue(expectedPlayerInfoToPlayerPublicUidMap.TryGetValue(actualPlayerInfo.public_uid, out expectedPlayerInfo));
 
+                Assert.IsNotNull(expectedPlayerInfo);
                 Assert.Greater(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(-5), "Player creation time was not as expected for player " + j);
                 Assert.LessOrEqual(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(5), "Player creation time was not as expected for player " + j);
                 Assert.AreEqual(expectedPlayerInfo.name, actualPlayerInfo.name, "Player name was not as expected for player " + j);

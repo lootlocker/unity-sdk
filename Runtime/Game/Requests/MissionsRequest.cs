@@ -59,36 +59,36 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetAllMissions(Action<LootLockerGetAllMissionsResponse> onComplete)
+        public static void GetAllMissions(string forPlayerWithUlid, Action<LootLockerGetAllMissionsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAllMissions;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
 
-        public static void GetMission(LootLockerGetRequest data, Action<LootLockerGetMissionResponse> onComplete)
+        public static void GetMission(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerGetMissionResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.gettingASingleMission;
 
             string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
 
-        public static void StartMission(LootLockerGetRequest data, Action<LootLockerStartMissionResponse> onComplete)
+        public static void StartMission(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerStartMissionResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.startingMission;
 
             string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
 
-        public static void FinishMission(LootLockerFinishMissionRequest data, Action<LootLockerFinishMissionResponse> onComplete)
+        public static void FinishMission(string forPlayerWithUlid, LootLockerFinishMissionRequest data, Action<LootLockerFinishMissionResponse> onComplete)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishMissionResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishMissionResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -98,7 +98,7 @@ namespace LootLocker
 
             string endPoint = requestEndPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
     }
 }

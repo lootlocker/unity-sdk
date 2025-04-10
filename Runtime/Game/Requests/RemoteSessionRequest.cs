@@ -224,10 +224,6 @@ namespace LootLocker
                 GetInstance()._CancelRemoteSessionProcess(processGuid);
             }
 
-            public static void RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
-            {
-                GetInstance()._RefreshRemoteSession(data, onComplete);
-            }
             #endregion
 
             #region Internal Workings
@@ -403,38 +399,13 @@ namespace LootLocker
                 }
             }
 
-            private void _RefreshRemoteSession(LootLockerRefreshRemoteSessionRequest data, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
-            {
-                if (data == null)
-                {
-                    onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerRefreshRemoteSessionResponse>());
-                    return;
-                }
-
-                string json = LootLockerJson.SerializeObject(data);
-                if (string.IsNullOrEmpty(json))
-                {
-                    return;
-                }
-                EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
-                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-                {
-                    var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
-                    LootLockerConfig.current.token = response.session_token;
-                    LootLockerConfig.current.deviceID = response.player_identifier;
-                    LootLockerConfig.current.playerULID = response.player_ulid;
-                    LootLockerConfig.current.refreshToken = response.refresh_token;
-                    onComplete?.Invoke(response);
-                }, false);
-            }
-
             private void LeaseRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> onComplete)
             {
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
                     new LootLockerLeaseRemoteSessionRequest();
 
                 EndPointClass endPoint = LootLockerEndPoints.leaseRemoteSession;
-                LootLockerServerRequest.CallAPI(endPoint.endPoint,
+                LootLockerServerRequest.CallAPI(null, endPoint.endPoint,
                     endPoint.httpMethod,
                     LootLockerJson.SerializeObject(leaseRemoteSessionRequest),
                     (serverResponse) =>
@@ -451,7 +422,7 @@ namespace LootLocker
                 };
 
                 EndPointClass endPoint = LootLockerEndPoints.startRemoteSession;
-                LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(remoteSessionRequest), (serverResponse) =>
+                LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(remoteSessionRequest), (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerStartRemoteSessionResponse>(serverResponse);
                     if (!response.success)
@@ -462,11 +433,22 @@ namespace LootLocker
 
                     if (response.lease_status == LootLockerRemoteSessionLeaseStatus.Authorized)
                     {
-                        CurrentPlatform.Set(Platforms.Remote);
-                        LootLockerConfig.current.token = response.session_token;
-                        LootLockerConfig.current.refreshToken = response.refresh_token;
-                        LootLockerConfig.current.deviceID = response.player_ulid;
-                        LootLockerConfig.current.playerULID = response.player_ulid;
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Remote),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
                     }
 
                     onComplete?.Invoke(response);

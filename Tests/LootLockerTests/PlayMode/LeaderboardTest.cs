@@ -25,6 +25,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -100,11 +101,14 @@ namespace LootLockerTests.PlayMode
                 guestLoginCompleted = true;
             });
             yield return new WaitUntil(() => guestLoginCompleted);
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -121,8 +125,11 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.logLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
         [UnityTest]
@@ -152,7 +159,7 @@ namespace LootLockerTests.PlayMode
                 LootLockerSDKManager.SubmitScore(null, score, leaderboardKey, (response) => 
                 {
                     scoreSubmitted = true;
-                });
+                }, playerUlid);
                 yield return new WaitUntil(()=> scoreSubmitted);
                 Scores.Add(score);
             }
@@ -169,7 +176,7 @@ namespace LootLockerTests.PlayMode
 
             //Then
             Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
-            Assert.AreEqual(submittedScores, actualResponse.items.Length, "got more scores than expected");
+            Assert.AreEqual(submittedScores, actualResponse.items.Length, "Didn't get the expected number of scores");
             for (int i = 0; i < actualResponse.items.Length; i++)
             {
                 Assert.AreEqual(i+1, actualResponse.items[i].rank, $"Did not get expected rank order");

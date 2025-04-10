@@ -40,11 +40,11 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
+        public static void GetMessages(string forPlayerWithUlid, Action<LootLockerGetMessagesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getMessages;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

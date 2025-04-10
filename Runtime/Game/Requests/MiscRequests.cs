@@ -14,11 +14,11 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void Ping(Action<LootLockerPingResponse> onComplete)
+        public static void Ping(string forPlayerWithUlid, Action<LootLockerPingResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.ping;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
