@@ -23,12 +23,12 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
             LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
-            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Verbose;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Debug;
             LootLockerConfig.current.logErrorsAsWarnings = true;
             
             endPoint = endPoint.Replace("#GAMEID#", ActiveGameId.ToString());
 
-            LootLockerServerRequest.CallAPI(endPoint, httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
                     if (!serverResponse.success && serverResponse.errorData.retry_after_seconds > 0)
@@ -39,12 +39,9 @@ namespace LootLockerTestConfigurationUtils
                     }
                     LootLockerConfig.current.logLevel = logLevelSavedState;
                 },
-                useAuthToken,
+                useAuthToken: useAuthToken,
                 callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
-
-
-
     }
 
     public class LootLockerCIRetry : MonoBehaviour

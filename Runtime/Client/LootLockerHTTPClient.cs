@@ -23,7 +23,7 @@ namespace LootLocker
     {
         #region Make ServerRequest and call send (3 functions)
 
-        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
+        public static void CallAPI(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
             if (httpMethod == LootLockerHTTPMethod.GET || httpMethod == LootLockerHTTPMethod.HEAD || httpMethod == LootLockerHTTPMethod.OPTIONS)
             {
@@ -31,29 +31,29 @@ namespace LootLocker
                 {
                     LootLockerLogger.Log("Payloads can not be sent in GET, HEAD, or OPTIONS requests. Attempted to send a body to: " + httpMethod.ToString() + " " + endPoint, LootLockerLogger.LogLevel.Warning);
                 }
-                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeNoContentRequest(endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeNoContentRequest(forPlayerWithUlid, endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
             else
             {
-                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeJsonRequest(endPoint, httpMethod, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeJsonRequest(forPlayerWithUlid, endPoint, httpMethod, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
         }
 
-        public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
+        public static void UploadFile(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
             if (file == null || file.Length == 0)
             {
                 LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
-                onComplete(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
+                onComplete(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed.", forPlayerWithUlid, DateTime.Now));
                 return;
             }
 
-            LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeFileRequest(endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+            LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeFileRequest(forPlayerWithUlid, endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
         }
         
-        public static void UploadFile(EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
+        public static void UploadFile(string forPlayerWithUlid, EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
         {
-            UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole, additionalHeaders);
+            UploadFile(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole, additionalHeaders);
         }
 
         #endregion
@@ -225,12 +225,13 @@ namespace LootLocker
                     continue;
                 }
 
-                HandleRequestResult(executionItem, Result);                
+                HandleRequestResult(executionItem, Result);
             }
 
             // Bulk session refresh requests
             if (ExecutionItemsNeedingRefresh.Count > 0)
             {
+                UniqueList<string> refreshSessionsForPlayers = new UniqueList<string>();
                 foreach (string executionItemId in ExecutionItemsNeedingRefresh)
                 {
                     if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
@@ -238,42 +239,54 @@ namespace LootLocker
                         CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
                         executionItem.IsWaitingForSessionRefresh = true;
                         executionItem.RequestData.TimesRetried++;
-
+                        refreshSessionsForPlayers.AddUnique(executionItem.RequestData.ForPlayerWithUlid);
                         // Unsetting web request fields will make the execution queue retry it
                         executionItem.AbortRequest();
                     }
                 }
 
-                string tokenBeforeRefresh = LootLockerConfig.current.token;
-                StartCoroutine(RefreshSession(newSessionResponse =>
+                foreach (string refreshForPlayerUlid in refreshSessionsForPlayers)
                 {
-                    foreach (string executionItemId in ExecutionItemsNeedingRefresh)
+                    StartCoroutine(RefreshSession(refreshForPlayerUlid, newSessionResponse =>
                     {
-                        if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
+                        foreach (string executionItemId in ExecutionItemsNeedingRefresh)
                         {
-                            if (tokenBeforeRefresh.Equals(LootLockerConfig.current.token))
+                            if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
                             {
-                                // Session refresh failed so abort call chain
-                                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>());
-                            }
+                                if (!executionItem.RequestData.ForPlayerWithUlid.Equals(refreshForPlayerUlid))
+                                {
+                                    // This refresh callback was not for this user
+                                    continue;
+                                }
+                                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
+                                string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders["x-session-token"];
+                                string tokenAfterRefresh = playerData?.SessionToken;
+                                if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
+                                {
+                                    // Session refresh failed so abort call chain
+                                    CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
+                                    continue;
+                                }
 
-                            // Session refresh worked so update the session token header
-                            if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
-                            {
-#if UNITY_EDITOR
-                                executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
-#endif
-                            }
-                            else
-                            {
-                                executionItem.RequestData.ExtraHeaders["x-session-token"] = LootLockerConfig.current.token;
-                            }
+                                // Session refresh worked so update the session token header
+                                if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
+                                {
+    #if UNITY_EDITOR
+                                    executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
+    #endif
+                                }
+                                else
+                                {
+                                    executionItem.RequestData.ExtraHeaders["x-session-token"] = tokenAfterRefresh;
+                                }
 
-                            // Mark request as ready for continuation
-                            executionItem.IsWaitingForSessionRefresh = false;
+                                // Mark request as ready for continuation
+                                executionItem.IsWaitingForSessionRefresh = false;
+                            }
                         }
-                    }
-                }));
+                    }));
+
+                }
             }
 
             if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
@@ -298,22 +311,22 @@ namespace LootLocker
                     {
                         if(completedRequest.Response != null)
                         {
-                            completedRequest.RequestData.CallListenersWithResult(completedRequest.Response);
+                            CallListenersAndMarkDone(completedRequest, completedRequest.Response);
                         }
                         else if (completedRequest.WebRequest != null)
                         {
                             if (WebRequestSucceeded(completedRequest.WebRequest))
                             {
-                                completedRequest.RequestData.CallListenersWithResult(LootLockerResponseFactory.Success<LootLockerResponse>((int)completedRequest.WebRequest.responseCode, completedRequest.WebRequest.downloadHandler.text));
+                                CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.Success<LootLockerResponse>((int)completedRequest.WebRequest.responseCode, completedRequest.WebRequest.downloadHandler.text, completedRequest.RequestData.ForPlayerWithUlid));
                             }
                             else
                             {
-                                completedRequest.RequestData.CallListenersWithResult(ExtractFailureResponseFromExecutionItem(completedRequest));
+                                CallListenersAndMarkDone(completedRequest, ExtractFailureResponseFromExecutionItem(completedRequest));
                             }
                         }
                         else
                         {
-                            completedRequest.RequestData.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request completed but no response was present"));
+                            CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.ClientError<LootLockerResponse>("Request completed but no response was present", completedRequest.RequestData.ForPlayerWithUlid));
                         }
                     }
 
@@ -359,7 +372,7 @@ namespace LootLocker
             if (DenyIncomingRequestsWhenBackedUp && (HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
             {
                 // Execution queue is backed up, deny request
-                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request was denied because there are currently too many requests in queue"));
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request was denied because there are currently too many requests in queue", request.ForPlayerWithUlid, request.RequestStartTime));
                 yield break;
             }
 
@@ -375,7 +388,7 @@ namespace LootLocker
         {
             if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
             {
-                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
+                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, RateLimiter.Get().GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid));
                 return false;
             }
 
@@ -384,7 +397,7 @@ namespace LootLocker
             UnityWebRequest webRequest = CreateWebRequest(executionItem.RequestData);
             if (webRequest == null)
             {
-                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {executionItem.RequestData.Endpoint} failed because Unity Web Request could not be created"));
+                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {executionItem.RequestData.Endpoint} failed because Unity Web Request could not be created", executionItem.RequestData.ForPlayerWithUlid));
                 return false;
             }
 
@@ -420,9 +433,11 @@ namespace LootLocker
                 return HTTPExecutionQueueProcessingResult.Completed_Success;
             }
 
-            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
+
+            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
-                if (ShouldRefreshSession(executionItem.WebRequest.responseCode) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedData()))
+                if (ShouldRefreshSession(executionItem.WebRequest.responseCode, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
                 {
                     executionItem.IsWaitingForSessionRefresh = true;
                     return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
@@ -448,7 +463,7 @@ namespace LootLocker
                     }
                 case HTTPExecutionQueueProcessingResult.Completed_Success:
                     {
-                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.Success<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text));
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.Success<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid));
                     }
                     break;
                 case HTTPExecutionQueueProcessingResult.ShouldBeRetried:
@@ -459,7 +474,7 @@ namespace LootLocker
                             // If the retry after header suggests to retry after we'd have timed out the request then handle it as a failure
                             if (executionItem.RequestStartTime + RetryAfterHeader > LootLockerConfig.current.clientSideRequestTimeOut)
                             {
-                                LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
+                                LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid);
                                 response.errorData = ExtractErrorData(response);
                                 if (response.errorData != null)
                                 {
@@ -487,7 +502,7 @@ namespace LootLocker
                     }
                 case HTTPExecutionQueueProcessingResult.Completed_TimedOut:
                     {
-                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RequestTimeOut<LootLockerResponse>());
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RequestTimeOut<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
                     }
                     break;
                 case HTTPExecutionQueueProcessingResult.Completed_Failed:
@@ -508,102 +523,119 @@ namespace LootLocker
             CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
             executionItem.IsWaitingForSessionRefresh = false;
             executionItem.Done = true;
+            response.requestContext = new LootLockerRequestContext(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime);
             executionItem.Response = response;
             executionItem.RequestData.CallListenersWithResult(response);
             CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
         }
 
-        private IEnumerator RefreshSession(Action<LootLockerSessionResponse> onSessionRefreshedCallback)
+        private IEnumerator RefreshSession(string refreshForPlayerUlid, Action<LootLockerSessionResponse> onSessionRefreshedCallback)
         {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(refreshForPlayerUlid);
+            if (playerData == null)
+            {
+                LootLockerLogger.Log($"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", LootLockerLogger.LogLevel.Warning);
+                onSessionRefreshedCallback?.Invoke(LootLockerResponseFactory.Failure<LootLockerSessionResponse>(401, $"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", refreshForPlayerUlid));
+                yield break;
+            }
+
             LootLockerSessionResponse newSessionResponse = null;
             bool callCompleted = false;
-            switch (CurrentPlatform.Get())
+            switch (playerData.CurrentPlatform.Platform)
             {
-                case Platforms.Guest:
+                case LL_AuthPlatforms.Guest:
                     {
-                        LootLockerSDKManager.StartGuestSession(response =>
+                        LootLockerSDKManager.StartGuestSessionForPlayer(refreshForPlayerUlid, response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
                         });
                     }
                     break;
-                case Platforms.WhiteLabel:
+                case LL_AuthPlatforms.WhiteLabel:
                     {
                         LootLockerSDKManager.StartWhiteLabelSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, playerData.ULID);
                     }
                     break;
-                case Platforms.AppleGameCenter:
+                case LL_AuthPlatforms.AppleGameCenter:
                     {
                         LootLockerSDKManager.RefreshAppleGameCenterSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, refreshForPlayerUlid);
                     }
                     break;
-                case Platforms.AppleSignIn:
+                case LL_AuthPlatforms.AppleSignIn:
                     {
                         LootLockerSDKManager.RefreshAppleSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, refreshForPlayerUlid);
                     }
                     break;
-                case Platforms.Epic:
+                case LL_AuthPlatforms.Epic:
                     {
                         LootLockerSDKManager.RefreshEpicSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, refreshForPlayerUlid);
                     }
                     break;
-                case Platforms.Google:
+                case LL_AuthPlatforms.Google:
                     {
                         LootLockerSDKManager.RefreshGoogleSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, refreshForPlayerUlid);
                     }
                     break;
-                case Platforms.Remote:
+                case LL_AuthPlatforms.Remote:
                     {
                         LootLockerSDKManager.RefreshRemoteSession(response =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, refreshForPlayerUlid);
                     }
                     break;
-                case Platforms.PlayStationNetwork:
-                case Platforms.XboxOne:
-                case Platforms.AmazonLuna:
+                case LL_AuthPlatforms.PlayStationNetwork:
+                case LL_AuthPlatforms.XboxOne:
+                case LL_AuthPlatforms.AmazonLuna:
                     {
-                        LootLockerAPIManager.Session(new LootLockerSessionRequest(LootLockerConfig.current.deviceID), (response) =>
+                        LootLockerSDKManager.StartAmazonLunaSession(playerData.Identifier, (response) =>
                         {
                             newSessionResponse = response;
                             callCompleted = true;
                         });
                     }
                     break;
-                case Platforms.NintendoSwitch:
-                case Platforms.Steam:
+                case LL_AuthPlatforms.NintendoSwitch:
+                case LL_AuthPlatforms.Steam:
                     {
-                        LootLockerLogger.Log($"Token has expired and token refresh is not supported for {CurrentPlatform.GetFriendlyString()}", LootLockerLogger.LogLevel.Warning);
-                        yield break;
+                        LootLockerLogger.Log($"Token has expired and token refresh is not supported for {playerData.CurrentPlatform.PlatformFriendlyString}", LootLockerLogger.LogLevel.Warning);
+                        newSessionResponse =
+                            LootLockerResponseFactory
+                                .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
+                        callCompleted = true;
+                        break;
                     }
-                case Platforms.None:
+                case LL_AuthPlatforms.None:
                 default:
                     {
-                        LootLockerLogger.Log($"Token refresh for platform {CurrentPlatform.GetFriendlyString()} not supported", LootLockerLogger.LogLevel.Error);
-                        yield break;
+                        LootLockerLogger.Log($"Token refresh for platform {playerData.CurrentPlatform.PlatformFriendlyString} not supported", LootLockerLogger.LogLevel.Error);
+                        newSessionResponse =
+                            LootLockerResponseFactory
+                                .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
+                        callCompleted = true;
+                        break;
                     }
             }
             yield return new WaitUntil(() => callCompleted);
@@ -612,14 +644,14 @@ namespace LootLocker
 
         #region Session Refresh Helper Methods
 
-        private static bool ShouldRetryRequest(long statusCode, int timesRetried)
+        private static bool ShouldRetryRequest(long statusCode, int timesRetried, LL_AuthPlatforms platform)
         {
-            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
+            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && platform != LL_AuthPlatforms.Steam && timesRetried < MaxRetries;
         }
 
-        private static bool ShouldRefreshSession(long statusCode)
+        private static bool ShouldRefreshSession(long statusCode, LL_AuthPlatforms platform)
         {
-            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam;
+            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && platform != LL_AuthPlatforms.Steam;
         }
 
         private static bool IsAuthorizedRequest(LootLockerHTTPExecutionQueueItem request)
@@ -629,33 +661,38 @@ namespace LootLocker
 
         private static bool CanRefreshUsingRefreshToken(LootLockerHTTPRequestData cachedRequest)
         {
-            if (!LootLockerPlatformSettings.PlatformsWithRefreshTokens.Contains(CurrentPlatform.Get()))
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.ForPlayerWithUlid);
+            if (!LootLockerAuthPlatformSettings.PlatformsWithRefreshTokens.Contains(playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform))
             {
                 return false;
             }
             // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
             string json = cachedRequest.Content.dataType == LootLockerHTTPRequestDataType.JSON ? ((LootLockerJsonBodyRequestContent)cachedRequest.Content).jsonBody : null;
-            return (string.IsNullOrEmpty(json) || !json.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerConfig.current.refreshToken);
+            return (string.IsNullOrEmpty(json) || !json.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.ForPlayerWithUlid)?.RefreshToken);
         }
 
-        private static bool CanStartNewSessionUsingCachedData()
+        private static bool CanStartNewSessionUsingCachedAuthData(string forPlayerWithUlid)
         {
-            if (!LootLockerPlatformSettings.PlatformsWithStoredAuthData.Contains(CurrentPlatform.Get()))
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (playerData == null)
             {
                 return false;
             }
-            if (CurrentPlatform.Get() == Platforms.Guest)
+
+            if (!LootLockerAuthPlatformSettings.PlatformsWithStoredAuthData.Contains(playerData.CurrentPlatform.Platform))
+            {
+                return false;
+            }
+
+            if (playerData.CurrentPlatform.Platform == LL_AuthPlatforms.WhiteLabel 
+                && !string.IsNullOrEmpty(playerData.WhiteLabelEmail) 
+                && !string.IsNullOrEmpty(playerData.WhiteLabelToken))
             {
                 return true;
             }
-            else if (CurrentPlatform.Get() == Platforms.WhiteLabel && !string.IsNullOrEmpty(PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "")) && !string.IsNullOrEmpty(PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "")))
-            {
-                return true;
-            }
-            else
-            {
-                return !string.IsNullOrEmpty(LootLockerConfig.current.deviceID);
-            }
+           
+           
+            return !string.IsNullOrEmpty(playerData.Identifier);
         }
         #endregion
 
@@ -672,7 +709,7 @@ namespace LootLocker
 
         private LootLockerResponse ExtractFailureResponseFromExecutionItem(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text);
+            LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid);
             response.errorData = ExtractErrorData(response);
             if (response.errorData != null)
             {
@@ -700,7 +737,7 @@ namespace LootLocker
                 case LootLockerHTTPMethod.UPDATE_FILE:
                     if (request.Content.dataType != LootLockerHTTPRequestDataType.FILE)
                     {
-                        request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("File request without file content"));
+                        request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("File request without file content", request.ForPlayerWithUlid, request.RequestStartTime));
                         return null;
                     }
                     webRequest = UnityWebRequest.Post(request.FormattedURL, ((LootLockerFileRequestContent)request.Content).fileForm);
@@ -726,7 +763,7 @@ namespace LootLocker
                     }
                     break;
                 default:
-                    request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Unsupported HTTP Method"));
+                    request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Unsupported HTTP Method", request.ForPlayerWithUlid, request.RequestStartTime));
                     return webRequest;
             }
 

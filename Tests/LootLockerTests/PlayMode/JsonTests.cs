@@ -106,7 +106,7 @@ namespace LootLockerTests.PlayMode
         public void Json_SerializingSimpleJson_Succeeds()
         {
             // Given
-            LootLockerSessionRequest SessionRequest = new LootLockerSessionRequest("uuid-11223344");
+            LootLockerSessionRequest SessionRequest = new LootLockerSessionRequest("uuid-11223344", LL_AuthPlatforms.NintendoSwitch);
 
             // When
             string serializedJson = LootLockerJson.SerializeObject(SessionRequest);

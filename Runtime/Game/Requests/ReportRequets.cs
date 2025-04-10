@@ -88,13 +88,13 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        public static void GetReportTypes(string forPlayerWithUlid, Action<LootLockerReportsGetTypesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetTypes;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
+        public static void GetRemovedUGCForPlayer(string forPlayerWithUlid, GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.reportsGetRemovedUGCForPlayer;
 
@@ -115,35 +115,35 @@ namespace LootLocker
                 queryParams.Add("since", input.Since);
             }
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void CreatePlayerReport(ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
+        public static void CreatePlayerReport(string forPlayerWithUlid, ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreatePlayer;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreatePlayerResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreatePlayerResponse>(forPlayerWithUlid));
             	return;
             }
 
             string json = LootLockerJson.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void CreateAssetReport(ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
+        public static void CreateAssetReport(string forPlayerWithUlid, ReportsCreateAssetRequest data, Action<LootLockerReportsCreateAssetResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.reportsCreateAsset;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreateAssetResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerReportsCreateAssetResponse>(forPlayerWithUlid));
             	return;
             }
 
             string json = LootLockerJson.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, requestEndPoint.endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

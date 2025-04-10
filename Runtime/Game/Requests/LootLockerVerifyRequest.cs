@@ -7,22 +7,21 @@ namespace LootLocker.Requests
     public class LootLockerVerifyRequest
     {
         public string key => LootLockerConfig.current.apiKey;
-        public string platform => CurrentPlatform.GetString();
+        public string platform { get; set; }
         public string token { get; set; }
 
-        public LootLockerVerifyRequest(string token)
+        public LootLockerVerifyRequest(string token, string platform)
         {
             this.token = token;
+            this.platform = platform;
         }
     }
 
     public class LootLockerVerifySteamRequest : LootLockerVerifyRequest
     {
-        public new string platform => CurrentPlatform.GetPlatformRepresentation(Platforms.Steam).PlatformString;
 
-        public LootLockerVerifySteamRequest(string token) : base(token)
+        public LootLockerVerifySteamRequest(string token) : base(token, LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Steam).PlatformString)
         {
-            this.token = token;
         }
     }
 
@@ -50,24 +49,24 @@ namespace LootLocker
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerVerifyResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerVerifyResponse>(null));
             	return;
             }
             string json = LootLockerJson.SerializeObject(data);
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, false);
+            LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, false);
         }
         public static void VerifyWithAppId(string token, int appId, Action<LootLockerVerifyResponse> onComplete)
         {
             if (string.IsNullOrEmpty(token))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerVerifyResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerVerifyResponse>(null));
                 return;
             }
             EndPointClass endPoint = LootLockerEndPoints.playerVerification;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(new LootLockerVerifySteamWithAppIdRequest(token, appId)), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, false);
+            LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(new LootLockerVerifySteamWithAppIdRequest(token, appId)), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, false);
         }
     }
 }

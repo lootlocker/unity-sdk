@@ -256,7 +256,7 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void LookupPlayerNames(string idType, string[] identifiers, Action<PlayerNameLookupResponse> onComplete)
+        public static void LookupPlayerNames(string forPlayerWithUlid, string idType, string[] identifiers, Action<PlayerNameLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayerNames;
 
@@ -266,10 +266,10 @@ namespace LootLocker
                 queryParams.Add(idType, identifier);
             }
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
-        public static void LookupPlayer1stPartyPlatformIDs(LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
+        public static void LookupPlayer1stPartyPlatformIDs(string forPlayerWithUlid, LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayer1stPartyPlatformIDs;
 
@@ -285,7 +285,7 @@ namespace LootLocker
                 queryParams.Add("player_public_uid", playerPublicUID);
             }
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

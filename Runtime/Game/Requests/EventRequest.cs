@@ -114,38 +114,38 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete)
+        public static void GettingAllEvents(Action<LootLockerEventResponse> onComplete, string forPlayerWithUlid = null)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAllEvents;
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GettingASingleEvent(LootLockerGetRequest data, Action<LootLockerSingleEventResponse> onComplete)
+        public static void GettingASingleEvent(LootLockerGetRequest data, Action<LootLockerSingleEventResponse> onComplete, string forPlayerWithUlid = null)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingASingleEvent;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void StartingEvent(LootLockerGetRequest data, Action<LootLockerStartinEventResponse> onComplete)
+        public static void StartingEvent(LootLockerGetRequest data, Action<LootLockerStartinEventResponse> onComplete, string forPlayerWithUlid = null)
         {
             EndPointClass endPoint = LootLockerEndPoints.startingEvent;
 
             string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void FinishingEvent(LootLockerGetRequest lootLockerGetRequest, FinishEventRequest data, Action<LootLockerFinishEventResponse> onComplete)
+        public static void FinishingEvent(LootLockerGetRequest lootLockerGetRequest, FinishEventRequest data, Action<LootLockerFinishEventResponse> onComplete, string forPlayerWithUlid = null)
         {
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishEventResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerFinishEventResponse>(forPlayerWithUlid));
             	return;
             }
 
@@ -155,7 +155,7 @@ namespace LootLocker
 
             string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
