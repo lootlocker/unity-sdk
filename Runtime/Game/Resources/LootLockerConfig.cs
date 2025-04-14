@@ -271,25 +271,20 @@ namespace LootLocker
 
         public (string key, string value) dateVersion = ("LL-Version", "2021-03-01");
         public string apiKey;
-        [HideInInspector]
-        public string token;
 #if UNITY_EDITOR
-        [HideInInspector]
-        public string adminToken = null;
+        [HideInInspector] public string adminToken = null;
 #endif
-        [HideInInspector]
-        public string refreshToken;
-        [HideInInspector]
-        public string domainKey;
-        [HideInInspector]
-        public int gameID;
+        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
+        [HideInInspector] public string token;
+        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
+        [HideInInspector] public string refreshToken;
+        [HideInInspector] public string domainKey;
         public string game_version = "1.0.0.0";
-        [HideInInspector] 
-        public string sdk_version = "";
-        [HideInInspector]
-        public string deviceID = "defaultPlayerId";
-        [HideInInspector]
-        public string playerULID = null;
+        [HideInInspector] public string sdk_version = "";
+        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
+        [HideInInspector] public string deviceID = "defaultPlayerId";
+        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
+        [HideInInspector] public string playerULID = null;
 
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
