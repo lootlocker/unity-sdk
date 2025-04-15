@@ -9,6 +9,7 @@ using UnityEngine.TestTools;
 
 namespace LootLockerTests.PlayMode
 {
+    //TODO: Add more multi user tests testing all public methods
     public class MultiUserTests
     {
         private LootLockerTestGame gameUnderTest = null;
