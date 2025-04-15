@@ -50,6 +50,11 @@ namespace LootLocker
                 return;
             }
 
+            if (useAuthToken && string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = LootLockerStateData.GetDefaultPlayerULID();
+            }
+
             LootLockerLogger.Log("Caller Type: " + callerRole, LootLockerLogger.LogLevel.Debug);
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
