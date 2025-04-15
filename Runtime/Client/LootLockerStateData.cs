@@ -29,7 +29,7 @@ namespace LootLocker
     {
         public UniqueList<string> SavedPlayerStateULIDs { get; set; } = new UniqueList<string>();
         public string DefaultPlayer { get; set; }
-        public Dictionary<string, string> WhiteLabelEmailToPlayerUlidMap = new Dictionary<string, string>();
+        public Dictionary<string, string> WhiteLabelEmailToPlayerUlidMap { get; set; } = new Dictionary<string, string>();
         public bool MultiUserInitialLoadCompleted { get; set; } //TODO: Deprecated (or rather temporary) - Remove after 20251001
     }
 
@@ -228,7 +228,7 @@ namespace LootLocker
                 return data;
             }
 
-            if (LoadPlayerDataFromPlayerPrefs(playerULID))
+            if (LoadPlayerDataFromPlayerPrefs(playerULIDToGetDataFor))
             {
                 if (ActivePlayerData.TryGetValue(playerULIDToGetDataFor, out var data2))
                 {
