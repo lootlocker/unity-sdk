@@ -2142,7 +2142,7 @@ namespace LootLocker.Requests
                     return;
 
                 }
-                else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
+                else if (name.ToLower().Contains(playerData.Identifier.ToLower()))
                 {
                     onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed", forPlayerWithUlid));
                     return;

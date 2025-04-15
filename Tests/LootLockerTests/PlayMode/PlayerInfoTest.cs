@@ -167,13 +167,24 @@ namespace LootLockerTests.PlayMode
             for (int playersCreated = 0; playersCreated < playersToCreate; playersCreated++)
             {
                 bool playerCreateCompleted = false;
+                string errorMessage = null;
                 LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
                 {
-                    Assert.IsTrue(sessionResponse.success, "Guest Session failed");
+                    if (!sessionResponse.success)
+                    {
+                        errorMessage = sessionResponse.errorData.ToString();
+                        playerCreateCompleted = true;
+                        return;
+                    }
                     var playerInfo = new LootLockerPlayerInfo { created_at = sessionResponse.player_created_at, id = sessionResponse.player_ulid, name = sessionResponse.player_name, legacy_id = sessionResponse.player_id, public_uid = sessionResponse.public_uid };
                     LootLockerSDKManager.SetPlayerName(sessionResponse.public_uid, (setPlayerNameResponse) =>
                     {
-                        Assert.IsTrue(setPlayerNameResponse.success, "Setting player name failed");
+                        if (!setPlayerNameResponse.success)
+                        {
+                            errorMessage = setPlayerNameResponse.errorData.ToString();
+                            playerCreateCompleted = true;
+                            return;
+                        }
                         playerInfo.name = setPlayerNameResponse.name;
                         expectedPlayerInfoToPlayerIdMap.Add(playerInfo.id, playerInfo);
                         expectedPlayerInfoToPlayerPublicUidMap.Add(playerInfo.public_uid, playerInfo);
@@ -182,6 +193,7 @@ namespace LootLockerTests.PlayMode
                     }, sessionResponse.player_ulid);
                 });
                 yield return new WaitUntil(() => playerCreateCompleted);
+                Assert.IsNull(errorMessage, errorMessage);
             }
 
             var guestSessionSucceeded = false;
