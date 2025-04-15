@@ -1250,7 +1250,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListConnectedAccounts(Action<LootLockerListConnectedAccountsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>(forPlayerWithUlid));
                 return;
@@ -1269,7 +1269,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -1288,7 +1288,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ConnectGoogleAccount(string idToken, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -1310,7 +1310,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -1331,7 +1331,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -1875,7 +1875,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrentPlayerInfo(Action<LootLockerGetCurrentPlayerInfoResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentPlayerInfoResponse>(forPlayerWithUlid));
                 return;
@@ -1895,7 +1895,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListPlayerInfo(string[] playerIdsToLookUp, int[] playerLegacyIdsToLookUp, string[] playerPublicUidsToLookUp, Action<LootLockerListPlayerInfoResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlayerInfoResponse>(forPlayerWithUlid));
                 return;
@@ -1928,7 +1928,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetInventory(int count, int after, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
@@ -1954,7 +1954,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetInventory(Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
@@ -1970,7 +1970,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetInventory(int count, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
@@ -1988,7 +1988,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetBalance(Action<LootLockerBalanceResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceResponse>(forPlayerWithUlid));
                 return;
@@ -2005,7 +2005,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerAssetNotificationsResponse>(forPlayerWithUlid));
                 return;
@@ -2022,7 +2022,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDeactivatedAssetsResponse>(forPlayerWithUlid));
                 return;
@@ -2040,7 +2040,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>(forPlayerWithUlid));
                 return;
@@ -2057,7 +2057,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>(forPlayerWithUlid));
                 return;
@@ -2074,7 +2074,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>(forPlayerWithUlid));
                 return;
@@ -2091,7 +2091,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>(forPlayerWithUlid));
                 return;
@@ -2108,7 +2108,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetPlayerName(Action<PlayerNameResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>(forPlayerWithUlid));
                 return;
@@ -2126,7 +2126,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>(forPlayerWithUlid));
                 return;
@@ -2172,7 +2172,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayer1stPartyPlatformIds(ulong[] playerIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2192,7 +2192,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2212,7 +2212,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2235,7 +2235,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPlayerPublicUIds(string[] playerPublicUIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2252,7 +2252,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPlayerUlids(string[] playerUlids, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2269,7 +2269,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByGuestLoginIds(string[] guestLoginIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2286,7 +2286,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPlayerNames(string[] playerNames, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2303,7 +2303,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesBySteamIds(ulong[] steamIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2326,7 +2326,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesBySteamIds(string[] steamIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2343,7 +2343,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPSNIds(ulong[] psnIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2366,7 +2366,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2383,7 +2383,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LookupPlayerNamesByXboxIds(string[] xboxIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
                 return;
@@ -2399,7 +2399,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeletePlayer(Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -2425,7 +2425,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2443,7 +2443,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>(forPlayerWithUlid));
                 return;
@@ -2459,7 +2459,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>(forPlayerWithUlid));
                 return;
@@ -2480,7 +2480,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2534,7 +2534,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2587,7 +2587,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2630,7 +2630,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdatePlayerFile(int fileId, string pathToFile, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2665,7 +2665,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdatePlayerFile(int fileId, FileStream fileStream, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2700,7 +2700,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdatePlayerFile(int fileId, byte[] fileBytes, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
@@ -2723,7 +2723,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -2746,7 +2746,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>(forPlayerWithUlid));
                 return;
@@ -2794,7 +2794,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>(forPlayerWithUlid));
                 return;
@@ -2814,7 +2814,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddPointsToPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -2836,7 +2836,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SubtractPointsFromPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -2857,7 +2857,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ResetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -2876,7 +2876,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeletePlayerProgression(string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -2908,7 +2908,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersProgressions(string playerUlid, int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>(forPlayerWithUlid));
                 return;
@@ -2959,7 +2959,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersProgression(string playerUlid, string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>(forPlayerWithUlid));
                 return;
@@ -2984,7 +2984,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreateHero(int heroId, string name, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
 
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
@@ -3007,7 +3007,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetGameHeroes(Action<LootLockerGameHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3022,7 +3022,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListPlayerHeroes(Action<LootLockerListHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3039,7 +3039,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListOtherPlayersHeroesBySteamID64(int steamID64, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3059,7 +3059,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreateHeroWithVariation(string name, int heroId, int assetVariationId, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3083,7 +3083,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetHero(int heroId, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3100,7 +3100,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersDefaultHeroBySteamID64(int steamId, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3120,7 +3120,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateHero(string heroId, string name, bool isDefault, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3146,7 +3146,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteHero(int heroID, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
@@ -3163,7 +3163,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetHeroInventory(int heroID, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
@@ -3179,7 +3179,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetHeroLoadout(Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3196,7 +3196,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersHeroLoadout(int heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3214,7 +3214,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddAssetToHeroLoadout(int heroID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3240,7 +3240,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddAssetVariationToHeroLoadout(int heroID, int assetID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3265,7 +3265,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RemoveAssetFromHeroLoadout(string assetID, string heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3293,7 +3293,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreateClass(string classTypeID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3315,7 +3315,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListClassTypes(Action<LootLockerListClassTypesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListClassTypesResponse>(forPlayerWithUlid));
                 return;
@@ -3330,7 +3330,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListPlayerClasses(Action<LootLockerPlayerClassListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerClassListResponse>(forPlayerWithUlid));
                 return;
@@ -3345,7 +3345,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetClassLoadout(Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3375,7 +3375,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersClassLoadout(string playerID, LL_AuthPlatforms platform, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3397,7 +3397,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateClass(string classID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3423,7 +3423,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SetDefaultClass(string classID, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3448,7 +3448,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void EquipIdAssetToDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3467,7 +3467,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void EquipGlobalAssetToDefaultClass(string assetID, string assetVariationID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3487,7 +3487,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void EquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3510,7 +3510,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void EquipGlobalAssetToClass(string assetID, string assetVariationID, string classID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3531,7 +3531,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UnEquipIdAssetFromDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3551,7 +3551,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UnEquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
@@ -3569,7 +3569,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>(forPlayerWithUlid));
                 return;
@@ -3598,7 +3598,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrentLoadoutToOtherClass(string playerID, LL_AuthPlatforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>(forPlayerWithUlid));
             }
@@ -3615,7 +3615,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetEquipableContextToDefaultClass(Action<LootLockerContextResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>(forPlayerWithUlid));
                 return;
@@ -3637,7 +3637,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedCharacterProgressionsResponse>(forPlayerWithUlid));
                 return;
@@ -3688,7 +3688,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionResponse>(forPlayerWithUlid));
                 return;
@@ -3709,7 +3709,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddPointsToCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -3732,7 +3732,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -3754,7 +3754,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ResetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -3774,7 +3774,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteCharacterProgression(int characterId, string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -3797,7 +3797,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3813,7 +3813,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponseDictionary>(forPlayerWithUlid));
                 return;
@@ -3831,7 +3831,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetSingleKeyPersistentStorage(string key, Action<LootLockerGetPersistentSingle> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentSingle>(forPlayerWithUlid));
                 return;
@@ -3852,7 +3852,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3874,7 +3874,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3894,7 +3894,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3912,7 +3912,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3933,7 +3933,7 @@ namespace LootLocker.Requests
         public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
 
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
@@ -3952,7 +3952,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetContext(Action<LootLockerContextResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>(forPlayerWithUlid));
                 return;
@@ -3973,7 +3973,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -3993,7 +3993,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4022,7 +4022,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4066,7 +4066,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetById(int assetId, Action<LootLockerSingleAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4086,7 +4086,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFavouritesListResponse>(forPlayerWithUlid));
                 return;
@@ -4102,7 +4102,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4120,7 +4120,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RemoveFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4138,7 +4138,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4171,7 +4171,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GrantAssetToPlayerInventory(int assetID, int? assetVariationID, int? assetRentalOptionID, Action<LootLockerGrantAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGrantAssetResponse>(forPlayerWithUlid));
                 return;
@@ -4195,7 +4195,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllKeyValuePairsForAssetInstances(Action<LootLockerGetAllKeyValuePairsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllKeyValuePairsResponse>(forPlayerWithUlid));
                 return;
@@ -4211,7 +4211,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllKeyValuePairsToAnInstance(int assetInstanceID, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4230,7 +4230,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetSingleKeyValuePairsResponse>(forPlayerWithUlid));
                 return;
@@ -4251,7 +4251,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4273,7 +4273,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetInstanceID, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4299,7 +4299,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4325,7 +4325,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdateKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4354,7 +4354,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteKeyValuePairForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
@@ -4373,7 +4373,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void InspectALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerInspectALootBoxResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInspectALootBoxResponse>(forPlayerWithUlid));
                 return;
@@ -4391,7 +4391,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void OpenALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerOpenLootBoxResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerOpenLootBoxResponse>(forPlayerWithUlid));
                 return;
@@ -4409,7 +4409,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteAssetInstanceFromPlayerInventory(int assetInstanceID, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -4433,7 +4433,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetInstanceProgressions(int assetInstanceId, int count, string after, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedAssetInstanceProgressionsResponse>(forPlayerWithUlid));
                 return;
@@ -4484,7 +4484,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionResponse>(forPlayerWithUlid));
                 return;
@@ -4505,7 +4505,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddPointsToAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -4528,7 +4528,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SubtractPointsFromAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -4550,7 +4550,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ResetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
@@ -4570,7 +4570,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -4633,7 +4633,7 @@ namespace LootLocker.Requests
             Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1, bool complete = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4676,7 +4676,7 @@ namespace LootLocker.Requests
             string name = null, Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
             Dictionary<string, string> data_entities = null, int context_id = -1, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4714,7 +4714,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeletingAnAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4732,7 +4732,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GettingASingleAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4749,7 +4749,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAssetCandidatesResponse>(forPlayerWithUlid));
                 return;
@@ -4770,7 +4770,7 @@ namespace LootLocker.Requests
         public static void AddingFilesToAssetCandidates(int assetCandidateID, string filePath, string fileName,
             FilePurpose filePurpose, Action<LootLockerUserGenerateContentResponse> onComplete, string fileContentType = null, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4800,7 +4800,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RemovingFilesFromAssetCandidates(int assetCandidateID, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
@@ -4825,7 +4825,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetProgressions(int count, string after, Action<LootLockerPaginatedProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionsResponse>(forPlayerWithUlid));
                 return;
@@ -4873,7 +4873,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetProgression(string progressionKey, Action<LootLockerProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionResponse>(forPlayerWithUlid));
                 return;
@@ -4894,7 +4894,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetProgressionTiers(string progressionKey, int count, ulong? after, Action<LootLockerPaginatedProgressionTiersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionTiersResponse>(forPlayerWithUlid));
                 return;
@@ -4945,7 +4945,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetProgressionTier(string progressionKey, ulong step, Action<LootLockerProgressionTierResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionTierResponse>(forPlayerWithUlid));
                 return;
@@ -4967,7 +4967,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllMissions(Action<LootLockerGetAllMissionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMissionsResponse>(forPlayerWithUlid));
                 return;
@@ -4983,7 +4983,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetMission(int missionId, Action<LootLockerGetMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMissionResponse>(forPlayerWithUlid));
                 return;
@@ -5001,7 +5001,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void StartMission(int missionId, Action<LootLockerStartMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartMissionResponse>(forPlayerWithUlid));
                 return;
@@ -5023,7 +5023,7 @@ namespace LootLocker.Requests
         public static void FinishMission(int missionId, string startingMissionSignature, string playerId,
             LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishMissionResponse>(forPlayerWithUlid));
                 return;
@@ -5055,7 +5055,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>(forPlayerWithUlid));
                 return;
@@ -5078,7 +5078,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseOrderStatus>(forPlayerWithUlid));
                 return;
@@ -5096,7 +5096,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ActivateRentalAsset(int assetInstanceID, Action<LootLockerActivateRentalAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateRentalAssetResponse>(forPlayerWithUlid));
                 return;
@@ -5135,7 +5135,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void LootLockerPurchaseCatalogItems(string walletId, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action<LootLockerPurchaseCatalogItemResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseCatalogItemResponse>(forPlayerWithUlid));
                 return;
@@ -5158,7 +5158,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RedeemAppleAppStorePurchaseForPlayer(string transactionId, Action<LootLockerResponse> onComplete, bool sandboxed = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -5182,7 +5182,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete, bool sandboxed = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -5206,7 +5206,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RedeemGooglePlayStorePurchaseForPlayer(string productId, string purchaseToken, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -5230,7 +5230,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RedeemGooglePlayStorePurchaseForClass(string productId, string purchaseToken, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -5260,7 +5260,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void BeginSteamPurchaseRedemption(string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>(forPlayerWithUlid));
                 return;
@@ -5339,7 +5339,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void BeginSteamPurchaseRedemptionForClass(int classId, string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>(forPlayerWithUlid));
                 return;
@@ -5414,7 +5414,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void QuerySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerQuerySteamPurchaseRedemptionStatusResponse>(forPlayerWithUlid));
                 return;
@@ -5437,7 +5437,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void FinalizeSteamPurchaseRedemption(string entitlementId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -5460,7 +5460,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCollectablesResponse>(forPlayerWithUlid));
                 return;
@@ -5476,7 +5476,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CollectItem(string slug, Action<LootLockerCollectItemResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectItemResponse>(forPlayerWithUlid));
                 return;
@@ -5497,7 +5497,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMessagesResponse>(forPlayerWithUlid));
                 return;
@@ -5523,7 +5523,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void InvokeTriggersByKey(string[] KeysToInvoke, Action<LootLockerInvokeTriggersByKeyResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInvokeTriggersByKeyResponse>(forPlayerWithUlid));
                 return;
@@ -5543,7 +5543,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListLeaderboards(int count, int after, Action<LootLockerListLeaderboardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListLeaderboardsResponse>(forPlayerWithUlid));
                 return;
@@ -5571,7 +5571,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>(forPlayerWithUlid));
                 return;
@@ -5593,7 +5593,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetByListOfMembersResponse>(forPlayerWithUlid));
                 return;
@@ -5615,7 +5615,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllMemberRanksMain(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>(forPlayerWithUlid));
                 return;
@@ -5692,7 +5692,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllMemberRanksOriginal(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>(forPlayerWithUlid));
                 return;
@@ -5715,7 +5715,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>(forPlayerWithUlid));
                 return;
@@ -5806,7 +5806,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SubmitScore(string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
                 return;
@@ -5828,7 +5828,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListLeaderboardArchive(string leaderboard_key, Action<LootLockerLeaderboardArchiveResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveResponse>(forPlayerWithUlid));
                 return;
@@ -5872,7 +5872,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveDetailsResponse>(forPlayerWithUlid));
                 return;
@@ -5900,7 +5900,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetLeaderboardData(string leaderboard_key, Action<LootLockerLeaderboardDetailResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>(forPlayerWithUlid));
                 return;
@@ -5925,7 +5925,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "", string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>(forPlayerWithUlid));
                 return;
@@ -5943,7 +5943,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ComputeAndLockDropTable(int tableInstanceId, bool AddAssetDetails, string tag, Action<LootLockerComputeAndLockDropTableResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>(forPlayerWithUlid));
                 return;
@@ -5960,7 +5960,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void PickDropsFromDropTable(int[] picks, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPickDropsFromDropTableResponse>(forPlayerWithUlid));
                 return;
@@ -5982,7 +5982,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>(forPlayerWithUlid));
                 return;
@@ -5999,7 +5999,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreatePlayerReport(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreatePlayerResponse>(forPlayerWithUlid));
                 return;
@@ -6016,7 +6016,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreateAssetReport(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreateAssetResponse>(forPlayerWithUlid));
                 return;
@@ -6034,7 +6034,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>(forPlayerWithUlid));
                 return;
@@ -6080,7 +6080,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         private static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>(forPlayerWithUlid));
                 return;
@@ -6134,7 +6134,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
@@ -6165,7 +6165,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFriends(Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFriendsResponse>(forPlayerWithUlid));
                 return;
@@ -6181,7 +6181,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListIncomingFriendRequests(Action<LootLockerListIncomingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListIncomingFriendRequestsResponse>(forPlayerWithUlid));
                 return;
@@ -6197,7 +6197,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListOutgoingFriendRequests(Action<LootLockerListOutgoingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListOutgoingFriendRequestsResponse>(forPlayerWithUlid));
                 return;
@@ -6214,7 +6214,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void SendFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6238,7 +6238,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CancelFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6262,7 +6262,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AcceptFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6286,7 +6286,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeclineFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6309,7 +6309,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListBlockedPlayers(Action<LootLockerListBlockedPlayersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBlockedPlayersResponse>(forPlayerWithUlid));
                 return;
@@ -6326,7 +6326,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void BlockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6350,7 +6350,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UnblockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6374,7 +6374,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DeleteFriend(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
@@ -6400,7 +6400,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>(forPlayerWithUlid));
                 return;
@@ -6417,7 +6417,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrencyDetails(string currencyCode, Action<GetLootLockerCurrencyDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<GetLootLockerCurrencyDetailsResponse>(forPlayerWithUlid));
                 return;
@@ -6436,7 +6436,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrencyDenominationsByCode(string currencyCode, Action<LootLockerListDenominationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListDenominationsResponse>(forPlayerWithUlid));
                 return;
@@ -6458,7 +6458,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListBalancesInWallet(string walletId, Action<LootLockerListBalancesForWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>(forPlayerWithUlid));
                 return;
@@ -6476,7 +6476,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetWalletByWalletId(string walletId, Action<LootLockerGetWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>(forPlayerWithUlid));
                 return;
@@ -6495,7 +6495,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetWalletByHolderId(string holderUlid, LootLockerWalletHolderTypes holderType, Action<LootLockerGetWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>(forPlayerWithUlid));
                 return;
@@ -6547,7 +6547,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerCreditWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreditWalletResponse>(forPlayerWithUlid));
                 return;
@@ -6568,7 +6568,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerDebitWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDebitWalletResponse>(forPlayerWithUlid));
                 return;
@@ -6589,7 +6589,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListCatalogs(Action<LootLockerListCatalogsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogsResponse>(forPlayerWithUlid));
                 return;
@@ -6608,7 +6608,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogPricesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>(forPlayerWithUlid));
                 return;
@@ -6638,7 +6638,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListEntitlements(int count, string after, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEntitlementHistoryResponse>(forPlayerWithUlid));
                 return;
@@ -6707,7 +6707,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementResponse>(forPlayerWithUlid));
                 return;
@@ -6775,7 +6775,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListMetadataResponse>(forPlayerWithUlid));
                 return;
@@ -6818,7 +6818,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMultisourceMetadataResponse>(forPlayerWithUlid));
                 return;
@@ -6838,7 +6838,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>(forPlayerWithUlid));
                 return;
@@ -6857,7 +6857,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListNotificationsWithDefaultParameters(Action<LootLockerListNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>(forPlayerWithUlid));
                 return;
@@ -6899,7 +6899,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListNotifications(bool ShowRead, LootLockerNotificationPriority? WithPriority, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>(forPlayerWithUlid));
                 return;
@@ -6940,7 +6940,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void MarkAllNotificationsAsRead(Action<LootLockerReadNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>(forPlayerWithUlid));
                 return;
@@ -6957,7 +6957,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void MarkNotificationsAsRead(string[] NotificationIds, Action<LootLockerReadNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>(forPlayerWithUlid));
                 return;
@@ -6982,7 +6982,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void Ping(Action<LootLockerPingResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPingResponse>(forPlayerWithUlid));
                 return;
