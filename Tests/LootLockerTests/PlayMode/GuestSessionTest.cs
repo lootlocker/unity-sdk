@@ -232,5 +232,156 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedIdentifier, actualResponse.player_identifier, "Guest Session using stored Identifier failed to work");
         }
 
+        [UnityTest]
+        public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerActive_CreatesMultipleUsers()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            //When
+            bool guestSessionCompleted = false;
+            string player1Ulid = null;
+            string player2Ulid = null;
+            string player3Ulid = null;
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player1Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player2Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player3Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            //Then
+            Assert.IsNotNull(player1Ulid);
+            Assert.IsNotNull(player2Ulid);
+            Assert.IsNotNull(player3Ulid);
+            Assert.AreNotEqual(player1Ulid, player2Ulid, "Same user created with multiple start guest session requests");
+            Assert.AreNotEqual(player2Ulid, player3Ulid, "Same user created with multiple start guest session requests");
+        }
+
+        [UnityTest]
+        public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerNotActive_ReusesDefaultUser()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            //When
+            bool guestSessionCompleted = false;
+            string player1Ulid = null;
+            string player2Ulid = null;
+            string player3Ulid = null;
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player1Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+            LootLockerStateData.Reset();
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player2Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+            LootLockerStateData.Reset();
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player3Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+            LootLockerStateData.Reset();
+
+            //Then
+            Assert.IsNotNull(player1Ulid);
+            Assert.IsNotNull(player2Ulid);
+            Assert.IsNotNull(player3Ulid);
+            Assert.AreEqual(player1Ulid, player2Ulid, "Default user not re-used with session request 2");
+            Assert.AreEqual(player1Ulid, player3Ulid, "Default user not re-used with session request 3");
+        }
+
+        [UnityTest]
+        public IEnumerator StartGuestSession_MultipleSessionStartsWithUlid_ReusesSpecifiedUser()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            //Given
+            bool guestSessionCompleted = false;
+            string player1Ulid = null;
+            string player1InitialSessionToken = null;
+            string player2Ulid = null;
+            string player2InitialSessionToken = null;
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player1Ulid = response?.player_ulid;
+                player1InitialSessionToken = response?.session_token;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player2Ulid = response?.player_ulid;
+                player2InitialSessionToken = response?.session_token;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            // When
+            string player1Ulid2 = null;
+            string player1SubsequentSessionToken = null;
+            string player2Ulid2 = null;
+            string player2SubsequentSessionToken = null;
+            LootLockerSDKManager.StartGuestSessionForPlayer(player1Ulid, (response) =>
+            {
+                player1Ulid2 = response?.player_ulid;
+                player1SubsequentSessionToken = response?.session_token;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            LootLockerSDKManager.StartGuestSessionForPlayer(player2Ulid, (response) =>
+            {
+                player2Ulid2 = response?.player_ulid;
+                player2SubsequentSessionToken = response?.session_token;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            //Then
+            Assert.IsNotNull(player1Ulid);
+            Assert.IsNotNull(player2Ulid);
+            Assert.IsNotNull(player1Ulid2);
+            Assert.IsNotNull(player2Ulid2);
+            Assert.IsNotNull(player1InitialSessionToken);
+            Assert.IsNotNull(player1SubsequentSessionToken);
+            Assert.IsNotNull(player2InitialSessionToken);
+            Assert.IsNotNull(player2SubsequentSessionToken);
+            Assert.AreEqual(player1Ulid, player1Ulid2, "Player 1 was not re-used after new session start");
+            Assert.AreNotEqual(player1InitialSessionToken, player1SubsequentSessionToken, "New session wasn't started (old one was re-used)");
+            Assert.AreEqual(player2Ulid, player2Ulid2, "Player 2 was not re-used after new session start");
+            Assert.AreNotEqual(player2InitialSessionToken, player2SubsequentSessionToken, "New session wasn't started (old one was re-used)");
+        }
+
     }
 }
