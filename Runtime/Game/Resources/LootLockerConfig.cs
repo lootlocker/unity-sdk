@@ -295,7 +295,7 @@ namespace LootLocker
 #if LOOTLOCKER_TARGET_STAGE_ENV
            "api.stage.internal.dev.lootlocker.cloud";
 #else
-            "localhost:8080";//null;
+            null;
 #endif
         private static string GetUrlCore() { return string.IsNullOrEmpty(UrlCoreOverride) ? UrlCore : UrlCoreOverride; }
 
