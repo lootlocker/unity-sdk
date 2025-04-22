@@ -52,11 +52,12 @@ namespace LootLocker.Requests
         /// <param name="apiKey">Find the Game API-key at https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
+        /// <param name="logLevel">What log level to use for the SDKs internal logging</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
-        public static bool Init(string apiKey, string gameVersion, string domainKey)
+        public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info)
         {
             LootLockerHTTPClient.Instantiate();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: LootLockerLogger.LogLevel.Info);
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: logLevel);
         }
 
         static bool LoadConfig()
