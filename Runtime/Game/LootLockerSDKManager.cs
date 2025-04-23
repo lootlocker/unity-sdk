@@ -1270,6 +1270,7 @@ namespace LootLocker.Requests
         /// Disconnect account from the currently logged in account
         ///
         /// Use this to disconnect an account (like a Google or Apple account) that can be used to start sessions for this LootLocker account so that it is no longer allowed to do that
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the provider is disconnected from
         /// </summary>
         /// <param name="accountToDisconnect">What account to disconnect from this LootLocker Account</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
@@ -1289,6 +1290,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Connect a Google Account to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
@@ -1309,7 +1311,8 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player 
+        /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="platform">Google OAuth2 ClientID platform</param>
@@ -1332,6 +1335,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Connect an Apple Account (authorized by Rest Sign In) to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Apple account is linked into
         /// </summary>
         /// <param name="authorizationCode">Authorization code, provided by apple during Sign In</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
@@ -1352,22 +1356,85 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Connect an account (authorized using a remote session) to the currently logged in LootLocker account allowing that authentication method to start sessions for this player
+        /// Connect an identity provider (authorized using a remote link session) to the currently logged in LootLocker account allowing that authentication method to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Remote Session account is linked into
         /// </summary>
-        /// <param name="Code">The lease code returned with the response when starting a lease process</param>
-        /// <param name="Nonce">The nonce returned with the response when starting a lease process</param>
+        /// <param name="Code">The lease code returned with the response when starting a lease process. Note that the process must have concluded successfully first.</param>
+        /// <param name="Nonce">The nonce returned with the response when starting a lease process. Note that the process must have concluded successfully first.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             
             string data = LootLockerJson.SerializeObject(new LootLockerConnectRemoteSessionToAccountRequest() { Code = Code, Nonce = Nonce });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.connectRemoteSessionToAccount.endPoint, LootLockerEndPoints.connectRemoteSessionToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.attachRemoteSessionToAccount.endPoint, LootLockerEndPoints.attachRemoteSessionToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// This endpoint lets you transfer identity providers between two players, provided you have a valid session for both.
+        /// The designated identity providers will be transferred FROM the player designated by the `FromPlayerWithUlid` parameter and TO the player designated by the `ToPlayerWithUlid` parameter.
+        /// If any of the providers can not be transferred the whole operation will fail and NO identity providers will be transferred.
+        /// IMPORTANT: This is a destructive action.Once an identity provider has been transferred they will allow authentication for the target player and no longer authenticate for the source player.
+        /// This can leave the source player without means of authentication and thus unusable from the game.
+   	    /// 
+        /// ** Limitations**
+        /// - You can not move an identity provider that the source player does not have
+        /// - You can not move an identity provider to a player that already has an account from said identity provider associated with their account.
+        /// - You can not move an identity provider which isn't active in your game settings.
+        /// </summary>
+        /// <param name="FromPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers FROM</param>
+        /// <param name="ToPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers TO</param>
+        /// <param name="ProvidersToTransfer">Which identity providers you wish to transfer</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void TransferIdentityProvidersBetweenAccounts(string FromPlayerWithUlid, string ToPlayerWithUlid, List<LootLockerAccountProvider> ProvidersToTransfer, Action<LootLockerListConnectedAccountsResponse> onComplete)
+        {
+            if (!CheckInitialized(false, FromPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>(FromPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(FromPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No ulid provided for source player", FromPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ToPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No ulid provided for target player", ToPlayerWithUlid));
+                return;
+            }
+
+            var fromPlayer = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(FromPlayerWithUlid);
+            if (string.IsNullOrEmpty(fromPlayer?.SessionToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No valid session token found for source player", FromPlayerWithUlid));
+                return;
+            }
+
+            var toPlayer = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(ToPlayerWithUlid);
+            if (string.IsNullOrEmpty(toPlayer?.SessionToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No valid session token found for target player", ToPlayerWithUlid));
+                return;
+            }
+
+            if (ProvidersToTransfer.Count == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No providers submitted", FromPlayerWithUlid));
+                return;
+            }
+
+            string data = LootLockerJson.SerializeObject(new LootLockerTransferProvidersBetweenAccountsRequest() { Source_token = fromPlayer.SessionToken, Target_token = toPlayer.SessionToken, Identity_providers = ProvidersToTransfer.ToArray() });
+
+            LootLockerServerRequest.CallAPI(FromPlayerWithUlid, LootLockerEndPoints.transferProvidersBetweenAccountsEndpoint.endPoint, LootLockerEndPoints.transferProvidersBetweenAccountsEndpoint.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         #endregion
@@ -1397,25 +1464,26 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Start a remote session specifically intended to use for linking accounts together
-        /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
+        /// Start a remote session
+        /// If you want to let your local user sign in using another device then you use this method.First you will get the lease information needed to allow a secondary device to authenticate.
         /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
-        /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
+        /// When the process has come to an end(whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
+        /// <param name="forPlayerWithUlid">Execute the request for the specified player (the player that you intend to link the remote account into</param>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
-        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
-        public static Guid StartRemoteSessionForLinking(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
+        public static Guid StartRemoteSessionForLinking(string forPlayerWithUlid, Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
         {
             if (!CheckInitialized())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>(forPlayerWithUlid));
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.link, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.link, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes, forPlayerWithUlid);
         }
 
         /// <summary>
