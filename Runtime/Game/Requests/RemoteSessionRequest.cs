@@ -222,11 +222,12 @@ namespace LootLocker
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
-                float timeOutAfterMinutes = 5.0f)
+                float timeOutAfterMinutes = 5.0f,
+                string forPlayerWithUlid = null)
             {
                 return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
-                    timeOutAfterMinutes);
+                    timeOutAfterMinutes, forPlayerWithUlid);
             }
 
             public static void CancelRemoteSessionProcess(Guid processGuid)
@@ -249,6 +250,8 @@ namespace LootLocker
                 public DateTime LastUpdatedAt;
                 public int Retries = 0;
                 public bool ShouldCancel;
+                public LootLockerRemoteSessionLeaseIntent Intent;
+                public string forPlayerWithUlid;
                 public Action<LootLockerRemoteSessionStatusPollingResponse> UpdateCallbackAction;
                 public Action<LootLockerStartRemoteSessionResponse> ProcessCompletedCallbackAction;
             }
@@ -357,7 +360,8 @@ namespace LootLocker
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
-                float timeOutAfterMinutes = 5.0f)
+                float timeOutAfterMinutes = 5.0f, 
+                string forPlayerWithUlid = null)
             {
                 if (_remoteSessionsProcesses.Count > 0)
                 {
@@ -374,11 +378,13 @@ namespace LootLocker
                     LeasingProcessTimeoutTime = DateTime.UtcNow.AddMinutes(timeOutAfterMinutes),
                     PollingIntervalSeconds = pollingIntervalSeconds,
                     UpdateCallbackAction = remoteSessionLeaseStatusUpdateCallback,
-                    ProcessCompletedCallbackAction = remoteSessionCompleted
+                    ProcessCompletedCallbackAction = remoteSessionCompleted,
+                    Intent = leaseIntent,
+                    forPlayerWithUlid = forPlayerWithUlid
                 };
                 AddRemoteSessionProcess(processGuid, lootLockerRemoteSessionProcess);
 
-                LeaseRemoteSession(leaseIntent, leaseRemoteSessionResponse =>
+                LeaseRemoteSession(leaseIntent, forPlayerWithUlid, leaseRemoteSessionResponse =>
                 {
                     if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                     {
@@ -410,13 +416,14 @@ namespace LootLocker
             }
 
             private void LeaseRemoteSession(LootLockerRemoteSessionLeaseIntent leaseIntent,
+                string forPlayerWithUlid,
                 Action<LootLockerLeaseRemoteSessionResponse> onComplete)
             {
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
                     new LootLockerLeaseRemoteSessionRequest();
 
                 EndPointClass endPoint = leaseIntent == LootLockerRemoteSessionLeaseIntent.login ? LootLockerEndPoints.leaseRemoteSession : LootLockerEndPoints.leaseRemoteSessionForLinking;
-                LootLockerServerRequest.CallAPI(null, endPoint.endPoint,
+                LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint,
                     endPoint.httpMethod,
                     LootLockerJson.SerializeObject(leaseRemoteSessionRequest),
                     (serverResponse) =>

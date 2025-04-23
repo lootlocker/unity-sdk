@@ -10,6 +10,13 @@ namespace LootLocker.LootLockerEnums
         guest = 0,
         google = 1,
         apple = 2,
+        steam = 3,
+        epic = 4,
+        credentials = 5, // White Label Login
+        nintendo = 6,
+        xbox = 7,
+        playstation = 8,
+        twitch = 9
     }
 
     /// <summary>
@@ -81,6 +88,24 @@ namespace LootLocker.Requests
         /// The nonce used to sign usage of the lease code
         /// </summary>
         public string Nonce { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerTransferProvidersBetweenAccountsRequest
+    {
+        /// <summary>
+        /// Session token belonging to the player to move platforms FROM
+        /// </summary>
+        public string Source_token { get; set; }
+        /// <summary>
+        /// Session token belonging to the player to move platforms TO
+        /// </summary>
+        public string Target_token { get; set; }
+        /// <summary>
+        /// List of identity providers to move FROM the account authenticated by the source token TO the account authenticated by the target token
+        /// </summary>
+        public LootLockerAccountProvider[] Identity_providers { get; set; }
     }
 
     /// <summary>
