@@ -21,7 +21,6 @@ namespace LootLockerTests.PlayMode
 
     public class JsonTests
     {
-
         [Test]
         public void Json_DeserializingSimpleJson_Succeeds()
         {
@@ -375,6 +374,31 @@ namespace LootLockerTests.PlayMode
             var json = Json.Serialize(persons, options);
             Assert.IsTrue(json == "[{\"name\":\"héllo\"},{\"name\":\"héllo\"}]");
         }
+
+        [Test]
+        public void Json_SerializingAndDesierializingEnumArrays_Works()
+        {
+            // Given
+            EnumArrayMember eam = new EnumArrayMember
+            {
+                enumArray = new JsonEnumTest[] {
+                    JsonEnumTest.Number_one,
+                    JsonEnumTest.Number_two
+                }
+            };
+            JsonEnumTest defaultEnumValue = (JsonEnumTest)(0);
+
+            // When
+            var serialized = LootLockerJson.SerializeObject(eam);
+            var deserialized =
+                LootLockerJson.DeserializeObject<EnumArrayMember>(serialized);
+
+            // Then
+            Assert.IsNotNull(serialized);
+            Assert.IsNotEmpty(serialized);
+            Assert.IsNotEmpty(deserialized.enumArray);
+            Assert.AreNotEqual(defaultEnumValue, deserialized.enumArray[0]);
+        }
     }
 
     class CustomOptions : JsonOptions
@@ -421,6 +445,18 @@ namespace LootLockerTests.PlayMode
             public bool TryGetValue(object key, out object value) => throw new NotImplementedException();
             IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
         }
+    }
+
+    public enum JsonEnumTest
+    {
+        None = 0,
+        Number_one = 1,
+        Number_two = 2
+    }
+
+    public struct EnumArrayMember
+    {
+        public JsonEnumTest[] enumArray { get; set; }
     }
 
     class Person
