@@ -104,7 +104,7 @@ namespace LootLocker
 
                 //Build the URL that we will hit based on the specified endpoint, query params, etc
                 string url = BuildUrl(request.endpoint, request.queryParams, request.callerRole);
-                LootLockerLogger.Log("ServerRequest " + request.httpMethod + " URL: " + url, LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log("LL Request " + request.httpMethod + " URL: " + url, LootLockerLogger.LogLevel.Verbose);
                 using (UnityWebRequest webRequest = CreateWebRequest(url, request))
                 {
                     webRequest.downloadHandler = new DownloadHandlerBuffer();
@@ -217,7 +217,7 @@ namespace LootLocker
 
             try
             {
-                LootLockerLogger.Log("Server Response: " +
+                LootLockerLogger.Log("LL Response: " +
                     statusCode + " " +
                     request.endpoint + " completed in " +
                     (Time.time - startTime).ToString("n4") +
