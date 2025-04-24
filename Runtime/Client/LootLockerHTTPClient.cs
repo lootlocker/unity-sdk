@@ -392,7 +392,7 @@ namespace LootLocker
                 return false;
             }
 
-            LootLockerLogger.Log("ServerRequest " + executionItem.RequestData.HTTPMethod + " URL: " + executionItem.RequestData.FormattedURL, LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log("LL Request " + executionItem.RequestData.HTTPMethod + " URL: " + executionItem.RequestData.FormattedURL, LootLockerLogger.LogLevel.Verbose);
 
             UnityWebRequest webRequest = CreateWebRequest(executionItem.RequestData);
             if (webRequest == null)
@@ -875,7 +875,7 @@ namespace LootLocker
 
             try
             {
-                LootLockerLogger.Log("Server Response: " +
+                LootLockerLogger.Log("LL Response: " +
                     executedItem.WebRequest.responseCode + " " +
                     executedItem.RequestData.FormattedURL + " completed in " +
                     (Time.time - executedItem.RequestStartTime).ToString("n4") +
