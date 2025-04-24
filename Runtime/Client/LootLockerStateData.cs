@@ -305,6 +305,9 @@ namespace LootLocker
                     removedULIDs.Add(ULID);
                 }
             }
+
+            ActiveMetaData = new LootLockerStateMetaData();
+            SaveMetaDataToPlayerPrefs();
             return removedULIDs;
         }
 
@@ -363,6 +366,8 @@ namespace LootLocker
 #pragma warning disable CS0618 // This is the transfer mechanic from the obsolete members
             if (cache == null || string.IsNullOrEmpty(cache.token))
             {
+                ActiveMetaData.MultiUserInitialLoadCompleted = true;
+                SaveMetaDataToPlayerPrefs();
                 return false;
             }
 
@@ -417,6 +422,7 @@ namespace LootLocker
                     ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[playerData.WhiteLabelEmail] = playerData.ULID;
                 }
 
+                ActiveMetaData.MultiUserInitialLoadCompleted = true;
                 SaveMetaDataToPlayerPrefs();
                 SavePlayerDataToPlayerPrefs(playerData.ULID);
                 PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
@@ -424,7 +430,6 @@ namespace LootLocker
                 PlayerPrefs.DeleteKey("LootLockerGuestPlayerID");
                 PlayerPrefs.DeleteKey("LastActivePlatform");
                 PlayerPrefs.Save();
-                ActiveMetaData.MultiUserInitialLoadCompleted = true;
                 MultiUserMigrationInProgress = false;
             }, playerData.ULID);
             return true;
