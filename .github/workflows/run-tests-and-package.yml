@@ -103,7 +103,7 @@ jobs:
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
           testMode: ${{ matrix.testMode }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Test Results
+          checkName: Smoke Test (${{ matrix.unityVersion }}-${{ matrix.testMode }}) Test Results
           artifactsPath: editor-smoke-tests-gameci-${{ matrix.unityVersion }}-${{ matrix.testMode }}-artifacts
           projectPath: unity-sdk-smoketest-project
           unityVersion: ${{ matrix.unityVersion }}
@@ -505,11 +505,12 @@ jobs:
           projectPath: TestProject/
           testMode: playmode
           unityVersion: ${{ matrix.unityVersion }}
-          checkName: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }} Test Results
+          checkName: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
           artifactsPath: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
           useHostNetwork: true
+      ####### CLEANUP ###########
       - name: Bring down Go Backend
         if: always()
         run: |
@@ -523,7 +524,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }} Test Results
+          name: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
           path: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
   test-samples:
     name: Test Samples
@@ -725,7 +726,7 @@ jobs:
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
           testMode: editmode
-          checkName: SDK Packaging ${{ matrix.unityVersion }} Test Results
+          checkName: SDK Packaging ${{ matrix.unityVersion }} Results
           artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
           projectPath: unity-sdk-packager
           unityVersion: ${{ matrix.unityVersion }}
