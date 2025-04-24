@@ -625,19 +625,19 @@ namespace ZeroDepJson
 
             if (target is IDictionary dicTarget)
             {
-                var itemType = GetItemType(dicTarget.GetType());
                 foreach (DictionaryEntry entry in dictionary)
                 {
                     if (entry.Key == null)
                         continue;
 
-                    if (itemType == typeof(object))
+                    var valueType = entry.Value.GetType();
+                    if (valueType == typeof(object))
                     {
                         dicTarget[entry.Key] = entry.Value;
                     }
                     else
                     {
-                        dicTarget[entry.Key] = ChangeType(target, entry.Value, itemType, options);
+                        dicTarget[entry.Key] = ChangeType(target, entry.Value, valueType, options);
                     }
                 }
                 return;
