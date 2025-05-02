@@ -290,14 +290,20 @@ namespace LootLocker.Requests
             }
 
             string defaultPlayerUlid = LootLockerStateData.GetDefaultPlayerULID();
-            if (string.IsNullOrEmpty(defaultPlayerUlid) ||
-                LootLockerStateData.GetActivePlayerULIDs().Contains(defaultPlayerUlid))
+            if (string.IsNullOrEmpty(defaultPlayerUlid) || LootLockerStateData.GetActivePlayerULIDs().Contains(defaultPlayerUlid))
             {
                 // Start a new guest session with a new identifier if there is no default player to use or if that player is already playing
                 StartGuestSession(null, onComplete);
                 return;
+            } 
+            else if (LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.CurrentPlatform.Platform != LL_AuthPlatforms.Guest)
+            {
+                // Also start a new guest session with a new identifier if the default player is not playing but isn't a guest user
+                LootLockerStateData.SetPlayerULIDToInactive(defaultPlayerUlid);
+                StartGuestSession(null, onComplete);
+                return;
             }
-            
+
             StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.Identifier, onComplete);
         }
 
