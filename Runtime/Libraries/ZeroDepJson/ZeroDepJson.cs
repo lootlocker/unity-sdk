@@ -1812,6 +1812,7 @@ namespace ZeroDepJson
                     }
                     var targetValue = GetOrCreateInstance(target, dic.Count, options);
                     Apply(dic, targetValue, options);
+                    Accessor.Set(target, targetValue);
                     return;
 
                 }
