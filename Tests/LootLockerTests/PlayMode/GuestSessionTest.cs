@@ -318,6 +318,56 @@ namespace LootLockerTests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerNotActiveButNotGuestUser_CreatesNewUser()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            //When
+            bool guestSessionCompleted = false;
+            string player1Ulid = null;
+            string player2Ulid = null;
+            string player3Ulid = null;
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player1Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+            var player1Data = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(player1Ulid);
+            player1Data.CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.WhiteLabel);
+            LootLockerStateData.SetPlayerData(player1Data);
+            LootLockerStateData.Reset();
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player2Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            var player2Data = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(player2Ulid);
+            player2Data.CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.WhiteLabel);
+            LootLockerStateData.SetPlayerData(player1Data);
+            guestSessionCompleted = false;
+            LootLockerStateData.Reset();
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                player3Ulid = response?.player_ulid;
+                guestSessionCompleted = true;
+            });
+            yield return new WaitUntil(() => guestSessionCompleted);
+            guestSessionCompleted = false;
+
+            //Then
+            Assert.IsNotNull(player1Ulid);
+            Assert.IsNotNull(player2Ulid);
+            Assert.IsNotNull(player3Ulid);
+            Assert.AreNotEqual(player1Ulid, player2Ulid, "Default user re-used with session request 2");
+            Assert.AreNotEqual(player1Ulid, player3Ulid, "Default user re-used with session request 3");
+            Assert.AreEqual(1, LootLockerStateData.GetActivePlayerULIDs().Count, "The expected number of players were not active");
+        }
+
+        [UnityTest]
         public IEnumerator StartGuestSession_MultipleSessionStartsWithUlid_ReusesSpecifiedUser()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
