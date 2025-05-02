@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using LootLocker.Requests;
-using UnityEditor;
 using UnityEngine;
 
 namespace LootLocker
@@ -135,7 +134,7 @@ namespace LootLocker
             }
 
             string playerDataJson = PlayerPrefs.GetString($"{PlayerDataSaveSlot}_{playerULID}");
-            if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
+            if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData)) //TODO: auth platform is not parsed correctly. Write json test
             {
                 return false;
             }
