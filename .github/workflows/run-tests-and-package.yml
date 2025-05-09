@@ -467,9 +467,9 @@ jobs:
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON/g' TestProject/ProjectSettings/ProjectSettings.asset
           sed -i -e 's/"nunit.framework.dll"/"nunit.framework.dll",\n\t\t"Newtonsoft.Json.dll"/g' sdk/Tests/LootLockerTests/PlayMode/PlayModeTests.asmdef
       - name: Use HTTP Execution Queue
-        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE == 'true' }}
+        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE == 'false' }}
         run: |
-          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_BETA_HTTP_QUEUE/g' TestProject/ProjectSettings/ProjectSettings.asset
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_LEGACY_HTTP_STACK/g' TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set LootLocker to target stage environment
         if: ${{ ENV.TARGET_ENVIRONMENT == 'STAGE' }}
         run: |
