@@ -40,6 +40,36 @@ namespace LootLocker.Requests
         public string created_at { get; set; }
     };
 
+    /// <summary>
+    /// </summary>
+    public class LootLockerBalanceModifiers
+    {
+        /// <summary>
+        /// The id of the currency
+        /// </summary>
+        string currency_id { get; set; }
+        /// <summary>
+        /// The name of the currency
+        /// </summary>
+        string currency_name {get; set; }
+        /// <summary>
+        /// The currency code
+        /// </summary>
+        string currency_code {get; set; }
+        /// <summary>
+        /// The factor of this currency
+        /// </summary>
+        string factor {get; set; }
+        /// <summary>
+        /// When this currency modifier was created
+        /// </summary>
+        string created_at {get; set; }
+        /// <summary>
+        /// When this currency modifier expires
+        /// </summary>
+        string expires_at {get; set; }
+    };
+
     //==================================================
     // Request Definitions
     //==================================================
@@ -125,7 +155,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The type of entity that holds this wallet
         /// </summary>
-        public LootLockerWalletHolderTypes type { get; set;}
+        public LootLockerWalletHolderTypes type { get; set; }
+        /// <summary>
+        /// The modifiers for this wallet
+        /// </summary>
+        public LootLockerBalanceModifiers modifiers { get; set; }
     };
 
     /// <summary>
