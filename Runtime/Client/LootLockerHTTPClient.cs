@@ -5,12 +5,12 @@ using System;
 using LootLocker.LootLockerEnums;
 using System.Collections;
 using System.Text;
+using JetBrains.Annotations;
 using UnityEngine.Networking;
 using LootLocker.Requests;
 using LootLocker.HTTP;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditorInternal;
 #endif
 
 namespace LootLocker
@@ -59,18 +59,63 @@ namespace LootLocker
         #endregion
     }
 
+    public class LootLockerHTTPClientConfiguration
+    {
+        /*
+         * TODO: Document
+         */
+        public int MaxRetries = 5;
+        /*
+         * TODO: Document
+         */
+        public int IncrementalBackoffFactor = 2;
+        /*
+         * TODO: Document
+         */
+        public int InitialRetryWaitTimeInMs = 50;
+
+        /*
+         * TODO: Document
+         */
+        public int MaxOngoingRequests = 50;
+        /*
+         * TODO: Document
+         */
+        public int ChokeWarningThreshold = 500;
+        /*
+         * TODO: Document
+         */
+        public bool DenyIncomingRequestsWhenBackedUp = true;
+
+        public LootLockerHTTPClientConfiguration()
+        {
+            MaxRetries = 5;
+            IncrementalBackoffFactor = 2;
+            InitialRetryWaitTimeInMs = 50;
+            MaxOngoingRequests = 50;
+            ChokeWarningThreshold = 500;
+            DenyIncomingRequestsWhenBackedUp = true;
+        }
+
+        public LootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
+        {
+            MaxRetries = maxRetries;
+            IncrementalBackoffFactor = incrementalBackoffFactor;
+            InitialRetryWaitTimeInMs = initialRetryWaitTime;
+            MaxOngoingRequests = 50;
+            ChokeWarningThreshold = 500;
+            DenyIncomingRequestsWhenBackedUp = true;
+        }
+    }
+
     #if UNITY_EDITOR
     [ExecuteInEditMode]
     #endif
     public class LootLockerHTTPClient : MonoBehaviour
     {
         #region Configuration
-        private const int MaxRetries = 5;
-        private const int IncrementalBackoffFactor = 2;
-        private const int InitialRetryWaitTimeInMs = 50;
-        private const int MaxOngoingRequests = 50;
-        private const int ChokeWarningThreshold = 500;
-        private const bool DenyIncomingRequestsWhenBackedUp = true;
+
+        private static LootLockerHTTPClientConfiguration configuration = new LootLockerHTTPClientConfiguration();
         private Dictionary<string, bool> CurrentlyOngoingRequests =  new Dictionary<string, bool>();
 
         private static readonly Dictionary<string, string> BaseHeaders = new Dictionary<string, string>
@@ -154,6 +199,14 @@ namespace LootLocker
             }
             return _instance;
         }
+
+        public void OverrideConfiguration([NotNull] LootLockerHTTPClientConfiguration configuration)
+        {
+            if (configuration != null)
+            {
+                LootLockerHTTPClient.configuration = configuration;
+            }
+        }
         #endregion
 
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
@@ -200,7 +253,7 @@ namespace LootLocker
                         continue;
                     }
 
-                    if (CurrentlyOngoingRequests.Count >= MaxOngoingRequests)
+                    if (CurrentlyOngoingRequests.Count >= configuration.MaxOngoingRequests)
                     {
                         // Wait for some requests to finish before scheduling more requests
                         continue;
@@ -276,7 +329,7 @@ namespace LootLocker
                 }));
             }
 
-            if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
+            if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > configuration.ChokeWarningThreshold)
             {
                 LootLockerLogger.Log($"LootLocker HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'", LootLockerLogger.LogLevel.Warning);
             }
@@ -356,7 +409,7 @@ namespace LootLocker
             //Always wait 1 frame before starting any request to the server to make sure the requester code has exited the main thread.
             yield return null;
 
-            if (DenyIncomingRequestsWhenBackedUp && (HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > ChokeWarningThreshold)
+            if (configuration.DenyIncomingRequestsWhenBackedUp && (HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > configuration.ChokeWarningThreshold)
             {
                 // Execution queue is backed up, deny request
                 request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request was denied because there are currently too many requests in queue"));
@@ -475,7 +528,7 @@ namespace LootLocker
                         else
                         {
                             // Incremental backoff
-                            executionItem.RetryAfter = DateTime.Now.AddMilliseconds(InitialRetryWaitTimeInMs + (InitialRetryWaitTimeInMs * executionItem.RequestData.TimesRetried*IncrementalBackoffFactor));
+                            executionItem.RetryAfter = DateTime.Now.AddMilliseconds(configuration.InitialRetryWaitTimeInMs + (configuration.InitialRetryWaitTimeInMs * executionItem.RequestData.TimesRetried*configuration.IncrementalBackoffFactor));
                         }
                         executionItem.RequestData.TimesRetried++;
 
@@ -614,7 +667,7 @@ namespace LootLocker
 
         private static bool ShouldRetryRequest(long statusCode, int timesRetried)
         {
-            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < MaxRetries;
+            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && CurrentPlatform.Get() != Platforms.Steam && timesRetried < configuration.MaxRetries;
         }
 
         private static bool ShouldRefreshSession(long statusCode)

@@ -116,7 +116,14 @@ namespace LootLocker.Requests
             return true;
         }
 
-        #endregion
+#if !LOOTLOCKER_LEGACY_HTTP_STACK && LOOTLOCKER_ENABLE_HTTP_CONFIGURATION_OVERRIDE
+        public static void _OverrideLootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
+        {
+            LootLockerHTTPClient.Get().OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
+        }
+#endif
+
+#endregion
 
         #region Authentication
         /// <summary>
