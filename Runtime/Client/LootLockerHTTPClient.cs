@@ -88,17 +88,17 @@ namespace LootLocker
         #region Instance Handling
         private static LootLockerHTTPClient _instance;
         private static int _instanceId = 0;
-        public GameObject HostingGameObject = null;
+        private GameObject _hostingGameObject = null;
 
         public static void Instantiate()
         {
-            if (_instance == null)
+            if (!_instance)
             {
                 var gameObject = new GameObject("LootLockerHTTPClient");
 
                 _instance = gameObject.AddComponent<LootLockerHTTPClient>();
                 _instanceId = _instance.GetInstanceID();
-                _instance.HostingGameObject = gameObject;
+                _instance._hostingGameObject = gameObject;
                 _instance.StartCoroutine(CleanUpOldInstances());
                 if (Application.isPlaying)
                     DontDestroyOnLoad(_instance.gameObject);
@@ -114,10 +114,10 @@ namespace LootLocker
 #endif
             foreach (LootLockerHTTPClient serverApi in serverApis)
             {
-                if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
+                if (serverApi && _instanceId != serverApi.GetInstanceID() && serverApi._hostingGameObject)
                 {
 #if UNITY_EDITOR
-                    DestroyImmediate(serverApi.HostingGameObject);
+                    DestroyImmediate(serverApi._hostingGameObject);
 #else
                     Destroy(serverApi.HostingGameObject);
 #endif
@@ -128,7 +128,7 @@ namespace LootLocker
 
         public static void ResetInstance()
         {
-            if (_instance == null) return;
+            if (!_instance) return;
 #if UNITY_EDITOR
             DestroyImmediate(_instance.gameObject);
 #else
@@ -148,7 +148,7 @@ namespace LootLocker
 
         public static LootLockerHTTPClient Get()
         {
-            if (_instance == null)
+            if (!_instance)
             {
                 Instantiate();
             }
