@@ -116,6 +116,7 @@ namespace LootLocker
         #region Configuration
 
         private static LootLockerHTTPClientConfiguration configuration = new LootLockerHTTPClientConfiguration();
+
         private Dictionary<string, bool> CurrentlyOngoingRequests =  new Dictionary<string, bool>();
 
         private static readonly Dictionary<string, string> BaseHeaders = new Dictionary<string, string>
@@ -164,7 +165,7 @@ namespace LootLocker
 #if UNITY_EDITOR
                     DestroyImmediate(serverApi._hostingGameObject);
 #else
-                    Destroy(serverApi.HostingGameObject);
+                    Destroy(serverApi._hostingGameObject);
 #endif
                 }
             }
