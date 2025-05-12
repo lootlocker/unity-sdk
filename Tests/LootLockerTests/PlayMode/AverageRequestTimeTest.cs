@@ -161,6 +161,7 @@ public class AverageRequestTimeTest
 
             Debug.LogWarning("Setup done, waiting 10");
             yield return new WaitForSeconds(10);
+            LootLockerSDKManager._OverrideLootLockerHTTPClientConfiguration(30, 1, 1);
             Debug.LogWarning("Setup done, continuing");
             // Given
             List<RequestData> executedRequests = new List<RequestData>();
