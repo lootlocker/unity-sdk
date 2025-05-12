@@ -5,7 +5,10 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "LootLockerTestUtils",
-        "lootlocker.lootlockersdk.runtime"
+        "lootlocker.lootlockersdk.runtime",
+        "Unity.Multiplayer.Tools.NetworkSimulator.Runtime",
+        "Unity.Networking.Transport",
+        "Unity.Multiplayer.Tools.Common"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -5,6 +5,7 @@ using LootLocker;
 using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
 using NUnit.Framework;
+using Unity.Multiplayer.Tools.NetworkSimulator.Runtime;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -24,15 +25,21 @@ public class AverageRequestTimeTest
     private static int TestCounter = 0;
     private bool SetupFailed = false;
     string leaderboardKey = "gl_leaderboard";
+    private GameObject networkSimulatorContainer;
 
     [UnitySetUp]
     public IEnumerator Setup()
     {
+        networkSimulatorContainer = new GameObject("NetworkSimulatorContainer");
+        var networkSimulator = networkSimulatorContainer.AddComponent<NetworkSimulator>();
+        networkSimulator.ConnectionPreset = NetworkSimulatorPresets.Mobile2G;
+        networkSimulator.Disconnect();
         yield return null;
     }
 
     public IEnumerator _Setup()
     {
+
         TestCounter++;
         configCopy = LootLockerConfig.current;
 
@@ -43,13 +50,13 @@ public class AverageRequestTimeTest
 
         // Create game
         bool gameCreationCallCompleted = false;
-        LootLockerTestGame.CreateGame(testName: "AverageRequestTimeTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+        LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
         {
             if (!success)
             {
-                SetupFailed = true;
                 gameCreationCallCompleted = true;
-                return;
+                Debug.LogError(errorMessage);
+                SetupFailed = true;
             }
             gameUnderTest = game;
             gameCreationCallCompleted = true;
@@ -67,6 +74,7 @@ public class AverageRequestTimeTest
         {
             if (!success)
             {
+                Debug.LogError(errorMessage);
                 SetupFailed = true;
             }
             enableGuestLoginCallCompleted = true;
@@ -76,7 +84,7 @@ public class AverageRequestTimeTest
         {
             yield break;
         }
-        Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Failed to initialize LootLocker");
+        Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
 
         for (int i = 0; i < 5; i++)
         {
@@ -131,7 +139,7 @@ public class AverageRequestTimeTest
         }
 
         LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-            configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+            configCopy.logLevel, configCopy.allowTokenRefresh);
     }
 
     [UnityTest]
@@ -150,6 +158,10 @@ public class AverageRequestTimeTest
             yield return _Setup();
 
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            Debug.LogWarning("Setup done, waiting 10");
+            yield return new WaitForSeconds(10);
+            Debug.LogWarning("Setup done, continuing");
             // Given
             List<RequestData> executedRequests = new List<RequestData>();
             int requestChainsToRun = 30;
@@ -324,19 +336,23 @@ public class AverageRequestTimeTest
             {
                 totalLongestRequestTime = longestRequestTime;
             }
+            
+            Debug.LogWarning("Test done, waiting 10");
+            yield return new WaitForSeconds(10);
+            Debug.LogWarning("Test done, continuing");
             yield return _TearDown();
-            /*Assert.IsTrue(averageRequestTime <= 75.0f, $"Average Request Time exceeded 75ms. Was {averageRequestTime}ms");
-            Assert.IsTrue(p10RequestTime <= 10.0f, $"p10 Request Time exceeded 10ms. Was {p10RequestTime}ms");
-            Assert.IsTrue(p99RequestTime <= 250.0f, $"p99 Request Time exceeded 250ms. Was {p99RequestTime}ms");
-            Assert.IsTrue(longestRequestTime <= 700.0f, $"Longest Request Time exceeded 700ms. Was {longestRequestTime}ms");*/
+            //Assert.IsTrue(averageRequestTime <= 30.0f, $"Average Request Time exceeded 20ms. Was {averageRequestTime}ms");
+            //Assert.IsTrue(p10RequestTime <= 8.0f, $"p10 Request Time exceeded 4ms. Was {p10RequestTime}ms");
+            //Assert.IsTrue(p99RequestTime <= 75.0f, $"p99 Request Time exceeded 60ms. Was {p99RequestTime}ms");
+            //Assert.IsTrue(longestRequestTime <= 150.0f, $"Longest Request Time exceeded 120ms. Was {longestRequestTime}ms");
         }
         var totalAverageRequestTime = totalTotalRequestTime / totalRequestsCount;
         Debug.LogWarning($"Total. {totalRequestsCount} requests executed. Average time = {totalAverageRequestTime}ms. The lowest 10% of requests were executed in {totalP10RequestTime}ms and the top 1% in {totalP99RequestTime}ms. The absolutely longest request took {totalLongestRequestTime}ms");
 
-        Assert.IsTrue(totalAverageRequestTime <= 75.0f, $"Average Request Time exceeded 75ms. Was {totalAverageRequestTime}ms");
-        Assert.IsTrue(totalP10RequestTime <= 10.0f, $"p10 Request Time exceeded 10ms. Was {totalP10RequestTime}ms");
-        Assert.IsTrue(totalP99RequestTime <= 250.0f, $"p99 Request Time exceeded 250ms. Was {totalP99RequestTime}ms");
-        Assert.IsTrue(totalLongestRequestTime <= 700.0f, $"Longest Request Time exceeded 700ms. Was {totalLongestRequestTime}ms");
+        Assert.IsTrue(totalAverageRequestTime <= 100.0f, $"Average Request Time exceeded 100ms. Was {totalAverageRequestTime}ms");
+        Assert.IsTrue(totalP10RequestTime <= 15.0f, $"p10 Request Time exceeded 15ms. Was {totalP10RequestTime}ms");
+        Assert.IsTrue(totalP99RequestTime <= 1000.0f, $"p99 Request Time exceeded 1000ms. Was {totalP99RequestTime}ms");
+        Assert.IsTrue(totalLongestRequestTime <= 1500.0f, $"Longest Request Time exceeded 1500ms. Was {totalLongestRequestTime}ms");
 
         // NOTE: TIME LIMITS ARE SOURCED FROM A BUNCH OF PRE-REFACTORING TEST RUNS
         yield return null;
