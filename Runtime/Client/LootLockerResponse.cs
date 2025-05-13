@@ -73,7 +73,7 @@ namespace LootLocker
             }
             else if (serverResponse.errorData != null)
             {
-                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode, text = serverResponse.text };
+                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode, text = serverResponse.text, requestContext = serverResponse.requestContext };
             }
 
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
