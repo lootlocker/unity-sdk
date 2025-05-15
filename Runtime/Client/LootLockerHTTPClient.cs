@@ -5,7 +5,6 @@ using System;
 using LootLocker.LootLockerEnums;
 using System.Collections;
 using System.Text;
-using JetBrains.Annotations;
 using UnityEngine.Networking;
 using LootLocker.Requests;
 using LootLocker.HTTP;
@@ -201,7 +200,7 @@ namespace LootLocker
             return _instance;
         }
 
-        public void OverrideConfiguration([NotNull] LootLockerHTTPClientConfiguration configuration)
+        public void OverrideConfiguration(LootLockerHTTPClientConfiguration configuration)
         {
             if (configuration != null)
             {
