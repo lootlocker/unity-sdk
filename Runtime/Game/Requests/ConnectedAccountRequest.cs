@@ -11,7 +11,7 @@ namespace LootLocker.LootLockerEnums
         google = 1,
         apple = 2,
         steam = 3,
-        epic = 4,
+        epic_games = 4,
         credentials = 5, // White Label Login
         nintendo = 6,
         xbox = 7,
