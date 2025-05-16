@@ -94,6 +94,9 @@ namespace LootLockerTestConfigurationUtils
 
         [Header("LootLocker Admin API Trigger Operations")]
         public static EndPointClass createTrigger = new EndPointClass("game/#GAMEID#/triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Notification Operations")]
+        public static EndPointClass sendCustomNotification = new EndPointClass("game/#GAMEID#/notifications/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }

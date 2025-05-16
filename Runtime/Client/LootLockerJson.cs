@@ -98,7 +98,7 @@ namespace LootLocker
             try
             {
                 output = Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
-                return true;
+                return output != null || string.IsNullOrEmpty(json) || json.Equals("\"\"") || json.Equals("null");
             }
             catch (Exception)
             {
