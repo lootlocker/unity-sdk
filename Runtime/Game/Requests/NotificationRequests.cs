@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using LootLocker.LootLockerEnums;
 
 namespace LootLocker.LootLockerEnums
@@ -13,6 +15,22 @@ namespace LootLocker.LootLockerEnums
         medium = 1,
         high = 2,
         emergency = 3,
+    };
+
+    /// <summary>
+    /// Enum of the different possible sources for notifications
+    /// </summary>
+    public enum LootLockerNotificationSource
+    {
+        triggers = 0,
+        purchasing_steam_store = 1,
+        purchasing_apple_app_store = 2,
+        purchasing_google_play_store = 3,
+        purchasing_lootlocker_store = 4,
+        twitch_drop = 5,
+        lootlocker_console = 6,
+        lootlocker_server_api = 7,
+        lootlocker_admin_api = 8,
     };
 
     /// <summary>
@@ -52,6 +70,9 @@ namespace LootLocker.LootLockerStaticStrings
             public static readonly string LootLocker = "purchasing.lootlocker";
         }
         public static readonly string TwitchDrop = "twitch_drop";
+        public static readonly string LootLockerConsole = "lootlocker.console";
+        public static readonly string LootLockerServerApi = "lootlocker.server_api";
+        public static readonly string LootLockerAdminApi = "lootlocker.admin_api";
     }
 
     /// <summary>
@@ -429,7 +450,7 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
-    public class LootLockerNotificationContentBody
+    public class LootLockerNotificationContentRewardBody
     {
         /// <summary>
         /// The kind of notification body this contains. Use it to know which field in this object will be populated. If the kind is asset_reward for example, the asset field will be populated, the rest will be null.
@@ -473,7 +494,200 @@ namespace LootLocker.Requests
         /// <summary>
         /// The body for this notification content, use the kind variable to know which field will be filled with data.
         /// </summary>
-        public LootLockerNotificationContentBody Body { get; set; }
+        public object Body { get; set; }
+
+        /// <summary>
+        /// Get the body as a String. Returns true if body could be parsed in which case Output contains the string body, returns false if parsing failed.
+        /// </summary>
+        public bool TryGetContentBodyAsString(out string output)
+        {
+            output = Body.ToString();
+            return output != null || Body == null;
+        }
+
+        /// <summary>
+        /// Get the body as a double. Returns true if body could be parsed in which case Output contains the double, returns false if parsing failed which can happen if the body is not numeric, the conversion under or overflows, or the string body precision is larger than can be dealt within a double.
+        /// </summary>
+        public bool TryGetContentBodyAsDouble(out double output)
+        {
+            try
+            {
+                string doubleAsString = Body.ToString();
+                return double.TryParse(doubleAsString, out output);
+            }
+            catch (InvalidCastException)
+            {
+                output = 0.0;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as an integer. Returns true if body could be parsed in which case Output contains the int, returns false if parsing failed which can happen if
+        /// </summary>
+        public bool TryGetContentBodyAsInteger(out int output)
+        {
+            try
+            {
+                string intAsString = Body.ToString();
+                return int.TryParse(intAsString, out output);
+            }
+            catch (InvalidCastException)
+            {
+                output = 0;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as a boolean. Returns true if body could be parsed in which case Output contains the bool, returns false if parsing failed which can happen if the string is not a convertible to a boolean (those are for example "0", "1", "true", "False", "yes", "NO", etc).
+        /// </summary>
+        public bool TryGetContentBodyAsBool(out bool output)
+        {
+            try
+            {
+                string boolAsString = Body.ToString();
+                return bool.TryParse(boolAsString, out output);
+            }
+            catch (InvalidCastException)
+            {
+                output = false;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as the specified type. Returns true if value could be parsed in which case output contains the parsed object, returns false if parsing failed which can happen if the value is not a valid json object string convertible to the specified object.
+        ///</summary>
+        public bool TryGetContentBodyAsType<T>(out T output)
+        {
+            return LootLockerJson.TryDeserializeObject<T>(LootLockerJson.SerializeObject(Body), out output);
+        }
+
+        /// <summary>
+        /// Get the body as a LootLockerNotificationContentRewardBody object. Returns true if body could be parsed in which case Output contains the LootLockerNotificationContentRewardBody, returns false if parsing failed.
+        /// </summary>
+        public bool TryGetContentBodyAsRewardNotification(out LootLockerNotificationContentRewardBody output)
+        { 
+            return TryGetContentBodyAsType(out output);
+        }
+
+        /// <summary>
+        /// Get the body as a String array. Returns true if body could be parsed in which case Output contains the string array body, returns false if parsing failed.
+        /// </summary>
+        public bool TryGetContentBodyAsStringArray(out string[] output)
+        {
+            try
+            {
+                output = ((IEnumerable)Body).Cast<object>().Select(entry => entry.ToString()).ToArray();
+                return output != null || Body == null;
+            }
+            catch (InvalidCastException)
+            {
+                output = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as a double array. Returns true if body could be parsed in which case Output contains the double array, returns false if parsing failed which can happen if the body is not numeric, the conversion under or overflows, or the string body precision is larger than can be dealt within a double.
+        /// </summary>
+        public bool TryGetContentBodyAsDoubleArray(out double[] output)
+        {
+            try
+            {
+                output = ((IEnumerable)Body).Cast<object>().Select(entry =>
+                {
+                    if (double.TryParse(entry.ToString(), out var outVal))
+                    {
+                        return outVal;
+                    }
+
+                    throw new InvalidCastException();
+                }).ToArray();
+                return output != null || Body == null;
+            }
+            catch (InvalidCastException)
+            {
+                output = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as an integer array. Returns true if body could be parsed in which case Output contains the int array, returns false if parsing failed which can happen if
+        /// </summary>
+        public bool TryGetContentBodyAsIntegerArray(out int[] output)
+        {
+            try
+            {
+                output = ((IEnumerable)Body).Cast<object>().Select(entry =>
+                {
+                    if (int.TryParse(entry.ToString(), out var outVal))
+                    {
+                        return outVal;
+                    }
+
+                    throw new InvalidCastException();
+                }).ToArray();
+                return output != null || Body == null;
+            }
+            catch (InvalidCastException)
+            {
+                output = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as a boolean array. Returns true if body could be parsed in which case Output contains the bool array, returns false if parsing failed which can happen if the string is not a convertible to a boolean (those are for example "0", "1", "true", "False", "yes", "NO", etc).
+        /// </summary>
+        public bool TryGetContentBodyAsBoolArray(out bool[] output)
+        {
+            try
+            {
+                output = ((IEnumerable)Body).Cast<object>().Select(entry =>
+                {
+                    if (bool.TryParse(entry.ToString(), out var outVal))
+                    {
+                        return outVal;
+                    }
+
+                    throw new InvalidCastException();
+                }).ToArray();
+                return output != null || Body == null;
+            }
+            catch (InvalidCastException)
+            {
+                output = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the body as an array of the specified type. Returns true if body could be parsed in which case Output contains the type array, returns false if parsing failed.
+        /// </summary>
+        public bool TryGetContentBodyAsTypeArray<T>(out T[] output)
+        {
+            try
+            {
+                output = ((IEnumerable)Body).Cast<object>().Select(entry =>
+                {
+                    if (LootLockerJson.TryDeserializeObject<T>(LootLockerJson.SerializeObject(entry), out var outVal))
+                    {
+                        return outVal;
+                    }
+
+                    throw new InvalidCastException();
+                }).ToArray();
+                return output != null || Body == null;
+            }
+            catch (InvalidCastException)
+            {
+                output = null;
+                return false;
+            }
+        }
     };
 
     /// <summary>
@@ -504,6 +718,10 @@ namespace LootLocker.Requests
         /// The originating source of this notification (for example, did it originate from a purchase, a leaderboard reward, or a trigger?). Use the static defines in LootLockerStaticStrings.LootLockerNotificationSources know what possible values this can be
         /// </summary>
         public string Source { get; set; }
+        /// <summary>
+        /// The originating source of this notification as an enum (for example, did it originate from a purchase, a leaderboard reward, or a trigger?). Use the static defines in LootLockerStaticStrings.LootLockerNotificationSources know what possible values this can be
+        /// </summary>
+        public LootLockerNotificationSource SourceEnum { get; set; }
         /// <summary>
         /// The actual content of this notification
         /// </summary>
@@ -580,8 +798,10 @@ namespace LootLocker.Requests
         /// For Triggers the identifying value is the key of the trigger
         /// For Google Play Store purchases it is the product id
         /// For Apple App Store purchases it is the transaction id
+        /// For Steam Store purchases it is the entitlement id
         /// For LootLocker virtual purchases it is the catalog item id
-        /// Twitch Drops have no uniquely identifying information, so sending in "twitch_drop" returns all twitch drop notifications
+        /// For Twitch Drops it is the Twitch reward id
+        /// For custom notifications(notifications with the field Custom = true and with the source being either LootLocker Console, LootLocker Admin API or LootLocker Server API) the content of the notification is defined by the sender, so the identifying value is simply the Notification type matching the pattern ^[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+$
         /// </summary>
         /// <param name="identifyingValue">The identifying value of the notification you want to fetch.</param>
         /// <param name="notifications">A list of notifications that were found for the given identifying value or null if none were found.</param>
@@ -604,11 +824,13 @@ namespace LootLocker.Requests
                 }
                 var notification = Notifications[lookupEntry.NotificationIndex];
                 if (notification == null 
-                    || !notification.Id.Equals(lookupEntry.NotificationId, StringComparison.OrdinalIgnoreCase) 
-                    || (!notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
+                    || !notification.Id.Equals(lookupEntry.NotificationId, StringComparison.OrdinalIgnoreCase)
+                    || (!identifyingValue.Equals(notification.Notification_type)
+                    && (!notification.Content.ContextAsDictionary.TryGetValue(lookupEntry.IdentifyingKey, out string actualContextValue) 
                         || actualContextValue == null 
                         || !actualContextValue.Equals(identifyingValue, StringComparison.OrdinalIgnoreCase)
                         )
+                    )
                     )
                 {
                     // The notifications array is not the same as when the lookup table was populated
@@ -647,27 +869,48 @@ namespace LootLocker.Requests
                 string identifyingKey = null;
                 if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Triggers, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.triggers;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key;
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.LootLocker, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_lootlocker_store;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.LootLocker.CatalogItemId;
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.GooglePlayStore, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_google_play_store;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore.ProductId;
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_apple_app_store;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.TransactionId;
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.SteamStore, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_steam_store;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.SteamStore.EntitlementId;
                 }
                 else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.TwitchDrop, StringComparison.OrdinalIgnoreCase))
                 {
+                    notification.SourceEnum = LootLockerNotificationSource.twitch_drop;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.TwitchDrop.TwitchRewardId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.LootLockerConsole, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.lootlocker_console;
+                    identifyingKey = notification.Notification_type;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.LootLockerServerApi, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.lootlocker_server_api;
+                    identifyingKey = notification.Notification_type;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.LootLockerAdminApi, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.lootlocker_admin_api;
+                    identifyingKey = notification.Notification_type;
                 }
 
                 if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)
@@ -686,6 +929,24 @@ namespace LootLocker.Requests
                     {
                         NotificationLookupTable.Add(value, new List<LootLockerNotificationLookupTableEntry> { lookupEntry });
                     }
+                } 
+                else if (identifyingKey != null && identifyingKey.Equals(notification.Notification_type))
+                {
+                    var lookupEntry = new LootLockerNotificationLookupTableEntry
+                    {
+                        IdentifyingKey = identifyingKey,
+                        NotificationId = notification.Id,
+                        NotificationIndex = i
+                    };
+                    if (NotificationLookupTable.TryGetValue(identifyingKey, out var indexes))
+                    {
+                        indexes.Add(lookupEntry);
+                    }
+                    else
+                    {
+                        NotificationLookupTable.Add(identifyingKey, new List<LootLockerNotificationLookupTableEntry> { lookupEntry });
+                    }
+
                 }
                 ++i;
             }

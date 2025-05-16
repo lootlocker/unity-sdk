@@ -61,28 +61,27 @@ namespace LootLocker
     public class LootLockerHTTPClientConfiguration
     {
         /*
-         * TODO: Document
+         * The max number of times each failed request will be retried before errors are returned
          */
         public int MaxRetries = 5;
         /*
-         * TODO: Document
+         * The multiplicative factor applied for each back off iteration. Example: If InitialRetryWaitTimeInMs is 50ms and the IncrementalBackoffFactor is 2 then the first retry will happen after 50ms, the second 100ms after that, the third 200ms after that and so on)
          */
         public int IncrementalBackoffFactor = 2;
         /*
-         * TODO: Document
+         * The time to wait before retrying the request the first time. Example: If InitialRetryWaitTimeInMs is 50ms and the IncrementalBackoffFactor is 2 then the first retry will happen after 50ms, the second 100ms after that, the third 200ms after that and so on)
          */
         public int InitialRetryWaitTimeInMs = 50;
-
         /*
-         * TODO: Document
+         * The maximum number of requests allowed to be in progress at the same time
          */
         public int MaxOngoingRequests = 50;
         /*
-         * TODO: Document
+         * The threshold of number of requests outstanding to use for warning about the building queue
          */
         public int ChokeWarningThreshold = 500;
         /*
-         * TODO: Document
+         * Whether to deny incoming requests when the HTTP client is already handling too many requests
          */
         public bool DenyIncomingRequestsWhenBackedUp = true;
 
