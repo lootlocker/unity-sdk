@@ -44,13 +44,24 @@ namespace LootLocker.Requests
     public class LootLockerLeaseRemoteSessionRequest
     {
         /// <summary>
-        /// The Game Key configured for the game
+        /// The Title ID of the game
         /// </summary>
-        public string game_key { get; set; } = LootLockerConfig.current.apiKey;
+        public string title_id { get; set; }
+        /// <summary>
+        /// The Environment ID of the game and environment
+        /// </summary>
+        public string environment_id { get; set; }
         /// <summary>
         /// The Game Version configured for the game
         /// </summary>
-        public string game_version { get; set; } = LootLockerConfig.current.game_version;
+        public string game_version { get; set; }
+
+        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId)
+        {
+            title_id = titleId;
+            environment_id = environmentId;
+            game_version = LootLockerConfig.current.game_version;
+        }
     }
 
     /// <summary>
@@ -218,6 +229,8 @@ namespace LootLocker
             #region Public Methods
             public static Guid StartRemoteSessionWithContinualPolling(
                 LootLockerRemoteSessionLeaseIntent leaseIntent,
+                string titleId,
+                string environmentId,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
@@ -225,7 +238,7 @@ namespace LootLocker
                 float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
+                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, titleId, environmentId, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
                     timeOutAfterMinutes, forPlayerWithUlid);
             }
@@ -355,12 +368,15 @@ namespace LootLocker
                 }
             }
 
-            private Guid _StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent leaseIntent,
+            private Guid _StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent leaseIntent,
+                string titleId,
+                string environmentId,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
-                float timeOutAfterMinutes = 5.0f, 
+                float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
                 if (_remoteSessionsProcesses.Count > 0)
@@ -384,7 +400,7 @@ namespace LootLocker
                 };
                 AddRemoteSessionProcess(processGuid, lootLockerRemoteSessionProcess);
 
-                LeaseRemoteSession(leaseIntent, forPlayerWithUlid, leaseRemoteSessionResponse =>
+                LeaseRemoteSession(leaseIntent, titleId, environmentId, forPlayerWithUlid, leaseRemoteSessionResponse =>
                 {
                     if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                     {
@@ -415,12 +431,15 @@ namespace LootLocker
                 }
             }
 
-            private void LeaseRemoteSession(LootLockerRemoteSessionLeaseIntent leaseIntent,
+            private void LeaseRemoteSession(
+                LootLockerRemoteSessionLeaseIntent leaseIntent,
+                string titleId,
+                string environmentId,
                 string forPlayerWithUlid,
                 Action<LootLockerLeaseRemoteSessionResponse> onComplete)
             {
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
-                    new LootLockerLeaseRemoteSessionRequest();
+                    new LootLockerLeaseRemoteSessionRequest(titleId, environmentId);
 
                 EndPointClass endPoint = leaseIntent == LootLockerRemoteSessionLeaseIntent.login ? LootLockerEndPoints.leaseRemoteSession : LootLockerEndPoints.leaseRemoteSessionForLinking;
                 LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint,
