@@ -120,7 +120,94 @@ namespace LootLocker.Requests
         }
 #endif
 
-#endregion
+
+        #endregion
+        
+        #region Multi-User Management
+
+        /// <summary>
+        /// Get a list of player ULIDs that have been active since game start (or state initialization).
+        /// </summary>
+        /// <returns>List of player ULIDs that have been active since game start.</returns>
+        public static List<string> GetActivePlayerUlids()
+        {
+            return LootLockerStateData.GetActivePlayerULIDs();
+        }
+
+        /// <summary>
+        /// Make the state for the player with the specified ULID to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove it from the list of active players.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player whose state should be set to inactive.</param>
+        public static void SetPlayerUlidToInactive(string playerUlid)
+        {
+            LootLockerStateData.SetPlayerULIDToInactive(playerUlid);
+        }
+
+        /// <summary>
+        /// Get a list of player ULIDs that there is a stored state for.
+        /// This includes both active and inactive players.
+        /// </summary>
+        /// <returns>List of player ULIDs that have a stored state.</returns>
+        public static List<string> GetCachedPlayerUlids()
+        {
+            return LootLockerStateData.GetCachedPlayerULIDs();
+        }
+
+        /// <summary>
+        /// Get the ULID of the player state that is used as the default state for calls that have no other player specified.
+        /// </summary>
+        /// <returns>The ULID of the default player state.</returns>
+        public static string GetDefaultPlayerUlid()
+        {
+            return LootLockerStateData.GetDefaultPlayerULID();
+        }
+
+        /// <summary>
+        /// Set the player state that is used as the default state for calls that have no other player specified.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player state to set as default.</param>
+        /// <returns>True if the default player ULID was set successfully, false otherwise.</returns>
+        public static bool SetDefaultPlayerUlid(string playerUlid)
+        {
+            return LootLockerStateData.SetDefaultPlayerULID(playerUlid);
+        }
+
+        /// <summary>
+        /// Get the player state for the player with the specified ULID, or the default player state if the supplied player ULID is empty, or an empty state if none of the previous are present.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player whose state should be retrieved.</param>
+        /// <returns>The player state for the specified player, or the default player state if the supplied ULID is empty or could not be found, or an empty state if none of the previous are valid.</returns>
+        public static LootLockerPlayerData GetSavedStateOrDefaultOrEmptyForPlayer(string playerUlid)
+        {
+            return LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
+        }
+
+        /// <summary>
+        /// Remove stored state information for the specified player if present (player will need to re-authenticate).
+        /// If the player is the default player, the default player will be set to an empty state.
+        /// If the player is not the default player, the state will be removed but the default player will not be changed.
+        /// If the player is not found, no action will be taken.
+        /// </summary> 
+        /// <param name="playerUlid">The ULID of the player whose state should be cleared.</param>
+        public static void ClearCacheForPlayer(string playerUlid)
+        {
+            LootLockerStateData.ClearSavedStateForPlayerWithULID(playerUlid);
+        }
+
+        /// <summary>
+        /// Remove all stored state information (players will need to re-authenticate).
+        /// This will clear all player states, including the default player state.
+        /// If you want to clear the state for a specific player, use ClearCacheForPlayer(string playerUlid) instead.
+        /// This will also reset the default player to an empty state.
+        /// </summary>
+        public static void ClearAllPlayerCaches()
+        {
+            LootLockerStateData.ClearAllSavedStates();
+        }
+
+        #endregion
 
         #region Authentication
         /// <summary>
