@@ -1454,12 +1454,21 @@ namespace LootLocker.Requests
         /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
         /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
+        /// <param name="titleId">The Title ID of the game</param>
+        /// <param name="environmentId">The Environment ID of the game and environment</param>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
-        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
-        public static Guid StartRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
+        public static Guid StartRemoteSession(
+            string titleId,
+            string environmentId,
+            Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
+            Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
+            Action<LootLockerStartRemoteSessionResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeOutAfterMinutes = 5.0f)
         {
             if (!CheckInitialized(true))
             {
@@ -1467,22 +1476,41 @@ namespace LootLocker.Requests
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.login, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent.login,
+                titleId,
+                environmentId,
+                remoteSessionLeaseInformation,
+                remoteSessionLeaseStatusUpdate,
+                onComplete,
+                pollingIntervalSeconds,
+                timeOutAfterMinutes
+            );
         }
 
         /// <summary>
-        /// Start a remote session
-        /// If you want to let your local user sign in using another device then you use this method.First you will get the lease information needed to allow a secondary device to authenticate.
+        /// Start a remote session for linking
+        /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
         /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
-        /// When the process has come to an end(whether successfully or not), the onComplete action will be invoked with the updated information.
+        /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
-        /// <param name="forPlayerWithUlid">Execute the request for the specified player (the player that you intend to link the remote account into</param>
+        /// <param name="titleId">The Title ID of the game</param>
+        /// <param name="environmentId">The Environment ID of the game and environment</param>
+        /// <param name="forPlayerWithUlid">Execute the request for the specified player (the player that you intend to link the remote account into)</param>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
-        public static Guid StartRemoteSessionForLinking(string forPlayerWithUlid, Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
+        public static Guid StartRemoteSessionForLinking(
+            string titleId,
+            string environmentId,
+            string forPlayerWithUlid,
+            Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
+            Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
+            Action<LootLockerStartRemoteSessionResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeOutAfterMinutes = 5.0f)
         {
             if (!CheckInitialized())
             {
@@ -1490,7 +1518,17 @@ namespace LootLocker.Requests
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(LootLockerRemoteSessionLeaseIntent.link, remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes, forPlayerWithUlid);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent.link,
+                titleId,
+                environmentId,
+                remoteSessionLeaseInformation,
+                remoteSessionLeaseStatusUpdate,
+                onComplete,
+                pollingIntervalSeconds,
+                timeOutAfterMinutes,
+                forPlayerWithUlid
+            );
         }
 
         /// <summary>
@@ -1543,7 +1581,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.startRemoteSession.endPoint, LootLockerEndPoints.startRemoteSession.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerRefreshRemoteSessionRequest( refreshToken)),
+                LootLockerJson.SerializeObject(new LootLockerRefreshRemoteSessionRequest(refreshToken)),
                 (LootLockerResponse serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
