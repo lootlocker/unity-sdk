@@ -6,6 +6,7 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
 using System.Security.Cryptography;
+using UnityEngine.Networking;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -118,11 +119,16 @@ namespace LootLocker.Requests
         {
             LootLockerHTTPClient.Get().OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
         }
+
+        public static void _OverrideLootLockerCertificateHandler(CertificateHandler certificateHandler)
+        {
+            LootLockerHTTPClient.Get().OverrideCertificateHandler(certificateHandler);
+        }
 #endif
 
 
         #endregion
-        
+
         #region Multi-User Management
 
         /// <summary>
