@@ -6,6 +6,7 @@ using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.TestTools;
 
 namespace LootLockerTests.PlayMode

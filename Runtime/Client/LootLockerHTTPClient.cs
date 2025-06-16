@@ -114,6 +114,7 @@ namespace LootLocker
         #region Configuration
 
         private static LootLockerHTTPClientConfiguration configuration = new LootLockerHTTPClientConfiguration();
+        private static CertificateHandler certificateHandler = null;
 
         private Dictionary<string, bool> CurrentlyOngoingRequests =  new Dictionary<string, bool>();
 
@@ -205,6 +206,11 @@ namespace LootLocker
             {
                 LootLockerHTTPClient.configuration = configuration;
             }
+        }
+
+        public void OverrideCertificateHandler(CertificateHandler certificateHandler)
+        {
+            LootLockerHTTPClient.certificateHandler = certificateHandler;
         }
         #endregion
 
@@ -793,7 +799,7 @@ namespace LootLocker
                         return null;
                     }
                     webRequest = UnityWebRequest.Post(request.FormattedURL, ((LootLockerFileRequestContent)request.Content).fileForm);
-                    if(request.HTTPMethod == LootLockerHTTPMethod.UPDATE_FILE)
+                    if (request.HTTPMethod == LootLockerHTTPMethod.UPDATE_FILE)
                     {
                         // Workaround for UnityWebRequest with PUT HTTP verb not having form fields
                         webRequest.method = UnityWebRequest.kHttpVerbPUT;
@@ -843,6 +849,12 @@ namespace LootLocker
             }
 
             webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+            if (certificateHandler != null)
+            {
+                webRequest.certificateHandler = certificateHandler;
+            }
+
             return webRequest;
         }
 
@@ -872,7 +884,7 @@ namespace LootLocker
             webRequest.method = UnityWebRequest.kHttpVerbPOST;
             return webRequest;
         }
-        #endregion
+#endregion
 
         #region Misc Helper Methods
 
