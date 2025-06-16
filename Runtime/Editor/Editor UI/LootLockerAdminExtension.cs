@@ -127,182 +127,171 @@ namespace LootLocker.Extension
             var styleLength = new StyleLength();
             var current = styleLength.value;
             current.unit = LengthUnit.Percent;
-
             current.value = 100;
-
             labelFromUXML.style.height = current;
-
             root.Add(labelFromUXML);
+
+            var securityWarning = new Label("Warning: Admin tokens are stored in EditorPrefs and are not encrypted. Do not use on shared or insecure machines.");
+            securityWarning.style.color = new StyleColor(Color.yellow);
+            securityWarning.style.unityFontStyleAndWeight = FontStyle.Bold;
+            root.Add(securityWarning);
 
             live.value = new Color(0.749f, 0.325f, 0.098f, 1);
             stage.value = new Color(0.094f, 0.749f, 0.352f, 1);
             defaultButton.value = new Color(0.345f, 0.345f, 0.345f, 1);
 
+            // Null checks for all Q<T>() calls
             menuLogoutBtn = root.Q<Button>("LogoutBtn");
-
-            menuLogoutBtn.style.display = DisplayStyle.None;
+            if (menuLogoutBtn == null) Debug.LogWarning("LogoutBtn not found in UXML");
+            else menuLogoutBtn.style.display = DisplayStyle.None;
 
             environmentBackground = root.Q<VisualElement>("SwitchBackground");
-
-            environmentBackground.AddManipulator(new Clickable(evt => SwapEnvironment()));
+            if (environmentBackground == null) Debug.LogWarning("SwitchBackground not found in UXML");
+            else environmentBackground.AddManipulator(new Clickable(evt => SwapEnvironment()));
 
             environmentHandle = root.Q<VisualElement>("Handle");
+            if (environmentHandle == null) Debug.LogWarning("Handle not found in UXML");
+            else environmentHandle.AddManipulator(new Clickable(evt => SwapEnvironment()));
 
-            environmentHandle.AddManipulator(new Clickable(evt => SwapEnvironment()));
-
-            environmentBackground.tooltip = "Stage";
+            // environmentBackground?.SetTooltip("Stage");
+            if (environmentBackground != null) environmentBackground.tooltip = "Stage";
 
             environmentElement = root.Q<VisualElement>("Environment");
-
-            environmentElement.style.display = DisplayStyle.None;
+            if (environmentElement == null) Debug.LogWarning("Environment not found in UXML");
+            else environmentElement.style.display = DisplayStyle.None;
 
             environmentTitle = root.Q<Label>("EnvironmentTitle");
+            if (environmentTitle == null) Debug.LogWarning("EnvironmentTitle not found in UXML");
 
             gameName = root.Q<Label>("GameName");
+            if (gameName == null) Debug.LogWarning("GameName not found in UXML");
 
             menu = root.Q<VisualElement>("MenuBar");
-
-            menu.style.display = DisplayStyle.None;
+            if (menu == null) Debug.LogWarning("MenuBar not found in UXML");
+            else menu.style.display = DisplayStyle.None;
 
             menuChangeGameBtn = root.Q<Button>("ChangeGameBtn");
+            if (menuChangeGameBtn == null) Debug.LogWarning("ChangeGameBtn not found in UXML");
 
             menuAPIKeyBtn = root.Q<Button>("APIKeyBtn");
+            if (menuAPIKeyBtn == null) Debug.LogWarning("APIKeyBtn not found in UXML");
 
             menuLogoutBtn = root.Q<Button>("LogoutBtn");
+            if (menuLogoutBtn != null)
+                menuLogoutBtn.clickable.clicked += () => { ConfirmLogout(); };
 
-            menuLogoutBtn.clickable.clicked += () =>
-            {
-                Logout();
-            };
-
-            menuChangeGameBtn.clickable.clicked += () =>
-            {
-                SwapFlows(gameSelectorFlow);
-            };
+            // menuChangeGameBtn?.clickable.clicked += () => { SwapFlows(gameSelectorFlow); };
+            if (menuChangeGameBtn != null) menuChangeGameBtn.clickable.clicked += () => { SwapFlows(gameSelectorFlow); };
 
             popup = root.Q<VisualElement>("PopUp");
+            if (popup == null) Debug.LogWarning("PopUp not found in UXML");
 
             popupTitle = root.Q<Label>("popupTitle");
             popupMessage = root.Q<Label>("popupMessage");
-
             popupBtn = root.Q<Button>("popupCloseBtn");
-
-            popupBtn.clickable.clickedWithEventInfo += ClosePopup;
+            if (popupBtn != null) popupBtn.clickable.clickedWithEventInfo += ClosePopup;
 
             loginFlow = root.Q<VisualElement>("LoginFlow");
-
-            loginFlow.style.display = DisplayStyle.None;
+            if (loginFlow == null) Debug.LogWarning("LoginFlow not found in UXML");
+            else loginFlow.style.display = DisplayStyle.None;
 
             emailField = root.Q<TextField>("EmailField");
             passwordField = root.Q<TextField>("PasswordField");
-
-            passwordField.RegisterCallback<KeyDownEvent>((evt) =>
+            if (passwordField != null)
             {
-                if (evt.keyCode == KeyCode.Return)
+                passwordField.RegisterCallback<KeyDownEvent>((evt) =>
                 {
-                    Login();
-                }
-            });
+                    if (evt.keyCode == KeyCode.Return)
+                    {
+                        Login();
+                    }
+                });
+            }
 
             signupLink = root.Q<Label>("newUserLink");
             gettingStartedLink = root.Q<Label>("gettingStartedLink");
             forgotPasswordLink = root.Q<Label>("forgotPasswordLink");
-
             loginBtn = root.Q<Button>("LoginBtn");
-
-            signupLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://lootlocker.com/sign-up"));
-            forgotPasswordLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://console.lootlocker.com/forgot-password"));
-            gettingStartedLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://docs.lootlocker.com/the-basics/readme"));
-
-            loginBtn.clickable.clicked += Login;
+            if (signupLink != null) signupLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://lootlocker.com/sign-up"));
+            if (forgotPasswordLink != null) forgotPasswordLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://console.lootlocker.com/forgot-password"));
+            if (gettingStartedLink != null) gettingStartedLink.RegisterCallback<MouseDownEvent>(_ => Application.OpenURL("https://docs.lootlocker.com/the-basics/readme"));
+            if (loginBtn != null) loginBtn.clickable.clicked += Login;
 
             mfaFlow = root.Q<VisualElement>("MFAFlow");
-
             codeField = root.Q<TextField>("CodeField");
-
             signInBtn = root.Q<Button>("SignInBtn");
-
-            signInBtn.clickable.clickedWithEventInfo += SignIn;
-
-            mfaFlow.style.display = DisplayStyle.None;
+            if (signInBtn != null) signInBtn.clickable.clickedWithEventInfo += SignIn;
+            if (mfaFlow != null) mfaFlow.style.display = DisplayStyle.None;
 
             gameSelectorFlow = root.Q<VisualElement>("GameSelectorFlow");
-
             gameSelectorList = root.Q<VisualElement>("GamesList");
-
-            gameSelectorFlow.style.display = DisplayStyle.None;
+            if (gameSelectorFlow != null) gameSelectorFlow.style.display = DisplayStyle.None;
 
             apiKeyFlow = root.Q<VisualElement>("APIKeyFlow");
-
-            apiKeyFlow.style.display = DisplayStyle.None;
+            if (apiKeyFlow != null) apiKeyFlow.style.display = DisplayStyle.None;
 
             createApiKeyWindow = root.Q<VisualElement>("InfoandCreate");
-
-            createApiKeyWindow.style.display = DisplayStyle.None;
+            if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
 
             apiKeyList = root.Q<VisualElement>("APIKeyList");
-
             newApiKeyWindow = root.Q<VisualElement>("CreateAPIKeyWindow");
-
             newApiKeyName = root.Q<TextField>("newApiKeyName");
-
             newApiKeyCancel = root.Q<Label>("APINewKeyCancel");
-
-            newApiKeyCancel.RegisterCallback<MouseDownEvent>(_ =>
-            {
-                newApiKeyName.value = "";
-                newApiKeyWindow.style.display = DisplayStyle.None;
-
-            });
+            if (newApiKeyCancel != null)
+                newApiKeyCancel.RegisterCallback<MouseDownEvent>(_ =>
+                {
+                    if (newApiKeyName != null) newApiKeyName.value = "";
+                    if (newApiKeyWindow != null) newApiKeyWindow.style.display = DisplayStyle.None;
+                });
 
             createApiKeyBtn = root.Q<Button>("CreateNewKey");
-
-            createApiKeyBtn.clickable.clicked += () =>
-            {
-                CreateNewAPIKey();
-                newApiKeyWindow.style.display = DisplayStyle.None;
-            };
+            if (createApiKeyBtn != null)
+                createApiKeyBtn.clickable.clicked += () =>
+                {
+                    CreateNewAPIKey();
+                    if (newApiKeyWindow != null) newApiKeyWindow.style.display = DisplayStyle.None;
+                };
 
             createNewApiKeyBtn = root.Q<Button>("CreateKeyBtn");
-
-            createNewApiKeyBtn.clickable.clicked += () =>
-            {
-                newApiKeyWindow.style.display = DisplayStyle.Flex;
-            };
+            if (createNewApiKeyBtn != null)
+                createNewApiKeyBtn.clickable.clicked += () =>
+                {
+                    if (newApiKeyWindow != null) newApiKeyWindow.style.display = DisplayStyle.Flex;
+                };
 
             isStage = LootLockerEditorData.IsEnvironmentStage();
-
             if (isStage)
             {
-                environmentHandle.style.alignSelf = Align.FlexStart;
-                environmentBackground.style.backgroundColor = stage;
-                environmentTitle.text = "Environment: Stage";
+                if (environmentHandle != null) environmentHandle.style.alignSelf = Align.FlexStart;
+                if (environmentBackground != null) environmentBackground.style.backgroundColor = stage;
+                if (environmentTitle != null) environmentTitle.text = "Environment: Stage";
             }
             else
             {
-                environmentHandle.style.alignSelf = Align.FlexEnd;
-                environmentBackground.style.backgroundColor = live;
-                environmentTitle.text = "Environment: Live";
+                if (environmentHandle != null) environmentHandle.style.alignSelf = Align.FlexEnd;
+                if (environmentBackground != null) environmentBackground.style.backgroundColor = live;
+                if (environmentTitle != null) environmentTitle.text = "Environment: Live";
             }
 
             loadingPage = root.Q<VisualElement>("LoadingBackground");
-            loadingPage.style.display = DisplayStyle.Flex;
+            if (loadingPage != null) loadingPage.style.display = DisplayStyle.Flex;
             currentFlow = loadingPage;
 
             loadingIcon = root.Q<VisualElement>("LoadingIcon");
-
-            loadingIcon.schedule.Execute(() =>
+            if (loadingIcon != null)
             {
-                if (rotateIndex >= 360)
+                loadingIcon.schedule.Execute(() =>
                 {
-                    rotateIndex = 0;
-                }
-                rotateIndex += 1;
-                EditorApplication.update += OnEditorUpdate;
-                loadingIcon.style.rotate = new StyleRotate(new Rotate(new Angle(rotateIndex, AngleUnit.Degree)));
-                EditorApplication.update -= OnEditorUpdate;
-
-            }).Every(1);
+                    if (rotateIndex >= 360)
+                    {
+                        rotateIndex = 0;
+                    }
+                    rotateIndex += 1;
+                    EditorApplication.update += OnEditorUpdate;
+                    loadingIcon.style.rotate = new StyleRotate(new Rotate(new Angle(rotateIndex, AngleUnit.Degree)));
+                    EditorApplication.update -= OnEditorUpdate;
+                }).Every(16); // 60 FPS
+            }
 
             Run();
         }
@@ -339,69 +328,54 @@ namespace LootLocker.Extension
         void SwapFlows(VisualElement New)
         {
             if (currentFlow == New) return;
-
             activeFlow = New;
-
             if (currentFlow != null)
             {
                 currentFlow.style.display = DisplayStyle.None;
                 if (currentFlow == apiKeyFlow)
                 {
-                    apiKeyList.Clear();
+                    apiKeyList?.Clear();
                 }
             }
-
             New.style.display = DisplayStyle.Flex;
-
             if (activeFlow == gameSelectorFlow)
             {
-                gameName.text = "LootLocker";
-                emailField.value = "hector@lootlocker.com";
-                passwordField.value = "its my password!";
-                menuAPIKeyBtn.style.display = DisplayStyle.None;
-                menuChangeGameBtn.style.display = DisplayStyle.None;
-                environmentElement.style.display = DisplayStyle.None;
-                createApiKeyWindow.style.display = DisplayStyle.None;
-                menu.style.display = DisplayStyle.Flex;
-                menuLogoutBtn.style.display = DisplayStyle.Flex;
-                menuAPIKeyBtn.style.display = DisplayStyle.None;
-                menuChangeGameBtn.style.display = DisplayStyle.None;
-
+                if (gameName != null) gameName.text = "LootLocker";
+                // Remove hardcoded credentials
+                if (emailField != null) emailField.value = "";
+                if (passwordField != null) passwordField.value = "";
+                SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
+                if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
+                if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
                 CreateGameButtons();
             }
-
             if (activeFlow == apiKeyFlow)
             {
-                gameName.text = LootLockerEditorData.GetSelectedGameName();
-                menu.style.display = DisplayStyle.Flex;
-                menuAPIKeyBtn.style.display = DisplayStyle.Flex;
-                menuChangeGameBtn.style.display = DisplayStyle.Flex;
-                environmentElement.style.display = DisplayStyle.Flex;
-                createApiKeyWindow.style.display = DisplayStyle.Flex;
-                menuLogoutBtn.style.display = DisplayStyle.Flex;
-                menuAPIKeyBtn.style.display = DisplayStyle.Flex;
-                menuChangeGameBtn.style.display = DisplayStyle.Flex;
-
+                if (gameName != null) gameName.text = LootLockerEditorData.GetSelectedGameName();
+                SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
+                if (environmentElement != null) environmentElement.style.display = DisplayStyle.Flex;
+                if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.Flex;
                 RefreshAPIKeys();
             }
-
             if (activeFlow == loginFlow)
             {
-                environmentElement.style.display = DisplayStyle.None;
-                menu.style.display = DisplayStyle.None;
-                createApiKeyWindow.style.display = DisplayStyle.None;
-
+                if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
+                if (menu != null) menu.style.display = DisplayStyle.None;
+                if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
             }
-
             if (activeFlow == mfaFlow)
             {
-                menu.style.display = DisplayStyle.Flex;
-                menuLogoutBtn.style.display = DisplayStyle.Flex;
-                menuAPIKeyBtn.style.display = DisplayStyle.None;
-                menuChangeGameBtn.style.display = DisplayStyle.None;
+                SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
             }
-
             currentFlow = New;
+        }
+        // Helper for menu visibility
+        void SetMenuVisibility(bool apiKey, bool changeGame, bool logout)
+        {
+            if (menu != null) menu.style.display = DisplayStyle.Flex;
+            if (menuAPIKeyBtn != null) menuAPIKeyBtn.style.display = apiKey ? DisplayStyle.Flex : DisplayStyle.None;
+            if (menuChangeGameBtn != null) menuChangeGameBtn.style.display = changeGame ? DisplayStyle.Flex : DisplayStyle.None;
+            if (menuLogoutBtn != null) menuLogoutBtn.style.display = logout ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void OnEditorUpdate()
@@ -424,44 +398,49 @@ namespace LootLocker.Extension
 
         public void Login()
         {
-            if (string.IsNullOrEmpty(emailField.value) || string.IsNullOrEmpty(passwordField.value))
+            if (string.IsNullOrEmpty(emailField?.value) || string.IsNullOrEmpty(passwordField?.value))
             {
                 ShowPopup("Error", "Email or Password is empty.");
-                loadingPage.style.display = DisplayStyle.None;
+                if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
                 return;
             }
-
             EditorApplication.update += OnEditorUpdate;
-            loadingPage.style.display = DisplayStyle.Flex;
-
-            LootLockerAdminManager.AdminLogin(emailField.value, passwordField.value, (onComplete) =>
+            if (loadingPage != null) loadingPage.style.display = DisplayStyle.Flex;
+            try
             {
-                if (!onComplete.success)
+                LootLockerAdminManager.AdminLogin(emailField.value, passwordField.value, (onComplete) =>
                 {
-                    ShowPopup("Error", "We couldn't recognize your information or there is no user with this email, please check and try again!");
-                    loadingPage.style.display = DisplayStyle.None;
-                    return;
-                }
-
-                if (onComplete.mfa_key != null)
-                {
-                    mfaKey = onComplete.mfa_key;
-                    menu.style.display = DisplayStyle.Flex;
-                    loadingPage.style.display = DisplayStyle.None;
-                    SwapFlows(mfaFlow);
-                }
-                else
-                {
-                    menu.style.display = DisplayStyle.Flex;
-                    LootLockerConfig.current.adminToken = onComplete.auth_token;
-                    LootLockerEditorData.SetAdminToken(onComplete.auth_token);
-                    loadingPage.style.display = DisplayStyle.None;
-
-                    SwapFlows(gameSelectorFlow);
-                }
-                menuLogoutBtn.style.display = DisplayStyle.Flex;
-                EditorApplication.update -= OnEditorUpdate;
-            });
+                    if (!onComplete.success)
+                    {
+                        string errorMsg = !string.IsNullOrEmpty(onComplete.errorData?.message) ? onComplete.errorData.message : "We couldn't recognize your information or there is no user with this email, please check and try again!";
+                        ShowPopup("Error", errorMsg);
+                        if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
+                        return;
+                    }
+                    if (onComplete.mfa_key != null)
+                    {
+                        mfaKey = onComplete.mfa_key;
+                        if (menu != null) menu.style.display = DisplayStyle.Flex;
+                        if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
+                        SwapFlows(mfaFlow);
+                    }
+                    else
+                    {
+                        if (menu != null) menu.style.display = DisplayStyle.Flex;
+                        LootLockerConfig.current.adminToken = onComplete.auth_token;
+                        LootLockerEditorData.SetAdminToken(onComplete.auth_token);
+                        if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
+                        SwapFlows(gameSelectorFlow);
+                    }
+                    if (menuLogoutBtn != null) menuLogoutBtn.style.display = DisplayStyle.Flex;
+                    EditorApplication.update -= OnEditorUpdate;
+                });
+            }
+            catch (Exception ex)
+            {
+                ShowPopup("Error", $"Unexpected error: {ex.Message}");
+                if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
+            }
         }
 
         public void SignIn(EventBase e)
@@ -696,10 +675,8 @@ namespace LootLocker.Extension
         void APIKeyTemplate(KeyResponse key)
         {
             Button button = new Button();
-
             bool isLegacyKey = !(key.api_key.StartsWith("prod_") || key.api_key.StartsWith("dev_"));
             button.name = key.api_key;
-
             Label keyName = new Label();
             keyName.text = key.name;
             if (string.IsNullOrEmpty(key.name))
@@ -709,8 +686,8 @@ namespace LootLocker.Extension
             if (button.name == LootLockerConfig.current.apiKey)
             {
                 button.style.borderRightColor = button.style.borderLeftColor = button.style.borderTopColor = button.style.borderBottomColor = stage;
+                button.style.backgroundColor = new StyleColor(new Color(0.2f, 0.5f, 0.2f, 1f)); // Feedback highlight
             }
-
             if (isLegacyKey)
             {
                 keyName.text = "Legacy key: " + keyName.text;
@@ -720,19 +697,14 @@ namespace LootLocker.Extension
             {
                 button.AddToClassList("apikey");
             }
-
-
             keyName.AddToClassList("apikeyName");
-
-
             button.Add(keyName);
-
             if (!isLegacyKey)
             {
                 button.clickable.clickedWithEventInfo += OnAPIKeySelected;
+                button.tooltip = "Click to select this API key.";
             }
-
-            apiKeyList.Add(button);
+            apiKeyList?.Add(button);
         }
 
         void OnAPIKeySelected(EventBase e)
@@ -745,23 +717,20 @@ namespace LootLocker.Extension
             LootLockerConfig.current.apiKey = target.name;
 
             SwapNewSelectedKey();
+            ShowPopup("API Key Selected", $"API Key {target.name} is now active."); // Feedback
         }
 
-        void SwapNewSelectedKey()
+        void ConfirmLogout()
         {
-            foreach (var element in apiKeyList.Children())
+            ShowPopup("Confirm Logout", "Are you sure you want to log out? This will clear your admin token and settings.");
+            if (popupBtn != null)
             {
-
-                var key = element as Button;
-
-                if (key.name == LootLockerConfig.current.apiKey)
+                popupBtn.clickable.clickedWithEventInfo -= ClosePopup;
+                popupBtn.clickable.clickedWithEventInfo += (evt) =>
                 {
-                    key.style.borderRightColor = key.style.borderLeftColor = key.style.borderTopColor = key.style.borderBottomColor = stage;
-                }
-                else
-                {
-                    key.style.backgroundColor = defaultButton;
-                }
+                    Logout();
+                    ClosePopup(evt);
+                };
             }
         }
 
@@ -780,6 +749,26 @@ namespace LootLocker.Extension
         private void OnDestroy()
         {
             LootLockerHTTPClient.ResetInstance();
+        }
+
+        void SwapNewSelectedKey()
+        {
+            if (apiKeyList == null) return;
+            foreach (var element in apiKeyList.Children())
+            {
+                var key = element as Button;
+                if (key == null) continue;
+                if (key.name == LootLockerConfig.current.apiKey)
+                {
+                    key.style.borderRightColor = key.style.borderLeftColor = key.style.borderTopColor = key.style.borderBottomColor = stage;
+                    key.style.backgroundColor = new StyleColor(new Color(0.2f, 0.5f, 0.2f, 1f)); // Feedback highlight
+                }
+                else
+                {
+                    key.style.backgroundColor = defaultButton;
+                    key.style.borderRightColor = key.style.borderLeftColor = key.style.borderTopColor = key.style.borderBottomColor = defaultButton;
+                }
+            }
         }
 
     }
