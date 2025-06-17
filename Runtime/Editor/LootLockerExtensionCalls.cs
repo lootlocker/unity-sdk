@@ -6,7 +6,8 @@ using LootLocker.Extension.Requests;
 using LootLocker.Extension.Responses;
 
 namespace LootLocker.Extension
-{    public partial class LootLockerAdminManager
+{
+    public partial class LootLockerAdminManager
     {
         private static LootLockerLogger.LogLevel? savedLogLevel = null;
         private static int activeAdminRequestCount = 0;
@@ -24,7 +25,6 @@ namespace LootLocker.Extension
             try
             {
                 LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) => { 
-                    // Always restore log level, regardless of success or failure
                     try 
                     {
                         LootLockerResponse.Deserialize(onComplete, serverResponse); 
@@ -62,7 +62,6 @@ namespace LootLocker.Extension
 
         public static void AdminLogin(string email, string password, Action<LoginResponse> onComplete)
         {
-
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionLogin;
 
             AdminLoginRequest request = new AdminLoginRequest();
@@ -72,23 +71,22 @@ namespace LootLocker.Extension
             string json = LootLockerJson.SerializeObject(request);
 
             SendAdminRequest(endPoint.endPoint, endPoint.httpMethod, json,
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
 
         public static void GetGameDomainKey(int game_id, Action<GameResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetGameInformation;
-
             string getVariable = endPoint.WithPathParameter(game_id);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
+
         public static void MFAAuthenticate(string authCode, string secret, Action<LoginResponse> onComplete)
         {
             if (string.IsNullOrEmpty(authCode) || string.IsNullOrEmpty(secret))
             {
-                Debug.Log("No authentication code found!");
                 return;
             }
 
@@ -101,7 +99,7 @@ namespace LootLocker.Extension
             string json = LootLockerJson.SerializeObject(data);
 
             SendAdminRequest(endPoint.endPoint, endPoint.httpMethod, json,
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
 
         public static void GetAllKeys(int game_id, Action<KeysResponse> onComplete)
@@ -110,13 +108,12 @@ namespace LootLocker.Extension
             string getVariable = endPoint.WithPathParameter(game_id);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
 
         public static void GenerateKey(int game_id, string key_name, string key_environment, Action<KeyResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionCreateKey;
-
             string getVariable = endPoint.WithPathParameter(game_id);
 
             KeyCreationRequest data = new KeyCreationRequest();
@@ -126,7 +123,7 @@ namespace LootLocker.Extension
             string json = LootLockerJson.SerializeObject(data);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, json,
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
 
         public static void GetUserInformation(Action<LoginResponse> onComplete)
@@ -134,17 +131,16 @@ namespace LootLocker.Extension
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionUserInformation;
 
             SendAdminRequest(endPoint.endPoint, endPoint.httpMethod, "",
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
 
         public static void GetUserRole(string userId, Action<UserRoleResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerAdminEndPoints.adminExtensionGetUserRole;
-
             string getVariable = endPoint.WithPathParameter(userId);
 
             SendAdminRequest(getVariable, endPoint.httpMethod, "",
-                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, true);
+                (serverResponse) => LootLockerResponse.Deserialize(onComplete, serverResponse), true);
         }
     }
 }
