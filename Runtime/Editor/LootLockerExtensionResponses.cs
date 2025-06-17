@@ -29,7 +29,11 @@ namespace LootLocker.Extension.DataTypes
     public class Game
     {
         public int id { get; set; }
+        public string title_id { get; set; }
+        public string environment_id { get; set; }
+        public System.DateTime created_at { get; set; }
         public bool is_demo { get; set; }
+        public string trial_end_date { get; set; }
         public string name { get; set; }
         public string badge_url { get; set; }
         public string logo_url { get; set; }
@@ -40,7 +44,14 @@ namespace LootLocker.Extension.DataTypes
     public class DevelopmentGame
     {
         public int id { get; set; }
-
+        public string title_id { get; set; }
+        public string environment_id { get; set; }
+        public System.DateTime created_at { get; set; }
+        public bool is_demo { get; set; }
+        public string trial_end_date { get; set; }
+        public string name { get; set; }
+        public string badge_url { get; set; }
+        public string logo_url { get; set; }
     }
 
     public class Organisation
@@ -48,6 +59,8 @@ namespace LootLocker.Extension.DataTypes
         public int id { get; set; }
         public string name { get; set; }
         public Game[] games { get; set; }
+        public string finalized_signup_at { get; set; }
+        public bool subscribed { get; set; }
 
         public Game GetGameByID(int id)
         {
@@ -66,7 +79,9 @@ namespace LootLocker.Extension.DataTypes
     {
         public int id { get; set; }
         public string name { get; set; }
+        public string email { get; set; }
         public long signed_up { get; set; }
+        public bool is_verified { get; set; }
         public Organisation[] organisations { get; set; }
         private Dictionary<int, int> organisationIndexByID { get; set; }
 

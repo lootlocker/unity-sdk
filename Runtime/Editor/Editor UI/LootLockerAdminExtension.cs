@@ -76,6 +76,8 @@ namespace LootLocker.Extension
         VisualElement loadingIcon;
         int rotateIndex = 0;
 
+        private Label securityWarning;
+
         [MenuItem("Window/LootLocker")]
         public static void Run()
         {
@@ -131,9 +133,10 @@ namespace LootLocker.Extension
             labelFromUXML.style.height = current;
             root.Add(labelFromUXML);
 
-            var securityWarning = new Label("Warning: Admin tokens are stored in EditorPrefs and are not encrypted. Do not use on shared or insecure machines.");
+            securityWarning = new Label("Warning: Do not use on shared or insecure machines, data is stored in EditorPrefs");
             securityWarning.style.color = new StyleColor(Color.yellow);
             securityWarning.style.unityFontStyleAndWeight = FontStyle.Bold;
+            securityWarning.style.display = DisplayStyle.None; // Hide by default
             root.Add(securityWarning);
 
             live.value = new Color(0.749f, 0.325f, 0.098f, 1);
@@ -296,6 +299,16 @@ namespace LootLocker.Extension
             Run();
         }
 
+        private bool IsStageOnlyGame()
+        {
+            int selectedGameId = LootLockerEditorData.GetSelectedGame();
+            if (!gameData.ContainsKey(selectedGameId)) return false;
+            var game = gameData[selectedGameId];
+            if (game.created_at == default(System.DateTime) || game.created_at == null) return false;
+            var cutoff = new System.DateTime(2025, 3, 10);
+            return game.created_at < cutoff;
+        }
+
         void SwapEnvironment()
         {
             if (isLoadingKeys)
@@ -338,6 +351,8 @@ namespace LootLocker.Extension
                 }
             }
             New.style.display = DisplayStyle.Flex;
+            if (securityWarning != null) securityWarning.style.display = DisplayStyle.None;
+            
             if (activeFlow == gameSelectorFlow)
             {
                 if (gameName != null) gameName.text = "LootLocker";
@@ -353,8 +368,20 @@ namespace LootLocker.Extension
             {
                 if (gameName != null) gameName.text = LootLockerEditorData.GetSelectedGameName();
                 SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
-                if (environmentElement != null) environmentElement.style.display = DisplayStyle.Flex;
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.Flex;
+                if (environmentElement != null && environmentBackground != null && environmentHandle != null && environmentTitle != null)
+                {
+                    if (IsStageOnlyGame())
+                    {
+                        environmentElement.style.display = DisplayStyle.Flex;
+                        environmentBackground.style.display = DisplayStyle.Flex;
+                        environmentHandle.style.display = DisplayStyle.Flex;
+                    }
+                    else
+                    {
+                        environmentElement.style.display = DisplayStyle.None;
+                    }
+                }
                 RefreshAPIKeys();
             }
             if (activeFlow == loginFlow)
@@ -362,6 +389,7 @@ namespace LootLocker.Extension
                 if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
                 if (menu != null) menu.style.display = DisplayStyle.None;
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
+                if (securityWarning != null) securityWarning.style.display = DisplayStyle.Flex;
             }
             if (activeFlow == mfaFlow)
             {
@@ -581,8 +609,13 @@ namespace LootLocker.Extension
             var target = e.target as Button;
 
             LootLockerEditorData.SetSelectedGame(target.name);
+            var selectedGameData = gameData[int.Parse(target.name)];
 
-            gameName.text = gameData[int.Parse(target.name)].name;
+            LootLockerEditorData.SetSelectedGameName(selectedGameData.name);
+            gameName.text = selectedGameData.name;
+
+            LootLockerEditorData.SetEnvironmentStage();
+            isStage = true;
 
             EditorApplication.update += OnEditorUpdate;
 
@@ -598,15 +631,12 @@ namespace LootLocker.Extension
                 EditorApplication.update -= OnEditorUpdate;
             });
 
-
-
             SwapFlows(apiKeyFlow);
         }
 
         void CreateNewAPIKey()
         {
             int gameId = LootLockerEditorData.GetSelectedGame();
-
             if (gameId == 0)
             {
                 ShowPopup("Error", "No active Game found!");
@@ -644,7 +674,11 @@ namespace LootLocker.Extension
         void RefreshAPIKeys()
         {
             apiKeyList.Clear();
-            int gameID = isStage ? gameData[LootLockerEditorData.GetSelectedGame()].development.id : LootLockerEditorData.GetSelectedGame();
+            int gameID = LootLockerEditorData.GetSelectedGame();
+            if (isStage)
+            {
+                gameID = gameData[gameID].development.id;
+            }
             isLoadingKeys = true;
 
             EditorApplication.update += OnEditorUpdate;
