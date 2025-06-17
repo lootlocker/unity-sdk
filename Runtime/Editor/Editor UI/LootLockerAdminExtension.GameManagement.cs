@@ -59,6 +59,8 @@ namespace LootLocker.Extension
 
         void APIKeyTemplate(KeyResponse key)
         {
+            // Only show game api keys
+            if (key.api_type != "game") return;
             Button button = new Button();
             bool isLegacyKey = !(key.api_key.StartsWith("prod_") || key.api_key.StartsWith("dev_"));
             button.name = key.api_key;
