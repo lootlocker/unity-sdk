@@ -78,6 +78,11 @@ namespace LootLocker.Extension
 
         private Label securityWarning;
 
+        // License Countdown UI
+        private VisualElement licenseCountdownContainer;
+        private Label licenseCountdownLabel;
+        private Image licenseCountdownIcon;
+
         [MenuItem("Window/LootLocker")]
         public static void Run()
         {
@@ -296,6 +301,12 @@ namespace LootLocker.Extension
                 }).Every(16); // 60 FPS
             }
 
+            // License Countdown UI
+            licenseCountdownContainer = root.Q<VisualElement>("LicenseCountdownContainer");
+            licenseCountdownLabel = root.Q<Label>("LicenseCountdownLabel");
+            licenseCountdownIcon = root.Q<Image>("LicenseCountdownIcon");
+            if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
+
             Run();
         }
 
@@ -355,6 +366,7 @@ namespace LootLocker.Extension
             
             if (activeFlow == gameSelectorFlow)
             {
+                if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
                 if (gameName != null) gameName.text = "LootLocker";
                 // Remove hardcoded credentials
                 if (emailField != null) emailField.value = "";
@@ -367,6 +379,7 @@ namespace LootLocker.Extension
             if (activeFlow == apiKeyFlow)
             {
                 if (gameName != null) gameName.text = LootLockerEditorData.GetSelectedGameName();
+                UpdateLicenseCountdownUI();
                 SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.Flex;
                 if (environmentElement != null && environmentBackground != null && environmentHandle != null && environmentTitle != null)
@@ -386,6 +399,7 @@ namespace LootLocker.Extension
             }
             if (activeFlow == loginFlow)
             {
+                if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
                 if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
                 if (menu != null) menu.style.display = DisplayStyle.None;
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
@@ -524,6 +538,7 @@ namespace LootLocker.Extension
                         gameData.Add(game.id, game);
                     }
                 }
+                UpdateLicenseCountdownUI();
 
                 gameDataRefreshTime = DateTime.Now;
 
@@ -613,6 +628,7 @@ namespace LootLocker.Extension
 
             LootLockerEditorData.SetSelectedGameName(selectedGameData.name);
             gameName.text = selectedGameData.name;
+            UpdateLicenseCountdownUI();
 
             LootLockerEditorData.SetEnvironmentStage();
             isStage = true;
@@ -805,6 +821,95 @@ namespace LootLocker.Extension
             }
         }
 
+        // Call this whenever the selected game changes or flows swap to APIKeyFlow
+        private void UpdateLicenseCountdownUI()
+        {
+            if (licenseCountdownContainer == null || licenseCountdownLabel == null || licenseCountdownIcon == null)
+                return;
+
+            int selectedGameId = LootLockerEditorData.GetSelectedGame();
+            if (!gameData.ContainsKey(selectedGameId))
+            {
+                licenseCountdownContainer.style.display = DisplayStyle.None;
+                return;
+            }
+            var game = gameData[selectedGameId];
+            string trialEndDate = game.trial_end_date;
+            if (string.IsNullOrEmpty(trialEndDate))
+            {
+                licenseCountdownContainer.style.display = DisplayStyle.None;
+                return;
+            }
+            if (!System.DateTime.TryParse(trialEndDate, out var endDate))
+            {
+                licenseCountdownContainer.style.display = DisplayStyle.None;
+                return;
+            }
+            var now = System.DateTime.UtcNow;
+            int daysLeft = (endDate.Date - now.Date).Days;
+            if (endDate < now)
+            {
+                // Expired
+                licenseCountdownLabel.text = "Trial Expired";
+                licenseCountdownLabel.RemoveFromClassList("licenseCountdownLabel");
+                licenseCountdownLabel.RemoveFromClassList("expired");
+                licenseCountdownLabel.AddToClassList("licenseCountdownLabel");
+                licenseCountdownLabel.AddToClassList("expired");
+                licenseCountdownLabel.style.color = new Color(1f, 0.31f, 0.31f); // rgb(255,80,80)
+                licenseCountdownLabel.style.display = DisplayStyle.Flex;
+                licenseCountdownIcon.image = EditorGUIUtility.IconContent("console.warnicon").image as Texture2D;
+                licenseCountdownIcon.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.tooltip = "Click to manage your license";
+                licenseCountdownContainer.RegisterCallback<MouseDownEvent>(LicenseCountdownContainerClick);
+            }
+            else if (daysLeft == 0)
+            {
+                // Trial ends today
+                licenseCountdownLabel.text = "Trial ends today";
+                licenseCountdownLabel.RemoveFromClassList("licenseCountdownLabel");
+                licenseCountdownLabel.RemoveFromClassList("expired");
+                licenseCountdownLabel.AddToClassList("licenseCountdownLabel");
+                licenseCountdownLabel.AddToClassList("expired");
+                licenseCountdownLabel.style.color = new Color(1f, 0.31f, 0.31f); // rgb(255,80,80)
+                licenseCountdownLabel.style.display = DisplayStyle.Flex;
+                licenseCountdownIcon.image = EditorGUIUtility.IconContent("console.warnicon").image as Texture2D;
+                licenseCountdownIcon.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.tooltip = "Click to manage your license";
+                licenseCountdownContainer.RegisterCallback<MouseDownEvent>(LicenseCountdownContainerClick);
+            }
+            else if (daysLeft > 0 && daysLeft <= 10)
+            {
+                // Not expired, but less than or equal to 10 days left
+                licenseCountdownLabel.text = $"Trial ends in {daysLeft} days";
+                licenseCountdownLabel.RemoveFromClassList("expired");
+                licenseCountdownLabel.AddToClassList("licenseCountdownLabel");
+                licenseCountdownLabel.style.display = DisplayStyle.Flex;
+                licenseCountdownIcon.image = EditorGUIUtility.IconContent("_Help").image as Texture2D;
+                licenseCountdownIcon.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.style.display = DisplayStyle.Flex;
+                licenseCountdownContainer.tooltip = "Learn more about your license";
+                licenseCountdownContainer.UnregisterCallback<MouseDownEvent>(LicenseCountdownContainerClick);
+                licenseCountdownIcon.RegisterCallback<MouseDownEvent>(LicenseCountdownIconClick);
+            }
+            else
+            {
+                // More than 10 days left, hide
+                licenseCountdownContainer.style.display = DisplayStyle.None;
+            }
+        }
+
+        private void LicenseCountdownIconClick(MouseDownEvent evt)
+        {
+            Application.OpenURL("https://console.lootlocker.com");
+            evt.StopPropagation();
+        }
+        private void LicenseCountdownContainerClick(MouseDownEvent evt)
+        {
+            Application.OpenURL("https://console.lootlocker.com");
+            evt.StopPropagation();
+        }
     }
 }
 #endif
