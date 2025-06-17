@@ -113,3 +113,14 @@
     cursor: link;
     margin-left: 2px;
 }
+
+#SettingsBtn {
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+#SettingsBtn:hover {
+    background-color: rgba(90, 90, 90, 0.8);
+}
