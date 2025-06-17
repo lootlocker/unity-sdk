@@ -15,10 +15,10 @@ namespace LootLocker.Extension
         bool isStage = true;
         bool isLoadingKeys = false;
         Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
-        private Label gameName;
-        DateTime gameDataRefreshTime;
+        private Label gameName;        DateTime gameDataRefreshTime;
         readonly int gameDataCacheExpirationTimeMinutes = 1;
         private VisualElement currentFlow = null;
+        private VisualElement previousFlow = null; // Track previous flow for back button
 
         [SerializeField]
         private VisualTreeAsset m_VisualTreeAsset = default;
@@ -36,7 +36,7 @@ namespace LootLocker.Extension
 
         [Header("Flows")]
         private VisualElement activeFlow;
-        private VisualElement loginFlow, mfaFlow, gameSelectorFlow, apiKeyFlow;
+        private VisualElement loginFlow, mfaFlow, gameSelectorFlow, apiKeyFlow, settingsFlow;
 
         [Header("Menu")]
         private VisualElement menu;
@@ -161,7 +161,6 @@ namespace LootLocker.Extension
             if (environmentHandle == null) Debug.LogWarning("Handle not found in UXML");
             else environmentHandle.AddManipulator(new Clickable(evt => SwapEnvironment()));
 
-            // environmentBackground?.SetTooltip("Stage");
             if (environmentBackground != null) environmentBackground.tooltip = "Stage";
 
             environmentElement = root.Q<VisualElement>("Environment");
@@ -187,9 +186,9 @@ namespace LootLocker.Extension
             menuLogoutBtn = root.Q<Button>("LogoutBtn");
             if (menuLogoutBtn != null)
                 menuLogoutBtn.clickable.clicked += () => { ConfirmLogout(); };
+            if (menuChangeGameBtn != null) menuChangeGameBtn.clickable.clicked += () => { RequestFlowSwitch(gameSelectorFlow); };
 
-            // menuChangeGameBtn?.clickable.clicked += () => { SwapFlows(gameSelectorFlow); };
-            if (menuChangeGameBtn != null) menuChangeGameBtn.clickable.clicked += () => { SwapFlows(gameSelectorFlow); };
+            if (menuAPIKeyBtn != null) menuAPIKeyBtn.clickable.clicked += () => { RequestFlowSwitch(apiKeyFlow); };
 
             popup = root.Q<VisualElement>("PopUp");
             if (popup == null) Debug.LogWarning("PopUp not found in UXML");
@@ -265,7 +264,63 @@ namespace LootLocker.Extension
                 createNewApiKeyBtn.clickable.clicked += () =>
                 {
                     if (newApiKeyWindow != null) newApiKeyWindow.style.display = DisplayStyle.Flex;
+                };            // Settings UI
+            settingsFlow = root.Q<VisualElement>("SettingsFlow");
+            settingsBtn = root.Q<Button>("SettingsBtn");
+            settingsBackBtn = root.Q<Button>("SettingsBackBtn");
+            // Save/Cancel buttons no longer needed - settings save immediately
+            gameVersionField = root.Q<TextField>("GameVersionField");
+            gameVersionWarning = root.Q<Label>("GameVersionWarning");
+            logLevelField = root.Q<EnumField>("LogLevelField");
+            logErrorsAsWarningsToggle = root.Q<Toggle>("LogErrorsAsWarningsToggle");
+            logInBuildsToggle = root.Q<Toggle>("LogInBuildsToggle");
+            allowTokenRefreshToggle = root.Q<Toggle>("AllowTokenRefreshToggle");            // Set up immediate save callbacks (only once during initialization)
+            if (gameVersionField != null) gameVersionField.RegisterValueChangedCallback(evt => { 
+                SaveGameVersion(evt.newValue); 
+            });
+            if (logLevelField != null) logLevelField.RegisterValueChangedCallback(evt => { 
+                SaveLogLevel((LootLockerLogger.LogLevel)evt.newValue); 
+            });            if (logErrorsAsWarningsToggle != null) logErrorsAsWarningsToggle.RegisterValueChangedCallback(evt => { 
+                SaveLogErrorsAsWarnings(evt.newValue); 
+            });
+            if (logInBuildsToggle != null) logInBuildsToggle.RegisterValueChangedCallback(evt => { 
+                SaveLogInBuilds(evt.newValue); 
+            });
+            if (allowTokenRefreshToggle != null) allowTokenRefreshToggle.RegisterValueChangedCallback(evt => { 
+                SaveAllowTokenRefresh(evt.newValue); 
+            });
+              if (settingsBtn != null) 
+            {
+                settingsBtn.clickable.clicked += () => { 
+                    previousFlow = currentFlow; // Store current flow before switching
+                    RequestFlowSwitch(settingsFlow, LoadSettingsUI); 
                 };
+                // Set the Unity built-in settings icon
+                var settingsIcon = EditorGUIUtility.IconContent("SettingsIcon");
+                if (settingsIcon != null && settingsIcon.image != null)
+                {
+                    settingsBtn.style.backgroundImage = new StyleBackground(settingsIcon.image as Texture2D);
+                }
+            }
+            
+            // Settings back button
+            if (settingsBackBtn != null)
+            {
+                settingsBackBtn.clickable.clicked += () => {
+                    if (previousFlow != null)
+                    {
+                        RequestFlowSwitch(previousFlow);
+                        previousFlow = null; // Clear previous flow after going back
+                    }
+                    else
+                    {
+                        // Default to API Keys if no previous flow
+                        RequestFlowSwitch(apiKeyFlow);
+                    }
+                };
+            }            // Save/Cancel buttons no longer needed - settings save immediately
+            if (settingsFlow != null) settingsFlow.style.display = DisplayStyle.None;
+            // Settings button will be shown when user is authenticated
 
             isStage = LootLockerEditorData.IsEnvironmentStage();
             if (isStage)
@@ -317,7 +372,7 @@ namespace LootLocker.Extension
             var game = gameData[selectedGameId];
             if (game.created_at == default(System.DateTime) || game.created_at == null) return false;
             var cutoff = new System.DateTime(2025, 3, 10);
-            return game.created_at < cutoff;
+            return game.created_at >= cutoff;
         }
 
         void SwapEnvironment()
@@ -362,12 +417,11 @@ namespace LootLocker.Extension
                 }
             }
             New.style.display = DisplayStyle.Flex;
-            if (securityWarning != null) securityWarning.style.display = DisplayStyle.None;
-            
-            if (activeFlow == gameSelectorFlow)
+            if (securityWarning != null) securityWarning.style.display = DisplayStyle.None;            if (activeFlow == gameSelectorFlow)
             {
                 if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
                 if (gameName != null) gameName.text = "LootLocker";
+                if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.None;
                 // Remove hardcoded credentials
                 if (emailField != null) emailField.value = "";
                 if (passwordField != null) passwordField.value = "";
@@ -375,16 +429,17 @@ namespace LootLocker.Extension
                 if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
                 CreateGameButtons();
-            }
-            if (activeFlow == apiKeyFlow)
+            }if (activeFlow == apiKeyFlow)
             {
+                if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.Flex;
                 if (gameName != null) gameName.text = LootLockerEditorData.GetSelectedGameName();
                 UpdateLicenseCountdownUI();
                 SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.Flex;
+                  // Show environment switcher only for non-stage-only games
                 if (environmentElement != null && environmentBackground != null && environmentHandle != null && environmentTitle != null)
                 {
-                    if (IsStageOnlyGame())
+                    if (!IsStageOnlyGame())
                     {
                         environmentElement.style.display = DisplayStyle.Flex;
                         environmentBackground.style.display = DisplayStyle.Flex;
@@ -397,16 +452,26 @@ namespace LootLocker.Extension
                 }
                 RefreshAPIKeys();
             }
+            if (activeFlow == settingsFlow)
+            {
+                if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.Flex;
+                if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
+                SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
+                if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
+                if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
+                LoadSettingsUI();
+            }
             if (activeFlow == loginFlow)
             {
                 if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
-                if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
+                if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.None;
                 if (menu != null) menu.style.display = DisplayStyle.None;
                 if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
                 if (securityWarning != null) securityWarning.style.display = DisplayStyle.Flex;
             }
             if (activeFlow == mfaFlow)
             {
+                if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.None;
                 SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
             }
             currentFlow = New;
@@ -909,6 +974,88 @@ namespace LootLocker.Extension
         {
             Application.OpenURL("https://console.lootlocker.com");
             evt.StopPropagation();
+        }        // Settings UI
+        private Button settingsBtn; // Save/Cancel buttons no longer needed
+        private Button settingsBackBtn;
+        private TextField gameVersionField;
+        private Label gameVersionWarning;
+        private EnumField logLevelField;        private Toggle logErrorsAsWarningsToggle, logInBuildsToggle, allowTokenRefreshToggle;
+        // Settings now save immediately - no need for change tracking
+
+        // Individual save methods for immediate saving
+        private void SaveGameVersion(string newVersion)
+        {
+            if (!IsSemverString(newVersion))
+            {
+                if (gameVersionWarning != null)
+                {
+                    gameVersionWarning.text = "Game version must be in format X.Y.Z.B (MAJOR.MINOR.PATCH.BUILD, last two optional)";
+                    gameVersionWarning.style.display = DisplayStyle.Flex;
+                }
+                return;
+            }
+            
+            if (gameVersionWarning != null) gameVersionWarning.style.display = DisplayStyle.None;
+            LootLockerConfig.current.game_version = newVersion;
+            SaveConfig();
+        }
+
+        private void SaveLogLevel(LootLockerLogger.LogLevel newLogLevel)
+        {
+            LootLockerConfig.current.logLevel = newLogLevel;
+            SaveConfig();
+        }
+
+        private void SaveLogErrorsAsWarnings(bool newValue)
+        {
+            LootLockerConfig.current.logErrorsAsWarnings = newValue;
+            SaveConfig();
+        }
+
+        private void SaveLogInBuilds(bool newValue)
+        {
+            LootLockerConfig.current.logInBuilds = newValue;
+            SaveConfig();
+        }
+
+        private void SaveAllowTokenRefresh(bool newValue)
+        {
+            LootLockerConfig.current.allowTokenRefresh = newValue;
+            SaveConfig();
+        }
+
+        private void SaveConfig()
+        {
+            EditorUtility.SetDirty(LootLockerConfig.current);
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.SaveAssets();
+#endif
+        }        // Loads current LootLockerConfig values into the settings UI
+        private void LoadSettingsUI()
+        {
+            // Force reload the config to ensure we have the latest values
+            var config = LootLockerConfig.current;
+            if (gameVersionField != null) gameVersionField.SetValueWithoutNotify(config.game_version);
+            if (logLevelField != null) {
+                // Initialize the enum field first, then set value without notification
+                logLevelField.Init(config.logLevel);
+                logLevelField.SetValueWithoutNotify(config.logLevel);
+            }
+            if (logErrorsAsWarningsToggle != null) logErrorsAsWarningsToggle.SetValueWithoutNotify(config.logErrorsAsWarnings);
+            if (logInBuildsToggle != null) logInBuildsToggle.SetValueWithoutNotify(config.logInBuilds);            if (allowTokenRefreshToggle != null) allowTokenRefreshToggle.SetValueWithoutNotify(config.allowTokenRefresh);
+            if (gameVersionWarning != null) gameVersionWarning.style.display = DisplayStyle.None;
+        }
+
+        private static bool IsSemverString(string str)
+        {
+            return System.Text.RegularExpressions.Regex.IsMatch(str,
+                @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$" );
+        }
+
+        // Simple flow switching - no save confirmation needed since settings save immediately
+        void RequestFlowSwitch(VisualElement targetFlow, System.Action onSuccess = null)        {
+            SwapFlows(targetFlow);
+            onSuccess?.Invoke();
         }
     }
 }

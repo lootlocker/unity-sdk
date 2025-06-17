@@ -6,19 +6,58 @@ using LootLocker.Extension.Requests;
 using LootLocker.Extension.Responses;
 
 namespace LootLocker.Extension
-{
-    public partial class LootLockerAdminManager
+{    public partial class LootLockerAdminManager
     {
-
+        private static LootLockerLogger.LogLevel? savedLogLevel = null;
+        private static int activeAdminRequestCount = 0;
+        
         public static void SendAdminRequest(string endPoint, LootLockerHTTPMethod httpMethod, string json, Action<LootLockerResponse> onComplete, bool useAuthToken)
         {
-            LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
-            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.None;
+            // Only save the log level if this is the first admin request
+            if (activeAdminRequestCount == 0)
+            {
+                savedLogLevel = LootLockerConfig.current.logLevel;
+                LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.None;
+            }
+            activeAdminRequestCount++;
 
-            LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); LootLockerConfig.current.logLevel = logLevelSavedState; },
-                useAuthToken: useAuthToken,
-                callerRole: LootLockerEnums.LootLockerCallerRole.Admin);
-
+            try
+            {
+                LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) => { 
+                    // Always restore log level, regardless of success or failure
+                    try 
+                    {
+                        LootLockerResponse.Deserialize(onComplete, serverResponse); 
+                    } finally 
+                    {
+                        activeAdminRequestCount--;
+                        // Only restore log level when all admin requests are complete
+                        if (activeAdminRequestCount == 0 && savedLogLevel.HasValue)
+                        {
+                            LootLockerConfig.current.logLevel = savedLogLevel.Value;
+                            savedLogLevel = null;
+#if UNITY_EDITOR
+                            UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
+#endif
+                        }
+                    }
+                },
+                    useAuthToken: useAuthToken,
+                    callerRole: LootLockerEnums.LootLockerCallerRole.Admin);
+            } catch
+            {
+                // If CallAPI itself throws an exception, restore the log level
+                activeAdminRequestCount--;
+                if (activeAdminRequestCount == 0 && savedLogLevel.HasValue)
+                {
+                    LootLockerConfig.current.logLevel = savedLogLevel.Value;
+                    savedLogLevel = null;
+#if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
+#endif
+                }
+                throw; // Re-throw the exception
+            }
         }
 
         public static void AdminLogin(string email, string password, Action<LoginResponse> onComplete)
