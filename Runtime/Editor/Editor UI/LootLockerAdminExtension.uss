@@ -91,3 +91,36 @@
 
 .menuBtn {
 }
+
+.licenseCountdownLabel {
+    font-size: 14px;
+    color: rgb(255, 200, 0);
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+}
+.licenseCountdownLabel.expired, .expired.licenseCountdownLabel, .expired {
+    color: rgb(255, 80, 80) !important;
+    -unity-font-style: bold;
+}
+.licenseCountdownLabel.expired:hover, .expired.licenseCountdownLabel:hover, .expired:hover {
+    cursor: link;
+}
+.licenseCountdownIcon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    cursor: link;
+    margin-left: 2px;
+}
+
+#SettingsBtn {
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+#SettingsBtn:hover {
+    background-color: rgba(90, 90, 90, 0.8);
+}
