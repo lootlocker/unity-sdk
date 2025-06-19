@@ -13,7 +13,9 @@
                     <ui:Button name="SettingsBtn" tooltip="Settings" style="width: 28px; height: 28px; align-self: center; background-color: rgba(60, 60, 60, 0); border-width: 1px; border-color: rgba(100,100,100,0.0); border-radius: 0px; font-size: 18px; cursor: link; display: none; color: rgb(200,200,200);" />
                 </ui:VisualElement>
             </ui:VisualElement>
-        </ui:VisualElement>        <ui:VisualElement name="ContentView" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-top: 0; opacity: 1; bottom: 0; top: 0; height: 100%;">            <ui:VisualElement name="MenuBar" style="flex-grow: 0; flex-shrink: 0; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: center; margin-left: 0; margin-bottom: 12px; min-height: 40px;">
+        </ui:VisualElement>
+        <ui:VisualElement name="ContentView" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-top: 0; opacity: 1; bottom: 0; top: 0; height: 100%;">
+            <ui:VisualElement name="MenuBar" style="flex-grow: 0; flex-shrink: 0; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: center; margin-left: 0; margin-bottom: 12px; min-height: 40px;">
                 <ui:VisualElement name="DynamicMenu" style="flex-grow: 1; flex-direction: row; align-items: center;">
                     <ui:Button text="API Keys" display-tooltip-when-elided="true" name="APIKeyBtn" class="menuBtn" style="-unity-font-style: bold; background-color: rgba(188, 188, 188, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0); margin-left: 20px;" />
                 </ui:VisualElement>
@@ -76,6 +78,7 @@
                 <ui:Toggle name="AllowTokenRefreshToggle" label="Allow Token Refresh" style="margin-bottom: 24px;" />
                 <ui:Button text="← Back" name="SettingsBackBtn" style="align-self: flex-start; font-size: 12px; padding: 4px 8px; background-color: rgba(80, 80, 80, 0.3); border-color: rgba(120, 120, 120, 0.5); color: rgb(180, 180, 180);" />
             </ui:VisualElement>
+            <!-- LogViewerFlow and all log viewer UI elements have been removed. -->
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="InfoandCreate" style="flex-grow: 1; align-self: center; align-items: auto; justify-content: flex-start; -unity-text-align: middle-center; flex-direction: column; margin-right: 15px; margin-left: 0; padding-left: 0; min-width: 81px; max-width: 167px; position: absolute; right: 0; top: 109px; bottom: 0;">
