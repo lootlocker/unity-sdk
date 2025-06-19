@@ -7,10 +7,40 @@ namespace LootLocker.Extension
 {
     public partial class LootLockerAdminExtension : EditorWindow
     {
+        private Button reloadButton;
+
         public void InitializeUIElements()
         {
-            VisualElement root = rootVisualElement;
-            VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
+            // Clear the root to remove all previous UI
+            var root = rootVisualElement;
+            root.Clear();
+            reloadButton = null;
+            loadingPage = null;
+            loadingIcon = null;
+
+            VisualTreeAsset visualTree = m_VisualTreeAsset;
+            if (visualTree == null)
+            {
+                // Try to load from Assets/LootLockerSDK
+                visualTree = EditorGUIUtility.Load("Assets/LootLockerSDK/Runtime/Editor UI/LootLockerAdminExtension.uxml") as VisualTreeAsset;
+            }
+            if (visualTree == null)
+            {
+                // Try to load from Assets/LootLocker
+                visualTree = EditorGUIUtility.Load("Assets/LootLocker/Runtime/Editor UI/LootLockerAdminExtension.uxml") as VisualTreeAsset;
+            }
+            if (visualTree == null)
+            {
+                // Try to load from Packages
+                visualTree = EditorGUIUtility.Load("Packages/com.lootlocker.lootlockersdk/Runtime/Editor UI/LootLockerAdminExtension.uxml") as VisualTreeAsset;
+            }
+            if (visualTree == null)
+            {
+                Debug.LogError("LootLockerAdminExtension: LootLocker not found in `Assets/LootLocker` or in Packages. Non standard install locations not supported.");
+                return;
+            }
+
+            VisualElement labelFromUXML = visualTree.Instantiate();
 
             var styleLength = new StyleLength();
             var current = styleLength.value;
@@ -133,8 +163,8 @@ namespace LootLocker.Extension
 
             // Menu buttons
             if (menuLogoutBtn != null) menuLogoutBtn.clickable.clicked += ConfirmLogout;
-            if (menuChangeGameBtn != null) menuChangeGameBtn.clickable.clicked += () => RequestFlowSwitch(gameSelectorFlow);
-            if (menuAPIKeyBtn != null) menuAPIKeyBtn.clickable.clicked += () => RequestFlowSwitch(apiKeyFlow);
+            if (menuChangeGameBtn != null) menuChangeGameBtn.clickable.clicked += () => SwapFlows(gameSelectorFlow);
+            if (menuAPIKeyBtn != null) menuAPIKeyBtn.clickable.clicked += () => SwapFlows(apiKeyFlow);
 
             // Popup
             if (popupBtn != null) popupBtn.clickable.clickedWithEventInfo += ClosePopup;
@@ -184,6 +214,16 @@ namespace LootLocker.Extension
             loadingPage = root.Q<VisualElement>("LoadingBackground");
             if (loadingPage != null) loadingPage.style.display = DisplayStyle.Flex;
             currentFlow = loadingPage;
+
+            if (loadingPage != null)
+            {
+                reloadButton = new Button(() => CreateGUI()) { text = "Reload", tooltip = "Reload UI" };
+                reloadButton.style.position = Position.Absolute;
+                reloadButton.style.top = 8;
+                reloadButton.style.right = 8;
+                reloadButton.style.display = DisplayStyle.Flex;
+                loadingPage.Add(reloadButton);
+            }
 
             loadingIcon = root.Q<VisualElement>("LoadingIcon");
             if (loadingIcon != null)
