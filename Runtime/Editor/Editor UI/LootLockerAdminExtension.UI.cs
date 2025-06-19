@@ -145,6 +145,11 @@ namespace LootLocker.Extension
             logInBuildsToggle = root.Q<Toggle>("LogInBuildsToggle");
             allowTokenRefreshToggle = root.Q<Toggle>("AllowTokenRefreshToggle");
 
+            // Log Viewer button
+            Button logViewerBtn = root.Q<Button>("LogViewerBtn");
+            if (logViewerBtn != null)
+                logViewerBtn.clickable.clicked += () => LootLocker.Extension.LootLockerLogViewerWindow.ShowWindow();
+
             // Set initial display states
             SetInitialDisplayStates();
         }
