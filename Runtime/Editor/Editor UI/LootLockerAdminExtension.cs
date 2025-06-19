@@ -100,7 +100,7 @@ namespace LootLocker.Extension
         #endregion
 
         #region Window Management
-        [MenuItem("Window/LootLocker")]
+        [MenuItem("LootLocker/Manage", false, 1)]
         public static void Run()
         {
             LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
