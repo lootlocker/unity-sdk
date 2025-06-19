@@ -450,18 +450,15 @@ namespace LootLocker
                 return false;
             }
 
-            LootLockerLogger.Log("LL Request " + executionItem.RequestData.HTTPMethod + " URL: " + executionItem.RequestData.FormattedURL, LootLockerLogger.LogLevel.Verbose);
+            executionItem.RequestStartTime = Time.time;
 
-            UnityWebRequest webRequest = CreateWebRequest(executionItem.RequestData);
-            if (webRequest == null)
+            executionItem.WebRequest = CreateWebRequest(executionItem.RequestData);
+            if (executionItem.WebRequest == null)
             {
                 CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {executionItem.RequestData.Endpoint} failed because Unity Web Request could not be created", executionItem.RequestData.ForPlayerWithUlid));
                 return false;
             }
 
-            executionItem.RequestStartTime = Time.time;
-
-            executionItem.WebRequest = webRequest;
             executionItem.AsyncOperation = executionItem.WebRequest.SendWebRequest();
             CurrentlyOngoingRequests.Add(executionItem.RequestData.RequestId, true);
             return true;
@@ -539,7 +536,7 @@ namespace LootLocker
                                     response.errorData.retry_after_seconds = RetryAfterHeader;
                                 }
 
-                                LootLockerLogger.Log(response.errorData.ToString(), LootLockerLogger.LogLevel.Error);
+                                //LootLockerLogger.Log(response.errorData.ToString(), LootLockerLogger.LogLevel.Error);
                                 CallListenersAndMarkDone(executionItem, response);
                                 return;
                             }
@@ -566,18 +563,37 @@ namespace LootLocker
                 case HTTPExecutionQueueProcessingResult.Completed_Failed:
                     {
                         LootLockerResponse response = ExtractFailureResponseFromExecutionItem(executionItem);
-
-                        LootLockerLogger.Log(response.errorData.ToString(), LootLockerLogger.LogLevel.Error);
                         CallListenersAndMarkDone(executionItem, response);
                     }
                     break;
             }
-
-            LogResponse(executionItem);
         }
 
         private void CallListenersAndMarkDone(LootLockerHTTPExecutionQueueItem executionItem, LootLockerResponse response)
         {
+            // Log HTTP request/response for the log viewer
+            try
+            {
+                var requestData = executionItem.RequestData;
+                var webRequest = executionItem.WebRequest;
+                var logEntry = new LootLockerLogger.LootLockerHttpLogEntry
+                {
+                    Method = requestData.HTTPMethod.ToString(),
+                    Url = requestData.FormattedURL,
+                    RequestHeaders = requestData.ExtraHeaders,
+                    RequestBody = requestData.Content?.dataType == LootLocker.LootLockerEnums.LootLockerHTTPRequestDataType.JSON ? ((LootLockerJsonBodyRequestContent)requestData.Content)?.jsonBody : null,
+                    StatusCode = response.statusCode,
+                    ResponseHeaders = webRequest?.GetResponseHeaders(),
+                    Response = response,
+                    DurationSeconds = Time.time - executionItem.RequestStartTime,
+                    Timestamp = DateTime.Now
+                };
+                LootLockerLogger.LogHttpRequestResponse(logEntry);
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Failed to log HTTP request: {ex}", LootLockerLogger.LogLevel.Warning);
+            }
             CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
             executionItem.IsWaitingForSessionRefresh = false;
             executionItem.Done = true;
@@ -814,7 +830,6 @@ namespace LootLocker
                     }
                     else
                     {
-                        LootLockerLogger.Log("REQUEST BODY = " + LootLockerObfuscator.ObfuscateJsonStringForLogging(((LootLockerJsonBodyRequestContent)request.Content).jsonBody), LootLockerLogger.LogLevel.Verbose);
                         byte[] bytes = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(((LootLockerJsonBodyRequestContent)request.Content).jsonBody) ? "{}" : ((LootLockerJsonBodyRequestContent)request.Content).jsonBody);
                         webRequest = UnityWebRequest.Put(request.FormattedURL, bytes);
                         webRequest.method = request.HTTPMethod.ToString();
@@ -920,39 +935,6 @@ namespace LootLocker
                 errorData = new LootLockerErrorData(response.statusCode, response.text);
             }
             return errorData;
-        }
-
-        private static void LogResponse(LootLockerHTTPExecutionQueueItem executedItem)
-        {
-            if(!executedItem.Done)
-            {
-                return;
-            }
-            if (executedItem.WebRequest.responseCode == 0 && string.IsNullOrEmpty(executedItem.WebRequest.downloadHandler.text) && !string.IsNullOrEmpty(executedItem.WebRequest.error))
-            {
-                LootLockerLogger.Log("Unity Web request failed, request to " +
-                    executedItem.RequestData.FormattedURL + " completed in " +
-                    (Time.time - executedItem.RequestStartTime).ToString("n4") +
-                    " secs.\nWeb Request Error: " + executedItem.WebRequest.error, LootLockerLogger.LogLevel.Verbose);
-                return;
-            }
-
-            try
-            {
-                LootLockerLogger.Log("LL Response: " +
-                    executedItem.WebRequest.responseCode + " " +
-                    executedItem.RequestData.FormattedURL + " completed in " +
-                    (Time.time - executedItem.RequestStartTime).ToString("n4") +
-                    " secs.\nResponse: " +
-                    LootLockerObfuscator
-                        .ObfuscateJsonStringForLogging(executedItem.WebRequest.downloadHandler.text), LootLockerLogger.LogLevel.Verbose);
-            }
-            catch
-            {
-                LootLockerLogger.Log(executedItem.RequestData.HTTPMethod.ToString(), LootLockerLogger.LogLevel.Error);
-                LootLockerLogger.Log(executedItem.RequestData.FormattedURL, LootLockerLogger.LogLevel.Error);
-                LootLockerLogger.Log(LootLockerObfuscator.ObfuscateJsonStringForLogging(executedItem.WebRequest.downloadHandler.text), LootLockerLogger.LogLevel.Error);
-            }
         }
         #endregion
     }
