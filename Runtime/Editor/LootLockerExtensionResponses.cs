@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
 using LootLocker.Extension.DataTypes;
+
 namespace LootLocker.Extension.Requests
 {
     public class MfaAdminLoginRequest

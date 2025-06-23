@@ -1,10 +1,11 @@
 using System;
-using LootLocker.Extension.Responses;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
+using LootLocker.Extension.Responses;
+
 namespace LootLocker.Extension
 {
     public partial class LootLockerAdminExtension : EditorWindow
