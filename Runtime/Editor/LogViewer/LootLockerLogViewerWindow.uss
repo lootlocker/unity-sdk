@@ -154,11 +154,11 @@
 }
 
 .log-doc-icon {
-    cursor: pointer;
+    cursor: link;
     color: #4da3ff;
     font-size: 14px;
     margin-left: 6px;
-    unity-font-style: bold;
+    -unity-font-style: bold;
     transition: color 0.1s;
 }
 .log-doc-icon:hover {
