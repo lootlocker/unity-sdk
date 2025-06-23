@@ -198,7 +198,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             //Given 
-            string genericLeaderboardKey = "genericLeaderboard";
+            string genericLeaderboardKey = "genericleaderboard";
             var createLeaderboardRequest = new CreateLootLockerLeaderboardRequest
             {
                 name = "Local Generic Leaderboard",
