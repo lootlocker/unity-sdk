@@ -1,3 +1,4 @@
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,7 @@ namespace LootLocker.LogViewer
             showAdminToggle = root.Q<Toggle>("ShowAdminToggle");
             InitializeLogViewerEventHandlers(onBack);
             SetupLogLevelDropdown();
-            // Only register the log listener if not already registered            if (string.IsNullOrEmpty(logListenerIdentifier))
             RegisterLogListener();
-            // Register HTTP log listener
-            LootLockerLogger.RegisterHttpLogListener(this);
             showAllLogLevels = true;
             showAdminRequests = false;
             FilterLogs();
@@ -444,3 +442,4 @@ namespace LootLocker.LogViewer
         }
     }
 }
+#endif
