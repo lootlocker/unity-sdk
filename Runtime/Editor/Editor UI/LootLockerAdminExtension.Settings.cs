@@ -64,12 +64,13 @@ namespace LootLocker.Extension
             if (gameVersionField != null) 
                 gameVersionField.SetValueWithoutNotify(config.game_version);
             
+#if UNITY_2022_1_OR_NEWER
             if (logLevelField != null) 
             {
                 logLevelField.Init(config.logLevel);
                 logLevelField.SetValueWithoutNotify(config.logLevel);
             }
-            
+#endif
             if (logErrorsAsWarningsToggle != null) 
                 logErrorsAsWarningsToggle.SetValueWithoutNotify(config.logErrorsAsWarnings);
             
