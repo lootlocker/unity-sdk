@@ -35,6 +35,13 @@ namespace LootLocker.Requests
         public LootLockerRental rental { get; set; }
     }
 
+    public class LootLockerClassTypeDefaultLoadout 
+    {
+        public int asset_id { get; set; }
+        public int asset_variation_id { get; set; }
+        public LootLockerCommonAsset asset { get; set; }
+    }
+
     public class LootLockerListClassTypesResponse : LootLockerResponse
     {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -51,6 +58,7 @@ namespace LootLocker.Requests
         public bool is_default { get; set; }
         public string name { get; set; }
         public LootLockerStorage[] storage { get; set; }
+        public LootLockerClassTypeDefaultLoadout[] default_loadout { get; set; }
     }
 
     public class LootLockerLoadouts
