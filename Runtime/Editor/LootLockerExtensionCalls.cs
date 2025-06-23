@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
 using LootLocker.Extension.Requests;
 using LootLocker.Extension.Responses;
 
