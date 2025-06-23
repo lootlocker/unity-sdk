@@ -95,7 +95,9 @@ namespace LootLocker.Extension
         private Button settingsBackBtn;
         private TextField gameVersionField;
         private Label gameVersionWarning;
+#if UNITY_2022_1_OR_NEWER
         private EnumField logLevelField;
+#endif
         private Toggle logErrorsAsWarningsToggle, logInBuildsToggle, allowTokenRefreshToggle;
         #endregion
 
