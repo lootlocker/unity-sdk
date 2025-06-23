@@ -133,7 +133,14 @@ namespace LootLocker.Extension
             settingsBackBtn = root.Q<Button>("SettingsBackBtn");
             gameVersionField = root.Q<TextField>("GameVersionField");
             gameVersionWarning = root.Q<Label>("GameVersionWarning");
+#if UNITY_2022_1_OR_NEWER
             logLevelField = root.Q<EnumField>("LogLevelField");
+#else
+            Label logLevelTooltip = new Label("Log Level editing requires Unity 2022.1 or newer.");
+            logLevelTooltip.tooltip = "Log Level editing requires Unity 2022.1 or newer.";
+            logLevelTooltip.style.color = new StyleColor(Color.yellow);
+            settingsFlow.Add(logLevelTooltip);
+#endif
             logErrorsAsWarningsToggle = root.Q<Toggle>("LogErrorsAsWarningsToggle");
             logInBuildsToggle = root.Q<Toggle>("LogInBuildsToggle");
             allowTokenRefreshToggle = root.Q<Toggle>("AllowTokenRefreshToggle");
@@ -195,7 +202,9 @@ namespace LootLocker.Extension
         private void InitializeSettingsEventHandlers()
         {
             if (gameVersionField != null) gameVersionField.RegisterValueChangedCallback(evt => SaveGameVersion(evt.newValue));
+#if UNITY_2022_1_OR_NEWER
             if (logLevelField != null) logLevelField.RegisterValueChangedCallback(evt => SaveLogLevel((LootLockerLogger.LogLevel)evt.newValue));
+#endif
             if (logErrorsAsWarningsToggle != null) logErrorsAsWarningsToggle.RegisterValueChangedCallback(evt => SaveLogErrorsAsWarnings(evt.newValue));
             if (logInBuildsToggle != null) logInBuildsToggle.RegisterValueChangedCallback(evt => SaveLogInBuilds(evt.newValue));
             if (allowTokenRefreshToggle != null) allowTokenRefreshToggle.RegisterValueChangedCallback(evt => SaveAllowTokenRefresh(evt.newValue));
