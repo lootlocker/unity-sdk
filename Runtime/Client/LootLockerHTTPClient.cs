@@ -536,7 +536,6 @@ namespace LootLocker
                                     response.errorData.retry_after_seconds = RetryAfterHeader;
                                 }
 
-                                //LootLockerLogger.Log(response.errorData.ToString(), LootLockerLogger.LogLevel.Error);
                                 CallListenersAndMarkDone(executionItem, response);
                                 return;
                             }
