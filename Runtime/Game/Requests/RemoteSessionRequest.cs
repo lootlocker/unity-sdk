@@ -229,8 +229,6 @@ namespace LootLocker
             #region Public Methods
             public static Guid StartRemoteSessionWithContinualPolling(
                 LootLockerRemoteSessionLeaseIntent leaseIntent,
-                string titleId,
-                string environmentId,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
@@ -238,7 +236,7 @@ namespace LootLocker
                 float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, titleId, environmentId, remoteSessionLeaseInformation,
+                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
                     timeOutAfterMinutes, forPlayerWithUlid);
             }
@@ -370,8 +368,6 @@ namespace LootLocker
 
             private Guid _StartRemoteSessionWithContinualPolling(
                 LootLockerRemoteSessionLeaseIntent leaseIntent,
-                string titleId,
-                string environmentId,
                 Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
                 Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdateCallback,
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
@@ -400,25 +396,47 @@ namespace LootLocker
                 };
                 AddRemoteSessionProcess(processGuid, lootLockerRemoteSessionProcess);
 
-                LeaseRemoteSession(leaseIntent, titleId, environmentId, forPlayerWithUlid, leaseRemoteSessionResponse =>
+                LootLockerAPIManager.GetGameInfo(gameInfoResponse =>
                 {
-                    if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
+                    if (!gameInfoResponse.success)
                     {
-                        return;
-                    }
-                    if (!leaseRemoteSessionResponse.success)
-                    {
+                        if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
+                        {
+                            return;
+                        }
                         RemoveRemoteSessionProcess(processGuid);
-                        remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
+                        remoteSessionLeaseInformation?.Invoke(new LootLockerLeaseRemoteSessionResponse
+                        {
+                            success = gameInfoResponse.success,
+                            statusCode = gameInfoResponse.statusCode,
+                            text = gameInfoResponse.text,
+                            errorData = gameInfoResponse.errorData,
+                            requestContext = gameInfoResponse.requestContext,
+                            status = LootLockerRemoteSessionLeaseStatus.Failed
+                        });
                         return;
                     }
-                    remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
 
-                    process.LeaseCode = leaseRemoteSessionResponse.code;
-                    process.LeaseNonce = leaseRemoteSessionResponse.nonce;
-                    process.LastUpdatedStatus = leaseRemoteSessionResponse.status;
-                    process.LastUpdatedAt = DateTime.UtcNow;
-                    StartCoroutine(ContinualPollingAction(processGuid));
+                    LeaseRemoteSession(leaseIntent, gameInfoResponse.info.title_id, gameInfoResponse.info.environment_id, forPlayerWithUlid, leaseRemoteSessionResponse =>
+                    {
+                        if (!_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
+                        {
+                            return;
+                        }
+                        if (!leaseRemoteSessionResponse.success)
+                        {
+                            RemoveRemoteSessionProcess(processGuid);
+                            remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
+                            return;
+                        }
+                        remoteSessionLeaseInformation?.Invoke(leaseRemoteSessionResponse);
+
+                        process.LeaseCode = leaseRemoteSessionResponse.code;
+                        process.LeaseNonce = leaseRemoteSessionResponse.nonce;
+                        process.LastUpdatedStatus = leaseRemoteSessionResponse.status;
+                        process.LastUpdatedAt = DateTime.UtcNow;
+                        StartCoroutine(ContinualPollingAction(processGuid));
+                    });
                 });
                 return processGuid;
             }

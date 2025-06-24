@@ -1547,16 +1547,12 @@ namespace LootLocker.Requests
         /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
         /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
-        /// <param name="titleId">The Title ID of the game</param>
-        /// <param name="environmentId">The Environment ID of the game and environment</param>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
         public static Guid StartRemoteSession(
-            string titleId,
-            string environmentId,
             Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
             Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
             Action<LootLockerStartRemoteSessionResponse> onComplete,
@@ -1571,8 +1567,6 @@ namespace LootLocker.Requests
 
             return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
                 LootLockerRemoteSessionLeaseIntent.login,
-                titleId,
-                environmentId,
                 remoteSessionLeaseInformation,
                 remoteSessionLeaseStatusUpdate,
                 onComplete,
@@ -1587,8 +1581,6 @@ namespace LootLocker.Requests
         /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
         /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
         /// </summary>
-        /// <param name="titleId">The Title ID of the game</param>
-        /// <param name="environmentId">The Environment ID of the game and environment</param>
         /// <param name="forPlayerWithUlid">Execute the request for the specified player (the player that you intend to link the remote account into)</param>
         /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
@@ -1596,8 +1588,6 @@ namespace LootLocker.Requests
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
         public static Guid StartRemoteSessionForLinking(
-            string titleId,
-            string environmentId,
             string forPlayerWithUlid,
             Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
             Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
@@ -1613,8 +1603,6 @@ namespace LootLocker.Requests
 
             return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
                 LootLockerRemoteSessionLeaseIntent.link,
-                titleId,
-                environmentId,
                 remoteSessionLeaseInformation,
                 remoteSessionLeaseStatusUpdate,
                 onComplete,
@@ -7243,6 +7231,21 @@ namespace LootLocker.Requests
             }
 
             LootLockerAPIManager.Ping(forPlayerWithUlid, onComplete);
+        }
+
+        /// <summary>
+        ///  Get meta information about the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetGameInfo(Action<LootLockerGameInfoResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameInfoResponse>(""));
+                return;
+            }
+
+            LootLockerAPIManager.GetGameInfo(onComplete);
         }
 
         /// <summary>
