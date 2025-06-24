@@ -51,6 +51,15 @@ namespace LootLocker.Extension
                 logViewerUI = new LogViewerUI();
             logViewerUI.InitializeLogViewerUI(root);
         }
+
+        public void OnDestroy()
+        {
+            if (logViewerUI != null)
+            {
+                logViewerUI.Dispose();
+                logViewerUI = null;
+            }
+        }
     }
 }
 #endif

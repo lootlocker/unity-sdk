@@ -265,6 +265,7 @@ namespace LootLocker
         // Misc
         [Header("Misc")]
         public static EndPointClass ping = new EndPointClass("ping", LootLockerHTTPMethod.GET);
+        public static EndPointClass gameInfo = new EndPointClass("info/v1", LootLockerHTTPMethod.POST);
 
         // Reports
         [Header("Reports")]

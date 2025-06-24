@@ -65,6 +65,12 @@ namespace LootLocker.LogViewer
             showAdminRequests = false;
             FilterLogs();
         }
+
+        public void RemoveLogViewerUI()
+        {
+            UnregisterLogListener();
+        }
+
         private void InitializeLogViewerEventHandlers(Action onBack)
         {
             if (logViewerBackBtn != null)
@@ -83,7 +89,8 @@ namespace LootLocker.LogViewer
             if (logSearchField != null)
                 logSearchField.RegisterValueChangedCallback(evt => { searchFilter = evt.newValue; FilterLogs(); });
             if (logLevelDropdown != null)
-                logLevelDropdown.RegisterValueChangedCallback(evt => {
+                logLevelDropdown.RegisterValueChangedCallback(evt =>
+                {
                     if (evt.newValue == "All")
                     {
                         showAllLogLevels = true;
@@ -99,7 +106,8 @@ namespace LootLocker.LogViewer
             if (showAdminToggle != null)
             {
                 showAdminToggle.value = false;
-                showAdminToggle.RegisterValueChangedCallback(evt => {
+                showAdminToggle.RegisterValueChangedCallback(evt =>
+                {
                     showAdminRequests = evt.newValue;
                     FilterLogs();
                 });
@@ -132,6 +140,7 @@ namespace LootLocker.LogViewer
             if (string.IsNullOrEmpty(logListenerIdentifier))
             {
                 logListenerIdentifier = LootLockerLogger.RegisterListener(this);
+                LootLockerLogger.RegisterHttpLogListener(this);
             }
         }
         public void UnregisterLogListener()
@@ -139,6 +148,7 @@ namespace LootLocker.LogViewer
             if (!string.IsNullOrEmpty(logListenerIdentifier))
             {
                 LootLockerLogger.UnregisterListener(logListenerIdentifier);
+                LootLockerLogger.UnregisterHttpLogListener(this);
                 logListenerIdentifier = null;
             }
         }
@@ -354,7 +364,8 @@ namespace LootLocker.LogViewer
             }
 
             // Insert the summaryRow into the Foldout's Toggle
-            foldout.schedule.Execute(() => {
+            foldout.schedule.Execute(() =>
+            {
                 var toggle = foldout.Q<Toggle>(className: "unity-foldout__toggle");
                 if (toggle != null)
                 {
@@ -366,7 +377,8 @@ namespace LootLocker.LogViewer
                 }
             });
 
-            foldout.schedule.Execute(() => {
+            foldout.schedule.Execute(() =>
+            {
                 var headerLabel = summaryLabel;
                 if (headerLabel != null)
                 {
@@ -439,6 +451,11 @@ namespace LootLocker.LogViewer
             if (networkRequests > 0 || networkResponses > 0 || networkErrors > 0)
                 status += $" | Network: {networkRequests} req, {networkResponses} resp, {networkErrors} errors";
             logStatusLabel.text = status;
+        }
+
+        public void Dispose()
+        {
+            UnregisterLogListener();
         }
     }
 }
