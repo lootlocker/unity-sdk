@@ -152,6 +152,27 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Make the state for all currently active players to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove all players from the list of active players.
+        /// </summary>
+        public static void SetAllPlayersToInactive()
+        {
+            LootLockerStateData.SetAllPlayersToInactive();
+        }
+
+        /// <summary>
+        /// Make the state for all currently active players except the specified player to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove all players except the specified one from the list of active players.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player to keep active.</param>
+        public static void SetAllPlayersToInactiveExceptForPlayer(string playerUlid)
+        {
+            LootLockerStateData.SetAllPlayersToInactiveExceptForPlayer(playerUlid);
+        }
+
+        /// <summary>
         /// Get a list of player ULIDs that there is a stored state for.
         /// This includes both active and inactive players.
         /// </summary>
@@ -211,6 +232,17 @@ namespace LootLocker.Requests
         public static void ClearAllPlayerCaches()
         {
             LootLockerStateData.ClearAllSavedStates();
+        }
+
+        /// <summary>
+        /// Remove all stored state information except for the specified player (players will need to re-authenticate).
+        /// This will clear all player states except for the specified player.
+        /// If the specified player is the default player, it will remain as the default player.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player to save the cache for.</param>
+        public static void ClearAllPlayerCachesExceptForPlayer(string playerUlid)
+        {
+            LootLockerStateData.ClearAllSavedStatesExceptForPlayer(playerUlid);
         }
 
         #endregion

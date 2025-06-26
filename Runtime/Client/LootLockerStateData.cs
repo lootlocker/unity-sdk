@@ -310,6 +310,29 @@ namespace LootLocker
             return removedULIDs;
         }
 
+        public static List<string> ClearAllSavedStatesExceptForPlayer(string playerULID)
+        {
+            List<string> removedULIDs = new List<string>();
+            LoadMetaDataFromPlayerPrefsIfNeeded();
+            if (ActiveMetaData == null)
+            {
+                return removedULIDs;
+            }
+
+            List<string> ulidsToRemove = new List<string>(ActiveMetaData.SavedPlayerStateULIDs);
+            foreach (string ULID in ulidsToRemove)
+            {
+                if (!ULID.Equals(playerULID, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ClearSavedStateForPlayerWithULID(ULID))
+                    {
+                        removedULIDs.Add(ULID);
+                    }
+                }
+            }
+            return removedULIDs;
+        }
+
         public static void SetPlayerULIDToInactive(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID) || !ActivePlayerData.ContainsKey(playerULID))
@@ -318,6 +341,25 @@ namespace LootLocker
             }
 
             ActivePlayerData.Remove(playerULID);
+        }
+
+        public static void SetAllPlayersToInactive()
+        {
+            ActivePlayerData.Clear();
+        }
+
+        public static void SetAllPlayersToInactiveExceptForPlayer(string playerULID)
+        {
+            if (string.IsNullOrEmpty(playerULID))
+            {
+                return;
+            }
+
+            var keysToRemove = ActivePlayerData.Keys.Where(key => !key.Equals(playerULID, StringComparison.OrdinalIgnoreCase)).ToList();
+            foreach (string key in keysToRemove)
+            {
+                ActivePlayerData.Remove(key);
+            }
         }
 
         public static List<string> GetActivePlayerULIDs()
