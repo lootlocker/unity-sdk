@@ -132,6 +132,15 @@ namespace LootLocker.Requests
         #region Multi-User Management
 
         /// <summary>
+        /// Get the information from the stored state for the player with the specified ULID.
+        /// </summary>
+        /// <returns>The data stored for the specified player. Will be empty if no data is found.</returns>
+        public static LootLockerPlayerData GetPlayerDataForPlayerWithUlid(string playerUlid)
+        {
+            return LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid);
+        }
+
+        /// <summary>
         /// Get a list of player ULIDs that have been active since game start (or state initialization).
         /// </summary>
         /// <returns>List of player ULIDs that have been active since game start.</returns>
