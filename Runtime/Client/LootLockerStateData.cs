@@ -134,7 +134,7 @@ namespace LootLocker
             }
 
             string playerDataJson = PlayerPrefs.GetString($"{PlayerDataSaveSlot}_{playerULID}");
-            if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData)) //TODO: auth platform is not parsed correctly. Write json test
+            if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
             {
                 return false;
             }
@@ -157,6 +157,36 @@ namespace LootLocker
         public static bool SaveStateExistsForPlayer(string playerULID)
         {
             return PlayerPrefs.HasKey($"{PlayerDataSaveSlot}_{playerULID}");
+        }
+
+        public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
+        {
+            if (string.IsNullOrEmpty(playerULID))
+            {
+                return new LootLockerPlayerData();
+            }
+            LoadMetaDataFromPlayerPrefsIfNeeded();
+            if (ActiveMetaData == null)
+            {
+                return new LootLockerPlayerData();
+            }
+
+            if (!SaveStateExistsForPlayer(playerULID))
+            {
+                return new LootLockerPlayerData();
+            }
+
+            if (ActivePlayerData.TryGetValue(playerULID, out var data))
+            {
+                return data;
+            }
+
+            string playerDataJson = PlayerPrefs.GetString($"{PlayerDataSaveSlot}_{playerULID}");
+            if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
+            {
+                return new LootLockerPlayerData();
+            }
+            return parsedPlayerData;
         }
 
         [CanBeNull]
@@ -330,6 +360,8 @@ namespace LootLocker
                     }
                 }
             }
+
+            SetDefaultPlayerULID(playerULID);
             return removedULIDs;
         }
 
@@ -360,6 +392,8 @@ namespace LootLocker
             {
                 ActivePlayerData.Remove(key);
             }
+
+            SetDefaultPlayerULID(playerULID);
         }
 
         public static List<string> GetActivePlayerULIDs()
