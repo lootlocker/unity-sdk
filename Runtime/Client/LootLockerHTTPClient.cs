@@ -216,6 +216,8 @@ namespace LootLocker
 
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
+        private List<string> ExecutionItemsNeedingRefresh = new List<string>();
+        private List<string> OngoingIdsToCleanUp = new List<string>();
 
         private void OnDestroy()
         {
@@ -230,13 +232,14 @@ namespace LootLocker
 
         void Update()
         {
-            List<string> ExecutionItemsNeedingRefresh = new List<string>();
-            foreach(var executionItem in HTTPExecutionQueue.Values)
+            ExecutionItemsNeedingRefresh.Clear();
+            // Process the execution queue
+            foreach (var executionItem in HTTPExecutionQueue.Values)
             {
                 // Skip completed requests
-                if(executionItem.Done)
+                if (executionItem.Done)
                 {
-                    if(!CompletedRequestIDs.Contains(executionItem.RequestData.RequestId))
+                    if (!CompletedRequestIDs.Contains(executionItem.RequestData.RequestId))
                     {
                         CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
                     }
@@ -252,7 +255,7 @@ namespace LootLocker
                 // Send unsent
                 if (executionItem.AsyncOperation == null && executionItem.WebRequest == null)
                 {
-                    if(executionItem.RetryAfter != null && executionItem.RetryAfter > DateTime.Now)
+                    if (executionItem.RetryAfter != null && executionItem.RetryAfter > DateTime.Now)
                     {
                         // Wait for retry
                         continue;
@@ -271,13 +274,13 @@ namespace LootLocker
                 // Process ongoing
                 var Result = ProcessOngoingRequest(executionItem);
 
-                if(Result == HTTPExecutionQueueProcessingResult.NeedsSessionRefresh)
+                if (Result == HTTPExecutionQueueProcessingResult.NeedsSessionRefresh)
                 {
                     //Bulk handle session refreshes at the end
                     ExecutionItemsNeedingRefresh.Add(executionItem.RequestData.RequestId);
                     continue;
                 }
-                else if(Result == HTTPExecutionQueueProcessingResult.WaitForNextTick || Result == HTTPExecutionQueueProcessingResult.None)
+                else if (Result == HTTPExecutionQueueProcessingResult.WaitForNextTick || Result == HTTPExecutionQueueProcessingResult.None)
                 {
                     // Nothing to handle, simply continue
                     continue;
@@ -402,11 +405,11 @@ namespace LootLocker
                     CompletedRequestIDs.Add(ExecutionItem.RequestData.RequestId);
                 }
             }
-
-            List<string> OngoingIdsToCleanUp = new List<string>();
-            foreach(string OngoingId in CurrentlyOngoingRequests.Keys)
+            
+            OngoingIdsToCleanUp.Clear();
+            foreach (string OngoingId in CurrentlyOngoingRequests.Keys)
             {
-                if(!HTTPExecutionQueue.TryGetValue(OngoingId, out var executionQueueItem) || executionQueueItem.Done)
+                if (!HTTPExecutionQueue.TryGetValue(OngoingId, out var executionQueueItem) || executionQueueItem.Done)
                 {
                     OngoingIdsToCleanUp.Add(OngoingId);
                 }
