@@ -82,6 +82,7 @@ namespace LootLocker
         [Header("Class")]
         public static EndPointClass classLoadouts = new EndPointClass("v1/player/character/loadout", LootLockerHTTPMethod.GET);
         public static EndPointClass getOtherPlayersClassLoadouts = new EndPointClass("v1/player/character/loadout/{0}?platform={1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersClassLoadoutsByUid = new EndPointClass("v1/player/character/loadout/puid/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass updateClass = new EndPointClass("v1/player/character/{0}", LootLockerHTTPMethod.PUT);
         public static EndPointClass equipIDAssetToDefaultClass = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);
         public static EndPointClass equipGlobalAssetToDefaultClass = new EndPointClass("v1/player/equip", LootLockerHTTPMethod.POST);

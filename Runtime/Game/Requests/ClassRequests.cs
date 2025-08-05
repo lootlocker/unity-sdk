@@ -210,6 +210,15 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        public static void GetOtherPlayersClassLoadoutByUid(string forPlayerWithUlid, string playerUid, Action<LootLockerClassLoadoutResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersClassLoadoutsByUid;
+
+            string parameterizedEndpoint = endPoint.WithPathParameter(playerUid);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, parameterizedEndpoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         public static void UpdateClass(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateClassRequest data, Action<LootLockerClassLoadoutResponse> onComplete)
         {
             if (data == null)
