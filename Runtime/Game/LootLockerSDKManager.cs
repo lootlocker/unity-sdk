@@ -3671,6 +3671,17 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get a class loadout from a specific player by the player's UID
+        /// </summary>
+        /// <param name="playerUid">The UID of the player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersClassLoadoutByUid(string playerUid, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            LootLockerAPIManager.GetOtherPlayersClassLoadoutByUid(forPlayerWithUlid, playerUid, onComplete);
+        }
+
+        /// <summary>
         /// Update information about the class. The class must be owned by the currently active player.
         /// </summary>
         /// <param name="classID">ID of the class</param>
