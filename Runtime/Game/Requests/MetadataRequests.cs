@@ -46,7 +46,8 @@ namespace LootLocker.LootLockerEnums
     {
         create = 0,
         update = 1,
-        delete = 2
+        delete = 2,
+        create_or_update = 3,
     };
 }
 
@@ -296,7 +297,7 @@ namespace LootLocker.Requests
             this.value = other.value;
             this.tags = other.tags;
             this.access = other.access;
-            this.action = other.action.ToString().ToLower();
+            this.action = other.action == LootLockerMetadataActions.create_or_update ? "upsert" : other.action.ToString().ToLower();
         }
 
         public new string type { get; set; }
