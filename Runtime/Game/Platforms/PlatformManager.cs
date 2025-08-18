@@ -5,21 +5,22 @@ namespace LootLocker.Requests
 {
     public enum LL_AuthPlatforms
     {
-        None
-        ,Guest
-        ,WhiteLabel
-        ,Steam
-        ,PlayStationNetwork
-        ,XboxOne
-        ,NintendoSwitch
-        ,AmazonLuna
-        ,AppleSignIn
-        ,AppleGameCenter
-        ,Android
-        ,Google
-        ,Epic
-        ,Meta
-        ,Remote
+    None
+    ,Guest
+    ,WhiteLabel
+    ,Steam
+    ,PlayStationNetwork
+    ,XboxOne
+    ,NintendoSwitch
+    ,AmazonLuna
+    ,AppleSignIn
+    ,AppleGameCenter
+    ,Android
+    ,Google
+    ,GooglePlayGames
+    ,Epic
+    ,Meta
+    ,Remote
     }
     public struct LL_AuthPlatformRepresentation
     {
@@ -30,7 +31,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAuthPlatformSettings
     {
-        public static List<LL_AuthPlatforms> PlatformsWithRefreshTokens = new List<LL_AuthPlatforms> { LL_AuthPlatforms.AppleGameCenter, LL_AuthPlatforms.AppleSignIn, LL_AuthPlatforms.Epic, LL_AuthPlatforms.Google, LL_AuthPlatforms.Remote };
+        public static List<LL_AuthPlatforms> PlatformsWithRefreshTokens = new List<LL_AuthPlatforms> { LL_AuthPlatforms.AppleGameCenter, LL_AuthPlatforms.AppleSignIn, LL_AuthPlatforms.Epic, LL_AuthPlatforms.Google, LL_AuthPlatforms.GooglePlayGames, LL_AuthPlatforms.Remote };
         public static List<LL_AuthPlatforms> PlatformsWithStoredAuthData = new List<LL_AuthPlatforms> { LL_AuthPlatforms.Guest, LL_AuthPlatforms.WhiteLabel, LL_AuthPlatforms.AmazonLuna, LL_AuthPlatforms.PlayStationNetwork, LL_AuthPlatforms.XboxOne };
     }
 
@@ -63,6 +64,7 @@ namespace LootLocker.Requests
             ,"apple_game_center" // Apple Game Center
             ,"android" // Android
             ,"google_sign_in" // Google
+            ,"google_play_games" // Google Play Games
             ,"epic_games" // Epic Online Services / Epic Games
             ,"meta" // Meta
             ,"remote" // Remote (leased) session
@@ -82,6 +84,7 @@ namespace LootLocker.Requests
             ,"Apple Game Center" // Apple Game Center
             ,"Android" // Android
             ,"Google" // Google
+            ,"Google Play Games" // Google Play Games
             ,"Epic Online Services" // Epic Online Services / Epic Games
             ,"Meta" // Meta
             ,"Remote" // Remote (leased) session

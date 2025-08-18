@@ -139,6 +139,13 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
+    public class LootLockerGooglePlayGamesSessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
+        public string refresh_token { get; set; }
+    }
+
+    [Serializable]
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
@@ -277,6 +284,29 @@ namespace LootLocker.Requests
         public LootLockerGoogleRefreshSessionRequest(string refresh_token)
         {
             this.refresh_token = refresh_token;
+        }
+    }
+    public class LootLockerGooglePlayGamesSessionRequest
+    {
+        public string game_api_key => LootLockerConfig.current.apiKey;
+        public string auth_code { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerGooglePlayGamesSessionRequest(string authCode)
+        {
+            this.auth_code = authCode;
+        }
+    }
+
+    public class LootLockerGooglePlayGamesRefreshSessionRequest
+    {
+        public string game_api_key => LootLockerConfig.current.apiKey;
+        public string refresh_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerGooglePlayGamesRefreshSessionRequest(string refreshToken)
+        {
+            this.refresh_token = refreshToken;
         }
     }
 
