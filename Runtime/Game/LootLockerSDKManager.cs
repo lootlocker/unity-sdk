@@ -873,6 +873,127 @@ namespace LootLocker.Requests
                 false
             );
         }
+        
+        /// <summary>
+        /// Start a Google Play Games Services session.
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="authCode">The auth code received from Google Play Games Services authentication.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartGooglePlayGamesSession(string authCode, Action<LootLockerGooglePlayGamesSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+            var request = new Requests.LootLockerGooglePlayGamesSessionRequest(authCode);
+            LootLockerServerRequest.CallAPI(
+                null,
+                LootLocker.LootLockerEndPoints.googlePlayGamesSessionRequest.endPoint,
+                LootLocker.LootLockerEndPoints.googlePlayGamesSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(request),
+                (serverResponse) =>
+                {
+                    var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.GooglePlayGames),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Google Play Games
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="refreshToken">The refresh token received from a previous GPGS session.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void RefreshGooglePlayGamesSession(string refreshToken, Action<LootLockerGooglePlayGamesSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+            var request = new Requests.LootLockerGooglePlayGamesRefreshSessionRequest(refreshToken);
+            LootLockerServerRequest.CallAPI(
+                null,
+                LootLocker.LootLockerEndPoints.googlePlayGamesRefreshSessionRequest.endPoint,
+                LootLocker.LootLockerEndPoints.googlePlayGamesRefreshSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(request),
+                (serverResponse) =>
+                {
+                    var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.GooglePlayGames),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Google Play Games
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshGooglePlayGamesSession(Action<LootLockerGooglePlayGamesSessionResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGooglePlayGamesSessionResponse>(null));
+                return;
+            }
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.RefreshToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerGooglePlayGamesSessionResponse>(playerData?.ULID));
+                return;
+            }
+
+            RefreshGooglePlayGamesSession(playerData.RefreshToken, onComplete);
+        }
 
         /// <summary>
         /// Create a new session for Sign in with Apple
