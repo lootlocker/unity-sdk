@@ -21,6 +21,7 @@ namespace LootLocker.Requests
     ,Epic
     ,Meta
     ,Remote
+    ,Discord
     }
     public struct LL_AuthPlatformRepresentation
     {
@@ -31,7 +32,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAuthPlatformSettings
     {
-        public static List<LL_AuthPlatforms> PlatformsWithRefreshTokens = new List<LL_AuthPlatforms> { LL_AuthPlatforms.AppleGameCenter, LL_AuthPlatforms.AppleSignIn, LL_AuthPlatforms.Epic, LL_AuthPlatforms.Google, LL_AuthPlatforms.GooglePlayGames, LL_AuthPlatforms.Remote };
+        public static List<LL_AuthPlatforms> PlatformsWithRefreshTokens = new List<LL_AuthPlatforms> { LL_AuthPlatforms.AppleGameCenter, LL_AuthPlatforms.AppleSignIn, LL_AuthPlatforms.Epic, LL_AuthPlatforms.Google, LL_AuthPlatforms.GooglePlayGames, LL_AuthPlatforms.Remote, LL_AuthPlatforms.Discord };
         public static List<LL_AuthPlatforms> PlatformsWithStoredAuthData = new List<LL_AuthPlatforms> { LL_AuthPlatforms.Guest, LL_AuthPlatforms.WhiteLabel, LL_AuthPlatforms.AmazonLuna, LL_AuthPlatforms.PlayStationNetwork, LL_AuthPlatforms.XboxOne };
     }
 
@@ -68,6 +69,7 @@ namespace LootLocker.Requests
             ,"epic_games" // Epic Online Services / Epic Games
             ,"meta" // Meta
             ,"remote" // Remote (leased) session
+            ,"discord" // Discord
         };
 
         private static readonly string[] PlatformFriendlyStrings = new[]
@@ -88,6 +90,7 @@ namespace LootLocker.Requests
             ,"Epic Online Services" // Epic Online Services / Epic Games
             ,"Meta" // Meta
             ,"Remote" // Remote (leased) session
+            ,"Discord" // Discord
         };
 
         public static LL_AuthPlatformRepresentation GetPlatformRepresentation(LL_AuthPlatforms platform)

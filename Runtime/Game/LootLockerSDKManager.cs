@@ -1461,6 +1461,134 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Start a Discord session.
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="accessToken">The player's Discord OAuth token</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartDiscordSession(string accessToken, Action<LootLockerDiscordSessionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.discordSessionRequest.endPoint,
+                LootLockerEndPoints.discordSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerDiscordSessionRequest(accessToken)),
+                (serverResponse) =>
+                    {
+                        var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
+                        if (response.success)
+                        {
+                            LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                            {
+                                SessionToken = response.session_token,
+                                RefreshToken = response.refresh_token,
+                                ULID = response.player_ulid,
+                                Identifier = "",
+                                PublicUID = response.public_uid,
+                                LegacyID = response.player_id,
+                                Name = response.player_name,
+                                WhiteLabelEmail = "",
+                                WhiteLabelToken = "",
+                                CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Discord),
+                                LastSignIn = DateTime.Now,
+                                CreatedAt = response.player_created_at,
+                                WalletID = response.wallet_id,
+                            });
+                        }
+
+                        onComplete?.Invoke(response);
+                    }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous Discord session
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.RefreshToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerDiscordSessionResponse>(playerData?.ULID));
+                return;
+            }
+
+            RefreshDiscordSession(playerData.RefreshToken, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Refresh a previous Discord session
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid) method.
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="refresh_token">Token received in response from StartDiscordSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDiscordSessionResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshDiscordSession(string refresh_token, Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDiscordSessionResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(refresh_token))
+            {
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerDiscordSessionResponse>(playerData?.ULID));
+                    return;
+                }
+                refresh_token = playerData.RefreshToken;
+                forPlayerWithUlid = playerData.ULID;
+            }
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, 
+                LootLockerEndPoints.discordSessionRequest.endPoint, LootLockerEndPoints.discordSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerDiscordRefreshSessionRequest(refresh_token)), 
+                (serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Discord),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
         /// End active session (if any exists)
         /// Succeeds if a session was ended or no sessions were active
         /// </summary>
