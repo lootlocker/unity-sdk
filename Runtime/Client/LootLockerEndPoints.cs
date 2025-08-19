@@ -13,6 +13,8 @@ namespace LootLocker
         public static EndPointClass endingSession = new EndPointClass("v1/session", LootLockerHTTPMethod.DELETE);
         public static EndPointClass nintendoSwitchSessionRequest = new EndPointClass("session/nintendo-switch", LootLockerHTTPMethod.POST);
         public static EndPointClass epicSessionRequest = new EndPointClass("session/epic", LootLockerHTTPMethod.POST);
+        public static EndPointClass discordSessionRequest = new EndPointClass("session/discord", LootLockerHTTPMethod.POST);
+        public static EndPointClass discordRefreshSessionRequest = new EndPointClass("session/discord", LootLockerHTTPMethod.POST);
         public static EndPointClass metaSessionRequest = new EndPointClass("session/meta", LootLockerHTTPMethod.POST);
         public static EndPointClass xboxSessionRequest = new EndPointClass("session/xbox-one", LootLockerHTTPMethod.POST);
         public static EndPointClass appleSessionRequest = new EndPointClass("session/apple", LootLockerHTTPMethod.POST);

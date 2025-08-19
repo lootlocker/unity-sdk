@@ -367,4 +367,34 @@ namespace LootLocker.Requests
             this.refresh_token = refreshToken;
         }
     }
+    public class LootLockerDiscordSessionRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey;
+        public string access_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerDiscordSessionRequest(string accessToken)
+        {
+            this.access_token = accessToken;
+        }
+    }
+
+    public class LootLockerDiscordRefreshSessionRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey;
+        public string refresh_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+
+        public LootLockerDiscordRefreshSessionRequest(string refreshToken)
+        {
+            this.refresh_token = refreshToken;
+        }
+    }
+
+    [Serializable]
+    public class LootLockerDiscordSessionResponse : LootLockerSessionResponse
+    {
+        public string refresh_token { get; set; }
+        public string player_identifier { get; set; }
+    }
 }
