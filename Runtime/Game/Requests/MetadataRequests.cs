@@ -47,7 +47,8 @@ namespace LootLocker.LootLockerEnums
         create = 0,
         update = 1,
         delete = 2,
-        create_or_update = 3,
+        create_or_update = 3, // Alias for upsert (same thing)
+        upsert = 4, 
     };
 }
 
