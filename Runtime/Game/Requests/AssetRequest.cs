@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using LootLocker.Requests;
-using System.Linq;
+﻿using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -66,6 +63,67 @@ namespace LootLocker.Requests
         {
             lastId = 0;
         }
+    }
+
+    /// <summary>
+    /// Request object for listing assets with settings for what to include, exclude, and filter.
+    /// </summary>
+    public class LootLockerListAssetsRequest
+    {
+        /// <summary>Fields to include in the response.</summary>
+        public LootLockerAssetIncludes includes { get; set; } = new LootLockerAssetIncludes();
+        /// <summary>Fields to exclude from the response.</summary>
+        public LootLockerAssetExcludes excludes { get; set; } = new LootLockerAssetExcludes();
+        /// <summary>Filters to apply to the asset listing.</summary>
+        public LootLockerAssetFilters filters { get; set; } = new LootLockerAssetFilters();
+    }
+
+    /// <summary>
+    /// Fields to include in the asset response.
+    /// </summary>
+    public class LootLockerAssetIncludes
+    {
+        ///<summary>If set to true, response will include storage key-value pairs.</summary>
+        public bool storage { get; set; } = false;
+        ///<summary>If set to true, response will include files.</summary>
+        public bool files { get; set; } = false;
+        ///<summary>If set to true, response will include asset data entities.</summary>
+        public bool data_entities { get; set; } = false;
+        ///<summary>If set to true, response will include asset metadata.</summary>
+        public bool metadata { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Fields to exclude from the asset response.
+    /// </summary>
+    public class LootLockerAssetExcludes
+    {
+        ///<summary>If set to true, UGC assets authors will not be returned.</summary>
+        public bool authors { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Filters to apply to the asset listing.
+    /// </summary>
+    public class LootLockerAssetFilters
+    {
+        ///<summary>If set to true, response will include only UGC assets.</summary>
+        public bool ugc_only { get; set; } = false;
+        ///<summary>If provided, only the requested ids will be returned. No pagination will be attempted or respected, maximum 100 assets.</summary>
+        public List<int> asset_ids { get; set; } = new List<int>();
+    }
+
+    /// <summary>
+    /// Response object for listing assets from the simple asset endpoint.
+    /// </summary>
+    [Serializable]
+    public class LootLockerListAssetsResponse : LootLockerResponse
+    {
+        /// <summary>List of assets returned by the endpoint.</summary>
+        public LootLockerSimpleAsset[] assets { get; set; }
+
+        /// <summary>Pagination data for this request</summary>
+        public LootLockerExtendedPagination pagination { get; set; }
     }
 
     public class LootLockerGrantAssetRequest
@@ -143,6 +201,47 @@ namespace LootLocker.Requests
         public LootLockerFile[] files { get; set; }
         public LootLockerAssetCandidate asset_candidate { get; set; }
         public string[] data_entities { get; set; }
+    }
+
+    /// <summary>
+    /// A simplified asset object to improve performance
+    /// </summary>
+    [Serializable]
+    public class LootLockerSimpleAsset
+    {
+        public int asset_id { get; set; }
+        public string asset_uuid { get; set; }
+        public string asset_ulid { get; set; }
+        public string asset_name { get; set; }
+        public int context_id { get; set; }
+        public string context_name { get; set; }
+        public LootLockerSimpleAssetAuthor author { get; set; }
+        public LootLockerStorage[] storage { get; set; }
+        public LootLockerSimpleAssetFile[] files { get; set; }
+        public LootLockerSimpleAssetDataEntity[] data_entities { get; set; }
+        public LootLockerMetadataEntry[] metadata { get; set; }
+    }
+
+    public class LootLockerSimpleAssetAuthor
+    {
+        public int player_id { get; set; }
+        public string player_ulid { get; set; }
+        public string public_uid { get; set; }
+        public string active_name { get; set; }
+    }
+
+    public class LootLockerSimpleAssetFile
+    {
+        public int size { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+        public string[] tags { get; set; }
+    }
+
+    public class LootLockerSimpleAssetDataEntity
+    {
+        public string name { get; set; }
+        public string data { get; set; }
     }
 
     public class LootLockerAssetCandidate

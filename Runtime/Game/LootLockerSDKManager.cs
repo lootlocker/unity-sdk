@@ -4729,6 +4729,49 @@ namespace LootLocker.Requests
         }
 
         #endregion
+        /// <summary>
+        /// List assets with default parameters (no filters, first page, default page size).
+        /// </summary>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListAssetsWithDefaultParameters(Action<LootLockerListAssetsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListAssets(new LootLockerListAssetsRequest(), onComplete, forPlayerWithUlid: forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List assets with configurable response data. Use this to limit the fields returned in the response and improve performance.
+        /// </summary>
+        /// <param name="Request">Request object with settings on what fields to include, exclude, and what assets to filter</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this Request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
+        /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this Request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the Request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListAssets(LootLockerListAssetsRequest Request, Action<LootLockerListAssetsResponse> onComplete, int PerPage = 0, int Page = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListAssetsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endPoint = LootLockerEndPoints.ListAssets.endPoint + queryParams.Build();
+
+            string body = LootLockerJson.SerializeObject(Request);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, LootLockerEndPoints.ListAssets.httpMethod, body,
+                (response) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerListAssetsResponse>(response);
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
 
         #region AssetInstance
         /// <summary>
