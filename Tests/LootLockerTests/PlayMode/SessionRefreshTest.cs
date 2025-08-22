@@ -127,7 +127,7 @@ namespace LootLockerTests.PlayMode
                    LootLockerTestConfigurationUtilities.GetRandomVerb();
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RefreshSession_ExpiredWhiteLabelSessionAndAutoRefreshEnabled_SessionIsAutomaticallyRefreshed()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -160,7 +160,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreNotEqual(invalidToken, LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null)?.SessionToken, "Token was not refreshed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator RefreshSession_ExpiredWhiteLabelSessionButAutoRefreshDisabled_SessionDoesNotRefresh()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

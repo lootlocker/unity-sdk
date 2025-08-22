@@ -104,7 +104,7 @@ namespace LootLockerTests.PlayMode
         }
 
         //TODO: Deprecated (or rather temporary) - Remove after 20251001
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator MultiUser_JustMigratedToMultiUserSDK_TransfersStoredUser()
         {
             // Setup Succeeded
@@ -168,7 +168,7 @@ namespace LootLockerTests.PlayMode
             Assert.False(PlayerPrefs.HasKey("LootLockerWhiteLabelSessionToken"), "Key LootLockerWhiteLabelSessionToken was not cleared from player prefs");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_MakingRequestsWithoutSpecifyingUser_UsesDefaultUser()
         {
             // Setup Succeeded
@@ -203,7 +203,7 @@ namespace LootLockerTests.PlayMode
                 "The expected number of local players were not 'active'");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_MakingRequestsWithSpecifiedUser_UsesSpecifiedUser()
         {
             // Setup Succeeded
@@ -241,7 +241,7 @@ namespace LootLockerTests.PlayMode
                 "The expected number of local players were not 'active'");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_RequestCurrentPlayerDataForDefaultUser_GetsCorrectUserData()
         {
             // Setup Succeeded
@@ -293,7 +293,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(defaultPlayerData.Name, currentPlayerInfoResponse.info.name ?? "");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetDefaultPlayerULID_ChangesDefaultPlayerUsedForRequests()
         {
             // Setup Succeeded
@@ -377,7 +377,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(nonDefaultPlayerData.Name, currentPlayerInfoAfterDefaultUserSwitch.info.name ?? "");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_RequestCurrentPlayerDataForNonDefaultUser_GetsCorrectUserData()
         {
             // Setup Succeeded
@@ -429,7 +429,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(nonDefaultPlayerData.Name, currentPlayerInfoResponse.info.name ?? "");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SaveStateExistsForPlayerWhenPlayerExists_ReturnsTrue()
         {
             // Setup Succeeded
@@ -464,7 +464,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_ulid, playerData.ULID);
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SaveStateExistsForPlayerWhenPlayerDoesNotExist_ReturnsFalse()
         {
             // Setup Succeeded
@@ -485,7 +485,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_GetActivePlayerUlid_ListsAllActivePlayers()
         {
             // Setup Succeeded
@@ -518,7 +518,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(guestUsersToCreate, matches);
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetPlayerULIDToInactive_MakesThePlayerNotActiveButSaveStateStillExistsAndIsCached()
         {
             // Setup Succeeded
@@ -590,7 +590,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_ClearSavedStateForPlayer_SaveStateIsRemoved()
         {
             // Setup Succeeded
@@ -622,7 +622,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNull(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(ulidToRemove));
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_ClearAllSavedStates_AllSaveStatesAreRemoved()
         {
             // Setup Succeeded
@@ -655,7 +655,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetPlayerDataWhenPlayerExists_UpdatesPlayerCache()
         {
             // Setup Succeeded
@@ -705,7 +705,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("ChangedName", postUpdatePlayerData.Name);
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetPlayerDataWhenPlayerDoesNotExistButOtherPlayersActive_CreatesPlayerCacheButDoesNotSetDefault()
         {
             // Setup Succeeded
@@ -758,7 +758,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("ChangedName", postUpdateNewPlayerData.Name);
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetPlayerDataWhenNoPlayerCachesExist_CreatesPlayerCacheAndSetsDefault()
         {
             // Setup Succeeded
@@ -803,7 +803,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_SetPlayerDataWhenPlayerCachesExistButNoPlayersAreActive_CreatesPlayerCacheAndSetsDefault()
         {
             // Setup Succeeded
@@ -851,7 +851,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_GetPlayerUlidFromWLEmailWhenPlayerIsCached_ReturnsCorrectULID()
         {
             // Setup Succeeded
@@ -900,7 +900,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_GetPlayerUlidFromWLEmailWhenPlayerIsNotCached_ReturnsNoULID()
         {
             // Setup Succeeded

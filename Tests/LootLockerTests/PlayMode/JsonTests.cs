@@ -21,7 +21,7 @@ namespace LootLockerTests.PlayMode
 
     public class JsonTests
     {
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DeserializingSimpleJson_Succeeds()
         {
             // Given
@@ -40,7 +40,7 @@ namespace LootLockerTests.PlayMode
                 "Not deserialized, does not contain player_identifier value");
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DeserializingComplexArrayJson_Succeeds()
         {
             // Given
@@ -61,7 +61,7 @@ namespace LootLockerTests.PlayMode
                 "Not deserialized, does not contain the correct character");
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DeserializingMultiDimensionalArray_Succeeds()
         {
             // Given
@@ -82,7 +82,7 @@ namespace LootLockerTests.PlayMode
         }
 
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SerializingMultidimensionalArray_Succeeds()
         {
             // Given
@@ -101,7 +101,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(serializedJson.Contains("3-1"), "Not Serialized, does not contain 3-1 value");
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SerializingSimpleJson_Succeeds()
         {
             // Given
@@ -144,7 +144,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_ConditionalSerializationConfigured_OnlyConfiguredFieldsAreSerialized()
         {
             // Given
@@ -216,7 +216,7 @@ namespace LootLockerTests.PlayMode
             public string MultiLetterISAok { get; set; } = "n/a";
         };
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SerializationCaseConversion_CaseIsConvertedToSnake()
         {
             // Given
@@ -239,7 +239,7 @@ namespace LootLockerTests.PlayMode
 #endif
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DeserializationCaseConversion_CaseIsConvertedToSnake()
         {
             // Given
@@ -265,7 +265,7 @@ namespace LootLockerTests.PlayMode
         }
 
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SimpleTypeSerialization_Succeeds()
         {
             Assert.AreEqual("true", Json.Serialize(true));
@@ -292,7 +292,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("1234.5678", Json.Serialize(1234.5678d));
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_ListSerializationDeserialization_BackAndForthPreservesData()
         {
             var list = new List<Customer>();
@@ -309,7 +309,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(json, json2);
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DictionarySerializationAndDeserialization_Succeeds()
         {
             var dic = new Dictionary<Guid, Customer>();
@@ -349,7 +349,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(json3, json4);
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_CyclicJsonSerialization_ThrowsCyclicJsonException()
         {
             var person = new Person { Name = "foo" };
@@ -365,7 +365,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_CyclicJsonSerializationWithCustomOptions_Succeeds()
         {
             var person = new Person { Name = "héllo" };
@@ -375,7 +375,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(json == "[{\"name\":\"héllo\"},{\"name\":\"héllo\"}]");
         }
 
-        [Test]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SerializingAndDesierializingEnumArrays_Works()
         {
             // Given

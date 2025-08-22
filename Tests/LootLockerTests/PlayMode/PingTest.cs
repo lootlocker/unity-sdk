@@ -1,10 +1,12 @@
 using System.Collections;
 using LootLocker;
 using LootLocker.Requests;
-using UnityEngine.TestTools;
 using LootLockerTestConfigurationUtils;
-using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
+using System.ComponentModel;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace LootLockerTests.PlayMode
 {
@@ -94,7 +96,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, NUnit.Framework.Category("LootLocker"), NUnit.Framework.Category("LootLockerCI"), NUnit.Framework.Category("LootLockerCIFast")]
         public IEnumerator Ping_WithSession_Succeeds()
         {
             // Setup Succeeded
@@ -123,7 +125,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotNull(pingResponse.date, "Ping response contained no date");
         }
 
-        [UnityTest]
+        [UnityTest, NUnit.Framework.Category("LootLocker"), NUnit.Framework.Category("LootLockerCI")]
         public IEnumerator Ping_WithoutSession_Fails()
         {
             // Setup Succeeded

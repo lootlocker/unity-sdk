@@ -11,6 +11,7 @@ on:
   push:
     branches: # Made towards the following
       - main
+      - dev
   workflow_dispatch:
     inputs:
       LL_URL:
@@ -485,6 +486,14 @@ jobs:
       - name: Cat projects settings file
         run: |
           cat TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set test category to full ci when PR to main
+        if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
+        run: |
+          echo "TEST_CATEGORY=-testcategory LootLockerCI" >> $GITHUB_ENV
+      - name: Set test category to minimal ci
+        if: ${{ github.event_name != 'pull_request' || github.base_ref != 'main' }}
+        run: |
+          echo "TEST_CATEGORY=-testcategory LootLockerCIFast" >> $GITHUB_ENV
       ####### RUN TESTS ###########
       - name: Cache Libraries
         if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
@@ -508,7 +517,7 @@ jobs:
           checkName: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
           artifactsPath: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }} ${{ ENV.TEST_CATEGORY }}
           useHostNetwork: true
       ####### CLEANUP ###########
       - name: Bring down Go Backend
