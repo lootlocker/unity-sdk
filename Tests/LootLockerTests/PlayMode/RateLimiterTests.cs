@@ -149,7 +149,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_NormalAmountOfAverageRequests_DoesNotHitRateLimit()
         {
             // Given
@@ -173,7 +173,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_UndulatingLowLevelOfRequests_DoesNotHitRateLimit()
         {
             // Given
@@ -202,7 +202,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_FrequentSmallBursts_DoesNotHitRateLimit()
         {
             // Given
@@ -238,7 +238,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_InfrequentLargeBursts_DoesNotHitRateLimit()
         {
             // Given
@@ -278,7 +278,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_ExcessiveQuickSuccessionRequests_HitsTripwireRateLimit()
         {
             // Given
@@ -310,7 +310,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_LowLevelBackgroundRequestsWithIntermittentBursts_HitsRateLimit()
         {
             // Given
@@ -352,7 +352,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_SuddenHugeBurstBelowLimit_DoesNotTriggerRateLimit()
         {
             // Given
@@ -390,7 +390,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_SuddenHugeBurstAbove_LimitTriggersRateLimit()
         {
             // Given
@@ -428,7 +428,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_SuddenHugeBurstBelowLimitFollowedByAFewRequests_TriggersRateLimit()
         {
             // Given
@@ -479,7 +479,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_ConstantRequestsBelowTripWire_HitsMovingAverageRateLimit()
         {
             // Given
@@ -505,7 +505,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RateLimiter_RateLimiterHit_ResetsAfter3Minutes()
         {
             // Given

@@ -129,7 +129,7 @@ namespace LootLockerTests.PlayMode
             return data;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PlayerStorage_CreatePayload_SucceedsAndReturnsStorage()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -165,7 +165,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(actualRequest.payload.Count, matchedKVPairs, "Not all storage kv pairs were matched in the response");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PlayerStorage_UpdatePayload_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -241,7 +241,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(actualRequest.payload.Count, keysMatched, "Not all keys were found in fetched payload");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PlayerStorage_GetOtherPlayersStorage_GetsOnlyPublicValues()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

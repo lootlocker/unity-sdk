@@ -101,7 +101,7 @@ namespace LootLockerTests.PlayMode
         }
 
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator StartGuestSession_WithPlayerAsIdentifier_Fails()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -129,7 +129,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(actualResponse.success, "Guest Session with 'player' as Identifier started despite it being disallowed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator StartGuestSession_WithoutIdentifier_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -148,7 +148,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(string.IsNullOrEmpty(actualResponse.player_identifier), "No player_identifier found in response");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator StartGuestSession_WithProvidedIdentifier_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -173,7 +173,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(providedIdentifier, actualResponse.player_identifier, "response player_identifier did not match the expected identifier");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator EndGuestSession_Succeeds()
         {
             //Given
@@ -199,7 +199,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(actualResponse.success, "GuestSession was not ended correctly");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator StartGuestSession_WithStoredIdentifier_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -233,7 +233,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedIdentifier, actualResponse.player_identifier, "Guest Session using stored Identifier failed to work");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerActive_CreatesMultipleUsers()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -274,7 +274,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreNotEqual(player2Ulid, player3Ulid, "Same user created with multiple start guest session requests");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerNotActive_ReusesDefaultUser()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -318,7 +318,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(player1Ulid, player3Ulid, "Default user not re-used with session request 3");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator StartGuestSession_MultipleSessionStartsWithoutIdentifierWithDefaultPlayerNotActiveButNotGuestUser_CreatesNewUser()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -368,7 +368,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, LootLockerStateData.GetActivePlayerULIDs().Count, "The expected number of players were not active");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator StartGuestSession_MultipleSessionStartsWithUlid_ReusesSpecifiedUser()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

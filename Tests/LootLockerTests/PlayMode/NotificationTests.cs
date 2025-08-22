@@ -207,7 +207,7 @@ public class NotificationTests
         onComplete?.Invoke(triggerCreated, errorMessage, createdTrigger);
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
     public IEnumerator Notifications_ListWithDefaultParametersWhenLessThanDefaultPageSize_ReturnsAllNotifications()
     {
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -255,7 +255,7 @@ public class NotificationTests
         }
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
     public IEnumerator Notifications_ListNotificationsWithPaginationParameters_ReturnsCorrectPage()
     {
         // Given
@@ -329,7 +329,7 @@ public class NotificationTests
         }
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
     public IEnumerator Notifications_MarkAllNotificationsAsRead_AllNotificationsMarkedAsRead()
     {
         // Given
@@ -380,7 +380,7 @@ public class NotificationTests
         }
     }
     
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
     public IEnumerator Notifications_MarkSpecificNotificationsAsRead_SpecifiedNotificationsMarkedAsRead()
     {
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -441,7 +441,7 @@ public class NotificationTests
         Assert.AreEqual(listResponse.Notifications.Length - notificationIdsToMarkAsRead.Count(), listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Notifications_MarkSpecificNotificationsAsReadUsingConvenienceMethod_SpecifiedNotificationsMarkedAsRead()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -497,7 +497,7 @@ public class NotificationTests
             Assert.AreEqual(listResponse.Notifications.Length - 1, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Notifications_MarkAllNotificationsAsReadUsingConvenienceMethod_SpecifiedNotificationsMarkedAsRead()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -562,7 +562,9 @@ public class NotificationTests
             Assert.AreEqual(CreatedTriggers.Count - notificationIdsToMarkAsRead.Length, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+
+        //TODO: Populate with new types
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Notifications_ConvenienceLookupTable_CanLookUpAllNotificationTypes()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -638,7 +640,7 @@ public class NotificationTests
             yield break;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Notifications_SendCustomNotificationsFromConsoleAndListNotifications_ListsAndParsesCustomNotificationsSuccessfully()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");

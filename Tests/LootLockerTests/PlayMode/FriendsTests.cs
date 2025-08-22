@@ -98,7 +98,7 @@ namespace LootLockerTests.PlayMode
         }
 
         // This test also tests List Friends, List Outgoing requests, List Incoming requests, Send Friend Request, and Accept Friend Request in passing
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_DeleteFriend_RemovesFriendFromFriendsList()
         {
             // Given
@@ -217,7 +217,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(foundFriendUlidPostDelete, "Friend ulid was present in friends list post delete");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_DeclineIncomingFriendRequest_DoesNotAddToFriendsListAndRemovesFromIncomingAndOutgoing()
         {
             // Given
@@ -330,7 +330,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(foundFriendUlid, "Friend ulid was present in friends list");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Friends_AcceptIncomingFriendRequest_AddsToFriendsListAndRemovesFromIncomingAndOutgoing()
         {
             // Given
@@ -444,7 +444,7 @@ namespace LootLockerTests.PlayMode
             yield break;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_CancelOutgoingFriendRequest_RemovesFriendRequestFromIncomingAndOutgoingRequest()
         {
             // Given
@@ -558,7 +558,7 @@ namespace LootLockerTests.PlayMode
             yield break;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_BlockPlayerWhenHavingIncomingFriendRequestThenUnblockAndReceiveNewFriendRequest_RemovesFriendRequestFromIncomingWhenBlockingAndUnblockingAllowsFriendRequestsAgain()
         {
             // Given
@@ -693,7 +693,7 @@ namespace LootLockerTests.PlayMode
             Assert.Greater(outgoingFriendRequestsPostUnblockResponse.outgoing.Length, outgoingFriendRequestsPostBlockResponse.outgoing.Length, "Friend request was not added to outgoing when unblocking");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Friends_BlockPlayer_RemovesBlockedPlayerFromFriendsList()
         {
             // Given
