@@ -98,7 +98,7 @@ namespace LootLockerTests.PlayMode
 
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_SignUp_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -122,7 +122,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(actualResponse.CreatedAt, "Created At date is empty in the response");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator WhiteLabel_SignUpAndLogin_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -159,7 +159,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(actualResponse.LoginResponse.SessionToken, "No session token found from login");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_SignUpAndLoginWithWrongPassword_Fails()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -200,7 +200,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(actualResponse.success, "Started White Label Session with wrong password");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator WhiteLabel_VerifySession_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -249,7 +249,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(actualResponse, "Could not Verify Session");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_RequestsAfterGameResetWhenWLDefaultUser_ReusesSession()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -301,7 +301,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedPlayerUlid, pingResponse.requestContext.player_ulid, "WL user not used for request");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_WLSessionStartByEmailAfterGameReset_ReusesSession()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

@@ -112,7 +112,7 @@ namespace LootLockerTests.PlayMode
         }
 
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PlayerFiles_UploadSimplePublicFile_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

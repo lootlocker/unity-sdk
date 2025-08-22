@@ -132,7 +132,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Leaderboard_ListTopTenAsPlayer_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -192,7 +192,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListTopTenAsGeneric_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -277,7 +277,7 @@ namespace LootLockerTests.PlayMode
         }
 
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListScoresThatHaveMetadata_GetsMetadata()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

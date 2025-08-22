@@ -136,7 +136,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListSchedule_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -171,7 +171,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedCronExpression, actualResponse.schedule.cron_expression, "The submitted cron expression was not set on the leaderboard");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListRewards_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

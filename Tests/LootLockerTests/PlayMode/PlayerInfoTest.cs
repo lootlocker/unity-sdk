@@ -99,7 +99,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator PlayerInfo_GetCurrentPlayerInfo_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -155,7 +155,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedPlayerLegacyId, actualPlayerLegacyId, "Player legacy id was not the same between session start and player info fetch");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator PlayerInfo_ListPlayerInfoForMultiplePlayersUsingDifferentIds_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

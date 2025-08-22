@@ -185,7 +185,7 @@ namespace LootLockerTests.PlayMode
             onComplete?.Invoke(triggerCreated, errorMessage, createdTrigger);
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Triggers_InvokeTriggerWithoutLimit_Succeeds()
         {
             // Setup Succeeded
@@ -222,7 +222,7 @@ namespace LootLockerTests.PlayMode
                 "The right key was not successfully executed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Triggers_InvokeTriggerUnderLimit_Succeeds()
         {
             // Setup Succeeded
@@ -258,7 +258,7 @@ namespace LootLockerTests.PlayMode
                 "The right key was not successfully executed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Triggers_MultipleTriggersWithoutLimitCalledInSameCall_Succeeds()
         {
             // Setup Succeeded
@@ -303,7 +303,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(0, invokeResponse.Failed_keys?.Length, "Failed Keys were not of expected length");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Triggers_InvokeNonExistentTrigger_Fails()
         {
             // Setup Succeeded
@@ -329,7 +329,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(nonExistentTriggerKey, invokeResponse?.Failed_keys[0].Key, "Failed key was not as expected");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Triggers_InvokeTriggerOverLimit_Fails()
         {
             // Setup Succeeded
@@ -373,7 +373,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(createdTrigger.key, secondInvokeResponse?.Failed_keys[0].Key, "Failed key was not as expected");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Triggers_InvokeSameTriggerTwiceInSameCall_InvokesOnlyOnce()
         {
             // Setup Succeeded
