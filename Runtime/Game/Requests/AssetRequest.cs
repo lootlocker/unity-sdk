@@ -1,4 +1,7 @@
-﻿using LootLocker.Requests;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -167,7 +170,44 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
-    public class LootLockerCommonAsset : LootLockerResponse
+    public class LootLockerCommonAsset
+    {
+        public int id { get; set; }
+        public string uuid { get; set; }
+        public string ulid { get; set; }
+        public string name { get; set; }
+        public bool active { get; set; }
+        public bool purchasable { get; set; }
+        public string type { get; set; }
+        public int price { get; set; }
+        public int? sales_price { get; set; }
+        public string display_price { get; set; }
+        public string context { get; set; }
+        public string unlocks_context { get; set; }
+        public bool detachable { get; set; }
+        public string updated { get; set; }
+        public string marked_new { get; set; }
+        public int default_variation_id { get; set; }
+        public string description { get; set; }
+        public LootLockerLinks links { get; set; }
+        public LootLockerStorage[] storage { get; set; }
+        public LootLockerRarity rarity { get; set; }
+        public bool popular { get; set; }
+        public int popularity_score { get; set; }
+        public bool unique_instance { get; set; }
+        public LootLockerRental_Options[] rental_options { get; set; }
+        public LootLockerFilter[] filters { get; set; }
+        public LootLockerVariation[] variations { get; set; }
+        public bool featured { get; set; }
+        public bool context_locked { get; set; }
+        public bool initially_purchasable { get; set; }
+        public LootLockerFile[] files { get; set; }
+        public LootLockerAssetCandidate asset_candidate { get; set; }
+        public string[] data_entities { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerCommonAssetResponse : LootLockerResponse
     {
         public int id { get; set; }
         public string uuid { get; set; }
@@ -449,7 +489,7 @@ namespace LootLocker
             }));
         }
 
-        public static void GetAssetInformation(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerCommonAsset> onComplete)
+        public static void GetAssetInformation(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerCommonAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetInformationForOneorMoreAssets;
 
