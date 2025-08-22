@@ -10,17 +10,17 @@ namespace LootLocker.Requests
 {
     public class LootLockerPlayerHeroResponse : LootLockerResponse
     {
-        public LootLockerPlayerHero hero;
+        public LootLockerPlayerHero hero { get; set; }
     }
 
     public class LootLockerGameHeroResponse : LootLockerResponse
     {
-        public LootLockerHero[] game_heroes;
+        public LootLockerHero[] game_heroes { get; set; }
     }
 
     public class LootLockerListHeroResponse : LootLockerResponse
     {
-        public LootLockerPlayerHero[] heroes;
+        public LootLockerPlayerHero[] heroes { get; set; }
     }
 
     public class LootLockerHeroLoadoutResponse : LootLockerResponse
