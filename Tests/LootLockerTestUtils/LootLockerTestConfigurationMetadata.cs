@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using LootLocker;
 
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json.Linq;
+#endif
+
 namespace LootLockerTestConfigurationUtils
 {
     public class LootLockerTestMetadata
