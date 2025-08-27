@@ -1,6 +1,8 @@
 ﻿using LootLocker.Requests;
 using System;
 using LootLocker.LootLockerEnums;
+using System.Collections.Generic;
+
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 #else
@@ -125,6 +127,39 @@ namespace LootLocker.Requests
         [Json(Name = "character_id")]
 #endif
         public int class_id { get; set; }
+    }
+
+    public class LootLockerRedeemEpicStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The epic account id of the account that this purchase was made for
+        /// </summary>
+        public string account_id;
+        /// <summary>
+        /// This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Access Token or the Auth Token
+        /// </summary>
+        public string bearer_token;
+        /// <summary>
+        /// The ids of the purchased entitlements that you wish to redeem
+        /// </summary>
+        public List<string> entitlement_ids;
+        /// <summary>
+        /// The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)
+        /// </summary>
+        public string sandbox_id;
+    }
+
+    public class LootLockerRedeemEpicStorePurchaseForClassRequest : LootLockerRedeemEpicStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The ulid of the character to redeem this purchase for
+        /// </summary>
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id;
     }
 
     /// <summary>

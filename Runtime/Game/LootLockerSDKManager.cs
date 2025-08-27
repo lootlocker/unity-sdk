@@ -5832,6 +5832,60 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Redeem a purchase that was made successfully towards the Epic Store for the current player
+        /// </summary>
+        /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
+        /// <param name="bearerToken">The token from Epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Access Token or the Auth Token</param>
+        /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="sandboxId">Optional: The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)</param>
+        public static void RedeemEpicStorePurchaseForPlayer(string accountId, string bearerToken, List<string> entitlementIds, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null, string sandboxId = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemEpicStorePurchaseForPlayerRequest()
+            {
+                account_id = accountId,
+                bearer_token = bearerToken,
+                entitlement_ids = entitlementIds,
+                sandbox_id = sandboxId
+            });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns
+        /// </summary>
+        /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
+        /// <param name="bearerToken">The token from Epic used to allow the LootLocker backend to verify ownership of the specified entitlements.  This is sometimes referred to as the Access Token or the Auth Token</param>
+        /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="sandboxId">Optional: The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)</param>
+        public static void RedeemEpicStorePurchaseForClass(string accountId, string bearerToken, List<string> entitlementIds, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null, string sandboxId = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemEpicStorePurchaseForClassRequest()
+            {
+                account_id = accountId,
+                bearer_token = bearerToken,
+                entitlement_ids = entitlementIds,
+                class_id = classId,
+                sandbox_id = sandboxId
+            });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
         /// 
         /// Steam in-app purchases need to be configured for this to work
