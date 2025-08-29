@@ -288,7 +288,6 @@ namespace LootLocker
 
         // Friends
         [Header("Friends")]
-#if LOOTLOCKER_BETA_FRIENDS
         public static EndPointClass listFriends = new EndPointClass("player/friends", LootLockerHTTPMethod.GET);
         public static EndPointClass listIncomingFriendReqeusts = new EndPointClass("player/friends/incoming", LootLockerHTTPMethod.GET);
         public static EndPointClass listOutgoingFriendRequests = new EndPointClass("player/friends/outgoing", LootLockerHTTPMethod.GET);
@@ -300,7 +299,13 @@ namespace LootLocker
         public static EndPointClass blockPlayer = new EndPointClass("player/friends/{0}/block", LootLockerHTTPMethod.POST);
         public static EndPointClass unblockPlayer = new EndPointClass("player/friends/{0}/unblock", LootLockerHTTPMethod.POST);
         public static EndPointClass deleteFriend = new EndPointClass("player/friends/{0}", LootLockerHTTPMethod.DELETE);
-#endif
+
+        // Followers
+        [Header("Followers")]
+        public static EndPointClass listFollowers = new EndPointClass("player/{0}/followers", LootLockerHTTPMethod.GET);
+        public static EndPointClass listFollowing = new EndPointClass("player/{0}/following", LootLockerHTTPMethod.GET);
+        public static EndPointClass followPlayer = new EndPointClass("player/{0}/followers/follow", LootLockerHTTPMethod.POST);
+        public static EndPointClass unfollowPlayer = new EndPointClass("player/{0}/followers/unfollow", LootLockerHTTPMethod.DELETE);
 
         // Entitlements
         [Header("Entitlements")]
