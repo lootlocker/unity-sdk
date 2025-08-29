@@ -11,7 +11,6 @@ namespace LootLockerTests.PlayMode
     public class FriendsTests
     {
 
-#if LOOTLOCKER_BETA_FRIENDS
         private LootLockerTestGame gameUnderTest = null;
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
@@ -819,6 +818,5 @@ namespace LootLockerTests.PlayMode
             }
             Assert.IsFalse(foundFriendUlidPostBlockPlayer2, "Friend ulid was present in friends list pre block");
         }
-#endif
     }
 }

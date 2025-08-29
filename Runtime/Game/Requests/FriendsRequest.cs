@@ -1,14 +1,5 @@
 using System;
 
-#if LOOTLOCKER_BETA_FRIENDS
-
-//==================================================
-// Enum Definitions
-//==================================================
-namespace LootLocker.LootLockerEnums
-{
-}
-
 namespace LootLocker.Requests
 {
     //==================================================
@@ -123,7 +114,4 @@ namespace LootLocker.Requests
     {
         // Empty unless errors occured
     }
-
 }
-
-#endif
