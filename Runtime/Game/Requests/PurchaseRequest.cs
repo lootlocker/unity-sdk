@@ -136,7 +136,7 @@ namespace LootLocker.Requests
         /// </summary>
         public string account_id;
         /// <summary>
-        /// This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Access Token or the Auth Token
+        /// This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.
         /// </summary>
         public string bearer_token;
         /// <summary>
@@ -144,7 +144,7 @@ namespace LootLocker.Requests
         /// </summary>
         public List<string> entitlement_ids;
         /// <summary>
-        /// The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)
+        /// The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)
         /// </summary>
         public string sandbox_id;
     }
