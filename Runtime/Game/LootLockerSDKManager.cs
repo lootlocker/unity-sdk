@@ -6743,7 +6743,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Friends
-#if LOOTLOCKER_BETA_FRIENDS
         /// <summary>
         /// List friends for the currently logged in player
         /// </summary>
@@ -6975,7 +6974,130 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.deleteFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-#endif
+        #endregion
+
+        #region Followers
+        /// <summary>
+        /// List followers of the currently logged in player
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowers(Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowersResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowers(playerData.PublicUID, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List followers that the specified player has
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player whose followers to list</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowers(string playerPublicUID, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowersResponse>(forPlayerWithUlid));
+                return;
+            }
+
+
+            var formattedEndPoint = LootLockerEndPoints.listFollowers.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// List what players the currently logged in player is following
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowing(Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowingResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowing(playerData.PublicUID, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List players that the specified player is following
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player for which to list following players</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowing(string playerPublicUID, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowingResponse>(forPlayerWithUlid));
+                return;
+            }
+
+
+            var formattedEndPoint = LootLockerEndPoints.listFollowing.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowing.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Follow the specified player
+        /// </summary>
+        /// <param name="playerPublicUID">The public uid of the player to follow</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void FollowPlayer(string playerPublicUID, Action<LootLockerFollowersOperationResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFollowersOperationResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerPublicUID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFollowersOperationResponse>("A player public UID needs to be provided for this method", forPlayerWithUlid));
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.followPlayer.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.followPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Unfollow the specified player
+        /// </summary>
+        /// <param name="playerPublicUID">The public uid of the player to unfollow</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnfollowPlayer(string playerPublicUID, Action<LootLockerFollowersOperationResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFollowersOperationResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerPublicUID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFollowersOperationResponse>("A player public UID needs to be provided for this method", forPlayerWithUlid));
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.unfollowPlayer.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.unfollowPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
         #endregion
 
         #region Currency
