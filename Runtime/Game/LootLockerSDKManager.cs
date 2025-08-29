@@ -5835,12 +5835,12 @@ namespace LootLocker.Requests
         /// Redeem a purchase that was made successfully towards the Epic Store for the current player
         /// </summary>
         /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
-        /// <param name="bearerToken">The token from Epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Access Token or the Auth Token</param>
+        /// <param name="bearerToken">This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</param>
         /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="sandboxId">The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <param name="sandboxId">Optional: The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)</param>
-        public static void RedeemEpicStorePurchaseForPlayer(string accountId, string bearerToken, List<string> entitlementIds, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null, string sandboxId = null)
+        public static void RedeemEpicStorePurchaseForPlayer(string accountId, string bearerToken, List<string> entitlementIds, string sandboxId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -5861,13 +5861,13 @@ namespace LootLocker.Requests
         /// Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns
         /// </summary>
         /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
-        /// <param name="bearerToken">The token from Epic used to allow the LootLocker backend to verify ownership of the specified entitlements.  This is sometimes referred to as the Access Token or the Auth Token</param>
+        /// <param name="bearerToken">This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</param>
         /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="sandboxId">The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</param>
         /// <param name="classId">The id of the class to redeem this purchase for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <param name="sandboxId">Optional: The sandbox id to use for the request, only applicable for "sandbox purchases" (ie, fake development purchases)</param>
-        public static void RedeemEpicStorePurchaseForClass(string accountId, string bearerToken, List<string> entitlementIds, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null, string sandboxId = null)
+        public static void RedeemEpicStorePurchaseForClass(string accountId, string bearerToken, List<string> entitlementIds, string sandboxId, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
