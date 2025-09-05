@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using LootLocker;
 using LootLocker.Requests;
@@ -434,12 +435,20 @@ namespace LootLockerTests.PlayMode
             Assert.Greater(incomingFriendRequestsResponse.incoming?.Length, incomingFriendRequestsPostAcceptResponse.incoming?.Length, "Friend request was not removed when accepting");
             Assert.Greater(outgoingFriendRequestsResponse.outgoing?.Length, outgoingFriendRequestsPostAcceptResponse.outgoing?.Length, "Friend request was not removed when accepting");
 
-            bool foundFriendUlid = false;
+            LootLockerAcceptedFriend foundFriend = null;
             foreach (var player in listFriendsResponse?.friends)
             {
-                foundFriendUlid |= player.player_id.Equals(Player2Ulid, System.StringComparison.OrdinalIgnoreCase);
+                if (player.player_id.Equals(Player2Ulid, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    foundFriend = player;
+                }
             }
-            Assert.IsTrue(foundFriendUlid, "Friend ulid was not present in friends list");
+            Assert.IsNotNull(foundFriend, "Friend ulid was not present in friends list");
+            Assert.IsNotEmpty(foundFriend.public_uid, "Friend public uid was not populated in friends list");
+            Assert.IsNotNull(foundFriend.created_at, "Friend created at was not populated in friends list");
+            Assert.AreNotEqual(foundFriend.created_at, default(DateTime), "Friend created at was not populated in friends list");
+            Assert.IsNotNull(foundFriend.accepted_at, "Friend accepted at was not populated in friends list");
+            Assert.AreNotEqual(foundFriend.accepted_at, default(DateTime), "Friend accepted at was not populated in friends list");
             yield break;
         }
 

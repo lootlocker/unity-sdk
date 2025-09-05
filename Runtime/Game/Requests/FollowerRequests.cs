@@ -30,7 +30,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// When the player's account was created
         ///</summary>
-        public DateTime created_at { get; set; }
+        public DateTime createdat { get; set; }
     }
 
     //==================================================
