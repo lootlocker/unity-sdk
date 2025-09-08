@@ -12,6 +12,7 @@ on:
     branches: # Made towards the following
       - main
       - dev
+      - ci/*
   workflow_dispatch:
     inputs:
       LL_URL:
@@ -23,6 +24,7 @@ jobs:
     name: Test SDK in Editor
     runs-on: [ubuntu-latest]
     needs: []
+#    if: ( true == false )
     timeout-minutes: 10
     env: 
       LL_USE_STAGE: false
