@@ -213,6 +213,17 @@ namespace LootLocker
             _instance.httpLogRecords[_instance.nextHttpLogRecordWrite] = entry;
             _instance.nextHttpLogRecordWrite = (_instance.nextHttpLogRecordWrite + 1) % HttpLogBacklogSize;
 
+            if( entry == null )
+            {
+                Log("LootLockerLogger.LogHttpRequestResponse called with null entry", LogLevel.Warning);
+                return;
+            }
+            else if (entry.Response == null)
+            {
+                Log($"LootLockerLogger.LogHttpRequestResponse called with null entry. Response for {entry.Method} {entry.Url}", LogLevel.Error);
+                return;
+            }
+
             // Construct log string for Unity log
             var sb = new System.Text.StringBuilder();
             if (entry.Response?.success ?? false)
