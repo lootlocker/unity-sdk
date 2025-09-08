@@ -216,7 +216,7 @@ namespace LootLocker
 
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
-        private List<string> ExecutionItemsNeedingRefresh = new List<string>();
+        private UniqueList<string> ExecutionItemsNeedingRefresh = new UniqueList<string>();
         private List<string> OngoingIdsToCleanUp = new List<string>();
 
         private void OnDestroy()
@@ -232,7 +232,6 @@ namespace LootLocker
 
         void Update()
         {
-            ExecutionItemsNeedingRefresh.Clear();
             // Process the execution queue
             foreach (var executionItem in HTTPExecutionQueue.Values)
             {
@@ -277,7 +276,7 @@ namespace LootLocker
                 if (Result == HTTPExecutionQueueProcessingResult.NeedsSessionRefresh)
                 {
                     //Bulk handle session refreshes at the end
-                    ExecutionItemsNeedingRefresh.Add(executionItem.RequestData.RequestId);
+                    ExecutionItemsNeedingRefresh.AddUnique(executionItem.RequestData.RequestId);
                     continue;
                 }
                 else if (Result == HTTPExecutionQueueProcessingResult.WaitForNextTick || Result == HTTPExecutionQueueProcessingResult.None)
@@ -292,61 +291,28 @@ namespace LootLocker
             // Bulk session refresh requests
             if (ExecutionItemsNeedingRefresh.Count > 0)
             {
-                UniqueList<string> refreshSessionsForPlayers = new UniqueList<string>();
                 foreach (string executionItemId in ExecutionItemsNeedingRefresh)
                 {
                     if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
                     {
+                        if (executionItem == null)
+                {
+                            ExecutionItemsNeedingRefresh.Remove(executionItemId);
+                                    continue;
+                                }
+                        else if (executionItem.IsWaitingForSessionRefresh)
+                                {
+                            // Already waiting for session refresh
+                                    continue;
+                                }
                         CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
                         executionItem.IsWaitingForSessionRefresh = true;
                         executionItem.RequestData.TimesRetried++;
-                        refreshSessionsForPlayers.AddUnique(executionItem.RequestData.ForPlayerWithUlid);
                         // Unsetting web request fields will make the execution queue retry it
                         executionItem.AbortRequest();
+                        
+                        StartCoroutine(RefreshSession(executionItem.RequestData.ForPlayerWithUlid, executionItemId, HandleSessionRefreshResult));
                     }
-                }
-
-                foreach (string refreshForPlayerUlid in refreshSessionsForPlayers)
-                {
-                    StartCoroutine(RefreshSession(refreshForPlayerUlid, newSessionResponse =>
-                    {
-                        foreach (string executionItemId in ExecutionItemsNeedingRefresh)
-                        {
-                            if (HTTPExecutionQueue.TryGetValue(executionItemId, out var executionItem))
-                            {
-                                if (!executionItem.RequestData.ForPlayerWithUlid.Equals(refreshForPlayerUlid))
-                                {
-                                    // This refresh callback was not for this user
-                                    continue;
-                                }
-                                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
-                                string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders["x-session-token"];
-                                string tokenAfterRefresh = playerData?.SessionToken;
-                                if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
-                                {
-                                    // Session refresh failed so abort call chain
-                                    CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
-                                    continue;
-                                }
-
-                                // Session refresh worked so update the session token header
-                                if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
-                                {
-    #if UNITY_EDITOR
-                                    executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
-    #endif
-                                }
-                                else
-                                {
-                                    executionItem.RequestData.ExtraHeaders["x-session-token"] = tokenAfterRefresh;
-                                }
-
-                                // Mark request as ready for continuation
-                                executionItem.IsWaitingForSessionRefresh = false;
-                            }
-                        }
-                    }));
-
                 }
             }
 
@@ -497,7 +463,6 @@ namespace LootLocker
             {
                 if (ShouldRefreshSession(executionItem.WebRequest.responseCode, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
                 {
-                    executionItem.IsWaitingForSessionRefresh = true;
                     return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
                 }
                 return HTTPExecutionQueueProcessingResult.ShouldBeRetried;
@@ -605,13 +570,13 @@ namespace LootLocker
             CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
         }
 
-        private IEnumerator RefreshSession(string refreshForPlayerUlid, Action<LootLockerSessionResponse> onSessionRefreshedCallback)
+        private IEnumerator RefreshSession(string refreshForPlayerUlid, string forExecutionItemId, Action<LootLockerSessionResponse, string, string> onSessionRefreshedCallback)
         {
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(refreshForPlayerUlid);
             if (playerData == null)
             {
                 LootLockerLogger.Log($"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", LootLockerLogger.LogLevel.Warning);
-                onSessionRefreshedCallback?.Invoke(LootLockerResponseFactory.Failure<LootLockerSessionResponse>(401, $"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", refreshForPlayerUlid));
+                onSessionRefreshedCallback?.Invoke(LootLockerResponseFactory.Failure<LootLockerSessionResponse>(401, $"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", refreshForPlayerUlid), refreshForPlayerUlid, forExecutionItemId);
                 yield break;
             }
 
@@ -715,7 +680,45 @@ namespace LootLocker
                     }
             }
             yield return new WaitUntil(() => callCompleted);
-            onSessionRefreshedCallback?.Invoke(newSessionResponse);
+            onSessionRefreshedCallback?.Invoke(newSessionResponse, refreshForPlayerUlid, forExecutionItemId);
+        }
+
+        private void HandleSessionRefreshResult(LootLockerResponse newSessionResponse, string forPlayerWithUlid, string forExecutionItemId)
+        {
+            if (HTTPExecutionQueue.TryGetValue(forExecutionItemId, out var executionItem))
+            {
+                if (!executionItem.RequestData.ForPlayerWithUlid.Equals(forPlayerWithUlid))
+                {
+                    // This refresh callback was not for this user
+                    LootLockerLogger.Log($"Session refresh callback ulid {forPlayerWithUlid} does not match the execution item ulid {executionItem.RequestData.ForPlayerWithUlid}. Ignoring.", LootLockerLogger.LogLevel.Error);
+                    return;
+                }
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
+                string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders["x-session-token"];
+                string tokenAfterRefresh = playerData?.SessionToken;
+                if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
+                {
+                    // Session refresh failed so abort call chain
+                    CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
+                    return;
+                }
+
+                // Session refresh worked so update the session token header
+                if (executionItem.RequestData.CallerRole == LootLockerCallerRole.Admin)
+                {
+#if UNITY_EDITOR
+                    executionItem.RequestData.ExtraHeaders["x-auth-token"] = LootLockerConfig.current.adminToken;
+#endif
+                }
+                else
+                {
+                    executionItem.RequestData.ExtraHeaders["x-session-token"] = tokenAfterRefresh;
+                }
+
+                // Mark request as ready for continuation
+                ExecutionItemsNeedingRefresh.Remove(forExecutionItemId);
+                executionItem.IsWaitingForSessionRefresh = false;
+            }
         }
 
         #region Session Refresh Helper Methods
