@@ -6461,6 +6461,34 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Increment an existing score on a leaderboard by the given amount.
+        /// </summary>
+        /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise this is the identifier you wish to use for this score</param>
+        /// <param name="amount">The amount with which to increment the current score on the given leaderboard (can be positive or negative)</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void IncrementScore(string memberId, int amount, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerIncrementScoreRequest request = new LootLockerIncrementScoreRequest();
+            request.member_id = memberId;
+            request.amount = amount;
+
+            EndPointClass requestEndPoint = LootLockerEndPoints.incrementScore;
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            string endPoint = requestEndPoint.WithPathParameter(leaderboardKey);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// List the archived versions of a leaderboard, containing past rewards, ranks, etc.
         /// </summary>
         /// <param name="leaderboard_key">Key of the Leaderboard</param>
