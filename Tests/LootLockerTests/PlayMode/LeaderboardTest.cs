@@ -320,5 +320,159 @@ namespace LootLockerTests.PlayMode
             }
 
         }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_IncrementScorePositive_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 100;
+            bool scoreSubmitted = false;
+            LootLockerSDKManager.SubmitScore(null, initialScore, leaderboardKey, (response) =>
+            {
+                scoreSubmitted = true;
+            });
+            yield return new WaitUntil(() => scoreSubmitted);
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = 10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_IncrementScoreNegative_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 100;
+            bool scoreSubmitted = false;
+            LootLockerSDKManager.SubmitScore(null, initialScore, leaderboardKey, (response) =>
+            {
+                scoreSubmitted = true;
+            });
+            yield return new WaitUntil(() => scoreSubmitted);
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = -10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_PositivelyIncrementNonExistingScore_SetsScoreToIncrementValue()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 0;
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = 10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_NegativelyIncrementNonExistingScore_Leaderboard_PositivelyIncrementNonExistingScore_SetsScoreToIncrementValue()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = -10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsFalse(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(0, actualResponse.items.Length, "Did not get the expected number of scores");
+        }
     }
 }
