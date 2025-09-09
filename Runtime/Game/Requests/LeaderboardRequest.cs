@@ -171,6 +171,12 @@ namespace LootLocker.Requests
         public string metadata { get; set; }
     }
 
+    public class LootLockerIncrementScoreRequest
+    {
+        public string member_id { get; set; }
+        public int amount { get; set; }
+    }
+
     [Serializable]
     public class LootLockerLeaderboardArchiveRequest
     {
