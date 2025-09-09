@@ -6461,6 +6461,32 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Query a leaderboard for which rank a specific score would achieve. Does not submit the score but returns the projected rank.
+        /// </summary>
+        /// <param name="score">The score to use for the query</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void QueryScore(int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerQueryScoreRequest request = new LootLockerQueryScoreRequest();
+            request.score = score;
+
+            EndPointClass requestEndPoint = LootLockerEndPoints.queryScore;
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            string endPoint = requestEndPoint.WithPathParameter(leaderboardKey);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Increment an existing score on a leaderboard by the given amount.
         /// </summary>
         /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise this is the identifier you wish to use for this score</param>
