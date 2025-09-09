@@ -2390,7 +2390,7 @@ namespace LootLocker.Requests
                     onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, null));
                     return;
                 }
-                StartWhiteLabelSession(sessionResponse =>
+                StartWhiteLabelSession(email, sessionResponse =>
                 {
                     onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, sessionResponse));
                 });
