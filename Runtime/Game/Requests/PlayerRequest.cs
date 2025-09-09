@@ -93,6 +93,10 @@ namespace LootLocker.Requests
         /// </summary>
         public DateTime created_at { get; set; }
         /// <summary>
+        /// The last time this player logged in
+        /// </summary>
+        public DateTime last_seen { get; set; }
+        /// <summary>
         /// The name of the player expressly configured through a SetPlayerName call
         /// </summary>
         public string name { get; set; }

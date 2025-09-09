@@ -207,10 +207,12 @@ namespace LootLockerTests.PlayMode
             //Given
             LootLockerGuestSessionResponse actualResponse = null;
             string expectedIdentifier = null;
+            DateTime lastSeenOnFirstSession = DateTime.MinValue;
             bool firstSessionCompleted = false;
             LootLockerSDKManager.StartGuestSession((startSessionResponse) =>
             {
                 expectedIdentifier = startSessionResponse.player_identifier;
+                lastSeenOnFirstSession = startSessionResponse.last_seen;
 
                 LootLockerSDKManager.EndSession((endSessionResponse) =>
                 {
@@ -230,6 +232,8 @@ namespace LootLockerTests.PlayMode
 
             //Then
             Assert.IsTrue(actualResponse.success, "Guest Session failed to start");
+            Assert.AreEqual(lastSeenOnFirstSession, DateTime.MinValue, "last_seen on first session was set");
+            Assert.Greater(actualResponse.last_seen, DateTime.MinValue, "last_seen on second session was not set");
             Assert.AreEqual(expectedIdentifier, actualResponse.player_identifier, "Guest Session using stored Identifier failed to work");
         }
 
