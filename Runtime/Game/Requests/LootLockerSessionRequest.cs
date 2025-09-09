@@ -78,6 +78,10 @@ namespace LootLocker.Requests
         /// </summary>
         public bool seen_before { get; set; }
         /// <summary>
+        /// The last time this player logged in
+        /// </summary>
+        public DateTime last_seen { get; set; }
+        /// <summary>
         /// The public UID for this player
         /// </summary>
         public string public_uid { get; set; }
