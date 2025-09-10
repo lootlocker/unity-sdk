@@ -29,6 +29,7 @@ namespace LootLocker.Requests
     {
         public string id { get; set; }
         public string progression_key { get; set; }
+        public string progression_id { get; set; }
         public string progression_name { get; set; }
         public ulong step { get; set; }
         public ulong points { get; set; }
@@ -46,6 +47,7 @@ namespace LootLocker.Requests
         {
             public string id { get; set; }
             public string progression_key { get; set; }
+            public string progression_id { get; set; }
             public string progression_name { get; set; }
             public ulong step { get; set; }
             public ulong points { get; set; }
@@ -64,6 +66,7 @@ namespace LootLocker.Requests
     {
         public string id { get; set; }
         public string progression_key { get; set; }
+        public string progression_id { get; set; }
         public string progression_name { get; set; }
         public ulong step { get; set; }
         public ulong points { get; set; }
@@ -81,6 +84,7 @@ namespace LootLocker.Requests
         {
             public string id { get; set; }
             public string progression_key { get; set; }
+            public string progression_id { get; set; }
             public string progression_name { get; set; }
             public ulong step { get; set; }
             public ulong points { get; set; }
@@ -99,6 +103,7 @@ namespace LootLocker.Requests
     {
         public string id { get; set; }
         public string progression_key { get; set; }
+        public string progression_id { get; set; }
         public string progression_name { get; set; }
         public ulong step { get; set; }
         public ulong points { get; set; }
@@ -116,6 +121,7 @@ namespace LootLocker.Requests
         {
             public string id { get; set; }
             public string progression_key { get; set; }
+            public string progression_id { get; set; }
             public string progression_name { get; set; }
             public ulong step { get; set; }
             public ulong points { get; set; }
