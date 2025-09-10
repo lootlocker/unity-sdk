@@ -8175,7 +8175,94 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ReadNotifications.endPoint, LootLockerEndPoints.ReadNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerReadNotificationsRequest{ Notifications = NotificationIds }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
         #endregion
-        
+
+        #region Broadcasts
+        /// <summary>
+        /// List broadcasts for this game with default localisation and pagination settings
+        /// </summary>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListTopBroadcasts(Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// List broadcasts for this game with specified localisation and default pagination settings
+        /// </summary>
+        /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListTopBroadcastsLocalized(string[] languages, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string acceptLanguages = "";
+            if (languages != null && languages.Length > 0)
+            {
+                acceptLanguages = string.Join(",", languages);
+            }
+            var headers = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(acceptLanguages))
+            {
+                headers.Add("Accept-Language", acceptLanguages);
+            }
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, additionalHeaders: headers, onComplete: (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// List broadcasts for this game
+        /// </summary>
+        /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
+        /// <param name="per_page">Used for pagination, this is the number of broadcasts to retrieve per page.</param>
+        /// <param name="page">Used for pagination, this is the page number to retrieve.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBroadcasts(string[] languages, int per_page, int page, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.ListBroadcasts.endPoint;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (per_page > 0)
+                queryParams.Add("per_page", per_page);
+            if (page > 0)
+                queryParams.Add("page", page);
+
+            endpoint += queryParams.Build();
+
+            string acceptLanguages = "";
+            if (languages != null && languages.Length > 0)
+            {
+                acceptLanguages = string.Join(",", languages);
+            }
+            var headers = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(acceptLanguages))
+            {
+                headers.Add("Accept-Language", acceptLanguages);
+            }
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, additionalHeaders: headers, onComplete: (response) => {
+                var internalResponse = LootLockerResponse.Deserialize<__LootLockerInternalListBroadcastsResponse>(response);
+                onComplete?.Invoke(new LootLockerListBroadcastsResponse(internalResponse));
+            });
+        }
+        #endregion
+
         #region Misc
 
         /// <summary>

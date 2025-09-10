@@ -329,6 +329,10 @@ namespace LootLocker
         public static EndPointClass ListNotifications = new EndPointClass("notifications/v1", LootLockerHTTPMethod.GET);
         public static EndPointClass ReadNotifications = new EndPointClass("notifications/v1/read", LootLockerHTTPMethod.PUT);
         public static EndPointClass ReadAllNotifications = new EndPointClass("notifications/v1/read/all", LootLockerHTTPMethod.PUT);
+
+        // Broadcasts
+        [Header("Broadcasts")]
+        public static EndPointClass ListBroadcasts = new EndPointClass("broadcasts/v1", LootLockerHTTPMethod.GET);
     }
 
     [Serializable]
