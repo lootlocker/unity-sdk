@@ -6869,11 +6869,23 @@ namespace LootLocker.Requests
 
         #region Friends
         /// <summary>
-        /// List friends for the currently logged in player
+        /// List friends for the currently logged in player with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFriends(Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListFriendsPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List friends for the currently logged in player
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to return</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFriendsPaginated(int PerPage, int Page, Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -6881,15 +6893,55 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listFriends.endPoint, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listFriends.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
-        /// List incoming friend requests for the currently logged in player (friend requests made by others for this player)
+        /// Get a specific friend of the currently logged in player
+        /// </summary>
+        /// <param name="friendPlayerULID">The ULID of the player for whom to get friend information</param>
+        /// <param name="onComplete">Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetFriend(string friendPlayerULID, Action<LootLockerGetFriendResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetFriendResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.getFriend.WithPathParameter(friendPlayerULID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.getFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List incoming friend requests for the currently logged in player (friend requests made by others for this player) with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListIncomingFriendRequests(Action<LootLockerListIncomingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListIncomingFriendRequestsPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List incoming friend requests for the currently logged in player with pagination (friend requests made by others for this player)
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+
+        public static void ListIncomingFriendRequestsPaginated(int PerPage, int Page, Action<LootLockerListIncomingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -6897,7 +6949,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listIncomingFriendReqeusts.endPoint, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listIncomingFriendReqeusts.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6907,13 +6967,34 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListOutgoingFriendRequests(Action<LootLockerListOutgoingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
         {
+            ListOutGoingFriendRequestsPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+
+        /// <summary>
+        /// List outgoing friend requests for the currently logged in player with pagination (friend requests made by this player)
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListOutGoingFriendRequestsPaginated(int PerPage, int Page, Action<LootLockerListOutgoingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
+        {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListOutgoingFriendRequestsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listOutgoingFriendRequests.endPoint, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listOutgoingFriendRequests.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -7013,11 +7094,23 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// List the players (if any) that are blocked by the currently logged in player
+        /// List the players (if any) that are blocked by the currently logged in player with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListBlockedPlayers(Action<LootLockerListBlockedPlayersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListBlockedPlayersPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List the players (if any) that are blocked by the currently logged in player
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBlockedPlayersPaginated(int PerPage, int Page, Action<LootLockerListBlockedPlayersResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -7025,7 +7118,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listBlockedPlayers.endPoint, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listOutgoingFriendRequests.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -7103,75 +7204,126 @@ namespace LootLocker.Requests
 
         #region Followers
         /// <summary>
-        /// List followers of the currently logged in player
+        /// List followers of the currently logged in player with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowers(Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowersResponse>(forPlayerWithUlid));
-                return;
-            }
-
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
             ListFollowers(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
-        
         /// <summary>
-        /// List followers that the specified player has
+        /// List followers of the currently logged in player
+        /// </summary>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowersPaginated(string Cursor, int Count, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowersPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List followers that the specified player has with default pagination
         /// </summary>
         /// <param name="playerPublicUID">The public UID of the player whose followers to list</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowers(string playerPublicUID, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
         {
+            ListFollowersPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List followers that the specified player has
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player whose followers to list</param>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowersPaginated(string playerPublicUID, string Cursor, int Count, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowersResponse>(forPlayerWithUlid));
                 return;
             }
 
-
             var formattedEndPoint = LootLockerEndPoints.listFollowers.WithPathParameter(playerPublicUID);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (!string.IsNullOrEmpty(Cursor))
+                queryParams.Add("cursor", Cursor);
+            if (Count > 0)
+                queryParams.Add("per_page", Count.ToString());
+            formattedEndPoint += queryParams.ToString();
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
         /// <summary>
-        /// List what players the currently logged in player is following
+        /// List what players the currently logged in player is following with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowing(Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowingResponse>(forPlayerWithUlid));
-                return;
-            }
-
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
             ListFollowing(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
         
         /// <summary>
-        /// List players that the specified player is following
+        /// List what players the currently logged in player is following
+        /// </summary>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowingPaginated(string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowingPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List players that the specified player is following with default pagination
         /// </summary>
         /// <param name="playerPublicUID">The public UID of the player for which to list following players</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowing(string playerPublicUID, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
         {
+            ListFollowingPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List players that the specified player is following
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player for which to list following players</param>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowingPaginated(string playerPublicUID, string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowingResponse>(forPlayerWithUlid));
                 return;
             }
 
-
             var formattedEndPoint = LootLockerEndPoints.listFollowing.WithPathParameter(playerPublicUID);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (!string.IsNullOrEmpty(Cursor))
+                queryParams.Add("cursor", Cursor);
+            if (Count > 0)
+                queryParams.Add("per_page", Count.ToString());
+            formattedEndPoint += queryParams.ToString();
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowing.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
