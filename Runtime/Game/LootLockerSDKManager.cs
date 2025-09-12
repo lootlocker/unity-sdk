@@ -3841,6 +3841,23 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Delete a Class with the provided classId. The Class will be removed from the currently active player.
+        /// </summary>
+        /// <param name="classId">The id of the class you want to delete</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteClass(int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.DeleteClass(forPlayerWithUlid, classId, onComplete);
+        }
+
+        /// <summary>
         /// List all available Class types for your game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListClassTypesResponse</param>
