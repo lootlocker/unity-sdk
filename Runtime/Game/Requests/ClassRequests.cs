@@ -174,6 +174,13 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        public static void DeleteClass(string forPlayerWithUlid, int classId, Action<LootLockerResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.deleteClass;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(classId), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
         public static void ListClassTypes(string forPlayerWithUlid, Action<LootLockerListClassTypesResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listClassTypes;
