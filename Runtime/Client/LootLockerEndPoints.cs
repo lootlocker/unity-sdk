@@ -99,6 +99,7 @@ namespace LootLocker
         public static EndPointClass getEquipableContextToDefaultClass = new EndPointClass("v1/player/character/contexts", LootLockerHTTPMethod.GET);
         public static EndPointClass getEquipableContextbyClass = new EndPointClass("v1/player/character/{0}/contexts", LootLockerHTTPMethod.GET);
         public static EndPointClass createClass = new EndPointClass("v1/player/character", LootLockerHTTPMethod.POST);
+        public static EndPointClass deleteClass = new EndPointClass("v1/player/character/{0}", LootLockerHTTPMethod.DELETE);
         public static EndPointClass listClassTypes = new EndPointClass("v1/player/character/types", LootLockerHTTPMethod.GET);
         public static EndPointClass listPlayerClasses = new EndPointClass("v1/player/character/list", LootLockerHTTPMethod.GET);
 
