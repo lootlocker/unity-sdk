@@ -16,7 +16,9 @@ namespace LootLocker.LootLockerEnums
         nintendo = 6,
         xbox = 7,
         playstation = 8,
-        twitch = 9
+        twitch = 9,
+        epic = 10,
+        discord = 11
     }
 
     /// <summary>
@@ -117,6 +119,50 @@ namespace LootLocker.Requests
         /// </summary>
         public string authorization_code { get; set; }
     }
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerConnectEpicProviderToAccountRequest
+    {
+        /// <summary>
+        /// The Token from epic sign in
+        /// </summary>
+        public string token { get; set; }
+    }
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerConnectPlaystationProviderToAccountRequest
+    {
+        /// <summary>
+        /// The environment for the playstation account (dev, qa, prod)
+        /// </summary>
+        public string environment { get; set; }
+        /// <summary>
+        /// The code from playstation sign in
+        /// </summary>
+        public string code { get; set; }
+    }
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerConnectDiscordProviderToAccountRequest
+    {
+        /// <summary>
+        /// The Token from discord sign in
+        /// </summary>
+        public string token { get; set; }
+    }
+    
+    /// <summary>
+    /// </summary>
+    public class LootLockerConnectTwitchProviderToAccountRequest
+    {
+        /// <summary>
+        /// The Authorization Code from Twitch sign in
+        /// </summary>
+        public string authorization_code { get; set; }
+    }
 
     //==================================================
     // Response Definitions
@@ -127,13 +173,9 @@ namespace LootLocker.Requests
     public class LootLockerAccountConnectedResponse : LootLockerResponse
     {
         /// <summary>
-        /// The account provider
+        /// The connected account provider
         /// </summary>
-        public LootLockerAccountProvider provider { get; set; }
-        /// <summary>
-        /// Decorated name of this provider to use for displaying
-        /// </summary>
-        public string provider_name { get; set; }
+        public LootLockerConnectedAccountProvider connected_account { get; set; }
     }
 
     /// <summary>
