@@ -212,7 +212,7 @@ namespace LootLockerTests.PlayMode
             LootLockerSDKManager.StartGuestSession((startSessionResponse) =>
             {
                 expectedIdentifier = startSessionResponse.player_identifier;
-                lastSeenOnFirstSession = startSessionResponse.last_seen;
+                lastSeenOnFirstSession = startSessionResponse.last_seen ?? DateTime.MinValue;
 
                 LootLockerSDKManager.EndSession((endSessionResponse) =>
                 {
