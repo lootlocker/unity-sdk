@@ -80,7 +80,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The last time this player logged in
         /// </summary>
-        public DateTime last_seen { get; set; }
+        public DateTime? last_seen { get; set; }
         /// <summary>
         /// The public UID for this player
         /// </summary>
