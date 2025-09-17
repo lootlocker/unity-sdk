@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
@@ -85,8 +86,9 @@ namespace LootLocker.Requests
         public int id { get; set; }
         public string url { get; set; }
         public int size { get; set; }
-        public string name { get; set; }
-        public string purpose { get; set; }
+        public string filename { get; set; }
+        public string content_type { get; set; }
+        public FilePurpose purpose { get; set; }
     }
 
     #endregion
