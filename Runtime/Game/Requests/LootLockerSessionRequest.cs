@@ -11,6 +11,22 @@ namespace LootLocker.Requests
         public string steam_ticket { get; set; }
     }
 
+    public class LootLockerPlaystationNetworkVerificationRequest
+    {
+        public string key { get; set; } = LootLockerConfig.current.apiKey;
+        public string platform { get; set; } = "psn";
+        public string token { get; set; }
+        public int psn_issuer_id { get; set; } = 256; // Default to production
+    }
+
+    public class LootLockerPlaystationNetworkV3SessionRequest
+    {
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
+        public string game_version => LootLockerConfig.current.game_version;
+        public string auth_code { get; set; }
+        public int env_iss_id { get; set; } = 256; // Default to production
+    }
+
     public class LootLockerSteamSessionWithAppIdRequest : LootLockerSteamSessionRequest
     {
         public string steam_app_id { get; set; }
@@ -171,6 +187,11 @@ namespace LootLocker.Requests
     public class LootLockerMetaSessionResponse : LootLockerSessionResponse
     {
         public string refresh_token { get; set; }
+    }
+    
+    public class LootLockerPlaystationV3SessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
     }
 
     [Serializable]

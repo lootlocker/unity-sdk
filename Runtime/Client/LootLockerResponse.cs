@@ -125,6 +125,21 @@ namespace LootLocker
         }
 
         /// <summary>
+        /// Construct a failure response of type T from an existing failure response of any type
+        /// </summary>
+        public static T FailureResponseConversion<T>(LootLockerResponse failureResponse) where T : LootLockerResponse, new()
+        {
+            return new T()
+            {
+                success = failureResponse.success,
+                text = failureResponse.text,
+                statusCode = failureResponse.statusCode,
+                errorData = failureResponse.errorData,
+                requestContext = failureResponse.requestContext
+            };
+        }
+
+        /// <summary>
         /// Construct an error response from a network request to send to the client.
         /// </summary>
         public static T NetworkError<T>(string errorMessage, int httpStatusCode, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
