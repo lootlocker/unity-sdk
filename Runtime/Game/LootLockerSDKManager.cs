@@ -263,6 +263,7 @@ namespace LootLocker.Requests
         /// <param name="deviceId"></param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        [Obsolete("This method is deprecated, please use VerifyPlayerAndStartPlaystationNetworkSession or VerifyPlayerAndStartSteamSession instead.")] // Deprecation date 20250922
         public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(true))
@@ -287,6 +288,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="psnOnlineId">The player's Online ID</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        [Obsolete("This method is deprecated, please use VerifyPlayerAndStartPlaystationNetworkSession instead.")] // Deprecation date 20250922
         public static void StartPlaystationNetworkSession(string psnOnlineId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
@@ -297,7 +299,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerSessionRequest(psnOnlineId, LL_AuthPlatforms.PlayStationNetwork)), 
+                    LootLockerJson.SerializeObject(new LootLockerSessionRequest(psnOnlineId, LL_AuthPlatforms.PlayStationNetwork)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -325,6 +327,118 @@ namespace LootLocker.Requests
                 }, 
                 false
             );
+        }
+
+        /// <summary>
+        /// Start a Playstation Network session. If your token starts with v3, then you should use VerifyPlayerAndStartPlaystationNetworkV3Session instead.
+        /// 
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// 
+        /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
+        /// <param name="AccountId">The numeric representation of the account id received from PSN after a successful login</param>
+        /// <param name="PsnIssuerId">Optional: The PSN issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartPlaystationNetworkSession(string AuthCode, long AccountId, Action<LootLockerSessionResponse> onComplete, int PsnIssuerId = 256)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
+                return;
+            }
+
+            LootLockerPlaystationNetworkVerificationRequest verificationRequest = new LootLockerPlaystationNetworkVerificationRequest
+            {
+                token = AuthCode,
+                psn_issuer_id = PsnIssuerId
+            };
+
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.playerVerification.endPoint, LootLockerEndPoints.playerVerification.httpMethod, LootLockerJson.SerializeObject(verificationRequest), onComplete: (verificationResponse) =>
+            {
+                if (!verificationResponse.success)
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.FailureResponseConversion<LootLockerSessionResponse>(verificationResponse));
+                    return;
+                }
+
+                LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(AccountId.ToString(), LL_AuthPlatforms.PlayStationNetwork);
+
+                LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
+                {
+                    var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (sessionResponse.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = sessionResponse.session_token,
+                            RefreshToken = "",
+                            ULID = sessionResponse.player_ulid,
+                            Identifier = AccountId.ToString(),
+                            PublicUID = sessionResponse.public_uid,
+                            LegacyID = sessionResponse.player_id,
+                            Name = sessionResponse.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.PlayStationNetwork),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = sessionResponse.player_created_at,
+                            WalletID = sessionResponse.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(sessionResponse);
+                });
+            });
+        }
+
+        /// <summary>
+        /// Start a Playstation Network session using the v3 version of PSN authentication. If your token starts with v3, then you're using this version.
+        /// 
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// 
+        /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
+        /// <param name="EnvIssuerId">Optional: The PSN Environment issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartPlaystationNetworkV3Session(string AuthCode, Action<LootLockerPlaystationV3SessionResponse> onComplete, int EnvIssuerId = 256)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlaystationV3SessionResponse>(null));
+                return;
+            }
+
+            LootLockerPlaystationNetworkV3SessionRequest sessionRequest = new LootLockerPlaystationNetworkV3SessionRequest
+            {
+                auth_code = AuthCode,
+                env_iss_id = EnvIssuerId
+            };
+
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.playstationNetworkv3SessionRequest.endPoint, LootLockerEndPoints.playstationNetworkv3SessionRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
+            {
+                var sessionResponse = LootLockerResponse.Deserialize<LootLockerPlaystationV3SessionResponse>(serverResponse);
+                if (sessionResponse.success)
+                {
+                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    {
+                        SessionToken = sessionResponse.session_token,
+                        RefreshToken = "",
+                        ULID = sessionResponse.player_ulid,
+                        Identifier = sessionResponse.player_identifier,
+                        PublicUID = sessionResponse.public_uid,
+                        LegacyID = sessionResponse.player_id,
+                        Name = sessionResponse.player_name,
+                        WhiteLabelEmail = "",
+                        WhiteLabelToken = "",
+                        CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.PlayStationNetwork),
+                        LastSignIn = DateTime.Now,
+                        CreatedAt = sessionResponse.player_created_at,
+                        WalletID = sessionResponse.wallet_id,
+                    });
+                }
+
+                onComplete?.Invoke(sessionResponse);
+            });
         }
 
         /// <summary>
