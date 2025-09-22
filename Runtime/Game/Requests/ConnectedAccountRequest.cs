@@ -17,8 +17,7 @@ namespace LootLocker.LootLockerEnums
         xbox = 7,
         playstation = 8,
         twitch = 9,
-        epic = 10,
-        discord = 11
+        discord = 10
     }
 
     /// <summary>
