@@ -1665,11 +1665,11 @@ namespace LootLocker.Requests
         /// <param name="accountToDisconnect">What account to disconnect from this LootLocker Account</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -1685,11 +1685,11 @@ namespace LootLocker.Requests
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ConnectGoogleAccount(string idToken, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        public static void ConnectGoogleAccount(string idToken, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -1708,11 +1708,11 @@ namespace LootLocker.Requests
         /// <param name="platform">Google OAuth2 ClientID platform</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -1730,17 +1730,106 @@ namespace LootLocker.Requests
         /// <param name="authorizationCode">Authorization code, provided by apple during Sign In</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
             string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("apple-rest");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectAppleRestProviderToAccountRequest() { authorization_code = authorizationCode });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Twitch Account to the currently logged in LootLocker account allowing that Twitch account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Twitch account is linked into
+        /// </summary>
+        /// <param name="authorizationCode">The Authorization Code from Twitch sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectTwitchAccount(string authorizationCode, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("twitch");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectTwitchProviderToAccountRequest() { authorization_code = authorizationCode });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an Epic Account to the currently logged in LootLocker account allowing that Epic account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Epic account is linked into
+        /// </summary>
+        /// <param name="token">The Token from Epic sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectEpicAccount(string Token, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("epic");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectEpicProviderToAccountRequest() { token = Token });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Playstation Account to the currently logged in LootLocker account allowing that Playstation account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Playstation account is linked into
+        /// </summary>
+        /// <param name="environment">The environment for the playstation account (dev, qa, prod)</param>
+        /// <param name="code">The code from playstation sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectPlaystationAccount(string environment, string code, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("playstation");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectPlaystationProviderToAccountRequest() { environment = environment, code = code });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an Discord Account to the currently logged in LootLocker account allowing that Discord account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Discord account is linked into
+        /// </summary>
+        /// <param name="token">The Token from Discord sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectDiscordAccount(string token, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("discord");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectDiscordProviderToAccountRequest() { token = token });
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
@@ -1753,11 +1842,11 @@ namespace LootLocker.Requests
         /// <param name="Nonce">The nonce returned with the response when starting a lease process. Note that the process must have concluded successfully first.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
             
