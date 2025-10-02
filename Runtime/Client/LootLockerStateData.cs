@@ -30,31 +30,14 @@ namespace LootLocker
         public UniqueList<string> SavedPlayerStateULIDs { get; set; } = new UniqueList<string>();
         public string DefaultPlayer { get; set; }
         public Dictionary<string, string> WhiteLabelEmailToPlayerUlidMap { get; set; } = new Dictionary<string, string>();
-        public bool MultiUserInitialLoadCompleted { get; set; } //TODO: Deprecated (or rather temporary) - Remove after 20251001
     }
 
     public class LootLockerStateData
     {
-        //TODO: Deprecated (or rather temporary) - Remove after 20251001
-        private static bool MultiUserMigrationInProgress = false;
-        //TODO: Deprecated (or rather temporary) - Remove after 20251001
         public LootLockerStateData()
         {
             LoadMetaDataFromPlayerPrefsIfNeeded();
-            if (!ActiveMetaData.MultiUserInitialLoadCompleted)
-            {
-                TransferPlayerCacheToMultiUserSystem();
-            }
         }
-#if UNITY_EDITOR
-        //TODO: Deprecated (or rather temporary) - Remove after 20251001
-        public static void ResetMultiUserTransferFlag()
-        {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
-            ActiveMetaData.MultiUserInitialLoadCompleted = false;
-            MultiUserMigrationInProgress = false;
-        }
-#endif
 
         //==================================================
         // Constants
@@ -92,11 +75,6 @@ namespace LootLocker
             if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) && ActiveMetaData.SavedPlayerStateULIDs.Count == 1)
             {
                 ActiveMetaData.DefaultPlayer = ActiveMetaData.SavedPlayerStateULIDs[0];
-            }
-
-            if (!ActiveMetaData.MultiUserInitialLoadCompleted)
-            {
-                TransferPlayerCacheToMultiUserSystem();
             }
 
             SaveMetaDataToPlayerPrefs();
@@ -428,86 +406,6 @@ namespace LootLocker
         {
             ActiveMetaData = null;
             ActivePlayerData.Clear();
-        }
-
-        //TODO: Deprecated (or rather temporary) - Remove after 20251001
-        public static bool TransferPlayerCacheToMultiUserSystem()
-        {
-            if (MultiUserMigrationInProgress)
-            {
-                return false;
-            }
-            var cache = LootLockerConfig.current;
-#pragma warning disable CS0618 // This is the transfer mechanic from the obsolete members
-            if (cache == null || string.IsNullOrEmpty(cache.token))
-            {
-                ActiveMetaData.MultiUserInitialLoadCompleted = true;
-                SaveMetaDataToPlayerPrefs();
-                return false;
-            }
-
-            MultiUserMigrationInProgress = true;
-            LootLockerPlayerData playerData = new LootLockerPlayerData();
-            playerData.CreatedAt = new DateTime(1970, 1, 1);
-            playerData.CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation((LL_AuthPlatforms)PlayerPrefs.GetInt("LastActivePlatform"));
-            playerData.Identifier = playerData.CurrentPlatform.Platform == LL_AuthPlatforms.Guest ? PlayerPrefs.GetString("LootLockerGuestPlayerID", "") : cache.deviceID;
-            playerData.LastSignIn = new DateTime(1970, 1, 1);
-            playerData.LegacyID = -1;
-            playerData.Name = "";
-            playerData.PublicUID = "";
-            playerData.RefreshToken = cache.refreshToken;
-            playerData.SessionToken = cache.token;
-            playerData.ULID = string.IsNullOrEmpty(cache.playerULID) ? "temp-ulid" : cache.playerULID;
-            playerData.WalletID = "";
-#pragma warning restore CS0618 // This was the transfer mechanic from the obsolete members
-            PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", playerData.WhiteLabelEmail);
-            PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", playerData.WhiteLabelToken);
-
-            ActivePlayerData[playerData.ULID] = playerData;
-
-            LootLockerSDKManager.GetCurrentPlayerInfo((response) =>
-            {
-                if (!response.success)
-                {
-                    ActivePlayerData.Remove(playerData.ULID);
-                    return;
-                }
-
-                string oldULID = playerData.ULID;
-                var playerInfo = response.info;
-                playerData.ULID = playerInfo.id;
-                playerData.CreatedAt = playerInfo.created_at;
-                playerData.Name = playerInfo.name;
-                playerData.PublicUID = playerInfo.public_uid;
-                playerData.LegacyID = playerInfo.legacy_id;
-                playerData.LastSignIn = DateTime.Now;
-                ActivePlayerData[playerData.ULID] = playerData;
-                if (!oldULID.Equals(playerData.ULID))
-                {
-                    ActivePlayerData.Remove(oldULID);
-                }
-                ActiveMetaData.SavedPlayerStateULIDs.AddUnique(playerData.ULID);
-                if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || ActiveMetaData.DefaultPlayer.Equals(oldULID))
-                {
-                    ActiveMetaData.DefaultPlayer = playerData.ULID;
-                }
-
-                if (!string.IsNullOrEmpty(playerData.WhiteLabelEmail))
-                {
-                    ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[playerData.WhiteLabelEmail] = playerData.ULID;
-                }
-
-                ActiveMetaData.MultiUserInitialLoadCompleted = true;
-                SaveMetaDataToPlayerPrefs();
-                SavePlayerDataToPlayerPrefs(playerData.ULID);
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
-                PlayerPrefs.DeleteKey("LootLockerGuestPlayerID");
-                PlayerPrefs.DeleteKey("LastActivePlatform");
-                PlayerPrefs.Save();
-                MultiUserMigrationInProgress = false;
-            }, playerData.ULID);
-            return true;
         }
     }
     #endregion // Public Methods
