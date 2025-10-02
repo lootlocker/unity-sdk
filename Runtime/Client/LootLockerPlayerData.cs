@@ -57,5 +57,9 @@ namespace LootLocker
         /// The id of the wallet for this player
         /// </summary>
         public string WalletID { get; set; }
+        /// <summary>
+        /// Optional parameters used when starting/refreshing a session
+        /// </summary>
+        public LootLockerSessionOptionals SessionOptionals { get; set; } = new LootLockerSessionOptionals();
     }
 }
