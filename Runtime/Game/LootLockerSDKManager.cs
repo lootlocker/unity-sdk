@@ -347,8 +347,9 @@ namespace LootLocker.Requests
         /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
         /// <param name="AccountId">The numeric representation of the account id received from PSN after a successful login</param>
         /// <param name="PsnIssuerId">Optional: The PSN issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void VerifyPlayerAndStartPlaystationNetworkSession(string AuthCode, long AccountId, Action<LootLockerSessionResponse> onComplete, int PsnIssuerId = 256)
+        public static void VerifyPlayerAndStartPlaystationNetworkSession(string AuthCode, long AccountId, Action<LootLockerSessionResponse> onComplete, int PsnIssuerId = 256, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -370,7 +371,7 @@ namespace LootLocker.Requests
                     return;
                 }
 
-                LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(AccountId.ToString(), LL_AuthPlatforms.PlayStationNetwork);
+                LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(AccountId.ToString(), LL_AuthPlatforms.PlayStationNetwork, Optionals);
 
                 LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
                 {
@@ -392,6 +393,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = sessionResponse.player_created_at,
                             WalletID = sessionResponse.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -408,8 +410,9 @@ namespace LootLocker.Requests
         /// 
         /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
         /// <param name="EnvIssuerId">Optional: The PSN Environment issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void VerifyPlayerAndStartPlaystationNetworkV3Session(string AuthCode, Action<LootLockerPlaystationV3SessionResponse> onComplete, int EnvIssuerId = 256)
+        public static void VerifyPlayerAndStartPlaystationNetworkV3Session(string AuthCode, Action<LootLockerPlaystationV3SessionResponse> onComplete, int EnvIssuerId = 256, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -420,7 +423,8 @@ namespace LootLocker.Requests
             LootLockerPlaystationNetworkV3SessionRequest sessionRequest = new LootLockerPlaystationNetworkV3SessionRequest
             {
                 auth_code = AuthCode,
-                env_iss_id = EnvIssuerId
+                env_iss_id = EnvIssuerId,
+                optionals = Optionals
             };
 
             LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.playstationNetworkv3SessionRequest.endPoint, LootLockerEndPoints.playstationNetworkv3SessionRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
@@ -443,6 +447,7 @@ namespace LootLocker.Requests
                         LastSignIn = DateTime.Now,
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
                     });
                 }
 
@@ -455,8 +460,9 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="deviceId">The player's Device ID</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartAndroidSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAndroidSession(string deviceId, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -466,7 +472,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerSessionRequest(deviceId, LL_AuthPlatforms.Android)), 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(deviceId, LL_AuthPlatforms.Android, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -487,6 +493,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -501,8 +508,9 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="amazonLunaGuid">The player's Amazon Luna GUID</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartAmazonLunaSession(string amazonLunaGuid, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAmazonLunaSession(string amazonLunaGuid, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -512,7 +520,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerSessionRequest(amazonLunaGuid, LL_AuthPlatforms.AmazonLuna)), 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(amazonLunaGuid, LL_AuthPlatforms.AmazonLuna, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -533,6 +541,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -544,8 +553,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Start a guest session.
         /// </summary>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
-        public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
+        public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -568,15 +578,16 @@ namespace LootLocker.Requests
                 return;
             }
 
-            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.Identifier, onComplete);
+            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.Identifier, onComplete, Optionals);
         }
 
         /// <summary>
         /// Start a guest session for an already existing player that has previously had active guest sessions on this device
         /// </summary>
         /// <param name="forPlayerWithUlid">Execute the request for the specified player</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
-        public static void StartGuestSessionForPlayer(string forPlayerWithUlid, Action<LootLockerGuestSessionResponse> onComplete)
+        public static void StartGuestSessionForPlayer(string forPlayerWithUlid, Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -590,15 +601,16 @@ namespace LootLocker.Requests
                 return;
             }
 
-            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.Identifier, onComplete);
+            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.Identifier, onComplete, Optionals ?? LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals);
         }
 
         /// <summary>
         /// Start a guest session with an identifier, you can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
         /// </summary>
         /// <param name="identifier">Identifier for the player. Set this to empty if you want an identifier to be generated for you.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
-        public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
+        public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -608,7 +620,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.guestSessionRequest.endPoint, LootLockerEndPoints.guestSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerSessionRequest(identifier, LL_AuthPlatforms.Guest)), 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(identifier, LL_AuthPlatforms.Guest, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
@@ -629,6 +641,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -643,8 +656,9 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
+        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -653,7 +667,7 @@ namespace LootLocker.Requests
             }
 
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
-            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionRequest{ steam_ticket = sessionTicket }), onComplete: (serverResponse) => {
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionRequest{ steam_ticket = sessionTicket , optionals = Optionals }), onComplete: (serverResponse) => {
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 if (sessionResponse.success)
                 {
@@ -672,6 +686,7 @@ namespace LootLocker.Requests
                         LastSignIn = DateTime.Now,
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
                     });
                 }
 
@@ -685,8 +700,9 @@ namespace LootLocker.Requests
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
         /// <param name="steamAppId">The steam app id to start this steam session for</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete)
+        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -695,7 +711,7 @@ namespace LootLocker.Requests
             }
 
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
-            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionWithAppIdRequest { steam_ticket = sessionTicket, steam_app_id = steamAppId }), onComplete: (serverResponse) => {
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionWithAppIdRequest { steam_ticket = sessionTicket, steam_app_id = steamAppId, optionals = Optionals }), onComplete: (serverResponse) => {
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 if (sessionResponse.success)
                 {
@@ -714,6 +730,7 @@ namespace LootLocker.Requests
                         LastSignIn = DateTime.Now,
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
                     });
                 }
 
@@ -743,8 +760,9 @@ namespace LootLocker.Requests
         /// The Nintendo Switch platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="nsa_id_token">nsa (Nintendo Switch Account) id token as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -754,7 +772,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.nintendoSwitchSessionRequest.endPoint, LootLockerEndPoints.nintendoSwitchSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerNintendoSwitchSessionRequest(nsa_id_token)), 
+                LootLockerJson.SerializeObject(new LootLockerNintendoSwitchSessionRequest(nsa_id_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -775,6 +793,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -789,8 +808,9 @@ namespace LootLocker.Requests
         /// The Xbox One platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="xbox_user_token">Xbox user token as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of typeLootLockerSessionResponse</param>
-        public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -800,7 +820,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.xboxSessionRequest.endPoint, LootLockerEndPoints.xboxSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerXboxOneSessionRequest(xbox_user_token)), 
+                LootLockerJson.SerializeObject(new LootLockerXboxOneSessionRequest(xbox_user_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -821,6 +841,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -835,8 +856,9 @@ namespace LootLocker.Requests
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartGoogleSession(string idToken, Action<LootLockerGoogleSessionResponse> onComplete)
+        public static void StartGoogleSession(string idToken, Action<LootLockerGoogleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -846,7 +868,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerGoogleSignInSessionRequest(idToken)), 
+                LootLockerJson.SerializeObject(new LootLockerGoogleSignInSessionRequest(idToken, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
@@ -867,6 +889,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -883,8 +906,9 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="googlePlatform">Google OAuth2 ClientID platform</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete)
+        public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -894,7 +918,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerGoogleSignInWithPlatformSessionRequest(idToken, googlePlatform.ToString())), 
+                LootLockerJson.SerializeObject(new LootLockerGoogleSignInWithPlatformSessionRequest(idToken, googlePlatform.ToString(), Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
@@ -915,6 +939,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -930,10 +955,11 @@ namespace LootLocker.Requests
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshGoogleSession(null, onComplete, forPlayerWithUlid);
+            RefreshGoogleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
@@ -944,8 +970,9 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -965,9 +992,14 @@ namespace LootLocker.Requests
                 refresh_token = playerData.RefreshToken;
             }
 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
             LootLockerServerRequest.CallAPI(null,
-                LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerGoogleRefreshSessionRequest(refresh_token)), 
+                LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerGoogleRefreshSessionRequest(refresh_token, Optionals)),
                 (serverResponse) =>
                 {
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
@@ -988,6 +1020,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1002,15 +1035,16 @@ namespace LootLocker.Requests
         /// The Google Play Games sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="authCode">The auth code received from Google Play Games Services authentication.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartGooglePlayGamesSession(string authCode, Action<LootLockerGooglePlayGamesSessionResponse> onComplete)
+        public static void StartGooglePlayGamesSession(string authCode, Action<LootLockerGooglePlayGamesSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(null);
                 return;
             }
-            var request = new Requests.LootLockerGooglePlayGamesSessionRequest(authCode);
+            var request = new Requests.LootLockerGooglePlayGamesSessionRequest(authCode, Optionals);
             LootLockerServerRequest.CallAPI(
                 null,
                 LootLocker.LootLockerEndPoints.googlePlayGamesSessionRequest.endPoint,
@@ -1036,6 +1070,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1051,15 +1086,16 @@ namespace LootLocker.Requests
         /// The Google Play Games sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refreshToken">The refresh token received from a previous GPGS session.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshGooglePlayGamesSession(string refreshToken, Action<LootLockerGooglePlayGamesSessionResponse> onComplete)
+        public static void RefreshGooglePlayGamesSession(string refreshToken, Action<LootLockerGooglePlayGamesSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
                 onComplete?.Invoke(null);
                 return;
             }
-            var request = new Requests.LootLockerGooglePlayGamesRefreshSessionRequest(refreshToken);
+            var request = new Requests.LootLockerGooglePlayGamesRefreshSessionRequest(refreshToken, Optionals);
             LootLockerServerRequest.CallAPI(
                 null,
                 LootLocker.LootLockerEndPoints.googlePlayGamesRefreshSessionRequest.endPoint,
@@ -1085,6 +1121,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1100,8 +1137,9 @@ namespace LootLocker.Requests
         /// The Google Play Games sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshGooglePlayGamesSession(Action<LootLockerGooglePlayGamesSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshGooglePlayGamesSession(Action<LootLockerGooglePlayGamesSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1115,7 +1153,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            RefreshGooglePlayGamesSession(playerData.RefreshToken, onComplete);
+            RefreshGooglePlayGamesSession(playerData.RefreshToken, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
         /// <summary>
@@ -1123,8 +1161,9 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="authorization_code">Authorization code, provided by apple</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete)
+        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1134,7 +1173,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.appleSessionRequest.endPoint, LootLockerEndPoints.appleSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerAppleSignInSessionRequest(authorization_code)), 
+                LootLockerJson.SerializeObject(new LootLockerAppleSignInSessionRequest(authorization_code, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
@@ -1155,6 +1194,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1170,10 +1210,11 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshAppleSession(null, onComplete, forPlayerWithUlid);
+            RefreshAppleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
@@ -1185,7 +1226,8 @@ namespace LootLocker.Requests
         /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1205,9 +1247,14 @@ namespace LootLocker.Requests
                 refresh_token = playerData.RefreshToken;
             }
 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.appleSessionRequest.endPoint, LootLockerEndPoints.appleSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerAppleRefreshSessionRequest(refresh_token)), 
+                LootLockerJson.SerializeObject(new LootLockerAppleRefreshSessionRequest(refresh_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
@@ -1228,6 +1275,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1247,8 +1295,9 @@ namespace LootLocker.Requests
         /// <param name="signature">The signature generated from Apple Game Center Identity Verification</param>
         /// <param name="salt">The salt of the signature generated from Apple Game Center Identity Verification</param>
         /// <param name="timestamp">The timestamp of the verification generated from Apple Game Center Identity Verification</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionRe
-        public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response
+        public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1258,7 +1307,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.appleGameCenterSessionRequest.endPoint, LootLockerEndPoints.appleGameCenterSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterSessionRequest(bundleId, playerId, publicKeyUrl, signature, salt, timestamp)), 
+                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterSessionRequest(bundleId, playerId, publicKeyUrl, signature, salt, timestamp, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
@@ -1279,6 +1328,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1295,7 +1345,8 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshAppleGameCenterSession(Action<LootLockerAppleGameCenterSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshAppleGameCenterSession(Action<LootLockerAppleGameCenterSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1310,9 +1361,14 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.appleGameCenterSessionRequest.endPoint, LootLockerEndPoints.appleGameCenterSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterRefreshSessionRequest(playerData?.RefreshToken)), 
+                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterRefreshSessionRequest(playerData?.RefreshToken, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
@@ -1333,6 +1389,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1348,7 +1405,8 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="id_token">EOS Id Token as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
-        public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1358,7 +1416,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.epicSessionRequest.endPoint, LootLockerEndPoints.epicSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerEpicSessionRequest(id_token)), 
+                LootLockerJson.SerializeObject(new LootLockerEpicSessionRequest(id_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
@@ -1379,6 +1437,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1395,9 +1454,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshEpicSession(null, onComplete, forPlayerWithUlid);
+            RefreshEpicSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
@@ -1409,7 +1469,8 @@ namespace LootLocker.Requests
         /// <param name="refresh_token">Token received in response from StartEpicSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshEpicSession(string refresh_token, Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshEpicSession(string refresh_token, Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1429,9 +1490,14 @@ namespace LootLocker.Requests
                 refresh_token = playerData.RefreshToken;
             }
 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
             LootLockerServerRequest.CallAPI(null, 
                 LootLockerEndPoints.epicSessionRequest.endPoint, LootLockerEndPoints.epicSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerEpicRefreshSessionRequest(refresh_token)), 
+                LootLockerJson.SerializeObject(new LootLockerEpicRefreshSessionRequest(refresh_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
@@ -1452,6 +1518,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1467,8 +1534,9 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="user_id">User ID as a string</param>
         /// <param name="nonce">Nonce as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">Action to handle the response of type LootLockerMetaSessionResponse</param>
-        public static void StartMetaSession(string user_id, string nonce, Action<LootLockerMetaSessionResponse> onComplete)
+        public static void StartMetaSession(string user_id, string nonce, Action<LootLockerMetaSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1479,7 +1547,8 @@ namespace LootLocker.Requests
             var sessionRequest = new LootLockerMetaSessionRequest()
             {
                 user_id = user_id,
-                nonce = nonce
+                nonce = nonce,
+                optionals = Optionals
             };
             var endPoint = LootLockerEndPoints.metaSessionRequest;
 
@@ -1503,6 +1572,7 @@ namespace LootLocker.Requests
                         LastSignIn = DateTime.Now,
                         CreatedAt = response.player_created_at,
                         WalletID = response.wallet_id,
+                        SessionOptionals = Optionals
                     });
                 }
 
@@ -1516,10 +1586,11 @@ namespace LootLocker.Requests
         /// The Meta / Oculus platform must be enabled and configured in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshMetaSession(null, onComplete, forPlayerWithUlid);
+            RefreshMetaSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
@@ -1531,7 +1602,8 @@ namespace LootLocker.Requests
         /// <param name="refresh_token">Token received in response from StartMetaSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshMetaSession(string refresh_token, Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshMetaSession(string refresh_token, Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1551,9 +1623,14 @@ namespace LootLocker.Requests
                 refresh_token = playerData.RefreshToken;
             }
 
-            LootLockerServerRequest.CallAPI(null, 
-                LootLockerEndPoints.metaSessionRequest.endPoint, LootLockerEndPoints.metaSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerMetaRefreshSessionRequest{ refresh_token = refresh_token }), 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.metaSessionRequest.endPoint, LootLockerEndPoints.metaSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerMetaRefreshSessionRequest{ refresh_token = refresh_token, optionals = Optionals }),
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
@@ -1574,6 +1651,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -1589,8 +1667,9 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="accessToken">The player's Discord OAuth token</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartDiscordSession(string accessToken, Action<LootLockerDiscordSessionResponse> onComplete)
+        public static void StartDiscordSession(string accessToken, Action<LootLockerDiscordSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1601,7 +1680,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(null,
                 LootLockerEndPoints.discordSessionRequest.endPoint,
                 LootLockerEndPoints.discordSessionRequest.httpMethod,
-                LootLockerJson.SerializeObject(new LootLockerDiscordSessionRequest(accessToken)),
+                LootLockerJson.SerializeObject(new LootLockerDiscordSessionRequest(accessToken, Optionals)),
                 (serverResponse) =>
                     {
                         var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
@@ -1622,6 +1701,7 @@ namespace LootLocker.Requests
                                 LastSignIn = DateTime.Now,
                                 CreatedAt = response.player_created_at,
                                 WalletID = response.wallet_id,
+                                SessionOptionals = Optionals
                             });
                         }
 
@@ -1638,7 +1718,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
             if (string.IsNullOrEmpty(playerData?.RefreshToken))
@@ -1647,7 +1727,12 @@ namespace LootLocker.Requests
                 return;
             }
 
-            RefreshDiscordSession(playerData.RefreshToken, onComplete, forPlayerWithUlid);
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            RefreshDiscordSession(playerData.RefreshToken, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
@@ -1659,7 +1744,8 @@ namespace LootLocker.Requests
         /// <param name="refresh_token">Token received in response from StartDiscordSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDiscordSessionResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RefreshDiscordSession(string refresh_token, Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshDiscordSession(string refresh_token, Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -1679,9 +1765,14 @@ namespace LootLocker.Requests
                 forPlayerWithUlid = playerData.ULID;
             }
 
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, 
                 LootLockerEndPoints.discordSessionRequest.endPoint, LootLockerEndPoints.discordSessionRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerDiscordRefreshSessionRequest(refresh_token)), 
+                LootLockerJson.SerializeObject(new LootLockerDiscordRefreshSessionRequest(refresh_token, Optionals)), 
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
@@ -1702,6 +1793,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
                         });
                     }
 
@@ -2452,7 +2544,9 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete, string forPlayerWithUlid = null)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
+        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -2486,7 +2580,12 @@ namespace LootLocker.Requests
                 return;
             }
 
-            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token }, onComplete);
+            if (Optionals == null)
+            {
+                Optionals = playerData?.SessionOptionals;
+            }
+
+            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
         }
 
         /// <summary>
@@ -2494,8 +2593,9 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="email">The email of the White Label user to start a WL session for</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartWhiteLabelSession(string email, Action<LootLockerSessionResponse> onComplete)
+        public static void StartWhiteLabelSession(string email, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
@@ -2521,6 +2621,10 @@ namespace LootLocker.Requests
                 var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlidInStateData);
 
                 token = playerData.WhiteLabelToken;
+                if(Optionals == null)
+                {
+                    Optionals = playerData?.SessionOptionals;
+                }
             }
             else
             {
@@ -2534,7 +2638,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token }, onComplete);
+            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
         }
 
         /// <summary>
@@ -2542,6 +2646,7 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="sessionRequest">A White Label Session Request with inner values already set</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
         {
@@ -2574,6 +2679,7 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
+                            SessionOptionals = sessionRequest.optionals
                         });
                         _wllProcessesDictionary.Remove(sessionRequest.email);
                     }

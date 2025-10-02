@@ -590,7 +590,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.WhiteLabel:
@@ -599,7 +599,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        }, playerData.ULID);
+                        }, playerData.ULID, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.AppleGameCenter:
@@ -608,7 +608,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        }, refreshForPlayerUlid);
+                        }, refreshForPlayerUlid, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.AppleSignIn:
@@ -617,7 +617,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        }, refreshForPlayerUlid);
+                        }, refreshForPlayerUlid, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.Epic:
@@ -626,7 +626,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        }, refreshForPlayerUlid);
+                        }, refreshForPlayerUlid, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.Google:
@@ -635,7 +635,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        }, refreshForPlayerUlid);
+                        }, refreshForPlayerUlid, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.Remote:
@@ -655,7 +655,7 @@ namespace LootLocker
                         {
                             newSessionResponse = response;
                             callCompleted = true;
-                        });
+                        }, playerData.SessionOptionals);
                     }
                     break;
                 case LL_AuthPlatforms.NintendoSwitch:
