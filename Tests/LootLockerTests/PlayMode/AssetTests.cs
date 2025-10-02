@@ -234,7 +234,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_DefaultParameters_ReturnsAssetsWithNullValuesForIncludables()
         {
@@ -269,7 +269,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeStorage_ReturnsAssetsWithStorageButNullOtherwise()
         {
@@ -311,7 +311,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeMetadata_ReturnsAssetsWithMetadataButNullOtherwise()
         {
@@ -353,7 +353,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeDataEntities_ReturnsAssetsWithDataEntitiesButNullOtherwise()
         {
@@ -395,7 +395,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeEverything_ReturnsAssetsWithAllIncludables()
         {
@@ -442,7 +442,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithPaginationParameters_ReturnsExpectedAsset()
         {
@@ -474,10 +474,10 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(paginatedListResponse.success, paginatedListResponse.errorData?.ToString() ?? "Paginated ListAssets call failed");
             Assert.AreEqual(listResponse.pagination.total, paginatedListResponse.pagination.total, "Total assets count does not match");
             Assert.AreEqual(1, paginatedListResponse.assets.Length, "Paginated response should contain only one asset");
-            Assert.AreEqual(listResponse.assets[2].asset_ulid, paginatedListResponse.assets[0].asset_ulid, "The expected asset was not returned in the paginated response");
+            Assert.AreEqual(listResponse.assets[1].asset_ulid, paginatedListResponse.assets[0].asset_ulid, "The expected asset was not returned in the paginated response");
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithFilterAndAllIncludes_ReturnsExpectedAssetWithAllIncludes()
         {
@@ -526,7 +526,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByIdAscending_ReturnsAssetsInAscendingIdOrder()
         {
@@ -558,7 +558,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByIdDescending_ReturnsAssetsInDescendingIdOrder()
         {
@@ -590,7 +590,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByNameDescending_ReturnsAssetsInDescendingNameOrder()
         {
@@ -622,7 +622,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByCreatedAtDescending_ReturnsAssetsInDescendingCreatedOrder()
         {
@@ -651,7 +651,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by created_at");
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderingWithPagination_ReturnsCorrectlyOrderedPaginatedResults()
         {
@@ -694,7 +694,7 @@ namespace LootLockerTests.PlayMode
             Assert.Less(firstPageResponse.assets[1].asset_id, secondPageResponse.assets[0].asset_id, "Assets should be ordered across pages");
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderingWithFiltersAndIncludes_ReturnsCorrectlyOrderedFilteredResults()
         {
@@ -749,7 +749,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OnlyOrderByWithoutDirection_UsesDefaultDirectionSuccessfully()
         {
@@ -777,7 +777,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by ID with default direction");
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithAssetFilters_ReturnsOnlyFilteredAssets()
         {
@@ -883,7 +883,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithMultipleAssetFilterValues_ReturnsAssetsMatchingAnyValue()
         {
