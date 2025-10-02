@@ -11,6 +11,41 @@ using System;
 
 namespace LootLockerTests.PlayMode
 {
+#if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+    public class InMemoryTestStateWriter : ILootLockerStateWriter
+    {
+        private Dictionary<string, string> _storage = new Dictionary<string, string>();
+
+        public void DeleteKey(string key)
+        {
+            if (_storage.ContainsKey(key))
+            {
+                _storage.Remove(key);
+            }
+        }
+
+        public string GetString(string key, string defaultValue = "")
+        {
+            if (_storage.ContainsKey(key))
+            {
+                return _storage[key];
+            }
+            return defaultValue;
+        }
+
+        public void SetString(string key, string value)
+        {
+            _storage[key] = value;
+        }
+
+        public bool HasKey(string key)
+        {
+            return _storage.ContainsKey(key);
+        }
+    }
+    
+#endif //LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+
     public class MultiUserTests
     {
         private LootLockerTestGame gameUnderTest = null;
@@ -23,6 +58,9 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+            LootLockerSDKManager.SetStateWriter(new InMemoryTestStateWriter());
+            #endif
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
             if (!LootLockerConfig.ClearSettings())
             {
@@ -101,6 +139,9 @@ namespace LootLockerTests.PlayMode
                 configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings,
                 configCopy.allowTokenRefresh);
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
+            #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+            LootLockerSDKManager.SetStateWriter(new LootLockerPlayerPrefsStateWriter());
+            #endif
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -552,8 +593,8 @@ namespace LootLockerTests.PlayMode
 
             // Then
             Assert.IsFalse(LootLockerStateData.SaveStateExistsForPlayer(ulidToRemove));
-            Assert.AreEqual(guestUsersToCreate-1, LootLockerStateData.GetActivePlayerULIDs().Count);
-            Assert.AreEqual(guestUsersToCreate-1, LootLockerStateData.GetCachedPlayerULIDs().Count);
+            Assert.AreEqual(guestUsersToCreate - 1, LootLockerStateData.GetActivePlayerULIDs().Count);
+            Assert.AreEqual(guestUsersToCreate - 1, LootLockerStateData.GetCachedPlayerULIDs().Count);
             Assert.IsNull(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(ulidToRemove));
         }
 

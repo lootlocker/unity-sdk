@@ -129,6 +129,15 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region SDK Customization
+        #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+        public static void SetStateWriter(ILootLockerStateWriter stateWriter)
+        {
+            LootLockerStateData.overrideStateWriter(stateWriter);
+        }
+        #endif
+        #endregion
+
         #region Multi-User Management
 
         /// <summary>
