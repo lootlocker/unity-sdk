@@ -15,6 +15,30 @@ namespace LootLocker.LootLockerEnums
         nonpopular,
         none
     }
+
+    public enum OrderAssetListBy
+    {
+        // Unordered
+        none,
+        // Order by asset ID
+        id,
+        // Order by asset name
+        name,
+        // Order by when the asset was created
+        created_at,
+        // Order by when the asset was last updated
+        updated_at,
+    }
+
+    public enum OrderAssetListDirection
+    {
+        // Unordered
+        none,
+        // Ascending order
+        asc,
+        // Descending order
+        desc
+    }
 }
 
 namespace LootLocker.Requests
@@ -106,6 +130,17 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Filters to apply to the asset listing based on key-value pairs.
+    /// </summary>
+    public class LootLockerSimpleAssetFilter
+    {
+        // The key for which to look for the filtered values
+        public string key { get; set; }
+        // A list of values to filter by. If the asset has any of these values for the given key, it will be included in the results.
+        public string[] values { get; set; }
+    }
+
+    /// <summary>
     /// Filters to apply to the asset listing.
     /// </summary>
     public class LootLockerAssetFilters
@@ -114,6 +149,8 @@ namespace LootLocker.Requests
         public bool ugc_only { get; set; } = false;
         ///<summary>If provided, only the requested ids will be returned. No pagination will be attempted or respected, maximum 100 assets.</summary>
         public List<int> asset_ids { get; set; } = new List<int>();
+        /// <summary>Filters to apply to the asset listing.</summary>
+        public List<LootLockerSimpleAssetFilter> asset_filters { get; set; } = new List<LootLockerSimpleAssetFilter>();
     }
 
     /// <summary>
