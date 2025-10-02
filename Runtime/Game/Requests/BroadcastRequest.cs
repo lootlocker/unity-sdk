@@ -13,6 +13,10 @@ namespace LootLocker.Requests
     public class LootLockerBroadcastPublicationSetting
     {
         /// <summary>
+        /// The id of the publication setting
+        /// </summary>
+        public int id { get; set; }
+        /// <summary>
         /// The time of publication
         /// </summary>
         public DateTime start { get; set; }
@@ -21,9 +25,25 @@ namespace LootLocker.Requests
         /// </summary>
         public DateTime end { get; set; }
         /// <summary>
-        /// The timezone that the start and end times are specified in, eg. UTC, Asia/Tokyo, or America/Washington
+        /// The IANA timezone that the start and end times are specified in, eg. UTC, Asia/Tokyo, or America/Washington
         /// </summary>
         public string tz { get; set; }
+    };
+
+    /// <summary>
+    /// Indicates which games are allowed to see this broadcast.
+    /// This may be useful if you want to know what other games might be seeing this broadcast at the point of display.
+    /// </summary>
+    public class LootLockerBroadcastGame
+    {
+        /// <summary>
+        /// The id of the game
+        /// </summary>
+        public int id { get; set; }
+        /// <summary>
+        /// The name of the game
+        /// </summary>
+        public string name { get; set; }
     };
 
     public class __LootLockerInternalBroadcastLocalization
@@ -103,6 +123,15 @@ namespace LootLocker.Requests
         /// </summary>
         public string name { get; set; }
         /// <summary>
+        /// Name of the current game you're seeing this broadcast on.
+        /// </summary>
+        public string game_name { get; set; }
+        /// <summary>
+        /// Indicates which games are allowed to see this broadcast.
+        /// This may be useful if you want to know what other games might be seeing this broadcast at the point of display.
+        /// </summary>
+        public List<LootLockerBroadcastGame> games { get; set; }
+        /// <summary>
         /// A list of publication settings for this broadcast message
         /// This list will always contain at least the publication time in UTC, but may also contain additional publication settings for different timezones
         /// </summary>
@@ -126,6 +155,15 @@ namespace LootLocker.Requests
         /// The name of this broadcast message
         /// </summary>
         public string name { get; set; }
+        /// <summary>
+        /// Name of the current game you're seeing this broadcast on.
+        /// </summary>
+        public string game_name { get; set; }
+        /// <summary>
+        /// Indicates which games are allowed to see this broadcast.
+        /// This may be useful if you want to know what other games might be seeing this broadcast at the point of display.
+        /// </summary>
+        public List<LootLockerBroadcastGame> games { get; set; }
         /// <summary>
         /// A list of publication settings for this broadcast message
         /// This list will always contain at least the publication time in UTC, but may also contain additional publication settings for different timezones
@@ -210,6 +248,8 @@ namespace LootLocker.Requests
                 LootLockerBroadcast translatedBroadcast = new LootLockerBroadcast();
                 translatedBroadcast.id = internalBroadcast.id;
                 translatedBroadcast.name = internalBroadcast.name;
+                translatedBroadcast.game_name = internalBroadcast.game_name;
+                translatedBroadcast.games = internalBroadcast.games;
                 translatedBroadcast.publication_settings = internalBroadcast.publication_settings;
                 translatedBroadcast.language_codes = new string[internalBroadcast.languages?.Length ?? 0];
                 translatedBroadcast.languages = new Dictionary<string, LootLockerBroadcastLanguage>();

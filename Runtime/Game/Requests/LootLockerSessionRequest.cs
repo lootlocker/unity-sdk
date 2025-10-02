@@ -4,11 +4,25 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
+
+    /// <summary>
+    /// Optional parameters that can be sent when starting a session.
+    /// These are a collection of configuration options relating to the player whom the session is being started for.
+    /// </summary>
+    public class LootLockerSessionOptionals
+    {
+        /// <summary>
+        /// Timezone in IANA format. If not supplied, will be set to UTC.
+        /// </summary>
+        public string timezone { get; set; } = null;
+    }
+
     public class LootLockerSteamSessionRequest
     {
         public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
         public string game_version { get; set; } = LootLockerConfig.current.game_version;
         public string steam_ticket { get; set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     public class LootLockerPlaystationNetworkVerificationRequest
@@ -25,6 +39,7 @@ namespace LootLocker.Requests
         public string game_version => LootLockerConfig.current.game_version;
         public string auth_code { get; set; }
         public int env_iss_id { get; set; } = 256; // Default to production
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     public class LootLockerSteamSessionWithAppIdRequest : LootLockerSteamSessionRequest
@@ -44,13 +59,16 @@ namespace LootLocker.Requests
         {
             player_identifier = "";
             platform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.None).PlatformString;
+            optionals = null;
         }
 
-        public LootLockerSessionRequest(string playerIdentifier, LL_AuthPlatforms forPlatform)
+        public LootLockerSessionRequest(string playerIdentifier, LL_AuthPlatforms forPlatform, LootLockerSessionOptionals optionals = null)
         {
             player_identifier = playerIdentifier;
             platform = LootLockerAuthPlatform.GetPlatformRepresentation(forPlatform).PlatformString;
+            this.optionals = optionals;
         }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     [Serializable]
@@ -60,17 +78,20 @@ namespace LootLocker.Requests
         public string email { get; set; }
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
         public LootLockerWhiteLabelSessionRequest(string email)
         {
             this.email = email;
             this.token = null;
+            this.optionals = null;
         }
 
         public LootLockerWhiteLabelSessionRequest()
         {
             this.email = null;
             this.token = null;
+            this.optionals = null;
         }
     }
 
@@ -209,10 +230,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string nsa_id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
+        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token, LootLockerSessionOptionals optionals = null)
         {
             this.nsa_id_token = nsa_id_token;
+            this.optionals = optionals;
         }
     }
 
@@ -222,10 +245,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerEpicSessionRequest(string id_token)
+        public LootLockerEpicSessionRequest(string id_token, LootLockerSessionOptionals optionals = null)
         {
             this.id_token = id_token;
+            this.optionals = optionals;
         }
     }
 
@@ -235,10 +260,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerEpicRefreshSessionRequest(string refresh_token)
+        public LootLockerEpicRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
         }
     }
     
@@ -251,6 +278,7 @@ namespace LootLocker.Requests
         public string user_id { get; set; }
 
         public string nonce { get; set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
     
     [Serializable]
@@ -259,6 +287,7 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     public class LootLockerXboxOneSessionRequest : LootLockerGetRequest
@@ -266,10 +295,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string xbox_user_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerXboxOneSessionRequest(string xbox_user_token)
+        public LootLockerXboxOneSessionRequest(string xbox_user_token, LootLockerSessionOptionals optionals = null)
         {
             this.xbox_user_token = xbox_user_token;
+            this.optionals = optionals;
         }
     }
 
@@ -278,10 +309,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGoogleSignInSessionRequest(string id_token)
+        public LootLockerGoogleSignInSessionRequest(string id_token, LootLockerSessionOptionals optionals = null)
         {
             this.id_token = id_token;
+            this.optionals = optionals;
         }
     }
     
@@ -294,7 +327,7 @@ namespace LootLocker.Requests
     {
         public string platform { get; set; }
 
-        public LootLockerGoogleSignInWithPlatformSessionRequest(string id_token, string platform) : base(id_token)
+        public LootLockerGoogleSignInWithPlatformSessionRequest(string id_token, string platform, LootLockerSessionOptionals optionals = null) : base(id_token, optionals)
         {
             this.platform = platform;
         }
@@ -305,10 +338,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGoogleRefreshSessionRequest(string refresh_token)
+        public LootLockerGoogleRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
         }
     }
     public class LootLockerGooglePlayGamesSessionRequest
@@ -316,10 +351,12 @@ namespace LootLocker.Requests
         public string game_api_key => LootLockerConfig.current.apiKey;
         public string auth_code { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGooglePlayGamesSessionRequest(string authCode)
+        public LootLockerGooglePlayGamesSessionRequest(string authCode, LootLockerSessionOptionals optionals = null)
         {
             this.auth_code = authCode;
+            this.optionals = optionals;
         }
     }
 
@@ -328,10 +365,12 @@ namespace LootLocker.Requests
         public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGooglePlayGamesRefreshSessionRequest(string refreshToken)
+        public LootLockerGooglePlayGamesRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
     }
 
@@ -340,10 +379,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string apple_authorization_code { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleSignInSessionRequest(string apple_authorization_code)
+        public LootLockerAppleSignInSessionRequest(string apple_authorization_code, LootLockerSessionOptionals optionals = null)
         {
             this.apple_authorization_code = apple_authorization_code;
+            this.optionals = optionals;
         }
     }
 
@@ -352,10 +393,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleRefreshSessionRequest(string refresh_token)
+        public LootLockerAppleRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
         }
     }
 
@@ -369,8 +412,9 @@ namespace LootLocker.Requests
         public string signature { get; private set; }
         public string salt { get; private set; }
         public long timestamp { get; private set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleGameCenterSessionRequest(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp)
+        public LootLockerAppleGameCenterSessionRequest(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, LootLockerSessionOptionals optionals = null)
         {
             this.bundle_id = bundleId;
             this.player_id = playerId;
@@ -378,6 +422,7 @@ namespace LootLocker.Requests
             this.signature = signature;
             this.salt = salt;
             this.timestamp = timestamp;
+            this.optionals = optionals;
         }
     }
 
@@ -386,10 +431,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         public string refresh_token { get; private set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleGameCenterRefreshSessionRequest(string refreshToken)
+        public LootLockerAppleGameCenterRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
     }
     public class LootLockerDiscordSessionRequest
@@ -397,10 +444,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string access_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerDiscordSessionRequest(string accessToken)
+        public LootLockerDiscordSessionRequest(string accessToken, LootLockerSessionOptionals optionals = null)
         {
             this.access_token = accessToken;
+            this.optionals = optionals;
         }
     }
 
@@ -409,10 +458,12 @@ namespace LootLocker.Requests
         public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerDiscordRefreshSessionRequest(string refreshToken)
+        public LootLockerDiscordRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
     }
 
