@@ -4966,8 +4966,10 @@ namespace LootLocker.Requests
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this Request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
         /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this Request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
+        /// <param name="orderBy">(Optional) Order the list by a specific field. Default is unordered.</param>
+        /// <param name="orderDirection">(Optional) Order the list in ascending or descending order. Default is unordered.</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the Request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ListAssets(LootLockerListAssetsRequest Request, Action<LootLockerListAssetsResponse> onComplete, int PerPage = 0, int Page = 0, string forPlayerWithUlid = null)
+        public static void ListAssets(LootLockerListAssetsRequest Request, Action<LootLockerListAssetsResponse> onComplete, int PerPage = 0, int Page = 0, OrderAssetListBy orderBy = OrderAssetListBy.none, OrderAssetListDirection orderDirection = OrderAssetListDirection.none, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4980,6 +4982,10 @@ namespace LootLocker.Requests
                 queryParams.Add("page", Page.ToString());
             if (PerPage > 0)
                 queryParams.Add("per_page", PerPage.ToString());
+            if (orderBy != OrderAssetListBy.none)
+                queryParams.Add("order_by", orderBy.ToString());
+            if (orderDirection != OrderAssetListDirection.none)
+                queryParams.Add("order_direction", orderDirection.ToString());
 
             string endPoint = LootLockerEndPoints.ListAssets.endPoint + queryParams.Build();
 
