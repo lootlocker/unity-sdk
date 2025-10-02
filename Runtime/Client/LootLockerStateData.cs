@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using LootLocker.Requests;
-using UnityEngine;
 
 namespace LootLocker
 {
@@ -40,6 +38,23 @@ namespace LootLocker
         }
 
         //==================================================
+        // Writer
+        //==================================================
+        private static ILootLockerStateWriter _stateWriter =
+            #if LOOTLOCKER_DISABLE_PLAYERPREFS
+                new LootLockerNullStateWriter();
+            #else
+                new LootLockerPlayerPrefsStateWriter();
+            #endif
+        public static void overrideStateWriter(ILootLockerStateWriter newWriter)
+        {
+            if (newWriter != null)
+            {
+                _stateWriter = newWriter;
+            }
+        }
+
+        //==================================================
         // Constants
         //==================================================
         private const string BaseSaveSlot = "LootLocker";
@@ -65,7 +80,7 @@ namespace LootLocker
             }
 
             // Load from player prefs
-            string metadataAsString = PlayerPrefs.GetString(MetaDataSaveSlot, "{}");
+            string metadataAsString = _stateWriter.GetString(MetaDataSaveSlot, "{}");
             if (!LootLockerJson.TryDeserializeObject(metadataAsString, out ActiveMetaData))
             {
                 ActiveMetaData = new LootLockerStateMetaData();
@@ -83,8 +98,7 @@ namespace LootLocker
         private static void SaveMetaDataToPlayerPrefs()
         {
             string metadataJson = LootLockerJson.SerializeObject(ActiveMetaData);
-            PlayerPrefs.SetString(MetaDataSaveSlot, metadataJson);
-            PlayerPrefs.Save();
+            _stateWriter.SetString(MetaDataSaveSlot, metadataJson);
         }
 
         private static void SavePlayerDataToPlayerPrefs(string playerULID)
@@ -95,8 +109,7 @@ namespace LootLocker
             }
 
             string playerDataJson = LootLockerJson.SerializeObject(playerData);
-            PlayerPrefs.SetString($"{PlayerDataSaveSlot}_{playerULID}", playerDataJson);
-            PlayerPrefs.Save();
+            _stateWriter.SetString($"{PlayerDataSaveSlot}_{playerULID}", playerDataJson);
         }
 
         private static bool LoadPlayerDataFromPlayerPrefs(string playerULID)
@@ -111,7 +124,7 @@ namespace LootLocker
                 return false;
             }
 
-            string playerDataJson = PlayerPrefs.GetString($"{PlayerDataSaveSlot}_{playerULID}");
+            string playerDataJson = _stateWriter.GetString($"{PlayerDataSaveSlot}_{playerULID}");
             if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
             {
                 return false;
@@ -134,7 +147,7 @@ namespace LootLocker
         //==================================================
         public static bool SaveStateExistsForPlayer(string playerULID)
         {
-            return PlayerPrefs.HasKey($"{PlayerDataSaveSlot}_{playerULID}");
+            return _stateWriter.HasKey($"{PlayerDataSaveSlot}_{playerULID}");
         }
 
         public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
@@ -159,7 +172,7 @@ namespace LootLocker
                 return data;
             }
 
-            string playerDataJson = PlayerPrefs.GetString($"{PlayerDataSaveSlot}_{playerULID}");
+            string playerDataJson = _stateWriter.GetString($"{PlayerDataSaveSlot}_{playerULID}");
             if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
             {
                 return new LootLockerPlayerData();
@@ -273,8 +286,7 @@ namespace LootLocker
             }
 
             ActivePlayerData.Remove(playerULID);
-            PlayerPrefs.DeleteKey($"{PlayerDataSaveSlot}_{playerULID}");
-            PlayerPrefs.Save();
+            _stateWriter.DeleteKey($"{PlayerDataSaveSlot}_{playerULID}");
 
             LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData != null)
