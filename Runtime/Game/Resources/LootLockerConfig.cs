@@ -173,32 +173,6 @@ namespace LootLocker
         }
 #endif
 
-        [Obsolete("This method has been deprecated, please use CreateNewSettings(string, string, string, LootLockerLogger.LogLevel, bool, bool) instead.")] // Deprecation date 20250224
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerConfig.DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
-        {
-            bool logErrorsAsWarnings = false;
-            LootLockerLogger.LogLevel logLevel;
-            switch (debugLevel)
-            {
-                case DebugLevel.Off:
-                    logLevel = LootLockerLogger.LogLevel.None;
-                    break;
-                case DebugLevel.ErrorOnly:
-                    logLevel = LootLockerLogger.LogLevel.Error;
-                    break;
-                case DebugLevel.AllAsNormal:
-                    logLevel = LootLockerLogger.LogLevel.Info;
-                    logErrorsAsWarnings = true;
-                    break;
-                case DebugLevel.All:
-                case DebugLevel.NormalOnly:
-                default:
-                    logLevel = LootLockerLogger.LogLevel.Info;
-                    break;
-            }
-            return CreateNewSettings(apiKey, gameVersion, domainKey, logLevel, logErrorsAsWarnings, allowTokenRefresh: allowTokenRefresh);
-        }
-
         public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false)
         {
             _current = Get();
@@ -210,11 +184,6 @@ namespace LootLocker
             _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
-#pragma warning disable CS0618 // Deprecated properties used
-            _current.token = null;
-            _current.refreshToken = null;
-            _current.deviceID = null;
-#pragma warning restore CS0618 // Deprecated properties used
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
@@ -232,11 +201,6 @@ namespace LootLocker
             _current.logLevel = LootLockerLogger.LogLevel.Info;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
-#pragma warning disable CS0618 // Deprecated properties used
-            _current.token = null;
-            _current.refreshToken = null;
-            _current.deviceID = null;
-#pragma warning restore CS0618 // Deprecated properties used
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
@@ -277,18 +241,9 @@ namespace LootLocker
 #if UNITY_EDITOR
         [HideInInspector] public string adminToken = null;
 #endif
-        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
-        [HideInInspector] public string token;
-        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
-        [HideInInspector] public string refreshToken;
         [HideInInspector] public string domainKey;
         public string game_version = "1.0.0.0";
         [HideInInspector] public string sdk_version = "";
-        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
-        [HideInInspector] public string deviceID = "defaultPlayerId";
-        [Obsolete("This field has been deprecated in favor of LootLockerPlayerData")] // Deprecation date 20250404
-        [HideInInspector] public string playerULID = null;
-
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
         [HideInInspector] private static string UrlCoreOverride =
@@ -316,10 +271,6 @@ namespace LootLocker
         [HideInInspector] public string userUrl = UrlProtocol + GetUrlCore() + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
-        [Obsolete] // Deprecation date 20250224
-        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
-        [Obsolete] // Deprecation date 20250224
-        public DebugLevel currentDebugLevel = DebugLevel.All;
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
         public bool logErrorsAsWarnings = false;
         public bool logInBuilds = false;
