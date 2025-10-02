@@ -459,7 +459,7 @@ namespace LootLocker
 
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
 
-            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
+            if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
                 if (ShouldRefreshSession(executionItem.WebRequest.responseCode, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
                 {
@@ -723,14 +723,14 @@ namespace LootLocker
 
         #region Session Refresh Helper Methods
 
-        private static bool ShouldRetryRequest(long statusCode, int timesRetried, LL_AuthPlatforms platform)
+        private static bool ShouldRetryRequest(long statusCode, int timesRetried)
         {
-            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && LootLockerConfig.current.allowTokenRefresh && platform != LL_AuthPlatforms.Steam && timesRetried < configuration.MaxRetries;
+            return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && timesRetried < configuration.MaxRetries;
         }
 
         private static bool ShouldRefreshSession(long statusCode, LL_AuthPlatforms platform)
         {
-            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && platform != LL_AuthPlatforms.Steam;
+            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && !new List<LL_AuthPlatforms>{ LL_AuthPlatforms.Steam, LL_AuthPlatforms.NintendoSwitch, LL_AuthPlatforms.None }.Contains(platform);
         }
 
         private static bool IsAuthorizedRequest(LootLockerHTTPExecutionQueueItem request)
