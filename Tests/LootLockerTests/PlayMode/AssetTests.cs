@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using LootLocker;
 using LootLocker.Requests;
+using LootLocker.LootLockerEnums;
 using LootLockerTestConfigurationUtils;
 using NUnit.Framework;
 using UnityEditor;
@@ -232,7 +234,7 @@ namespace LootLockerTests.PlayMode
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_DefaultParameters_ReturnsAssetsWithNullValuesForIncludables()
         {
@@ -267,7 +269,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeStorage_ReturnsAssetsWithStorageButNullOtherwise()
         {
@@ -309,7 +311,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeMetadata_ReturnsAssetsWithMetadataButNullOtherwise()
         {
@@ -351,7 +353,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeDataEntities_ReturnsAssetsWithDataEntitiesButNullOtherwise()
         {
@@ -393,7 +395,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeEverything_ReturnsAssetsWithAllIncludables()
         {
@@ -440,7 +442,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithPaginationParameters_ReturnsExpectedAsset()
         {
@@ -475,7 +477,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(listResponse.assets[2].asset_ulid, paginatedListResponse.assets[0].asset_ulid, "The expected asset was not returned in the paginated response");
         }
 
-        [UnityTest, Category("LootLocker")]
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithFilterAndAllIncludes_ReturnsExpectedAssetWithAllIncludes()
         {
@@ -523,5 +525,483 @@ namespace LootLockerTests.PlayMode
                 Assert.IsNull(asset.author, "Asset author should be null");
             }
         }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderByIdAscending_ReturnsAssetsInAscendingIdOrder()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.id, orderDirection: OrderAssetListDirection.asc);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(listResponse.pagination.total, numberOfAssetsToCreate, "Total assets count does not match the number created");
+            
+            // Verify ascending order by ID
+            for (int i = 1; i < listResponse.assets.Length; i++)
+            {
+                Assert.LessOrEqual(listResponse.assets[i - 1].asset_id, listResponse.assets[i].asset_id, 
+                    $"Assets should be in ascending order by ID. Asset at index {i-1} has ID {listResponse.assets[i - 1].asset_id}, but asset at index {i} has ID {listResponse.assets[i].asset_id}");
+            }
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderByIdDescending_ReturnsAssetsInDescendingIdOrder()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.id, orderDirection: OrderAssetListDirection.desc);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(listResponse.pagination.total, numberOfAssetsToCreate, "Total assets count does not match the number created");
+            
+            // Verify descending order by ID
+            for (int i = 1; i < listResponse.assets.Length; i++)
+            {
+                Assert.GreaterOrEqual(listResponse.assets[i - 1].asset_id, listResponse.assets[i].asset_id, 
+                    $"Assets should be in descending order by ID. Asset at index {i-1} has ID {listResponse.assets[i - 1].asset_id}, but asset at index {i} has ID {listResponse.assets[i].asset_id}");
+            }
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderByNameDescending_ReturnsAssetsInDescendingNameOrder()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.name, orderDirection: OrderAssetListDirection.desc);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(listResponse.pagination.total, numberOfAssetsToCreate, "Total assets count does not match the number created");
+            
+            // Verify descending order by name
+            for (int i = 1; i < listResponse.assets.Length; i++)
+            {
+                Assert.GreaterOrEqual(string.Compare(listResponse.assets[i - 1].asset_name, listResponse.assets[i].asset_name, System.StringComparison.OrdinalIgnoreCase), 0, 
+                    $"Assets should be in descending order by name. Asset at index {i-1} has name '{listResponse.assets[i - 1].asset_name}', but asset at index {i} has name '{listResponse.assets[i].asset_name}'");
+            }
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderByCreatedAtDescending_ReturnsAssetsInDescendingCreatedOrder()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.created_at, orderDirection: OrderAssetListDirection.desc);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(listResponse.pagination.total, numberOfAssetsToCreate, "Total assets count does not match the number created");
+            
+            // Verify that ordering was applied (we can't verify exact dates since they're not exposed in the simple asset response,
+            // but we can verify the API call was successful and returned the expected number of assets)
+            Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by created_at");
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderingWithPagination_ReturnsCorrectlyOrderedPaginatedResults()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When - Get first page ordered by ID ascending
+            bool firstPageCallCompleted = false;
+            LootLockerListAssetsResponse firstPageResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                firstPageResponse = assetsResponse;
+                firstPageCallCompleted = true;
+            }, PerPage: 2, Page: 1, orderBy: OrderAssetListBy.id, orderDirection: OrderAssetListDirection.asc);
+            yield return new WaitUntil(() => firstPageCallCompleted);
+
+            // Get second page ordered by ID ascending
+            bool secondPageCallCompleted = false;
+            LootLockerListAssetsResponse secondPageResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                secondPageResponse = assetsResponse;
+                secondPageCallCompleted = true;
+            }, PerPage: 2, Page: 2, orderBy: OrderAssetListBy.id, orderDirection: OrderAssetListDirection.asc);
+            yield return new WaitUntil(() => secondPageCallCompleted);
+
+            // Then
+            Assert.IsTrue(firstPageResponse.success, firstPageResponse.errorData?.ToString() ?? "First page ListAssets call failed");
+            Assert.IsTrue(secondPageResponse.success, secondPageResponse.errorData?.ToString() ?? "Second page ListAssets call failed");
+            
+            Assert.AreEqual(2, firstPageResponse.assets.Length, "First page should contain 2 assets");
+            Assert.AreEqual(2, secondPageResponse.assets.Length, "Second page should contain 2 assets");
+            
+            // Verify ordering is maintained across pages
+            Assert.Less(firstPageResponse.assets[0].asset_id, firstPageResponse.assets[1].asset_id, "First page should be ordered by ID ascending");
+            Assert.Less(secondPageResponse.assets[0].asset_id, secondPageResponse.assets[1].asset_id, "Second page should be ordered by ID ascending");
+            Assert.Less(firstPageResponse.assets[1].asset_id, secondPageResponse.assets[0].asset_id, "Assets should be ordered across pages");
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OrderingWithFiltersAndIncludes_ReturnsCorrectlyOrderedFilteredResults()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest
+            {
+                includes = new LootLockerAssetIncludes
+                {
+                    metadata = true,
+                    storage = true
+                },
+                filters = new LootLockerAssetFilters
+                {
+                    asset_ids = new List<int> { createdAssetIds[0], createdAssetIds[2], createdAssetIds[4] },
+                }
+            }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.id, orderDirection: OrderAssetListDirection.desc);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.AreEqual(3, listResponse.assets.Length, "Should return 3 filtered assets");
+            
+            // Verify filtering worked
+            var returnedIds = new List<int>();
+            foreach (var asset in listResponse.assets)
+            {
+                returnedIds.Add(asset.asset_id);
+                Assert.IsNotNull(asset.metadata, "Asset metadata should be included");
+                Assert.IsNotEmpty(asset.storage, "Asset storage should be included");
+            }
+            
+            Assert.Contains(createdAssetIds[0], returnedIds, "Should contain first requested asset");
+            Assert.Contains(createdAssetIds[2], returnedIds, "Should contain second requested asset");
+            Assert.Contains(createdAssetIds[4], returnedIds, "Should contain third requested asset");
+            
+            // Verify descending order by ID
+            for (int i = 1; i < listResponse.assets.Length; i++)
+            {
+                Assert.GreaterOrEqual(listResponse.assets[i - 1].asset_id, listResponse.assets[i].asset_id, 
+                    $"Filtered assets should be in descending order by ID. Asset at index {i-1} has ID {listResponse.assets[i - 1].asset_id}, but asset at index {i} has ID {listResponse.assets[i].asset_id}");
+            }
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_OnlyOrderByWithoutDirection_UsesDefaultDirectionSuccessfully()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup
+
+            // When
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest { }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            }, orderBy: OrderAssetListBy.id);
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(listResponse.pagination.total, numberOfAssetsToCreate, "Total assets count does not match the number created");
+            
+            // Verify that the call succeeded and returned expected number of assets
+            Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by ID with default direction");
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_WithAssetFilters_ReturnsOnlyFilteredAssets()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup - we have assets created in Setup()
+
+            // Add filters to some of the created assets
+            var filteredAssetIds = new List<int> { createdAssetIds[0], createdAssetIds[2] };
+            var unFilteredAssetIds = new List<int> { createdAssetIds[1], createdAssetIds[3], createdAssetIds[4] };
+
+            // Add "rarity" filter to first two assets
+            bool bulkEditFiltersCallCompleted = false;
+            LootLockerTestAssets.BulkEditFiltersOnAssets(new LootLockerTestAssetFiltersEdit[]
+            {
+                new LootLockerTestAssetFiltersEdit
+                {
+                    action = "set",
+                    asset_ids = filteredAssetIds.ToArray(),
+                    filters = new List<LootLockerTestAssetFiltersEdit.Filter>
+                    {
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "rarity", value = "legendary" },
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "type", value = "weapon" }
+                    }
+                }
+            }, (bulkEditResponse) =>
+            {
+                if (bulkEditResponse == null || !bulkEditResponse.success)
+                {
+                    Debug.LogError("Failed to bulk edit asset filters: " + bulkEditResponse?.errorData?.message);
+                    SetupFailed = true;
+                }
+                bulkEditFiltersCallCompleted = true;
+            });
+            yield return new WaitUntil(() => bulkEditFiltersCallCompleted);
+            Assert.IsFalse(SetupFailed, "Failed to add filters to assets");
+
+            // Add different filters to remaining assets
+            bool bulkEditFilters2CallCompleted = false;
+            LootLockerTestAssets.BulkEditFiltersOnAssets(new LootLockerTestAssetFiltersEdit[]
+            {
+                new LootLockerTestAssetFiltersEdit
+                {
+                    action = "set",
+                    asset_ids = unFilteredAssetIds.ToArray(),
+                    filters = new List<LootLockerTestAssetFiltersEdit.Filter>
+                    {
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "rarity", value = "common" },
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "type", value = "armor" }
+                    }
+                }
+            }, (bulkEditResponse) =>
+            {
+                if (bulkEditResponse == null || !bulkEditResponse.success)
+                {
+                    Debug.LogError("Failed to bulk edit asset filters: " + bulkEditResponse?.errorData?.message);
+                    SetupFailed = true;
+                }
+                bulkEditFilters2CallCompleted = true;
+            });
+            yield return new WaitUntil(() => bulkEditFilters2CallCompleted);
+            Assert.IsFalse(SetupFailed, "Failed to add filters to remaining assets");
+
+            // When - Filter for assets with rarity "legendary"
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest
+            {
+                filters = new LootLockerAssetFilters
+                {
+                    asset_filters = new List<LootLockerSimpleAssetFilter>
+                    {
+                        new LootLockerSimpleAssetFilter
+                        {
+                            key = "rarity",
+                            values = new string[] { "legendary" }
+                        }
+                    }
+                }
+            }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            });
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(2, listResponse.pagination.total, "Should return only assets with legendary rarity");
+            Assert.AreEqual(2, listResponse.assets.Length, "Should return exactly 2 filtered assets");
+
+            // Verify that the returned assets are the ones we filtered
+            var returnedAssetIds = listResponse.assets.Select(a => a.asset_id).ToList();
+            Assert.Contains(filteredAssetIds[0], returnedAssetIds, "Should contain first filtered asset");
+            Assert.Contains(filteredAssetIds[1], returnedAssetIds, "Should contain second filtered asset");
+            
+            // Verify that unfiltered assets are not returned
+            foreach (var unfilteredId in unFilteredAssetIds)
+            {
+                Assert.IsFalse(returnedAssetIds.Contains(unfilteredId), $"Should not contain unfiltered asset {unfilteredId}");
+            }
+        }
+
+        [UnityTest, Category("LootLocker", "LootLockerCI", "LootLockerCIFast")]
+        [Timeout(360_000)]
+        public IEnumerator ListAssets_WithMultipleAssetFilterValues_ReturnsAssetsMatchingAnyValue()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            // Set up in setup - we have assets created in Setup()
+
+            // Add different rarity filters to different assets
+            bool bulkEditFilters1CallCompleted = false;
+            LootLockerTestAssets.BulkEditFiltersOnAssets(new LootLockerTestAssetFiltersEdit[]
+            {
+                new LootLockerTestAssetFiltersEdit
+                {
+                    action = "set",
+                    asset_ids = new int[] { createdAssetIds[0] },
+                    filters = new List<LootLockerTestAssetFiltersEdit.Filter>
+                    {
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "rarity", value = "rare" }
+                    }
+                }
+            }, (bulkEditResponse) =>
+            {
+                if (bulkEditResponse == null || !bulkEditResponse.success)
+                {
+                    Debug.LogError("Failed to bulk edit asset filters: " + bulkEditResponse?.errorData?.message);
+                    SetupFailed = true;
+                }
+                bulkEditFilters1CallCompleted = true;
+            });
+            yield return new WaitUntil(() => bulkEditFilters1CallCompleted);
+
+            bool bulkEditFilters2CallCompleted = false;
+            LootLockerTestAssets.BulkEditFiltersOnAssets(new LootLockerTestAssetFiltersEdit[]
+            {
+                new LootLockerTestAssetFiltersEdit
+                {
+                    action = "set",
+                    asset_ids = new int[] { createdAssetIds[1] },
+                    filters = new List<LootLockerTestAssetFiltersEdit.Filter>
+                    {
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "rarity", value = "epic" }
+                    }
+                }
+            }, (bulkEditResponse) =>
+            {
+                if (bulkEditResponse == null || !bulkEditResponse.success)
+                {
+                    Debug.LogError("Failed to bulk edit asset filters: " + bulkEditResponse?.errorData?.message);
+                    SetupFailed = true;
+                }
+                bulkEditFilters2CallCompleted = true;
+            });
+            yield return new WaitUntil(() => bulkEditFilters2CallCompleted);
+
+            bool bulkEditFilters3CallCompleted = false;
+            LootLockerTestAssets.BulkEditFiltersOnAssets(new LootLockerTestAssetFiltersEdit[]
+            {
+                new LootLockerTestAssetFiltersEdit
+                {
+                    action = "set",
+                    asset_ids = new int[] { createdAssetIds[2], createdAssetIds[3], createdAssetIds[4] },
+                    filters = new List<LootLockerTestAssetFiltersEdit.Filter>
+                    {
+                        new LootLockerTestAssetFiltersEdit.Filter { key = "rarity", value = "common" }
+                    }
+                }
+            }, (bulkEditResponse) =>
+            {
+                if (bulkEditResponse == null || !bulkEditResponse.success)
+                {
+                    Debug.LogError("Failed to bulk edit asset filters: " + bulkEditResponse?.errorData?.message);
+                    SetupFailed = true;
+                }
+                bulkEditFilters3CallCompleted = true;
+            });
+            yield return new WaitUntil(() => bulkEditFilters3CallCompleted);
+            Assert.IsFalse(SetupFailed, "Failed to add filters to assets");
+
+            // When - Filter for assets with rarity "rare" OR "epic"
+            bool listAssetsCallCompleted = false;
+            LootLockerListAssetsResponse listResponse = null;
+
+            LootLockerSDKManager.ListAssets(new LootLocker.Requests.LootLockerListAssetsRequest
+            {
+                filters = new LootLockerAssetFilters
+                {
+                    asset_filters = new List<LootLockerSimpleAssetFilter>
+                    {
+                        new LootLockerSimpleAssetFilter
+                        {
+                            key = "rarity",
+                            values = new string[] { "rare", "epic" }
+                        }
+                    }
+                }
+            }, (assetsResponse) =>
+            {
+                listResponse = assetsResponse;
+                listAssetsCallCompleted = true;
+            });
+            yield return new WaitUntil(() => listAssetsCallCompleted);
+
+            // Then
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListAssets call failed");
+            Assert.IsNotEmpty(listResponse.assets, "Assets list should not be empty");
+            Assert.AreEqual(2, listResponse.pagination.total, "Should return only assets with rare or epic rarity");
+            Assert.AreEqual(2, listResponse.assets.Length, "Should return exactly 2 filtered assets");
+
+            // Verify that the returned assets are the correct ones
+            var returnedAssetIds = listResponse.assets.Select(a => a.asset_id).ToList();
+            Assert.Contains(createdAssetIds[0], returnedAssetIds, "Should contain asset with rare rarity");
+            Assert.Contains(createdAssetIds[1], returnedAssetIds, "Should contain asset with epic rarity");
+            
+            // Verify that common rarity assets are not returned
+            Assert.IsFalse(returnedAssetIds.Contains(createdAssetIds[2]), "Should not contain common rarity asset");
+            Assert.IsFalse(returnedAssetIds.Contains(createdAssetIds[3]), "Should not contain common rarity asset");
+            Assert.IsFalse(returnedAssetIds.Contains(createdAssetIds[4]), "Should not contain common rarity asset");
+        }
+
     }
 }

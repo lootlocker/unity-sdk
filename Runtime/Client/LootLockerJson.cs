@@ -39,6 +39,24 @@ namespace LootLocker
             return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
         }
 
+        public static string SerializeObjectArray(object[] obj)
+        {
+            return SerializeObjectArray(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj, JsonSerializerSettings settings)
+        {
+            string jsonArray = "[";
+            for (int i = 0; i < obj.Length; i++)
+            {
+                jsonArray += JsonConvert.SerializeObject(obj[i], settings ?? LootLockerJsonSettings.Default);
+                if (i < obj.Length - 1)
+                    jsonArray += ",";
+            }
+            jsonArray += "]";
+            return jsonArray;
+        }
+
         public static T DeserializeObject<T>(string json)
         {
             return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
@@ -76,6 +94,24 @@ namespace LootLocker
         public static string SerializeObject(object obj, JsonOptions options)
         {
             return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj)
+        {
+            return SerializeObjectArray(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj, JsonOptions options)
+        {
+            string jsonArray = "[";
+            for (int i = 0; i < obj.Length; i++)
+            {
+                jsonArray += Json.Serialize(obj[i], options ?? LootLockerJsonSettings.Default);
+                if (i < obj.Length - 1)
+                    jsonArray += ",";
+            }
+            jsonArray += "]";
+            return jsonArray;
         }
 
         public static T DeserializeObject<T>(string json)

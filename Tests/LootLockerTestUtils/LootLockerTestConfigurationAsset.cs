@@ -152,6 +152,25 @@ namespace LootLockerTestConfigurationUtils
                 onComplete?.Invoke(updateResponse);
             }, true);
         }
+
+        public static void BulkEditFiltersOnAssets(LootLockerTestAssetFiltersEdit[] edits, Action<LootLockerResponse> onComplete)
+        {
+            if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+
+            var endpoint = LootLockerTestConfigurationEndpoints.bulkEditAssetFilters;
+
+            string json = LootLockerJson.SerializeObjectArray(edits);
+
+            LootLockerAdminRequest.Send(endpoint.endPoint, endpoint.httpMethod, json, onComplete: (serverResponse) =>
+            {
+                var response = LootLockerResponse.Deserialize<LootLockerResponse>(serverResponse);
+                onComplete?.Invoke(response);
+            }, true);
+        }
     }
 
     public class LootLockerTestAssetResponse : LootLockerResponse
@@ -232,5 +251,19 @@ namespace LootLockerTestConfigurationUtils
     {
         public int context_id { get; set; }
         public string name { get; set; }
+    }
+
+    public class LootLockerTestAssetFiltersEdit
+    {
+        public class Filter
+        {
+            public string key { get; set; }
+            public string value { get; set; }
+        }
+
+        public string action { get; set; } = "set";
+        public int[] asset_ids { get; set; }
+
+        public List<Filter> filters { get; set; } = new List<Filter>();
     }
 }
