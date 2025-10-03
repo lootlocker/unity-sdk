@@ -487,6 +487,7 @@ namespace LootLocker.Requests
             );
         }
 
+        //Stupid change
         /// <summary>
         /// Start a Amazon Luna session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
@@ -501,9 +502,9 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(null, 
-                LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
-                LootLockerJson.SerializeObject(new LootLockerSessionRequest(amazonLunaGuid, LL_AuthPlatforms.AmazonLuna)), 
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(amazonLunaGuid, LL_AuthPlatforms.AmazonLuna)),
                 (serverResponse) =>
                 {
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
@@ -528,7 +529,7 @@ namespace LootLocker.Requests
                     }
 
                     onComplete?.Invoke(response);
-                }, 
+                },
                 false);
         }
 
