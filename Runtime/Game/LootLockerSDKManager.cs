@@ -6227,6 +6227,101 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Redeem a purchase that was made successfully towards the Playstation Store for the current player
+        /// </summary>
+        /// <param name="transaction_id">The transaction id from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="auth_code">The authorization code from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="entitlement_label">The entitlement label configured in the NP service for the entitlement that this redemption relates to </param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="service_label">Optional: The NP service label. </param>
+        /// <param name="service_name">Optional: The abreviation of the service name of the ASM service ID service that was used when configuring the serviceIds. Possible Values: pssdc, cce. Default Value: pssdc </param>
+        /// <param name="environment">Optional: The id of the environment you wish to make the request against. Allowed values: 1, 8, 256 </param>
+        /// <param name="use_count">Optional: The use count for this redemption </param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemPlaystationStorePurchaseForPlayer(string transaction_id, string auth_code, string entitlement_label, Action<LootLockerResponse> onComplete, string service_label = "", string service_name = "", int environment = -1, int use_count = -1, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            Dictionary<string, object> bodyDict = new Dictionary<string, object>
+            {
+                { "transaction_id", transaction_id },
+                { "auth_code", auth_code },
+                { "entitlement_label", entitlement_label }
+            };
+            if (!string.IsNullOrEmpty(service_label))
+            {
+                bodyDict.Add("service_label", service_label);
+            }
+            if (!string.IsNullOrEmpty(service_name))
+            {
+                bodyDict.Add("service_name", service_name);
+            }
+            if (environment != -1)
+            {
+                bodyDict.Add("environment", environment);
+            }
+            if (use_count != -1)
+            {
+                bodyDict.Add("use_count", use_count);
+            }
+            var body = LootLockerJson.SerializeObject(bodyDict);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Playstation Store for a class that the current player owns
+        /// </summary>
+        /// <param name="transaction_id">The transaction id from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="auth_code">The authorization code from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="entitlement_label">The entitlement label configured in the NP service for the entitlement that this redemption relates to </param>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="service_label">Optional: The NP service label. </param>
+        /// <param name="service_name">Optional: The abreviation of the service name of the ASM service ID service that was used when configuring the serviceIds. Possible Values: pssdc, cce. Default Value: pssdc </param>
+        /// <param name="environment">Optional: The id of the environment you wish to make the request against. Allowed values: 1, 8, 256 </param>
+        /// <param name="use_count">Optional: The use count for this redemption </param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemPlaystationStorePurchaseForClass(string transaction_id, string auth_code, string entitlement_label, int classId, Action<LootLockerResponse> onComplete, string service_label = "", string service_name = "", int environment = -1, int use_count = -1, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            
+            Dictionary<string, object> bodyDict = new Dictionary<string, object>
+            {
+                { "transaction_id", transaction_id },
+                { "auth_code", auth_code },
+                { "entitlement_label", entitlement_label },
+                { "character_id", classId }
+            };
+            if (!string.IsNullOrEmpty(service_label))
+            {
+                bodyDict.Add("service_label", service_label);
+            }
+            if (!string.IsNullOrEmpty(service_name))
+            {
+                bodyDict.Add("service_name", service_name);
+            }
+            if (environment != -1)
+            {
+                bodyDict.Add("environment", environment);
+            }
+            if (use_count != -1)
+            {
+                bodyDict.Add("use_count", use_count);
+            }
+            var body = LootLockerJson.SerializeObject(bodyDict);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
         /// 
         /// Steam in-app purchases need to be configured for this to work
