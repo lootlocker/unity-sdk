@@ -609,7 +609,7 @@ namespace LootLocker
             {"Etc/GMT-14", "Line Islands Standard Time"},
         };
 
-        public static string ConvertWindowsToIana(string windowsTimezone)
+        public static string ConvertWindowsToIanaTzString(string windowsTimezone)
         {
             if (windowsTimezone == null)
             {
@@ -624,7 +624,7 @@ namespace LootLocker
             return "Etc/UTC";
         }
 
-        public static string ConvertIANAToWindows(string ianaTimezone)
+        public static string ConvertIANAToWindowsTzString(string ianaTimezone)
         {
             // Reverse dictionary for IANA to Windows
             var ianaToWindows = WindowsToIana.ToDictionary(x => x.Value, x => x.Key);
@@ -637,32 +637,103 @@ namespace LootLocker
             return "UTC";
         }
 
-        // Function to convert to IANA timezone
-        public static string ConvertToIana(string timezone)
+        public static bool isValidIanaTimezone(string timezone)
         {
-            if (string.IsNullOrEmpty(timezone))
-                return "Etc/UTC"; // Default fallback
-
-            // Check if it's already an IANA timezone
-            if (WindowsToIana.ContainsValue(timezone))
-                return timezone;
-
-            // Attempt to convert from Windows to IANA
-            return ConvertWindowsToIana(timezone);
+            return IanaToWindows.ContainsKey(timezone);
         }
 
-        // Function to convert to Windows timezone
-        public static string ConvertToWindows(string timezone)
+        public static bool isValidWindowsTimezone(string timezone)
+        {
+            return WindowsToIana.ContainsKey(timezone);
+        }
+
+        public static string convertUTCOffsetToIanaTzString(int utcOffset)
+        {
+            utcOffset = Math.Clamp(utcOffset, -12, 14);
+            if (utcOffset < 0)
+            {
+                return $"Etc/GMT+{Math.Abs(utcOffset)}"; // Note the reversed sign for Etc/GMT
+            }
+            else if (utcOffset > 0)
+            {
+                return $"Etc/GMT-{utcOffset}"; // Note the reversed sign for Etc/GMT
+            }
+            else // utcOffset == 0
+            {
+                return "Etc/UTC";
+            }
+        }
+
+        public static string convertGMTOffsetToIanaTzString(int gmtOffset)
+        {
+            gmtOffset = Math.Clamp(gmtOffset, -14, 12);
+            if (gmtOffset < 0)
+            {
+                return $"Etc/GMT-{Math.Abs(gmtOffset)}";
+            }
+            else if (gmtOffset > 0)
+            {
+                return $"Etc/GMT+{gmtOffset}";
+            }
+            else // gmtOffset == 0
+            {
+                return "Etc/UTC";
+            }
+        }
+
+        public static bool TryConvertStringToIanaTzString(string timezone, out string ianaTimezone)
         {
             if (string.IsNullOrEmpty(timezone))
-                return "UTC"; // Default fallback
+            {
+                ianaTimezone = "Etc/UTC"; // Default fallback
+                return false;
+            }
 
-            // Check if it's already a Windows timezone
-            if (WindowsToIana.ContainsKey(timezone))
-                return timezone;
+            if(int.TryParse(timezone, out int offset))
+            {
+                ianaTimezone = convertUTCOffsetToIanaTzString(offset);
+                return true;
+            }
+            else if (isValidIanaTimezone(timezone))
+            {
+                ianaTimezone = timezone;
+                return true;
+            }
+            else if (isValidWindowsTimezone(timezone))
+            {
+                ianaTimezone = ConvertWindowsToIana(timezone);
+                return true;
+            }
+            else
+            {
+                ianaTimezone = "Etc/UTC"; // Default fallback
+                return false;
+            }
+        }
 
-            // Attempt to convert from IANA to Windows
-            return ConvertIANAToWindows(timezone);
+        public static bool TryConvertStringToWindowsTzString(string timezone, out string windowsTimezone)
+        {
+            if (string.IsNullOrEmpty(timezone))
+            {
+                windowsTimezone = "UTC"; // Default fallback
+                return false;
+            }
+            
+            else if (isValidIanaTimezone(timezone))
+            {
+                windowsTimezone = ConvertIANAToWindows(timezone);
+                return true;
+            }
+            else if (isValidWindowsTimezone(timezone))
+            {
+                windowsTimezone = timezone;
+                return true;
+            }
+            else
+            {
+                windowsTimezone = "UTC"; // Default fallback
+                return false;
+            }
         }
     }
 }
