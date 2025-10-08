@@ -6226,6 +6226,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+#if LOOTLOCKER_BETA_PLAYSTATION_IAP
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Playstation Store for the current player
         /// </summary>
@@ -6320,6 +6321,7 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+#endif
 
         /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
