@@ -193,10 +193,6 @@ namespace LootLocker.Requests
         /// A list of cronologically ordered broadcasts
         /// </summary>
         public __LootLockerInternalBroadcast[] broadcasts { get; set; }
-        /// <summary>
-        /// Pagination information for the request
-        /// </summary>
-        public LootLockerExtendedPagination pagination { get; set; }
     };
 
     /// <summary>
@@ -208,10 +204,6 @@ namespace LootLocker.Requests
         /// A list of cronologically ordered broadcasts
         /// </summary>
         public LootLockerBroadcast[] broadcasts { get; set; }
-        /// <summary>
-        /// Pagination information for the request
-        /// </summary>
-        public LootLockerExtendedPagination pagination { get; set; }
 
         public LootLockerListBroadcastsResponse()
         {
@@ -232,7 +224,6 @@ namespace LootLocker.Requests
             EventId = internalResponse.EventId;
             errorData = internalResponse.errorData;
             text = internalResponse.text;
-            pagination = internalResponse.pagination;
 
             if (internalResponse.broadcasts == null || internalResponse.broadcasts.Length == 0)
             {
