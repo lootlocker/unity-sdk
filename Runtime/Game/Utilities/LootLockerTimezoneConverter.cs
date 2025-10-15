@@ -701,7 +701,7 @@ namespace LootLocker
             }
             else if (isValidWindowsTimezone(timezone))
             {
-                ianaTimezone = ConvertWindowsToIana(timezone);
+                ianaTimezone = ConvertWindowsToIanaTzString(timezone);
                 return true;
             }
             else
@@ -721,7 +721,7 @@ namespace LootLocker
             
             else if (isValidIanaTimezone(timezone))
             {
-                windowsTimezone = ConvertIANAToWindows(timezone);
+                windowsTimezone = ConvertIANAToWindowsTzString(timezone);
                 return true;
             }
             else if (isValidWindowsTimezone(timezone))

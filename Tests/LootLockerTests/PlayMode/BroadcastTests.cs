@@ -23,9 +23,6 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsNotNull(broadcastResponse);
             Assert.IsNotEmpty(broadcastResponse.broadcasts);
-            Assert.IsNotNull(broadcastResponse.pagination);
-            Assert.AreEqual(1, broadcastResponse.pagination.total);
-            Assert.AreEqual(1, broadcastResponse.pagination.current_page);
             Assert.AreEqual(1, broadcastResponse.broadcasts.Length);
             Assert.AreEqual("01K4QGQTNHTXHM9ET5238NB4NF", broadcastResponse.broadcasts[0].id);
             Assert.AreEqual("Broadcast no 5", broadcastResponse.broadcasts[0].name);

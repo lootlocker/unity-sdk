@@ -8381,7 +8381,7 @@ namespace LootLocker.Requests
 
         #region Broadcasts
         /// <summary>
-        /// List broadcasts for this game with default localisation and pagination settings
+        /// List broadcasts for this game with default localisation and limit
         /// </summary>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
@@ -8397,7 +8397,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// List broadcasts for this game with specified localisation and default pagination settings
+        /// List broadcasts for this game with specified localisation and default limit
         /// </summary>
         /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
@@ -8427,11 +8427,10 @@ namespace LootLocker.Requests
         /// List broadcasts for this game
         /// </summary>
         /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
-        /// <param name="per_page">Used for pagination, this is the number of broadcasts to retrieve per page.</param>
-        /// <param name="page">Used for pagination, this is the page number to retrieve.</param>
+        /// <param name="limit">Limit the number of broadcasts returned.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ListBroadcasts(string[] languages, int per_page, int page, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        public static void ListBroadcasts(string[] languages, int limit, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -8442,10 +8441,8 @@ namespace LootLocker.Requests
             var endpoint = LootLockerEndPoints.ListBroadcasts.endPoint;
 
             var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
-            if (per_page > 0)
-                queryParams.Add("per_page", per_page);
-            if (page > 0)
-                queryParams.Add("page", page);
+            if (limit > 0)
+                queryParams.Add("limit", limit);
 
             endpoint += queryParams.Build();
 
