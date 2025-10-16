@@ -772,4 +772,319 @@ namespace LootLocker.Requests
             return inlinedEntries.ToArray();
         }
     }
+
+    /// <summary>
+    /// </summary>
+    public class LootLockerListCatalogPricesV2Response : LootLockerResponse
+    {
+        /// <summary>
+        /// Details about the catalog that the prices is in
+        /// </summary>
+        public LootLockerCatalog catalog { get; set; }
+
+        /// <summary>
+        /// A list of entries available in this catalog
+        /// </summary>
+        public LootLockerCatalogEntry[] entries { get; set; }
+
+        /// <summary>
+        /// Lookup map for details about entities of entity type assets
+        /// </summary>
+        public Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails> asset_details { get; set; }
+
+        /// <summary>
+        /// Lookup map for details about entities of entity type progression_points
+        /// </summary>
+        public Dictionary<LootLockerItemDetailsKey, LootLockerProgressionPointDetails> progression_points_details
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Lookup map for details about entities of entity type progression_reset
+        /// </summary>
+        public Dictionary<LootLockerItemDetailsKey, LootLockerProgressionResetDetails> progression_resets_details
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Lookup map for details about entities of entity type currency
+        /// </summary>
+        public Dictionary<LootLockerItemDetailsKey, LootLockerCurrencyDetails> currency_details { get; set; }
+
+        /// <summary>
+        /// Lookup map for details about entities of entity type group
+        /// </summary>
+        public Dictionary<LootLockerItemDetailsKey, LootLockerGroupDetails> group_details { get; set; }
+
+        /// <summary>
+        /// Pagination data to use for subsequent requests
+        /// </summary>
+        public LootLockerExtendedPagination pagination { get; set; }
+
+        public void AppendCatalogItems(LootLockerListCatalogPricesV2Response catalogPrices)
+        {
+            var concatenatedArray = new LootLockerCatalogEntry[entries.Length + catalogPrices.entries.Length];
+            entries.CopyTo(concatenatedArray, 0);
+            catalogPrices.entries.CopyTo(concatenatedArray, entries.Length);
+            pagination.total = catalogPrices.pagination.total;
+            pagination.offset = catalogPrices.pagination.offset;
+            pagination.per_page = catalogPrices.pagination.per_page;
+            pagination.last_page = catalogPrices.pagination.last_page;
+            pagination.current_page = catalogPrices.pagination.current_page;
+            pagination.next_page = catalogPrices.pagination.next_page;
+            pagination.prev_page = catalogPrices.pagination.prev_page;
+            pagination.errors = catalogPrices.pagination.errors;
+
+            foreach (var assetDetail in catalogPrices.asset_details)
+            {
+                asset_details.Add(assetDetail.Key, assetDetail.Value);
+            }
+
+            foreach (var progressionPointDetail in catalogPrices.progression_points_details)
+            {
+                progression_points_details.Add(progressionPointDetail.Key, progressionPointDetail.Value);
+            }
+
+            foreach (var progressionResetDetail in catalogPrices.progression_resets_details)
+            {
+                progression_resets_details.Add(progressionResetDetail.Key, progressionResetDetail.Value);
+            }
+
+            foreach (var currencyDetail in catalogPrices.currency_details)
+            {
+                currency_details.Add(currencyDetail.Key, currencyDetail.Value);
+            }
+
+            foreach (var groupDetail in catalogPrices.group_details)
+            {
+                group_details.Add(groupDetail.Key, groupDetail.Value);
+            }
+
+        }
+
+        public LootLockerListCatalogPricesV2Response() { }
+
+        /// This is the way that the response actually looks, but we don't want to expose it, hence the conversion
+        private class LootLockerListCatalogItemsWithArraysResponse : LootLockerResponse
+        {
+            public LootLockerCatalog catalog { get; set; }
+            public LootLockerCatalogEntry[] entries { get; set; }
+            public LootLockerAssetDetails[] assets_details { get; set; }
+            public LootLockerProgressionPointDetails[] progression_points_details { get; set; }
+            public LootLockerProgressionResetDetails[] progression_resets_details { get; set; }
+            public LootLockerCurrencyDetails[] currency_details { get; set; }
+            public LootLockerGroupDetails[] group_details { get; set; }
+            public LootLockerExtendedPagination pagination { get; set; }
+        }
+
+        public LootLockerListCatalogPricesV2Response(LootLockerResponse serverResponse)
+        {
+            LootLockerListCatalogItemsWithArraysResponse parsedResponse =
+                Deserialize<LootLockerListCatalogItemsWithArraysResponse>(serverResponse);
+            success = parsedResponse.success;
+            statusCode = parsedResponse.statusCode;
+            text = parsedResponse.text;
+            errorData = parsedResponse.errorData;
+            if (!success)
+            {
+                return;
+            }
+
+            catalog = parsedResponse.catalog;
+            entries = parsedResponse.entries;
+            pagination = parsedResponse.pagination;
+
+            if (parsedResponse.assets_details != null && parsedResponse.assets_details.Length > 0)
+            {
+                asset_details = new Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails>();
+                foreach (var detail in parsedResponse.assets_details)
+                {
+                    asset_details[detail.GetItemDetailsKey()] = detail;
+                }
+            }
+
+            if (parsedResponse.progression_points_details != null &&
+                parsedResponse.progression_points_details.Length > 0)
+            {
+                progression_points_details = new Dictionary<LootLockerItemDetailsKey, LootLockerProgressionPointDetails>();
+                foreach (var detail in parsedResponse.progression_points_details)
+                {
+                    progression_points_details[detail.GetItemDetailsKey()] = detail;
+                }
+            }
+
+            if (parsedResponse.progression_resets_details != null &&
+                parsedResponse.progression_resets_details.Length > 0)
+            {
+                progression_resets_details = new Dictionary<LootLockerItemDetailsKey, LootLockerProgressionResetDetails>();
+                foreach (var detail in parsedResponse.progression_resets_details)
+                {
+                    progression_resets_details[detail.GetItemDetailsKey()] = detail;
+                }
+            }
+
+            if (parsedResponse.currency_details != null && parsedResponse.currency_details.Length > 0)
+            {
+                currency_details = new Dictionary<LootLockerItemDetailsKey, LootLockerCurrencyDetails>();
+                foreach (var detail in parsedResponse.currency_details)
+                {
+                    currency_details[detail.GetItemDetailsKey()] = detail;
+                }
+            }
+
+            if (parsedResponse.group_details != null && parsedResponse.group_details.Length > 0)
+            {
+                group_details = new Dictionary<LootLockerItemDetailsKey, LootLockerGroupDetails>();
+                foreach (var detail in parsedResponse.group_details)
+                {
+                    group_details[detail.GetItemDetailsKey()] = detail;
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
+        {
+
+            /// <summary>
+            /// Asset details inlined for this catalog entry, will be null if the entity_kind is not asset
+            /// </summary>
+            public LootLockerAssetDetails asset_details { get; set; }
+
+            /// <summary>
+            /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
+            /// </summary>
+            public LootLockerProgressionPointDetails progression_point_details { get; set; }
+
+            /// <summary>
+            /// Progression reset details inlined for this catalog entry, will be null if the entity_kind is not progression_reset
+            /// </summary>
+            public LootLockerProgressionResetDetails progression_reset_details { get; set; }
+
+            /// <summary>
+            /// Currency details inlined for this catalog entry, will be null if the entity_kind is not currency
+            /// </summary>
+            public LootLockerCurrencyDetails currency_details { get; set; }
+
+            /// <summary>
+            /// Group details inlined for this catalog entry, will be null if the entity_kind is not group
+            /// </summary>
+            public LootLockerInlinedGroupDetails group_details { get; set; }
+
+            public LootLockerInlinedCatalogEntry(LootLockerCatalogEntry entry, LootLockerListCatalogPricesV2Response catalogListing)
+            {
+                created_at = entry.created_at;
+                entity_kind = entry.entity_kind;
+                entity_name = entry.entity_name;
+                entity_id = entry.entity_id;
+                listings = entry.listings;
+                prices = entry.prices;
+                catalog_listing_id = entry.catalog_listing_id;
+                purchasable = entry.purchasable;
+
+                switch (entity_kind)
+                {
+                    case LootLockerCatalogEntryEntityKind.asset:
+                        if (catalogListing.asset_details.ContainsKey(entry.GetItemDetailsKey()))
+                        {
+                            asset_details = catalogListing.asset_details[entry.GetItemDetailsKey()];
+                        }
+                        break;
+                    case LootLockerCatalogEntryEntityKind.currency:
+                        if (catalogListing.currency_details.ContainsKey(entry.GetItemDetailsKey()))
+                        {
+                            currency_details = catalogListing.currency_details[entry.GetItemDetailsKey()];
+                        }
+                        break;
+                    case LootLockerCatalogEntryEntityKind.progression_points:
+                        if (catalogListing.progression_points_details.ContainsKey(entry.GetItemDetailsKey()))
+                        {
+                            progression_point_details = catalogListing.progression_points_details[entry.GetItemDetailsKey()];
+                        }
+                        break;
+                    case LootLockerCatalogEntryEntityKind.progression_reset:
+                        if (catalogListing.progression_resets_details.ContainsKey(entry.GetItemDetailsKey()))
+                        {
+                            progression_reset_details = catalogListing.progression_resets_details[entry.GetItemDetailsKey()];
+                        }
+                        break;
+                    case LootLockerCatalogEntryEntityKind.group:
+                        if (!catalogListing.group_details.ContainsKey(entry.GetItemDetailsKey()))
+                            break;
+
+                        var catalogLevelGroup = catalogListing.group_details[entry.GetItemDetailsKey()];
+
+                        LootLockerInlinedGroupDetails inlinedGroupDetails = new LootLockerInlinedGroupDetails();
+
+                        inlinedGroupDetails.name = catalogLevelGroup.name;
+                        inlinedGroupDetails.description = catalogLevelGroup.description;
+                        inlinedGroupDetails.metadata = catalogLevelGroup.metadata;
+                        inlinedGroupDetails.id = catalogLevelGroup.id;
+                        inlinedGroupDetails.associations = catalogLevelGroup.associations;
+
+                        foreach (var association in catalogLevelGroup.associations)
+                        {
+                            switch (association.kind)
+                            {
+                                case LootLockerCatalogEntryEntityKind.asset:
+                                    if (catalogListing.asset_details.ContainsKey(association.GetItemDetailsKey()))
+                                    {
+                                        inlinedGroupDetails.assetDetails.Add(catalogListing.asset_details[association.GetItemDetailsKey()]);
+                                    }
+                                    break;
+                                case LootLockerCatalogEntryEntityKind.progression_points:
+                                    if (catalogListing.progression_points_details.ContainsKey(association.GetItemDetailsKey()))
+                                    {
+                                        inlinedGroupDetails.progressionPointDetails.Add(catalogListing.progression_points_details[association.GetItemDetailsKey()]);
+                                    }
+                                    break;
+                                case LootLockerCatalogEntryEntityKind.progression_reset:
+                                    if (catalogListing.progression_resets_details.ContainsKey(association.GetItemDetailsKey()))
+                                    {
+                                        inlinedGroupDetails.progressionResetDetails.Add(catalogListing.progression_resets_details[association.GetItemDetailsKey()]);
+                                    }
+                                    break;
+                                case LootLockerCatalogEntryEntityKind.currency:
+                                    if (catalogListing.currency_details.ContainsKey(association.GetItemDetailsKey()))
+                                    {
+                                        inlinedGroupDetails.currencyDetails.Add(catalogListing.currency_details[association.GetItemDetailsKey()]);
+                                    }
+                                    break;
+                                case LootLockerCatalogEntryEntityKind.group:
+                                default:
+                                    break;
+                            }
+                        }
+
+                        group_details = inlinedGroupDetails;
+
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Get all the entries with details inlined into the entries themselves
+        /// </summary>
+        public LootLockerInlinedCatalogEntry[] GetLootLockerInlinedCatalogEntries()
+        {
+            List<LootLockerInlinedCatalogEntry> inlinedEntries = new List<LootLockerInlinedCatalogEntry>();
+            foreach (var lootLockerCatalogEntry in entries)
+            {
+                inlinedEntries.Add(new LootLockerInlinedCatalogEntry(
+                    lootLockerCatalogEntry,
+                    this
+                    ));
+            }
+            return inlinedEntries.ToArray();
+        }
+    }
 }
