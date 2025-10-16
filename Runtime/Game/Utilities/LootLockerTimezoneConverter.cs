@@ -649,7 +649,9 @@ namespace LootLocker
 
         public static string convertUTCOffsetToIanaTzString(int utcOffset)
         {
+#if UNITY_2021_1_OR_NEWER
             utcOffset = Math.Clamp(utcOffset, -12, 14);
+#endif
             if (utcOffset < 0)
             {
                 return $"Etc/GMT+{Math.Abs(utcOffset)}"; // Note the reversed sign for Etc/GMT
@@ -666,7 +668,9 @@ namespace LootLocker
 
         public static string convertGMTOffsetToIanaTzString(int gmtOffset)
         {
+#if UNITY_2021_1_OR_NEWER
             gmtOffset = Math.Clamp(gmtOffset, -14, 12);
+#endif
             if (gmtOffset < 0)
             {
                 return $"Etc/GMT-{Math.Abs(gmtOffset)}";
