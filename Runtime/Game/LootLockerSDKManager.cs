@@ -8012,6 +8012,7 @@ namespace LootLocker.Requests
         /// <param name="after">Used for pagination, this is the cursor to start getting items from. Use null to get items from the beginning. Use the cursor from a previous call to get the next count of items in the list.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        [Obsolete("This method is deprecated, please use ListCatalogItems(string catalogKey, int PerPage, int Page, Action<LootLockerListCatalogPricesV2Response> onComplete, string forPlayerWithUlid = null) instead.")] // Deprecation date 20251016
         public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogPricesResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
@@ -8019,7 +8020,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>(forPlayerWithUlid));
                 return;
             }
-            var endpoint = LootLockerEndPoints.listCatalogItemsByKey.WithPathParameter(catalogKey);
+            var endpoint = LootLockerEndPoints.deprecatedListCatalogItemsByKey.WithPathParameter(catalogKey);
 
             var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
@@ -8029,7 +8030,35 @@ namespace LootLocker.Requests
 
             endpoint += queryParams.Build();
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.deprecatedListCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
+        }
+
+        /// <summary>
+        /// List the items available in a specific catalog
+        /// </summary>
+        /// <param name="catalogKey">Unique Key of the catalog that you want to get items for</param>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListCatalogItems(string catalogKey, int PerPage, int Page, Action<LootLockerListCatalogPricesV2Response> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesV2Response>(forPlayerWithUlid));
+                return;
+            }
+            var endpoint = LootLockerEndPoints.listCatalogItemsByKey.WithPathParameter(catalogKey);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage);
+            if (Page > 0)
+                queryParams.Add("page", Page);
+
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesV2Response(serverResponse)); });
         }
         #endregion
 
