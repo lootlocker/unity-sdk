@@ -806,7 +806,7 @@ namespace LootLockerTests.PlayMode
 
             // When
             bool loginCompleted = false;
-            LootLockerSDKManager.StartGuestSession(response =>
+            LootLockerSDKManager.StartGuestSession("completely-novel-identifier", response =>
             {
                 ulids.Add(response.player_ulid);
                 loginCompleted = true;
@@ -823,6 +823,55 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotNull(postSetDefaultPlayerPlayerData);
             Assert.AreEqual(ulids[ulids.Count - 1], postSetDefaultPlayerUlid);
             Assert.AreEqual(ulids[ulids.Count - 1], postSetDefaultPlayerPlayerData.ULID);
+
+            yield return null;
+        }
+        
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator MultiUser_GetPlayerDataWhenPlayerCachesExistButNoPlayersAreActive_GetsPlayerAndSetsDefault()
+        {
+            // Setup Succeeded
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            List<string> ulids = new List<string>();
+            int guestUsersToCreate = 3;
+            for (int i = 0; i < guestUsersToCreate; i++)
+            {
+                bool guestLoginCompleted = false;
+                LootLockerSDKManager.StartGuestSession(response =>
+                {
+                    ulids.Add(response.player_ulid);
+                    guestLoginCompleted = true;
+                });
+                yield return new WaitUntil(() => guestLoginCompleted);
+            }
+
+            foreach (var ulid in ulids)
+            {
+                LootLockerStateData.SetPlayerULIDToInactive(ulid);
+            }
+
+            // When
+            bool pingCompleted = false;
+            string pingUlid = null;
+            LootLockerSDKManager.Ping(response =>
+            {
+                pingUlid = response.requestContext.player_ulid;
+                pingCompleted = true;
+            }, ulids[ulids.Count - 1]);
+            yield return new WaitUntil(() => pingCompleted);
+
+            // Then
+            int postPingActivePlayerCount = LootLockerStateData.GetActivePlayerULIDs().Count;
+            var postPingDefaultPlayerPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null);
+            var postPingDefaultPlayerUlid = LootLockerStateData.GetDefaultPlayerULID();
+
+            Assert.AreEqual(1, postPingActivePlayerCount);
+            Assert.IsNotNull(postPingDefaultPlayerUlid);
+            Assert.IsNotNull(postPingDefaultPlayerPlayerData);
+            Assert.AreEqual(ulids[ulids.Count - 1], postPingDefaultPlayerUlid);
+            Assert.AreEqual(ulids[ulids.Count - 1], postPingDefaultPlayerPlayerData.ULID);
 
             yield return null;
         }
