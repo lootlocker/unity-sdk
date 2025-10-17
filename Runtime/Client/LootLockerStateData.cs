@@ -195,6 +195,9 @@ namespace LootLocker
             }
             string playerULIDToGetDataFor = string.IsNullOrEmpty(playerULID) ? ActiveMetaData.DefaultPlayer : playerULID;
 
+            // Make this player the default for requests if there is no default yet or if the current default is not currently active
+            bool shouldBeMadeDefault = ActivePlayerData.Count == 0 && !playerULIDToGetDataFor.Equals(ActiveMetaData.DefaultPlayer, StringComparison.OrdinalIgnoreCase);
+
             if (ActivePlayerData.TryGetValue(playerULIDToGetDataFor, out var data))
             {
                 return data;
@@ -204,6 +207,10 @@ namespace LootLocker
             {
                 if (ActivePlayerData.TryGetValue(playerULIDToGetDataFor, out var data2))
                 {
+                    if (shouldBeMadeDefault)
+                    {
+                        SetDefaultPlayerULID(data2.ULID);
+                    }
                     return data2;
                 }
             }
@@ -264,7 +271,7 @@ namespace LootLocker
             {
                 ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[updatedPlayerData.WhiteLabelEmail] = updatedPlayerData.ULID;
             }
-            if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer))
+            if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
             {
                 SetDefaultPlayerULID(updatedPlayerData.ULID);
             }
