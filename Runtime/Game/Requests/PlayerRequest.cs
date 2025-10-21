@@ -270,7 +270,7 @@ namespace LootLocker
                 queryParams.Add(idType, identifier);
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
         public static void LookupPlayer1stPartyPlatformIDs(string forPlayerWithUlid, LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
@@ -289,7 +289,7 @@ namespace LootLocker
                 queryParams.Add("player_public_uid", playerPublicUID);
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
