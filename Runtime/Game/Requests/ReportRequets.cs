@@ -115,7 +115,7 @@ namespace LootLocker
                 queryParams.Add("since", input.Since);
             }
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint += queryParams.Build(), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void CreatePlayerReport(string forPlayerWithUlid, ReportsCreatePlayerRequest data, Action<LootLockerReportsCreatePlayerResponse> onComplete)
