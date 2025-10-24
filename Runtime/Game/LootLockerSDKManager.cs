@@ -4059,9 +4059,10 @@ namespace LootLocker.Requests
         /// <summary>
         /// List the loadout of the specified hero that the current player owns
         /// </summary>
+        /// <param name="heroID">HeroID Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetHeroLoadout(Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
+        public static void GetHeroLoadout(int HeroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4069,7 +4070,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetHeroLoadout(forPlayerWithUlid, onComplete);
+            LootLockerAPIManager.GetHeroLoadout(forPlayerWithUlid, HeroID, onComplete);
         }
 
         /// <summary>
@@ -4110,7 +4111,7 @@ namespace LootLocker.Requests
             data.hero_id = heroID;
 
 
-            LootLockerAPIManager.AddAssetToHeroLoadout(forPlayerWithUlid, data, onComplete);
+            LootLockerAPIManager.AddAssetToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
         /// <summary>
@@ -4136,7 +4137,7 @@ namespace LootLocker.Requests
             data.asset_id = assetID;
             data.asset_variation_id = assetInstanceID;
 
-            LootLockerAPIManager.AddAssetVariationToHeroLoadout(forPlayerWithUlid, data, onComplete);
+            LootLockerAPIManager.AddAssetVariationToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
         /// <summary>
@@ -4147,7 +4148,7 @@ namespace LootLocker.Requests
         /// <param name="heroID">Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void RemoveAssetFromHeroLoadout(string assetID, string heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
+        public static void RemoveAssetFromHeroLoadout(int assetID, int heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4155,12 +4156,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-
-            lootLockerGetRequest.getRequests.Add(assetID);
-            lootLockerGetRequest.getRequests.Add(heroID);
-
-            LootLockerAPIManager.RemoveAssetFromHeroLoadout(forPlayerWithUlid, lootLockerGetRequest, onComplete);
+            LootLockerAPIManager.RemoveAssetFromHeroLoadout(forPlayerWithUlid, heroID, assetID, onComplete);
         }
 
         #endregion
