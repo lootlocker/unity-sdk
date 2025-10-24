@@ -116,10 +116,7 @@ namespace LootLocker
         public static void ListOtherPlayersHeroesBySteamID64(string forPlayerWithUlid, int SteamID64, Action<LootLockerPlayerHeroResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listOtherPlayersHeroesBySteamID64;
-
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, SteamID64.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(SteamID64.ToString()), endPoint.httpMethod, SteamID64.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void CreateHero(LootLockerCreateHeroRequest data,
@@ -154,19 +151,14 @@ namespace LootLocker
         public static void GetHero(string forPlayerWithUlid, int HeroID, Action<LootLockerPlayerHeroResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getHero;
-
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void GetOtherPlayersDefaultHeroBySteamID64(string forPlayerWithUlid, int steamID64, Action<LootLockerPlayerHeroResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersDefaultHeroBySteamID64;
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, steamID64.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(steamID64.ToString()), endPoint.httpMethod, steamID64.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void UpdateHero(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, LootLockerUpdateHeroRequest data, Action<LootLockerPlayerHeroResponse> onComplete)
@@ -189,39 +181,31 @@ namespace LootLocker
         {
             EndPointClass endPoint = LootLockerEndPoints.deleteHero;
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void GetHeroInventory(string forPlayerWithUlid, int HeroID, Action<LootLockerInventoryResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getHeroInventory;
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetHeroLoadout(string forPlayerWithUlid, Action<LootLockerHeroLoadoutResponse> onComplete)
+        public static void GetHeroLoadout(string forPlayerWithUlid, int HeroID, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getHeroLoadout;
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static void GetOtherPlayersHeroLoadout(string forPlayerWithUlid, int HeroID, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getOtherPlayersHeroLoadout;
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, HeroID.ToString(), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void AddAssetToHeroLoadout(string forPlayerWithUlid, LootLockerAddAssetToHeroLoadoutRequest data, Action<LootLockerHeroLoadoutResponse> onComplete)
+        public static void AddAssetToHeroLoadout(string forPlayerWithUlid, int HeroID, LootLockerAddAssetToHeroLoadoutRequest data, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.addAssetToHeroLoadout;
 
@@ -232,12 +216,10 @@ namespace LootLocker
             }
             string json = LootLockerJson.SerializeObject(data);
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void AddAssetVariationToHeroLoadout(string forPlayerWithUlid, LootLockerAddAssetVariationToHeroLoadoutRequest data, Action<LootLockerHeroLoadoutResponse> onComplete)
+        public static void AddAssetVariationToHeroLoadout(string forPlayerWithUlid, int HeroID, LootLockerAddAssetVariationToHeroLoadoutRequest data, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.addAssetVariationToHeroLoadout;
 
@@ -248,18 +230,14 @@ namespace LootLocker
             }
             string json = LootLockerJson.SerializeObject(data);
 
-            string getVariable = endPoint.endPoint;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(HeroID.ToString()), endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void RemoveAssetFromHeroLoadout(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, Action<LootLockerHeroLoadoutResponse> onComplete)
+        public static void RemoveAssetFromHeroLoadout(string forPlayerWithUlid, int HeroID, int assetID, Action<LootLockerHeroLoadoutResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.removeAssetFromHeroLoadout;
 
-            string getVariable = endPoint.WithPathParameters(lootLockerGetRequest.getRequests[0], lootLockerGetRequest.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }); ;
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameters(assetID.ToString(), HeroID.ToString()), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
 
         }
 
