@@ -566,8 +566,10 @@ namespace LootLocker
             executionItem.Done = true;
             response.requestContext = new LootLockerRequestContext(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime);
             executionItem.Response = response;
+            if(!CompletedRequestIDs.Contains(executionItem.RequestData.RequestId)) {
+                CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
+            }
             executionItem.RequestData.CallListenersWithResult(response);
-            CompletedRequestIDs.Add(executionItem.RequestData.RequestId);
         }
 
         private IEnumerator RefreshSession(string refreshForPlayerUlid, string forExecutionItemId, Action<LootLockerSessionResponse, string, string> onSessionRefreshedCallback)

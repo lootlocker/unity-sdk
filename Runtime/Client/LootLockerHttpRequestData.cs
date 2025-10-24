@@ -87,7 +87,14 @@ namespace LootLocker.HTTP
         {
             foreach(var listener in Listeners)
             {
-                listener?.Invoke(response);
+                try
+                {
+                    listener?.Invoke(response);
+                }
+                catch (Exception e)
+                {
+                    LootLockerLogger.Log($"Exception thrown in HTTP request listener for request id {RequestId}. Exception was: {e}.", LootLockerLogger.LogLevel.Error);
+                }
             }
             HaveListenersBeenInvoked = true;
         }
