@@ -647,8 +647,6 @@ namespace LootLocker
                         }, refreshForPlayerUlid);
                     }
                     break;
-                case LL_AuthPlatforms.PlayStationNetwork:
-                case LL_AuthPlatforms.XboxOne:
                 case LL_AuthPlatforms.AmazonLuna:
                     {
                         LootLockerSDKManager.StartAmazonLunaSession(playerData.Identifier, (response) =>
@@ -658,6 +656,8 @@ namespace LootLocker
                         }, playerData.SessionOptionals);
                     }
                     break;
+                case LL_AuthPlatforms.PlayStationNetwork:
+                case LL_AuthPlatforms.XboxOne:
                 case LL_AuthPlatforms.NintendoSwitch:
                 case LL_AuthPlatforms.Steam:
                     {
