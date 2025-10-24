@@ -27,22 +27,50 @@ namespace LootLocker
 
         public string WithPathParameter(object arg0)
         {
-            return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()));
+            try {
+                return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()));
+            }
+            catch (FormatException e)
+            {
+                LootLockerLogger.Log($"Error formatting endpoint \"{endPoint}\" with path parameter \"{WebUtility.UrlEncode(arg0.ToString())}\": {e}", LootLockerLogger.LogLevel.Error);
+                return endPoint;
+            }
         }
 
         public string WithPathParameters(object arg0, object arg1)
         {
-            return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()));
+            try {
+                return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()));
+            }
+            catch (FormatException e)
+            {
+                LootLockerLogger.Log($"Error formatting endpoint \"{endPoint}\" with path parameters \"{WebUtility.UrlEncode(arg0.ToString())}\", \"{WebUtility.UrlEncode(arg1.ToString())}\": {e}", LootLockerLogger.LogLevel.Error);
+                return endPoint;
+            }
         }
 
         public string WithPathParameters(object arg0, object arg1, object arg2)
         {
-            return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()), WebUtility.UrlEncode(arg2.ToString()));
+            try {
+                return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()), WebUtility.UrlEncode(arg2.ToString()));
+            }
+            catch (FormatException e)
+            {
+                LootLockerLogger.Log($"Error formatting endpoint \"{endPoint}\" with path parameters \"{WebUtility.UrlEncode(arg0.ToString())}\", \"{WebUtility.UrlEncode(arg1.ToString())}\", \"{WebUtility.UrlEncode(arg2.ToString())}\": {e}", LootLockerLogger.LogLevel.Error);
+                return endPoint;
+            }
         }
 
         public string WithPathParameters(object arg0, object arg1, object arg2, object arg3)
         {
-            return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()), WebUtility.UrlEncode(arg2.ToString()), WebUtility.UrlEncode(arg3.ToString()));
+            try {
+                return string.Format(endPoint, WebUtility.UrlEncode(arg0.ToString()), WebUtility.UrlEncode(arg1.ToString()), WebUtility.UrlEncode(arg2.ToString()), WebUtility.UrlEncode(arg3.ToString()));
+            }
+            catch (FormatException e)
+            {
+                LootLockerLogger.Log($"Error formatting endpoint \"{endPoint}\" with path parameters \"{WebUtility.UrlEncode(arg0.ToString())}\", \"{WebUtility.UrlEncode(arg1.ToString())}\", \"{WebUtility.UrlEncode(arg2.ToString())}\", \"{WebUtility.UrlEncode(arg3.ToString())}\": {e}", LootLockerLogger.LogLevel.Error);
+                return endPoint;
+            }
         }
     }
 }
