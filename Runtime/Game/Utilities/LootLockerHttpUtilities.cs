@@ -59,7 +59,7 @@ namespace LootLocker.Utilities.HTTP
 
             foreach (KeyValuePair<string, string> pair in _queryParams)
             {
-                if (string.IsNullOrEmpty(pair.Value))
+                if (string.IsNullOrEmpty(pair.Key) || string.IsNullOrEmpty(pair.Value))
                     continue;
 
                 if (query.Length > 1)
