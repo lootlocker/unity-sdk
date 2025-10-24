@@ -3243,6 +3243,40 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Epic Games ID's
+        /// </summary>
+        /// <param name="epicGamesIds">A list of multiple player Epic Games ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByEpicGamesIds(string[] epicGamesIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "epic_games_id", epicGamesIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Google Play Games ID's
+        /// </summary>
+        /// <param name="googlePlayGamesIds">A list of multiple player Google Play Games ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByGooglePlayGamesIds(string[] googlePlayGamesIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "google_play_games_id", googlePlayGamesIds, onComplete);
+        }
+
+        /// <summary>
         /// Mark the logged in player for deletion. After 30 days the player will be deleted from the system.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse></param>
