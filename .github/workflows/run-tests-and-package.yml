@@ -24,6 +24,8 @@ jobs:
     runs-on: [ubuntu-latest]
     needs: []
     timeout-minutes: 10
+    # Skip push events on ci/* branches (let pull_request handle them to avoid duplicates)
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/heads/ci/')
     env: 
       LL_USE_STAGE: false
     strategy:
