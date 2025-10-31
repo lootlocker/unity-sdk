@@ -97,6 +97,21 @@ jobs:
           restore-keys: |
             ${{ matrix.targetPlatform }}-Library-unity-sdk-smoketest-project
             Library-
+      - name: Setup Unity environment
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}
         id: editor-smoke-tests-gameci
         uses: game-ci/unity-test-runner@v4.3.1
@@ -150,6 +165,21 @@ jobs:
             tee /etc/apt/sources.list.d/docker.list > /dev/null
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      - name: Setup Unity environment for all builds
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Select stage keys
         if: ${{ env.LL_USE_STAGE == 'true' }}
         run: |
@@ -262,6 +292,21 @@ jobs:
             tee /etc/apt/sources.list.d/docker.list > /dev/null
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      - name: Setup Unity environment for WebGL build
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Select stage keys
         if: ${{ env.LL_USE_STAGE == 'true' }}
         run: |
@@ -506,6 +551,22 @@ jobs:
           path: tests~/Library
           key: Library-${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}
           restore-keys: Library-
+      - name: Setup Unity environment for integration tests
+        if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Run tests in ${{ matrix.unityVersion }} towards ${{ ENV.TARGET_ENVIRONMENT }} environment with json library ${{ ENV.JSON_LIBRARY }}
         uses: game-ci/unity-test-runner@v4.3.1
         if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
@@ -599,6 +660,21 @@ jobs:
           restore-keys: |
             ${{ matrix.targetPlatform }}-Library-unity-sdk-sample-tester
             Library-
+      - name: Setup Unity environment for sample tests
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Compile and run all sample scenes ${{ matrix.unityVersion }}
         id: test-samples
         uses: game-ci/unity-test-runner@v4.3.1
@@ -737,6 +813,21 @@ jobs:
           restore-keys: |
             ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
             Library-
+      - name: Setup Unity environment for packaging
+        run: |
+          # Install required system packages
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-6 libxcursor1 libxrandr2 libasound2-dev
+          # Create Unity cache directory with proper permissions
+          sudo mkdir -p /root/.cache/unity3d
+          sudo chmod -R 777 /root/.cache/unity3d
+          # Start virtual framebuffer for headless Unity
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+          # Verify Xvfb is running
+          ps aux | grep Xvfb
       - name: Package SDK for ${{ matrix.unityVersion }}
         id: package-sdk-gameci
         uses: game-ci/unity-test-runner@v4.3.1
