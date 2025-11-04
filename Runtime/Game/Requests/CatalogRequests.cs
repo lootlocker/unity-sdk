@@ -167,7 +167,65 @@ namespace LootLocker.Requests
         {
             return obj.GetHashCode() == GetHashCode();
         }
+    }
 
+    /// <summary>
+    /// Class to help getting asset item details including variation and rental option IDs
+    /// </summary>
+    public class LootLockerAssetItemDetailsKey
+    {
+        /// <summary>
+        /// The id of a catalog listing
+        /// </summary>
+        public string catalog_listing_id { get; set; }
+        /// <summary>
+        /// The id of the item
+        /// </summary>
+        public string item_id { get; set; }
+        /// <summary>
+        /// The id of the specific variation of this asset that this refers to
+        /// </summary>
+        public string variation_id { get; set; }
+        /// <summary>
+        /// The id of the specific rental option of this asset that this refers to
+        /// </summary>
+        public string rental_option_id { get; set; }
+
+        public override int GetHashCode()
+        {
+            return catalog_listing_id.GetHashCode() + item_id.GetHashCode() + 
+                   (variation_id?.GetHashCode() ?? 0) + (rental_option_id?.GetHashCode() ?? 0);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is LootLockerAssetItemDetailsKey other)
+            {
+                return catalog_listing_id == other.catalog_listing_id &&
+                       item_id == other.item_id &&
+                       variation_id == other.variation_id &&
+                       rental_option_id == other.rental_option_id;
+            }
+            return false;
+        }
+
+        public LootLockerAssetItemDetailsKey()
+        {
+        }
+
+        public LootLockerAssetItemDetailsKey(string catalogListingId, string itemId, string variationId, string rentalOptionId)
+        {
+            catalog_listing_id = catalogListingId;
+            item_id = itemId;
+            variation_id = variationId;
+            rental_option_id = rentalOptionId;
+        }
+
+        public LootLockerAssetItemDetailsKey(LootLockerItemDetailsKey key)
+        {
+            catalog_listing_id = key.catalog_listing_id;
+            item_id = key.item_id;
+        }
     }
 
     /// <summary>
@@ -256,6 +314,19 @@ namespace LootLocker.Requests
         public LootLockerItemDetailsKey GetItemDetailsKey()
         {
             return new LootLockerItemDetailsKey { catalog_listing_id = catalog_listing_id, item_id = id };
+        }
+        /// <summary>
+        /// Function to help identify asset details including variation and rental options
+        /// </summary>
+        /// <returns>The identifier for looking up asset details</returns>
+        public LootLockerAssetItemDetailsKey GetAssetItemDetailsKey()
+        {
+            return new LootLockerAssetItemDetailsKey { 
+                catalog_listing_id = catalog_listing_id, 
+                item_id = id,
+                variation_id = variation_id,
+                rental_option_id = rental_option_id
+            };
         }
     }
 
@@ -480,8 +551,15 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Lookup map for details about entities of entity type assets
+        /// If the asset in question has variations or rental options, those will be in the optional_asset_detail_variants structure instead
         /// </summary>
         public Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails> asset_details { get; set; }
+
+        /// <summary>
+        /// This is a list of potentially matching asset details for this catalog entry, in case there are multiple variations / rental options
+        /// Asset Variations and Rental Options are deprecated features, this is added for backward compatibility only
+        /// </summary>
+        public Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails> optional_asset_detail_variants { get; set; }
 
         /// <summary>
         /// Lookup map for details about entities of entity type progression_points
@@ -527,6 +605,15 @@ namespace LootLocker.Requests
             foreach (var assetDetail in catalogPrices.asset_details)
             {
                 asset_details.Add(assetDetail.Key, assetDetail.Value);
+            }
+
+            // Also append asset detail variants if they exist
+            if (catalogPrices.optional_asset_detail_variants != null)
+            {
+                foreach (var assetDetailVariant in catalogPrices.optional_asset_detail_variants)
+                {
+                    optional_asset_detail_variants.Add(assetDetailVariant.Key, assetDetailVariant.Value);
+                }
             }
 
             foreach (var progressionPointDetail in catalogPrices.progression_points_details)
@@ -586,9 +673,22 @@ namespace LootLocker.Requests
             if (parsedResponse.assets_details != null && parsedResponse.assets_details.Length > 0)
             {
                 asset_details = new Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails>();
+                optional_asset_detail_variants = new Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails>();
+                
                 foreach (var detail in parsedResponse.assets_details)
                 {
-                    asset_details[detail.GetItemDetailsKey()] = detail;
+                    if (detail == null)
+                        continue;
+                    if (!string.IsNullOrEmpty(detail.variation_id) || !string.IsNullOrEmpty(detail.rental_option_id))
+                    {
+                        // Populate for backward compatibility
+                        optional_asset_detail_variants[detail.GetAssetItemDetailsKey()] = detail;
+                        continue;
+                    }
+                    else
+                    {
+                        asset_details[detail.GetItemDetailsKey()] = detail;
+                    }
                 }
             }
 
@@ -642,6 +742,12 @@ namespace LootLocker.Requests
             public LootLockerAssetDetails asset_details { get; set; }
 
             /// <summary>
+            /// This is a list of potentially matching asset details for this catalog entry, in case there are multiple variations / rental options
+            /// Asset Variations and Rental Options are deprecated features, this is added for backward compatibility only
+            /// </summary>
+            public List<LootLockerAssetDetails> optional_asset_detail_variants { get; set; }
+
+            /// <summary>
             /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
             /// </summary>
             public LootLockerProgressionPointDetails progression_point_details { get; set; }
@@ -679,6 +785,17 @@ namespace LootLocker.Requests
                         {
                             asset_details = catalogListing.asset_details[entry.GetItemDetailsKey()];
                         }
+                        else
+                        {
+                            optional_asset_detail_variants = new List<LootLockerAssetDetails>();
+                            foreach (var optionalAssetDetailVariant in catalogListing.optional_asset_detail_variants)
+                            {
+                                if (entry.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
+                                {
+                                    optional_asset_detail_variants.Add(optionalAssetDetailVariant.Value);
+                                }
+                            }
+                        }
                         break;
                     case LootLockerCatalogEntryEntityKind.currency:
                         if (catalogListing.currency_details.ContainsKey(entry.GetItemDetailsKey()))
@@ -712,6 +829,7 @@ namespace LootLocker.Requests
                         inlinedGroupDetails.id = catalogLevelGroup.id;
                         inlinedGroupDetails.associations = catalogLevelGroup.associations;
 
+                        Dictionary<LootLockerAssetItemDetailsKey, bool> processedOptionalAssetDetails = new Dictionary<LootLockerAssetItemDetailsKey, bool>();
                         foreach (var association in catalogLevelGroup.associations)
                         {
                             switch (association.kind)
@@ -720,6 +838,18 @@ namespace LootLocker.Requests
                                     if (catalogListing.asset_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.assetDetails.Add(catalogListing.asset_details[association.GetItemDetailsKey()]);
+                                    }
+                                    else
+                                    {
+                                        foreach (var optionalAssetDetailVariant in catalogListing.optional_asset_detail_variants)
+                                        {
+                                            if(processedOptionalAssetDetails.ContainsKey(optionalAssetDetailVariant.Key))
+                                                continue;
+                                            if (association.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
+                                            {
+                                                inlinedGroupDetails.assetDetails.Add(optionalAssetDetailVariant.Value);
+                                            }
+                                        }
                                     }
                                     break;
                                 case LootLockerCatalogEntryEntityKind.progression_points:
@@ -789,8 +919,15 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Lookup map for details about entities of entity type assets
+        /// If the asset in question has variations or rental options, those will be in the optional_asset_detail_variants structure instead
         /// </summary>
         public Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails> asset_details { get; set; }
+
+        /// <summary>
+        /// This is a list of potentially matching asset details for this catalog entry, in case there are multiple variations / rental options
+        /// Asset Variations and Rental Options are deprecated features, this is added for backward compatibility only
+        /// </summary>
+        public Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails> optional_asset_detail_variants { get; set; }
 
         /// <summary>
         /// Lookup map for details about entities of entity type progression_points
@@ -842,6 +979,11 @@ namespace LootLocker.Requests
             foreach (var assetDetail in catalogPrices.asset_details)
             {
                 asset_details.Add(assetDetail.Key, assetDetail.Value);
+            }
+
+            foreach (var assetDetailVariant in catalogPrices.optional_asset_detail_variants)
+            {
+                optional_asset_detail_variants.Add(assetDetailVariant.Key, assetDetailVariant.Value);
             }
 
             foreach (var progressionPointDetail in catalogPrices.progression_points_details)
@@ -901,9 +1043,20 @@ namespace LootLocker.Requests
             if (parsedResponse.assets_details != null && parsedResponse.assets_details.Length > 0)
             {
                 asset_details = new Dictionary<LootLockerItemDetailsKey, LootLockerAssetDetails>();
+                optional_asset_detail_variants = new Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails>();
                 foreach (var detail in parsedResponse.assets_details)
                 {
-                    asset_details[detail.GetItemDetailsKey()] = detail;
+                    if (detail == null)
+                        continue;
+                    if (!string.IsNullOrEmpty(detail.variation_id) || !string.IsNullOrEmpty(detail.rental_option_id))
+                    {
+                        // Populate for backward compatibility
+                        optional_asset_detail_variants[detail.GetAssetItemDetailsKey()] = detail;
+                    }
+                    else
+                    {
+                        asset_details[detail.GetItemDetailsKey()] = detail;
+                    }
                 }
             }
 
@@ -957,6 +1110,12 @@ namespace LootLocker.Requests
             public LootLockerAssetDetails asset_details { get; set; }
 
             /// <summary>
+            /// This is a list of potentially matching asset details for this catalog entry, in case there are multiple variations / rental options
+            /// Asset Variations and Rental Options are deprecated features, this is added for backward compatibility only
+            /// </summary>
+            public List<LootLockerAssetDetails> optional_asset_detail_variants { get; set; }
+
+            /// <summary>
             /// Progression point details inlined for this catalog entry, will be null if the entity_kind is not progression_points
             /// </summary>
             public LootLockerProgressionPointDetails progression_point_details { get; set; }
@@ -994,6 +1153,17 @@ namespace LootLocker.Requests
                         {
                             asset_details = catalogListing.asset_details[entry.GetItemDetailsKey()];
                         }
+                        else
+                        {
+                            optional_asset_detail_variants = new List<LootLockerAssetDetails>();
+                            foreach (var optionalAssetDetailVariant in catalogListing.optional_asset_detail_variants)
+                            {
+                                if (entry.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
+                                {
+                                    optional_asset_detail_variants.Add(optionalAssetDetailVariant.Value);
+                                }
+                            }
+                        }
                         break;
                     case LootLockerCatalogEntryEntityKind.currency:
                         if (catalogListing.currency_details.ContainsKey(entry.GetItemDetailsKey()))
@@ -1027,6 +1197,7 @@ namespace LootLocker.Requests
                         inlinedGroupDetails.id = catalogLevelGroup.id;
                         inlinedGroupDetails.associations = catalogLevelGroup.associations;
 
+                        Dictionary<LootLockerAssetItemDetailsKey, bool> processedOptionalAssetDetails = new Dictionary<LootLockerAssetItemDetailsKey, bool>();
                         foreach (var association in catalogLevelGroup.associations)
                         {
                             switch (association.kind)
@@ -1035,6 +1206,18 @@ namespace LootLocker.Requests
                                     if (catalogListing.asset_details.ContainsKey(association.GetItemDetailsKey()))
                                     {
                                         inlinedGroupDetails.assetDetails.Add(catalogListing.asset_details[association.GetItemDetailsKey()]);
+                                    }
+                                    else
+                                    {
+                                        foreach (var optionalAssetDetailVariant in catalogListing.optional_asset_detail_variants)
+                                        {
+                                            if(processedOptionalAssetDetails.ContainsKey(optionalAssetDetailVariant.Key))
+                                                continue;
+                                            if (association.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
+                                            {
+                                                inlinedGroupDetails.assetDetails.Add(optionalAssetDetailVariant.Value);
+                                            }
+                                        }
                                     }
                                     break;
                                 case LootLockerCatalogEntryEntityKind.progression_points:
