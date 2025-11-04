@@ -461,7 +461,7 @@ namespace LootLocker
 
             if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
-                if (ShouldRefreshSession(executionItem.WebRequest.responseCode, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
+                if (ShouldRefreshSession(executionItem, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
                 {
                     return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
                 }
@@ -731,14 +731,24 @@ namespace LootLocker
             return (statusCode == 401 || statusCode == 403 || statusCode == 502 || statusCode == 500 || statusCode == 503) && timesRetried < configuration.MaxRetries;
         }
 
-        private static bool ShouldRefreshSession(long statusCode, LL_AuthPlatforms platform)
+        private static bool ShouldRefreshSession(LootLockerHTTPExecutionQueueItem request, LL_AuthPlatforms platform)
         {
-            return (statusCode == 401 || statusCode == 403) && LootLockerConfig.current.allowTokenRefresh && !new List<LL_AuthPlatforms>{ LL_AuthPlatforms.Steam, LL_AuthPlatforms.NintendoSwitch, LL_AuthPlatforms.None }.Contains(platform);
+            return IsAuthorizedGameRequest(request) && (request.WebRequest?.responseCode == 401 || request.WebRequest?.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !new List<LL_AuthPlatforms>{ LL_AuthPlatforms.Steam, LL_AuthPlatforms.NintendoSwitch, LL_AuthPlatforms.None }.Contains(platform);
         }
 
         private static bool IsAuthorizedRequest(LootLockerHTTPExecutionQueueItem request)
         {
-            return !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-session-token")) || !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-auth-token"));
+            return IsAuthorizedGameRequest(request) || IsAuthorizedAdminRequest(request);
+        }
+
+        private static bool IsAuthorizedGameRequest(LootLockerHTTPExecutionQueueItem request)
+        {
+            return !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-session-token"));
+        }
+
+        private static bool IsAuthorizedAdminRequest(LootLockerHTTPExecutionQueueItem request)
+        {
+            return !string.IsNullOrEmpty(request.WebRequest?.GetRequestHeader("x-auth-token"));
         }
 
         private static bool CanRefreshUsingRefreshToken(LootLockerHTTPRequestData cachedRequest)
