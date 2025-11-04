@@ -610,6 +610,10 @@ namespace LootLocker.Requests
             // Also append asset detail variants if they exist
             if (catalogPrices.optional_asset_detail_variants != null)
             {
+                if (optional_asset_detail_variants == null)
+                {
+                    optional_asset_detail_variants = new Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails>();
+                }
                 foreach (var assetDetailVariant in catalogPrices.optional_asset_detail_variants)
                 {
                     optional_asset_detail_variants.Add(assetDetailVariant.Key, assetDetailVariant.Value);
@@ -848,6 +852,7 @@ namespace LootLocker.Requests
                                             if (association.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
                                             {
                                                 inlinedGroupDetails.assetDetails.Add(optionalAssetDetailVariant.Value);
+                                                processedOptionalAssetDetails[optionalAssetDetailVariant.Key] = true;
                                             }
                                         }
                                     }
@@ -981,9 +986,17 @@ namespace LootLocker.Requests
                 asset_details.Add(assetDetail.Key, assetDetail.Value);
             }
 
-            foreach (var assetDetailVariant in catalogPrices.optional_asset_detail_variants)
+            // Also append asset detail variants if they exist
+            if (catalogPrices.optional_asset_detail_variants != null)
             {
-                optional_asset_detail_variants.Add(assetDetailVariant.Key, assetDetailVariant.Value);
+                if (optional_asset_detail_variants == null)
+                {
+                    optional_asset_detail_variants = new Dictionary<LootLockerAssetItemDetailsKey, LootLockerAssetDetails>();
+                }
+                foreach (var assetDetailVariant in catalogPrices.optional_asset_detail_variants)
+                {
+                    optional_asset_detail_variants.Add(assetDetailVariant.Key, assetDetailVariant.Value);
+                }
             }
 
             foreach (var progressionPointDetail in catalogPrices.progression_points_details)
@@ -1216,6 +1229,7 @@ namespace LootLocker.Requests
                                             if (association.GetItemDetailsKey() == optionalAssetDetailVariant.Value.GetItemDetailsKey())
                                             {
                                                 inlinedGroupDetails.assetDetails.Add(optionalAssetDetailVariant.Value);
+                                                processedOptionalAssetDetails[optionalAssetDetailVariant.Key] = true;
                                             }
                                         }
                                     }
