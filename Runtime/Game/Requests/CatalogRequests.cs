@@ -128,6 +128,36 @@ namespace LootLocker.Requests
 
     /// <summary>
     /// </summary>
+    public class LootLockerCatalogStripeStoreListing
+    {
+        /// <summary>
+        /// The currency to use for the purchase
+        /// </summary>
+        public string currency { get; set; }
+        /// <summary>
+        /// The amount to charge in the smallest unit of the currency (e.g. cents for USD)
+        /// </summary>
+        public int amount { get; set; }
+    }
+
+    public class LootLockerCatalogEpicGamesStoreListing
+    {
+        /// <summary>
+        /// The Epic Games audience item id associated with this listing
+        /// </summary>
+        public string audience_item_id { get; set; }
+    }
+
+    public class LootLockerCatalogPlaystationStoreListing
+    {
+        /// <summary>
+        /// The Playstation entitlement label associated with this listing
+        /// </summary>
+        public string entitlement_label { get; set; }
+    }
+
+    /// <summary>
+    /// </summary>
     public class LootLockerCatalogEntryListings
     {
         /// <summary>
@@ -142,6 +172,18 @@ namespace LootLocker.Requests
         /// The listing information (if configured) for Steam Store
         /// </summary>
         public LootLockerCatalogSteamStoreListing steam_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Stripe Store
+        /// </summary>
+        public LootLockerCatalogStripeStoreListing stripe_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Epic Games Store
+        /// </summary>
+        public LootLockerCatalogEpicGamesStoreListing epic_games_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Playstation Store
+        /// </summary>
+        public LootLockerCatalogPlaystationStoreListing playstation_store { get; set; }
     }
 
     /// <summary>
