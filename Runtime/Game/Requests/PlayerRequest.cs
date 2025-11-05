@@ -189,7 +189,6 @@ namespace LootLocker.Requests
         /// A list of context ids to filter the inventory items by
         /// </summary>
         public int[] context_ids { get; set; }
-
     }
 
     //==================================================
@@ -252,6 +251,9 @@ namespace LootLocker.Requests
         /// List of simplified inventory items according to the requested filters
         /// </summary>
         public LootLockerSimpleInventoryItem[] items { get; set; }
+        /// <summary>
+        /// Pagination information for the response
+        /// </summary>
         public LootLockerExtendedPagination pagination { get; set; }
     }
     
