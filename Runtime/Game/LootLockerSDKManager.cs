@@ -2838,7 +2838,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListPlayerInventoryWithDefaultParameters(Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListPlayerInventory(new LootLockerListSimplifiedInventoryRequest(), 0, 0, 0, onComplete, forPlayerWithUlid);
+            ListPlayerInventory(new LootLockerListSimplifiedInventoryRequest(), 0, 100, 1, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2860,10 +2860,8 @@ namespace LootLocker.Requests
             var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (characterId > 0)
                 queryParams.Add("character_id", characterId);
-            if (perPage > 0)
-                queryParams.Add("per_page", perPage);
-            if (page > 0)
-                queryParams.Add("page", page);
+            queryParams.Add("per_page", perPage > 0 ? perPage : 100);
+            queryParams.Add("page", page > 0 ? page : 1);
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
