@@ -53,6 +53,7 @@ namespace LootLocker
         public static EndPointClass getInfoFromSession = new EndPointClass("player/hazy-hammock/v1/info", LootLockerHTTPMethod.GET);
         public static EndPointClass listPlayerInfo = new EndPointClass("player/hazy-hammock/v1/info", LootLockerHTTPMethod.POST);
         public static EndPointClass getInventory = new EndPointClass("v1/player/inventory/list", LootLockerHTTPMethod.GET);
+        public static EndPointClass listSimplifiedInventory = new EndPointClass("player/inventories/v1", LootLockerHTTPMethod.POST);
         public static EndPointClass getCurrencyBalance = new EndPointClass("v1/player/balance", LootLockerHTTPMethod.GET);
         public static EndPointClass playerAssetNotifications = new EndPointClass("v1/player/notification/assets", LootLockerHTTPMethod.GET);
         public static EndPointClass playerAssetDeactivationNotification = new EndPointClass("v1/player/notification/deactivations", LootLockerHTTPMethod.GET);

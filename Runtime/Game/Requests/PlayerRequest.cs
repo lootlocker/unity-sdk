@@ -75,6 +75,29 @@ namespace LootLocker.Requests
         public float balance { get; set; }
     }
 
+    /// <summary>
+    /// A simplified view of an inventory item
+    /// </summary>
+    public class LootLockerSimpleInventoryItem
+    {
+        /// <summary>
+        /// The asset id of the inventory item
+        /// </summary>
+        public int asset_id { get; set; }
+        /// <summary>
+        /// The instance id of the inventory item
+        /// </summary>
+        public int instance_id { get; set; }
+        /// <summary>
+        /// The acquisition source of the inventory item
+        /// </summary>
+        public string acquisition_source { get; set; }
+        /// <summary>
+        /// The acquisition date of the inventory item
+        /// </summary>
+        public DateTime? acquisition_date { get; set; }
+    }
+
     public class LootLockerRewardObject
     {
         public int instance_id { get; set; }
@@ -153,6 +176,22 @@ namespace LootLocker.Requests
         public string[] player_public_uid { get; set; }
     }
 
+    /// <summary>
+    /// Request to list a player's simplified inventory with the given filters
+    /// </summary>
+    public class LootLockerListSimplifiedInventoryRequest
+    {
+        /// <summary>
+        /// A list of asset ids to filter the inventory items by
+        /// </summary>
+        public int[] asset_ids { get; set; }
+        /// <summary>
+        /// A list of context ids to filter the inventory items by
+        /// </summary>
+        public int[] context_ids { get; set; }
+
+    }
+
     //==================================================
     // Response Definitions
     //==================================================
@@ -201,6 +240,19 @@ namespace LootLocker.Requests
     public class LootLockerInventoryResponse : LootLockerResponse
     {
         public LootLockerInventory[] inventory { get; set; }
+    }
+
+    /// <summary>
+    /// The response class for simplified inventory requests
+    /// </summary>
+    [Serializable]
+    public class LootLockerSimpleInventoryResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// List of simplified inventory items according to the requested filters
+        /// </summary>
+        public LootLockerSimpleInventoryItem[] items { get; set; }
+        public LootLockerExtendedPagination pagination { get; set; }
     }
     
     public class LootLockerPlayerFilesResponse : LootLockerResponse
