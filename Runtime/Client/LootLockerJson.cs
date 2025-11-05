@@ -85,6 +85,21 @@ namespace LootLocker
                 return false;
             }
         }
+
+        public static string PrettifyJsonString(string json)
+        {
+            try
+            {
+                var parsedJson = DeserializeObject<object>(json);
+                var tempSettings = LootLockerJsonSettings.Default;
+                tempSettings.Formatting = Formatting.Indented;
+                return SerializeObject(parsedJson, tempSettings);
+            }
+            catch (Exception)
+            {
+                return json;
+            }
+        }
 #else //LOOTLOCKER_USE_NEWTONSOFTJSON
         public static string SerializeObject(object obj)
         {
@@ -140,6 +155,19 @@ namespace LootLocker
             {
                 output = default(T);
                 return false;
+            }
+        }
+
+        public static string PrettifyJsonString(string json)
+        {
+            try
+            {
+                var parsedJson = DeserializeObject<object>(json);
+                return Json.SerializeFormatted(parsedJson, LootLockerJsonSettings.Default);
+            }
+            catch (Exception)
+            {
+                return json;
             }
         }
 #endif //LOOTLOCKER_USE_NEWTONSOFTJSON

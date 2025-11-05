@@ -102,7 +102,7 @@ namespace LootLocker
             return new T()
             {
                 success = true,
-                text = responseBody,
+                text = LootLockerConfig.current.prettifyJson ? LootLockerJson.PrettifyJsonString(responseBody) : responseBody,
                 statusCode = statusCode,
                 errorData = null,
                 requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
@@ -117,7 +117,7 @@ namespace LootLocker
             return new T()
             {
                 success = false,
-                text = responseBody,
+                text = LootLockerConfig.current.prettifyJson ? LootLockerJson.PrettifyJsonString(responseBody) : responseBody,
                 statusCode = statusCode,
                 errorData = null,
                 requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
@@ -132,7 +132,7 @@ namespace LootLocker
             return new T()
             {
                 success = failureResponse.success,
-                text = failureResponse.text,
+                text = LootLockerConfig.current.prettifyJson ? LootLockerJson.PrettifyJsonString(failureResponse.text) : failureResponse.text,
                 statusCode = failureResponse.statusCode,
                 errorData = failureResponse.errorData,
                 requestContext = failureResponse.requestContext

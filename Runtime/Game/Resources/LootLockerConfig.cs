@@ -274,6 +274,7 @@ namespace LootLocker
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
+        public bool prettifyJson = true;
         public bool logErrorsAsWarnings = false;
         public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
