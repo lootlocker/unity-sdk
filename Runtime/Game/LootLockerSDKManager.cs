@@ -2832,6 +2832,43 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// List player inventory with default parameters (no filters, first page, default page size).
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerInventoryWithDefaultParameters(Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListPlayerInventory(new LootLockerListSimplifiedInventoryRequest(), 0, 0, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List player inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
+        /// </summary>
+        /// <param name="request">Request object containing any filters to apply to the inventory listing.</param>
+        /// <param name="characterId">Optional : Filter inventory by character ID.</param>
+        /// <param name="perPage">Optional : Number of items per page.</param>
+        /// <param name="page">Optional : Page number to retrieve.</param>
+        public static void ListPlayerInventory(LootLockerListSimplifiedInventoryRequest request, int characterId, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSimpleInventoryResponse>(forPlayerWithUlid));
+                return;
+            }
+            var endPoint = LootLockerEndPoints.listSimplifiedInventory;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (characterId > 0)
+                queryParams.Add("character_id", characterId);
+            if (perPage > 0)
+                queryParams.Add("per_page", perPage);
+            if (page > 0)
+                queryParams.Add("page", page);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get the amount of credits/currency that the player has.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerBalanceResponse</param>
