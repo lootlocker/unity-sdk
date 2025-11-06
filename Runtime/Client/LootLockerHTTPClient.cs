@@ -697,7 +697,7 @@ namespace LootLocker
                     return;
                 }
                 var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
-                string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders["x-session-token"];
+                string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders.GetValueOrDefault("x-session-token", "");
                 string tokenAfterRefresh = playerData?.SessionToken;
                 if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
                 {
