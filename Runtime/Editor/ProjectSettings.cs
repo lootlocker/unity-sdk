@@ -160,6 +160,15 @@ namespace LootLocker.Admin
             EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("prettifyJson"), new GUIContent("Log JSON Formatted"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue;
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
 
             if (EditorGUI.EndChangeCheck())
