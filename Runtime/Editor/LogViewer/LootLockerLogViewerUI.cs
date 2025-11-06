@@ -216,7 +216,11 @@ namespace LootLocker.LogViewer
                             if (!string.IsNullOrEmpty(http.RequestBody))
                             {
                                 sb.AppendLine("Request Body:");
-                                sb.AppendLine(http.RequestBody);
+                                sb.AppendLine(
+                                    LootLockerConfig.current.obfuscateLogs ?
+                                        LootLockerObfuscator.ObfuscateJsonStringForLogging(http.RequestBody) :
+                                        http.RequestBody
+                                );
                             }
                             sb.AppendLine("Response Headers:");
                             foreach (var h in http.ResponseHeaders ?? new Dictionary<string, string>())
@@ -224,7 +228,11 @@ namespace LootLocker.LogViewer
                             if (!string.IsNullOrEmpty(http.Response?.text))
                             {
                                 sb.AppendLine("Response Body:");
-                                sb.AppendLine(http.Response.text);
+                                sb.AppendLine(
+                                    LootLockerConfig.current.obfuscateLogs ?
+                                        LootLockerObfuscator.ObfuscateJsonStringForLogging(http.Response.text) :
+                                        http.Response.text
+                                );
                             }
                             writer.Write(sb.ToString());
                         }
@@ -401,23 +409,53 @@ namespace LootLocker.LogViewer
             var reqHeaders = new TextField { value = $"Request Headers: {FormatHeaders(entry.RequestHeaders)}", isReadOnly = true };
             reqHeaders.AddToClassList("log-message-field");
             details.Add(reqHeaders);
+            
             if (!string.IsNullOrEmpty(entry.RequestBody))
             {
-                var reqBody = new TextField { value = $"Request Body: {entry.RequestBody}", isReadOnly = true };
-                reqBody.AddToClassList("log-message-field");
-                details.Add(reqBody);
+                var requestBodyFoldout = CreateJsonFoldout("Request Body", entry.RequestBody);
+                details.Add(requestBodyFoldout);
             }
+            
             var respHeaders = new TextField { value = $"Response Headers: {FormatHeaders(entry.ResponseHeaders)}", isReadOnly = true };
             respHeaders.AddToClassList("log-message-field");
             details.Add(respHeaders);
+            
             if (!string.IsNullOrEmpty(entry.Response?.text))
             {
-                var respBody = new TextField { value = $"Response Body: {entry.Response.text}", isReadOnly = true };
-                respBody.AddToClassList("log-message-field");
-                details.Add(respBody);
+                var responseBodyFoldout = CreateJsonFoldout("Response Body", entry.Response.text);
+                details.Add(responseBodyFoldout);
             }
+            
             foldout.Add(details);
             logContainer.Add(foldout);
+        }
+
+        private Foldout CreateJsonFoldout(string title, string jsonContent)
+        {
+            // Initially show minified JSON (obfuscated if configured)
+            var obfuscatedJson = LootLockerConfig.current.obfuscateLogs
+                ? LootLockerObfuscator.ObfuscateJsonStringForLogging(jsonContent)
+                : jsonContent;
+            var prettifiedJson = LootLockerJson.PrettifyJsonString(obfuscatedJson);
+            var collapsedTitle = $"{title}: {obfuscatedJson}";
+
+            var foldout = new Foldout { text = collapsedTitle, value = false };
+
+            // Create a container for the JSON content
+            var jsonContainer = new VisualElement();
+
+            var jsonField = new TextField { value = prettifiedJson, isReadOnly = true, multiline = true };
+            jsonField.AddToClassList("log-message-field");
+            jsonField.style.whiteSpace = WhiteSpace.PreWrap;
+            jsonContainer.Add(jsonField);
+            
+            foldout.RegisterValueChangedCallback(evt =>
+            {
+                foldout.text = evt.newValue ? title : collapsedTitle;
+            });
+            
+            foldout.Add(jsonContainer);
+            return foldout;
         }
 
         private string FormatHeaders(Dictionary<string, string> headers)

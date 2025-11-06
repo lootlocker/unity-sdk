@@ -23,6 +23,7 @@ namespace LootLocker
     };
 #else
         public static readonly JsonOptions Default = new JsonOptions((JsonSerializationOptions.Default | JsonSerializationOptions.EnumAsText) & ~JsonSerializationOptions.SkipGetOnly);
+        public static readonly JsonOptions Indented = new JsonOptions((JsonSerializationOptions.Default | JsonSerializationOptions.EnumAsText) & ~JsonSerializationOptions.SkipGetOnly);
 #endif
     }
 
@@ -91,8 +92,12 @@ namespace LootLocker
             try
             {
                 var parsedJson = DeserializeObject<object>(json);
-                var tempSettings = LootLockerJsonSettings.Default;
-                tempSettings.Formatting = Formatting.Indented;
+                var tempSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = LootLockerJsonSettings.Default.ContractResolver,
+                    Converters = LootLockerJsonSettings.Default.Converters,
+                    Formatting = Formatting.Indented
+                };
                 return SerializeObject(parsedJson, tempSettings);
             }
             catch (Exception)
@@ -163,7 +168,9 @@ namespace LootLocker
             try
             {
                 var parsedJson = DeserializeObject<object>(json);
-                return Json.SerializeFormatted(parsedJson, LootLockerJsonSettings.Default);
+                var indentedOptions = LootLockerJsonSettings.Default.Clone();
+                indentedOptions.FormattingTab = "  ";
+                return Json.SerializeFormatted(parsedJson, indentedOptions);
             }
             catch (Exception)
             {

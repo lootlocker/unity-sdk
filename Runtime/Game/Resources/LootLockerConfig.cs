@@ -173,13 +173,14 @@ namespace LootLocker
         }
 #endif
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
             _current.logLevel = logLevel;
+            _current.prettifyJson = prettifyJson;
             _current.logInBuilds = logInBuilds;
             _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
@@ -199,6 +200,10 @@ namespace LootLocker
             _current.apiKey = null;
             _current.game_version = null;
             _current.logLevel = LootLockerLogger.LogLevel.Info;
+            _current.prettifyJson = false;
+            _current.logInBuilds = false;
+            _current.logErrorsAsWarnings = false;
+            _current.obfuscateLogs = true;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
 #if UNITY_EDITOR
@@ -274,7 +279,9 @@ namespace LootLocker
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
+        // Write JSON in a pretty and indented format when logging
         public bool prettifyJson = true;
+        [HideInInspector] public bool obfuscateLogs = true;
         public bool logErrorsAsWarnings = false;
         public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
