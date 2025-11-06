@@ -245,7 +245,7 @@ namespace LootLocker
             if (!string.IsNullOrEmpty(entry.RequestBody))
             {
                 sb.AppendLine("Request Body:");
-                sb.AppendLine(entry.RequestBody);
+                sb.AppendLine(ObfuscateAndPrettifyJsonIfConfigured(entry.RequestBody));
             }
             sb.AppendLine("Response Headers:");
             foreach (var h in entry.ResponseHeaders ?? new Dictionary<string, string>())
@@ -253,7 +253,7 @@ namespace LootLocker
             if (!string.IsNullOrEmpty(entry.Response?.text))
             {
                 sb.AppendLine("Response Body:");
-                sb.AppendLine(entry.Response.text);
+                sb.AppendLine(ObfuscateAndPrettifyJsonIfConfigured(entry.Response.text));
             }
 
             LogLevel level = entry.Response?.success ?? false ? LogLevel.Verbose : LogLevel.Error;
@@ -301,6 +301,19 @@ namespace LootLocker
                     listener.OnHttpLog(record);
                 }
             }
+        }
+
+        private static string ObfuscateAndPrettifyJsonIfConfigured(string json)
+        {
+            if (LootLockerConfig.current.obfuscateLogs)
+            {
+                json = LootLockerObfuscator.ObfuscateJsonStringForLogging(json);
+            }
+            if (LootLockerConfig.current.prettifyJson)
+            {
+                json = LootLockerJson.PrettifyJsonString(json);
+            }
+            return json;
         }
     }
 
