@@ -6,13 +6,63 @@ using UnityEditor;
 
 namespace LootLocker
 {
-    #region Rate Limiting Support
-
-    public class RateLimiter
+    /// <summary>
+    /// Rate limiter service for managing HTTP request rate limiting
+    /// </summary>
+    public class RateLimiter : ILootLockerService
     {
-        protected bool EnableRateLimiter = true;
+        #region ILootLockerService Implementation
+        
+        public string ServiceName => "RateLimiter";
+        public bool IsInitialized { get; private set; } = true; // Rate limiter is always ready to use
 
+        /// <summary>
+        /// Initialize the rate limiter service. 
+        /// The rate limiter is always ready to use and doesn't require special initialization.
+        /// </summary>
+        public void Initialize()
+        {
+            // Rate limiter doesn't need special initialization, but mark as initialized for consistency
+            IsInitialized = true;
+        }
+
+        /// <summary>
+        /// Reset all rate limiting state to initial values.
+        /// This clears all request buckets, counters, and rate limiting flags.
+        /// Call this when you want to start fresh with rate limiting tracking.
+        /// </summary>
+        public void Reset()
+        {
+            LootLockerLogger.Log("Resetting RateLimiter service", LootLockerLogger.LogLevel.Verbose);
+            
+            // Reset all rate limiting state with null safety
+            if (buckets != null)
+                Array.Clear(buckets, 0, buckets.Length);
+            lastBucket = -1;
+            _lastBucketChangeTime = DateTime.MinValue;
+            _totalRequestsInBuckets = 0;
+            _totalRequestsInBucketsInTripWireTimeFrame = 0;
+            isRateLimited = false;
+            _rateLimitResolvesAt = DateTime.MinValue;
+            FirstRequestSent = false;
+        }
+
+        /// <summary>
+        /// Handle application quit events by resetting all rate limiting state.
+        /// This ensures clean shutdown and prevents any lingering state issues.
+        /// </summary>
+        public void HandleApplicationQuit()
+        {
+            Reset();
+        }
+
+        #endregion
+
+        #region Rate Limiting Implementation
+        
+        protected bool EnableRateLimiter = true;
         protected bool FirstRequestSent = false;
+        
         /* -- Configurable constants -- */
         // Tripwire settings, allow for a max total of n requests per x seconds
         protected const int TripWireTimeFrameSeconds = 60;
@@ -28,21 +78,22 @@ namespace LootLocker
         protected const int RateLimitMovingAverageBucketCount = CountMovingAverageAcrossNTripWireTimeFrames * BucketsPerTimeFrame;
         private const int MaxRequestsPerBucketOnMovingAverage = (int)((MaxRequestsPerTripWireTimeFrame * AllowXPercentOfTripWireMaxForMovingAverage) / (BucketsPerTimeFrame)); 
 
+        protected int GetMaxRequestsInSingleBucket()
+        {
+            return MaxRequestsPerBucketOnMovingAverage;
+        }
 
-        /* -- Functionality -- */
         protected readonly int[] buckets = new int[RateLimitMovingAverageBucketCount];
-
         protected int lastBucket = -1;
         private DateTime _lastBucketChangeTime = DateTime.MinValue;
         private int _totalRequestsInBuckets;
         private int _totalRequestsInBucketsInTripWireTimeFrame;
-
         protected bool isRateLimited = false;
         private DateTime _rateLimitResolvesAt = DateTime.MinValue;
 
         protected virtual DateTime GetTimeNow()
         {
-            return DateTime.Now;
+            return DateTime.UtcNow; // Use UTC for timezone-independent behavior
         }
 
         public int GetSecondsLeftOfRateLimit()
@@ -53,6 +104,7 @@ namespace LootLocker
             }
             return (int)Math.Ceiling((_rateLimitResolvesAt - GetTimeNow()).TotalSeconds);
         }
+        
         private int MoveCurrentBucket(DateTime now)
         {
             int moveOverXBuckets = _lastBucketChangeTime == DateTime.MinValue ? 1 : (int)Math.Floor((now - _lastBucketChangeTime).TotalSeconds / SecondsPerBucket);
@@ -116,9 +168,10 @@ namespace LootLocker
 #endif
                 if (isRateLimited)
                 {
-                    _rateLimitResolvesAt = (now - TimeSpan.FromSeconds(now.Second % SecondsPerBucket)) + TimeSpan.FromSeconds(buckets.Length*SecondsPerBucket);
+                    _rateLimitResolvesAt = (now - TimeSpan.FromSeconds(now.Second % SecondsPerBucket)) + TimeSpan.FromSeconds(buckets.Length * SecondsPerBucket);
                 }
             }
+
             if (currentBucket != lastBucket)
             {
                 _lastBucketChangeTime = now;
@@ -126,41 +179,8 @@ namespace LootLocker
             }
             return isRateLimited;
         }
-
-        protected int GetMaxRequestsInSingleBucket()
-        {
-            int maxRequests = 0;
-            foreach (var t in buckets)
-            {
-                maxRequests = Math.Max(maxRequests, t);
-            }
-
-            return maxRequests;
-        }
-
-        private static RateLimiter _rateLimiter = null;
-
-        public static RateLimiter Get()
-        {
-            if (_rateLimiter == null)
-            {
-                Reset();
-            }
-            return _rateLimiter;
-        }
-
-        public static void Reset()
-        {
-            _rateLimiter = new RateLimiter();
-        }
-
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            Reset();
-        }
-#endif
-    }
+    
     #endregion
+    }
+    
 }
