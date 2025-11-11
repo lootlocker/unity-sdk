@@ -11,87 +11,113 @@ using LootLocker.Requests;
 
 namespace LootLocker
 {
-    public class LootLockerHTTPClient : MonoBehaviour
+    public class LootLockerHTTPClient : MonoBehaviour, ILootLockerService
     {
-        private static bool _bTaggedGameObjects = false;
+        #region ILootLockerService Implementation
+        
+        public bool IsInitialized { get; private set; } = false;
+        public string ServiceName => "LootLocker HTTP Client (Legacy)";
+
+        public void Initialize()
+        {
+            if (IsInitialized) return;
+            
+            LootLockerLogger.Log($"Initializing {ServiceName}", LootLockerLogger.LogLevel.Verbose);
+            IsInitialized = true;
+        }
+
+        public void Reset()
+        {
+            IsInitialized = false;
+            _tries = 0;
+            _instance = null;
+        }
+
+        public void HandleApplicationQuit()
+        {
+            Reset();
+        }
+
+        public void OnDestroy()
+        {
+            Reset();
+        }
+        
+        #endregion
+
+        #region Singleton Management
+        
         private static LootLockerHTTPClient _instance;
+        private static readonly object _instanceLock = new object();
+        
+        #endregion
+
+        #region Legacy Fields
+        
+        private static bool _bTaggedGameObjects = false;
         private static int _instanceId = 0;
         private const int MaxRetries = 3;
         private int _tries;
         public GameObject HostingGameObject = null;
+        
+        #endregion
 
-        public static void Instantiate()
+        #region Public API
+
+        /// <summary>
+        /// Get the HTTPClient service instance through the LifecycleManager.
+        /// Services are automatically registered and initialized on first access if needed.
+        /// </summary>
+        public static LootLockerHTTPClient Get()
         {
-            if (_instance == null)
+            if (_instance != null)
             {
-                var gameObject = new GameObject("LootLockerHTTPClient");
-                if (_bTaggedGameObjects)
+                return _instance;
+            }
+            
+            lock (_instanceLock)
+            {
+                if (_instance == null)
                 {
-                    gameObject.tag = "LootLockerHTTPClientGameObject";
+                    // Register with LifecycleManager (will auto-initialize if needed)
+                    _instance = LootLockerLifecycleManager.GetService<LootLockerHTTPClient>();
                 }
-
-                _instance = gameObject.AddComponent<LootLockerHTTPClient>();
-                _instanceId = _instance.GetInstanceID();
-                _instance.HostingGameObject = gameObject;
-                _instance.StartCoroutine(CleanUpOldInstances());
-                if (Application.isPlaying)
-                    DontDestroyOnLoad(_instance.gameObject);
+                return _instance;
             }
         }
 
-        public static IEnumerator CleanUpOldInstances()
+        public static void Instantiate()
         {
-#if UNITY_2020_1_OR_NEWER
-            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsByType<LootLockerHTTPClient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-#else
-            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsOfType<LootLockerHTTPClient>();
-#endif
-            foreach (LootLockerHTTPClient serverApi in serverApis)
-            {
-                if (serverApi != null && _instanceId != serverApi.GetInstanceID() && serverApi.HostingGameObject != null)
-                {
-#if UNITY_EDITOR
-                    DestroyImmediate(serverApi.HostingGameObject);
-#else
-                    Destroy(serverApi.HostingGameObject);
-#endif
-                }
-            }
-            yield return null;
+            // Legacy compatibility method - services are now managed by LifecycleManager
+            // This method is kept for backwards compatibility but does nothing
+            Get(); // Ensure service is initialized
         }
 
         public static void ResetInstance()
         {
-            if (_instance == null) return;
-#if UNITY_EDITOR
-            DestroyImmediate(_instance.gameObject);
-#else
-            Destroy(_instance.gameObject);
-#endif
-            _instance = null;
-            _instanceId = 0;
+            lock (_instanceLock)
+            {
+                _instance = null;
+            }
         }
 
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        private static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            ResetInstance();
-        }
-#endif
+        #endregion
 
-        void Update()
+        #region Legacy Implementation
+
+        public static IEnumerator CleanUpOldInstances()
         {
+            // Legacy method - cleanup is now handled by LifecycleManager
+            yield return null;
         }
 
         public static void SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
         {
-            if (_instance == null)
+            var instance = Get();
+            if (instance != null)
             {
-                Instantiate();
+                instance._SendRequest(request, OnServerResponse);
             }
-
-            _instance._SendRequest(request, OnServerResponse);
         }
 
         private void _SendRequest(LootLockerServerRequest request, Action<LootLockerResponse> OnServerResponse = null)
@@ -525,7 +551,10 @@ namespace LootLocker
 
             return (GetUrl(callerRole) + ep + new LootLocker.Utilities.HTTP.QueryParamaterBuilder(queryParams).ToString()).Trim();
         }
-#endregion
+        
+        #endregion
+        
+        #endregion
     }
 }
 #endif
