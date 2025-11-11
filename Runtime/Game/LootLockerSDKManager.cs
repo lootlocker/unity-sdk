@@ -43,7 +43,8 @@ namespace LootLocker.Requests
         
         static bool Init()
         {
-            LootLockerHTTPClient.Instantiate();
+            // Initialize the lifecycle manager which will set up HTTP client
+            var _ = LootLockerLifecycleManager.Instance;
             return LoadConfig();
         }
 
@@ -57,7 +58,8 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info)
         {
-            LootLockerHTTPClient.Instantiate();
+            // Initialize the lifecycle manager which will set up HTTP client
+            var _ = LootLockerLifecycleManager.Instance;
             return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: logLevel);
         }
 
@@ -90,6 +92,8 @@ namespace LootLocker.Requests
             return !string.IsNullOrEmpty(playerData?.SessionToken);
         }
 
+
+
         /// <summary>
         /// Utility function to check if the sdk has been initialized
         /// </summary>
@@ -104,6 +108,13 @@ namespace LootLocker.Requests
                 {
                     return false;
                 }
+            }
+
+            // Ensure the lifecycle manager is ready after config initialization
+            if (!LootLockerLifecycleManager.IsReady)
+            {
+                LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment or ensure LootLockerConfig.current is properly set.", LootLockerLogger.LogLevel.Warning);
+                return false;
             }
 
             if (skipSessionCheck)
@@ -136,6 +147,31 @@ namespace LootLocker.Requests
             LootLockerStateData.overrideStateWriter(stateWriter);
         }
         #endif
+
+        /// <summary>
+        /// Reset all SDK services and state. 
+        /// This will reset all managed services through the lifecycle manager and clear local state.
+        /// Call this if you need to completely reinitialize the SDK without restarting the application.
+        /// Note: After calling this method, you will need to re-authenticate and reinitialize.
+        /// </summary>
+        /// <summary>
+        /// Reset the entire LootLocker SDK, clearing all services and state.
+        /// This will terminate all ongoing requests and reset all cached data.
+        /// Call this when switching between different game contexts or during application cleanup.
+        /// After calling this method, you'll need to re-initialize the SDK before making API calls.
+        /// </summary>
+        public static void ResetSDK()
+        {
+            LootLockerLogger.Log("Resetting LootLocker SDK - all services and state will be cleared", LootLockerLogger.LogLevel.Info);
+            
+            // Reset the lifecycle manager which will reset all managed services and coordinate with StateData
+            LootLockerLifecycleManager.ResetInstance();
+            
+            // Mark as uninitialized so next call requires re-initialization
+            initialized = false;
+            
+            LootLockerLogger.Log("LootLocker SDK reset complete", LootLockerLogger.LogLevel.Info);
+        }
         #endregion
 
         #region Multi-User Management
@@ -314,7 +350,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -329,7 +365,8 @@ namespace LootLocker.Requests
                             LastSignIn = DateTime.Now,
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
-                        });
+                        };
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -378,7 +415,7 @@ namespace LootLocker.Requests
                     var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (sessionResponse.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = sessionResponse.session_token,
                             RefreshToken = "",
@@ -394,7 +431,8 @@ namespace LootLocker.Requests
                             CreatedAt = sessionResponse.player_created_at,
                             WalletID = sessionResponse.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(sessionResponse);
@@ -432,7 +470,7 @@ namespace LootLocker.Requests
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerPlaystationV3SessionResponse>(serverResponse);
                 if (sessionResponse.success)
                 {
-                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    var playerData = new LootLockerPlayerData
                     {
                         SessionToken = sessionResponse.session_token,
                         RefreshToken = "",
@@ -448,7 +486,8 @@ namespace LootLocker.Requests
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
                         SessionOptionals = Optionals
-                    });
+                    };
+                    LootLockerEventSystem.TriggerSessionStarted(playerData);
                 }
 
                 onComplete?.Invoke(sessionResponse);
@@ -478,7 +517,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -494,7 +533,8 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -526,7 +566,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -542,7 +582,8 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -626,7 +667,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -642,7 +683,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -671,7 +714,7 @@ namespace LootLocker.Requests
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 if (sessionResponse.success)
                 {
-                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    var playerData = new LootLockerPlayerData
                     {
                         SessionToken = sessionResponse.session_token,
                         RefreshToken = "",
@@ -687,7 +730,9 @@ namespace LootLocker.Requests
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
                         SessionOptionals = Optionals
-                    });
+                    };
+                    
+                    LootLockerEventSystem.TriggerSessionStarted(playerData);
                 }
 
                 onComplete?.Invoke(sessionResponse);
@@ -715,7 +760,7 @@ namespace LootLocker.Requests
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                 if (sessionResponse.success)
                 {
-                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    var playerData = new LootLockerPlayerData
                     {
                         SessionToken = sessionResponse.session_token,
                         RefreshToken = "",
@@ -731,7 +776,9 @@ namespace LootLocker.Requests
                         CreatedAt = sessionResponse.player_created_at,
                         WalletID = sessionResponse.wallet_id,
                         SessionOptionals = Optionals
-                    });
+                    };
+                    
+                    LootLockerEventSystem.TriggerSessionStarted(playerData);
                 }
 
                 onComplete?.Invoke(sessionResponse);
@@ -778,7 +825,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -794,7 +841,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -826,7 +875,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
@@ -842,7 +891,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -874,7 +925,7 @@ namespace LootLocker.Requests
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -890,7 +941,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -924,7 +977,7 @@ namespace LootLocker.Requests
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -940,7 +993,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1005,7 +1060,7 @@ namespace LootLocker.Requests
                     var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1021,7 +1076,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1055,7 +1112,7 @@ namespace LootLocker.Requests
                     var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1071,7 +1128,7 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
                     }
 
                     onComplete?.Invoke(response);
@@ -1106,7 +1163,7 @@ namespace LootLocker.Requests
                     var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1122,7 +1179,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1179,7 +1238,7 @@ namespace LootLocker.Requests
                     var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1195,7 +1254,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1260,7 +1321,7 @@ namespace LootLocker.Requests
                     var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1276,7 +1337,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1313,7 +1376,7 @@ namespace LootLocker.Requests
                     var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1329,7 +1392,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1374,7 +1439,7 @@ namespace LootLocker.Requests
                     var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1422,7 +1487,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        var playerData = new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1438,7 +1503,9 @@ namespace LootLocker.Requests
                             CreatedAt = response.player_created_at,
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
-                        });
+                        };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1503,7 +1570,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1557,7 +1624,7 @@ namespace LootLocker.Requests
                 var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
                 if (response.success)
                 {
-                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                     {
                         SessionToken = response.session_token,
                         RefreshToken = response.refresh_token,
@@ -1636,7 +1703,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1686,7 +1753,7 @@ namespace LootLocker.Requests
                         var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
                         if (response.success)
                         {
-                            LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                            LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                             {
                                 SessionToken = response.session_token,
                                 RefreshToken = response.refresh_token,
@@ -1778,7 +1845,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1850,8 +1917,147 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Execute the request for the specified player.</param>
         public static void ClearLocalSession(string forPlayerWithUlid)
         {
-            LootLockerStateData.ClearSavedStateForPlayerWithULID(forPlayerWithUlid);
+            ClearCacheForPlayer(forPlayerWithUlid);
         }
+        #endregion
+
+        #region Presence
+
+#if LOOTLOCKER_ENABLE_PRESENCE
+        /// <summary>
+        /// Start the Presence WebSocket connection for real-time status updates
+        /// This will automatically authenticate using the current session token
+        /// </summary>
+        /// <param name="onConnectionStateChanged">Callback for connection state changes</param>
+        /// <param name="onMessageReceived">Callback for all presence messages</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void StartPresence(
+            LootLockerPresenceConnectionStateChanged onConnectionStateChanged = null,
+            LootLockerPresenceMessageReceived onMessageReceived = null,
+            string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onConnectionStateChanged?.Invoke(forPlayerWithUlid, LootLockerPresenceConnectionState.Failed, "SDK not initialized");
+                return;
+            }
+
+            // Subscribe to events if provided
+            if (onConnectionStateChanged != null)
+                LootLockerPresenceManager.OnConnectionStateChanged += onConnectionStateChanged;
+            if (onMessageReceived != null)
+                LootLockerPresenceManager.OnMessageReceived += onMessageReceived;
+
+            // Connect
+            LootLockerPresenceManager.ConnectPresence(forPlayerWithUlid, (success, error) => {
+                if (!success)
+                {
+                    onConnectionStateChanged?.Invoke(forPlayerWithUlid, LootLockerPresenceConnectionState.Failed, error ?? "Failed to start connection");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Stop the Presence WebSocket connection for a specific player
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void StopPresence(string forPlayerWithUlid = null)
+        {
+            LootLockerPresenceManager.DisconnectPresence(forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Stop all Presence WebSocket connections
+        /// </summary>
+        public static void StopAllPresence()
+        {
+            LootLockerPresenceManager.DisconnectAll();
+        }
+
+        /// <summary>
+        /// Update the player's presence status
+        /// </summary>
+        /// <param name="status">The status to set (e.g., "online", "in_game", "away")</param>
+        /// <param name="metadata">Optional metadata to include with the status</param>
+        /// <param name="onComplete">Callback for the result of the operation</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdatePresenceStatus(string status, string metadata = null, Action<bool> onComplete = null, string forPlayerWithUlid = null)
+        {
+            LootLockerPresenceManager.UpdatePresenceStatus(status, metadata, forPlayerWithUlid, (success, error) => {
+                onComplete?.Invoke(success);
+            });
+        }
+
+        /// <summary>
+        /// Send a ping to keep the Presence connection alive
+        /// </summary>
+        /// <param name="onComplete">Callback for the result of the ping</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SendPresencePing(Action<bool> onComplete = null, string forPlayerWithUlid = null)
+        {
+            var client = LootLockerPresenceManager.GetPresenceClient(forPlayerWithUlid);
+            if (client != null)
+            {
+                client.SendPing((success, error) => {
+                    onComplete?.Invoke(success);
+                });
+            }
+            else
+            {
+                onComplete?.Invoke(false);
+            }
+        }
+
+        /// <summary>
+        /// Get the current Presence connection state for a specific player
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>The current connection state</returns>
+        public static LootLockerPresenceConnectionState GetPresenceConnectionState(string forPlayerWithUlid = null)
+        {
+            return LootLockerPresenceManager.GetPresenceConnectionState(forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Check if Presence is connected and authenticated for a specific player
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>True if connected and authenticated, false otherwise</returns>
+        public static bool IsPresenceConnected(string forPlayerWithUlid = null)
+        {
+            return LootLockerPresenceManager.IsPresenceConnected(forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Get the active Presence client instance for a specific player
+        /// Use this to subscribe to events or access advanced functionality
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>The active LootLockerPresenceClient instance, or null if not connected</returns>
+        public static LootLockerPresenceClient GetPresenceClient(string forPlayerWithUlid = null)
+        {
+            return LootLockerPresenceManager.GetPresenceClient(forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Enable or disable the entire Presence system
+        /// </summary>
+        /// <param name="enabled">Whether to enable presence</param>
+        public static void SetPresenceEnabled(bool enabled)
+        {
+            LootLockerPresenceManager.IsEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Enable or disable automatic presence connection when sessions start
+        /// </summary>
+        /// <param name="enabled">Whether to auto-connect presence</param>
+        public static void SetPresenceAutoConnectEnabled(bool enabled)
+        {
+            LootLockerPresenceManager.AutoConnectEnabled = enabled;
+        }
+#endif
+
         #endregion
 
         #region Connected Accounts
@@ -2262,7 +2468,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -2664,7 +2870,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = "",
