@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace LootLocker
 {
@@ -35,6 +36,40 @@ namespace LootLocker
         public LootLockerStateData()
         {
             LoadMetaDataFromPlayerPrefsIfNeeded();
+        }
+
+        //==================================================
+        // Event Subscription
+        //==================================================
+        private static bool _eventSubscriptionsInitialized = false;
+
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void Initialize()
+        {
+            // Ensure we only subscribe once, even after domain reloads
+            if (_eventSubscriptionsInitialized)
+            {
+                return;
+            }
+
+            // Subscribe to session started events to automatically save player data
+            LootLockerEventSystem.Subscribe<LootLockerSessionStartedEventData>(
+                LootLockerEventType.SessionStarted,
+                OnSessionStartedEvent
+            );
+
+            _eventSubscriptionsInitialized = true;
+        }
+
+        /// <summary>
+        /// Handle session started events by saving the player data
+        /// </summary>
+        private static void OnSessionStartedEvent(LootLockerSessionStartedEventData eventData)
+        {
+            if (eventData?.playerData != null)
+            {
+                SetPlayerData(eventData.playerData);
+            }
         }
 
         //==================================================
@@ -136,6 +171,7 @@ namespace LootLocker
             }
 
             ActivePlayerData.Add(parsedPlayerData.ULID, parsedPlayerData);
+            LootLockerEventSystem.TriggerLocalSessionActivated(parsedPlayerData);
             return true;
         }
 
@@ -311,6 +347,8 @@ namespace LootLocker
                 }
                 SaveMetaDataToPlayerPrefs();
             }
+            
+            LootLockerEventSystem.TriggerLocalSessionDeactivated(playerULID);
             return true;
         }
 
@@ -370,11 +408,16 @@ namespace LootLocker
             }
 
             ActivePlayerData.Remove(playerULID);
+            LootLockerEventSystem.TriggerLocalSessionDeactivated(playerULID);
         }
 
         public static void SetAllPlayersToInactive()
         {
-            ActivePlayerData.Clear();
+            var activePlayers = ActivePlayerData.Keys.ToList();
+            foreach (string playerULID in activePlayers)
+            {
+                SetPlayerULIDToInactive(playerULID);
+            }
         }
 
         public static void SetAllPlayersToInactiveExceptForPlayer(string playerULID)
@@ -387,7 +430,7 @@ namespace LootLocker
             var keysToRemove = ActivePlayerData.Keys.Where(key => !key.Equals(playerULID, StringComparison.OrdinalIgnoreCase)).ToList();
             foreach (string key in keysToRemove)
             {
-                ActivePlayerData.Remove(key);
+                SetPlayerULIDToInactive(key);
             }
 
             SetDefaultPlayerULID(playerULID);
@@ -423,8 +466,8 @@ namespace LootLocker
 
         public static void Reset()
         {
+            SetAllPlayersToInactive();
             ActiveMetaData = null;
-            ActivePlayerData.Clear();
         }
     }
     #endregion // Public Methods
