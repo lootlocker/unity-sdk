@@ -176,6 +176,10 @@ namespace LootLocker.Admin
                 gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
             EditorGUILayout.Space();
+
+#if LOOTLOCKER_ENABLE_PRESENCE
+            DrawPresenceSettings();
+#endif
         }
 
         private static bool IsSemverString(string str)
@@ -183,6 +187,124 @@ namespace LootLocker.Admin
             return Regex.IsMatch(str,
                 @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
+
+#if LOOTLOCKER_ENABLE_PRESENCE
+        private void DrawPresenceSettings()
+        {
+            EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+
+            // Enable presence toggle
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresence"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.enablePresence = m_CustomSettings.FindProperty("enablePresence").boolValue;
+            }
+
+            if (!gameSettings.enablePresence)
+            {
+                EditorGUILayout.HelpBox("Presence system is disabled. Enable it to configure platform-specific settings.", MessageType.Info);
+                EditorGUILayout.Space();
+                return;
+            }
+
+            // Platform selection
+            EditorGUI.BeginChangeCheck();
+            var platformsProp = m_CustomSettings.FindProperty("enabledPresencePlatforms");
+            LootLockerPresencePlatforms currentFlags = (LootLockerPresencePlatforms)platformsProp.enumValueFlag;
+
+            // Use Unity's built-in EnumFlagsField for a much cleaner multi-select UI
+            EditorGUILayout.LabelField("Enabled Platforms", EditorStyles.label);
+            currentFlags = (LootLockerPresencePlatforms)EditorGUILayout.EnumFlagsField("Select Platforms", currentFlags);
+
+            // Quick selection buttons
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Quick Selection", EditorStyles.label);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("All", GUILayout.Width(60)))
+                {
+                    currentFlags = LootLockerPresencePlatforms.AllPlatforms;
+                }
+                if (GUILayout.Button("Recommended", GUILayout.Width(100)))
+                {
+                    currentFlags = LootLockerPresencePlatforms.RecommendedPlatforms;
+                }
+                if (GUILayout.Button("Desktop Only", GUILayout.Width(100)))
+                {
+                    currentFlags = LootLockerPresencePlatforms.AllDesktop | LootLockerPresencePlatforms.UnityEditor;
+                }
+                if (GUILayout.Button("None", GUILayout.Width(60)))
+                {
+                    currentFlags = LootLockerPresencePlatforms.None;
+                }
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                platformsProp.enumValueFlag = (int)currentFlags;
+                gameSettings.enabledPresencePlatforms = currentFlags;
+            }
+
+            // Show warning for problematic platforms
+            if ((currentFlags & LootLockerPresencePlatforms.WebGL) != 0)
+            {
+                EditorGUILayout.HelpBox("WebGL: WebSocket support varies by browser. Consider implementing fallback mechanisms.", MessageType.Warning);
+            }
+            if ((currentFlags & LootLockerPresencePlatforms.AllMobile) != 0)
+            {
+                EditorGUILayout.HelpBox("Mobile: WebSockets may impact battery life. Battery optimizations will disconnect/reconnect presence when app goes to background/foreground.", MessageType.Info);
+            }
+
+            EditorGUILayout.Space();
+
+            // Mobile battery optimizations
+            if ((currentFlags & LootLockerPresencePlatforms.AllMobile) != 0)
+            {
+                EditorGUILayout.LabelField("Mobile Battery Optimizations", EditorStyles.label);
+                
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enableMobileBatteryOptimizations"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    gameSettings.enableMobileBatteryOptimizations = m_CustomSettings.FindProperty("enableMobileBatteryOptimizations").boolValue;
+                }
+
+                if (gameSettings.enableMobileBatteryOptimizations)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    
+                    // Custom slider for update interval with full steps between 5-55 seconds
+                    EditorGUILayout.LabelField("Mobile Presence Update Interval (seconds)");
+                    float currentInterval = gameSettings.mobilePresenceUpdateInterval;
+                    float newInterval = EditorGUILayout.IntSlider(
+                        "Update Interval", 
+                        Mathf.RoundToInt(currentInterval), 
+                        5, 
+                        55
+                    );
+                    
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        gameSettings.mobilePresenceUpdateInterval = newInterval;
+                        m_CustomSettings.FindProperty("mobilePresenceUpdateInterval").floatValue = newInterval;
+                    }
+                    
+                    if (gameSettings.mobilePresenceUpdateInterval > 0)
+                    {
+                        EditorGUILayout.HelpBox($"Mobile battery optimizations enabled:\n• Presence connections will disconnect when app goes to background\n• Ping intervals set to {gameSettings.mobilePresenceUpdateInterval} seconds when active\n• Automatic reconnection when app returns to foreground", MessageType.Info);
+                    }
+                    else
+                    {
+                        EditorGUILayout.HelpBox("Mobile battery optimizations enabled:\n• Presence connections will disconnect when app goes to background\n• No ping throttling (uses standard 25-second intervals)\n• Automatic reconnection when app returns to foreground", MessageType.Info);
+                    }
+                }
+
+                EditorGUILayout.Space();
+            }
+        }
+#endif
 
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
