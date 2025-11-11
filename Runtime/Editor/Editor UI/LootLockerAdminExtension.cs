@@ -303,7 +303,8 @@ namespace LootLocker.Extension
 
         private void OnDestroy()
         {
-            LootLockerHTTPClient.ResetInstance();
+            // Reset through lifecycle manager instead
+            LootLockerLifecycleManager.ResetInstance();
         }
     }
 }
