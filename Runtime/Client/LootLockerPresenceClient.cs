@@ -289,7 +289,7 @@ namespace LootLocker
                                    connectionState == LootLockerPresenceConnectionState.Reconnecting;
 
         /// <summary>
-        /// Whether the client is currently connecting or reconnecting
+        /// Whether the client is currently authenticating
         /// </summary>
         public bool IsAuthenticating => connectionState == LootLockerPresenceConnectionState.Authenticating;
 

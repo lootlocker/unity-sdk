@@ -108,7 +108,7 @@ namespace LootLocker
 
         #endregion
 
-        /// <summary>
+
         #region Singleton Management
         
         private static LootLockerPresenceManager _instance;
@@ -381,19 +381,20 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Handle local session activated events
+        /// Handle local session deactivated events
         /// </summary>
         private void OnLocalSessionDeactivatedEvent(LootLockerLocalSessionDeactivatedEventData eventData)
         {
             if (!string.IsNullOrEmpty(eventData.playerUlid))
             {
-                LootLockerLogger.Log($"Local session activated event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Local session deactivated event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Verbose);
                 DisconnectPresence(eventData.playerUlid);
             }
         }
 
         /// <summary>
-        /// Handle session activated events
+        /// Handles local session activation by checking if presence and auto-connect are enabled,
+        /// and, if so, automatically connects presence for the activated player session.
         /// </summary>
         private void OnLocalSessionActivatedEvent(LootLockerLocalSessionActivatedEventData eventData)
         {
