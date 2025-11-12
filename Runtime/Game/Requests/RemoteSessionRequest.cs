@@ -220,6 +220,16 @@ namespace LootLocker
                 _instance = null;
             }
 
+            void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+            {
+                // RemoteSessionPoller doesn't need special pause handling
+            }
+
+            void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+            {
+                // RemoteSessionPoller doesn't need special focus handling
+            }
+
             void ILootLockerService.HandleApplicationQuit()
             {
                 ((ILootLockerService)this).Reset();

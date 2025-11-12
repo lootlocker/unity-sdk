@@ -191,6 +191,16 @@ namespace LootLocker
             IsInitialized = false;
         }
 
+        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+        {
+            // Event system doesn't need to handle pause events
+        }
+
+        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+        {
+            // Event system doesn't need to handle focus events
+        }
+
         void ILootLockerService.HandleApplicationQuit()
         {
             ClearAllSubscribers();
