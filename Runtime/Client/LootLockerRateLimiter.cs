@@ -56,6 +56,22 @@ namespace LootLocker
             Reset();
         }
 
+        /// <summary>
+        /// Handle application pause events. Rate limiter doesn't need special handling.
+        /// </summary>
+        public void HandleApplicationPause(bool pauseStatus)
+        {
+            // Rate limiter doesn't need special pause handling
+        }
+
+        /// <summary>
+        /// Handle application focus events. Rate limiter doesn't need special handling.
+        /// </summary>
+        public void HandleApplicationFocus(bool hasFocus)
+        {
+            // Rate limiter doesn't need special focus handling
+        }
+
         #endregion
 
         #region Rate Limiting Implementation

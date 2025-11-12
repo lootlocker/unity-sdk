@@ -181,6 +181,16 @@ namespace LootLocker
             }
         }
 
+        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+        {
+            // HTTP client doesn't need special pause handling
+        }
+
+        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+        {
+            // HTTP client doesn't need special focus handling
+        }
+
         void ILootLockerService.HandleApplicationQuit()
         {
             // Abort all ongoing requests and notify callbacks
