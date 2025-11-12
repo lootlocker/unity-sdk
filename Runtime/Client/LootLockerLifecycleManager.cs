@@ -23,12 +23,12 @@ namespace LootLocker
         /// <summary>
         /// Handle application pause events (optional - default implementation does nothing)
         /// </summary>
-        void HandleApplicationPause(bool pauseStatus) { }
+        void HandleApplicationPause(bool pauseStatus);
         
         /// <summary>
         /// Handle application focus events (optional - default implementation does nothing)
         /// </summary>
-        void HandleApplicationFocus(bool hasFocus) { }
+        void HandleApplicationFocus(bool hasFocus);
         
         /// <summary>
         /// Handle application quit events
@@ -207,8 +207,10 @@ namespace LootLocker
             // Define the initialization order here
             typeof(RateLimiter), // Rate limiter first (used by HTTP client)
             typeof(LootLockerHTTPClient),         // HTTP client second
-            typeof(LootLockerEventSystem),        // Events system third
+            typeof(LootLockerEventSystem),       // Events system third
+#if LOOTLOCKER_ENABLE_PRESENCE
             typeof(LootLockerPresenceManager)     // Presence manager last (depends on HTTP)
+#endif
         };
         private bool _isInitialized = false;
         private static LifecycleManagerState _state = LifecycleManagerState.Ready;
@@ -382,8 +384,10 @@ namespace LootLocker
                             _RegisterAndInitializeService<LootLockerEventSystem>();
                         else if (serviceType == typeof(LootLockerHTTPClient))
                             _RegisterAndInitializeService<LootLockerHTTPClient>();
+#if LOOTLOCKER_ENABLE_PRESENCE
                         else if (serviceType == typeof(LootLockerPresenceManager))
                             _RegisterAndInitializeService<LootLockerPresenceManager>();
+#endif
                     }
 
                     // Note: RemoteSessionPoller is registered on-demand only when needed
