@@ -25,6 +25,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -33,7 +34,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -100,11 +101,14 @@ namespace LootLockerTests.PlayMode
                 guestLoginCompleted = true;
             });
             yield return new WaitUntil(() => guestLoginCompleted);
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -121,11 +125,14 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Leaderboard_ListTopTenAsPlayer_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -152,7 +159,7 @@ namespace LootLockerTests.PlayMode
                 LootLockerSDKManager.SubmitScore(null, score, leaderboardKey, (response) => 
                 {
                     scoreSubmitted = true;
-                });
+                }, playerUlid);
                 yield return new WaitUntil(()=> scoreSubmitted);
                 Scores.Add(score);
             }
@@ -169,7 +176,7 @@ namespace LootLockerTests.PlayMode
 
             //Then
             Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
-            Assert.AreEqual(submittedScores, actualResponse.items.Length, "got more scores than expected");
+            Assert.AreEqual(submittedScores, actualResponse.items.Length, "Didn't get the expected number of scores");
             for (int i = 0; i < actualResponse.items.Length; i++)
             {
                 Assert.AreEqual(i+1, actualResponse.items[i].rank, $"Did not get expected rank order");
@@ -185,13 +192,13 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListTopTenAsGeneric_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             //Given 
-            string genericLeaderboardKey = "genericLeaderboard";
+            string genericLeaderboardKey = "genericleaderboard";
             var createLeaderboardRequest = new CreateLootLockerLeaderboardRequest
             {
                 name = "Local Generic Leaderboard",
@@ -270,7 +277,7 @@ namespace LootLockerTests.PlayMode
         }
 
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListScoresThatHaveMetadata_GetsMetadata()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -312,6 +319,287 @@ namespace LootLockerTests.PlayMode
                 Assert.AreEqual($"Metadata_{item.score}", item.metadata, "Leaderboard item did not have the expected metadata");
             }
 
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_IncrementScorePositive_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 100;
+            bool scoreSubmitted = false;
+            LootLockerSDKManager.SubmitScore(null, initialScore, leaderboardKey, (response) =>
+            {
+                scoreSubmitted = true;
+            });
+            yield return new WaitUntil(() => scoreSubmitted);
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = 10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_IncrementScoreNegative_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 100;
+            bool scoreSubmitted = false;
+            LootLockerSDKManager.SubmitScore(null, initialScore, leaderboardKey, (response) =>
+            {
+                scoreSubmitted = true;
+            });
+            yield return new WaitUntil(() => scoreSubmitted);
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = -10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_PositivelyIncrementNonExistingScore_SetsScoreToIncrementValue()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 0;
+
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = 10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_NegativelyIncrementNonExistingScore_SetsScoreToIncrementValue()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int initialScore = 0;
+            //When
+            LootLockerSubmitScoreResponse incrementResponse = null;
+            bool scoreIncremented = false;
+            int incrementAmount = -10;
+            LootLockerSDKManager.IncrementScore(null, incrementAmount, leaderboardKey, (response) =>
+            {
+                incrementResponse = response;
+                scoreIncremented = true;
+            });
+            yield return new WaitUntil(() => scoreIncremented);
+
+            // Then
+            LootLockerGetScoreListResponse actualResponse = null;
+            bool scoreListCompleted = false;
+            LootLockerSDKManager.GetScoreList(leaderboardKey, 1, 0, (response) =>
+            {
+                actualResponse = response;
+                scoreListCompleted = true;
+            });
+            yield return new WaitUntil(() => scoreListCompleted);
+
+            //Then
+            Assert.IsTrue(incrementResponse.success, "IncrementScore request failed");
+            Assert.IsTrue(actualResponse.success, "GetScoreList request failed");
+            Assert.AreEqual(1, actualResponse.items.Length, "Did not get the expected number of scores");
+            Assert.AreEqual(initialScore + incrementAmount, actualResponse.items[0].score, "Score was not incremented as expected");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_QueryScoreForPlayerTypeLeaderboard_GivesCorrectPlacement()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            int submittedScores = 0;
+            List<string> Users = new List<string> { };
+            List<int> Scores = new List<int> { };
+            for (; submittedScores < 10; submittedScores++)
+            {
+                bool guestSessionCompleted = false;
+                string user = $"User_number_{submittedScores}";
+                string playerUlid = "";
+                LootLockerSDKManager.StartGuestSession(user, (response) =>
+                {
+                    playerUlid = response.player_ulid;
+                    guestSessionCompleted = true;
+                });
+                yield return new WaitUntil(() => guestSessionCompleted);
+
+                Users.Add(playerUlid);
+                bool scoreSubmitted = false;
+                int score = (submittedScores + 1) * 100;
+                LootLockerSDKManager.SubmitScore(null, score, leaderboardKey, (response) =>
+                {
+                    scoreSubmitted = true;
+                }, playerUlid);
+                yield return new WaitUntil(() => scoreSubmitted);
+                Scores.Add(score);
+            }
+
+            //When
+
+            int expectedRank = 5;
+            int scoreToQuery = Scores[Scores.Count - expectedRank] + 10; // Scores are in increasing order so reverse index
+            LootLockerSubmitScoreResponse queryResponse = null;
+            bool scoreQueried = false;
+            LootLockerSDKManager.QueryScore(scoreToQuery, leaderboardKey, (response) =>
+            {
+                queryResponse = response;
+                scoreQueried = true;
+            });
+            yield return new WaitUntil(() => scoreQueried);
+
+            //Then
+            Assert.IsTrue(queryResponse.success, "QueryScore request failed");
+            Assert.AreEqual(expectedRank, queryResponse.rank, "Did not get expected rank");
+            Assert.AreEqual(scoreToQuery, queryResponse.score, "Did not get expected score");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Leaderboard_QueryScoreForGenericTypeLeaderboard_GivesCorrectPlacement()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            string genericLeaderboardKey = "genericleaderboard";
+            var createLeaderboardRequest = new CreateLootLockerLeaderboardRequest
+            {
+                name = "Local Generic Leaderboard",
+                key = genericLeaderboardKey,
+                direction_method = LootLockerLeaderboardSortDirection.descending.ToString(),
+                enable_game_api_writes = true,
+                has_metadata = true,
+                overwrite_score_on_submit = false,
+                type = "generic"
+            };
+
+            bool leaderboardCreated = false;
+            bool leaderboardSuccess = false;
+            gameUnderTest.CreateLeaderboard(createLeaderboardRequest, (response) =>
+            {
+                leaderboardSuccess = response.success;
+                leaderboardCreated = true;
+
+            });
+            yield return new WaitUntil(() => leaderboardCreated);
+            Assert.IsTrue(leaderboardSuccess, "Could not create generic leaderboard");
+
+            int submittedScores = 0;
+            List<string> Users = new List<string> { };
+            List<int> Scores = new List<int> { };
+            for (; submittedScores < 10; submittedScores++)
+            {
+                bool guestSessionCompleted = false;
+                string user = $"User_number_{submittedScores}";
+                string playerUlid = "";
+                string playerPublicUID = "";
+                LootLockerSDKManager.StartGuestSession(user, (response) =>
+                {
+                    playerUlid = response.player_ulid;
+                    playerPublicUID = response.public_uid;
+                    guestSessionCompleted = true;
+                });
+                yield return new WaitUntil(() => guestSessionCompleted);
+
+                Users.Add(playerUlid);
+                bool scoreSubmitted = false;
+                int score = (submittedScores + 1) * 100;
+                LootLockerSDKManager.SubmitScore(playerPublicUID, score, genericLeaderboardKey, (response) =>
+                {
+                    scoreSubmitted = true;
+                }, playerUlid);
+                yield return new WaitUntil(() => scoreSubmitted);
+                Scores.Add(score);
+            }
+
+            //When
+            int expectedRank = 5;
+            int scoreToQuery = Scores[Scores.Count - expectedRank] + 10; // Scores are in increasing order so reverse index
+            LootLockerSubmitScoreResponse queryResponse = null;
+            bool scoreQueried = false;
+            LootLockerSDKManager.QueryScore(scoreToQuery, genericLeaderboardKey, (response) =>
+            {
+                queryResponse = response;
+                scoreQueried = true;
+            });
+            yield return new WaitUntil(() => scoreQueried);
+
+            //Then
+            Assert.IsTrue(queryResponse.success, "QueryScore request failed");
+            Assert.AreEqual(expectedRank, queryResponse.rank, "Did not get expected rank");
+            Assert.AreEqual(scoreToQuery, queryResponse.score, "Did not get expected score");
         }
     }
 }

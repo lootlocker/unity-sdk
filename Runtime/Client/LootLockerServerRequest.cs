@@ -1,4 +1,4 @@
-#if !LOOTLOCKER_BETA_HTTP_QUEUE
+#if LOOTLOCKER_LEGACY_HTTP_STACK
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -21,6 +21,8 @@ namespace LootLocker
         public string uploadType { get; set; }
         public LootLockerCallerRole callerRole { get; set; }
         public WWWForm form { get; set; }
+        public string forPlayerWithUlid { get; set; }
+        public DateTime requestStartTime { get; set; }
 
         /// <summary>
         /// Leave this null if you don't need custom headers
@@ -37,23 +39,28 @@ namespace LootLocker
 
         #region Make ServerRequest and call send (3 functions)
 
-        public static void CallAPI(string endPoint, LootLockerHTTPMethod httpMethod, string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
+        public static void CallAPI(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod,
+            string body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true,
+            LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User,
+            Dictionary<string, string> additionalHeaders = null)
         {
             if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
+                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit(), forPlayerWithUlid, DateTime.Now));
                 return;
             }
 
-#if UNITY_EDITOR
-            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Debug)("Caller Type: " + callerRole);
-#endif
+            if (useAuthToken && string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = LootLockerStateData.GetDefaultPlayerULID();
+            }
+
+            LootLockerLogger.Log("Caller Type: " + callerRole, LootLockerLogger.LogLevel.Debug);
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
             if (useAuthToken)
             {
-                headers = new Dictionary<string, string>();
                 if (callerRole == LootLockerCallerRole.Admin)
                 {
 #if UNITY_EDITOR
@@ -63,9 +70,13 @@ namespace LootLocker
                     }
 #endif
                 }
-                else if (!string.IsNullOrEmpty(LootLockerConfig.current.token))
+                else
                 {
-                    headers.Add("x-session-token", LootLockerConfig.current.token);
+                    var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                    if (playerData != null && !string.IsNullOrEmpty(playerData.SessionToken))
+                    {
+                        headers.Add("x-session-token", playerData.SessionToken);
+                    }
                 }
             }
 
@@ -80,46 +91,58 @@ namespace LootLocker
                 }
             }
 
-            new LootLockerServerRequest(endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
+            new LootLockerServerRequest(forPlayerWithUlid, endPoint, httpMethod, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
 
-        public static void UploadFile(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
+        public static void UploadFile(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
             if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
             {
-                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit()));
+                onComplete?.Invoke(LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(endPoint, RateLimiter.Get().GetSecondsLeftOfRateLimit(), forPlayerWithUlid, DateTime.Now));
                 return;
             }
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (file.Length == 0)
             {
-#if UNITY_EDITOR
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("File content is empty, not allowed.");
-#endif
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed."));
+                LootLockerLogger.Log("File content is empty, not allowed.", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("File content is empty, not allowed.", forPlayerWithUlid));
                 return;
             }
             if (useAuthToken)
             {
-                headers = new Dictionary<string, string>();
-
-                headers.Add(callerRole == LootLockerCallerRole.Admin ? "x-auth-token" : "x-session-token", LootLockerConfig.current.token);
+                if (callerRole == LootLockerCallerRole.Admin)
+                {
+#if UNITY_EDITOR
+                    if (!string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+                    {
+                        headers.Add("x-auth-token", LootLockerConfig.current.adminToken);
+                    }
+#endif
+                }
+                else
+                {
+                    var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                    if (playerData != null && !string.IsNullOrEmpty(playerData.SessionToken))
+                    {
+                        headers.Add("x-session-token", playerData.SessionToken);
+                    }
+                }
             }
             
-            new LootLockerServerRequest(endPoint, httpMethod, file, fileName, fileContentType, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
+            new LootLockerServerRequest(forPlayerWithUlid, endPoint, httpMethod, file, fileName, fileContentType, body, headers, callerRole: callerRole).Send((response) => { onComplete?.Invoke(response); });
         }
         
-        public static void UploadFile(EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null,
+        public static void UploadFile(string forPlayerWithUlid, EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null,
             bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
-            UploadFile(endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole);
+            UploadFile(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, file, fileName, fileContentType, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken, callerRole);
         }
 
         #endregion
 
         #region ServerRequest constructor
 
-        public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null,
+        public LootLockerServerRequest(string forPlayerWithUlid, string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, byte[] upload = null, string uploadName = null, string uploadType = null, Dictionary<string, string> body = null,
             Dictionary<string, string> extraHeaders = null, bool useAuthToken = true, LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, bool isFileUpload = true)
         {
             this.retryCount = 0;
@@ -134,6 +157,8 @@ namespace LootLocker
             this.queryParams = null;
             this.callerRole = callerRole;
             this.form = new WWWForm();
+            this.forPlayerWithUlid = forPlayerWithUlid;
+            this.requestStartTime = DateTime.Now;
 
             foreach (var kvp in body)
             {
@@ -146,11 +171,11 @@ namespace LootLocker
 
             if (this.payload != null && isNonPayloadMethod)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerLogger.Log("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint, LootLockerLogger.LogLevel.Warning);
             }
         }
 
-        public LootLockerServerRequest(string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true,
+        public LootLockerServerRequest(string forPlayerWithUlid, string endpoint, LootLockerHTTPMethod httpMethod = LootLockerHTTPMethod.GET, string payload = null, Dictionary<string, string> extraHeaders = null, Dictionary<string, string> queryParams = null, bool useAuthToken = true,
             LootLocker.LootLockerEnums.LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User)
         {
             this.retryCount = 0;
@@ -166,9 +191,11 @@ namespace LootLocker
             this.callerRole = callerRole;
             bool isNonPayloadMethod = (this.httpMethod == LootLockerHTTPMethod.GET || this.httpMethod == LootLockerHTTPMethod.HEAD || this.httpMethod == LootLockerHTTPMethod.OPTIONS);
             this.form = null;
+            this.forPlayerWithUlid = forPlayerWithUlid;
+            this.requestStartTime = DateTime.Now;
             if (!string.IsNullOrEmpty(jsonPayload) && isNonPayloadMethod)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Warning)("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint);
+                LootLockerLogger.Log("Payloads should not be sent in GET, HEAD, OPTIONS, requests. Attempted to send a payload to: " + this.httpMethod.ToString() + " " + this.endpoint, LootLockerLogger.LogLevel.Warning);
             }
         }
 

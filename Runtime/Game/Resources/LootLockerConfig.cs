@@ -4,7 +4,6 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
-using UnityEditor.PackageManager.UI;
 #endif
 using UnityEngine;
 
@@ -142,7 +141,7 @@ namespace LootLocker
                     if (package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
-                        LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                        LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                         return;
                     }
                 }
@@ -150,7 +149,7 @@ namespace LootLocker
                 if (File.Exists("Assets/LootLockerSDK/package.json"))
                 {
                     LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
-                    LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                    LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                     return;
                 }
 
@@ -163,7 +162,7 @@ namespace LootLocker
                         if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
                         {
                             LootLockerConfig.current.sdk_version = packageDescription.version;
-                            LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Verbose)($"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                            LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                             return;
                         }
                     }
@@ -173,22 +172,22 @@ namespace LootLocker
             }
         }
 #endif
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerConfig.DebugLevel debugLevel = DebugLevel.All, bool allowTokenRefresh = false)
+
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
-            _current.currentDebugLevel = debugLevel;
+            _current.logLevel = logLevel;
+            _current.prettifyJson = prettifyJson;
+            _current.logInBuilds = logInBuilds;
+            _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
-            _current.token = null;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
-            _current.refreshToken = null;
-            _current.gameID = 0;
-            _current.deviceID = null;
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             _current.CheckForSettingOverrides();
 #endif
@@ -200,30 +199,31 @@ namespace LootLocker
         {
             _current.apiKey = null;
             _current.game_version = null;
-            _current.currentDebugLevel = DebugLevel.All;
+            _current.logLevel = LootLockerLogger.LogLevel.Info;
+            _current.prettifyJson = false;
+            _current.logInBuilds = false;
+            _current.logErrorsAsWarnings = false;
+            _current.obfuscateLogs = true;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
-            _current.token = null;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
-            _current.refreshToken = null;
-            _current.gameID = 0;
-            _current.deviceID = null;
             return true;
         }
 
         private void ConstructUrls()
         {
-            string startOfUrl = UrlProtocol;
+            string urlCore = GetUrlCore();
+            string startOfUrl = urlCore.Contains("localhost") ? "http://" : UrlProtocol;
             if (!string.IsNullOrEmpty(domainKey))
             {
                 startOfUrl += domainKey + ".";
             }
-            adminUrl = startOfUrl + GetUrlCore() + AdminUrlAppendage;
-            playerUrl = startOfUrl + GetUrlCore() + PlayerUrlAppendage;
-            userUrl = startOfUrl + GetUrlCore() + UserUrlAppendage;
-            baseUrl = startOfUrl + GetUrlCore();
+            adminUrl = startOfUrl + urlCore + AdminUrlAppendage;
+            playerUrl = startOfUrl + urlCore + PlayerUrlAppendage;
+            userUrl = startOfUrl + urlCore + UserUrlAppendage;
+            baseUrl = startOfUrl + urlCore;
         }
 
         private static LootLockerConfig _current;
@@ -243,31 +243,19 @@ namespace LootLocker
 
         public (string key, string value) dateVersion = ("LL-Version", "2021-03-01");
         public string apiKey;
-        [HideInInspector]
-        public string token;
 #if UNITY_EDITOR
-        [HideInInspector]
-        public string adminToken = null;
+        [HideInInspector] public string adminToken = null;
 #endif
-        [HideInInspector]
-        public string refreshToken;
-        [HideInInspector]
-        public string domainKey;
-        [HideInInspector]
-        public int gameID;
+        [HideInInspector] public string domainKey;
         public string game_version = "1.0.0.0";
-        [HideInInspector] 
-        public string sdk_version = "";
-        [HideInInspector]
-        public string deviceID = "defaultPlayerId";
-        [HideInInspector]
-        public string playerULID = null;
-
+        [HideInInspector] public string sdk_version = "";
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
         [HideInInspector] private static string UrlCoreOverride =
 #if LOOTLOCKER_TARGET_STAGE_ENV
            "api.stage.internal.dev.lootlocker.cloud";
+#elif LOOTLOCKER_TARGET_LOCAL_ENV
+           "localhost:8080";
 #else
             null;
 #endif
@@ -290,8 +278,12 @@ namespace LootLocker
         [HideInInspector] public string userUrl = UrlProtocol + GetUrlCore() + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
-        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
-        public DebugLevel currentDebugLevel = DebugLevel.All;
+        public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
+        // Write JSON in a pretty and indented format when logging
+        public bool prettifyJson = true;
+        [HideInInspector] public bool obfuscateLogs = true;
+        public bool logErrorsAsWarnings = false;
+        public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
 
 #if UNITY_EDITOR

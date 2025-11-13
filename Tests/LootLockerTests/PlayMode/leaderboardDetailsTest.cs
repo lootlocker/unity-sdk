@@ -22,6 +22,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -30,7 +31,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -104,11 +105,14 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => leaderboardCreated);
 
             Assert.IsTrue(leaderboardSuccess, "Failed to create leaderboard");
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -125,11 +129,14 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListSchedule_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -164,7 +171,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedCronExpression, actualResponse.schedule.cron_expression, "The submitted cron expression was not set on the leaderboard");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Leaderboard_ListRewards_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

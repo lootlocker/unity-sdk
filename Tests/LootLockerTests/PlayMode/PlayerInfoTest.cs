@@ -24,6 +24,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -32,7 +33,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "PlayerInfoTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -67,11 +68,14 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -88,11 +92,14 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator PlayerInfo_GetCurrentPlayerInfo_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -148,7 +155,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(expectedPlayerLegacyId, actualPlayerLegacyId, "Player legacy id was not the same between session start and player info fetch");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator PlayerInfo_ListPlayerInfoForMultiplePlayersUsingDifferentIds_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -160,29 +167,43 @@ namespace LootLockerTests.PlayMode
             for (int playersCreated = 0; playersCreated < playersToCreate; playersCreated++)
             {
                 bool playerCreateCompleted = false;
+                string errorMessage = null;
                 LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
                 {
-                    Assert.IsTrue(sessionResponse.success, "Guest Session failed");
+                    if (!sessionResponse.success)
+                    {
+                        errorMessage = sessionResponse.errorData.ToString();
+                        playerCreateCompleted = true;
+                        return;
+                    }
                     var playerInfo = new LootLockerPlayerInfo { created_at = sessionResponse.player_created_at, id = sessionResponse.player_ulid, name = sessionResponse.player_name, legacy_id = sessionResponse.player_id, public_uid = sessionResponse.public_uid };
                     LootLockerSDKManager.SetPlayerName(sessionResponse.public_uid, (setPlayerNameResponse) =>
                     {
-                        Assert.IsTrue(setPlayerNameResponse.success, "Setting player name failed");
+                        if (!setPlayerNameResponse.success)
+                        {
+                            errorMessage = setPlayerNameResponse.errorData.ToString();
+                            playerCreateCompleted = true;
+                            return;
+                        }
                         playerInfo.name = setPlayerNameResponse.name;
                         expectedPlayerInfoToPlayerIdMap.Add(playerInfo.id, playerInfo);
                         expectedPlayerInfoToPlayerPublicUidMap.Add(playerInfo.public_uid, playerInfo);
                         expectedPlayerInfoToPlayerLegacyIdMap.Add(playerInfo.legacy_id, playerInfo);
                         playerCreateCompleted = true;
-                    });
+                    }, sessionResponse.player_ulid);
                 });
                 yield return new WaitUntil(() => playerCreateCompleted);
+                Assert.IsNull(errorMessage, errorMessage);
             }
 
             var guestSessionSucceeded = false;
             var guestSessionCompleted = false;
+            string guestUlid = null;
             LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), (sessionResponse) =>
             {
-                guestSessionSucceeded = sessionResponse.success;
+                guestSessionSucceeded = sessionResponse?.success ?? false;
                 guestSessionCompleted = true;
+                guestUlid = sessionResponse?.player_ulid ?? string.Empty;
             });
             yield return new WaitUntil(() => guestSessionCompleted);
             Assert.IsTrue(guestSessionSucceeded, "Guest Session Start failed");
@@ -210,7 +231,7 @@ namespace LootLockerTests.PlayMode
             {
                 actualResponse = response;
                 listPlayerInfoCompleted = true;
-            });
+            }, guestUlid);
             yield return new WaitUntil(() => listPlayerInfoCompleted);
 
             Assert.IsTrue(actualResponse?.success, "ListPlayerInfo request failed");
@@ -227,6 +248,7 @@ namespace LootLockerTests.PlayMode
                 else if (j % 3 == 2)
                     Assert.IsTrue(expectedPlayerInfoToPlayerPublicUidMap.TryGetValue(actualPlayerInfo.public_uid, out expectedPlayerInfo));
 
+                Assert.IsNotNull(expectedPlayerInfo);
                 Assert.Greater(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(-5), "Player creation time was not as expected for player " + j);
                 Assert.LessOrEqual(actualPlayerInfo.created_at, expectedPlayerInfo.created_at.AddMinutes(5), "Player creation time was not as expected for player " + j);
                 Assert.AreEqual(expectedPlayerInfo.name, actualPlayerInfo.name, "Player name was not as expected for player " + j);

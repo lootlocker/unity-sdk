@@ -6,6 +6,7 @@ using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
 using System.Security.Cryptography;
+using UnityEngine.Networking;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,14 +32,15 @@ namespace LootLocker.Requests
         /// <summary>
         /// Stores which platform the player currently has a session for.
         /// </summary>
-        public static string GetCurrentPlatform()
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static string GetCurrentPlatform(string forPlayerWithUlid = null)
         {
-            return CurrentPlatform.GetString();
+            return LootLockerAuthPlatform.GetPlatformRepresentation(GetLastActivePlatform(forPlayerWithUlid)).PlatformString;
         }
 
         #region Init
-
-        static bool initialized;
+        private static bool initialized;
+        
         static bool Init()
         {
             LootLockerHTTPClient.Instantiate();
@@ -51,11 +53,12 @@ namespace LootLocker.Requests
         /// <param name="apiKey">Find the Game API-key at https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
+        /// <param name="logLevel">What log level to use for the SDKs internal logging</param>
         /// <returns>True if initialized successfully, false otherwise</returns>
-        public static bool Init(string apiKey, string gameVersion, string domainKey)
+        public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info)
         {
             LootLockerHTTPClient.Instantiate();
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey);
+            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: logLevel);
         }
 
         static bool LoadConfig()
@@ -63,12 +66,12 @@ namespace LootLocker.Requests
             initialized = false;
             if (LootLockerConfig.current == null)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
+                LootLockerLogger.Log("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
             if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)");
+                LootLockerLogger.Log("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
                 return false;
             }
             
@@ -79,41 +82,185 @@ namespace LootLocker.Requests
         /// <summary>
         /// Checks if an active session exists.
         /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>True if a token is found, false otherwise.</returns>
-        private static bool CheckActiveSession()
+        private static bool CheckActiveSession(string forPlayerWithUlid = null)
         {
-            if (string.IsNullOrEmpty(LootLockerConfig.current.token))
-            {
-                return false;
-            }
-
-            return true;
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            return !string.IsNullOrEmpty(playerData?.SessionToken);
         }
 
         /// <summary>
         /// Utility function to check if the sdk has been initialized
         /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>True if initialized, false otherwise.</returns>
-        public static bool CheckInitialized(bool skipSessionCheck = false)
+        public static bool CheckInitialized(bool skipSessionCheck = false, string forPlayerWithUlid = null)
         {
             if (!initialized)
             {
-                LootLockerConfig.current.token = "";
-                LootLockerConfig.current.refreshToken = "";
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = null;
+                LootLockerStateData.Reset();
                 if (!Init())
                 {
                     return false;
                 }
             }
 
-            if (!skipSessionCheck && !CheckActiveSession())
+            if (skipSessionCheck)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return CheckActiveSession(forPlayerWithUlid);
+        }
+
+#if !LOOTLOCKER_LEGACY_HTTP_STACK && LOOTLOCKER_ENABLE_HTTP_CONFIGURATION_OVERRIDE
+        public static void _OverrideLootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
+        {
+            LootLockerHTTPClient.Get().OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
+        }
+
+        public static void _OverrideLootLockerCertificateHandler(CertificateHandler certificateHandler)
+        {
+            LootLockerHTTPClient.Get().OverrideCertificateHandler(certificateHandler);
+        }
+#endif
+
+
+        #endregion
+
+        #region SDK Customization
+        #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+        public static void SetStateWriter(ILootLockerStateWriter stateWriter)
+        {
+            LootLockerStateData.overrideStateWriter(stateWriter);
+        }
+        #endif
+        #endregion
+
+        #region Multi-User Management
+
+        /// <summary>
+        /// Get the information from the stored state for the player with the specified ULID.
+        /// </summary>
+        /// <returns>The data stored for the specified player. Will be empty if no data is found.</returns>
+        public static LootLockerPlayerData GetPlayerDataForPlayerWithUlid(string playerUlid)
+        {
+            return LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid);
+        }
+
+        /// <summary>
+        /// Get a list of player ULIDs that have been active since game start (or state initialization).
+        /// </summary>
+        /// <returns>List of player ULIDs that have been active since game start.</returns>
+        public static List<string> GetActivePlayerUlids()
+        {
+            return LootLockerStateData.GetActivePlayerULIDs();
+        }
+
+        /// <summary>
+        /// Make the state for the player with the specified ULID to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove it from the list of active players.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player whose state should be set to inactive.</param>
+        public static void SetPlayerUlidToInactive(string playerUlid)
+        {
+            LootLockerStateData.SetPlayerULIDToInactive(playerUlid);
+        }
+
+        /// <summary>
+        /// Make the state for all currently active players to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove all players from the list of active players.
+        /// </summary>
+        public static void SetAllPlayersToInactive()
+        {
+            LootLockerStateData.SetAllPlayersToInactive();
+        }
+
+        /// <summary>
+        /// Make the state for all currently active players except the specified player to be "inactive".
+        /// 
+        /// This will not delete the state, but it will remove all players except the specified one from the list of active players.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player to keep active.</param>
+        public static void SetAllPlayersToInactiveExceptForPlayer(string playerUlid)
+        {
+            LootLockerStateData.SetAllPlayersToInactiveExceptForPlayer(playerUlid);
+        }
+
+        /// <summary>
+        /// Get a list of player ULIDs that there is a stored state for.
+        /// This includes both active and inactive players.
+        /// </summary>
+        /// <returns>List of player ULIDs that have a stored state.</returns>
+        public static List<string> GetCachedPlayerUlids()
+        {
+            return LootLockerStateData.GetCachedPlayerULIDs();
+        }
+
+        /// <summary>
+        /// Get the ULID of the player state that is used as the default state for calls that have no other player specified.
+        /// </summary>
+        /// <returns>The ULID of the default player state.</returns>
+        public static string GetDefaultPlayerUlid()
+        {
+            return LootLockerStateData.GetDefaultPlayerULID();
+        }
+
+        /// <summary>
+        /// Set the player state that is used as the default state for calls that have no other player specified.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player state to set as default.</param>
+        /// <returns>True if the default player ULID was set successfully, false otherwise.</returns>
+        public static bool SetDefaultPlayerUlid(string playerUlid)
+        {
+            return LootLockerStateData.SetDefaultPlayerULID(playerUlid);
+        }
+
+        /// <summary>
+        /// Get the player state for the player with the specified ULID, or the default player state if the supplied player ULID is empty, or an empty state if none of the previous are present.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player whose state should be retrieved.</param>
+        /// <returns>The player state for the specified player, or the default player state if the supplied ULID is empty or could not be found, or an empty state if none of the previous are valid.</returns>
+        public static LootLockerPlayerData GetSavedStateOrDefaultOrEmptyForPlayer(string playerUlid)
+        {
+            return LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
+        }
+
+        /// <summary>
+        /// Remove stored state information for the specified player if present (player will need to re-authenticate).
+        /// If the player is the default player, the default player will be set to an empty state.
+        /// If the player is not the default player, the state will be removed but the default player will not be changed.
+        /// If the player is not found, no action will be taken.
+        /// </summary> 
+        /// <param name="playerUlid">The ULID of the player whose state should be cleared.</param>
+        public static void ClearCacheForPlayer(string playerUlid)
+        {
+            LootLockerStateData.ClearSavedStateForPlayerWithULID(playerUlid);
+        }
+
+        /// <summary>
+        /// Remove all stored state information (players will need to re-authenticate).
+        /// This will clear all player states, including the default player state.
+        /// If you want to clear the state for a specific player, use ClearCacheForPlayer(string playerUlid) instead.
+        /// This will also reset the default player to an empty state.
+        /// </summary>
+        public static void ClearAllPlayerCaches()
+        {
+            LootLockerStateData.ClearAllSavedStates();
+        }
+
+        /// <summary>
+        /// Remove all stored state information except for the specified player (players will need to re-authenticate).
+        /// This will clear all player states except for the specified player.
+        /// If the specified player is the default player, it will remain as the default player.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player to save the cache for.</param>
+        public static void ClearAllPlayerCachesExceptForPlayer(string playerUlid)
+        {
+            LootLockerStateData.ClearAllSavedStatesExceptForPlayer(playerUlid);
         }
 
         #endregion
@@ -124,13 +271,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="deviceId"></param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        [Obsolete("This method is deprecated, please use VerifyPlayerAndStartPlaystationNetworkSession or VerifyPlayerAndStartSteamSession instead.")] // Deprecation date 20250922
+        public static void VerifyID(string deviceId, Action<LootLockerVerifyResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>(forPlayerWithUlid));
+                return;
             }
-            LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(deviceId);
+
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (playerData == null || !playerData.Identifier.Equals(deviceId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerVerifyResponse>($"The provided deviceId did not match the identifier on player with ulid {forPlayerWithUlid}", forPlayerWithUlid));
+                return;
+            }
+            LootLockerVerifyRequest verifyRequest = new LootLockerVerifyRequest(deviceId, playerData.CurrentPlatform.PlatformString);
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
@@ -140,26 +297,161 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="psnOnlineId">The player's Online ID</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        [Obsolete("This method is deprecated, please use VerifyPlayerAndStartPlaystationNetworkSession instead.")] // Deprecation date 20250922
         public static void StartPlaystationNetworkSession(string psnOnlineId, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.PlayStationNetwork);
-
-            LootLockerConfig.current.deviceID = psnOnlineId;
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(psnOnlineId);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
+                    LootLockerJson.SerializeObject(new LootLockerSessionRequest(psnOnlineId, LL_AuthPlatforms.PlayStationNetwork)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = psnOnlineId,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.PlayStationNetwork),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Start a Playstation Network session. If your token starts with v3, then you should use VerifyPlayerAndStartPlaystationNetworkV3Session instead.
+        /// 
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// 
+        /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
+        /// <param name="AccountId">The numeric representation of the account id received from PSN after a successful login</param>
+        /// <param name="PsnIssuerId">Optional: The PSN issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartPlaystationNetworkSession(string AuthCode, long AccountId, Action<LootLockerSessionResponse> onComplete, int PsnIssuerId = 256, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
+                return;
+            }
+
+            LootLockerPlaystationNetworkVerificationRequest verificationRequest = new LootLockerPlaystationNetworkVerificationRequest
+            {
+                token = AuthCode,
+                psn_issuer_id = PsnIssuerId
+            };
+
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.playerVerification.endPoint, LootLockerEndPoints.playerVerification.httpMethod, LootLockerJson.SerializeObject(verificationRequest), onComplete: (verificationResponse) =>
+            {
+                if (!verificationResponse.success)
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.FailureResponseConversion<LootLockerSessionResponse>(verificationResponse));
+                    return;
                 }
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete(response);
+
+                LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(AccountId.ToString(), LL_AuthPlatforms.PlayStationNetwork, Optionals);
+
+                LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
+                {
+                    var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (sessionResponse.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = sessionResponse.session_token,
+                            RefreshToken = "",
+                            ULID = sessionResponse.player_ulid,
+                            Identifier = AccountId.ToString(),
+                            PublicUID = sessionResponse.public_uid,
+                            LegacyID = sessionResponse.player_id,
+                            Name = sessionResponse.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.PlayStationNetwork),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = sessionResponse.player_created_at,
+                            WalletID = sessionResponse.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(sessionResponse);
+                });
+            });
+        }
+
+        /// <summary>
+        /// Start a Playstation Network session using the v3 version of PSN authentication. If your token starts with v3, then you're using this version.
+        /// 
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// 
+        /// <param name="AuthCode">The authorization code received from PSN after a successful login</param>
+        /// <param name="EnvIssuerId">Optional: The PSN Environment issuer id to use when verifying the player towards PSN. If not supplied, will be defaulted to 256=production.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void VerifyPlayerAndStartPlaystationNetworkV3Session(string AuthCode, Action<LootLockerPlaystationV3SessionResponse> onComplete, int EnvIssuerId = 256, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlaystationV3SessionResponse>(null));
+                return;
+            }
+
+            LootLockerPlaystationNetworkV3SessionRequest sessionRequest = new LootLockerPlaystationNetworkV3SessionRequest
+            {
+                auth_code = AuthCode,
+                env_iss_id = EnvIssuerId,
+                optionals = Optionals
+            };
+
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.playstationNetworkv3SessionRequest.endPoint, LootLockerEndPoints.playstationNetworkv3SessionRequest.httpMethod, LootLockerJson.SerializeObject(sessionRequest), onComplete: (serverResponse) =>
+            {
+                var sessionResponse = LootLockerResponse.Deserialize<LootLockerPlaystationV3SessionResponse>(serverResponse);
+                if (sessionResponse.success)
+                {
+                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    {
+                        SessionToken = sessionResponse.session_token,
+                        RefreshToken = "",
+                        ULID = sessionResponse.player_ulid,
+                        Identifier = sessionResponse.player_identifier,
+                        PublicUID = sessionResponse.public_uid,
+                        LegacyID = sessionResponse.player_id,
+                        Name = sessionResponse.player_name,
+                        WhiteLabelEmail = "",
+                        WhiteLabelToken = "",
+                        CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.PlayStationNetwork),
+                        LastSignIn = DateTime.Now,
+                        CreatedAt = sessionResponse.player_created_at,
+                        WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
+                    });
+                }
+
+                onComplete?.Invoke(sessionResponse);
             });
         }
 
@@ -168,28 +460,47 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="deviceId">The player's Device ID</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartAndroidSession(string deviceId, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAndroidSession(string deviceId, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Android);
-
-            LootLockerConfig.current.deviceID = deviceId;
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(deviceId);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(deviceId, LL_AuthPlatforms.Android, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = deviceId,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Android),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -197,101 +508,147 @@ namespace LootLocker.Requests
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
         /// </summary>
         /// <param name="amazonLunaGuid">The player's Amazon Luna GUID</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartAmazonLunaSession(string amazonLunaGuid, Action<LootLockerSessionResponse> onComplete)
+        public static void StartAmazonLunaSession(string amazonLunaGuid, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.AmazonLuna);
-
-            LootLockerConfig.current.deviceID = amazonLunaGuid;
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(amazonLunaGuid);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.authenticationRequest.endPoint, LootLockerEndPoints.authenticationRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(amazonLunaGuid, LL_AuthPlatforms.AmazonLuna, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = amazonLunaGuid,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.AmazonLuna),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false);
         }
 
         /// <summary>
         /// Start a guest session.
         /// </summary>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
-        public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)
+        public static void StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Guest);
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
-            string existingPlayerID = PlayerPrefs.GetString("LootLockerGuestPlayerID", "");
-            if (!string.IsNullOrEmpty(existingPlayerID))
+            string defaultPlayerUlid = LootLockerStateData.GetDefaultPlayerULID();
+            if (string.IsNullOrEmpty(defaultPlayerUlid) || LootLockerStateData.GetActivePlayerULIDs().Contains(defaultPlayerUlid))
             {
-                sessionRequest = new LootLockerSessionRequest(existingPlayerID);
+                // Start a new guest session with a new identifier if there is no default player to use or if that player is already playing
+                StartGuestSession(null, onComplete);
+                return;
+            } 
+            else if (LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.CurrentPlatform.Platform != LL_AuthPlatforms.Guest)
+            {
+                // Also start a new guest session with a new identifier if the default player is not playing but isn't a guest user
+                LootLockerStateData.SetPlayerULIDToInactive(defaultPlayerUlid);
+                StartGuestSession(null, onComplete);
+                return;
             }
 
-            LootLockerAPIManager.GuestSession(sessionRequest, response =>
-            {
-                if (response.success)
-                {
-                    PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
-                    PlayerPrefs.Save();
-                }
-                else
-                {
-                    CurrentPlatform.Reset();
-                }
+            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.Identifier, onComplete, Optionals);
+        }
 
-                onComplete(response);
-            });
+        /// <summary>
+        /// Start a guest session for an already existing player that has previously had active guest sessions on this device
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Execute the request for the specified player</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
+        public static void StartGuestSessionForPlayer(string forPlayerWithUlid, Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>(null));
+                return;
+            }
+
+            if (!LootLockerStateData.SaveStateExistsForPlayer(forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerGuestSessionResponse>($"No save state exists for player with ulid {forPlayerWithUlid}", forPlayerWithUlid));
+                return;
+            }
+
+            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.Identifier, onComplete, Optionals ?? LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals);
         }
 
         /// <summary>
         /// Start a guest session with an identifier, you can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
         /// </summary>
-        /// <param name="identifier">Identifier for the player</param>
+        /// <param name="identifier">Identifier for the player. Set this to empty if you want an identifier to be generated for you.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGuestSessionResponse</param>
-        public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete)
+        public static void StartGuestSession(string identifier, Action<LootLockerGuestSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGuestSessionResponse>(null));
                 return;
             }
 
-            if (identifier.Length == 0)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerGuestSessionResponse>("Identifier cannot be empty when calling StartGuestSession (if you want an identifier to be generated for you, please use StartGuestSession(Action<LootLockerGuestSessionResponse> onComplete)"));
-                return;
-            }
-            CurrentPlatform.Set(Platforms.Guest);
-
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(identifier);
-
-            LootLockerAPIManager.GuestSession(sessionRequest, response =>
-            {
-                if (response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.guestSessionRequest.endPoint, LootLockerEndPoints.guestSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerSessionRequest(identifier, LL_AuthPlatforms.Guest, Optionals)), 
+                (serverResponse) =>
                 {
-                    PlayerPrefs.SetString("LootLockerGuestPlayerID", response.player_identifier);
-                    PlayerPrefs.Save();
-                }
-                else
-                {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Guest),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -299,25 +656,39 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete)
+        public static void VerifyPlayerAndStartSteamSession(ref byte[] ticket, uint ticketSize, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
+
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
-            CurrentPlatform.Set(Platforms.Steam);
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionRequest{ steam_ticket = sessionTicket }), onComplete: (serverResponse) => {
-                if (!serverResponse.success)
-                {
-                    CurrentPlatform.Reset();
-                }
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionRequest{ steam_ticket = sessionTicket , optionals = Optionals }), onComplete: (serverResponse) => {
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = sessionResponse.session_token;
-                LootLockerConfig.current.playerULID = sessionResponse.player_ulid;
-                LootLockerConfig.current.deviceID = "";
+                if (sessionResponse.success)
+                {
+                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    {
+                        SessionToken = sessionResponse.session_token,
+                        RefreshToken = "",
+                        ULID = sessionResponse.player_ulid,
+                        Identifier = "",
+                        PublicUID = sessionResponse.public_uid,
+                        LegacyID = sessionResponse.player_id,
+                        Name = sessionResponse.player_name,
+                        WhiteLabelEmail = "",
+                        WhiteLabelToken = "",
+                        CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Steam),
+                        LastSignIn = DateTime.Now,
+                        CreatedAt = sessionResponse.player_created_at,
+                        WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
+                    });
+                }
 
                 onComplete?.Invoke(sessionResponse);
             });
@@ -329,106 +700,42 @@ namespace LootLocker.Requests
         /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
         /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
         /// <param name="steamAppId">The steam app id to start this steam session for</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete)
+        public static void VerifyPlayerAndStartSteamSessionWithSteamAppId(ref byte[] ticket, uint ticketSize, string steamAppId, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
+
             var sessionTicket = _SteamSessionTicket(ref ticket, ticketSize);
-            CurrentPlatform.Set(Platforms.Steam);
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionWithAppIdRequest { steam_ticket = sessionTicket, steam_app_id = steamAppId }), onComplete: (serverResponse) => {
-                if (!serverResponse.success)
-                {
-                    CurrentPlatform.Reset();
-                }
+            LootLockerServerRequest.CallAPI(null, LootLockerEndPoints.steamSessionRequest.endPoint, LootLockerEndPoints.steamSessionRequest.httpMethod, LootLockerJson.SerializeObject(new LootLockerSteamSessionWithAppIdRequest { steam_ticket = sessionTicket, steam_app_id = steamAppId, optionals = Optionals }), onComplete: (serverResponse) => {
                 var sessionResponse = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = sessionResponse.session_token;
-                LootLockerConfig.current.playerULID = sessionResponse.player_ulid;
-                LootLockerConfig.current.deviceID = "";
+                if (sessionResponse.success)
+                {
+                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    {
+                        SessionToken = sessionResponse.session_token,
+                        RefreshToken = "",
+                        ULID = sessionResponse.player_ulid,
+                        Identifier = "",
+                        PublicUID = sessionResponse.public_uid,
+                        LegacyID = sessionResponse.player_id,
+                        Name = sessionResponse.player_name,
+                        WhiteLabelEmail = "",
+                        WhiteLabelToken = "",
+                        CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Steam),
+                        LastSignIn = DateTime.Now,
+                        CreatedAt = sessionResponse.player_created_at,
+                        WalletID = sessionResponse.wallet_id,
+                        SessionOptionals = Optionals
+                    });
+                }
 
                 onComplete?.Invoke(sessionResponse);
             });
-        }
-
-        /// <summary>
-        /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// Note: Steam requires that you verify the player using the VerifyPlayer method before starting a session
-        /// </summary>
-        /// <param name="steamId64">Steam ID ass a string</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void StartSteamSession(string steamId64, Action<LootLockerSessionResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
-                return;
-            }
-
-            CurrentPlatform.Set(Platforms.Steam);
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest(steamId64);
-            LootLockerAPIManager.Session(sessionRequest, response =>
-            {
-                if (!response.success)
-                {
-                    CurrentPlatform.Reset();
-                }
-
-                onComplete(response);
-            });
-        }
-
-        /// <summary>
-        /// Verify the player's steam identity with the server for the specified steam app id.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="steamAppId">The steam app id to verify this player for</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void VerifySteamID(string steamSessionTicket, int steamAppId, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerAPIManager.VerifyWithAppId(steamSessionTicket, steamAppId, onComplete);
-        }
-
-        /// <summary>
-        /// Verify the player's steam identity with the server.
-        ///
-        /// You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamSessionTicket">A steamSessionTicket in string-format</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerVerifyResponse</param>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static void VerifySteamID(string steamSessionTicket, Action<LootLockerVerifyResponse> onComplete)
-        {
-            if (!CheckInitialized(true))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerVerifyResponse>());
-                return;
-            }
-            LootLockerVerifySteamRequest verifyRequest = new LootLockerVerifySteamRequest(steamSessionTicket);
-            LootLockerAPIManager.Verify(verifyRequest, onComplete);
-        }
-
-        /// <summary>
-        /// Convert a steam ticket so LootLocker can read it. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="ticket">The Steam session ticket received from Steam Authentication</param>
-        /// <param name="ticketSize">The size of the Steam session ticket received from Steam Authentication</param>
-        /// <returns>A converted SteamSessionTicket as a string for use with VerifyPlayer.</returns>
-        [Obsolete("This method is deprecated, use VerifyPlayerAndStartSteamSession instead")]
-        public static string SteamSessionTicket(ref byte[] ticket, uint ticketSize)
-        {
-            return _SteamSessionTicket(ref ticket, ticketSize);
         }
 
         /// <summary>
@@ -453,24 +760,47 @@ namespace LootLocker.Requests
         /// The Nintendo Switch platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="nsa_id_token">nsa (Nintendo Switch Account) id token as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartNintendoSwitchSession(string nsa_id_token, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
-            CurrentPlatform.Set(Platforms.NintendoSwitch);
-            LootLockerNintendoSwitchSessionRequest sessionRequest = new LootLockerNintendoSwitchSessionRequest(nsa_id_token);
-            LootLockerAPIManager.NintendoSwitchSession(sessionRequest, response =>
-            {
-                if (!response.success)
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.nintendoSwitchSessionRequest.endPoint, LootLockerEndPoints.nintendoSwitchSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerNintendoSwitchSessionRequest(nsa_id_token, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.NintendoSwitch),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -478,25 +808,47 @@ namespace LootLocker.Requests
         /// The Xbox One platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="xbox_user_token">Xbox user token as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of typeLootLockerSessionResponse</param>
-        public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete)
+        public static void StartXboxOneSession(string xbox_user_token, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.XboxOne);
-            LootLockerXboxOneSessionRequest sessionRequest = new LootLockerXboxOneSessionRequest(xbox_user_token);
-            LootLockerAPIManager.XboxOneSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.xboxSessionRequest.endPoint, LootLockerEndPoints.xboxSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerXboxOneSessionRequest(xbox_user_token, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.XboxOne),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -504,26 +856,47 @@ namespace LootLocker.Requests
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartGoogleSession(string idToken, Action<LootLockerGoogleSessionResponse> onComplete)
+        public static void StartGoogleSession(string idToken, Action<LootLockerGoogleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Google);
-
-            LootLockerGoogleSignInSessionRequest sessionRequest = new LootLockerGoogleSignInSessionRequest(idToken);
-            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerGoogleSignInSessionRequest(idToken, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Google),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -533,30 +906,47 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="googlePlatform">Google OAuth2 ClientID platform</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete)
+        public static void StartGoogleSession(string idToken, GooglePlatform googlePlatform, Action<LootLockerGoogleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Google);
-
-            var sessionRequest = new LootLockerGoogleSignInWithPlatformSessionRequest(idToken)
-            {
-                platform = googlePlatform.ToString()
-            };
-
-            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerGoogleSignInWithPlatformSessionRequest(idToken, googlePlatform.ToString(), Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Google),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -565,37 +955,205 @@ namespace LootLocker.Requests
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshGoogleSession("", onComplete);
+            RefreshGoogleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
         /// Refresh a previous session signed in with Google.
-        /// If you do not want to manually handle the refresh token we recommend using the RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete) method.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid) method.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Google sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartGoogleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshGoogleSession(string refresh_token, Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGoogleSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Google);
-            LootLockerGoogleRefreshSessionRequest sessionRequest = new LootLockerGoogleRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
-            LootLockerAPIManager.GoogleSession(sessionRequest, response =>
+            if (string.IsNullOrEmpty(refresh_token))
             {
-                if (!response.success)
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
-                    CurrentPlatform.Reset();
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerGoogleSessionResponse>(playerData?.ULID));
+                    return;
                 }
-                onComplete(response);
-            });
+
+                refresh_token = playerData.RefreshToken;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.googleSessionRequest.endPoint, LootLockerEndPoints.googleSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerGoogleRefreshSessionRequest(refresh_token, Optionals)),
+                (serverResponse) =>
+                {
+                    var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Google),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+        
+        /// <summary>
+        /// Start a Google Play Games Services session.
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="authCode">The auth code received from Google Play Games Services authentication.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartGooglePlayGamesSession(string authCode, Action<LootLockerGooglePlayGamesSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+            var request = new Requests.LootLockerGooglePlayGamesSessionRequest(authCode, Optionals);
+            LootLockerServerRequest.CallAPI(
+                null,
+                LootLocker.LootLockerEndPoints.googlePlayGamesSessionRequest.endPoint,
+                LootLocker.LootLockerEndPoints.googlePlayGamesSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(request),
+                (serverResponse) =>
+                {
+                    var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.GooglePlayGames),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Google Play Games
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="refreshToken">The refresh token received from a previous GPGS session.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void RefreshGooglePlayGamesSession(string refreshToken, Action<LootLockerGooglePlayGamesSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+            var request = new Requests.LootLockerGooglePlayGamesRefreshSessionRequest(refreshToken, Optionals);
+            LootLockerServerRequest.CallAPI(
+                null,
+                LootLocker.LootLockerEndPoints.googlePlayGamesRefreshSessionRequest.endPoint,
+                LootLocker.LootLockerEndPoints.googlePlayGamesRefreshSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(request),
+                (serverResponse) =>
+                {
+                    var response = LootLockerGooglePlayGamesSessionResponse.Deserialize<LootLockerGooglePlayGamesSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.GooglePlayGames),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous session signed in with Google Play Games
+        /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
+        /// The Google Play Games sign in platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshGooglePlayGamesSession(Action<LootLockerGooglePlayGamesSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGooglePlayGamesSessionResponse>(null));
+                return;
+            }
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.RefreshToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerGooglePlayGamesSessionResponse>(playerData?.ULID));
+                return;
+            }
+
+            RefreshGooglePlayGamesSession(playerData.RefreshToken, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
         /// <summary>
@@ -603,25 +1161,47 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="authorization_code">Authorization code, provided by apple</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete)
+        public static void StartAppleSession(string authorization_code, Action<LootLockerAppleSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.AppleSignIn);
-            LootLockerAppleSignInSessionRequest sessionRequest = new LootLockerAppleSignInSessionRequest(authorization_code);
-            LootLockerAPIManager.AppleSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.appleSessionRequest.endPoint, LootLockerEndPoints.appleSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerAppleSignInSessionRequest(authorization_code, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.AppleSignIn),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -630,37 +1210,79 @@ namespace LootLocker.Requests
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshAppleSession("", onComplete);
+            RefreshAppleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
         /// Refresh a previous session signed in with Apple
-        /// If you do not want to manually handle the refresh token we recommend using the RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete) method.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid) method.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Apple sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartAppleSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleSessionResponse</param>
-        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshAppleSession(string refresh_token, Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.AppleSignIn);
-            LootLockerAppleRefreshSessionRequest sessionRequest = new LootLockerAppleRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
-            LootLockerAPIManager.AppleSession(sessionRequest, response =>
+            if (string.IsNullOrEmpty(refresh_token))
             {
-                if (!response.success)
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
-                    CurrentPlatform.Reset();
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerAppleSessionResponse>(playerData?.ULID));
+                    return;
                 }
-                onComplete(response);
-            });
+
+                refresh_token = playerData.RefreshToken;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.appleSessionRequest.endPoint, LootLockerEndPoints.appleSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerAppleRefreshSessionRequest(refresh_token, Optionals)), 
+                (serverResponse) =>
+                {
+                    var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.AppleSignIn),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -673,25 +1295,47 @@ namespace LootLocker.Requests
         /// <param name="signature">The signature generated from Apple Game Center Identity Verification</param>
         /// <param name="salt">The salt of the signature generated from Apple Game Center Identity Verification</param>
         /// <param name="timestamp">The timestamp of the verification generated from Apple Game Center Identity Verification</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
-        public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response
+        public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.AppleGameCenter);
-            LootLockerAppleGameCenterSessionRequest sessionRequest = new LootLockerAppleGameCenterSessionRequest(bundleId, playerId, publicKeyUrl, signature, salt, timestamp);
-            LootLockerAPIManager.AppleGameCenterSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.appleGameCenterSessionRequest.endPoint, LootLockerEndPoints.appleGameCenterSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterSessionRequest(bundleId, playerId, publicKeyUrl, signature, salt, timestamp, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.AppleGameCenter),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -700,24 +1344,59 @@ namespace LootLocker.Requests
         /// The Apple Game Center sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
-        public static void RefreshAppleGameCenterSession(Action<LootLockerAppleGameCenterSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshAppleGameCenterSession(Action<LootLockerAppleGameCenterSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.AppleGameCenter);
-            LootLockerAppleGameCenterRefreshSessionRequest sessionRequest = new LootLockerAppleGameCenterRefreshSessionRequest(LootLockerConfig.current.refreshToken);
-            LootLockerAPIManager.AppleGameCenterSession(sessionRequest, response =>
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.RefreshToken))
             {
-                if (!response.success)
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerAppleGameCenterSessionResponse>(playerData?.ULID));
+                return;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.appleGameCenterSessionRequest.endPoint, LootLockerEndPoints.appleGameCenterSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerAppleGameCenterRefreshSessionRequest(playerData?.RefreshToken, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.AppleGameCenter),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -726,23 +1405,46 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="id_token">EOS Id Token as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
-        public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void StartEpicSession(string id_token, Action<LootLockerEpicSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>(null));
                 return;
             }
-            CurrentPlatform.Set(Platforms.Epic);
-            LootLockerEpicSessionRequest sessionRequest = new LootLockerEpicSessionRequest(id_token);
-            LootLockerAPIManager.EpicSession(sessionRequest, response =>
-            {
-                if (!response.success)
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.epicSessionRequest.endPoint, LootLockerEndPoints.epicSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerEpicSessionRequest(id_token, Optionals)), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Epic),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -751,37 +1453,79 @@ namespace LootLocker.Requests
         /// The Epic sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
-        public static void RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshEpicSession("", onComplete);
+            RefreshEpicSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
         /// Refresh a previous session signed in with Epic
-        /// If you do not want to manually handle the refresh token we recommend using the RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete) method.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid) method.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Epic sign in platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartEpicSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEpicSessionResponse</param>
-        public static void RefreshEpicSession(string refresh_token, Action<LootLockerEpicSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshEpicSession(string refresh_token, Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEpicSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Epic);
-            LootLockerEpicRefreshSessionRequest sessionRequest = new LootLockerEpicRefreshSessionRequest(string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token);
-            LootLockerAPIManager.EpicSession(sessionRequest, response =>
+            if (string.IsNullOrEmpty(refresh_token))
             {
-                if (!response.success)
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
-                    CurrentPlatform.Reset();
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerEpicSessionResponse>(playerData?.ULID));
+                    return;
                 }
-                onComplete(response);
-            });
+
+                refresh_token = playerData.RefreshToken;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.epicSessionRequest.endPoint, LootLockerEndPoints.epicSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerEpicRefreshSessionRequest(refresh_token, Optionals)), 
+                (serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Epic),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
         
         /// <summary>
@@ -790,30 +1534,48 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="user_id">User ID as a string</param>
         /// <param name="nonce">Nonce as a string</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
         /// <param name="onComplete">Action to handle the response of type LootLockerMetaSessionResponse</param>
-        public static void StartMetaSession(string user_id, string nonce, Action<LootLockerMetaSessionResponse> onComplete)
+        public static void StartMetaSession(string user_id, string nonce, Action<LootLockerMetaSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>(null));
                 return;
             }
-            CurrentPlatform.Set(Platforms.Meta);
+
             var sessionRequest = new LootLockerMetaSessionRequest()
             {
                 user_id = user_id,
-                nonce = nonce
+                nonce = nonce,
+                optionals = Optionals
             };
-            
             var endPoint = LootLockerEndPoints.metaSessionRequest;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(sessionRequest), (serverResponse) =>
+            LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(sessionRequest), (serverResponse) =>
             {
                 var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = response.player_ulid;
+                if (response.success)
+                {
+                    LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                    {
+                        SessionToken = response.session_token,
+                        RefreshToken = response.refresh_token,
+                        ULID = response.player_ulid,
+                        Identifier = "",
+                        PublicUID = response.public_uid,
+                        LegacyID = response.player_id,
+                        Name = response.player_name,
+                        WhiteLabelEmail = "",
+                        WhiteLabelToken = "",
+                        CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Meta),
+                        LastSignIn = DateTime.Now,
+                        CreatedAt = response.player_created_at,
+                        WalletID = response.wallet_id,
+                        SessionOptionals = Optionals
+                    });
+                }
+
                 onComplete?.Invoke(response);
             }, false);
         }
@@ -824,44 +1586,221 @@ namespace LootLocker.Requests
         /// The Meta / Oculus platform must be enabled and configured in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
-        public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete)
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
-            RefreshMetaSession("", onComplete);
+            RefreshMetaSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
         /// <summary>
         /// Refresh a previous Meta session
-        /// If you do not want to manually handle the refresh token we recommend using the RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete) method.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid) method.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// The Meta platform must be enabled and configured in the web console for this to work.
         /// </summary>
         /// <param name="refresh_token">Token received in response from StartMetaSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetaSessionResponse</param>
-        public static void RefreshMetaSession(string refresh_token, Action<LootLockerMetaSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshMetaSession(string refresh_token, Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetaSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Meta);
-            var sessionRequest = new LootLockerMetaRefreshSessionRequest()
+            if (string.IsNullOrEmpty(refresh_token))
             {
-                refresh_token = string.IsNullOrEmpty(refresh_token) ? LootLockerConfig.current.refreshToken : refresh_token
-            };
-            var endPoint = LootLockerEndPoints.metaSessionRequest;
-            
-            
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(sessionRequest), (serverResponse) =>
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerMetaSessionResponse>(playerData?.ULID));
+                    return;
+                }
+
+                refresh_token = playerData.RefreshToken;
+            }
+
+            if (Optionals == null)
             {
-                var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.metaSessionRequest.endPoint, LootLockerEndPoints.metaSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerMetaRefreshSessionRequest{ refresh_token = refresh_token, optionals = Optionals }),
+                (serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Meta),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Start a Discord session.
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
+        /// </summary>
+        /// <param name="accessToken">The player's Discord OAuth token</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void StartDiscordSession(string accessToken, Action<LootLockerDiscordSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.discordSessionRequest.endPoint,
+                LootLockerEndPoints.discordSessionRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerDiscordSessionRequest(accessToken, Optionals)),
+                (serverResponse) =>
+                    {
+                        var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
+                        if (response.success)
+                        {
+                            LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                            {
+                                SessionToken = response.session_token,
+                                RefreshToken = response.refresh_token,
+                                ULID = response.player_ulid,
+                                Identifier = "",
+                                PublicUID = response.public_uid,
+                                LegacyID = response.player_id,
+                                Name = response.player_name,
+                                WhiteLabelEmail = "",
+                                WhiteLabelToken = "",
+                                CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Discord),
+                                LastSignIn = DateTime.Now,
+                                CreatedAt = response.player_created_at,
+                                WalletID = response.wallet_id,
+                                SessionOptionals = Optionals
+                            });
+                        }
+
+                        onComplete?.Invoke(response);
+                    }, 
+                false
+            );
+        }
+
+        /// <summary>
+        /// Refresh a previous Discord session
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.RefreshToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerDiscordSessionResponse>(playerData?.ULID));
+                return;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            RefreshDiscordSession(playerData.RefreshToken, onComplete, forPlayerWithUlid, Optionals);
+        }
+
+        /// <summary>
+        /// Refresh a previous Discord session
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid) method.
+        /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
+        /// The Discord platform must be enabled and configured in the web console for this to work.
+        /// </summary>
+        /// <param name="refresh_token">Token received in response from StartDiscordSession request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDiscordSessionResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional: Additional session options</param>
+        public static void RefreshDiscordSession(string refresh_token, Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDiscordSessionResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(refresh_token))
+            {
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerDiscordSessionResponse>(playerData?.ULID));
+                    return;
+                }
+                refresh_token = playerData.RefreshToken;
+                forPlayerWithUlid = playerData.ULID;
+            }
+
+            if (Optionals == null)
+            {
+                Optionals = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals;
+            }
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, 
+                LootLockerEndPoints.discordSessionRequest.endPoint, LootLockerEndPoints.discordSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerDiscordRefreshSessionRequest(refresh_token, Optionals)), 
+                (serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Discord),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = Optionals
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false
+            );
         }
 
         /// <summary>
@@ -869,44 +1808,49 @@ namespace LootLocker.Requests
         /// Succeeds if a session was ended or no sessions were active
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void EndSession(Action<LootLockerSessionResponse> onComplete)
+        /// <param name="clearLocalState">If set to true all local data about the player will be removed from the device if the session is successfully ended</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EndSession(Action<LootLockerSessionResponse> onComplete, bool clearLocalState = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized(true) || !CheckActiveSession())
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = LootLockerStateData.GetDefaultPlayerULID();
+            }
+            if (!CheckInitialized(true) || !CheckActiveSession(forPlayerWithUlid))
             {
                 onComplete?.Invoke(new LootLockerSessionResponse() { success = true, text = "No active session" });
                 return;
             }
 
-            LootLockerSessionRequest sessionRequest = new LootLockerSessionRequest();
-            LootLockerAPIManager.EndSession(sessionRequest, response =>
-            {
-                if (response.success)
+            EndPointClass endPoint = LootLockerEndPoints.endingSession;
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null,
+                (serverResponse) =>
                 {
-                    ClearLocalSession();
-                }
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        if (clearLocalState)
+                        {
+                            ClearLocalSession(serverResponse.requestContext.player_ulid);
+                        }
+                        else
+                        {
+                            LootLockerStateData.SetPlayerULIDToInactive(serverResponse.requestContext.player_ulid);
+                        }
+                    }
 
-                onComplete?.Invoke(response);
-            });
+                    onComplete?.Invoke(response);
+                }
+            );
         }
 
         /// <summary>
         /// Clears client session data. WARNING: This does not end the session in LootLocker servers.
         /// </summary>
-        public static void ClearLocalSession()
+        /// <param name="forPlayerWithUlid">Execute the request for the specified player.</param>
+        public static void ClearLocalSession(string forPlayerWithUlid)
         {
-            // Clear White Label Login credentials
-            if (CurrentPlatform.Get() == Platforms.WhiteLabel)
-            {
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionToken");
-                PlayerPrefs.DeleteKey("LootLockerWhiteLabelSessionEmail");
-            }
-
-            CurrentPlatform.Reset();
-
-            LootLockerConfig.current.token = "";
-            LootLockerConfig.current.deviceID = "";
-            LootLockerConfig.current.playerULID = null;
-            LootLockerConfig.current.refreshToken = "";
+            LootLockerStateData.ClearSavedStateForPlayerWithULID(forPlayerWithUlid);
         }
         #endregion
 
@@ -915,96 +1859,276 @@ namespace LootLocker.Requests
         /// List identity providers (like Apple, Google, etc.) that are connected to the currently logged in account
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListConnectedAccounts(Action<LootLockerListConnectedAccountsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListConnectedAccounts(Action<LootLockerListConnectedAccountsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listConnectedAccounts.endPoint, LootLockerEndPoints.listConnectedAccounts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listConnectedAccounts.endPoint, LootLockerEndPoints.listConnectedAccounts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
         /// Disconnect account from the currently logged in account
         ///
         /// Use this to disconnect an account (like a Google or Apple account) that can be used to start sessions for this LootLocker account so that it is no longer allowed to do that
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the provider is disconnected from
         /// </summary>
         /// <param name="accountToDisconnect">What account to disconnect from this LootLocker Account</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DisconnectAccount(LootLockerAccountProvider accountToDisconnect, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.disconnectAccount.endPoint, accountToDisconnect);
+            string endpoint = LootLockerEndPoints.disconnectAccount.WithPathParameter(accountToDisconnect);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
         /// Connect a Google Account to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ConnectGoogleAccount(string idToken, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectGoogleAccount(string idToken, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("google");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountRequest{id_token = idToken });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
-        /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player 
+        /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
         /// </summary>
         /// <param name="idToken">The Id Token from google sign in</param>
         /// <param name="platform">Google OAuth2 ClientID platform</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectGoogleAccount(string idToken, GoogleAccountProviderPlatform platform, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "google");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("google");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectGoogleProviderToAccountWithPlatformRequest() { id_token = idToken, platform = platform });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
         /// Connect an Apple Account (authorized by Rest Sign In) to the currently logged in LootLocker account allowing that google account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Apple account is linked into
         /// </summary>
         /// <param name="authorizationCode">Authorization code, provided by apple during Sign In</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectAppleAccountByRestSignIn(string authorizationCode, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
                 return;
             }
 
-            string endpoint = string.Format(LootLockerEndPoints.connectProviderToAccount.endPoint, "apple-rest");
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("apple-rest");
 
             string data = LootLockerJson.SerializeObject(new LootLockerConnectAppleRestProviderToAccountRequest() { authorization_code = authorizationCode });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Twitch Account to the currently logged in LootLocker account allowing that Twitch account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Twitch account is linked into
+        /// </summary>
+        /// <param name="authorizationCode">The Authorization Code from Twitch sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectTwitchAccount(string authorizationCode, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("twitch");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectTwitchProviderToAccountRequest() { authorization_code = authorizationCode });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an Epic Account to the currently logged in LootLocker account allowing that Epic account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Epic account is linked into
+        /// </summary>
+        /// <param name="token">The Token from Epic sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectEpicAccount(string Token, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("epic");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectEpicProviderToAccountRequest() { token = Token });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect a Playstation Account to the currently logged in LootLocker account allowing that Playstation account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Playstation account is linked into
+        /// </summary>
+        /// <param name="environment">The environment for the playstation account (dev, qa, prod)</param>
+        /// <param name="code">The code from playstation sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectPlaystationAccount(string environment, string code, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("playstation");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectPlaystationProviderToAccountRequest() { environment = environment, code = code });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an Discord Account to the currently logged in LootLocker account allowing that Discord account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Discord account is linked into
+        /// </summary>
+        /// <param name="token">The Token from Discord sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectDiscordAccount(string token, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("discord");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectDiscordProviderToAccountRequest() { token = token });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// Connect an identity provider (authorized using a remote link session) to the currently logged in LootLocker account allowing that authentication method to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Remote Session account is linked into
+        /// </summary>
+        /// <param name="Code">The lease code returned with the response when starting a lease process. Note that the process must have concluded successfully first.</param>
+        /// <param name="Nonce">The nonce returned with the response when starting a lease process. Note that the process must have concluded successfully first.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectRemoteSessionAccount(string Code, string Nonce, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+            
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectRemoteSessionToAccountRequest() { Code = Code, Nonce = Nonce });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.attachRemoteSessionToAccount.endPoint, LootLockerEndPoints.attachRemoteSessionToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// This endpoint lets you transfer identity providers between two players, provided you have a valid session for both.
+        /// The designated identity providers will be transferred FROM the player designated by the `FromPlayerWithUlid` parameter and TO the player designated by the `ToPlayerWithUlid` parameter.
+        /// If any of the providers can not be transferred the whole operation will fail and NO identity providers will be transferred.
+        /// IMPORTANT: This is a destructive action.Once an identity provider has been transferred they will allow authentication for the target player and no longer authenticate for the source player.
+        /// This can leave the source player without means of authentication and thus unusable from the game.
+   	    /// 
+        /// ** Limitations**
+        /// - You can not move an identity provider that the source player does not have
+        /// - You can not move an identity provider to a player that already has an account from said identity provider associated with their account.
+        /// - You can not move an identity provider which isn't active in your game settings.
+        /// </summary>
+        /// <param name="FromPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers FROM</param>
+        /// <param name="ToPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers TO</param>
+        /// <param name="ProvidersToTransfer">Which identity providers you wish to transfer</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void TransferIdentityProvidersBetweenAccounts(string FromPlayerWithUlid, string ToPlayerWithUlid, List<LootLockerAccountProvider> ProvidersToTransfer, Action<LootLockerListConnectedAccountsResponse> onComplete)
+        {
+            if (!CheckInitialized(false, FromPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>(FromPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(FromPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No ulid provided for source player", FromPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ToPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No ulid provided for target player", ToPlayerWithUlid));
+                return;
+            }
+
+            var fromPlayer = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(FromPlayerWithUlid);
+            if (string.IsNullOrEmpty(fromPlayer?.SessionToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No valid session token found for source player", FromPlayerWithUlid));
+                return;
+            }
+
+            var toPlayer = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(ToPlayerWithUlid);
+            if (string.IsNullOrEmpty(toPlayer?.SessionToken))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No valid session token found for target player", ToPlayerWithUlid));
+                return;
+            }
+
+            if (ProvidersToTransfer.Count == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>("No providers submitted", FromPlayerWithUlid));
+                return;
+            }
+
+            string data = LootLockerJson.SerializeObject(new LootLockerTransferProvidersBetweenAccountsRequest() { Source_token = fromPlayer.SessionToken, Target_token = toPlayer.SessionToken, Identity_providers = ProvidersToTransfer.ToArray() });
+
+            LootLockerServerRequest.CallAPI(FromPlayerWithUlid, LootLockerEndPoints.transferProvidersBetweenAccountsEndpoint.endPoint, LootLockerEndPoints.transferProvidersBetweenAccountsEndpoint.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         #endregion
@@ -1021,16 +2145,65 @@ namespace LootLocker.Requests
         /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
-        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in it's entirety</param>
-        public static Guid StartRemoteSession(Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation, Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate, Action<LootLockerStartRemoteSessionResponse> onComplete, float pollingIntervalSeconds = 1.0f, float timeOutAfterMinutes = 5.0f)
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
+        public static Guid StartRemoteSession(
+            Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
+            Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
+            Action<LootLockerStartRemoteSessionResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeOutAfterMinutes = 5.0f)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>(null));
                 return Guid.Empty;
             }
 
-            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(remoteSessionLeaseInformation, remoteSessionLeaseStatusUpdate, onComplete, pollingIntervalSeconds, timeOutAfterMinutes);
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent.login,
+                remoteSessionLeaseInformation,
+                remoteSessionLeaseStatusUpdate,
+                onComplete,
+                pollingIntervalSeconds,
+                timeOutAfterMinutes
+            );
+        }
+
+        /// <summary>
+        /// Start a remote session for linking
+        /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
+        /// While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process.
+        /// When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Execute the request for the specified player (the player that you intend to link the remote account into)</param>
+        /// <param name="remoteSessionLeaseInformation">Will be invoked once to provide the lease information that the secondary device can use to authenticate</param>
+        /// <param name="remoteSessionLeaseStatusUpdate">Will be invoked intermittently to update the status lease process</param>
+        /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
+        /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
+        /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
+        public static Guid StartRemoteSessionForLinking(
+            string forPlayerWithUlid,
+            Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
+            Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
+            Action<LootLockerStartRemoteSessionResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeOutAfterMinutes = 5.0f)
+        {
+            if (!CheckInitialized())
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartRemoteSessionResponse>(forPlayerWithUlid));
+                return Guid.Empty;
+            }
+
+            return LootLockerAPIManager.RemoteSessionPoller.StartRemoteSessionWithContinualPolling(
+                LootLockerRemoteSessionLeaseIntent.link,
+                remoteSessionLeaseInformation,
+                remoteSessionLeaseStatusUpdate,
+                onComplete,
+                pollingIntervalSeconds,
+                timeOutAfterMinutes,
+                forPlayerWithUlid
+            );
         }
 
         /// <summary>
@@ -1047,41 +2220,75 @@ namespace LootLocker.Requests
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshRemoteSession(Action<LootLockerRefreshRemoteSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshRemoteSession(Action<LootLockerRefreshRemoteSessionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            RefreshRemoteSession("", onComplete);
+            RefreshRemoteSession(null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// Refresh a previous session signed in remotely.
-        /// If you do not want to manually handle the refresh token we recommend using the RefreshRemoteSession(Action<LootLockerRemoteSessionResponse> onComplete) method.
+        /// If you do not want to manually handle the refresh token we recommend using the RefreshRemoteSession(Action<LootLockerRemoteSessionResponse> onComplete, string forPlayerWithUlid) method.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
         /// </summary>
         /// <param name="refreshToken">Token received in response from StartRemoteSession request</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RefreshRemoteSession(string refreshToken, Action<LootLockerRefreshRemoteSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefreshRemoteSession(string refreshToken, Action<LootLockerRefreshRemoteSessionResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerRefreshRemoteSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerRefreshRemoteSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.Remote);
-
-            LootLockerRefreshRemoteSessionRequest sessionRequest = new LootLockerRefreshRemoteSessionRequest(string.IsNullOrEmpty(refreshToken) ? LootLockerConfig.current.refreshToken : refreshToken);
-            LootLockerAPIManager.RemoteSessionPoller.RefreshRemoteSession(sessionRequest, response =>
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                if (!response.success)
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
-                    CurrentPlatform.Reset();
+                    onComplete?.Invoke(LootLockerResponseFactory.TokenExpiredError<LootLockerRefreshRemoteSessionResponse>(playerData?.ULID));
+                    return;
                 }
-                onComplete(response);
-            });
+
+                refreshToken = playerData.RefreshToken;
+            }
+
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.startRemoteSession.endPoint, LootLockerEndPoints.startRemoteSession.httpMethod, 
+                LootLockerJson.SerializeObject(new LootLockerRefreshRemoteSessionRequest(refreshToken)),
+                (LootLockerResponse serverResponse) =>
+                {
+                    var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = response.refresh_token,
+                            ULID = response.player_ulid,
+                            Identifier = response.player_identifier,
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = "",
+                            WhiteLabelToken = "",
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.Remote),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                        });
+                    }
+
+                    onComplete?.Invoke(response);
+                },
+                false);
         }
         #endregion
 
         #region White Label
+
+        private static Dictionary<string /*email*/, string /*token*/> _wllProcessesDictionary = new Dictionary<string, string>();
 
         /// <summary>
         /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
@@ -1108,9 +2315,18 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelLoginResponse>(null));
                 return;
             }
+
+            if (_wllProcessesDictionary.ContainsKey(email))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelLoginResponse>($"White Label login already in progress for email {email}", null));
+
+                return;
+            }
+
+            _wllProcessesDictionary.Add(email, null);
 
             LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
             {
@@ -1121,11 +2337,16 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.WhiteLabelLogin(input, response =>
             {
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionToken", response.SessionToken);
-                PlayerPrefs.SetString("LootLockerWhiteLabelSessionEmail", email);
-                PlayerPrefs.Save();
+                if (response.success)
+                {
+                    _wllProcessesDictionary[input.email] = response.SessionToken;
+                }
+                else
+                {
+                    _wllProcessesDictionary.Remove(input.email);
+                }
 
-                onComplete(response);
+                onComplete?.Invoke(response);
             });
         }
 
@@ -1140,7 +2361,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignupResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignupResponse>(null));
                 return;
             }
 
@@ -1163,7 +2384,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(null));
                 return;
             }
 
@@ -1181,7 +2402,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(null));
                 return;
             }
 
@@ -1199,7 +2420,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(null));
                 return;
             }
 
@@ -1208,24 +2429,69 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Checks for a stored session and if that session is valid.
-        /// Depending on response of this method the developer can either start a session using the token,
-        /// or show a login form.
+        /// Depending on response of this method the developer can either start a session using the token, or show a login form.
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action bool that returns true if a White Label session exists </param>
-        public static void CheckWhiteLabelSession(Action<bool> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CheckWhiteLabelSession(Action<bool> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete(false);
+                onComplete?.Invoke(false);
                 return;
             }
 
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            string existingSessionEmail = playerData?.WhiteLabelEmail;
+            string existingSessionToken = playerData?.WhiteLabelToken;
             if (string.IsNullOrEmpty(existingSessionToken) || string.IsNullOrEmpty(existingSessionEmail))
             {
-                onComplete(false);
+                onComplete?.Invoke(false);
+                return;
+            }
+
+            VerifyWhiteLabelSession(existingSessionEmail, existingSessionToken, onComplete);
+        }
+
+        /// <summary>
+        /// Checks for a stored session and if that session is valid.
+        /// Depending on response of this method the developer can either start a session using the token, or show a login form.
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="email">The email to check for a valid white label session</param>
+        /// <param name="onComplete">onComplete Action bool that returns true if a White Label session exists </param>
+        public static void CheckWhiteLabelSession(string email, Action<bool> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(false);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                onComplete?.Invoke(false);
+                return;
+            }
+
+            string playerUlid = LootLockerStateData.GetPlayerUlidFromWLEmail(email);
+            string token = null;
+            if (!string.IsNullOrEmpty(playerUlid))
+            {
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
+                token = playerData?.WhiteLabelToken;
+            }
+            else
+            {
+                _wllProcessesDictionary.TryGetValue(email, out token);
+            }
+
+            string existingSessionEmail = email;
+            string existingSessionToken = token;
+            if (string.IsNullOrEmpty(existingSessionToken))
+            {
+                onComplete?.Invoke(false);
                 return;
             }
 
@@ -1245,7 +2511,7 @@ namespace LootLocker.Requests
         {
             if (!CheckInitialized(true))
             {
-                onComplete(false);
+                onComplete?.Invoke(false);
                 return;
             }
 
@@ -1269,7 +2535,7 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.WhiteLabelVerifySession(sessionRequest, response =>
             {
-                onComplete(response.success);
+                onComplete?.Invoke(response.success);
             });
         }
 
@@ -1278,30 +2544,101 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
-        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
+        public static void StartWhiteLabelSession(Action<LootLockerSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            string existingSessionToken = PlayerPrefs.GetString("LootLockerWhiteLabelSessionToken", "");
-            if (string.IsNullOrEmpty(existingSessionToken))
+            string email = null;
+            string token = null;
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (playerData == null || string.IsNullOrEmpty(playerData.WhiteLabelEmail))
             {
-                onComplete(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>("No White Label Session Token found"));
-                return;
+                if (_wllProcessesDictionary.Count == 0)
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>("No cached white label data found, please start a session explicitly using WhiteLabelLoginAndStartSession", forPlayerWithUlid));
+                    return;
+                }
+                var pair = _wllProcessesDictionary.ToList()[0];
+                email = pair.Key;
+                token = pair.Value;
             }
-
-            string existingSessionEmail = PlayerPrefs.GetString("LootLockerWhiteLabelSessionEmail", "");
-            if (string.IsNullOrEmpty(existingSessionEmail))
+            else
             {
-                onComplete(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>("No White Label Session Email found"));
+                email = playerData.WhiteLabelEmail;
+                token = playerData.WhiteLabelToken;
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>($"No valid white label token found for {email}", forPlayerWithUlid));
                 return;
             }
 
-            LootLockerWhiteLabelSessionRequest sessionRequest = new LootLockerWhiteLabelSessionRequest() { email = existingSessionEmail, token = existingSessionToken };
-            StartWhiteLabelSession(sessionRequest, onComplete);
+            if (Optionals == null)
+            {
+                Optionals = playerData?.SessionOptionals;
+            }
+
+            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
+        }
+
+        /// <summary>
+        /// Start a LootLocker Session using the cached White Label token for the specified email if it exist
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="email">The email of the White Label user to start a WL session for</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
+        public static void StartWhiteLabelSession(string email, Action<LootLockerSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                StartWhiteLabelSession(onComplete);
+                return;
+            }
+
+            string token = null;
+            if (!_wllProcessesDictionary.ContainsKey(email))
+            {
+                string playerUlidInStateData = LootLockerStateData.GetPlayerUlidFromWLEmail(email);
+                if (string.IsNullOrEmpty(playerUlidInStateData))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>($"No White Label data stored for {email}", null));
+                    return;
+                }
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlidInStateData);
+
+                token = playerData.WhiteLabelToken;
+                if(Optionals == null)
+                {
+                    Optionals = playerData?.SessionOptionals;
+                }
+            }
+            else
+            {
+                token = _wllProcessesDictionary[email];
+            }
+
+
+            if (string.IsNullOrEmpty(token))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerSessionResponse>($"No White Label token stored for {email}", null));
+                return;
+            }
+
+            StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
         }
 
         /// <summary>
@@ -1309,24 +2646,47 @@ namespace LootLocker.Requests
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="sessionRequest">A White Label Session Request with inner values already set</param>
+        /// <param name="Optionals">Optional parameters for the session start request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
         {
             if (!CheckInitialized(true))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
             }
 
-            CurrentPlatform.Set(Platforms.WhiteLabel);
-            LootLockerAPIManager.WhiteLabelSession(sessionRequest, response =>
-            {
-                if (!response.success)
+            LootLockerServerRequest.CallAPI(null, 
+                LootLockerEndPoints.whiteLabelLoginSessionRequest.endPoint, LootLockerEndPoints.whiteLabelLoginSessionRequest.httpMethod, 
+                LootLockerJson.SerializeObject(sessionRequest), 
+                (serverResponse) =>
                 {
-                    CurrentPlatform.Reset();
-                }
-                onComplete(response);
-            });
+                    var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
+                    if (response.success)
+                    {
+                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        {
+                            SessionToken = response.session_token,
+                            RefreshToken = "",
+                            ULID = response.player_ulid,
+                            Identifier = "",
+                            PublicUID = response.public_uid,
+                            LegacyID = response.player_id,
+                            Name = response.player_name,
+                            WhiteLabelEmail = sessionRequest.email,
+                            WhiteLabelToken = sessionRequest.token,
+                            CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.WhiteLabel),
+                            LastSignIn = DateTime.Now,
+                            CreatedAt = response.player_created_at,
+                            WalletID = response.wallet_id,
+                            SessionOptionals = sessionRequest.optionals
+                        });
+                        _wllProcessesDictionary.Remove(sessionRequest.email);
+                    }
+
+                    onComplete?.Invoke(response);
+                }, 
+                false);
         }
 
         /// <summary>
@@ -1348,7 +2708,7 @@ namespace LootLocker.Requests
                     onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, null));
                     return;
                 }
-                StartWhiteLabelSession(sessionResponse =>
+                StartWhiteLabelSession(email, sessionResponse =>
                 {
                     onComplete?.Invoke(LootLockerWhiteLabelLoginAndStartSessionResponse.MakeWhiteLabelLoginAndStartSessionResponse(loginResponse, sessionResponse));
                 });
@@ -1362,16 +2722,17 @@ namespace LootLocker.Requests
         /// Get information about the currently logged in player such as name and different ids to use for subsequent calls to LootLocker methods
         /// </summary>
         /// <param name="onComplete">Action for handling the response</param>
-        public static void GetCurrentPlayerInfo(Action<LootLockerGetCurrentPlayerInfoResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrentPlayerInfo(Action<LootLockerGetCurrentPlayerInfoResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentPlayerInfoResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentPlayerInfoResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.getInfoFromSession;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1381,11 +2742,12 @@ namespace LootLocker.Requests
         /// <param name="playerLegacyIdsToLookUp">A list of legacy ids of players to look up. These ids are in the form of integers and are sometimes called simply player_id or id</param>
         /// <param name="playerPublicUidsToLookUp">A list of public uids to look up. These ids are in the form of UIDs.</param>
         /// <param name="onComplete">Action for handling the response</param>
-        public static void ListPlayerInfo(string[] playerIdsToLookUp, int[] playerLegacyIdsToLookUp, string[] playerPublicUidsToLookUp, Action<LootLockerListPlayerInfoResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerInfo(string[] playerIdsToLookUp, int[] playerLegacyIdsToLookUp, string[] playerPublicUidsToLookUp, Action<LootLockerListPlayerInfoResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlayerInfoResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlayerInfoResponse>(forPlayerWithUlid));
                 return;
             }
             if(playerIdsToLookUp.Length == 0 && playerLegacyIdsToLookUp.Length == 0 && playerPublicUidsToLookUp.Length == 0)
@@ -1397,73 +2759,15 @@ namespace LootLocker.Requests
 
             var endPoint = LootLockerEndPoints.listPlayerInfo;
 
-            LootLockerServerRequest.CallAPI(
-                endPoint.endPoint,
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint,
                 endPoint.httpMethod,
                 LootLockerJson.SerializeObject(new LootLockerListPlayerInfoRequest {
-                        player_id = playerIdsToLookUp,
-                        player_legacy_id = playerLegacyIdsToLookUp,
-                        player_public_uid = playerPublicUidsToLookUp
+                    player_id = playerIdsToLookUp,
+                    player_legacy_id = playerLegacyIdsToLookUp,
+                    player_public_uid = playerPublicUidsToLookUp
                 }),
                 onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-
-        /// <summary>
-        /// Get general information about the current current player, such as the XP, Level information and their account balance.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPlayerInfoResponse</param>
-        [Obsolete("This function is deprecated, use GetCurrentPlayerInfo instead")]
-        public static void GetPlayerInfo(Action<LootLockerGetPlayerInfoResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPlayerInfoResponse>());
-                return;
-            }
-            var endPoint = LootLockerEndPoints.getPlayerInfo;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Get the players XP and Level information from a playerIdentifier. This uses the same platform as the current session.
-        /// If you are using multiple platforms (White Label + Steam for example), you must use the GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete) method instead.
-        /// </summary>
-        /// <param name="playerIdentifier">The player identifier for this platform.</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpResponse</param>
-        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
-        public static void GetOtherPlayerInfo(string playerIdentifier, Action<LootLockerXpResponse> onComplete)
-        {
-            GetOtherPlayerInfo(playerIdentifier, CurrentPlatform.GetString(), onComplete);
-        }
-
-        /// <summary>
-        /// Get the players XP and Level information from a playerIdentifier.
-        /// </summary>
-        /// <param name="playerIdentifier">The player identifier for this platform.</param>
-        /// <param name="platform">The platform that the user is present on as a string.</param>
-        /// <param name="onComplete"></param>
-        [Obsolete("This function is deprecated, use ListPlayerInfo instead")]
-        public static void GetOtherPlayerInfo(string playerIdentifier, string platform, Action<LootLockerXpResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
-                return;
-            }
-
-            if (string.IsNullOrEmpty(platform))
-            {
-                platform = CurrentPlatform.GetString();
-            }
-
-            LootLockerOtherPlayerInfoRequest infoRequest = new LootLockerOtherPlayerInfoRequest(playerIdentifier, platform);
-            var endPoint = LootLockerEndPoints.getXpAndLevel;
-            var getVariable = string.Format(endPoint.endPoint, infoRequest.getRequests[0], infoRequest.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
 
         /// <summary>
         /// Get the players inventory.
@@ -1471,38 +2775,41 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of assets to retrieve</param>
         /// <param name="after">The instance ID the list should start from</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
-        public static void GetInventory(int count, int after, Action<LootLockerInventoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetInventory(int count, int after, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
             }
 
             var endpoint = LootLockerEndPoints.getInventory.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
+                queryParams.Add("count", count);
             if (after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
+            endpoint += queryParams.Build();
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get the players inventory.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
-        public static void GetInventory(Action<LootLockerInventoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetInventory(Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
             }
-            GetInventory(-1, -1, onComplete);
+            GetInventory(-1, -1, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -1510,108 +2817,136 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="count">Amount of assets to retrieve</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
-        public static void GetInventory(int count, Action<LootLockerInventoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetInventory(int count, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
             }
 
 
-            GetInventory(count, -1, onComplete);
+            GetInventory(count, -1, onComplete, forPlayerWithUlid);
 
+        }
+
+        /// <summary>
+        /// List player inventory with default parameters (no filters, first page, default page size).
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerInventoryWithDefaultParameters(Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListPlayerInventory(new LootLockerListSimplifiedInventoryRequest(), 100, 1, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List player inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
+        /// </summary>
+        /// <param name="request">Request object containing any filters to apply to the inventory listing.</param>
+        /// <param name="perPage">Optional : Number of items per page.</param>
+        /// <param name="page">Optional : Page number to retrieve.</param>
+        public static void ListPlayerInventory(LootLockerListSimplifiedInventoryRequest request, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSimpleInventoryResponse>(forPlayerWithUlid));
+                return;
+            }
+            var endPoint = LootLockerEndPoints.listSimplifiedInventory;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            queryParams.Add("per_page", perPage > 0 ? perPage : 100);
+            queryParams.Add("page", page > 0 ? page : 1);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List character inventory with default parameters (no filters, first page, default page size).
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListCharacterInventoryWithDefaultParameters(Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListCharacterInventory(new LootLockerListSimplifiedInventoryRequest(), 0, 100, 1, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List character inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
+        /// </summary>
+        /// <param name="request">Request object containing any filters to apply to the inventory listing.</param>
+        /// <param name="characterId">Optional : Filter inventory by character ID.</param>
+        /// <param name="perPage">Optional : Number of items per page.</param>
+        /// <param name="page">Optional : Page number to retrieve.</param>
+        public static void ListCharacterInventory(LootLockerListSimplifiedInventoryRequest request, int characterId, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSimpleInventoryResponse>(forPlayerWithUlid));
+                return;
+            }
+            var endPoint = LootLockerEndPoints.listSimplifiedInventory;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (characterId > 0)
+                queryParams.Add("character_id", characterId);
+            queryParams.Add("per_page", perPage > 0 ? perPage : 100);
+            queryParams.Add("page", page > 0 ? page : 1);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get the amount of credits/currency that the player has.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerBalanceResponse</param>
-        public static void GetBalance(Action<LootLockerBalanceResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetBalance(Action<LootLockerBalanceResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBalanceResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.getCurrencyBalance;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Award XP to the player.
-        /// </summary>
-        /// <param name="xpToSubmit">Amount of XP</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerXpSubmitResponse</param>
-        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
-        public static void SubmitXp(int xpToSubmit, Action<LootLockerXpSubmitResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpSubmitResponse>());
-                return;
-            }
-            LootLockerXpSubmitRequest xpSubmitRequest = new LootLockerXpSubmitRequest(xpToSubmit);
-            if (xpSubmitRequest == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerXpSubmitResponse>());
-                return;
-            }
-
-            string json = LootLockerJson.SerializeObject(xpSubmitRequest);
-
-            var endPoint = LootLockerEndPoints.submitXp;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        [Obsolete("This function will be removed at a later stage, use the new progression system instead")]
-        public static void GetXpAndLevel(Action<LootLockerXpResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXpResponse>());
-                return;
-            }
-            LootLockerXpRequest xpRequest = new LootLockerXpRequest();
-            var endPoint = LootLockerEndPoints.getXpAndLevel;
-
-            var getVariable = string.Format(endPoint.endPoint, xpRequest.getRequests[0], xpRequest.getRequests[1]);
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get assets that have been given to the currently logged in player since the last time this endpoint was called.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerAssetNotificationsResponse</param>
-        public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerAssetNotificationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerAssetNotificationsResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.playerAssetNotifications;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get asset deactivations for the currently logged in player since the last time this endpoint was called.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDeactivatedAssetsResponse</param>
-        public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetDeactivatedAssetNotification(Action<LootLockerDeactivatedAssetsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDeactivatedAssetsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDeactivatedAssetsResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.playerAssetDeactivationNotification;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1619,251 +2954,85 @@ namespace LootLocker.Requests
         /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any. If you only want the ID's of the assets you can also use  GetDLCMigrated(Action<LootLockerDlcResponse> onComplete).
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDlcResponse</param>
-        public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void InitiateDLCMigration(Action<LootLockerDlcResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.initiateDlcMigration;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get a list of DLC's migrated for the player. This response will only list the asset-ID's of the migrated DLC, if you want more information about the assets, use GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete) instead.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerDlcResponse</param>
-        public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetDLCMigrated(Action<LootLockerDlcResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDlcResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.getDlcMigration;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Set the players profile to be private. This means that their inventory will not be displayed publicly on Steam and other places.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStandardResponse</param>
-        public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SetProfilePrivate(Action<LootLockerStandardResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.setProfilePrivate;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Set the players profile to public. This means that their inventory will be displayed publicly on Steam and other places.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStandardResponse</param>
-        public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SetProfilePublic(Action<LootLockerStandardResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStandardResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.setProfilePublic;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Get the logged in players name.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameResponse</param>
-        public static void GetPlayerName(Action<PlayerNameResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerName(Action<PlayerNameResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>(forPlayerWithUlid));
                 return;
             }
             var endPoint = LootLockerEndPoints.getPlayerName;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        /// <summary>
-        /// Get players 1st party platform ID's from the provided list of playerID's.
-        /// </summary>
-        /// <param name="playerIds">A list of multiple player ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</param>
-        public static void LookupPlayer1stPartyPlatformIds(ulong[] playerIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayer1stPartyPlatformIDs(new LookupPlayer1stPartyPlatformIDsRequest()
-            {
-                player_ids = playerIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get players 1st party platform ID's from the provided list of playerID's.
-        /// </summary>
-        /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</param>
-        public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayer1stPartyPlatformIDs(new LookupPlayer1stPartyPlatformIDsRequest()
-            {
-                player_public_uids = playerPublicUIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by playerID's.
-        /// </summary>
-        /// <param name="playerIds">A list of multiple player ID's<</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                player_ids = playerIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by public playerID's.
-        /// </summary>
-        /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesByPlayerPublicUIds(string[] playerPublicUIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                player_public_uids = playerPublicUIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamIds">A list of multiple player Steam ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesBySteamIds(ulong[] steamIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                steam_ids = steamIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by Steam ID's. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
-        /// </summary>
-        /// <param name="steamIds">A list of multiple player Steam ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesBySteamIds(string[] steamIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                steam_ids = steamIds.Select(steamId => Convert.ToUInt64(steamId)).ToArray()
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by PSN ID's.
-        /// </summary>
-        /// <param name="psnIds">A list of multiple player PSN ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesByPSNIds(ulong[] psnIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                psn_ids = psnIds
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by PSN ID's.
-        /// </summary>
-        /// <param name="psnIds">A list of multiple player PSN ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                psn_ids = psnIds.Select(psnId => Convert.ToUInt64(psnId)).ToArray()
-            }, onComplete);
-        }
-
-        /// <summary>
-        /// Get player names of the players from their last active platform by Xbox ID's.
-        /// </summary>
-        /// <param name="xboxIds">A list of multiple player XBOX ID's</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
-        public static void LookupPlayerNamesByXboxIds(string[] xboxIds, Action<PlayerNameLookupResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>());
-                return;
-            }
-
-            LootLockerAPIManager.LookupPlayerNames(new LookupPlayerNamesRequest()
-            {
-                xbox_ids = xboxIds
-            }, onComplete);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1871,24 +3040,28 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="name">The name to set to the currently logged in player</param>
         /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameResponse</param>
-        public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SetPlayerName(string name, Action<PlayerNameResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameResponse>(forPlayerWithUlid));
                 return;
             }
 
-            if (CurrentPlatform.Get() == Platforms.Guest)
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+
+            if (playerData != null && playerData.CurrentPlatform.Platform == LL_AuthPlatforms.Guest)
             {
                 if (name.ToLower().Contains("player"))
                 {
-                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed"));
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed", forPlayerWithUlid));
                     return;
 
-                } else if (name.ToLower().Contains(PlayerPrefs.GetString("LootLockerGuestPlayerID").ToLower()))
+                }
+                else if (name.ToLower().Contains(playerData.Identifier.ToLower()))
                 {
-                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed"));
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to the Identifier is not allowed", forPlayerWithUlid));
                     return;
                 }
             }
@@ -1897,7 +3070,7 @@ namespace LootLocker.Requests
             data.name = name;
             if (data == null)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<PlayerNameResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -1905,30 +3078,292 @@ namespace LootLocker.Requests
 
             var endPoint = LootLockerEndPoints.setPlayerName;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get players 1st party platform ID's from the provided list of playerID's.
+        /// </summary>
+        /// <param name="playerIds">A list of multiple player ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayer1stPartyPlatformIds(ulong[] playerIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayer1stPartyPlatformIDs(forPlayerWithUlid, new LookupPlayer1stPartyPlatformIDsRequest()
+            {
+                player_ids = playerIds
+            }, onComplete);
+        }
+
+        /// <summary>
+        /// Get players 1st party platform ID's from the provided list of playerID's.
+        /// </summary>
+        /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayer1stPartyPlatformIds(string[] playerPublicUIds, Action<Player1stPartyPlatformIDsLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<Player1stPartyPlatformIDsLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayer1stPartyPlatformIDs(forPlayerWithUlid, new LookupPlayer1stPartyPlatformIDsRequest()
+            {
+                player_public_uids = playerPublicUIds
+            }, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by playerID's.
+        /// </summary>
+        /// <param name="playerIds">A list of multiple player ID's<</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPlayerIds(ulong[] playerIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            List<string> stringPlayerIds = new List<string>();
+            foreach (ulong id in playerIds)
+            {
+                stringPlayerIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_public_uid", stringPlayerIds.ToArray(), onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerPublicUIds">A list of multiple player public UID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPlayerPublicUIds(string[] playerPublicUIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_public_uid", playerPublicUIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerUlids">A list of player ulids</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPlayerUlids(string[] playerUlids, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_ulid", playerUlids, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="guestLoginIds">A list of guest login ids</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByGuestLoginIds(string[] guestLoginIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_guest_login_id", guestLoginIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by public playerID's.
+        /// </summary>
+        /// <param name="playerNames">A list of player names</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPlayerNames(string[] playerNames, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_name", playerNames, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by steam ID's
+        /// </summary>
+        /// <param name="steamIds">A list of multiple player Steam ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesBySteamIds(ulong[] steamIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            List<string> stringSteamIds = new List<string>();
+            foreach (ulong id in steamIds)
+            {
+                stringSteamIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "steam_id", stringSteamIds.ToArray(), onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Steam ID's
+        /// </summary>
+        /// <param name="steamIds">A list of multiple player Steam ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesBySteamIds(string[] steamIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "steam_id", steamIds, onComplete);
+        }
+
+        /// <summary>
+        ///Get player names and important ids of a set of players from their last active platform by PSN ID's
+        /// </summary>
+        /// <param name="psnIds">A list of multiple player PSN ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPSNIds(ulong[] psnIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            List<string> stringPsnIds = new List<string>();
+            foreach (ulong id in psnIds)
+            {
+                stringPsnIds.Add(id.ToString());
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "psn_id", stringPsnIds.ToArray(), onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by PSN ID's
+        /// </summary>
+        /// <param name="psnIds">A list of multiple player PSN ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByPSNIds(string[] psnIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "psn_id", psnIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Xbox ID's
+        /// </summary>
+        /// <param name="xboxIds">A list of multiple player XBOX ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByXboxIds(string[] xboxIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "xbox_id", xboxIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Epic Games ID's
+        /// </summary>
+        /// <param name="epicGamesIds">A list of multiple player Epic Games ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByEpicGamesIds(string[] epicGamesIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "epic_games_id", epicGamesIds, onComplete);
+        }
+
+        /// <summary>
+        /// Get player names and important ids of a set of players from their last active platform by Google Play Games ID's
+        /// </summary>
+        /// <param name="googlePlayGamesIds">A list of multiple player Google Play Games ID's</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type PlayerNameLookupResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LookupPlayerNamesByGooglePlayGamesIds(string[] googlePlayGamesIds, Action<PlayerNameLookupResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<PlayerNameLookupResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "google_play_games_id", googlePlayGamesIds, onComplete);
         }
 
         /// <summary>
         /// Mark the logged in player for deletion. After 30 days the player will be deleted from the system.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse></param>
-        public static void DeletePlayer(Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletePlayer(Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.deletePlayer.endPoint, LootLockerEndPoints.deletePlayer.httpMethod, null, onComplete:
-                (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.deletePlayer.endPoint, LootLockerEndPoints.deletePlayer.httpMethod, null, onComplete: (serverResponse) =>
+            {
+                if (serverResponse != null && serverResponse.success)
                 {
-                    if (serverResponse != null && serverResponse.success)
-                    {
-                        ClearLocalSession();
-                    }
-                    LootLockerResponse.Deserialize(onComplete, serverResponse);
-                });
+                    ClearLocalSession(serverResponse.requestContext.player_ulid);
+                }
+                LootLockerResponse.Deserialize(onComplete, serverResponse);
+            });
         }
         #endregion
 
@@ -1938,49 +3373,52 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="fileId">Id of the file, can be retrieved with GetAllPlayerFiles() or when the file is uploaded</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFile(int fileId, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleplayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.getSingleplayerFile.WithPathParameter(fileId);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Returns all the files that your currently active player own.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFilesResponse</param>
-        public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllPlayerFiles(Action<LootLockerPlayerFilesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// Returns all public files that the player with the provided playerID owns.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFilesResponse</param>
-        public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFilesResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getPlayerFilesByPlayerId.endPoint, playerId);
+            var endpoint = LootLockerEndPoints.getPlayerFilesByPlayerId.WithPathParameter(playerId);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -1990,11 +3428,12 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
@@ -2012,11 +3451,11 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body,
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2030,9 +3469,10 @@ namespace LootLocker.Requests
         /// <param name="pathToFile">Path to the file, example: Application.persistentDataPath + "/" + fileName;</param>
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(pathToFile, filePurpose, false, onComplete);
+            UploadPlayerFile(pathToFile, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2042,11 +3482,12 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
@@ -2063,11 +3504,11 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body,
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2080,9 +3521,10 @@ namespace LootLocker.Requests
         /// <param name="fileStream">Filestream to upload</param>
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileStream, filePurpose, false, onComplete);
+            UploadPlayerFile(fileStream, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2093,11 +3535,12 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
@@ -2107,7 +3550,7 @@ namespace LootLocker.Requests
                 { "public", isPublic.ToString().ToLower() }
             };
 
-            LootLockerServerRequest.UploadFile(LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2121,9 +3564,10 @@ namespace LootLocker.Requests
         /// <param name="fileName">Name of the file on LootLocker</param>
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete);
+            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
         ///////////////////////////////////////////////////////////////////////////////
@@ -2134,11 +3578,12 @@ namespace LootLocker.Requests
         /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
         /// <param name="pathToFile">Path to the file, example: Application.persistentDataPath + "/" + fileName;</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UpdatePlayerFile(int fileId, string pathToFile, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdatePlayerFile(int fileId, string pathToFile, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
@@ -2149,13 +3594,13 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(),
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2168,11 +3613,12 @@ namespace LootLocker.Requests
         /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
         /// <param name="fileStream">Filestream to upload</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UpdatePlayerFile(int fileId, FileStream fileStream, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdatePlayerFile(int fileId, FileStream fileStream, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
@@ -2183,13 +3629,13 @@ namespace LootLocker.Requests
             }
             catch (Exception e)
             {
-                LootLockerLogger.GetForLogLevel(LootLockerLogger.LogLevel.Error)($"File error: {e.Message}");
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(),
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2202,17 +3648,18 @@ namespace LootLocker.Requests
         /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
         /// <param name="fileBytes">Byte array to upload</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        public static void UpdatePlayerFile(int fileId, byte[] fileBytes, Action<LootLockerPlayerFile> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdatePlayerFile(int fileId, byte[] fileBytes, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.updatePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.updatePlayerFile.WithPathParameter(fileId);
 
-            LootLockerServerRequest.UploadFile(endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(),
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, endpoint, LootLockerEndPoints.updatePlayerFile.httpMethod, fileBytes, null, "multipart/form-data", new Dictionary<string, string>(),
                 onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
@@ -2224,17 +3671,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="fileId">Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletePlayerFile(int fileId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deletePlayerFile.endPoint, fileId);
+            var endpoint = LootLockerEndPoints.deletePlayerFile.WithPathParameter(fileId);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         #endregion
 
@@ -2246,24 +3694,26 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerProgressions(int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>(forPlayerWithUlid));
                 return;
             }
 
             var endpoint = LootLockerEndPoints.getAllPlayerProgressions.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2271,18 +3721,20 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetPlayerProgressions(int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerProgressions(int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetPlayerProgressions(count, null, onComplete);
+            GetPlayerProgressions(count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
-        public static void GetPlayerProgressions(Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerProgressions(Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetPlayerProgressions(-1, null, onComplete);
+            GetPlayerProgressions(-1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2290,17 +3742,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgression</param>
-        public static void GetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSinglePlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getSinglePlayerProgression.WithPathParameter(progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2309,19 +3762,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to be added</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void AddPointsToPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddPointsToPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToPlayerProgression.WithPathParameter(progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2330,19 +3784,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to be subtracted</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void SubtractPointsFromPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubtractPointsFromPlayerProgression(string progressionKey, ulong amount, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromPlayerProgression.WithPathParameter(progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2350,17 +3805,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void ResetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ResetPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetPlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.resetPlayerProgression.WithPathParameter(progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2368,17 +3824,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void DeletePlayerProgression(string progressionKey, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletePlayerProgression(string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deletePlayerProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.deletePlayerProgression.WithPathParameter(progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -2386,9 +3843,82 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</param>
-        public static void RegisterPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RegisterPlayerProgression(string progressionKey, Action<LootLockerPlayerProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            AddPointsToPlayerProgression(progressionKey, 0, onComplete);
+            AddPointsToPlayerProgression(progressionKey, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="after">Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, int count, string after, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedPlayerProgressionsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getAllOtherPlayersProgressions.WithPathParameter(playerUlid);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (count > 0)
+                queryParams.Add("count", count);
+            if (!string.IsNullOrEmpty(after))
+                queryParams.Add("after", after);
+
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="count">Amount of entries to receive</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, int count, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            GetOtherPlayersProgressions(playerUlid, count, null, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Returns multiple progressions that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersProgressions(string playerUlid, Action<LootLockerPaginatedPlayerProgressionsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            GetOtherPlayersProgressions(playerUlid, -1, null, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Returns a single progression that the specified player is currently on.
+        /// </summary>
+        /// <param name="playerUlid">The ulid of the player you wish to look up</param>
+        /// <param name="progressionKey">Progression key</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerProgression</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersProgression(string playerUlid, string progressionKey, Action<LootLockerPlayerProgressionResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerProgressionResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.getSingleOtherPlayersProgression.WithPathParameters(progressionKey, playerUlid);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -2402,12 +3932,13 @@ namespace LootLocker.Requests
         /// <param name="name">The new name for the hero</param>
         /// <param name="isDefault">Should this hero be the default hero?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void CreateHero(int heroId, string name, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateHero(int heroId, string name, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
 
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerCreateHeroRequest data = new LootLockerCreateHeroRequest();
@@ -2417,36 +3948,38 @@ namespace LootLocker.Requests
             data.is_default = isDefault;
 
 
-            LootLockerAPIManager.CreateHero(data, onComplete);
+            LootLockerAPIManager.CreateHero(data, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// List the heroes with names and character information
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGameHeroResponse</param>
-        public static void GetGameHeroes(Action<LootLockerGameHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetGameHeroes(Action<LootLockerGameHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameHeroResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetGameHeroes(onComplete);
+            LootLockerAPIManager.GetGameHeroes(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
         /// List the heroes that the current player owns
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void ListPlayerHeroes(Action<LootLockerListHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerHeroes(Action<LootLockerListHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.ListPlayerHeroes(onComplete);
+            LootLockerAPIManager.ListPlayerHeroes(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -2454,15 +3987,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="steamID64">Steam id of the requested player</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void ListOtherPlayersHeroesBySteamID64(int steamID64, Action<LootLockerPlayerHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListOtherPlayersHeroesBySteamID64(int steamID64, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.ListOtherPlayersHeroesBySteamID64(steamID64, onComplete);
+            LootLockerAPIManager.ListOtherPlayersHeroesBySteamID64(forPlayerWithUlid, steamID64, onComplete);
         }
 
         /// <summary>
@@ -2473,11 +4007,12 @@ namespace LootLocker.Requests
         /// <param name="assetVariationId">ID of the asset variation to use</param>
         /// <param name="isDefault">Should this hero be the default hero?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void CreateHeroWithVariation(string name, int heroId, int assetVariationId, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateHeroWithVariation(string name, int heroId, int assetVariationId, bool isDefault, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2488,7 +4023,7 @@ namespace LootLocker.Requests
             data.asset_variation_id = assetVariationId;
             data.is_default = isDefault;
 
-            LootLockerAPIManager.CreateHeroWithVariation(data, onComplete);
+            LootLockerAPIManager.CreateHeroWithVariation(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -2496,15 +4031,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="heroId">The id of the hero to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void GetHero(int heroId, Action<LootLockerPlayerHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetHero(int heroId, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetHero(heroId, onComplete);
+            LootLockerAPIManager.GetHero(forPlayerWithUlid, heroId, onComplete);
         }
 
         /// <summary>
@@ -2512,15 +4048,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="steamId">Steam Id of the requested player</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void GetOtherPlayersDefaultHeroBySteamID64(int steamId, Action<LootLockerPlayerHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersDefaultHeroBySteamID64(int steamId, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetOtherPlayersDefaultHeroBySteamID64(steamId, onComplete);
+            LootLockerAPIManager.GetOtherPlayersDefaultHeroBySteamID64(forPlayerWithUlid, steamId, onComplete);
 
         }
 
@@ -2531,11 +4068,12 @@ namespace LootLocker.Requests
         /// <param name="name">The new name for the hero</param>
         /// <param name="isDefault">Should this hero be the default hero?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void UpdateHero(string heroId, string name, bool isDefault, Action<LootLockerPlayerHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateHero(string heroId, string name, bool isDefault, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2548,7 +4086,7 @@ namespace LootLocker.Requests
             data.is_default = isDefault;
 
 
-            LootLockerAPIManager.UpdateHero(lootLockerGetRequest, data, onComplete);
+            LootLockerAPIManager.UpdateHero(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
         /// <summary>
@@ -2556,15 +4094,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="heroID">HeroID Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerHeroResponse</param>
-        public static void DeleteHero(int heroID, Action<LootLockerPlayerHeroResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteHero(int heroID, Action<LootLockerPlayerHeroResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerHeroResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.DeleteHero(heroID, onComplete);
+            LootLockerAPIManager.DeleteHero(forPlayerWithUlid, heroID, onComplete);
         }
 
         /// <summary>
@@ -2572,30 +4111,33 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="heroID">HeroID Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInventoryResponse</param>
-        public static void GetHeroInventory(int heroID, Action<LootLockerInventoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetHeroInventory(int heroID, Action<LootLockerInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInventoryResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetHeroInventory(heroID, onComplete);
+            LootLockerAPIManager.GetHeroInventory(forPlayerWithUlid, heroID, onComplete);
         }
 
         /// <summary>
         /// List the loadout of the specified hero that the current player owns
         /// </summary>
+        /// <param name="heroID">HeroID Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void GetHeroLoadout(Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetHeroLoadout(int HeroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetHeroLoadout(onComplete);
+            LootLockerAPIManager.GetHeroLoadout(forPlayerWithUlid, HeroID, onComplete);
         }
 
         /// <summary>
@@ -2603,15 +4145,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="heroID">HeroID Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void GetOtherPlayersHeroLoadout(int heroID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersHeroLoadout(int heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetOtherPlayersHeroLoadout(heroID, onComplete);
+            LootLockerAPIManager.GetOtherPlayersHeroLoadout(forPlayerWithUlid, heroID, onComplete);
         }
 
         /// <summary>
@@ -2620,11 +4163,12 @@ namespace LootLocker.Requests
         /// <param name="heroID">Id of the hero</param>
         /// <param name="assetInstanceID">Id of the asset instance to give</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void AddAssetToHeroLoadout(int heroID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddAssetToHeroLoadout(int heroID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2634,7 +4178,7 @@ namespace LootLocker.Requests
             data.hero_id = heroID;
 
 
-            LootLockerAPIManager.AddAssetToHeroLoadout(data, onComplete);
+            LootLockerAPIManager.AddAssetToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
         /// <summary>
@@ -2645,11 +4189,12 @@ namespace LootLocker.Requests
         /// <param name="assetID">Id of the asset</param>
         /// <param name="assetInstanceID">Id of the asset instance to give</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void AddAssetVariationToHeroLoadout(int heroID, int assetID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddAssetVariationToHeroLoadout(int heroID, int assetID, int assetInstanceID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2659,7 +4204,7 @@ namespace LootLocker.Requests
             data.asset_id = assetID;
             data.asset_variation_id = assetInstanceID;
 
-            LootLockerAPIManager.AddAssetVariationToHeroLoadout(data, onComplete);
+            LootLockerAPIManager.AddAssetVariationToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
         /// <summary>
@@ -2669,33 +4214,21 @@ namespace LootLocker.Requests
         /// <param name="assetID">Id of the asset</param>
         /// <param name="heroID">Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
-        public static void RemoveAssetFromHeroLoadout(string assetID, string heroID, Action<LootLockerHeroLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RemoveAssetFromHeroLoadout(int assetID, int heroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerHeroLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
-
-            lootLockerGetRequest.getRequests.Add(assetID);
-            lootLockerGetRequest.getRequests.Add(heroID);
-
-            LootLockerAPIManager.RemoveAssetFromHeroLoadout(lootLockerGetRequest, onComplete);
+            LootLockerAPIManager.RemoveAssetFromHeroLoadout(forPlayerWithUlid, heroID, assetID, onComplete);
         }
 
         #endregion
 
         #region Base Classes
-
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function CreateClass() instead")]
-        public static void CreateCharacter(string characterTypeId, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            CreateClass(characterTypeId, newCharacterName, isDefault, onComplete);
-        }
-
         /// <summary>
         /// Create a Class with the provided type and name. The Class will be owned by the currently active player.
         /// Use ListClassTypes() to get a list of available Class types for your game.
@@ -2704,11 +4237,12 @@ namespace LootLocker.Requests
         /// <param name="newClassName">The new name for the class</param>
         /// <param name="isDefault">Should this class be the default class?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void CreateClass(string classTypeID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateClass(string classTypeID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2718,80 +4252,70 @@ namespace LootLocker.Requests
             data.is_default = isDefault;
             data.character_type_id = classTypeID;
 
-            LootLockerAPIManager.CreateClass(data, onComplete);
+            LootLockerAPIManager.CreateClass(forPlayerWithUlid, data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListClassTypes() instead")]
-        public static void ListCharacterTypes(Action<LootLockerListClassTypesResponse> onComplete)
+        /// <summary>
+        /// Delete a Class with the provided classId. The Class will be removed from the currently active player.
+        /// </summary>
+        /// <param name="classId">The id of the class you want to delete</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteClass(int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListClassTypes(onComplete);
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.DeleteClass(forPlayerWithUlid, classId, onComplete);
         }
 
         /// <summary>
         /// List all available Class types for your game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListClassTypesResponse</param>
-        public static void ListClassTypes(Action<LootLockerListClassTypesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListClassTypes(Action<LootLockerListClassTypesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListClassTypesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListClassTypesResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ListClassTypes(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function ListPlayerClasses() instead")]
-        public static void ListPlayerCharacters(Action<LootLockerPlayerClassListResponse> onComplete)
-        {
-            ListPlayerClasses(onComplete);
+            LootLockerAPIManager.ListClassTypes(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
         /// Get list of classes to a player
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerClassListResponse</param>
-        public static void ListPlayerClasses(Action<LootLockerPlayerClassListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerClasses(Action<LootLockerPlayerClassListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerClassListResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerClassListResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ListPlayerClasses(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetClassLoadout() instead")]
-        public static void GetCharacterLoadout(Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetClassLoadout(onComplete);
+            LootLockerAPIManager.ListPlayerClasses(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
         /// Get all class loadouts for your game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void GetClassLoadout(Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetClassLoadout(Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetClassLoadout(onComplete);
+            LootLockerAPIManager.GetClassLoadout(forPlayerWithUlid, onComplete);
 
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetOtherPlayersCharacterLoadout(player_id, CurrentPlatform.Get(), onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetOtherPlayersClassLoadout() instead")]
-        public static void GetOtherPlayersCharacterLoadout(string player_id, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            GetOtherPlayersClassLoadout(player_id, platform, onComplete);
         }
 
         /// <summary>
@@ -2799,9 +4323,11 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">ID of the player</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void GetOtherPlayersClassLoadout(string playerID, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersClassLoadout(string playerID, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetOtherPlayersClassLoadout(playerID, CurrentPlatform.Get(), onComplete);
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            GetOtherPlayersClassLoadout(playerID, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2810,24 +4336,30 @@ namespace LootLocker.Requests
         /// <param name="playerID">ID of the player</param>
         /// <param name="platform">The platform that the ID of the player is for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void GetOtherPlayersClassLoadout(string playerID, Platforms platform, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersClassLoadout(string playerID, LL_AuthPlatforms platform, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
 
             data.getRequests.Add(playerID);
-            data.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
-            LootLockerAPIManager.GetOtherPlayersClassLoadout(data, onComplete);
+            data.getRequests.Add(LootLockerAuthPlatform.GetPlatformRepresentation(platform).PlatformString);
+            LootLockerAPIManager.GetOtherPlayersClassLoadout(forPlayerWithUlid, data, onComplete);
         }
 
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UpdateClass() instead")]
-        public static void UpdateCharacter(string characterID, string newCharacterName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <summary>
+        /// Get a class loadout from a specific player by the player's UID
+        /// </summary>
+        /// <param name="playerUid">The UID of the player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersClassLoadoutByUid(string playerUid, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            UpdateClass(characterID, newCharacterName, isDefault, onComplete);
+            LootLockerAPIManager.GetOtherPlayersClassLoadoutByUid(forPlayerWithUlid, playerUid, onComplete);
         }
 
         /// <summary>
@@ -2837,11 +4369,12 @@ namespace LootLocker.Requests
         /// <param name="newClassName">New name for the class</param>
         /// <param name="isDefault">Should the class be the default class?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void UpdateClass(string classID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateClass(string classID, string newClassName, bool isDefault, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2854,14 +4387,7 @@ namespace LootLocker.Requests
 
             lootLockerGetRequest.getRequests.Add(classID);
 
-            LootLockerAPIManager.UpdateClass(lootLockerGetRequest, data, onComplete);
-
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function SetDefaultClass() instead")]
-        public static void SetDefaultCharacter(string characterID, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            SetDefaultClass(characterID, onComplete);
+            LootLockerAPIManager.UpdateClass(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
         /// <summary>
@@ -2869,11 +4395,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="classID">ID of the class</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerClassLoadoutResponse</param>
-        public static void SetDefaultClass(string classID, Action<LootLockerClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SetDefaultClass(string classID, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -2885,13 +4412,7 @@ namespace LootLocker.Requests
 
             lootLockerGetRequest.getRequests.Add(classID);
 
-            LootLockerAPIManager.UpdateClass(lootLockerGetRequest, data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToDefaultClass() instead")]
-        public static void EquipIdAssetToDefaultCharacter(string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipIdAssetToDefaultClass(assetInstanceId, onComplete);
+            LootLockerAPIManager.UpdateClass(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
         /// <summary>
@@ -2899,22 +4420,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">ID of the asset instance to equip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void EquipIdAssetToDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EquipIdAssetToDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
             data.instance_id = int.Parse(assetInstanceID);
-            LootLockerAPIManager.EquipIdAssetToDefaultClass(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToDefaultClass() instead")]
-        public static void EquipGlobalAssetToDefaultCharacter(string assetId, string assetVariationId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipGlobalAssetToDefaultClass(assetId, assetVariationId, onComplete);
+            LootLockerAPIManager.EquipIdAssetToDefaultClass(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -2923,23 +4439,18 @@ namespace LootLocker.Requests
         /// <param name="assetID">ID of the asset instance to equip</param>
         /// <param name="assetVariationID">ID of the asset variation to use</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void EquipGlobalAssetToDefaultClass(string assetID, string assetVariationID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EquipGlobalAssetToDefaultClass(string assetID, string assetVariationID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
             data.asset_id = int.Parse(assetID);
             data.asset_variation_id = int.Parse(assetVariationID);
-            LootLockerAPIManager.EquipGlobalAssetToDefaultClass(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipIdAssetToClass() instead")]
-        public static void EquipIdAssetToCharacter(string characterID, string assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipIdAssetToClass(characterID, assetInstanceId, onComplete);
+            LootLockerAPIManager.EquipGlobalAssetToDefaultClass(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -2948,11 +4459,12 @@ namespace LootLocker.Requests
         /// <param name="classID">ID of the class</param>
         /// <param name="assetInstanceID">ID of the asset instance to equip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToclassLoadoutResponse</param>
-        public static void EquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerEquipByIDRequest data = new LootLockerEquipByIDRequest();
@@ -2960,13 +4472,7 @@ namespace LootLocker.Requests
 
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(classID);
-            LootLockerAPIManager.EquipIdAssetToClass(lootLockerGetRequest, data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function EquipGlobalAssetToClass() instead")]
-        public static void EquipGlobalAssetToCharacter(string assetId, string assetVariationId, string characterID, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            EquipGlobalAssetToClass(assetId, assetVariationId, characterID, onComplete);
+            LootLockerAPIManager.EquipIdAssetToClass(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
         /// <summary>
@@ -2976,11 +4482,12 @@ namespace LootLocker.Requests
         /// <param name="assetVariationID">ID of the variation to use</param>
         /// <param name="classID">ID of the class to equip the asset to</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void EquipGlobalAssetToClass(string assetID, string assetVariationID, string classID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EquipGlobalAssetToClass(string assetID, string assetVariationID, string classID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerEquipByAssetRequest data = new LootLockerEquipByAssetRequest();
@@ -2988,13 +4495,7 @@ namespace LootLocker.Requests
             data.asset_variation_id = int.Parse(assetVariationID);
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(classID);
-            LootLockerAPIManager.EquipGlobalAssetToClass(lootLockerGetRequest, data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
-        public static void UnEquipIdAssetToCharacter(string assetId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            UnEquipIdAssetFromDefaultClass(assetId, onComplete);
+            LootLockerAPIManager.EquipGlobalAssetToClass(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
         /// <summary>
@@ -3002,23 +4503,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">Asset instance ID of the asset to unequip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void UnEquipIdAssetFromDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnEquipIdAssetFromDefaultClass(string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
 
             lootLockerGetRequest.getRequests.Add(assetInstanceID);
-            LootLockerAPIManager.UnEquipIdAssetToDefaultClass(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function UnEquipIdAssetToClass() instead")]
-        public static void UnEquipIdAssetToCharacter(int characterID, int assetInstanceId, Action<EquipAssetToClassLoadoutResponse> onComplete)
-        {
-            UnEquipIdAssetToClass(characterID.ToString(), assetInstanceId.ToString(), onComplete);
+            LootLockerAPIManager.UnEquipIdAssetToDefaultClass(forPlayerWithUlid, lootLockerGetRequest, onComplete);
         }
 
         /// <summary>
@@ -3027,43 +4523,33 @@ namespace LootLocker.Requests
         /// <param name="classID">ID of the class to unequip</param>
         /// <param name="assetInstanceID">Asset instance ID of the asset to unequip</param>
         /// <param name="onComplete">onComplete Action for handling the response of type EquipAssetToClassLoadoutResponse</param>
-        public static void UnEquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnEquipIdAssetToClass(string classID, string assetInstanceID, Action<EquipAssetToClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<EquipAssetToClassLoadoutResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(classID);
             lootLockerGetRequest.getRequests.Add(assetInstanceID);
-            LootLockerAPIManager.UnEquipIdAssetToClass(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToDefaultClass() instead")]
-        public static void GetCurrentLoadOutToDefaultCharacter(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToDefaultClass(onComplete);
+            LootLockerAPIManager.UnEquipIdAssetToClass(forPlayerWithUlid, lootLockerGetRequest, onComplete);
         }
 
         /// <summary>
         /// Get the loadout for the players default class.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
-        public static void GetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrentLoadoutToDefaultClass(Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetCurrentLoadoutToDefaultClass(onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToOtherClass(playerID, onComplete);
+            LootLockerAPIManager.GetCurrentLoadoutToDefaultClass(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -3071,16 +4557,11 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">ID of the player to get the loadout for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
-        public static void GetCurrentLoadoutToOtherClass(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrentLoadoutToOtherClass(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetCurrentLoadoutToOtherClass(playerID, CurrentPlatform.Get(), onComplete);
-
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetCurrentLoadoutToOtherClass() instead")]
-        public static void GetCurrentLoadOutToOtherCharacter(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
-        {
-            GetCurrentLoadoutToOtherClass(playerID, platform, onComplete);
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            GetCurrentLoadoutToOtherClass(playerID, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3089,36 +4570,32 @@ namespace LootLocker.Requests
         /// <param name="playerID">ID of the player to get the loadout for</param>
         /// <param name="platform">The platform that the ID of the player is for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetCurrentLoadoutToDefaultClassResponse</param>
-        public static void GetCurrentLoadoutToOtherClass(string playerID, Platforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrentLoadoutToOtherClass(string playerID, LL_AuthPlatforms platform, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCurrentLoadoutToDefaultClassResponse>(forPlayerWithUlid));
             }
             LootLockerGetRequest lootLockerGetRequest = new LootLockerGetRequest();
             lootLockerGetRequest.getRequests.Add(playerID);
-            lootLockerGetRequest.getRequests.Add(CurrentPlatform.GetPlatformRepresentation(platform).PlatformString);
-            LootLockerAPIManager.GetCurrentLoadoutToOtherClass(lootLockerGetRequest, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function GetEquipableContextToDefaultClass() instead")]
-        public static void GetEquipableContextToDefaultCharacter(Action<LootLockerContextResponse> onComplete)
-        {
-            GetEquipableContextToDefaultClass(onComplete);
+            lootLockerGetRequest.getRequests.Add(LootLockerAuthPlatform.GetPlatformRepresentation(platform).PlatformString);
+            LootLockerAPIManager.GetCurrentLoadoutToOtherClass(forPlayerWithUlid, lootLockerGetRequest, onComplete);
         }
 
         /// <summary>
         /// Get the equippable contexts for the players default class.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerContextResponse</param>
-        public static void GetEquipableContextToDefaultClass(Action<LootLockerContextResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEquipableContextToDefaultClass(Action<LootLockerContextResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetEquipableContextToDefaultClass(onComplete);
+            LootLockerAPIManager.GetEquipableContextToDefaultClass(forPlayerWithUlid, onComplete);
         }
 
         #endregion
@@ -3132,24 +4609,26 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the character progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCharacterProgressions(int characterId, int count, string after, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedCharacterProgressionsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedCharacterProgressionsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getAllCharacterProgressions.endPoint, characterId);
+            var endpoint = LootLockerEndPoints.getAllCharacterProgressions.WithPathParameter(characterId);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3158,9 +4637,10 @@ namespace LootLocker.Requests
         /// <param name="characterId">Id of the character</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetCharacterProgressions(int characterId, int count, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCharacterProgressions(int characterId, int count, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetCharacterProgressions(characterId, count, null, onComplete);
+            GetCharacterProgressions(characterId, count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3168,9 +4648,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="characterId">Id of the character</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedCharacterProgressions</param>
-        public static void GetCharacterProgressions(int characterId, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCharacterProgressions(int characterId, Action<LootLockerPaginatedCharacterProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetCharacterProgressions(characterId, -1, null, onComplete);
+            GetCharacterProgressions(characterId, -1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3179,17 +4660,18 @@ namespace LootLocker.Requests
         /// <param name="characterId">Id of the character</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgression</param>
-        public static void GetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleCharacterProgression.WithPathParameters(characterId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3199,19 +4681,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to add</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
-        public static void AddPointsToCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddPointsToCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3221,19 +4704,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to subtract</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
-        public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubtractPointsFromCharacterProgression(int characterId, string progressionKey, ulong amount, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromCharacterProgression.WithPathParameters(characterId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3242,17 +4726,18 @@ namespace LootLocker.Requests
         /// <param name="characterId">Id of the character</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCharacterProgressionWithRewards</param>
-        public static void ResetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ResetCharacterProgression(int characterId, string progressionKey, Action<LootLockerCharacterProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCharacterProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.resetCharacterProgression.WithPathParameters(characterId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3261,17 +4746,18 @@ namespace LootLocker.Requests
         /// <param name="characterId">Id of the character</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void DeleteCharacterProgression(int characterId, string progressionKey, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteCharacterProgression(int characterId, string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deleteCharacterProgression.endPoint, characterId, progressionKey);
+            var endpoint = LootLockerEndPoints.deleteCharacterProgression.WithPathParameters(characterId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -3283,14 +4769,15 @@ namespace LootLocker.Requests
         /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
+            LootLockerAPIManager.GetEntirePersistentStorage(forPlayerWithUlid, onComplete);
         }
         /// <summary>
         /// Get the player storage as a Dictionary<string, string> for the currently active player (key/values).
@@ -3298,14 +4785,15 @@ namespace LootLocker.Requests
         /// If you are not already deeply integrated with the Player Persistent Storage in your game, consider moving to Player Metadata.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponseDictionary</param>
-        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEntirePersistentStorage(Action<LootLockerGetPersistentStorageResponseDictionary> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponseDictionary>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponseDictionary>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetEntirePersistentStorage(onComplete);
+            LootLockerAPIManager.GetEntirePersistentStorage(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -3315,16 +4803,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="key">Name of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentSingle</param>
-        public static void GetSingleKeyPersistentStorage(string key, Action<LootLockerGetPersistentSingle> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetSingleKeyPersistentStorage(string key, Action<LootLockerGetPersistentSingle> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentSingle>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentSingle>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(key);
-            LootLockerAPIManager.GetSingleKeyPersistentStorage(data, onComplete);
+            LootLockerAPIManager.GetSingleKeyPersistentStorage(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3335,16 +4824,17 @@ namespace LootLocker.Requests
         /// <param name="key">Name of the key</param>
         /// <param name="value">Value of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
             data.AddToPayload(new LootLockerPayload { key = key, value = value });
-            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+            LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3356,16 +4846,17 @@ namespace LootLocker.Requests
         /// <param name="value">Value of the key</param>
         /// <param name="isPublic">Is the key public?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateOrCreateKeyValue(string key, string value, bool isPublic, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetPersistentStorageRequest data = new LootLockerGetPersistentStorageRequest();
             data.AddToPayload(new LootLockerPayload { key = key, value = value, is_public = isPublic });
-            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+            LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3375,14 +4866,15 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="data">A LootLockerGetPersistentStorageRequest with multiple keys</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateOrCreateKeyValue(LootLockerGetPersistentStorageRequest data, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.UpdateOrCreateKeyValue(data, onComplete);
+            LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3392,16 +4884,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="keyToDelete">The key/value key(name) to delete</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteKeyValue(string keyToDelete, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(keyToDelete);
-            LootLockerAPIManager.DeleteKeyValue(data, onComplete);
+            LootLockerAPIManager.DeleteKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3411,17 +4904,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="otherPlayerId">The ID of the player to retrieve the public ley/values for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetPersistentStorageResponse</param>
-        public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStorageResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersPublicKeyValuePairs(string otherPlayerId, Action<LootLockerGetPersistentStorageResponse> onComplete, string forPlayerWithUlid = null)
         {
 
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPersistentStorageResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(otherPlayerId);
-            LootLockerAPIManager.GetOtherPlayersPublicKeyValuePairs(data, onComplete);
+            LootLockerAPIManager.GetOtherPlayersPublicKeyValuePairs(forPlayerWithUlid, data, onComplete);
         }
         #endregion
 
@@ -3430,14 +4924,15 @@ namespace LootLocker.Requests
         /// Get the available contexts for the game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerContextResponse</param>
-        public static void GetContext(Action<LootLockerContextResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetContext(Action<LootLockerContextResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerContextResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetContext(onComplete);
+            LootLockerAPIManager.GetContext(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -3450,14 +4945,15 @@ namespace LootLocker.Requests
         /// <param name="includeUGC">Should User Generated Content be included in this response?</param>
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
-        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAssetsOriginal(onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
+            LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
         }
 
         /// <summary>
@@ -3469,14 +4965,15 @@ namespace LootLocker.Requests
         /// <param name="includeUGC">Should User Generated Content be included in this response?</param>
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
-        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAssetsOriginal((response) =>
+            LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, (response) =>
             {
                 if (response.statusCode == 200)
                 {
@@ -3497,15 +4994,16 @@ namespace LootLocker.Requests
         /// <param name="includeUGC">Should User Generated Content be included in this response?</param>
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
-        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetAssetsOriginal((response) =>
+            LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, (response) =>
             {
                 if (response.statusCode == 200)
                 {
@@ -3524,17 +5022,15 @@ namespace LootLocker.Requests
             LootLockerAssetRequest.lastId = 0;
         }
 
-        [Obsolete("This function will soon be removed. Use GetAssetInformation(int assetId, Action<LootLockerCommonAsset> onComplete) with int parameter instead")]
-        public static void GetAssetInformation(string assetId, Action<LootLockerCommonAsset> onComplete)
+        /// <summary>
+        /// Get information about a specific asset.
+        /// </summary>
+        /// <param name="assetId">The ID of the asset that you want information about</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSingleAssetResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetInformation(int assetId, Action<LootLockerSingleAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCommonAsset>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId);
-            LootLockerAPIManager.GetAssetInformation(data, onComplete);
+            GetAssetById(assetId, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3542,11 +5038,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetId">The ID of the asset that you want information about</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSingleAssetResponse</param>
-        public static void GetAssetInformation(int assetId, Action<LootLockerSingleAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetById(int assetId, Action<LootLockerSingleAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleAssetResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -3554,21 +5051,22 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetId.ToString());
 
             // Using GetAssetByID in the background
-            LootLockerAPIManager.GetAssetById(data, onComplete);
+            LootLockerAPIManager.GetAssetById(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
         /// List the current players favorite assets.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerFavouritesListResponse</param>
-        public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFavouritesListResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFavouritesListResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ListFavouriteAssets(onComplete);
+            LootLockerAPIManager.ListFavouriteAssets(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -3576,16 +5074,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetId">The ID of the asset to add to favourites</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
-            LootLockerAPIManager.AddFavouriteAsset(data, onComplete);
+            LootLockerAPIManager.AddFavouriteAsset(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3593,16 +5092,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetId">The ID of the asset to remove from favourites</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void RemoveFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RemoveFavouriteAsset(string assetId, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId);
-            LootLockerAPIManager.RemoveFavouriteAsset(data, onComplete);
+            LootLockerAPIManager.RemoveFavouriteAsset(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3610,11 +5110,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetIdsToRetrieve">A list of multiple assets to retrieve</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetResponse</param>
-        public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetsById(string[] assetIdsToRetrieve, Action<LootLockerAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -3622,16 +5123,17 @@ namespace LootLocker.Requests
             for (int i = 0; i < assetIdsToRetrieve.Length; i++)
                 data.getRequests.Add(assetIdsToRetrieve[i]);
 
-            LootLockerAPIManager.GetAssetsById(data, onComplete);
+            LootLockerAPIManager.GetAssetsById(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
         /// Grant an Asset to the Player's Inventory.
         /// </summary>
         /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
-        public static void GrantAssetToPlayerInventory(int assetID, Action<LootLockerGrantAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GrantAssetToPlayerInventory(int assetID, Action<LootLockerGrantAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GrantAssetToPlayerInventory(assetID, null, null, onComplete);
+            GrantAssetToPlayerInventory(assetID, null, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3641,11 +5143,12 @@ namespace LootLocker.Requests
         /// <param name="assetVariationID">The id of the Asset Variation you want to grant</param>
         /// <param name="assetRentalOptionID">The rental option id you want to give the Asset Instance</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGrantAssetResponse</param>
-        public static void GrantAssetToPlayerInventory(int assetID, int? assetVariationID, int? assetRentalOptionID, Action<LootLockerGrantAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GrantAssetToPlayerInventory(int assetID, int? assetVariationID, int? assetRentalOptionID, Action<LootLockerGrantAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGrantAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGrantAssetResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -3654,24 +5157,74 @@ namespace LootLocker.Requests
             data.asset_variation_id = assetVariationID;
             data.asset_rental_option_id = assetRentalOptionID;
 
-            LootLockerAPIManager.GrantAssetToPlayerInventory(data, onComplete);
+            LootLockerAPIManager.GrantAssetToPlayerInventory(forPlayerWithUlid, data, onComplete);
         }
 
         #endregion
+        /// <summary>
+        /// List assets with default parameters (no filters, first page, default page size).
+        /// </summary>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListAssetsWithDefaultParameters(Action<LootLockerListAssetsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListAssets(new LootLockerListAssetsRequest(), onComplete, forPlayerWithUlid: forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List assets with configurable response data. Use this to limit the fields returned in the response and improve performance.
+        /// </summary>
+        /// <param name="Request">Request object with settings on what fields to include, exclude, and what assets to filter</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this Request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
+        /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this Request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
+        /// <param name="orderBy">(Optional) Order the list by a specific field. Default is unordered.</param>
+        /// <param name="orderDirection">(Optional) Order the list in ascending or descending order. Default is unordered.</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the Request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListAssets(LootLockerListAssetsRequest Request, Action<LootLockerListAssetsResponse> onComplete, int PerPage = 0, int Page = 0, OrderAssetListBy orderBy = OrderAssetListBy.none, OrderAssetListDirection orderDirection = OrderAssetListDirection.none, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListAssetsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+            if (orderBy != OrderAssetListBy.none)
+                queryParams.Add("order_by", orderBy.ToString());
+            if (orderDirection != OrderAssetListDirection.none)
+                queryParams.Add("order_direction", orderDirection.ToString());
+
+            string endPoint = LootLockerEndPoints.ListAssets.endPoint + queryParams.Build();
+
+            string body = LootLockerJson.SerializeObject(Request);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, LootLockerEndPoints.ListAssets.httpMethod, body,
+                (response) =>
+                {
+                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerListAssetsResponse>(response);
+                    onComplete?.Invoke(parsedResponse);
+                });
+        }
 
         #region AssetInstance
         /// <summary>
         /// Get all key/value pairs for all asset instances.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllKeyValuePairsResponse</param>
-        public static void GetAllKeyValuePairsForAssetInstances(Action<LootLockerGetAllKeyValuePairsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllKeyValuePairsForAssetInstances(Action<LootLockerGetAllKeyValuePairsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllKeyValuePairsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllKeyValuePairsResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAllKeyValuePairs(onComplete);
+            LootLockerAPIManager.GetAllKeyValuePairs(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -3679,16 +5232,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">The asset instance ID to get the key/value-pairs for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void GetAllKeyValuePairsToAnInstance(int assetInstanceID, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllKeyValuePairsToAnInstance(int assetInstanceID, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(data, onComplete);
+            LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3697,17 +5251,18 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceID">The asset instance ID to get the key/value-pairs for</param>
         /// <param name="keyValueID">The ID of the key-value to get. Can be obtained when creating a new key/value-pair or with GetAllKeyValuePairsToAnInstance()</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetSingleKeyValuePairsResponse</param>
-        public static void GetAKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerGetSingleKeyValuePairsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetSingleKeyValuePairsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetSingleKeyValuePairsResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
             data.getRequests.Add(keyValueID.ToString());
-            LootLockerAPIManager.GetAKeyValuePairById(data, onComplete);
+            LootLockerAPIManager.GetAKeyValuePairById(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3717,11 +5272,12 @@ namespace LootLocker.Requests
         /// <param name="key">Key(name)</param>
         /// <param name="value">The value of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void CreateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -3729,7 +5285,7 @@ namespace LootLocker.Requests
             LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
             createKeyValuePairRequest.key = key;
             createKeyValuePairRequest.value = value;
-            LootLockerAPIManager.CreateKeyValuePair(data, createKeyValuePairRequest, onComplete);
+            LootLockerAPIManager.CreateKeyValuePair(forPlayerWithUlid, data, createKeyValuePairRequest, onComplete);
         }
 
         /// <summary>
@@ -3738,11 +5294,12 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceID">The asset instance ID to create the key/value for</param>
         /// <param name="data">A Dictionary<string, string> for multiple key/values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetInstanceID, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateOneOrMoreKeyValuePairForAssetInstances(int assetInstanceID, Dictionary<string, string> data, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest request = new LootLockerGetRequest();
@@ -3754,7 +5311,7 @@ namespace LootLocker.Requests
                 temp.Add(new LootLockerCreateKeyValuePairRequest { key = d.Key, value = d.Value });
             }
             createKeyValuePairRequest.storage = temp.ToArray();
-            LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(request, createKeyValuePairRequest, onComplete);
+            LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(forPlayerWithUlid, request, createKeyValuePairRequest, onComplete);
         }
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance by key.
@@ -3763,11 +5320,12 @@ namespace LootLocker.Requests
         /// <param name="key">Name of the key to update</param>
         /// <param name="value">The new value of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void UpdateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateKeyValuePairForAssetInstances(int assetInstanceID, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest request = new LootLockerGetRequest();
@@ -3776,22 +5334,7 @@ namespace LootLocker.Requests
             List<LootLockerCreateKeyValuePairRequest> temp = new List<LootLockerCreateKeyValuePairRequest>();
             temp.Add(new LootLockerCreateKeyValuePairRequest { key = key, value = value });
             createKeyValuePairRequest.storage = temp.ToArray();
-            LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(request, createKeyValuePairRequest, onComplete);
-        }
-        [ObsoleteAttribute("This function will be removed soon, use this function with 4 parameters instead:\n(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete)")]
-        public static void UpdateKeyValuePairByIdForAssetInstances(int assetId, string key, string value, Action<LootLockerAssetDefaultResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(assetId.ToString());
-            LootLockerCreateKeyValuePairRequest createKeyValuePairRequest = new LootLockerCreateKeyValuePairRequest();
-            createKeyValuePairRequest.key = key;
-            createKeyValuePairRequest.value = value;
-            LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
+            LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(forPlayerWithUlid, request, createKeyValuePairRequest, onComplete);
         }
 
         /// 
@@ -3803,11 +5346,12 @@ namespace LootLocker.Requests
         /// <param name="value">The new value of the key</param>
         /// <param name="key">The new key(name) of the key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void UpdateKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UpdateKeyValuePairByIdForAssetInstances(int assetInstanceID, int keyValueID, string value, string key, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
@@ -3822,7 +5366,7 @@ namespace LootLocker.Requests
             {
                 createKeyValuePairRequest.value = value;
             }
-            LootLockerAPIManager.UpdateKeyValuePairById(data, createKeyValuePairRequest, onComplete);
+            LootLockerAPIManager.UpdateKeyValuePairById(forPlayerWithUlid, data, createKeyValuePairRequest, onComplete);
         }
 
         /// <summary>
@@ -3831,17 +5375,18 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceID">The asset instance ID to delete the key/value for</param>
         /// <param name="keyValueID">ID of the key/value, can be obtained when creating the key or by using GetAllKeyValuePairsToAnInstance()</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetDefaultResponse</param>
-        public static void DeleteKeyValuePairForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerAssetDefaultResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteKeyValuePairForAssetInstances(int assetInstanceID, int keyValueID, Action<LootLockerAssetDefaultResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetDefaultResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
             data.getRequests.Add(keyValueID.ToString());
-            LootLockerAPIManager.DeleteKeyValuePair(data, onComplete);
+            LootLockerAPIManager.DeleteKeyValuePair(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3849,16 +5394,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">The asset instance ID of the loot box</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerInspectALootBoxResponse</param>
-        public static void InspectALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerInspectALootBoxResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void InspectALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerInspectALootBoxResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInspectALootBoxResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInspectALootBoxResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.InspectALootBox(data, onComplete);
+            LootLockerAPIManager.InspectALootBox(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3866,16 +5412,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">The asset instance ID of the loot box</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerOpenLootBoxResponse</param>
-        public static void OpenALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerOpenLootBoxResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void OpenALootBoxForAssetInstances(int assetInstanceID, Action<LootLockerOpenLootBoxResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerOpenLootBoxResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerOpenLootBoxResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.OpenALootBox(data, onComplete);
+            LootLockerAPIManager.OpenALootBox(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -3883,17 +5430,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">The asset instance ID of the asset instance you want to delete from the current Players Inventory</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void DeleteAssetInstanceFromPlayerInventory(int assetInstanceID, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteAssetInstanceFromPlayerInventory(int assetInstanceID, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.DeleteAssetInstanceFromPlayerInventory(data, onComplete);
+            LootLockerAPIManager.DeleteAssetInstanceFromPlayerInventory(forPlayerWithUlid, data, onComplete);
         }
         #endregion
         
@@ -3906,24 +5454,26 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, ID of the asset instance progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
-        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, string after, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, string after, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedAssetInstanceProgressionsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedAssetInstanceProgressionsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getAllAssetInstanceProgressions.endPoint, assetInstanceId);
+            var endpoint = LootLockerEndPoints.getAllAssetInstanceProgressions.WithPathParameter(assetInstanceId);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3932,9 +5482,10 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceId">ID of the asset instance</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
-        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, int count, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetAssetInstanceProgressions(assetInstanceId, count, null, onComplete);
+            GetAssetInstanceProgressions(assetInstanceId, count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3942,9 +5493,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceId">ID of the asset instance</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedAssetInstanceProgressions</param>
-        public static void GetAssetInstanceProgressions(int assetInstanceId, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetInstanceProgressions(int assetInstanceId, Action<LootLockerPaginatedAssetInstanceProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetAssetInstanceProgressions(assetInstanceId, -1, null, onComplete);
+            GetAssetInstanceProgressions(assetInstanceId, -1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -3953,17 +5505,18 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceId">ID of the asset instance</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgression</param>
-        public static void GetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3973,19 +5526,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to add</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
-        public static void AddPointsToAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AddPointsToAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.addPointsToAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.addPointsToAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
             var body = LootLockerJson.SerializeObject(new { amount });  
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -3995,19 +5549,20 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="amount">Amount of points to subtract</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
-        public static void SubtractPointsFromAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubtractPointsFromAssetInstanceProgression(int assetInstanceId, string progressionKey, ulong amount, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.subtractPointsFromAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.subtractPointsFromAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
             
             var body = LootLockerJson.SerializeObject(new { amount });
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4016,17 +5571,18 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceId">ID of the asset instance</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAssetInstanceProgressionWithRewards</param>
-        public static void ResetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ResetAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerAssetInstanceProgressionWithRewardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetInstanceProgressionWithRewardsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.resetAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.resetAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
         /// <summary>
@@ -4035,17 +5591,18 @@ namespace LootLocker.Requests
         /// <param name="assetInstanceId">ID of the asset instance</param>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void DeleteAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteAssetInstanceProgression(int assetInstanceId, string progressionKey, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.deleteAssetInstanceProgression.endPoint, assetInstanceId, progressionKey);
+            var endpoint = LootLockerEndPoints.deleteAssetInstanceProgression.WithPathParameters(assetInstanceId, progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
         #endregion
@@ -4095,13 +5652,14 @@ namespace LootLocker.Requests
         /// <param name="data_entities">(Optional) Dictionary<string, string> of data to include in the asset candidate</param>
         /// <param name="context_id">(Optional) ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
         /// <param name="complete">(Optional) Whether this asset is complete, if set to true this asset candidate will become an asset and can not be edited anymore</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void CreatingAnAssetCandidate(string name, Action<LootLockerUserGenerateContentResponse> onComplete,
             Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
-            Dictionary<string, string> data_entities = null, int context_id = -1, bool complete = false)
+            Dictionary<string, string> data_entities = null, int context_id = -1, bool complete = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -4123,7 +5681,7 @@ namespace LootLocker.Requests
                 completed = complete
             };
 
-            LootLockerAPIManager.CreatingAnAssetCandidate(data, onComplete);
+            LootLockerAPIManager.CreatingAnAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4137,13 +5695,14 @@ namespace LootLocker.Requests
         /// <param name="filters">(Optional)A Dictionary<string, string> of key-values that can be used to filter out assets</param>
         /// <param name="data_entities">(Optional)A Dictionary<string, string> of data to include in the asset candidate</param>
         /// <param name="context_id">(Optional)An ID of the context to use when promoting to an asset, will be automatically filled if not provided</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UpdatingAnAssetCandidate(int assetId, bool isCompleted, Action<LootLockerUserGenerateContentResponse> onComplete,
             string name = null, Dictionary<string, string> kv_storage = null, Dictionary<string, string> filters = null,
-            Dictionary<string, string> data_entities = null, int context_id = -1)
+            Dictionary<string, string> data_entities = null, int context_id = -1, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -4168,7 +5727,7 @@ namespace LootLocker.Requests
             LootLockerGetRequest getRequest = new LootLockerGetRequest();
             getRequest.getRequests.Add(assetId.ToString());
 
-            LootLockerAPIManager.UpdatingAnAssetCandidate(data, getRequest, onComplete);
+            LootLockerAPIManager.UpdatingAnAssetCandidate(forPlayerWithUlid, data, getRequest, onComplete);
         }
 
         /// <summary>
@@ -4176,16 +5735,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetCandidateID">ID of the asset candidate to delete</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
-        public static void DeletingAnAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletingAnAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetCandidateID.ToString());
-            LootLockerAPIManager.DeletingAnAssetCandidate(data, onComplete);
+            LootLockerAPIManager.DeletingAnAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4193,30 +5753,32 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetCandidateID">The ID of the asset candidate to receive information about</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
-        public static void GettingASingleAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GettingASingleAssetCandidate(int assetCandidateID, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetCandidateID.ToString());
-            LootLockerAPIManager.GettingASingleAssetCandidate(data, onComplete);
+            LootLockerAPIManager.GettingASingleAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
         /// Get all asset candidates for the current player.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAssetCandidatesResponse</param>
-        public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListingAssetCandidates(Action<LootLockerListingAssetCandidatesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAssetCandidatesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListingAssetCandidatesResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ListingAssetCandidates(onComplete);
+            LootLockerAPIManager.ListingAssetCandidates(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -4228,12 +5790,13 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
         /// <param name="fileContentType">Special use-case for some files, leave blank unless you know what you're doing</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AddingFilesToAssetCandidates(int assetCandidateID, string filePath, string fileName,
-            FilePurpose filePurpose, Action<LootLockerUserGenerateContentResponse> onComplete, string fileContentType = null)
+            FilePurpose filePurpose, Action<LootLockerUserGenerateContentResponse> onComplete, string fileContentType = null, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -4249,7 +5812,7 @@ namespace LootLocker.Requests
 
             getRequest.getRequests.Add(assetCandidateID.ToString());
 
-            LootLockerAPIManager.AddingFilesToAssetCandidates(data, getRequest, onComplete);
+            LootLockerAPIManager.AddingFilesToAssetCandidates(forPlayerWithUlid, data, getRequest, onComplete);
         }
 
         /// <summary>
@@ -4258,11 +5821,12 @@ namespace LootLocker.Requests
         /// <param name="assetCandidateID">ID of the asset instance to remove the file from</param>
         /// <param name="fileId">ID of the file to remove</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerUserGenerateContentResponse</param>
-        public static void RemovingFilesFromAssetCandidates(int assetCandidateID, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RemovingFilesFromAssetCandidates(int assetCandidateID, int fileId, Action<LootLockerUserGenerateContentResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerUserGenerateContentResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -4270,7 +5834,7 @@ namespace LootLocker.Requests
             data.getRequests.Add(assetCandidateID.ToString());
             data.getRequests.Add(fileId.ToString());
 
-            LootLockerAPIManager.RemovingFilesFromAssetCandidates(data, onComplete);
+            LootLockerAPIManager.RemovingFilesFromAssetCandidates(forPlayerWithUlid, data, onComplete);
         }
         #endregion
 
@@ -4282,24 +5846,26 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, id of the progression from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetProgressions(int count, string after, Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressions(int count, string after, Action<LootLockerPaginatedProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionsResponse>(forPlayerWithUlid));
                 return;
             }
 
             var endpoint = LootLockerEndPoints.getAllProgressions.endPoint;
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4307,18 +5873,20 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetProgressions(int count, Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressions(int count, Action<LootLockerPaginatedProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetProgressions(count, null, onComplete);
+            GetProgressions(count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressions</param>
-        public static void GetProgressions(Action<LootLockerPaginatedProgressionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressions(Action<LootLockerPaginatedProgressionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetProgressions(-1, null, onComplete);
+            GetProgressions(-1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -4326,17 +5894,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerProgression</param>
-        public static void GetProgression(string progressionKey, Action<LootLockerProgressionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgression(string progressionKey, Action<LootLockerProgressionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getSingleProgression.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getSingleProgression.WithPathParameter(progressionKey);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4346,24 +5915,26 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">Used for pagination, step of the tier from which the pagination starts from, use the next_cursor and previous_cursor values</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
-        public static void GetProgressionTiers(string progressionKey, int count, ulong? after, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressionTiers(string progressionKey, int count, ulong? after, Action<LootLockerPaginatedProgressionTiersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionTiersResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPaginatedProgressionTiersResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getProgressionTiers.endPoint, progressionKey);
+            var endpoint = LootLockerEndPoints.getProgressionTiers.WithPathParameter(progressionKey);
 
-            endpoint += "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
-
+                queryParams.Add("count", count);
             if (after.HasValue && after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after ?? 0);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4372,9 +5943,10 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
-        public static void GetProgressionTiers(string progressionKey, int count, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressionTiers(string progressionKey, int count, Action<LootLockerPaginatedProgressionTiersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetProgressionTiers(progressionKey, count, null, onComplete);
+            GetProgressionTiers(progressionKey, count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -4382,9 +5954,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="progressionKey">Progression key</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPaginatedProgressionTiers</param>
-        public static void GetProgressionTiers(string progressionKey, Action<LootLockerPaginatedProgressionTiersResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressionTiers(string progressionKey, Action<LootLockerPaginatedProgressionTiersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetProgressionTiers(progressionKey, -1, null, onComplete);
+            GetProgressionTiers(progressionKey, -1, null, onComplete, forPlayerWithUlid);
         }
         
         /// <summary>
@@ -4393,17 +5966,18 @@ namespace LootLocker.Requests
         /// <param name="progressionKey">Progression key</param>
         /// <param name="step">Step of the progression tier that is being fetched</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerProgressionTierResponse</param>
-        public static void GetProgressionTier(string progressionKey, ulong step, Action<LootLockerProgressionTierResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetProgressionTier(string progressionKey, ulong step, Action<LootLockerProgressionTierResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionTierResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerProgressionTierResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getProgressionTier.endPoint, progressionKey, step);
+            var endpoint = LootLockerEndPoints.getProgressionTier.WithPathParameters(progressionKey, step);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -4414,14 +5988,15 @@ namespace LootLocker.Requests
         /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingAllMissionsResponse</param>
-        public static void GetAllMissions(Action<LootLockerGetAllMissionsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMissions(Action<LootLockerGetAllMissionsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMissionsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMissionsResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAllMissions(onComplete);
+            LootLockerAPIManager.GetAllMissions(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -4429,16 +6004,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="missionId">The ID of the mission to get information about</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingASingleMissionResponse</param>
-        public static void GetMission(int missionId, Action<LootLockerGetMissionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetMission(int missionId, Action<LootLockerGetMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMissionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMissionResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.GetMission(data, onComplete);
+            LootLockerAPIManager.GetMission(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4446,16 +6022,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="missionId">The ID of the mission to start</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStartingAMissionResponse</param>
-        public static void StartMission(int missionId, Action<LootLockerStartMissionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void StartMission(int missionId, Action<LootLockerStartMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartMissionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartMissionResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.StartMission(data, onComplete);
+            LootLockerAPIManager.StartMission(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4466,12 +6043,13 @@ namespace LootLocker.Requests
         /// <param name="playerId">ID of the current player</param>
         /// <param name="finishingPayload">A LootLockerFinishingPayload with variables for how the mission was completed</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerFinishingAMissionResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void FinishMission(int missionId, string startingMissionSignature, string playerId,
-            LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishMissionResponse> onComplete)
+            LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishMissionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishMissionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishMissionResponse>(forPlayerWithUlid));
                 return;
             }
             string source = LootLockerJson.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
@@ -4489,7 +6067,7 @@ namespace LootLocker.Requests
                 payload = finishingPayload
             };
             data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.FinishMission(data, onComplete);
+            LootLockerAPIManager.FinishMission(forPlayerWithUlid, data, onComplete);
         }
         #endregion
 
@@ -4498,105 +6076,19 @@ namespace LootLocker.Requests
         /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMapsResponse</param>
-        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMaps(Action<LootLockerMapsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMapsResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAllMaps(onComplete);
+            LootLockerAPIManager.GetAllMaps(forPlayerWithUlid, onComplete);
         }
         #endregion
 
         #region Purchasing
-        /// <summary>
-        /// Purchase an asset. If your game uses soft currency, it will check the players account balance and grant the assets to the player if there is coverage. For rental Assets use RentalPurchaseCall() instead.
-        /// </summary>
-        /// <param name="assetID">The ID of the asset to purchase</param>
-        /// <param name="variationID">The variation ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void NormalPurchaseCall(int assetID, int variationID, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerNormalPurchaseRequest data = new LootLockerNormalPurchaseRequest { asset_id = assetID, variation_id = variationID };
-            List<LootLockerNormalPurchaseRequest> datas = new List<LootLockerNormalPurchaseRequest>();
-            datas.Add(data);
-            LootLockerAPIManager.NormalPurchaseCall(datas.ToArray(), onComplete);
-        }
-
-        /// <summary>
-        /// Purchase a rental asset. If your game uses soft currency, it will check the players account balance and grant the assets to the player if there is coverage. For non-rental Assets use NormalPurchaseCall() instead.
-        /// </summary>
-        /// <param name="assetID">The ID of the asset to purchase</param>
-        /// <param name="variationID">The variation ID of the asset to purchase</param>
-        /// <param name="rentalOptionID">The rental option ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void RentalPurchaseCall(int assetID, int variationID, int rentalOptionID, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerRentalPurchaseRequest data = new LootLockerRentalPurchaseRequest { asset_id = assetID, variation_id = variationID, rental_option_id = rentalOptionID };
-            LootLockerAPIManager.RentalPurchaseCall(data, onComplete);
-        }
-
-        /// <summary>
-        /// Provide a receipt that you get from Apple to validate the purchase. The item will be granted to the player if the receipt is valid.
-        /// </summary>
-        /// <param name="receipt_data">Receipt that is received when a purchase goes through with apple</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void IosPurchaseVerification(string receipt_data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerIosPurchaseVerificationRequest[] data = new LootLockerIosPurchaseVerificationRequest[] { new LootLockerIosPurchaseVerificationRequest { receipt_data = receipt_data } };
-            LootLockerAPIManager.IosPurchaseVerification(data, onComplete);
-        }
-
-        /// <summary>
-        /// Provide a purchase_token that you get from Google when making an In-App purchase. The item will be granted to the player if the purchase_token is valid.
-        /// </summary>
-        /// <param name="purchase_token">The token that is received when a purchase has been made</param>
-        /// <param name="asset_id">The ID of the asset to purchase</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseResponse</param>
-        [Obsolete("This purchasing system has been replaced with our new IAP system and will be removed at a later stage. Read more here: https://docs.lootlocker.com/content/in-app-purchases")]
-        public static void AndroidPurchaseVerification(string purchase_token, int asset_id, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseResponse>());
-                return;
-            }
-            LootLockerAndroidPurchaseVerificationRequest[] data = new LootLockerAndroidPurchaseVerificationRequest[] { new LootLockerAndroidPurchaseVerificationRequest { purchase_token = purchase_token, asset_id = asset_id } };
-
-            LootLockerAPIManager.AndroidPurchaseVerification(data, onComplete);
-        }
-
-        [Obsolete("This function is deprecated and will be removed soon. Please use the function PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete) instead")]
-        public static void PollOrderStatus(int assetId, Action<LootLockerClassLoadoutResponse> onComplete)
-        {
-            PollOrderStatus(assetId, (LootLockerPurchaseOrderStatus orderStatus) => onComplete(new LootLockerClassLoadoutResponse
-            {
-                errorData = orderStatus.errorData,
-                statusCode = orderStatus.statusCode,
-                success = orderStatus.success,
-                text = orderStatus.text
-            }));
-        }
-
         /// <summary>
         /// This will give you the current status of a purchase. These statuses can be returned;
         /// open - The order is being processed
@@ -4607,16 +6099,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetId">The ID of the asset to check the status for</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPurchaseOrderStatus</param>
-        public static void PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void PollOrderStatus(int assetId, Action<LootLockerPurchaseOrderStatus> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseOrderStatus>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseOrderStatus>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetId.ToString());
-            LootLockerAPIManager.PollOrderStatus(data, onComplete);
+            LootLockerAPIManager.PollOrderStatus(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4624,16 +6117,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="assetInstanceID">The asset instance ID of the asset to activate</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerActivateARentalAssetResponse</param>
-        public static void ActivateRentalAsset(int assetInstanceID, Action<LootLockerActivateRentalAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ActivateRentalAsset(int assetInstanceID, Action<LootLockerActivateRentalAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateRentalAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerActivateRentalAssetResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetRequest data = new LootLockerGetRequest();
             data.getRequests.Add(assetInstanceID.ToString());
-            LootLockerAPIManager.ActivateRentalAsset(data, onComplete);
+            LootLockerAPIManager.ActivateRentalAsset(forPlayerWithUlid, data, onComplete);
         }
 
         /// <summary>
@@ -4643,7 +6137,8 @@ namespace LootLocker.Requests
         /// <param name="itemID">The id of the item that you want to purchase</param>
         /// <param name="quantity">The amount that you want to purchase the item </param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void LootLockerPurchaseSingleCatalogItem(string walletID, string itemID, int quantity, Action<LootLockerPurchaseCatalogItemResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LootLockerPurchaseSingleCatalogItem(string walletID, string itemID, int quantity, Action<LootLockerPurchaseCatalogItemResponse> onComplete, string forPlayerWithUlid = null)
         {
             LootLockerCatalogItemAndQuantityPair item = new LootLockerCatalogItemAndQuantityPair();
 
@@ -4652,7 +6147,7 @@ namespace LootLocker.Requests
 
             LootLockerCatalogItemAndQuantityPair[] items = { item };
 
-            LootLockerPurchaseCatalogItems(walletID, items, onComplete);
+            LootLockerPurchaseCatalogItems(walletID, items, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -4661,11 +6156,12 @@ namespace LootLocker.Requests
         /// <param name="walletId">The id of the wallet to use for the purchase</param>
         /// <param name="itemsToPurchase">A list of items to purchase along with the quantity of each item to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void LootLockerPurchaseCatalogItems(string walletId, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action<LootLockerPurchaseCatalogItemResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void LootLockerPurchaseCatalogItems(string walletId, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action<LootLockerPurchaseCatalogItemResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseCatalogItemResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPurchaseCatalogItemResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerPurchaseCatalogItemRequest
@@ -4674,7 +6170,7 @@ namespace LootLocker.Requests
                 items = itemsToPurchase
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.purchaseCatalogItem.endPoint, LootLockerEndPoints.purchaseCatalogItem.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.purchaseCatalogItem.endPoint, LootLockerEndPoints.purchaseCatalogItem.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4683,11 +6179,12 @@ namespace LootLocker.Requests
         /// <param name="transactionId">The id of the transaction successfully made towards the Apple App Store</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="sandboxed">Optional: Should this redemption be made towards sandbox App Store</param>
-        public static void RedeemAppleAppStorePurchaseForPlayer(string transactionId, Action<LootLockerResponse> onComplete, bool sandboxed = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemAppleAppStorePurchaseForPlayer(string transactionId, Action<LootLockerResponse> onComplete, bool sandboxed = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForPlayerRequest()
@@ -4696,7 +6193,7 @@ namespace LootLocker.Requests
                 sandboxed = sandboxed
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4706,11 +6203,12 @@ namespace LootLocker.Requests
         /// <param name="classId">The id of the class to redeem this transaction for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="sandboxed">Optional: Should this redemption be made towards sandbox App Store</param>
-        public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete, bool sandboxed = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemAppleAppStorePurchaseForClass(string transactionId, int classId, Action<LootLockerResponse> onComplete, bool sandboxed = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemAppleAppStorePurchaseForClassRequest()
@@ -4720,7 +6218,7 @@ namespace LootLocker.Requests
                 sandboxed = sandboxed
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4729,11 +6227,12 @@ namespace LootLocker.Requests
         /// <param name="productId">The id of the product that this redemption refers to</param>
         /// <param name="purchaseToken">The token from the purchase successfully made towards the Google Play Store</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemGooglePlayStorePurchaseForPlayer(string productId, string purchaseToken, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemGooglePlayStorePurchaseForPlayer(string productId, string purchaseToken, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemGooglePlayStorePurchaseForPlayerRequest()
@@ -4742,7 +6241,7 @@ namespace LootLocker.Requests
                 purchase_token = purchaseToken
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4752,11 +6251,12 @@ namespace LootLocker.Requests
         /// <param name="purchaseToken">The token from the purchase successfully made towards the Google Play Store</param>
         /// <param name="classId">The id of the class to redeem this purchase for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void RedeemGooglePlayStorePurchaseForClass(string productId, string purchaseToken, int classId, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemGooglePlayStorePurchaseForClass(string productId, string purchaseToken, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerRedeemGooglePlayStorePurchaseForClassRequest()
@@ -4766,8 +6266,159 @@ namespace LootLocker.Requests
                 class_id = classId
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Epic Store for the current player
+        /// </summary>
+        /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
+        /// <param name="bearerToken">This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</param>
+        /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="sandboxId">The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemEpicStorePurchaseForPlayer(string accountId, string bearerToken, List<string> entitlementIds, string sandboxId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemEpicStorePurchaseForPlayerRequest()
+            {
+                account_id = accountId,
+                bearer_token = bearerToken,
+                entitlement_ids = entitlementIds,
+                sandbox_id = sandboxId
+            });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns
+        /// </summary>
+        /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
+        /// <param name="bearerToken">This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</param>
+        /// <param name="entitlementIds">The ids of the purchased entitlements that you wish to redeem</param>
+        /// <param name="sandboxId">The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</param>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemEpicStorePurchaseForClass(string accountId, string bearerToken, List<string> entitlementIds, string sandboxId, int classId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerRedeemEpicStorePurchaseForClassRequest()
+            {
+                account_id = accountId,
+                bearer_token = bearerToken,
+                entitlement_ids = entitlementIds,
+                class_id = classId,
+                sandbox_id = sandboxId
+            });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+#if LOOTLOCKER_BETA_PLAYSTATION_IAP
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Playstation Store for the current player
+        /// </summary>
+        /// <param name="transaction_id">The transaction id from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="auth_code">The authorization code from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="entitlement_label">The entitlement label configured in the NP service for the entitlement that this redemption relates to </param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="service_label">Optional: The NP service label. </param>
+        /// <param name="service_name">Optional: The abreviation of the service name of the ASM service ID service that was used when configuring the serviceIds. Possible Values: pssdc, cce. Default Value: pssdc </param>
+        /// <param name="environment">Optional: The id of the environment you wish to make the request against. Allowed values: 1, 8, 256 </param>
+        /// <param name="use_count">Optional: The use count for this redemption </param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemPlaystationStorePurchaseForPlayer(string transaction_id, string auth_code, string entitlement_label, Action<LootLockerResponse> onComplete, string service_label = "", string service_name = "", int environment = -1, int use_count = -1, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            Dictionary<string, object> bodyDict = new Dictionary<string, object>
+            {
+                { "transaction_id", transaction_id },
+                { "auth_code", auth_code },
+                { "entitlement_label", entitlement_label }
+            };
+            if (!string.IsNullOrEmpty(service_label))
+            {
+                bodyDict.Add("service_label", service_label);
+            }
+            if (!string.IsNullOrEmpty(service_name))
+            {
+                bodyDict.Add("service_name", service_name);
+            }
+            if (environment != -1)
+            {
+                bodyDict.Add("environment", environment);
+            }
+            if (use_count != -1)
+            {
+                bodyDict.Add("use_count", use_count);
+            }
+            var body = LootLockerJson.SerializeObject(bodyDict);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Playstation Store for a class that the current player owns
+        /// </summary>
+        /// <param name="transaction_id">The transaction id from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="auth_code">The authorization code from the PlayStation Store of the purchase to redeem </param>
+        /// <param name="entitlement_label">The entitlement label configured in the NP service for the entitlement that this redemption relates to </param>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="service_label">Optional: The NP service label. </param>
+        /// <param name="service_name">Optional: The abreviation of the service name of the ASM service ID service that was used when configuring the serviceIds. Possible Values: pssdc, cce. Default Value: pssdc </param>
+        /// <param name="environment">Optional: The id of the environment you wish to make the request against. Allowed values: 1, 8, 256 </param>
+        /// <param name="use_count">Optional: The use count for this redemption </param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemPlaystationStorePurchaseForClass(string transaction_id, string auth_code, string entitlement_label, int classId, Action<LootLockerResponse> onComplete, string service_label = "", string service_name = "", int environment = -1, int use_count = -1, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            
+            Dictionary<string, object> bodyDict = new Dictionary<string, object>
+            {
+                { "transaction_id", transaction_id },
+                { "auth_code", auth_code },
+                { "entitlement_label", entitlement_label },
+                { "character_id", classId }
+            };
+            if (!string.IsNullOrEmpty(service_label))
+            {
+                bodyDict.Add("service_label", service_label);
+            }
+            if (!string.IsNullOrEmpty(service_name))
+            {
+                bodyDict.Add("service_name", service_name);
+            }
+            if (environment != -1)
+            {
+                bodyDict.Add("environment", environment);
+            }
+            if (use_count != -1)
+            {
+                bodyDict.Add("use_count", use_count);
+            }
+            var body = LootLockerJson.SerializeObject(bodyDict);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+#endif
 
         /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
@@ -4781,11 +6432,12 @@ namespace LootLocker.Requests
         /// <param name="language">The language to use for the purchase</param>
         /// <param name="catalogItemId">The LootLocker Catalog Item Id for the item you wish to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void BeginSteamPurchaseRedemption(string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void BeginSteamPurchaseRedemption(string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerBeginSteamPurchaseRedemptionRequest()
@@ -4796,15 +6448,14 @@ namespace LootLocker.Requests
                 catalog_item_id = catalogItemId
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete:
-                (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) =>
+            {
+                var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
+                if (!parsedResponse.success)
                 {
-                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
-                    if (!parsedResponse.success)
-                    {
-                        onComplete?.Invoke(parsedResponse);
-                        return;
-                    }
+                    onComplete?.Invoke(parsedResponse);
+                    return;
+                }
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
                     JObject jsonObject;
@@ -4825,26 +6476,26 @@ namespace LootLocker.Requests
                         }
                     }
 #else
-                    Dictionary<string, object> jsonObject = null;
-                    try
-                    {
-                        jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
-                    }
-                    catch (JsonException)
-                    {
-                        onComplete?.Invoke(parsedResponse);
-                        return;
-                    }
-                    if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
-                    {
-                        if (successObj is bool isSuccess)
-                        {
-                            parsedResponse.isSuccess = isSuccess;
-                        }
-                    }
-#endif
+                Dictionary<string, object> jsonObject = null;
+                try
+                {
+                    jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
+                }
+                catch (JsonException)
+                {
                     onComplete?.Invoke(parsedResponse);
-                });
+                    return;
+                }
+                if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
+                {
+                    if (successObj is bool isSuccess)
+                    {
+                        parsedResponse.isSuccess = isSuccess;
+                    }
+                }
+#endif
+                onComplete?.Invoke(parsedResponse);
+            });
         }
 
         /// <summary>
@@ -4860,11 +6511,12 @@ namespace LootLocker.Requests
         /// <param name="language">The language to use for the purchase</param>
         /// <param name="catalogItemId">The LootLocker Catalog Item Id for the item you wish to purchase</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void BeginSteamPurchaseRedemptionForClass(int classId, string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void BeginSteamPurchaseRedemptionForClass(int classId, string steamId, string currency, string language, string catalogItemId, Action<LootLockerBeginSteamPurchaseRedemptionResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBeginSteamPurchaseRedemptionResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerBeginSteamPurchaseRedemptionForClassRequest()
@@ -4876,15 +6528,14 @@ namespace LootLocker.Requests
                 catalog_item_id = catalogItemId
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete:
-                (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.beginSteamPurchaseRedemption.endPoint, LootLockerEndPoints.beginSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) =>
+            {
+                var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
+                if (!parsedResponse.success)
                 {
-                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerBeginSteamPurchaseRedemptionResponse>(serverResponse);
-                    if (!parsedResponse.success)
-                    {
-                        onComplete?.Invoke(parsedResponse);
-                        return;
-                    }
+                    onComplete?.Invoke(parsedResponse);
+                    return;
+                }
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
                     JObject jsonObject;
@@ -4905,32 +6556,26 @@ namespace LootLocker.Requests
                         }
                     }
 #else
-                    Dictionary<string, object> jsonObject = null;
-                    try
-                    {
-                        jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
-                    }
-                    catch (JsonException)
-                    {
-                        onComplete?.Invoke(parsedResponse);
-                        return;
-                    }
-                    if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
-                    {
-                        if (successObj is bool isSuccess)
-                        {
-                            parsedResponse.isSuccess = isSuccess;
-                        }
-                    }
-#endif
+                Dictionary<string, object> jsonObject = null;
+                try
+                {
+                    jsonObject = Json.Deserialize(serverResponse.text) as Dictionary<string, object>;
+                }
+                catch (JsonException)
+                {
                     onComplete?.Invoke(parsedResponse);
-                });
-        }
-
-        [Obsolete("This function will be removed on a later date. Use QuerySteamPurchaseRedemption instead.")]
-        public static void BeginSteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
-        {
-            QuerySteamPurchaseRedemption(entitlementId, onComplete);
+                    return;
+                }
+                if (jsonObject != null && jsonObject.TryGetValue("success", out var successObj))
+                {
+                    if (successObj is bool isSuccess)
+                    {
+                        parsedResponse.isSuccess = isSuccess;
+                    }
+                }
+#endif
+                onComplete?.Invoke(parsedResponse);
+            });
         }
 
         /// <summary>
@@ -4941,11 +6586,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement to check the status for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void QuerySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void QuerySteamPurchaseRedemption(string entitlementId, Action<LootLockerQuerySteamPurchaseRedemptionStatusResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerQuerySteamPurchaseRedemptionStatusResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerQuerySteamPurchaseRedemptionStatusResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerQuerySteamPurchaseRedemptionStatusRequest()
@@ -4953,7 +6599,7 @@ namespace LootLocker.Requests
                 entitlement_id = entitlementId
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.querySteamPurchaseRedemptionStatus.endPoint, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.endPoint, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -4963,11 +6609,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement to finalize the purchase for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void FinalizeSteamPurchaseRedemption(string entitlementId, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void FinalizeSteamPurchaseRedemption(string entitlementId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             var body = LootLockerJson.SerializeObject(new LootLockerFinalizeSteamPurchaseRedemptionRequest()
@@ -4975,7 +6622,7 @@ namespace LootLocker.Requests
                 entitlement_id = entitlementId
             });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
 #endregion
@@ -4985,14 +6632,15 @@ namespace LootLocker.Requests
         /// Get all collectables for the game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingCollectablesResponse</param>
-        public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCollectablesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCollectablesResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetCollectables(onComplete);
+            LootLockerAPIManager.GetCollectables(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -5000,16 +6648,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="slug">A string representing what was collected, example; Carsdriven.Bugs.Dune</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCollectingAnItemResponse</param>
-        public static void CollectItem(string slug, Action<LootLockerCollectItemResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CollectItem(string slug, Action<LootLockerCollectItemResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectItemResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectItemResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
             data.slug = slug;
-            LootLockerAPIManager.CollectItem(data, onComplete);
+            LootLockerAPIManager.CollectItem(forPlayerWithUlid, data, onComplete);
         }
 
         #endregion
@@ -5020,50 +6669,17 @@ namespace LootLocker.Requests
         /// Get the current messages.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMessagesResponse</param>
-        public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetMessages(Action<LootLockerGetMessagesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMessagesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMessagesResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetMessages(onComplete);
+            LootLockerAPIManager.GetMessages(forPlayerWithUlid, onComplete);
         }
 
-        #endregion
-
-        #region TriggerEvents
-        /// <summary>
-        /// Execute a trigger. This will grant the player any items that are attached to the trigger.
-        /// </summary>
-        /// <param name="eventName">Name of the trigger to execute</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerTriggerAnEventResponse</param>
-        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
-        public static void ExecuteTrigger(string triggerName, Action<LootLockerExecuteTriggerResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerExecuteTriggerResponse>());
-                return;
-            }
-            LootLockerExecuteTriggerRequest data = new LootLockerExecuteTriggerRequest { name = triggerName };
-            LootLockerAPIManager.ExecuteTrigger(data, onComplete);
-        }
-
-        /// <summary>
-        ///  Lists the triggers that a player have already executed.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListingAllTriggersResponse</param>
-        [Obsolete("The triggers system has been upgraded and replaced with a newer version. Read more here: https://docs.lootlocker.com/game-systems/triggers")]
-        public static void ListExecutedTriggers(Action<LootLockerListAllTriggersResponse> onComplete)
-        {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListAllTriggersResponse>());
-                return;
-            }
-            LootLockerAPIManager.ListAllExecutedTriggers(onComplete);
-        }
         #endregion
 
         #region Triggers
@@ -5079,15 +6695,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="KeysToInvoke">List of keys of the triggers to invoke</param>
         /// <param name="onComplete">onComplete Action for handling the server response</param>
-        public static void InvokeTriggersByKey(string[] KeysToInvoke, Action<LootLockerInvokeTriggersByKeyResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void InvokeTriggersByKey(string[] KeysToInvoke, Action<LootLockerInvokeTriggersByKeyResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInvokeTriggersByKeyResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerInvokeTriggersByKeyResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.InvokeTriggers.endPoint, LootLockerEndPoints.InvokeTriggers.httpMethod, LootLockerJson.SerializeObject(new LootLockerInvokeTriggersByKeyRequest { Keys = KeysToInvoke }), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.InvokeTriggers.endPoint, LootLockerEndPoints.InvokeTriggers.httpMethod, LootLockerJson.SerializeObject(new LootLockerInvokeTriggersByKeyRequest { Keys = KeysToInvoke }), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         #endregion
 
@@ -5098,24 +6715,26 @@ namespace LootLocker.Requests
         /// <param name="count">How many leaderboards to get in one request</param>
         /// <param name="after">Return leaderboards after this specified index</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        public static void ListLeaderboards(int count, int after, Action<LootLockerListLeaderboardsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListLeaderboards(int count, int after, Action<LootLockerListLeaderboardsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListLeaderboardsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListLeaderboardsResponse>(forPlayerWithUlid));
                 return;
             }
 
             string endpoint = LootLockerEndPoints.listLeaderboards.endPoint;
 
-            if(count > 0 || after > 0) 
-                endpoint += endpoint.Contains("?") ? "&" : "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"count={count}&";
+                queryParams.Add("count", count);
             if (after > 0)
-                endpoint += $"after={after}&";
+                queryParams.Add("after", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listLeaderboards.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listLeaderboards.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5124,11 +6743,12 @@ namespace LootLocker.Requests
         /// <param name="leaderboardKey">Key of the leaderboard as a string</param>
         /// <param name="member_id">ID of the player as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetMemberRankResponse</param>
-        public static void GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetMemberRank(string leaderboardKey, string member_id, Action<LootLockerGetMemberRankResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMemberRankResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetMemberRankRequest lootLockerGetMemberRankRequest = new LootLockerGetMemberRankRequest();
@@ -5136,7 +6756,7 @@ namespace LootLocker.Requests
             lootLockerGetMemberRankRequest.leaderboardId = leaderboardKey;
             lootLockerGetMemberRankRequest.member_id = member_id;
 
-            LootLockerAPIManager.GetMemberRank(lootLockerGetMemberRankRequest, onComplete);
+            LootLockerAPIManager.GetMemberRank(forPlayerWithUlid, lootLockerGetMemberRankRequest, onComplete);
         }
 
         /// <summary>
@@ -5145,18 +6765,19 @@ namespace LootLocker.Requests
         /// <param name="members">List of members to get as string</param>
         /// <param name="leaderboardKey">Key of the leaderboard as a string</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetByListOfMembersResponse</param>
-        public static void GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetByListOfMembers(string[] members, string leaderboardKey, Action<LootLockerGetByListOfMembersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetByListOfMembersResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetByListOfMembersResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetByListMembersRequest request = new LootLockerGetByListMembersRequest();
 
             request.members = members;
 
-            LootLockerAPIManager.GetByListOfMembers(request, leaderboardKey, onComplete);
+            LootLockerAPIManager.GetByListOfMembers(forPlayerWithUlid, request, leaderboardKey, onComplete);
         }
 
         /// <summary>
@@ -5166,11 +6787,12 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">How many extra rows after the returned position</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</param>
-        public static void GetAllMemberRanksMain(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMemberRanksMain(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
@@ -5188,7 +6810,7 @@ namespace LootLocker.Requests
                 }
                 onComplete?.Invoke(response);
             };
-            LootLockerAPIManager.GetAllMemberRanks(request, callback);
+            LootLockerAPIManager.GetAllMemberRanks(forPlayerWithUlid, request, callback);
         }
 
         /// <summary>
@@ -5197,9 +6819,10 @@ namespace LootLocker.Requests
         /// <param name="member_id">The ID of the player to check</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</param>
-        public static void GetAllMemberRanks(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMemberRanks(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetAllMemberRanksMain(member_id, count, -1, onComplete);
+            GetAllMemberRanksMain(member_id, count, -1, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5208,9 +6831,10 @@ namespace LootLocker.Requests
         /// <param name="member_id">The ID of the player to check</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</param>
-        public static void GetAllMemberRanksNext(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMemberRanksNext(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.nextCursor.ToString()), onComplete);
+            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.nextCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5219,9 +6843,10 @@ namespace LootLocker.Requests
         /// <param name="member_id">The ID of the player to check</param>
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</param>
-        public static void GetAllMemberRanksPrev(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMemberRanksPrev(int member_id, int count, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.prevCursor.ToString()), onComplete);
+            GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.prevCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5239,11 +6864,12 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of entries to receive</param>
         /// <param name="after">How many extra rows after the players position</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</param>
-        public static void GetAllMemberRanksOriginal(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAllMemberRanksOriginal(int member_id, int count, int after, Action<LootLockerGetAllMemberRanksResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMemberRanksResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetAllMemberRanksRequest request = new LootLockerGetAllMemberRanksRequest();
@@ -5251,7 +6877,7 @@ namespace LootLocker.Requests
             request.count = count;
             request.after = after > 0 ? after.ToString() : null;
 
-            LootLockerAPIManager.GetAllMemberRanks(request, onComplete);
+            LootLockerAPIManager.GetAllMemberRanks(forPlayerWithUlid, request, onComplete);
         }
 
         /// <summary>
@@ -5261,11 +6887,12 @@ namespace LootLocker.Requests
         /// <param name="count">How many entries to get</param>
         /// <param name="after">How many after the last entry to receive</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        public static void GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetScoreList(string leaderboardKey, int count, int after, Action<LootLockerGetScoreListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetScoreListResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerGetScoreListRequest request = new LootLockerGetScoreListRequest();
@@ -5283,7 +6910,7 @@ namespace LootLocker.Requests
                 }
                 onComplete?.Invoke(response);
             };
-            LootLockerAPIManager.GetScoreList(request, callback);
+            LootLockerAPIManager.GetScoreList(forPlayerWithUlid, request, callback);
         }
 
         /// <summary>
@@ -5292,9 +6919,10 @@ namespace LootLocker.Requests
         /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        public static void GetScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetScoreList(leaderboardKey, count, -1, onComplete);
+            GetScoreList(leaderboardKey, count, -1, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5303,9 +6931,10 @@ namespace LootLocker.Requests
         /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetNextScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete);
+            GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5314,9 +6943,10 @@ namespace LootLocker.Requests
         /// <param name="leaderboardKey">Key of the leaderboard to get entries for</param>
         /// <param name="count">How many entries to get</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetScoreListResponse</param>
-        public static void GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPrevScoreList(string leaderboardKey, int count, Action<LootLockerGetScoreListResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete);
+            GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5334,9 +6964,10 @@ namespace LootLocker.Requests
         /// <param name="score">The score to upload</param>
         /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
-        public static void SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubmitScore(string memberId, int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
         {
-            SubmitScore(memberId, score, leaderboardKey, "", onComplete);
+            SubmitScore(memberId, score, leaderboardKey, "", onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5347,11 +6978,12 @@ namespace LootLocker.Requests
         /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
         /// <param name="metadata">Additional metadata to add to the score</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
-        public static void SubmitScore(string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubmitScore(string memberId, int score, string leaderboardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
                 return;
             }
             LootLockerSubmitScoreRequest request = new LootLockerSubmitScoreRequest();
@@ -5360,7 +6992,61 @@ namespace LootLocker.Requests
             if (!string.IsNullOrEmpty(metadata))
                 request.metadata = metadata;
 
-            LootLockerAPIManager.SubmitScore(request, leaderboardKey, onComplete);
+            LootLockerAPIManager.SubmitScore(forPlayerWithUlid, request, leaderboardKey, onComplete);
+        }
+
+        /// <summary>
+        /// Query a leaderboard for which rank a specific score would achieve. Does not submit the score but returns the projected rank.
+        /// </summary>
+        /// <param name="score">The score to use for the query</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void QueryScore(int score, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerQueryScoreRequest request = new LootLockerQueryScoreRequest();
+            request.score = score;
+
+            EndPointClass requestEndPoint = LootLockerEndPoints.queryScore;
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            string endPoint = requestEndPoint.WithPathParameter(leaderboardKey);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Increment an existing score on a leaderboard by the given amount.
+        /// </summary>
+        /// <param name="memberId">Can be left blank if it is a player leaderboard, otherwise this is the identifier you wish to use for this score</param>
+        /// <param name="amount">The amount with which to increment the current score on the given leaderboard (can be positive or negative)</param>
+        /// <param name="leaderboardKey">Key of the leaderboard to submit score to</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSubmitScoreResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void IncrementScore(string memberId, int amount, string leaderboardKey, Action<LootLockerSubmitScoreResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerIncrementScoreRequest request = new LootLockerIncrementScoreRequest();
+            request.member_id = memberId;
+            request.amount = amount;
+
+            EndPointClass requestEndPoint = LootLockerEndPoints.incrementScore;
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            string endPoint = requestEndPoint.WithPathParameter(leaderboardKey);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5368,17 +7054,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="leaderboard_key">Key of the Leaderboard</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardArchiveResponse</param>
-        public static void ListLeaderboardArchive(string leaderboard_key, Action<LootLockerLeaderboardArchiveResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListLeaderboardArchive(string leaderboard_key, Action<LootLockerLeaderboardArchiveResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveResponse>(forPlayerWithUlid));
                 return;
             }
 
             EndPointClass endPoint = LootLockerEndPoints.listLeaderboardArchive;
-            string tempEndpoint = string.Format(endPoint.endPoint, leaderboard_key);
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
+            string tempEndpoint = endPoint.WithPathParameter(leaderboard_key);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
 
         /// <summary>
@@ -5386,9 +7073,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="key"> Key of the json archive to read</param>
         /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetLeaderboardArchive(string key, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetLeaderboardArchive(key, -1, null, onComplete);
+            GetLeaderboardArchive(key, -1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5397,9 +7085,10 @@ namespace LootLocker.Requests
         /// <param name="key"> Key of the json archive to read</param>
         /// <param name="count"> Amount of entries to read </param>
         /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetLeaderboardArchive(string key, int count, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            GetLeaderboardArchive(key, count, null, onComplete);
+            GetLeaderboardArchive(key, count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5409,17 +7098,18 @@ namespace LootLocker.Requests
         /// <param name="count"> Amount of entries to read </param>
         /// <param name="after"> Return after specified index </param>
         /// <param name="onComplete"><onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</param>
-        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetLeaderboardArchive(string key, int count, string after, Action<LootLockerLeaderboardArchiveDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveDetailsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardArchiveDetailsResponse>(forPlayerWithUlid));
                 return;
             }
             
             EndPointClass endPoint = LootLockerEndPoints.getLeaderboardArchive;
 
-            string tempEndpoint = string.Format(endPoint.endPoint, key);
+            string tempEndpoint = endPoint.WithPathParameter(key);
 
             if (count > 0)
                 tempEndpoint += $"count={count}&";
@@ -5428,7 +7118,7 @@ namespace LootLocker.Requests
                 tempEndpoint += $"after={after}&";
 
 
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));        
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));        
         }
 
         /// <summary>
@@ -5436,17 +7126,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="leaderboard_key">Key of the leaderboard to get data from</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerLeaderboardDetailResponse</param>
-        public static void GetLeaderboardData(string leaderboard_key, Action<LootLockerLeaderboardDetailResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetLeaderboardData(string leaderboard_key, Action<LootLockerLeaderboardDetailResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerLeaderboardDetailResponse>(forPlayerWithUlid));
                 return;
             }
 
             EndPointClass endPoint = LootLockerEndPoints.getLeaderboardData;
-            string formatedEndPoint = string.Format(endPoint.endPoint, leaderboard_key);
-            LootLockerServerRequest.CallAPI(formatedEndPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            string formatedEndPoint = endPoint.WithPathParameter(leaderboard_key);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formatedEndPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -5460,14 +7151,15 @@ namespace LootLocker.Requests
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerComputeAndLockDropTableResponse</param>
         /// <param name="AddAssetDetails">Optional:If true, return additional information about the asset</param>
         /// <param name="tag">Optional:Specific tag to use</param>
-        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "")
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ComputeAndLockDropTable(int tableInstanceId, Action<LootLockerComputeAndLockDropTableResponse> onComplete, bool AddAssetDetails = false, string tag = "", string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete, AddAssetDetails, tag);
+            LootLockerAPIManager.ComputeAndLockDropTable(forPlayerWithUlid, tableInstanceId, onComplete, AddAssetDetails, tag);
         }
 
         /// <summary>
@@ -5477,14 +7169,15 @@ namespace LootLocker.Requests
         /// <param name="AddAssetDetails">If true, return additional information about the asset</param>
         /// <param name="tag">Specific tag to use</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerComputeAndLockDropTableResponse</param>
-        public static void ComputeAndLockDropTable(int tableInstanceId, bool AddAssetDetails, string tag, Action<LootLockerComputeAndLockDropTableResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ComputeAndLockDropTable(int tableInstanceId, bool AddAssetDetails, string tag, Action<LootLockerComputeAndLockDropTableResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerComputeAndLockDropTableResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.ComputeAndLockDropTable(tableInstanceId, onComplete, AddAssetDetails, tag);
+            LootLockerAPIManager.ComputeAndLockDropTable(forPlayerWithUlid, tableInstanceId, onComplete, AddAssetDetails, tag);
         }
 
         /// <summary>
@@ -5493,17 +7186,18 @@ namespace LootLocker.Requests
         /// <param name="picks">A list of the ID's of the picks to choose</param>
         /// <param name="tableInstanceId">Asset instance ID of the drop table to pick from</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPickDropsFromDropTableResponse</param>
-        public static void PickDropsFromDropTable(int[] picks, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void PickDropsFromDropTable(int[] picks, int tableInstanceId, Action<LootLockerPickDropsFromDropTableResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPickDropsFromDropTableResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPickDropsFromDropTableResponse>(forPlayerWithUlid));
                 return;
             }
             PickDropsFromDropTableRequest data = new PickDropsFromDropTableRequest();
             data.picks = picks;
 
-            LootLockerAPIManager.PickDropsFromDropTable(data, tableInstanceId, onComplete);
+            LootLockerAPIManager.PickDropsFromDropTable(forPlayerWithUlid, data, tableInstanceId, onComplete);
         }
 #endregion //Drop Tables
 
@@ -5514,15 +7208,16 @@ namespace LootLocker.Requests
         /// These can be changed in the web interface or through the Admin API.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReportsGetTypesResponse</param>
-        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetReportTypes(Action<LootLockerReportsGetTypesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetTypesResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetReportTypes(onComplete);
+            LootLockerAPIManager.GetReportTypes(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
@@ -5530,15 +7225,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="input">The report to upload</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReportsCreatePlayerResponse</param>
-        public static void CreatePlayerReport(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreatePlayerReport(ReportsCreatePlayerRequest input, Action<LootLockerReportsCreatePlayerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreatePlayerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreatePlayerResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.CreatePlayerReport(input, onComplete);
+            LootLockerAPIManager.CreatePlayerReport(forPlayerWithUlid, input, onComplete);
         }
 
         /// <summary>
@@ -5546,15 +7242,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="input">The report to upload</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReportsCreateAssetResponse</param>
-        public static void CreateAssetReport(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateAssetReport(ReportsCreateAssetRequest input, Action<LootLockerReportsCreateAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreateAssetResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsCreateAssetResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.CreateAssetReport(input, onComplete);
+            LootLockerAPIManager.CreateAssetReport(forPlayerWithUlid, input, onComplete);
         }
 
         /// <summary>
@@ -5563,15 +7260,16 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="input">The report to upload</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReportsGetRemovedAssetsResponse</param>
-        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetRemovedUGCForPlayer(GetRemovedUGCForPlayerInput input, Action<LootLockerReportsGetRemovedAssetsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReportsGetRemovedAssetsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetRemovedUGCForPlayer(input, onComplete);
+            LootLockerAPIManager.GetRemovedUGCForPlayer(forPlayerWithUlid, input, onComplete);
         }
 
         #endregion
@@ -5582,42 +7280,46 @@ namespace LootLocker.Requests
         /// Returns a list of categories to be used for giving feedback about a certain player.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
-        public static void ListPlayerFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListFeedbackCategories(LootLockerFeedbackTypes.player, onComplete);
+            ListFeedbackCategories(LootLockerFeedbackTypes.player, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// Returns a list of categories to be used for giving feedback about the game.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
-        public static void ListGameFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListGameFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListFeedbackCategories(LootLockerFeedbackTypes.game, onComplete);
+            ListFeedbackCategories(LootLockerFeedbackTypes.game, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// Returns a list of categories to be used for giving feedback about a certain ugc asset.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type ListLootLockerFeedbackCategoryResponse</param>
-        public static void ListUGCFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListUGCFeedbackCategories(Action<ListLootLockerFeedbackCategoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListFeedbackCategories(LootLockerFeedbackTypes.ugc, onComplete);
+            ListFeedbackCategories(LootLockerFeedbackTypes.ugc, onComplete, forPlayerWithUlid);
         }
 
-        private static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        private static void ListFeedbackCategories(LootLockerFeedbackTypes type, Action<ListLootLockerFeedbackCategoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<ListLootLockerFeedbackCategoryResponse>(forPlayerWithUlid));
                 return;
             }
 
             EndPointClass endPoint = LootLockerEndPoints.listFeedbackCategories;
 
-            var formattedEndPoint = string.Format(endPoint.endPoint, type.ToString());
+            var formattedEndPoint = endPoint.WithPathParameter(type.ToString());
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5627,9 +7329,10 @@ namespace LootLocker.Requests
         /// <param name="description">Reason behind the report</param>
         /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SendPlayerFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete);
+            SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5638,9 +7341,10 @@ namespace LootLocker.Requests
         /// <param name="description">Reason behind the report</param>
         /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendGameFeedback(string description, string category_id, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SendGameFeedback(string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            SendFeedback(LootLockerFeedbackTypes.game, "", description, category_id, onComplete);
+            SendFeedback(LootLockerFeedbackTypes.game, "", description, category_id, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -5650,16 +7354,18 @@ namespace LootLocker.Requests
         /// <param name="description">Reason behind the report</param>
         /// <param name="category_id">A unique identifier of what catagory the report should belong under</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
-        public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SendUGCFeedback(string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete);
+            SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete, forPlayerWithUlid);
         }
 
-        private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
                 return;
             }
             EndPointClass endPoint = LootLockerEndPoints.createFeedbackEntry;
@@ -5674,56 +7380,139 @@ namespace LootLocker.Requests
 
             string json = LootLockerJson.SerializeObject(request);
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
 
         #region Friends
-#if LOOTLOCKER_BETA_FRIENDS
         /// <summary>
-        /// List friends for the currently logged in player
+        /// List friends for the currently logged in player with default pagination
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListFriends(Action<LootLockerListFriendsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFriends(Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFriendsResponse>());
-                return;
-            }
-
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listFriends.endPoint, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            ListFriendsPaginated(0, 0, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
-        /// List incoming friend requests for the currently logged in player (friend requests made by others for this player)
+        /// List friends for the currently logged in player
         /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to return</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListIncomingFriendRequests(Action<LootLockerListIncomingFriendRequestsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFriendsPaginated(int PerPage, int Page, Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListIncomingFriendRequestsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFriendsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listIncomingFriendReqeusts.endPoint, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listFriends.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Get a specific friend of the currently logged in player
+        /// </summary>
+        /// <param name="friendPlayerULID">The ULID of the player for whom to get friend information</param>
+        /// <param name="onComplete">Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetFriend(string friendPlayerULID, Action<LootLockerGetFriendResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetFriendResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.getFriend.WithPathParameter(friendPlayerULID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.getFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List incoming friend requests for the currently logged in player (friend requests made by others for this player) with default pagination
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListIncomingFriendRequests(Action<LootLockerListIncomingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListIncomingFriendRequestsPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List incoming friend requests for the currently logged in player with pagination (friend requests made by others for this player)
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+
+        public static void ListIncomingFriendRequestsPaginated(int PerPage, int Page, Action<LootLockerListIncomingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListIncomingFriendRequestsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listIncomingFriendReqeusts.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
         /// List outgoing friend requests for the currently logged in player (friend requests made by this player)
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListOutgoingFriendRequests(Action<LootLockerListOutgoingFriendRequestsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListOutgoingFriendRequests(Action<LootLockerListOutgoingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            ListOutGoingFriendRequestsPaginated(0, 0, onComplete, forPlayerWithUlid);
+        }
+
+
+        /// <summary>
+        /// List outgoing friend requests for the currently logged in player with pagination (friend requests made by this player)
+        /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListOutGoingFriendRequestsPaginated(int PerPage, int Page, Action<LootLockerListOutgoingFriendRequestsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListOutgoingFriendRequestsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListOutgoingFriendRequestsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listOutgoingFriendRequests.endPoint, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listOutgoingFriendRequests.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5731,22 +7520,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player to send the friend request to</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void SendFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SendFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.sendFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.sendFriendRequest.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5754,22 +7544,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player to cancel the friend request for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void CancelFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CancelFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.cancelOutgoingFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.cancelOutgoingFriendRequest.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.cancelOutgoingFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.cancelOutgoingFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5777,22 +7568,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player that sent the friend request you wish to accept</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void AcceptFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AcceptFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.acceptFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.acceptFriendRequest.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5800,37 +7592,59 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player that sent the friend request you wish to decline</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void DeclineFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeclineFriendRequest(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.declineFriendRequest.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.declineFriendRequest.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.declineFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.declineFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// List the players (if any) that are blocked by the currently logged in player with default pagination
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBlockedPlayers(Action<LootLockerListBlockedPlayersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListBlockedPlayersPaginated(0, 0, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
         /// List the players (if any) that are blocked by the currently logged in player
         /// </summary>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListBlockedPlayers(Action<LootLockerListBlockedPlayersResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBlockedPlayersPaginated(int PerPage, int Page, Action<LootLockerListBlockedPlayersResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBlockedPlayersResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBlockedPlayersResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listBlockedPlayers.endPoint, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+
+            string endpointWithParams = LootLockerEndPoints.listOutgoingFriendRequests.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5838,22 +7652,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player to block</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void BlockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void BlockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.blockPlayer.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.blockPlayer.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5861,22 +7676,23 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player to unblock</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void UnblockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnblockPlayer(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.unblockPlayer.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.unblockPlayer.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5884,24 +7700,199 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="playerID">The id of the player to delete from the friends list</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void DeleteFriend(string playerID, Action<LootLockerFriendsOperationResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeleteFriend(string playerID, Action<LootLockerFriendsOperationResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFriendsOperationResponse>(forPlayerWithUlid));
                 return;
             }
 
             if (string.IsNullOrEmpty(playerID))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method"));
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFriendsOperationResponse>("A player id needs to be provided for this method", forPlayerWithUlid));
             }
 
-            var formattedEndPoint = string.Format(LootLockerEndPoints.deleteFriend.endPoint, playerID);
+            var formattedEndPoint = LootLockerEndPoints.deleteFriend.WithPathParameter(playerID);
 
-            LootLockerServerRequest.CallAPI(formattedEndPoint, LootLockerEndPoints.deleteFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.deleteFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-#endif
+        #endregion
+
+        #region Followers
+        /// <summary>
+        /// List followers of the currently logged in player with default pagination
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowers(Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowers(playerData.PublicUID, onComplete, forPlayerWithUlid);
+        }
+        /// <summary>
+        /// List followers of the currently logged in player
+        /// </summary>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowersPaginated(string Cursor, int Count, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowersPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List followers that the specified player has with default pagination
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player whose followers to list</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowers(string playerPublicUID, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListFollowersPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List followers that the specified player has
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player whose followers to list</param>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowersPaginated(string playerPublicUID, string Cursor, int Count, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowersResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.listFollowers.WithPathParameter(playerPublicUID);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (!string.IsNullOrEmpty(Cursor))
+                queryParams.Add("cursor", Cursor);
+            if (Count > 0)
+                queryParams.Add("per_page", Count.ToString());
+            formattedEndPoint += queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        
+        /// <summary>
+        /// List what players the currently logged in player is following with default pagination
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowing(Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowing(playerData.PublicUID, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List what players the currently logged in player is following
+        /// </summary>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowingPaginated(string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            ListFollowingPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// List players that the specified player is following with default pagination
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player for which to list following players</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowing(string playerPublicUID, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ListFollowingPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
+        }
+        
+        /// <summary>
+        /// List players that the specified player is following
+        /// </summary>
+        /// <param name="playerPublicUID">The public UID of the player for which to list following players</param>
+        /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
+        /// <param name="Count">The number of results to return counting from the cursor</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFollowingPaginated(string playerPublicUID, string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFollowingResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.listFollowing.WithPathParameter(playerPublicUID);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (!string.IsNullOrEmpty(Cursor))
+                queryParams.Add("cursor", Cursor);
+            if (Count > 0)
+                queryParams.Add("per_page", Count.ToString());
+            formattedEndPoint += queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowing.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Follow the specified player
+        /// </summary>
+        /// <param name="playerPublicUID">The public uid of the player to follow</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void FollowPlayer(string playerPublicUID, Action<LootLockerFollowersOperationResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFollowersOperationResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerPublicUID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFollowersOperationResponse>("A player public UID needs to be provided for this method", forPlayerWithUlid));
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.followPlayer.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.followPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
+        /// Unfollow the specified player
+        /// </summary>
+        /// <param name="playerPublicUID">The public uid of the player to unfollow</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnfollowPlayer(string playerPublicUID, Action<LootLockerFollowersOperationResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFollowersOperationResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerPublicUID))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerFollowersOperationResponse>("A player public UID needs to be provided for this method", forPlayerWithUlid));
+            }
+
+            var formattedEndPoint = LootLockerEndPoints.unfollowPlayer.WithPathParameter(playerPublicUID);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.unfollowPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
         #endregion
 
         #region Currency
@@ -5909,15 +7900,16 @@ namespace LootLocker.Requests
         /// Get a list of available currencies for the game
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListCurrencies(Action<LootLockerListCurrenciesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCurrenciesResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCurrencies.endPoint, LootLockerEndPoints.listCurrencies.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listCurrencies.endPoint, LootLockerEndPoints.listCurrencies.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5925,17 +7917,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="currencyCode">The code of the currency to get details for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void GetCurrencyDetails(string currencyCode, Action<GetLootLockerCurrencyDetailsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrencyDetails(string currencyCode, Action<GetLootLockerCurrencyDetailsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<GetLootLockerCurrencyDetailsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<GetLootLockerCurrencyDetailsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDetails.endPoint, currencyCode);
+            var endpoint = LootLockerEndPoints.getCurrencyDetails.WithPathParameter(currencyCode);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDetails.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getCurrencyDetails.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5943,17 +7936,18 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="currencyCode">The code of the currency to fetch denominations for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void GetCurrencyDenominationsByCode(string currencyCode, Action<LootLockerListDenominationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetCurrencyDenominationsByCode(string currencyCode, Action<LootLockerListDenominationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListDenominationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListDenominationsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            var endpoint = string.Format(LootLockerEndPoints.getCurrencyDenominationsByCode.endPoint, currencyCode);
+            var endpoint = LootLockerEndPoints.getCurrencyDenominationsByCode.WithPathParameter(currencyCode);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getCurrencyDenominationsByCode.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getCurrencyDenominationsByCode.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -5964,16 +7958,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="walletId">Unique ID of the wallet to get balances for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListBalancesInWallet(string walletId, Action<LootLockerListBalancesForWalletResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBalancesInWallet(string walletId, Action<LootLockerListBalancesForWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBalancesForWalletResponse>(forPlayerWithUlid));
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.listBalancesInWallet.endPoint, walletId);
+            var endpoint = LootLockerEndPoints.listBalancesInWallet.WithPathParameter(walletId);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5981,16 +7976,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="walletId">Unique ID of the wallet to get information for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void GetWalletByWalletId(string walletId, Action<LootLockerGetWalletResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetWalletByWalletId(string walletId, Action<LootLockerGetWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>(forPlayerWithUlid));
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.getWalletByWalletId.endPoint, walletId);
+            var endpoint = LootLockerEndPoints.getWalletByWalletId.WithPathParameter(walletId);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -5999,17 +7995,17 @@ namespace LootLocker.Requests
         /// <param name="holderUlid">ULID of the holder of the wallet you want to get information for</param>
         /// <param name="holderType">The type of the holder to get the wallet for</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void GetWalletByHolderId(string holderUlid, LootLockerWalletHolderTypes holderType, Action<LootLockerGetWalletResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetWalletByHolderId(string holderUlid, LootLockerWalletHolderTypes holderType, Action<LootLockerGetWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetWalletResponse>(forPlayerWithUlid));
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.getWalletByHolderId.endPoint, holderUlid);
+            var endpoint = LootLockerEndPoints.getWalletByHolderId.WithPathParameter(holderUlid);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete:
-                (serverResponse) =>
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getWalletByHolderId.httpMethod, onComplete: (serverResponse) =>
                 {
                     var parsedResponse = LootLockerResponse.Deserialize<LootLockerGetWalletResponse>(serverResponse);
                     if (!parsedResponse.success && parsedResponse.statusCode == 404)
@@ -6019,13 +8015,13 @@ namespace LootLocker.Requests
                             holder_id = holderUlid,
                             holder_type = holderType.ToString()
                         };
-                        LootLockerServerRequest.CallAPI(LootLockerEndPoints.createWallet.endPoint,
+                        LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.createWallet.endPoint,
                             LootLockerEndPoints.createWallet.httpMethod, LootLockerJson.SerializeObject(request),
                             createWalletResponse =>
                             {
                                 if (createWalletResponse.success)
                                 {
-                                    LootLockerServerRequest.CallAPI(endpoint,
+                                    LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint,
                                         LootLockerEndPoints.getWalletByHolderId.httpMethod, null,
                                         secondResponse =>
                                         {
@@ -6051,17 +8047,18 @@ namespace LootLocker.Requests
         /// <param name="currencyId">Unique ID of the currency to credit</param>
         /// <param name="amount">The amount of the given currency to credit to the given wallet</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerCreditWalletResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreditBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerCreditWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreditWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreditWalletResponse>(forPlayerWithUlid));
                 return;
             }
 
             var json = LootLockerJson.SerializeObject(new LootLockerCreditRequest() { amount = amount, currency_id = currencyId, wallet_id = walletId });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.creditBalanceToWallet.endPoint, LootLockerEndPoints.creditBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.creditBalanceToWallet.endPoint, LootLockerEndPoints.creditBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6071,17 +8068,18 @@ namespace LootLocker.Requests
         /// <param name="currencyId">Unique ID of the currency to debit</param>
         /// <param name="amount">The amount of the given currency to debit from the given wallet</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerDebitWalletResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DebitBalanceToWallet(string walletId, string currencyId, string amount, Action<LootLockerDebitWalletResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDebitWalletResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerDebitWalletResponse>(forPlayerWithUlid));
                 return;
             }
 
             var json = LootLockerJson.SerializeObject(new LootLockerDebitRequest() { amount = amount, currency_id = currencyId, wallet_id = walletId });
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.debitBalanceToWallet.endPoint, LootLockerEndPoints.debitBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.debitBalanceToWallet.endPoint, LootLockerEndPoints.debitBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         #endregion
@@ -6091,15 +8089,16 @@ namespace LootLocker.Requests
         /// List the catalogs available for the game
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListCatalogs(Action<LootLockerListCatalogsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListCatalogs(Action<LootLockerListCatalogsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.listCatalogs.endPoint, LootLockerEndPoints.listCatalogs.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listCatalogs.endPoint, LootLockerEndPoints.listCatalogs.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6109,23 +8108,54 @@ namespace LootLocker.Requests
         /// <param name="count">Amount of catalog items to receive. Use null to simply get the default amount.</param>
         /// <param name="after">Used for pagination, this is the cursor to start getting items from. Use null to get items from the beginning. Use the cursor from a previous call to get the next count of items in the list.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogPricesResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        [Obsolete("This method is deprecated, please use ListCatalogItems(string catalogKey, int PerPage, int Page, Action<LootLockerListCatalogPricesV2Response> onComplete, string forPlayerWithUlid = null) instead.")] // Deprecation date 20251016
+        public static void ListCatalogItems(string catalogKey, int count, string after, Action<LootLockerListCatalogPricesResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesResponse>(forPlayerWithUlid));
                 return;
             }
-            var endpoint = string.Format(LootLockerEndPoints.listCatalogItemsByKey.endPoint, catalogKey); 
-            
-            endpoint += "?";
+            var endpoint = LootLockerEndPoints.deprecatedListCatalogItemsByKey.WithPathParameter(catalogKey);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"per_page={count}&";
-
+                queryParams.Add("per_page", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"cursor={after}&";
+                queryParams.Add("cursor", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.deprecatedListCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
+        }
+
+        /// <summary>
+        /// List the items available in a specific catalog
+        /// </summary>
+        /// <param name="catalogKey">Unique Key of the catalog that you want to get items for</param>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to retrieve</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListCatalogItems(string catalogKey, int PerPage, int Page, Action<LootLockerListCatalogPricesV2Response> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogPricesV2Response>(forPlayerWithUlid));
+                return;
+            }
+            var endpoint = LootLockerEndPoints.listCatalogItemsByKey.WithPathParameter(catalogKey);
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage);
+            if (Page > 0)
+                queryParams.Add("page", Page);
+
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesV2Response(serverResponse)); });
         }
         #endregion
 
@@ -6137,24 +8167,26 @@ namespace LootLocker.Requests
         /// <param name="count">Optional: Amount of historical entries to fetch</param>
         /// <param name="after">Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListEntitlements(int count, string after, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEntitlements(int count, string after, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEntitlementHistoryResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEntitlementHistoryResponse>(forPlayerWithUlid));
                 return;
             }
 
             string endpoint = LootLockerEndPoints.listEntitlementHistory.endPoint;
 
-            if(count > 0 || !string.IsNullOrEmpty(after)) 
-                endpoint += endpoint.Contains("?") ? "&" : "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
             if (count > 0)
-                endpoint += $"per_page={count}&";
+                queryParams.Add("per_page", count);
             if (!string.IsNullOrEmpty(after))
-                endpoint += $"cursor={after}&";
+                queryParams.Add("cursor", after);
 
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => {
+            endpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listEntitlementHistory.httpMethod, onComplete: (serverResponse) => {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
                 LootLockerResponse.Deserialize(onComplete, serverResponse);
 #else
@@ -6169,9 +8201,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="count">Optional: Amount of historical entries to fetch</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListEntitlements(int count, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEntitlements(int count, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListEntitlements(count, null, onComplete);
+            ListEntitlements(count, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6180,9 +8213,10 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="after">Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListEntitlements(string after, Action<LootLockerEntitlementHistoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEntitlements(string after, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListEntitlements(-1, after, onComplete);
+            ListEntitlements(-1, after, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6190,9 +8224,10 @@ namespace LootLocker.Requests
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
-        public static void ListEntitlements(Action<LootLockerEntitlementHistoryResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEntitlements(Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListEntitlements(-1, null, onComplete);
+            ListEntitlements(-1, null, onComplete, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6201,16 +8236,17 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="entitlementId"></param>
         /// <param name="onComplete"></param>
-        public static void GetEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEntitlement(string entitlementId, Action<LootLockerSingleEntitlementResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSingleEntitlementResponse>(forPlayerWithUlid));
                 return;
             }
             
-            var endpoint = string.Format(LootLockerEndPoints.getSingleEntitlement.endPoint, entitlementId);
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            var endpoint = LootLockerEndPoints.getSingleEntitlement.WithPathParameter(entitlementId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getSingleEntitlement.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
 #endregion
@@ -6223,9 +8259,10 @@ namespace LootLocker.Requests
         /// <param name="SourceID"> The specific source id for which to request metadata</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            ListMetadata(Source, SourceID, 0, 0, onComplete, IgnoreFiles);
+            ListMetadata(Source, SourceID, 0, 0, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6237,9 +8274,10 @@ namespace LootLocker.Requests
         /// <param name="PerPage"> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            ListMetadataWithTags(Source, SourceID, null, Page, PerPage, onComplete, IgnoreFiles);
+            ListMetadataWithTags(Source, SourceID, null, Page, PerPage, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6250,9 +8288,10 @@ namespace LootLocker.Requests
         /// <param name="Tags"> The tags that the requested metadata should have, only metadata matching *all of* the given tags will be returned </param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            ListMetadataWithTags(Source, SourceID, Tags, 0, 0, onComplete, IgnoreFiles);
+            ListMetadataWithTags(Source, SourceID, Tags, 0, 0, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
         /// <summary>
@@ -6265,15 +8304,16 @@ namespace LootLocker.Requests
         /// <param name="PerPage"> Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListMetadataWithTags(LootLockerMetadataSources Source, string SourceID, string[] Tags, int Page, int PerPage, Action<LootLockerListMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListMetadataResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListMetadataResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.ListMetadata(Source, SourceID, Page, PerPage, null, Tags, IgnoreFiles, onComplete);
+            LootLockerAPIManager.ListMetadata(forPlayerWithUlid, Source, SourceID, Page, PerPage, null, Tags, IgnoreFiles, onComplete);
         }
 
         /// <summary>
@@ -6284,11 +8324,12 @@ namespace LootLocker.Requests
         /// <param name="Key"> The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void GetMetadata(LootLockerMetadataSources Source, string SourceID, string Key, Action<LootLockerGetMetadataResponse> onComplete, bool IgnoreFiles=false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetMetadata(LootLockerMetadataSources Source, string SourceID, string Key, Action<LootLockerGetMetadataResponse> onComplete, bool IgnoreFiles=false, string forPlayerWithUlid = null)
         {
-            LootLockerAPIManager.ListMetadata(Source, SourceID, 0, 0, Key, null, IgnoreFiles, (ListResponse) =>
+            LootLockerAPIManager.ListMetadata(forPlayerWithUlid, Source, SourceID, 0, 0, Key, null, IgnoreFiles, (ListResponse) =>
             {
-                onComplete(new LootLockerGetMetadataResponse()
+                onComplete?.Invoke(new LootLockerGetMetadataResponse()
                 {
                     success = ListResponse.success,
                     statusCode = ListResponse.statusCode,
@@ -6306,15 +8347,16 @@ namespace LootLocker.Requests
         /// <param name="SourcesAndKeysToGet"> The combination of sources to get keys for, and the keys to get for those sources </param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="IgnoreFiles"> Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</param>
-        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool IgnoreFiles = false)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, Action<LootLockerGetMultisourceMetadataResponse> onComplete, bool IgnoreFiles = false, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMultisourceMetadataResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMultisourceMetadataResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.GetMultisourceMetadata(SourcesAndKeysToGet, IgnoreFiles, onComplete);
+            LootLockerAPIManager.GetMultisourceMetadata(forPlayerWithUlid, SourcesAndKeysToGet, IgnoreFiles, onComplete);
         }
 
         /// <summary>
@@ -6325,15 +8367,16 @@ namespace LootLocker.Requests
         /// <param name="SourceID"> The specific source id for which to set metadata, note that if the source is self then this too should be set to "self" </param>
         /// <param name="OperationsToPerform"> List of operations to perform for the given source </param>
         /// <param name="onComplete">Delegate for handling the server response</param>
-        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.PerformMetadataOperations(Source, SourceID, OperationsToPerform, onComplete);
+            LootLockerAPIManager.PerformMetadataOperations(forPlayerWithUlid, Source, SourceID, OperationsToPerform, onComplete);
         }
         #endregion
 
@@ -6343,15 +8386,16 @@ namespace LootLocker.Requests
         /// List notifications without filters and with default pagination settings
         /// </summary>
         /// <param name="onComplete">Delegate for handling the server response</param>
-        public static void ListNotificationsWithDefaultParameters(Action<LootLockerListNotificationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListNotificationsWithDefaultParameters(Action<LootLockerListNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ListNotifications.endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListNotifications.endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
                 {
 
@@ -6376,17 +8420,20 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="ShowRead">When set to true, only read notifications will be returned, when set to false only unread notifications will be returned.</param>
         /// <param name="WithPriority">(Optional) Return only notifications with the specified priority. Set to null to not use this filter.</param>
-        /// <param name="OfType">(Optional) Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use. Set to "" or null to not use this filter.</param>
-        /// <param name="WithSource">(Optional) Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use. Set to "" or null to not use this filter.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="OfType">(Optional) Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use. Set to "" or null to not use this filter.</param, string forPlayerWithUlid = null>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="WithSource">(Optional) Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use. Set to "" or null to not use this filter.</param, string forPlayerWithUlid = null>
         /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
         /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
         /// <param name="onComplete"></param>
         /// <param name="onComplete">Delegate for handling the server response</param>
-        public static void ListNotifications(bool ShowRead, LootLockerNotificationPriority? WithPriority, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListNotifications(bool ShowRead, LootLockerNotificationPriority? WithPriority, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListNotificationsResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -6404,7 +8451,7 @@ namespace LootLocker.Requests
                 endPoint = $"{endPoint}?{queryParams}";
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, LootLockerEndPoints.ListNotifications.httpMethod, null,
                 (response) =>
                 {
                     LootLockerListNotificationsResponse parsedResponse = LootLockerResponse.Deserialize<LootLockerListNotificationsResponse>(response);
@@ -6422,15 +8469,16 @@ namespace LootLocker.Requests
         /// Warning: This will mark ALL unread notifications as read, so if you have listed notifications but due to filters and/or pagination not pulled all of them you may have unviewed unread notifications
         /// </summary>
         /// <param name="onComplete">Delegate for handling the server response</param>
-        public static void MarkAllNotificationsAsRead(Action<LootLockerReadNotificationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void MarkAllNotificationsAsRead(Action<LootLockerReadNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ReadAllNotifications.endPoint, LootLockerEndPoints.ReadAllNotifications.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ReadAllNotifications.endPoint, LootLockerEndPoints.ReadAllNotifications.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
         /// <summary>
@@ -6438,11 +8486,12 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="NotificationIds">List of ids of notifications to mark as read</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
-        public static void MarkNotificationsAsRead(string[] NotificationIds, Action<LootLockerReadNotificationsResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void MarkNotificationsAsRead(string[] NotificationIds, Action<LootLockerReadNotificationsResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReadNotificationsResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -6452,42 +8501,142 @@ namespace LootLocker.Requests
                 return;
             }
             
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.ReadNotifications.endPoint, LootLockerEndPoints.ReadNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerReadNotificationsRequest{ Notifications = NotificationIds }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ReadNotifications.endPoint, LootLockerEndPoints.ReadNotifications.httpMethod, LootLockerJson.SerializeObject(new LootLockerReadNotificationsRequest{ Notifications = NotificationIds }), (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
         #endregion
+
+        #region Broadcasts
+        /// <summary>
+        /// List broadcasts for this game with default localisation and limit
+        /// </summary>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListTopBroadcasts(Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// List broadcasts for this game with specified localisation and default limit
+        /// </summary>
+        /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListTopBroadcastsLocalized(string[] languages, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string acceptLanguages = "";
+            if (languages != null && languages.Length > 0)
+            {
+                acceptLanguages = string.Join(",", languages);
+            }
+            var headers = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(acceptLanguages))
+            {
+                headers.Add("Accept-Language", acceptLanguages);
+            }
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, additionalHeaders: headers, onComplete: (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// <summary>
+        /// List broadcasts for this game
+        /// </summary>
+        /// <param name="languages">Array of language codes to filter the broadcasts by. Language codes are typically ISO 639-1 codes (e.g. "en", "fr", "es") with regional variations (e.g. "en-US", "fr-FR"), but can also be custom defined by the game developer.</param>
+        /// <param name="limit">Limit the number of broadcasts returned.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListBroadcasts(string[] languages, int limit, Action<LootLockerListBroadcastsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListBroadcastsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var endpoint = LootLockerEndPoints.ListBroadcasts.endPoint;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (limit > 0)
+                queryParams.Add("limit", limit);
+
+            endpoint += queryParams.Build();
+
+            string acceptLanguages = "";
+            if (languages != null && languages.Length > 0)
+            {
+                acceptLanguages = string.Join(",", languages);
+            }
+            var headers = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(acceptLanguages))
+            {
+                headers.Add("Accept-Language", acceptLanguages);
+            }
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, additionalHeaders: headers, onComplete: (response) => {
+                var internalResponse = LootLockerResponse.Deserialize<__LootLockerInternalListBroadcastsResponse>(response);
+                onComplete?.Invoke(new LootLockerListBroadcastsResponse(internalResponse));
+            });
+        }
+        #endregion
+
         #region Misc
 
         /// <summary>
         /// Ping the server, contains information about the current time of the server.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPingResponse</param>
-        public static void Ping(Action<LootLockerPingResponse> onComplete)
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void Ping(Action<LootLockerPingResponse> onComplete, string forPlayerWithUlid = null)
         {
-            if (!CheckInitialized())
+            if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPingResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPingResponse>(forPlayerWithUlid));
                 return;
             }
 
-            LootLockerAPIManager.Ping(onComplete);
+            LootLockerAPIManager.Ping(forPlayerWithUlid, onComplete);
+        }
+
+        /// <summary>
+        ///  Get meta information about the game
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetGameInfo(Action<LootLockerGameInfoResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameInfoResponse>(""));
+                return;
+            }
+
+            LootLockerAPIManager.GetGameInfo(onComplete);
         }
 
         /// <summary>
         /// Get the Platform the user last used. This can be used to know what login method to prompt.
         /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>The platform that was last used by the user</returns>
-        public static Platforms GetLastActivePlatform()
+        public static LL_AuthPlatforms GetLastActivePlatform(string forPlayerWithUlid = null)
         {
-            if (CurrentPlatform.Get() == Platforms.None)
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            if (playerData == null)
             {
-                return (Platforms)PlayerPrefs.GetInt("LastActivePlatform");
+                return LL_AuthPlatforms.None;
             }
-            else
-            {
-                return CurrentPlatform.Get();
-            }
-        }
 
+            return playerData.CurrentPlatform.Platform;
+        }
 
         #endregion
     }

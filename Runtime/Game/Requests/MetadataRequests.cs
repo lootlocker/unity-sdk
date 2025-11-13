@@ -46,7 +46,9 @@ namespace LootLocker.LootLockerEnums
     {
         create = 0,
         update = 1,
-        delete = 2
+        delete = 2,
+        create_or_update = 3, // Alias for upsert (same thing)
+        upsert = 4, 
     };
 }
 
@@ -296,7 +298,7 @@ namespace LootLocker.Requests
             this.value = other.value;
             this.tags = other.tags;
             this.access = other.access;
-            this.action = other.action.ToString().ToLower();
+            this.action = other.action == LootLockerMetadataActions.create_or_update ? "upsert" : other.action.ToString().ToLower();
         }
 
         public new string type { get; set; }
@@ -405,61 +407,58 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void ListMetadata(LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, string Key, string[] Tags, bool ignoreFiles, Action<LootLockerListMetadataResponse> onComplete)
+        public static void ListMetadata(string forPlayerWithUlid, LootLockerMetadataSources Source, string SourceID, int Page, int PerPage, string Key, string[] Tags, bool ignoreFiles, Action<LootLockerListMetadataResponse> onComplete)
         {
             if (Source == LootLockerMetadataSources.self)
             {
                 SourceID = "self";
             }
-            string formattedEndpoint = string.Format(LootLockerEndPoints.listMetadata.endPoint, Source.ToString(), SourceID);
+            string formattedEndpoint = LootLockerEndPoints.listMetadata.WithPathParameters(Source.ToString(), SourceID);
 
-            string queryParams = "";
-            if (Page > 0) queryParams += $"page={Page}&";
-            if (PerPage > 0) queryParams += $"per_page={PerPage}&";
-            if (!string.IsNullOrEmpty(Key)) queryParams += $"key={Key}&";
-            if (Tags?.Length > 0) {
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page);
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage);
+            if (!string.IsNullOrEmpty(Key))
+                queryParams.Add("key", Key);
+            if (Tags?.Length > 0)
+            {
                 foreach (string tag in Tags)
                 {
-                    queryParams += $"tags={tag}&";
+                    queryParams.Add("tags", tag);
                 }
             }
-            if (ignoreFiles) { queryParams += $"ignore_files=true"; } else { queryParams += $"ignore_files=false"; }
 
-            if (!string.IsNullOrEmpty(queryParams))
+            queryParams.Add("ignore_files", ignoreFiles ? "true" : "false");
+
+            formattedEndpoint += queryParams.Build();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndpoint, LootLockerEndPoints.listMetadata.httpMethod, onComplete: (serverResponse) =>
             {
-                queryParams = $"?{queryParams}";
-                formattedEndpoint += queryParams;
-            }
-
-            LootLockerServerRequest.CallAPI(formattedEndpoint, LootLockerEndPoints.listMetadata.httpMethod, onComplete:
-                (serverResponse) =>
+                var parsedResponse = LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(serverResponse);
+                if(parsedResponse.entries == null)
                 {
-                    var parsedResponse = LootLockerResponse.Deserialize<LootLockerListMetadataResponse>(serverResponse);
-                    if(parsedResponse.entries == null)
-                    {
-                        parsedResponse.entries = new LootLockerMetadataEntry[] {};
-                    }
-                    onComplete?.Invoke(parsedResponse);
-                });
+                    parsedResponse.entries = new LootLockerMetadataEntry[] {};
+                }
+                onComplete?.Invoke(parsedResponse);
+            });
         }
 
-        public static void GetMultisourceMetadata(LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, bool ignoreFiles, Action<LootLockerGetMultisourceMetadataResponse> onComplete)
+        public static void GetMultisourceMetadata(string forPlayerWithUlid, LootLockerMetadataSourceAndKeys[] SourcesAndKeysToGet, bool ignoreFiles, Action<LootLockerGetMultisourceMetadataResponse> onComplete)
         {
             if (SourcesAndKeysToGet == null)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetMultisourceMetadataResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetMultisourceMetadataResponse>(forPlayerWithUlid));
                 return;
             }
             string endpoint = LootLockerEndPoints.getMultisourceMetadata.endPoint;
 
-            string queryParams = "";
-            if (ignoreFiles) { queryParams += $"ignore_files=true"; } else { queryParams += $"ignore_files=false"; }
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
 
-            if (!string.IsNullOrEmpty(queryParams))
-            {
-                queryParams = $"?{queryParams}";
-                endpoint += queryParams;
-            }
+            queryParams.Add("ignore_files", ignoreFiles ? "true" : "false");
+
+            endpoint += queryParams.Build();
 
             foreach (LootLockerMetadataSourceAndKeys sourcePair in SourcesAndKeysToGet)
             {
@@ -472,18 +471,17 @@ namespace LootLocker
             LootLockerGetMultisourceMetadataRequest request = new LootLockerGetMultisourceMetadataRequest { sources = SourcesAndKeysToGet };
 
             string json = LootLockerJson.SerializeObject(request);
-            LootLockerServerRequest.CallAPI(endpoint, LootLockerEndPoints.getMultisourceMetadata.httpMethod, json, onComplete:
-                (serverResponse) =>
-                {
-                    LootLockerResponse.Deserialize<LootLockerGetMultisourceMetadataResponse>(onComplete, serverResponse);
-                });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getMultisourceMetadata.httpMethod, json, onComplete: (serverResponse) =>
+            {
+                LootLockerResponse.Deserialize<LootLockerGetMultisourceMetadataResponse>(onComplete, serverResponse);
+            });
         }
 
-        public static void PerformMetadataOperations(LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
+        public static void PerformMetadataOperations(string forPlayerWithUlid, LootLockerMetadataSources Source, string SourceID, List<LootLockerMetadataOperation> OperationsToPerform, Action<LootLockerMetadataOperationsResponse> onComplete)
         {
             if (string.IsNullOrEmpty(SourceID) || OperationsToPerform.Count == 0)
             {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerMetadataOperationsResponse>());
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerMetadataOperationsResponse>(forPlayerWithUlid));
                 return;
             }
 
@@ -503,11 +501,10 @@ namespace LootLocker
 
             string json = LootLockerJson.SerializeObject(request);
 
-            LootLockerServerRequest.CallAPI(LootLockerEndPoints.metadataOperations.endPoint, LootLockerEndPoints.metadataOperations.httpMethod, json, onComplete:
-                (serverResponse) =>
-                {
-                    LootLockerResponse.Deserialize<LootLockerMetadataOperationsResponse>(onComplete, serverResponse);
-                });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.metadataOperations.endPoint, LootLockerEndPoints.metadataOperations.httpMethod, json, onComplete: (serverResponse) =>
+            {
+                LootLockerResponse.Deserialize<LootLockerMetadataOperationsResponse>(onComplete, serverResponse);
+            });
         }
     }
 }

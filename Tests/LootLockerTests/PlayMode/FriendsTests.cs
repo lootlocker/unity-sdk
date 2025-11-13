@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using LootLocker;
 using LootLocker.Requests;
@@ -11,7 +12,6 @@ namespace LootLockerTests.PlayMode
     public class FriendsTests
     {
 
-#if LOOTLOCKER_BETA_FRIENDS
         private LootLockerTestGame gameUnderTest = null;
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
@@ -22,6 +22,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -30,7 +31,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "FriendsTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -66,11 +67,13 @@ namespace LootLockerTests.PlayMode
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
 
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -87,12 +90,15 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
         // This test also tests List Friends, List Outgoing requests, List Incoming requests, Send Friend Request, and Accept Friend Request in passing
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_DeleteFriend_RemovesFriendFromFriendsList()
         {
             // Given
@@ -125,7 +131,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
 
@@ -135,18 +141,11 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsResponse.success, "List Outgoing requests failed");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing.Length, 1, "Expected exactly 1 outgoing request");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing[0].player_id, Player1Ulid, "The ulid of the outgoing request didn't match");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsResponse = null;
@@ -154,7 +153,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsResponse.success, "List Incoming requests failed");
             Assert.AreEqual(incomingFriendRequestsResponse.incoming.Length, 1, "Expected exactly 1 incoming request");
@@ -166,7 +165,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 acceptFriendRequestCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => acceptFriendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Accepting friend request failed");
 
@@ -178,7 +177,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPreDeleteResponse = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
             Assert.IsTrue(listFriendsPreDeleteResponse.success, "Listing friends failed");
 
@@ -188,7 +187,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 deleteFriendCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => deleteFriendCompleted);
 
             listFriendsCompleted = false;
@@ -197,7 +196,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPostDeleteResponse = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
 
             // Then
@@ -218,7 +217,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(foundFriendUlidPostDelete, "Friend ulid was present in friends list post delete");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_DeclineIncomingFriendRequest_DoesNotAddToFriendsListAndRemovesFromIncomingAndOutgoing()
         {
             // Given
@@ -251,7 +250,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
 
@@ -261,18 +260,11 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsResponse.success, "List Outgoing requests failed");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing.Length, 1, "Expected exactly 1 outgoing request");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing[0].player_id, Player1Ulid, "The ulid of the outgoing request didn't match");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsResponse = null;
@@ -280,7 +272,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsResponse.success, "List Incoming requests failed");
             Assert.AreEqual(incomingFriendRequestsResponse.incoming.Length, 1, "Expected exactly 1 incoming request");
@@ -293,7 +285,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 declineFriendRequestCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => declineFriendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Declining friend request failed");
 
@@ -303,7 +295,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsResponse = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
 
             listIncomingRequestsCompleted = false;
@@ -312,16 +304,9 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsPostDeclineResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsPostDeclineResponse.success, "List Incoming requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listOutgoingRequestsCompleted = false;
             LootLockerListOutgoingFriendRequestsResponse outgoingFriendRequestsPostDeclineResponse = null;
@@ -329,7 +314,7 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsPostDeclineResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsPostDeclineResponse.success, "List Outgoing requests failed");
 
@@ -345,7 +330,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(foundFriendUlid, "Friend ulid was present in friends list");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Friends_AcceptIncomingFriendRequest_AddsToFriendsListAndRemovesFromIncomingAndOutgoing()
         {
             // Given
@@ -378,7 +363,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
 
@@ -388,18 +373,11 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsResponse.success, "List Outgoing requests failed");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing.Length, 1, "Expected exactly 1 outgoing request");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing[0].player_id, Player1Ulid, "The ulid of the outgoing request didn't match");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsResponse = null;
@@ -407,7 +385,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsResponse.success, "List Incoming requests failed");
             Assert.AreEqual(incomingFriendRequestsResponse.incoming.Length, 1, "Expected exactly 1 incoming request");
@@ -420,7 +398,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 acceptFriendRequestCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => acceptFriendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Accepting friend request failed");
 
@@ -430,7 +408,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsResponse = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
 
             listIncomingRequestsCompleted = false;
@@ -439,16 +417,9 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsPostAcceptResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsPostAcceptResponse.success, "List Incoming requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listOutgoingRequestsCompleted = false;
             LootLockerListOutgoingFriendRequestsResponse outgoingFriendRequestsPostAcceptResponse = null;
@@ -456,7 +427,7 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsPostAcceptResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsPostAcceptResponse.success, "List Outgoing requests failed");
 
@@ -464,16 +435,24 @@ namespace LootLockerTests.PlayMode
             Assert.Greater(incomingFriendRequestsResponse.incoming?.Length, incomingFriendRequestsPostAcceptResponse.incoming?.Length, "Friend request was not removed when accepting");
             Assert.Greater(outgoingFriendRequestsResponse.outgoing?.Length, outgoingFriendRequestsPostAcceptResponse.outgoing?.Length, "Friend request was not removed when accepting");
 
-            bool foundFriendUlid = false;
+            LootLockerAcceptedFriend foundFriend = null;
             foreach (var player in listFriendsResponse?.friends)
             {
-                foundFriendUlid |= player.player_id.Equals(Player2Ulid, System.StringComparison.OrdinalIgnoreCase);
+                if (player.player_id.Equals(Player2Ulid, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    foundFriend = player;
+                }
             }
-            Assert.IsTrue(foundFriendUlid, "Friend ulid was not present in friends list");
+            Assert.IsNotNull(foundFriend, "Friend ulid was not present in friends list");
+            Assert.IsNotEmpty(foundFriend.public_uid, "Friend public uid was not populated in friends list");
+            Assert.IsNotNull(foundFriend.created_at, "Friend created at was not populated in friends list");
+            Assert.AreNotEqual(foundFriend.created_at, default(DateTime), "Friend created at was not populated in friends list");
+            Assert.IsNotNull(foundFriend.accepted_at, "Friend accepted at was not populated in friends list");
+            Assert.AreNotEqual(foundFriend.accepted_at, default(DateTime), "Friend accepted at was not populated in friends list");
             yield break;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_CancelOutgoingFriendRequest_RemovesFriendRequestFromIncomingAndOutgoingRequest()
         {
             // Given
@@ -506,7 +485,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
 
@@ -516,18 +495,11 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsResponse.success, "List Outgoing requests failed");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing.Length, 1, "Expected exactly 1 outgoing request");
             Assert.AreEqual(outgoingFriendRequestsResponse.outgoing[0].player_id, Player1Ulid, "The ulid of the outgoing request didn't match");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsResponse = null;
@@ -535,27 +507,20 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsResponse.success, "List Incoming requests failed");
             Assert.AreEqual(incomingFriendRequestsResponse.incoming.Length, 1, "Expected exactly 1 incoming request");
             Assert.AreEqual(incomingFriendRequestsResponse.incoming[0].player_id, Player2Ulid, "The ulid of the incoming request didn't match");
 
             // When
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
-
             bool cancelFriendRequestCompleted = false;
             friendOperationResponse = null;
             LootLockerSDKManager.CancelFriendRequest(Player1Ulid, response =>
             {
                 friendOperationResponse = response;
                 cancelFriendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => cancelFriendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Cancelling friend request failed");
 
@@ -565,7 +530,7 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsPostCancelResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsPostCancelResponse.success, "List Outgoing requests failed");
 
@@ -575,15 +540,8 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsResponse = response;
                 listFriendsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsPostCancelResponse = null;
@@ -591,7 +549,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsPostCancelResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsPostCancelResponse.success, "List Incoming requests failed");
 
@@ -608,7 +566,7 @@ namespace LootLockerTests.PlayMode
             yield break;
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Friends_BlockPlayerWhenHavingIncomingFriendRequestThenUnblockAndReceiveNewFriendRequest_RemovesFriendRequestFromIncomingWhenBlockingAndUnblockingAllowsFriendRequestsAgain()
         {
             // Given
@@ -641,7 +599,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
 
@@ -651,16 +609,9 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsResponse.success, "List Outgoing requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsResponse = null;
@@ -668,7 +619,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsResponse.success, "List Incoming requests failed");
 
@@ -679,7 +630,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 blockPlayerCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => blockPlayerCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Block player request failed");
 
@@ -689,16 +640,9 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsPostBlockResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsPostBlockResponse.success, "List Incoming requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listOutgoingRequestsCompleted = false;
             LootLockerListOutgoingFriendRequestsResponse outgoingFriendRequestsPostBlockResponse = null;
@@ -706,16 +650,9 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsPostBlockResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsPostBlockResponse.success, "List Outgoing requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool unblockPlayerCompleted = false;
             LootLockerFriendsOperationResponse friendUnblockOperationResponse = null;
@@ -723,16 +660,9 @@ namespace LootLockerTests.PlayMode
             {
                 friendUnblockOperationResponse = response;
                 unblockPlayerCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => unblockPlayerCompleted);
             Assert.IsTrue(friendUnblockOperationResponse.success, "Block player request failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool friendRequestPostUnblockCompleted = false;
             LootLockerFriendsOperationResponse friendOperationPostUnblockResponse = null;
@@ -740,7 +670,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationPostUnblockResponse = response;
                 friendRequestPostUnblockCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestPostUnblockCompleted);
             Assert.IsTrue(friendOperationPostUnblockResponse.success, "Friend request failed");
 
@@ -750,16 +680,9 @@ namespace LootLockerTests.PlayMode
             {
                 outgoingFriendRequestsPostUnblockResponse = response;
                 listOutgoingRequestsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listOutgoingRequestsCompleted);
             Assert.IsTrue(outgoingFriendRequestsPostUnblockResponse.success, "List Outgoing requests failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listIncomingRequestsCompleted = false;
             LootLockerListIncomingFriendRequestsResponse incomingFriendRequestsPostUnblockResponse = null;
@@ -767,7 +690,7 @@ namespace LootLockerTests.PlayMode
             {
                 incomingFriendRequestsPostUnblockResponse = response;
                 listIncomingRequestsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listIncomingRequestsCompleted);
             Assert.IsTrue(incomingFriendRequestsPostUnblockResponse.success, "List Incoming requests failed");
 
@@ -778,7 +701,7 @@ namespace LootLockerTests.PlayMode
             Assert.Greater(outgoingFriendRequestsPostUnblockResponse.outgoing.Length, outgoingFriendRequestsPostBlockResponse.outgoing.Length, "Friend request was not added to outgoing when unblocking");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Friends_BlockPlayer_RemovesBlockedPlayerFromFriendsList()
         {
             // Given
@@ -811,16 +734,9 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 friendRequestCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => friendRequestCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Friend request failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player1Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             bool acceptFriendRequestCompleted = false;
             friendOperationResponse = null;
@@ -828,7 +744,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 acceptFriendRequestCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => acceptFriendRequestCompleted);
 
             bool listFriendsCompleted = false;
@@ -837,16 +753,9 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPreBlockPlayer1 = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
             Assert.IsTrue(listFriendsPreBlockPlayer1.success, "Listing friends failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listFriendsCompleted = false;
             LootLockerListFriendsResponse listFriendsPreBlockPlayer2 = null;
@@ -854,7 +763,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPreBlockPlayer2 = response;
                 listFriendsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
             Assert.IsTrue(listFriendsPreBlockPlayer2.success, "Listing friends failed");
 
@@ -865,7 +774,7 @@ namespace LootLockerTests.PlayMode
             {
                 friendOperationResponse = response;
                 blockPlayerCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => blockPlayerCompleted);
             Assert.IsTrue(friendOperationResponse.success, "Block player request failed");
 
@@ -875,16 +784,9 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPostBlockPlayer1 = response;
                 listFriendsCompleted = true;
-            });
+            }, Player2Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
             Assert.IsTrue(listFriendsPostBlockPlayer1.success, "Listing friends failed");
-
-            signInCompleted = false;
-            LootLockerSDKManager.StartGuestSession(Player2Identifier, response =>
-            {
-                signInCompleted = true;
-            });
-            yield return new WaitUntil(() => signInCompleted);
 
             listFriendsCompleted = false;
             LootLockerListFriendsResponse listFriendsPostBlockPlayer2 = null;
@@ -892,7 +794,7 @@ namespace LootLockerTests.PlayMode
             {
                 listFriendsPostBlockPlayer2 = response;
                 listFriendsCompleted = true;
-            });
+            }, Player1Ulid);
             yield return new WaitUntil(() => listFriendsCompleted);
             Assert.IsTrue(listFriendsPostBlockPlayer2.success, "Listing friends failed");
 
@@ -925,6 +827,5 @@ namespace LootLockerTests.PlayMode
             }
             Assert.IsFalse(foundFriendUlidPostBlockPlayer2, "Friend ulid was present in friends list pre block");
         }
-#endif
     }
 }

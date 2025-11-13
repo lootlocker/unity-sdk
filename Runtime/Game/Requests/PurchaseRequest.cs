@@ -1,6 +1,8 @@
 ﻿using LootLocker.Requests;
 using System;
 using LootLocker.LootLockerEnums;
+using System.Collections.Generic;
+
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 #else
@@ -25,43 +27,6 @@ namespace LootLocker.LootLockerEnums
 
 namespace LootLocker.Requests
 {
-    #region Legacy Purchasing
-
-    public class LootLockerPurchaseRequests
-    {
-    }
-
-    public class LootLockerNormalPurchaseRequest
-    {
-        public int asset_id { get; set; }
-        public int variation_id { get; set; }
-    }
-
-    public class LootLockerRentalPurchaseRequest
-    {
-        public int asset_id { get; set; }
-        public int variation_id { get; set; }
-        public int rental_option_id { get; set; }
-    }
-
-
-    public class LootLockerPurchaseResponse : LootLockerResponse
-    {
-        public bool overlay { get; set; }
-        public int order_id { get; set; }
-    }
-
-    public class LootLockerIosPurchaseVerificationRequest
-    {
-        public string receipt_data { get; set; }
-    }
-
-    public class LootLockerAndroidPurchaseVerificationRequest
-    {
-        public int asset_id { get; set; }
-        public string purchase_token { get; set; }
-    }
-
     public class LootLockerPurchaseCatalogItemResponse : LootLockerResponse
     {
 
@@ -71,7 +36,6 @@ namespace LootLocker.Requests
     {
         public string status { get; set; }
     }
-    #endregion
 
     /// <summary>
     /// 
@@ -165,6 +129,39 @@ namespace LootLocker.Requests
         public int class_id { get; set; }
     }
 
+    public class LootLockerRedeemEpicStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The epic account id of the account that this purchase was made for
+        /// </summary>
+        public string account_id;
+        /// <summary>
+        /// This is the token from epic used to allow the LootLocker backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.
+        /// </summary>
+        public string bearer_token;
+        /// <summary>
+        /// The ids of the purchased entitlements that you wish to redeem
+        /// </summary>
+        public List<string> entitlement_ids;
+        /// <summary>
+        /// The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)
+        /// </summary>
+        public string sandbox_id;
+    }
+
+    public class LootLockerRedeemEpicStorePurchaseForClassRequest : LootLockerRedeemEpicStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The ulid of the character to redeem this purchase for
+        /// </summary>
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id;
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -252,84 +249,23 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-#region Legacy Purchasing
-        public static void NormalPurchaseCall(LootLockerNormalPurchaseRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
 
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.normalPurchaseCall;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void RentalPurchaseCall(LootLockerRentalPurchaseRequest data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.rentalPurchaseCall;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void IosPurchaseVerification(LootLockerIosPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.iosPurchaseVerification;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void AndroidPurchaseVerification(LootLockerAndroidPurchaseVerificationRequest[] data, Action<LootLockerPurchaseResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPurchaseResponse>());
-            	return;
-            }
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            EndPointClass endPoint = LootLockerEndPoints.androidPurchaseVerification;
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void PollOrderStatus(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerPurchaseOrderStatus> onComplete)
+        public static void PollOrderStatus(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, Action<LootLockerPurchaseOrderStatus> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.pollingOrderStatus;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void ActivateRentalAsset(LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateRentalAssetResponse> onComplete)
+        public static void ActivateRentalAsset(string forPlayerWithUlid, LootLockerGetRequest lootLockerGetRequest, Action<LootLockerActivateRentalAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.activatingARentalAsset;
 
-            string getVariable = string.Format(endPoint.endPoint, lootLockerGetRequest.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
-#endregion
     }
 }

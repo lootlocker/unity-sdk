@@ -23,6 +23,7 @@ namespace LootLocker
     };
 #else
         public static readonly JsonOptions Default = new JsonOptions((JsonSerializationOptions.Default | JsonSerializationOptions.EnumAsText) & ~JsonSerializationOptions.SkipGetOnly);
+        public static readonly JsonOptions Indented = new JsonOptions((JsonSerializationOptions.Default | JsonSerializationOptions.EnumAsText) & ~JsonSerializationOptions.SkipGetOnly);
 #endif
     }
 
@@ -37,6 +38,24 @@ namespace LootLocker
         public static string SerializeObject(object obj, JsonSerializerSettings settings)
         {
             return JsonConvert.SerializeObject(obj, settings ?? LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj)
+        {
+            return SerializeObjectArray(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj, JsonSerializerSettings settings)
+        {
+            string jsonArray = "[";
+            for (int i = 0; i < obj.Length; i++)
+            {
+                jsonArray += JsonConvert.SerializeObject(obj[i], settings ?? LootLockerJsonSettings.Default);
+                if (i < obj.Length - 1)
+                    jsonArray += ",";
+            }
+            jsonArray += "]";
+            return jsonArray;
         }
 
         public static T DeserializeObject<T>(string json)
@@ -67,6 +86,25 @@ namespace LootLocker
                 return false;
             }
         }
+
+        public static string PrettifyJsonString(string json)
+        {
+            try
+            {
+                var parsedJson = DeserializeObject<object>(json);
+                var tempSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = LootLockerJsonSettings.Default.ContractResolver,
+                    Converters = LootLockerJsonSettings.Default.Converters,
+                    Formatting = Formatting.Indented
+                };
+                return SerializeObject(parsedJson, tempSettings);
+            }
+            catch (Exception)
+            {
+                return json;
+            }
+        }
 #else //LOOTLOCKER_USE_NEWTONSOFTJSON
         public static string SerializeObject(object obj)
         {
@@ -76,6 +114,24 @@ namespace LootLocker
         public static string SerializeObject(object obj, JsonOptions options)
         {
             return Json.Serialize(obj, options ?? LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj)
+        {
+            return SerializeObjectArray(obj, LootLockerJsonSettings.Default);
+        }
+
+        public static string SerializeObjectArray(object[] obj, JsonOptions options)
+        {
+            string jsonArray = "[";
+            for (int i = 0; i < obj.Length; i++)
+            {
+                jsonArray += Json.Serialize(obj[i], options ?? LootLockerJsonSettings.Default);
+                if (i < obj.Length - 1)
+                    jsonArray += ",";
+            }
+            jsonArray += "]";
+            return jsonArray;
         }
 
         public static T DeserializeObject<T>(string json)
@@ -98,12 +154,27 @@ namespace LootLocker
             try
             {
                 output = Json.Deserialize<T>(json, options ?? LootLockerJsonSettings.Default);
-                return true;
+                return output != null || string.IsNullOrEmpty(json) || json.Equals("\"\"") || json.Equals("null");
             }
             catch (Exception)
             {
                 output = default(T);
                 return false;
+            }
+        }
+
+        public static string PrettifyJsonString(string json)
+        {
+            try
+            {
+                var parsedJson = DeserializeObject<object>(json);
+                var indentedOptions = LootLockerJsonSettings.Default.Clone();
+                indentedOptions.FormattingTab = "  ";
+                return Json.SerializeFormatted(parsedJson, indentedOptions);
+            }
+            catch (Exception)
+            {
+                return json;
             }
         }
 #endif //LOOTLOCKER_USE_NEWTONSOFTJSON

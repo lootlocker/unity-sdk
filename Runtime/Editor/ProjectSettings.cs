@@ -133,11 +133,38 @@ namespace LootLocker.Admin
             }
 
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("currentDebugLevel"));
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logLevel"));
 
             if (EditorGUI.EndChangeCheck())
             {
-                gameSettings.currentDebugLevel = (LootLockerConfig.DebugLevel)m_CustomSettings.FindProperty("currentDebugLevel").enumValueIndex;
+                gameSettings.logLevel = (LootLockerLogger.LogLevel)m_CustomSettings.FindProperty("logLevel").enumValueIndex;
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logErrorsAsWarnings"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.logErrorsAsWarnings = m_CustomSettings.FindProperty("logErrorsAsWarnings").boolValue;
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logInBuilds"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue;
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("prettifyJson"), new GUIContent("Log JSON Formatted"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue;
             }
             EditorGUILayout.Space();
 

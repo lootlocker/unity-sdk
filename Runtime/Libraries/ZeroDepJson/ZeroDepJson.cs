@@ -393,6 +393,10 @@ namespace ZeroDepJson
                 }
 
                 var itemType = GetItemType(list.List.GetType());
+                if (IsNumericType(itemType) && array.GetType().GetElementType().IsEnum)
+                {
+                    itemType = array.GetType().GetElementType();
+                }
                 foreach (var value in input)
                 {
                     if (array != null)
@@ -499,8 +503,28 @@ namespace ZeroDepJson
 
             return null;
         }
+        private static bool IsNumericType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
-        private static bool TryGetObjectDefaultValue(MemberInfo mi, out object value)
+            private static bool TryGetObjectDefaultValue(MemberInfo mi, out object value)
         {
             var atts = mi.GetCustomAttributes(true);
             if (atts != null)
@@ -625,19 +649,19 @@ namespace ZeroDepJson
 
             if (target is IDictionary dicTarget)
             {
-                var itemType = GetItemType(dicTarget.GetType());
                 foreach (DictionaryEntry entry in dictionary)
                 {
                     if (entry.Key == null)
                         continue;
 
-                    if (itemType == typeof(object))
+                    var valueType = entry.Value.GetType();
+                    if (valueType == typeof(object))
                     {
                         dicTarget[entry.Key] = entry.Value;
                     }
                     else
                     {
-                        dicTarget[entry.Key] = ChangeType(target, entry.Value, itemType, options);
+                        dicTarget[entry.Key] = ChangeType(target, entry.Value, valueType, options);
                     }
                 }
                 return;
@@ -1812,6 +1836,7 @@ namespace ZeroDepJson
                     }
                     var targetValue = GetOrCreateInstance(target, dic.Count, options);
                     Apply(dic, targetValue, options);
+                    Accessor.Set(target, targetValue);
                     return;
 
                 }

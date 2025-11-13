@@ -31,6 +31,11 @@ namespace LootLocker
         public string text { get; set; }
 
         /// <summary>
+        /// Context for the request
+        /// </summary>
+        public LootLockerRequestContext requestContext { get; set; }
+
+        /// <summary>
         /// If this request was not a success, this structure holds all the information needed to identify the problem
         /// </summary>
         public LootLockerErrorData errorData { get; set; }
@@ -64,11 +69,11 @@ namespace LootLocker
         {
             if (serverResponse == null)
             {
-                return LootLockerResponseFactory.ClientError<T>("Unknown error, please check your internet connection.");
+                return LootLockerResponseFactory.ClientError<T>("Unknown error, please check your internet connection.", null);
             }
             else if (serverResponse.errorData != null)
             {
-                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode, text = serverResponse.text };
+                return new T() { success = false, errorData = serverResponse.errorData, statusCode = serverResponse.statusCode, text = serverResponse.text, requestContext = serverResponse.requestContext };
             }
 
             var response = LootLockerJson.DeserializeObject<T>(serverResponse.text, options ?? LootLockerJsonSettings.Default) ?? new T();
@@ -76,6 +81,7 @@ namespace LootLocker
             response.text = serverResponse.text;
             response.success = serverResponse.success;
             response.errorData = serverResponse.errorData;
+            response.requestContext = serverResponse.requestContext;
             response.statusCode = serverResponse.statusCode;
             response.EventId = serverResponse.EventId;
 
@@ -91,49 +97,67 @@ namespace LootLocker
         /// <summary>
         /// Construct a success response
         /// </summary>
-        public static T Success<T>(int statusCode, string responseBody) where T : LootLockerResponse, new()
+        public static T Success<T>(int statusCode, string responseBody, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
             return new T()
             {
                 success = true,
                 text = responseBody,
                 statusCode = statusCode,
-                errorData = null
+                errorData = null,
+                requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
             };
         }
 
         /// <summary>
         /// Construct a failure response
         /// </summary>
-        public static T Failure<T>(int statusCode, string responseBody) where T : LootLockerResponse, new()
+        public static T Failure<T>(int statusCode, string responseBody, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
             return new T()
             {
                 success = false,
                 text = responseBody,
                 statusCode = statusCode,
-                errorData = null
+                errorData = null,
+                requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
+            };
+        }
+
+        /// <summary>
+        /// Construct a failure response of type T from an existing failure response of any type
+        /// </summary>
+        public static T FailureResponseConversion<T>(LootLockerResponse failureResponse) where T : LootLockerResponse, new()
+        {
+            return new T()
+            {
+                success = failureResponse.success,
+                text = failureResponse.text,
+                statusCode = failureResponse.statusCode,
+                errorData = failureResponse.errorData,
+                requestContext = failureResponse.requestContext
             };
         }
 
         /// <summary>
         /// Construct an error response from a network request to send to the client.
         /// </summary>
-        public static T NetworkError<T>(string errorMessage, int httpStatusCode) where T : LootLockerResponse, new()
+        public static T NetworkError<T>(string errorMessage, int httpStatusCode, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
             return new T()
             {
                 success = false,
                 text = "{ \"message\": \"" + errorMessage + "\"}",
                 statusCode = httpStatusCode,
-                errorData = new LootLockerErrorData(httpStatusCode, errorMessage)
+                errorData = new LootLockerErrorData(httpStatusCode, errorMessage),
+                requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
             };
         }
 
         /// <summary>
         /// Construct an error response from a client side error to send to the client.
         /// </summary>
-        public static T ClientError<T>(string errorMessage) where T : LootLockerResponse, new()
+        public static T ClientError<T>(string errorMessage, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
             return new T()
             {
@@ -143,48 +167,49 @@ namespace LootLocker
                 errorData = new LootLockerErrorData
                 {
                     message = errorMessage,
-                }
+                },
+                requestContext = new LootLockerRequestContext(forPlayerWithUlid, requestTime)
             };
         }
 
         /// <summary>
         /// Construct an error response for token expiration.
         /// </summary>
-        public static T TokenExpiredError<T>() where T : LootLockerResponse, new()
+        public static T TokenExpiredError<T>(string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
-            return NetworkError<T>("Token Expired", 401);
+            return NetworkError<T>("Token Expired", 401, forPlayerWithUlid, requestTime);
         }
 
         /// <summary>
         /// Construct an error response for the request being timed out client side
         /// </summary>
-        public static T RequestTimeOut<T>() where T : LootLockerResponse, new()
+        public static T RequestTimeOut<T>(string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
-            return NetworkError<T>("The request has timed out", 408);
+            return NetworkError<T>("The request has timed out", 408, forPlayerWithUlid, requestTime);
         }
 
         /// <summary>
         /// Construct an error response specifically when the SDK has not been initialized.
         /// </summary>
-        public static T SDKNotInitializedError<T>() where T : LootLockerResponse, new()
+        public static T SDKNotInitializedError<T>(string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
-            return ClientError<T>("The LootLocker SDK has not been initialized, please start a session to call this method");
+            return ClientError<T>("The LootLocker SDK has not been initialized, please start a session to call this method", forPlayerWithUlid, requestTime);
         }
 
         /// <summary>
         /// Construct an error response because an unserializable input has been given
         /// </summary>
-        public static T InputUnserializableError<T>() where T : LootLockerResponse, new()
+        public static T InputUnserializableError<T>(string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
-            return ClientError<T>("Method parameter could not be serialized");
+            return ClientError<T>("Method parameter could not be serialized", forPlayerWithUlid, requestTime);
         }
 
         /// <summary>
         /// Construct an error response because the rate limit has been hit
         /// </summary>
-        public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit) where T : LootLockerResponse, new()
+        public static T RateLimitExceeded<T>(string method, int secondsLeftOfRateLimit, string forPlayerWithUlid, DateTime? requestTime = null) where T : LootLockerResponse, new()
         {
-            var error = ClientError<T>($"Your request to {method} was not sent. You are sending too many requests and are being rate limited for {secondsLeftOfRateLimit} seconds");
+            var error = ClientError<T>($"Your request to {method} was not sent. You are sending too many requests and are being rate limited for {secondsLeftOfRateLimit} seconds", forPlayerWithUlid, requestTime);
             error.errorData.retry_after_seconds = secondsLeftOfRateLimit;
             return error;
         }
@@ -196,6 +221,8 @@ namespace LootLocker
         {
             T response = new T();
             response.text = LootLockerJson.SerializeObject(response);
+            response.statusCode = 200;
+            response.success = true;
             return response;
         }
     }

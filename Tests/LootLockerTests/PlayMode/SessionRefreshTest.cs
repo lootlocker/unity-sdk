@@ -20,6 +20,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -28,7 +29,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -89,11 +90,14 @@ namespace LootLockerTests.PlayMode
             {
                 yield break;
             }
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -110,8 +114,11 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
         public string GetRandomName()
@@ -120,14 +127,19 @@ namespace LootLockerTests.PlayMode
                    LootLockerTestConfigurationUtilities.GetRandomVerb();
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator RefreshSession_ExpiredWhiteLabelSessionAndAutoRefreshEnabled_SessionIsAutomaticallyRefreshed()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // Given
             const string invalidToken = "ThisIsANonExistentToken";
-            LootLockerConfig.current.token = invalidToken;
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null);
+            if (playerData != null)
+            {
+                playerData.SessionToken = invalidToken;
+                LootLockerStateData.SetPlayerData(playerData);
+            }
             LootLockerConfig.current.allowTokenRefresh = true;
             LootLockerPingResponse actualPingResponse = null;
 
@@ -145,18 +157,24 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.NotNull(actualPingResponse, "Request did not execute correctly");
             Assert.IsTrue(actualPingResponse.success, "Ping failed");
-            Assert.AreNotEqual(invalidToken, LootLockerConfig.current.token, "Token was not refreshed");
+            Assert.AreNotEqual(invalidToken, LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null)?.SessionToken, "Token was not refreshed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator RefreshSession_ExpiredWhiteLabelSessionButAutoRefreshDisabled_SessionDoesNotRefresh()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // Given
             const string invalidToken = "ThisIsANonExistentToken";
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
-            LootLockerConfig.current.token = invalidToken;
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null);
+            if (playerData != null)
+            {
+                playerData.SessionToken = invalidToken;
+                LootLockerStateData.SetPlayerData(playerData);
+            }
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
+            LootLockerConfig.current.logErrorsAsWarnings = true;
             LootLockerConfig.current.allowTokenRefresh = false;
             LootLockerPingResponse actualPingResponse = null;
 
@@ -174,7 +192,7 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.NotNull(actualPingResponse, "Request did not execute correctly");
             Assert.IsFalse(actualPingResponse.success, "Ping failed");
-            Assert.AreEqual(invalidToken, LootLockerConfig.current.token, "Token was not refreshed");
+            Assert.AreEqual(invalidToken, LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null)?.SessionToken, "Token was not refreshed");
         }
 
     }

@@ -4,11 +4,42 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
+
+    /// <summary>
+    /// Optional parameters that can be sent when starting a session.
+    /// These are a collection of configuration options relating to the player whom the session is being started for.
+    /// </summary>
+    public class LootLockerSessionOptionals
+    {
+        /// <summary>
+        /// Timezone in IANA format. If not supplied, will be set to UTC.
+        /// </summary>
+        public string timezone { get; set; } = null;
+    }
+
     public class LootLockerSteamSessionRequest
     {
-        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey?.ToString();
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
         public string game_version { get; set; } = LootLockerConfig.current.game_version;
         public string steam_ticket { get; set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
+    }
+
+    public class LootLockerPlaystationNetworkVerificationRequest
+    {
+        public string key { get; set; } = LootLockerConfig.current.apiKey;
+        public string platform { get; set; } = "psn";
+        public string token { get; set; }
+        public int psn_issuer_id { get; set; } = 256; // Default to production
+    }
+
+    public class LootLockerPlaystationNetworkV3SessionRequest
+    {
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
+        public string game_version => LootLockerConfig.current.game_version;
+        public string auth_code { get; set; }
+        public int env_iss_id { get; set; } = 256; // Default to production
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     public class LootLockerSteamSessionWithAppIdRequest : LootLockerSteamSessionRequest
@@ -19,39 +50,48 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
-        public string platform => CurrentPlatform.GetString();
+        public string game_key => LootLockerConfig.current.apiKey;
+        public string platform { get; set; }
         public string player_identifier { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
 
-        public LootLockerSessionRequest(string player_identifier)
-        {
-            this.player_identifier = player_identifier;
-        }
-
         public LootLockerSessionRequest()
         {
+            player_identifier = "";
+            platform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.None).PlatformString;
+            optionals = null;
         }
+
+        public LootLockerSessionRequest(string playerIdentifier, LL_AuthPlatforms forPlatform, LootLockerSessionOptionals optionals = null)
+        {
+            player_identifier = playerIdentifier;
+            platform = LootLockerAuthPlatform.GetPlatformRepresentation(forPlatform).PlatformString;
+            this.optionals = optionals;
+        }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     [Serializable]
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string email { get; set; }
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
         public LootLockerWhiteLabelSessionRequest(string email)
         {
             this.email = email;
             this.token = null;
+            this.optionals = null;
         }
 
         public LootLockerWhiteLabelSessionRequest()
         {
             this.email = null;
             this.token = null;
+            this.optionals = null;
         }
     }
 
@@ -74,6 +114,10 @@ namespace LootLocker.Requests
         /// Whether this player has been seen before (true) or is new (false)
         /// </summary>
         public bool seen_before { get; set; }
+        /// <summary>
+        /// The last time this player logged in
+        /// </summary>
+        public DateTime? last_seen { get; set; }
         /// <summary>
         /// The public UID for this player
         /// </summary>
@@ -136,6 +180,13 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
+    public class LootLockerGooglePlayGamesSessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
+        public string refresh_token { get; set; }
+    }
+
+    [Serializable]
     public class LootLockerAppleSessionResponse : LootLockerSessionResponse
     {
         public string player_identifier { get; set; }
@@ -158,6 +209,11 @@ namespace LootLocker.Requests
     {
         public string refresh_token { get; set; }
     }
+    
+    public class LootLockerPlaystationV3SessionResponse : LootLockerSessionResponse
+    {
+        public string player_identifier { get; set; }
+    }
 
     [Serializable]
     public class LootLockerLevel_Thresholds
@@ -171,82 +227,94 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string nsa_id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token)
+        public LootLockerNintendoSwitchSessionRequest(string nsa_id_token, LootLockerSessionOptionals optionals = null)
         {
             this.nsa_id_token = nsa_id_token;
+            this.optionals = optionals;
         }
     }
 
     [Serializable]
     public class LootLockerEpicSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerEpicSessionRequest(string id_token)
+        public LootLockerEpicSessionRequest(string id_token, LootLockerSessionOptionals optionals = null)
         {
             this.id_token = id_token;
+            this.optionals = optionals;
         }
     }
 
     [Serializable]
     public class LootLockerEpicRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerEpicRefreshSessionRequest(string refresh_token)
+        public LootLockerEpicRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
         }
     }
     
     [Serializable]
     public class LootLockerMetaSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         
         public string user_id { get; set; }
 
         public string nonce { get; set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
     
     [Serializable]
     public class LootLockerMetaRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
     }
 
     public class LootLockerXboxOneSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string xbox_user_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerXboxOneSessionRequest(string xbox_user_token)
+        public LootLockerXboxOneSessionRequest(string xbox_user_token, LootLockerSessionOptionals optionals = null)
         {
             this.xbox_user_token = xbox_user_token;
+            this.optionals = optionals;
         }
     }
 
     public class LootLockerGoogleSignInSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGoogleSignInSessionRequest(string id_token)
+        public LootLockerGoogleSignInSessionRequest(string id_token, LootLockerSessionOptionals optionals = null)
         {
             this.id_token = id_token;
+            this.optionals = optionals;
         }
     }
     
@@ -259,51 +327,84 @@ namespace LootLocker.Requests
     {
         public string platform { get; set; }
 
-        public LootLockerGoogleSignInWithPlatformSessionRequest(string id_token) : base(id_token)
+        public LootLockerGoogleSignInWithPlatformSessionRequest(string id_token, string platform, LootLockerSessionOptionals optionals = null) : base(id_token, optionals)
         {
-            this.id_token = id_token;
+            this.platform = platform;
         }
     }
 
     public class LootLockerGoogleRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerGoogleRefreshSessionRequest(string refresh_token)
+        public LootLockerGoogleRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
+        }
+    }
+    public class LootLockerGooglePlayGamesSessionRequest
+    {
+        public string game_api_key => LootLockerConfig.current.apiKey;
+        public string auth_code { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
+
+        public LootLockerGooglePlayGamesSessionRequest(string authCode, LootLockerSessionOptionals optionals = null)
+        {
+            this.auth_code = authCode;
+            this.optionals = optionals;
+        }
+    }
+
+    public class LootLockerGooglePlayGamesRefreshSessionRequest
+    {
+        public string game_api_key => LootLockerConfig.current.apiKey;
+        public string refresh_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
+
+        public LootLockerGooglePlayGamesRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
+        {
+            this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
     }
 
     public class LootLockerAppleSignInSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string apple_authorization_code { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleSignInSessionRequest(string apple_authorization_code)
+        public LootLockerAppleSignInSessionRequest(string apple_authorization_code, LootLockerSessionOptionals optionals = null)
         {
             this.apple_authorization_code = apple_authorization_code;
+            this.optionals = optionals;
         }
     }
 
     public class LootLockerAppleRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleRefreshSessionRequest(string refresh_token)
+        public LootLockerAppleRefreshSessionRequest(string refresh_token, LootLockerSessionOptionals optionals = null)
         {
             this.refresh_token = refresh_token;
+            this.optionals = optionals;
         }
     }
 
     public class LootLockerAppleGameCenterSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         public string bundle_id { get; private set; }
         public string player_id { get; private set; }
@@ -311,8 +412,9 @@ namespace LootLocker.Requests
         public string signature { get; private set; }
         public string salt { get; private set; }
         public long timestamp { get; private set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleGameCenterSessionRequest(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp)
+        public LootLockerAppleGameCenterSessionRequest(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, LootLockerSessionOptionals optionals = null)
         {
             this.bundle_id = bundleId;
             this.player_id = playerId;
@@ -320,289 +422,55 @@ namespace LootLocker.Requests
             this.signature = signature;
             this.salt = salt;
             this.timestamp = timestamp;
+            this.optionals = optionals;
         }
     }
 
     public class LootLockerAppleGameCenterRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         public string refresh_token { get; private set; }
+        public LootLockerSessionOptionals optionals { get; set; } = null;
 
-        public LootLockerAppleGameCenterRefreshSessionRequest(string refresh_token)
+        public LootLockerAppleGameCenterRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
         {
-            this.refresh_token = refresh_token;
+            this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
     }
-}
-
-namespace LootLocker
-{
-    public partial class LootLockerAPIManager
+    public class LootLockerDiscordSessionRequest
     {
-        public static void Session(LootLockerSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+        public string game_key => LootLockerConfig.current.apiKey;
+        public string access_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
+
+        public LootLockerDiscordSessionRequest(string accessToken, LootLockerSessionOptionals optionals = null)
         {
-            EndPointClass endPoint = LootLockerEndPoints.authenticationRequest;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = data?.player_identifier;
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
+            this.access_token = accessToken;
+            this.optionals = optionals;
         }
+    }
 
-        public static void WhiteLabelSession(LootLockerWhiteLabelSessionRequest data, Action<LootLockerSessionResponse> onComplete)
+    public class LootLockerDiscordRefreshSessionRequest
+    {
+        public string game_key => LootLockerConfig.current.apiKey;
+        public string refresh_token { get; set; }
+        public string game_version => LootLockerConfig.current.game_version;
+        public LootLockerSessionOptionals optionals { get; set; } = null;
+
+        public LootLockerDiscordRefreshSessionRequest(string refreshToken, LootLockerSessionOptionals optionals = null)
         {
-            EndPointClass endPoint = LootLockerEndPoints.whiteLabelLoginSessionRequest;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = "";
-                onComplete?.Invoke(response);
-            }, false);
+            this.refresh_token = refreshToken;
+            this.optionals = optionals;
         }
+    }
 
-        public static void GuestSession(LootLockerSessionRequest data, Action<LootLockerGuestSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.guestSessionRequest;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGuestSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerGuestSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = (data as LootLockerSessionRequest)?.player_identifier;
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void GoogleSession(LootLockerGoogleSignInSessionRequest data, Action<LootLockerGoogleSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGoogleSessionResponse>());
-                return;
-            }
-
-            GoogleSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        public static void GoogleSession(LootLockerGoogleRefreshSessionRequest data, Action<LootLockerGoogleSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGoogleSessionResponse>());
-                return;
-            }
-
-            GoogleSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        private static void GoogleSession(string json, Action<LootLockerGoogleSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.googleSessionRequest;
-            if (string.IsNullOrEmpty(json))
-            {
-                return;
-            }
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                var response = LootLockerGoogleSessionResponse.Deserialize<LootLockerGoogleSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = response.player_identifier;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void NintendoSwitchSession(LootLockerNintendoSwitchSessionRequest data, Action<LootLockerSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.nintendoSwitchSessionRequest;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void EpicSession(LootLockerEpicSessionRequest data, Action<LootLockerEpicSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEpicSessionResponse>());
-                return;
-            }
-
-            EpicSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        public static void EpicSession(LootLockerEpicRefreshSessionRequest data, Action<LootLockerEpicSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEpicSessionResponse>());
-                return;
-            }
-
-            EpicSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        private static void EpicSession(string json, Action<LootLockerEpicSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.epicSessionRequest;
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void XboxOneSession(LootLockerXboxOneSessionRequest data, Action<LootLockerSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.xboxSessionRequest;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) =>
-            {
-                var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = "";
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void AppleSession(LootLockerAppleSignInSessionRequest data, Action<LootLockerAppleSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleSessionResponse>());
-                return;
-            }
-
-            AppleSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        public static void AppleSession(LootLockerAppleRefreshSessionRequest data, Action<LootLockerAppleSessionResponse> onComplete)
-        {
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleSessionResponse>());
-            	return;
-            }
-
-            AppleSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        private static void AppleSession(string json, Action<LootLockerAppleSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.appleSessionRequest;
-            if (string.IsNullOrEmpty(json))
-            {
-                return;
-            }
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                var response = LootLockerAppleSessionResponse.Deserialize<LootLockerAppleSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.deviceID = response.player_identifier;
-                LootLockerConfig.current.playerULID = response.player_ulid;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void AppleGameCenterSession(LootLockerAppleGameCenterSessionRequest data, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleGameCenterSessionResponse>());
-                return;
-            }
-
-            AppleGameCenterSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        public static void AppleGameCenterSession(LootLockerAppleGameCenterRefreshSessionRequest data, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
-        {
-            if (data == null)
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleGameCenterSessionResponse>());
-                return;
-            }
-
-            AppleGameCenterSession(LootLockerJson.SerializeObject(data), onComplete);
-        }
-
-        private static void AppleGameCenterSession(string json, Action<LootLockerAppleGameCenterSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.appleGameCenterSessionRequest;
-            if (string.IsNullOrEmpty(json))
-            {
-                return;
-            }
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) =>
-            {
-                var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
-                LootLockerConfig.current.token = response.session_token;
-                LootLockerConfig.current.refreshToken = response.refresh_token;
-                onComplete?.Invoke(response);
-            }, false);
-        }
-
-        public static void EndSession(LootLockerSessionRequest data, Action<LootLockerSessionResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.endingSession;
-
-            if(data == null)
-            {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAppleSessionResponse>());
-            	return;
-            }
-
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(data), (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
+    [Serializable]
+    public class LootLockerDiscordSessionResponse : LootLockerSessionResponse
+    {
+        public string refresh_token { get; set; }
+        public string player_identifier { get; set; }
     }
 }

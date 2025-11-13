@@ -171,6 +171,17 @@ namespace LootLocker.Requests
         public string metadata { get; set; }
     }
 
+    public class LootLockerQueryScoreRequest
+    {
+        public int score { get; set; }
+    }
+
+    public class LootLockerIncrementScoreRequest
+    {
+        public string member_id { get; set; }
+        public int amount { get; set; }
+    }
+
     [Serializable]
     public class LootLockerLeaderboardArchiveRequest
     {
@@ -305,35 +316,35 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetMemberRank(LootLockerGetMemberRankRequest data, Action<LootLockerGetMemberRankResponse> onComplete)
+        public static void GetMemberRank(string forPlayerWithUlid, LootLockerGetMemberRankRequest data, Action<LootLockerGetMemberRankResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getMemberRank;
-            string tempEndpoint = string.Format(endPoint.endPoint, data.leaderboardId, data.member_id);
-            LootLockerServerRequest.CallAPI(tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
+            string tempEndpoint = endPoint.WithPathParameters(data.leaderboardId, data.member_id);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
 
-        public static void GetByListOfMembers(LootLockerGetByListMembersRequest data, string id, Action<LootLockerGetByListOfMembersResponse> onComplete)
+        public static void GetByListOfMembers(string forPlayerWithUlid, LootLockerGetByListMembersRequest data, string id, Action<LootLockerGetByListOfMembersResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.getByListOfMembers;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetByListOfMembersResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetByListOfMembersResponse>(forPlayerWithUlid));
             	return;
             }
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, id);
+            string endPoint = requestEndPoint.WithPathParameter(id);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAllMemberRanks(LootLockerGetAllMemberRanksRequest getRequests, Action<LootLockerGetAllMemberRanksResponse> onComplete)
+        public static void GetAllMemberRanks(string forPlayerWithUlid, LootLockerGetAllMemberRanksRequest getRequests, Action<LootLockerGetAllMemberRanksResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.getAllMemberRanks;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.member_id, getRequests.count);
+            string endPoint = requestEndPoint.WithPathParameters(getRequests.member_id, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
@@ -341,15 +352,15 @@ namespace LootLocker
                 endPoint = string.Format(tempEndpoint, getRequests.member_id, getRequests.count, int.Parse(getRequests.after));
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetScoreList(LootLockerGetScoreListRequest getRequests, Action<LootLockerGetScoreListResponse> onComplete)
+        public static void GetScoreList(string forPlayerWithUlid, LootLockerGetScoreListRequest getRequests, Action<LootLockerGetScoreListResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.getScoreList;
 
             string tempEndpoint = requestEndPoint.endPoint;
-            string endPoint = string.Format(requestEndPoint.endPoint, getRequests.leaderboardKey, getRequests.count);
+            string endPoint = requestEndPoint.WithPathParameters(getRequests.leaderboardKey, getRequests.count);
 
             if (!string.IsNullOrEmpty(getRequests.after))
             {
@@ -358,23 +369,23 @@ namespace LootLocker
                 endPoint = string.Format(tempEndpoint, getRequests.leaderboardKey, getRequests.count, int.Parse(getRequests.after));
             }
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void SubmitScore(LootLockerSubmitScoreRequest data, string id, Action<LootLockerSubmitScoreResponse> onComplete)
+        public static void SubmitScore(string forPlayerWithUlid, LootLockerSubmitScoreRequest data, string id, Action<LootLockerSubmitScoreResponse> onComplete)
         {
             EndPointClass requestEndPoint = LootLockerEndPoints.submitScore;
             if(data == null)
             {
-            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSubmitScoreResponse>());
+            	onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerSubmitScoreResponse>(forPlayerWithUlid));
             	return;
             }
 
             string json = LootLockerJson.SerializeObject(data);
 
-            string endPoint = string.Format(requestEndPoint.endPoint, id);
+            string endPoint = requestEndPoint.WithPathParameter(id);
 
-            LootLockerServerRequest.CallAPI(endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

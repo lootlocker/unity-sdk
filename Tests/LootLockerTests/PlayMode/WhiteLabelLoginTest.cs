@@ -21,6 +21,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -29,7 +30,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -60,11 +61,14 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -81,8 +85,11 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
         public string GetRandomName()
         {
@@ -91,7 +98,7 @@ namespace LootLockerTests.PlayMode
 
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_SignUp_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -115,7 +122,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(actualResponse.CreatedAt, "Created At date is empty in the response");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator WhiteLabel_SignUpAndLogin_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -152,7 +159,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(actualResponse.LoginResponse.SessionToken, "No session token found from login");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator WhiteLabel_SignUpAndLoginWithWrongPassword_Fails()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -193,7 +200,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(actualResponse.success, "Started White Label Session with wrong password");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator WhiteLabel_VerifySession_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -240,6 +247,186 @@ namespace LootLockerTests.PlayMode
 
             //Then
             Assert.IsTrue(actualResponse, "Could not Verify Session");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator WhiteLabel_RequestsAfterGameResetWhenWLDefaultUser_ReusesSession()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            string email = GetRandomName() + "@lootlocker.com";
+            string expectedPlayerUlid = null;
+
+            LootLockerWhiteLabelSignupResponse signupResponse = null;
+            bool whiteLabelSignUpCompleted = false;
+            LootLockerSDKManager.WhiteLabelSignUp(email, "123456789", (response) =>
+            {
+
+                signupResponse = response;
+                whiteLabelSignUpCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelSignUpCompleted);
+
+            Assert.IsTrue(signupResponse.success, "Could not sign up with WhiteLabel");
+            Assert.IsNotEmpty(signupResponse.CreatedAt, "Created At date is empty in the response");
+
+            LootLockerWhiteLabelLoginAndStartSessionResponse loginResponse = null;
+            bool whiteLabelLoginCompleted = false;
+            LootLockerSDKManager.WhiteLabelLoginAndStartSession(email, "123456789", true, (response) =>
+            {
+                loginResponse = response;
+                expectedPlayerUlid = response?.SessionResponse?.player_ulid;
+                whiteLabelLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelLoginCompleted);
+
+            Assert.IsTrue(loginResponse.SessionResponse.success, "Could not start White Label Session");
+            Assert.IsNotEmpty(loginResponse.LoginResponse.SessionToken, "No session token found from login");
+
+            //When
+            LootLockerStateData.Reset();
+
+            bool pingRequestCompleted = false;
+            LootLockerPingResponse pingResponse = null;
+            LootLockerSDKManager.Ping(_pingResponse =>
+            {
+                pingResponse = _pingResponse;
+                pingRequestCompleted = true;
+            });
+            yield return new WaitUntil(() => pingRequestCompleted);
+
+            // Then
+            Assert.IsTrue(pingResponse.success, pingResponse.errorData?.ToString());
+            Assert.AreEqual(expectedPlayerUlid, pingResponse.requestContext.player_ulid, "WL user not used for request");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator WhiteLabel_WLSessionStartByEmailAfterGameReset_ReusesSession()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            //Given
+            string email = GetRandomName() + "@lootlocker.com";
+            string initialPlayerUlid = null;
+            string initialPlayerSessionToken = null;
+            string initialPlayerWLToken = null;
+
+            LootLockerWhiteLabelSignupResponse signupResponse = null;
+            bool whiteLabelSignUpCompleted = false;
+            LootLockerSDKManager.WhiteLabelSignUp(email, "123456789", (response) =>
+            {
+
+                signupResponse = response;
+                whiteLabelSignUpCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelSignUpCompleted);
+
+            Assert.IsTrue(signupResponse.success, "Could not sign up with WhiteLabel");
+            Assert.IsNotEmpty(signupResponse.CreatedAt, "Created At date is empty in the response");
+
+            LootLockerWhiteLabelLoginAndStartSessionResponse loginResponse = null;
+            bool whiteLabelLoginCompleted = false;
+            LootLockerSDKManager.WhiteLabelLoginAndStartSession(email, "123456789", true, (response) =>
+            {
+                loginResponse = response;
+                initialPlayerUlid = response?.SessionResponse?.player_ulid;
+                initialPlayerSessionToken = response?.SessionResponse?.session_token;
+                initialPlayerWLToken = response?.LoginResponse.SessionToken;
+                whiteLabelLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelLoginCompleted);
+
+            Assert.IsTrue(loginResponse.SessionResponse.success, "Could not start White Label Session");
+            Assert.IsNotEmpty(loginResponse.SessionResponse.session_token, "No session token found from login");
+
+            //When
+            LootLockerStateData.Reset();
+
+            bool postResetSessionRequestCompleted = false;
+            LootLockerSessionResponse postResetSessionResponse = null;
+            LootLockerSDKManager.StartWhiteLabelSession(email, (sessionResponse) =>
+            {
+                postResetSessionResponse = sessionResponse;
+                postResetSessionRequestCompleted = true;
+            });
+
+            yield return new WaitUntil(() => postResetSessionRequestCompleted);
+
+            // Then
+            Assert.IsTrue(postResetSessionResponse.success, postResetSessionResponse.errorData?.ToString());
+            Assert.AreEqual(initialPlayerUlid, postResetSessionResponse.player_ulid, "Session started for another user");
+            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(initialPlayerUlid);
+            Assert.IsNotNull(playerData);
+            Assert.AreEqual(initialPlayerWLToken, playerData.WhiteLabelToken, "White label token was not re-used");
+            Assert.AreNotEqual(initialPlayerSessionToken, playerData.SessionToken, "New session token was not generated");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator WhiteLabel_WLLoginAndStartSessionWhenOtherPlayerExists_CreatesWhiteLabelPlayer()
+        {
+            //Given
+            string otherEmail = GetRandomName() + "@lootlocker.com";
+            string email = GetRandomName() + "@lootlocker.com";
+
+            Assert.AreNotEqual(otherEmail, email, "Emails were randomized to the same value, test will not work");
+
+            LootLockerWhiteLabelSignupResponse signupResponse = null;
+            bool whiteLabelSignUpCompleted = false;
+            LootLockerSDKManager.WhiteLabelSignUp(otherEmail, "123456789", (response) =>
+            {
+
+                signupResponse = response;
+                whiteLabelSignUpCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelSignUpCompleted);
+            Assert.IsTrue(signupResponse.success, "Could not sign up other player with WhiteLabel");
+
+            LootLockerWhiteLabelLoginAndStartSessionResponse loginResponse = null;
+            bool whiteLabelLoginCompleted = false;
+            LootLockerSDKManager.WhiteLabelLoginAndStartSession(otherEmail, "123456789", true, (response) =>
+            {
+                loginResponse = response;
+                whiteLabelLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelLoginCompleted);
+
+            Assert.IsTrue(loginResponse.SessionResponse.success, "Could not start other player White Label Session");
+            Assert.IsNotEmpty(loginResponse.SessionResponse.session_token, "No session token found from login");
+            string otherPlayerUlid = loginResponse?.SessionResponse?.player_ulid;
+            string otherPlayerSessionToken = loginResponse?.SessionResponse?.session_token;
+            string otherPlayerWLEmail = loginResponse?.LoginResponse?.Email;
+
+            signupResponse = null;
+            whiteLabelSignUpCompleted = false;
+            LootLockerSDKManager.WhiteLabelSignUp(email, "123456789", (response) =>
+            {
+
+                signupResponse = response;
+                whiteLabelSignUpCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelSignUpCompleted);
+
+            Assert.IsTrue(signupResponse.success, "Could not sign up with WhiteLabel");
+
+            //When
+            loginResponse = null;
+            whiteLabelLoginCompleted = false;
+            LootLockerSDKManager.WhiteLabelLoginAndStartSession(email, "123456789", true, (response) =>
+            {
+                loginResponse = response;
+                whiteLabelLoginCompleted = true;
+            });
+            yield return new WaitUntil(() => whiteLabelLoginCompleted);
+
+            // Then
+            Assert.IsTrue(loginResponse.SessionResponse.success, "Could not start White Label Session");
+            Assert.IsNotEmpty(loginResponse.SessionResponse.session_token, "No session token found from login");
+            Assert.AreNotEqual(otherPlayerUlid, loginResponse?.SessionResponse?.player_ulid, "WL login did not create new player");
+            Assert.AreNotEqual(otherPlayerSessionToken, loginResponse?.SessionResponse?.session_token, "WL login did not create new session");
+            Assert.AreNotEqual(otherPlayerWLEmail, loginResponse?.LoginResponse?.Email, "WL login did not create new WL user");
+            Assert.AreEqual(email, loginResponse?.LoginResponse?.Email, "WL login email does not match");
+            Assert.AreEqual(otherPlayerUlid, LootLockerSDKManager.GetDefaultPlayerUlid(), "Default player ULID was changed by WL login");
         }
 
     }

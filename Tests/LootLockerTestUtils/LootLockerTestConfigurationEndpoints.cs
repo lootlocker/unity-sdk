@@ -22,12 +22,13 @@ namespace LootLockerTestConfigurationUtils
                 onComplete?.Invoke(new LootLockerResponse{statusCode = 0, success = false, text = "Request exceeded the allowed number of retries", errorData = new LootLockerErrorData{ message = "Request exceeded the allowed number of retries" } });
                 return;
             }
-            LootLockerConfig.DebugLevel debugLevelSavedState = LootLockerConfig.current.currentDebugLevel;
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerLogger.LogLevel logLevelSavedState = LootLockerConfig.current.logLevel;
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Debug;
+            LootLockerConfig.current.logErrorsAsWarnings = true;
             
             endPoint = endPoint.Replace("#GAMEID#", ActiveGameId.ToString());
 
-            LootLockerServerRequest.CallAPI(endPoint, httpMethod, json, onComplete: (serverResponse) =>
+            LootLockerServerRequest.CallAPI(null, endPoint, httpMethod, json, onComplete: (serverResponse) =>
                 {
                     LootLockerResponse.Deserialize(onComplete, serverResponse);
                     if (!serverResponse.success && serverResponse.errorData.retry_after_seconds > 0)
@@ -36,14 +37,11 @@ namespace LootLockerTestConfigurationUtils
                         _retries++;
                         go.Retry(serverResponse.errorData.retry_after_seconds.Value, endPoint, httpMethod, json, onComplete, useAuthToken);
                     }
-                    LootLockerConfig.current.currentDebugLevel = debugLevelSavedState;
+                    LootLockerConfig.current.logLevel = logLevelSavedState;
                 },
-                useAuthToken,
+                useAuthToken: useAuthToken,
                 callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
         }
-
-
-
     }
 
     public class LootLockerCIRetry : MonoBehaviour
@@ -92,10 +90,23 @@ namespace LootLockerTestConfigurationUtils
         [Header("LootLocker Admin API Asset Operations")]
         public static EndPointClass getAssetContexts = new EndPointClass("/v1/game/#GAMEID#/assets/contexts", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
         public static EndPointClass createAsset = new EndPointClass("/v1/game/#GAMEID#/asset", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass updateAsset = new EndPointClass("/v1/game/#GAMEID#/asset/{0}", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
+        public static EndPointClass getAsset = new EndPointClass("/v1/game/#GAMEID#/asset/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+
+        public static EndPointClass activateAsset = new EndPointClass("/v1/game/#GAMEID#/asset/{0}/activate", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass addDataEntityToAsset = new EndPointClass("/v1/game/#GAMEID#/data", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass updateAssetFilters = new EndPointClass("/v1/game/#GAMEID#/assets/filters/bulk", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
         public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass bulkEditAssetFilters = new EndPointClass("v1/game/#GAMEID#/assets/filters/bulk", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Trigger Operations")]
         public static EndPointClass createTrigger = new EndPointClass("game/#GAMEID#/triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Notification Operations")]
+        public static EndPointClass sendCustomNotification = new EndPointClass("game/#GAMEID#/notifications/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Metadata Operations")]
+        public static EndPointClass metadataOperations = new EndPointClass("game/#GAMEID#/metadata", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }

@@ -1,21 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/LootLockerSDK/Editor/Editor%20UI/LootLockerAdminExtension.uss?fileID=7433441132597879392&amp;guid=f1130e18dfb99e04cbd54f3fac00ff15&amp;type=3#LootLockerAdminExtension" />
-    <ui:VisualElement style="align-self: stretch; justify-content: center; align-items: stretch; height: 100%;">
-        <ui:VisualElement name="Topbar" style="flex-grow: 1; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: stretch; flex-wrap: wrap;">
+    <Style src="project://database/Assets/LootLockerSDK/Editor/Editor%20UI/LootLockerAdminExtension.uss?fileID=7433441132597879392&amp;guid=f1130e18dfb99e04cbd54f3fac00ff15&amp;type=3#LootLockerAdminExtension" />    <ui:VisualElement style="align-self: stretch; justify-content: center; align-items: stretch; height: 100%;">        <ui:VisualElement name="Topbar" style="flex-grow: 0; flex-shrink: 0; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: center; min-height: 60px; max-height: 60px;">
             <ui:Label tabindex="-1" text="LootLocker" display-tooltip-when-elided="true" name="GameName" style="align-items: flex-start; align-self: center; font-size: 28px; -unity-text-align: middle-left; text-overflow: clip; width: auto; white-space: nowrap; max-width: 750px; margin-left: 24px; justify-content: flex-start;" />
-            <ui:VisualElement name="Environment" style="flex-grow: 1; flex-direction: row; flex-shrink: 1; align-self: stretch; justify-content: flex-end; margin-right: 24px;">
-                <ui:Label tabindex="-1" text="Environment: Stage" display-tooltip-when-elided="true" name="EnvironmentTitle" style="align-items: flex-start; align-self: center; font-size: 14px; -unity-text-align: middle-left; text-overflow: clip; white-space: nowrap; margin-right: 8px;" />
-                <ui:VisualElement name="SwitchBackground" class="environmentToStageBackground" style="flex-grow: 1; background-color: rgb(28, 232, 109); min-width: 0; min-height: 26px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; align-items: auto; align-self: center; max-width: 45px; justify-content: center; flex-shrink: 0;">
-                    <ui:VisualElement name="Handle" style="flex-grow: 1; background-color: rgb(255, 255, 255); align-self: flex-start; align-items: flex-end; justify-content: flex-start; border-top-left-radius: 90px; border-top-right-radius: 90px; border-bottom-right-radius: 90px; border-bottom-left-radius: 90px; margin-right: 4px; margin-left: 4px; flex-shrink: 0; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-height: 20px; max-width: 20px; margin-top: 0;" />
+            <ui:VisualElement name="LicenseCountdownContainer" style="flex-direction: row; align-items: center; align-self: center; margin-left: 12px;">
+                <ui:Label name="LicenseCountdownLabel" text="" style="font-size: 14px; color: rgb(255, 200, 0); margin-right: 4px; display: none;" />
+                <ui:Image name="LicenseCountdownIcon" style="width: 16px; height: 16px; display: none; cursor: link;" />            </ui:VisualElement>            
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: flex-end;">                <ui:VisualElement name="Environment" style="flex-grow: 0; flex-direction: row; flex-shrink: 1; align-self: center; justify-content: flex-end; margin-right: 8px; align-items: center;">
+                    <ui:Label tabindex="-1" text="Environment: Stage" display-tooltip-when-elided="true" name="EnvironmentTitle" style="align-items: flex-start; align-self: center; font-size: 14px; -unity-text-align: middle-left; text-overflow: clip; white-space: nowrap; margin-right: 8px;" />
+                    <ui:VisualElement name="SwitchBackground" class="environmentToStageBackground" style="flex-grow: 1; background-color: rgb(28, 232, 109); min-width: 40px; min-height: 26px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; align-items: auto; align-self: center; max-width: 80px; justify-content: center; flex-shrink: 0;">
+                        <ui:VisualElement name="Handle" style="flex-grow: 1; background-color: rgb(255, 255, 255); align-self: flex-start; align-items: flex-end; justify-content: flex-start; border-top-left-radius: 90px; border-top-right-radius: 90px; border-bottom-right-radius: 90px; border-bottom-left-radius: 90px; margin-right: 4px; margin-left: 4px; flex-shrink: 0; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-height: 20px; max-width: 20px; margin-top: 0;" />
+                    </ui:VisualElement>                </ui:VisualElement>
+                <ui:VisualElement name="SettingsContainer" style="flex-direction: row; align-items: center; align-self: center; margin-right: 24px;">
+                    <ui:Button name="SettingsBtn" tooltip="Settings" style="width: 28px; height: 28px; align-self: center; background-color: rgba(60, 60, 60, 0); border-width: 1px; border-color: rgba(100,100,100,0.0); border-radius: 0px; font-size: 18px; cursor: link; display: none; color: rgb(200,200,200);" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ContentView" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-top: 0; opacity: 1; bottom: 0; top: 0; height: 100%;">
-            <ui:VisualElement name="MenuBar" style="flex-grow: 1; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: stretch; margin-left: 0; margin-bottom: 12px; flex-wrap: wrap;">
-                <ui:VisualElement name="DynamicMenu" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="MenuBar" style="flex-grow: 0; flex-shrink: 0; visibility: visible; display: flex; border-bottom-width: 2px; border-bottom-color: rgb(46, 46, 46); flex-direction: row; justify-content: flex-start; align-self: auto; align-items: center; margin-left: 0; margin-bottom: 12px; min-height: 40px;">
+                <ui:VisualElement name="DynamicMenu" style="flex-grow: 1; flex-direction: row; align-items: center;">
                     <ui:Button text="API Keys" display-tooltip-when-elided="true" name="APIKeyBtn" class="menuBtn" style="-unity-font-style: bold; background-color: rgba(188, 188, 188, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0); margin-left: 20px;" />
+                    <ui:Button text="Open Log Viewer" display-tooltip-when-elided="true" name="LogViewerBtn" class="menuBtn" style="-unity-font-style: bold; background-color: rgba(188, 188, 188, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0); margin-left: 10px;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="StaticMenu" style="flex-grow: 0; align-self: flex-end; flex-direction: row-reverse; margin-right: 15px;">
+                <ui:VisualElement name="StaticMenu" style="flex-grow: 0; align-self: center; flex-direction: row-reverse; margin-right: 15px; align-items: center;">
                     <ui:Button text="Logout" display-tooltip-when-elided="true" name="LogoutBtn" class="menuBtn" style="-unity-font-style: bold; background-color: rgba(221, 221, 221, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0);" />
                     <ui:Button text="Change Game" display-tooltip-when-elided="true" name="ChangeGameBtn" class="menuBtn" style="background-color: rgba(188, 188, 188, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0); -unity-font-style: bold;" />
                 </ui:VisualElement>
@@ -62,7 +67,19 @@
                     <ui:Label tabindex="-1" text="Select a key to use" display-tooltip-when-elided="true" name="Title" style="font-size: 14px; align-items: auto; justify-content: space-evenly; align-self: center; margin-bottom: 10px; padding-top: 0; margin-top: 0;" />
                     <ui:ScrollView name="APIKeyList" style="background-color: rgb(53, 53, 53); flex-direction: column-reverse;" />
                 </ui:VisualElement>
+            </ui:VisualElement>            <ui:VisualElement name="SettingsFlow" style="flex-grow: 1; flex-direction: column; display: none; padding: 32px; align-items: flex-start;">
+                <ui:Label text="LootLocker Settings" style="font-size: 24px; margin-bottom: 16px;" />
+                <ui:Label text="Game Version" style="margin-bottom: 4px;" />
+                <ui:TextField name="GameVersionField" style="margin-bottom: 12px; min-width: 200px;" />
+                <ui:Label name="GameVersionWarning" text="" style="color: rgb(255,80,80); margin-bottom: 8px; display: none;" />
+                <ui:Label text="Log Level" style="margin-bottom: 4px;" />
+                <ui:EnumField name="LogLevelField" style="margin-bottom: 12px; min-width: 200px;" />
+                <ui:Toggle name="LogErrorsAsWarningsToggle" label="Log Errors As Warnings" style="margin-bottom: 8px;" />
+                <ui:Toggle name="LogInBuildsToggle" label="Log In Builds" style="margin-bottom: 8px;" />
+                <ui:Toggle name="AllowTokenRefreshToggle" label="Allow Token Refresh" style="margin-bottom: 24px;" />
+                <ui:Button text="← Back" name="SettingsBackBtn" style="align-self: flex-start; font-size: 12px; padding: 4px 8px; background-color: rgba(80, 80, 80, 0.3); border-color: rgba(120, 120, 120, 0.5); color: rgb(180, 180, 180);" />
             </ui:VisualElement>
+            <!-- LogViewerFlow and all log viewer UI elements have been removed. -->
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="InfoandCreate" style="flex-grow: 1; align-self: center; align-items: auto; justify-content: flex-start; -unity-text-align: middle-center; flex-direction: column; margin-right: 15px; margin-left: 0; padding-left: 0; min-width: 81px; max-width: 167px; position: absolute; right: 0; top: 109px; bottom: 0;">

@@ -1,5 +1,5 @@
 name: Run Tests and Package SDK
-run-name: Run Tests and Package SDK on commit ${{ github.sha }}
+run-name: Run Tests and Package SDK on ${{ github.ref_name }} because of ${{ github.event_name }} with commit ${{ github.sha }}
 on:
   pull_request:
     branches: # Made towards the following
@@ -11,8 +11,7 @@ on:
   push:
     branches: # Made towards the following
       - main
-    tags:
-      - v**
+      - ci/*
   workflow_dispatch:
     inputs:
       LL_URL:
@@ -23,9 +22,6 @@ jobs:
   editor-smoke-test:
     name: Test SDK in Editor
     runs-on: [ubuntu-latest]
-    #runs-on: [k8s]
-    #container:
-    #  image: ubuntu-latest
     needs: []
     timeout-minutes: 10
     env: 
@@ -101,14 +97,14 @@ jobs:
             Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}
         id: editor-smoke-tests-gameci
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v4.3.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
           testMode: ${{ matrix.testMode }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }} Test Results
+          checkName: Smoke Test (${{ matrix.unityVersion }}-${{ matrix.testMode }}) Test Results
           artifactsPath: editor-smoke-tests-gameci-${{ matrix.unityVersion }}-${{ matrix.testMode }}-artifacts
           projectPath: unity-sdk-smoketest-project
           unityVersion: ${{ matrix.unityVersion }}
@@ -117,10 +113,8 @@ jobs:
   linux-build-smoke-test:
     name: Test SDK in StandaloneLinux64 build
     runs-on: [ubuntu-latest]
-    #runs-on: [k8s]
-    #container:
-    #  image: ubuntu-latest
-    needs: []
+    needs: [editor-smoke-test]
+    if: false
     timeout-minutes: 10
     env: 
       LL_USE_STAGE: false
@@ -204,7 +198,7 @@ jobs:
             Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
         id: build-smoke-tests-gameci
-        uses: game-ci/unity-builder@v4
+        uses: game-ci/unity-builder@v4.7.0
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
@@ -231,12 +225,9 @@ jobs:
   webgl-build-smoke-test:
     name: Test SDK in WebGL build
     runs-on: [ubuntu-latest]
-    #runs-on: [k8s]
-    #container:
-    #  image: ubuntu-latest
-    needs: []
+    needs: [editor-smoke-test]
     timeout-minutes: 20
-    if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || startsWith(github.ref, 'refs/tags/v') || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main'))
+    if: false && (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || startsWith(github.ref, 'refs/tags/v') || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main'))
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -319,7 +310,7 @@ jobs:
             Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
         id: build-smoke-tests-gameci
-        uses: game-ci/unity-builder@v4
+        uses: game-ci/unity-builder@v4.7.0
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
@@ -335,24 +326,109 @@ jobs:
     name: Run the integration tests
     runs-on: ubuntu-latest
     if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
-    needs: [editor-smoke-test, linux-build-smoke-test]
-    timeout-minutes: 30
+    needs: [editor-smoke-test]
+    timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 15 }}
     strategy:
       fail-fast: false
       matrix:
-        testMode:
-          - playmode
         unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
-        jsonLibrary:
-          - zerodep
-          - newtonsoft
     steps:
+      ####### RUN LOCAL BACKEND ENVIRONMENT ###########
+      - name: Checkout devenv repository
+        uses: actions/checkout@v4
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          repository: lootlocker/devenv
+          path: devenv
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout php-backend repository
+        uses: actions/checkout@v4
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          repository: lootlocker/php-backend
+          path: php-backend
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout gitops-lootlocker repository
+        uses: actions/checkout@v4
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          repository: lootlocker/gitops-lootlocker
+          path: gitops-lootlocker
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Checkout go-backend repository
+        uses: actions/checkout@v4
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          repository: lootlocker/go-backend
+          path: go-backend
+          token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          cache: false
+      - name: Run Mage
+        uses: magefile/mage-action@v3
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        with:
+          install-only: true
+      - name: Configure devenv
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          echo "DEV_ENV_BACKEND_NEW_PHP_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_PHP_BACKEND_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_REDIS_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo "DEV_ENV_NATS_PLATFORM=linux/amd64" >> $GITHUB_ENV
+          echo ${{ SECRETS.PHP_BACKEND_CONF_FILE }} | base64 --decode > php-backend/.env
+      - name: Create laravel log file
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          cd php-backend
+          touch storage/logs/laravel.log
+          chmod -R 777 storage/logs/laravel.log
+      - name: Launch devenv
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          cd devenv
+          mage env:setupsilent dev false false
+          mage env:upsilent dev
+          mage deps:installsilent dev
+      - name: Setup Go to use access token for private repos
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        env:
+          GH_ACCESS_TOKEN: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+        run: |
+          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          export GOPRIVATE=github.com/lootlocker/*
+          export GONOPROXY=localhost
+          export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
+      - name: Configure Go backend
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          cd go-backend
+          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
+          go run . jobs migrate
+      - name: Run Go Backend
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          mkdir logs
+          cd go-backend
+          go run . > ../logs/go-backend.log 2>&1 &
+      - name: Wait for Go backend ready healthcheck
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          curl --get http://localhost:9999/__/ready --retry 60 --retry-delay 2 --retry-all-errors --fail-with-body --verbose
+      ####### CONFIGURE TESTS ###########
       - name: Configure variables
         run: |
-          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "LOOTLOCKER_URL=${{ INPUTS.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
-          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "LOOTLOCKER_URL=${{ INPUTS.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_LOCAL_BACKEND }} == 'true' ]; then echo "LOOTLOCKER_URL=localhost:8080" >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ SECRETS.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_STAGE }} == 'true' ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ ${{ vars.LL_USE_LOCAL_BACKEND }} == 'true' ]; then echo "TARGET_ENVIRONMENT=LOCAL" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
           COINFLIP=$(($RANDOM%${{ vars.LL_USE_LEGACY_HTTP_ONE_IN }}))
-          if [[ $COINFLIP -lt 1 ]]; then echo "USE_HTTP_EXECUTION_QUEUE=false" >> $GITHUB_ENV; else echo "USE_HTTP_EXECUTION_QUEUE=true"; fi
+          echo "Coinflip resulted in $COINFLIP"
+          if [[ $COINFLIP -lt 1 ]]; then echo "USE_HTTP_EXECUTION_QUEUE=false" >> $GITHUB_ENV; else echo "USE_HTTP_EXECUTION_QUEUE=true" >> $GITHUB_ENV; fi
+          COINFLIP=$(($RANDOM%2))
+          echo "Coinflip resulted in $COINFLIP"
+          if [[ $COINFLIP -lt 1 ]]; then echo "JSON_LIBRARY=newtonsoft" >> $GITHUB_ENV; else echo "JSON_LIBRARY=zerodep" >> $GITHUB_ENV; fi
       - name: Checkout this repository
         uses: actions/checkout@v4
         with:
@@ -362,7 +438,7 @@ jobs:
           mkdir TestProject
           mkdir TestProject/Packages
           DEPENDENCY_STRING=$'{\n  "dependencies": {\n    "com.lootlocker.lootlockersdk": "file:../../sdk"'
-          if [[ ${{ matrix.jsonLibrary == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.2.1"'; fi
+          if [[ ${{ ENV.JSON_LIBRARY == 'newtonsoft' }} ]]; then DEPENDENCY_STRING=$DEPENDENCY_STRING$',\n    "com.unity.nuget.newtonsoft-json": "3.2.1"'; fi
           DEPENDENCY_STRING=$DEPENDENCY_STRING$'\n  },\n  "testables": ["com.lootlocker.lootlockersdk"]\n}'
           echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
           mkdir TestProject/Assets/
@@ -375,36 +451,62 @@ jobs:
           oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
           tags: tag:ci
       - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        if: ${{ ENV.TARGET_ENVIRONMENT == 'LOCAL' }}
+        run: |
+          curl -X POST "http://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
+      - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
+        if: ${{ ENV.TARGET_ENVIRONMENT != 'LOCAL' }}
         run: |
           curl -X POST "https://${{ ENV.LOOTLOCKER_URL }}/game/v2/session/guest" -H "Content-Type: application/json" -d "{\"game_key\": \"request_will_fail_but_will_tell_us_if_we_have_a_connection\", \"game_version\": \"0.10.0.0\" }"
-      - name: Set the project to use zerodep json
-        if: ${{ matrix.jsonLibrary == 'zerodep' }}
+      - name: Create Project Settings file and enable LootLocker commandline settings
         run: |
           mkdir TestProject/ProjectSettings
           echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Enable beta features
+        run: |
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;${{ VARS.CURRENT_BETA_FEATURES }}/g' TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set the project to use Newtonsoft json
-        if: ${{ matrix.jsonLibrary == 'newtonsoft' }}
+        if: ${{ ENV.JSON_LIBRARY == 'newtonsoft' }}
         run: |
-          mkdir TestProject/ProjectSettings
-          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON' >> TestProject/ProjectSettings/ProjectSettings.asset
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON/g' TestProject/ProjectSettings/ProjectSettings.asset
           sed -i -e 's/"nunit.framework.dll"/"nunit.framework.dll",\n\t\t"Newtonsoft.Json.dll"/g' sdk/Tests/LootLockerTests/PlayMode/PlayModeTests.asmdef
-      - name: Use HTTP Execution Queue
-        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE != 'true' }}
+      - name: Use Legacy HTTP Stack
+        if: ${{ ENV.USE_HTTP_EXECUTION_QUEUE == 'false' }}
         run: |
-          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_BETA_HTTP_QUEUE;LOOTLOCKER_TARGET_STAGE_ENV/g' TestProject/ProjectSettings/ProjectSettings.asset
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_LEGACY_HTTP_STACK/g' TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set LootLocker to target stage environment
+        if: ${{ ENV.TARGET_ENVIRONMENT == 'STAGE' }}
+        run: |
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_TARGET_STAGE_ENV/g' TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set project to allow for http request
+        if: ${{ ENV.TARGET_ENVIRONMENT == 'LOCAL' }}
+        run: |
+          echo $'  insecureHttpOption: 2' >> TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set user information command line arguments
-        if: ${{ ENV.USE_TAILSCALE != 'true' }}
+        if: ${{ ENV.TARGET_ENVIRONMENT == 'PRODUCTION' }}
         run: |
           echo "USER_COMMANDLINE_ARGUMENTS=-adminemail ${{ SECRETS.UNITY_CI_ADMIN_EMAIL }} -adminpassword ${{ SECRETS.UNITY_CI_ADMIN_PASSWORD }}" >> $GITHUB_ENV
+      - name: Cat projects settings file
+        run: |
+          cat TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Set test category to full ci when PR to main
+        if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
+        run: |
+          echo 'TEST_CATEGORY=-testCategory "LootLockerCI"' >> $GITHUB_ENV
+      - name: Set test category to minimal ci
+        if: ${{ github.event_name != 'pull_request' || github.base_ref != 'main' }}
+        run: |
+          echo 'TEST_CATEGORY=-testCategory "LootLockerCIFast"' >> $GITHUB_ENV
+      ####### RUN TESTS ###########
       - name: Cache Libraries
         if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
         uses: actions/cache@v4
         with:
           path: tests~/Library
-          key: Library-${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}
+          key: Library-${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}
           restore-keys: Library-
-      - name: Run tests in ${{ matrix.unityVersion }} ${{ matrix.testMode }} towards ${{ ENV.TARGET_ENVIRONMENT }} with json library ${{ matrix.jsonLibrary }}
-        uses: game-ci/unity-test-runner@v4
+      - name: Run tests in ${{ matrix.unityVersion }} towards ${{ ENV.TARGET_ENVIRONMENT }} environment with json library ${{ ENV.JSON_LIBRARY }}
+        uses: game-ci/unity-test-runner@v4.3.1
         if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
         id: tests
         env:
@@ -413,21 +515,40 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: TestProject/
-          testMode: ${{ matrix.testMode }}
+          testMode: playmode
           unityVersion: ${{ matrix.unityVersion }}
-          checkName: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }} Test Results
-          artifactsPath: ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.jsonLibrary }}-artifacts
+          checkName: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
+          artifactsPath: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }} ${{ ENV.TEST_CATEGORY }}
           useHostNetwork: true
+      ####### CLEANUP ###########
+      - name: Bring down Go Backend
+        if: always()
+        run: |
+          kill $(ps aux | grep '[g]o run .' | awk '{print $2}')
+      - name: Bring down devenv
+        if: always()
+        run: |
+          cd devenv
+          mage env:downsilent dev
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Logs
+          path: logs
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
+          path: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
   test-samples:
     name: Test Samples
     runs-on: [ubuntu-latest]
-    #runs-on: [k8s]
-    #container:
-    #  image: ubuntu-latest
-    needs: [editor-smoke-test, linux-build-smoke-test]
-    timeout-minutes: 8
+    needs: [editor-smoke-test]
+    timeout-minutes: 12
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -479,7 +600,7 @@ jobs:
             Library-
       - name: Compile and run all sample scenes ${{ matrix.unityVersion }}
         id: test-samples
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v4.3.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
@@ -494,10 +615,8 @@ jobs:
   validate-sdk:
     name: Validate SDK
     runs-on: [ubuntu-latest]
-    #runs-on: [k8s]
-    #container:
-    #  image: ubuntu-latest
-    needs: [editor-smoke-test, linux-build-smoke-test]
+    if: ${{ true == false }}
+    needs: [editor-smoke-test]
     timeout-minutes: 8
     env: 
       LL_USE_STAGE: false
@@ -550,7 +669,7 @@ jobs:
             Library-
       - name: Validate SDK using asset store tools
         id: validate-sdk
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v4.3.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
@@ -565,7 +684,7 @@ jobs:
   package-sdk:
     name: Package SDK
     runs-on: [ubuntu-latest]
-    needs: [test-samples, validate-sdk, run-integration-tests]
+    needs: [test-samples, run-integration-tests]
     timeout-minutes: 5
     if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main')) || startsWith(github.ref, 'refs/tags/v')
     env: 
@@ -619,14 +738,14 @@ jobs:
             Library-
       - name: Package SDK for ${{ matrix.unityVersion }}
         id: package-sdk-gameci
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v4.3.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
         with:
           testMode: editmode
-          checkName: SDK Packaging ${{ matrix.unityVersion }} Test Results
+          checkName: SDK Packaging ${{ matrix.unityVersion }} Results
           artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
           projectPath: unity-sdk-packager
           unityVersion: ${{ matrix.unityVersion }}

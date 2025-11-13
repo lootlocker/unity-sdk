@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using LootLocker.Requests;
 using System.Linq;
+using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -14,6 +14,30 @@ namespace LootLocker.LootLockerEnums
         popular,
         nonpopular,
         none
+    }
+
+    public enum OrderAssetListBy
+    {
+        // Unordered
+        none,
+        // Order by asset ID
+        id,
+        // Order by asset name
+        name,
+        // Order by when the asset was created
+        created_at,
+        // Order by when the asset was last updated
+        updated_at,
+    }
+
+    public enum OrderAssetListDirection
+    {
+        // Unordered
+        none,
+        // Ascending order
+        asc,
+        // Descending order
+        desc
     }
 }
 
@@ -68,6 +92,80 @@ namespace LootLocker.Requests
         }
     }
 
+    /// <summary>
+    /// Request object for listing assets with settings for what to include, exclude, and filter.
+    /// </summary>
+    public class LootLockerListAssetsRequest
+    {
+        /// <summary>Fields to include in the response.</summary>
+        public LootLockerAssetIncludes includes { get; set; } = new LootLockerAssetIncludes();
+        /// <summary>Fields to exclude from the response.</summary>
+        public LootLockerAssetExcludes excludes { get; set; } = new LootLockerAssetExcludes();
+        /// <summary>Filters to apply to the asset listing.</summary>
+        public LootLockerAssetFilters filters { get; set; } = new LootLockerAssetFilters();
+    }
+
+    /// <summary>
+    /// Fields to include in the asset response.
+    /// </summary>
+    public class LootLockerAssetIncludes
+    {
+        ///<summary>If set to true, response will include storage key-value pairs.</summary>
+        public bool storage { get; set; } = false;
+        ///<summary>If set to true, response will include files.</summary>
+        public bool files { get; set; } = false;
+        ///<summary>If set to true, response will include asset data entities.</summary>
+        public bool data_entities { get; set; } = false;
+        ///<summary>If set to true, response will include asset metadata.</summary>
+        public bool metadata { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Fields to exclude from the asset response.
+    /// </summary>
+    public class LootLockerAssetExcludes
+    {
+        ///<summary>If set to true, UGC assets authors will not be returned.</summary>
+        public bool authors { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Filters to apply to the asset listing based on key-value pairs.
+    /// </summary>
+    public class LootLockerSimpleAssetFilter
+    {
+        // The key for which to look for the filtered values
+        public string key { get; set; }
+        // A list of values to filter by. If the asset has any of these values for the given key, it will be included in the results.
+        public string[] values { get; set; }
+    }
+
+    /// <summary>
+    /// Filters to apply to the asset listing.
+    /// </summary>
+    public class LootLockerAssetFilters
+    {
+        ///<summary>If set to true, response will include only UGC assets.</summary>
+        public bool ugc_only { get; set; } = false;
+        ///<summary>If provided, only the requested ids will be returned. No pagination will be attempted or respected, maximum 100 assets.</summary>
+        public List<int> asset_ids { get; set; } = new List<int>();
+        /// <summary>Filters to apply to the asset listing.</summary>
+        public List<LootLockerSimpleAssetFilter> asset_filters { get; set; } = new List<LootLockerSimpleAssetFilter>();
+    }
+
+    /// <summary>
+    /// Response object for listing assets from the simple asset endpoint.
+    /// </summary>
+    [Serializable]
+    public class LootLockerListAssetsResponse : LootLockerResponse
+    {
+        /// <summary>List of assets returned by the endpoint.</summary>
+        public LootLockerSimpleAsset[] assets { get; set; }
+
+        /// <summary>Pagination data for this request</summary>
+        public LootLockerExtendedPagination pagination { get; set; }
+    }
+
     public class LootLockerGrantAssetRequest
     {
         public int asset_id { get; set; }
@@ -109,7 +207,7 @@ namespace LootLocker.Requests
     }
 
     [Serializable]
-    public class LootLockerCommonAsset : LootLockerResponse
+    public class LootLockerCommonAsset
     {
         public int id { get; set; }
         public string uuid { get; set; }
@@ -143,6 +241,84 @@ namespace LootLocker.Requests
         public LootLockerFile[] files { get; set; }
         public LootLockerAssetCandidate asset_candidate { get; set; }
         public string[] data_entities { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerCommonAssetResponse : LootLockerResponse
+    {
+        public int id { get; set; }
+        public string uuid { get; set; }
+        public string ulid { get; set; }
+        public string name { get; set; }
+        public bool active { get; set; }
+        public bool purchasable { get; set; }
+        public string type { get; set; }
+        public int price { get; set; }
+        public int? sales_price { get; set; }
+        public string display_price { get; set; }
+        public string context { get; set; }
+        public string unlocks_context { get; set; }
+        public bool detachable { get; set; }
+        public string updated { get; set; }
+        public string marked_new { get; set; }
+        public int default_variation_id { get; set; }
+        public string description { get; set; }
+        public LootLockerLinks links { get; set; }
+        public LootLockerStorage[] storage { get; set; }
+        public LootLockerRarity rarity { get; set; }
+        public bool popular { get; set; }
+        public int popularity_score { get; set; }
+        public bool unique_instance { get; set; }
+        public LootLockerRental_Options[] rental_options { get; set; }
+        public LootLockerFilter[] filters { get; set; }
+        public LootLockerVariation[] variations { get; set; }
+        public bool featured { get; set; }
+        public bool context_locked { get; set; }
+        public bool initially_purchasable { get; set; }
+        public LootLockerFile[] files { get; set; }
+        public LootLockerAssetCandidate asset_candidate { get; set; }
+        public string[] data_entities { get; set; }
+    }
+
+    /// <summary>
+    /// A simplified asset object to improve performance
+    /// </summary>
+    [Serializable]
+    public class LootLockerSimpleAsset
+    {
+        public int asset_id { get; set; }
+        public string asset_uuid { get; set; }
+        public string asset_ulid { get; set; }
+        public string asset_name { get; set; }
+        public int context_id { get; set; }
+        public string context_name { get; set; }
+        public LootLockerSimpleAssetAuthor author { get; set; }
+        public LootLockerStorage[] storage { get; set; }
+        public LootLockerSimpleAssetFile[] files { get; set; }
+        public LootLockerSimpleAssetDataEntity[] data_entities { get; set; }
+        public LootLockerMetadataEntry[] metadata { get; set; }
+    }
+
+    public class LootLockerSimpleAssetAuthor
+    {
+        public int player_id { get; set; }
+        public string player_ulid { get; set; }
+        public string public_uid { get; set; }
+        public string active_name { get; set; }
+    }
+
+    public class LootLockerSimpleAssetFile
+    {
+        public int size { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+        public string[] tags { get; set; }
+    }
+
+    public class LootLockerSimpleAssetDataEntity
+    {
+        public string name { get; set; }
+        public string data { get; set; }
     }
 
     public class LootLockerAssetCandidate
@@ -215,18 +391,18 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void GetContext(Action<LootLockerContextResponse> onComplete)
+        public static void GetContext(string forPlayerWithUlid, Action<LootLockerContextResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingContexts;
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAssetsOriginal(Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
+        public static void GetAssetsOriginal(string forPlayerWithUlid, Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
             int UGCCreatorPlayerID = 0)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
-            string getVariable = string.Format(endPoint.endPoint, assetCount);
+            string getVariable = endPoint.WithPathParameter(assetCount);
             string tempEndpoint = string.Empty;
             string filterString = string.Empty;
             if (idOfLastAsset != null)
@@ -275,7 +451,7 @@ namespace LootLocker
                 getVariable += tempEndpoint;
             }
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         public static string GetStringOfEnum(LootLocker.LootLockerEnums.AssetFilter filter)
@@ -306,7 +482,7 @@ namespace LootLocker
             return filterString;
         }
 
-        public static void GetAssetsById(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void GetAssetsById(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
 
@@ -317,12 +493,12 @@ namespace LootLocker
                     builtAssets += "," + data.getRequests[i];
 
 
-            string getVariable = string.Format(endPoint.endPoint, builtAssets);
+            string getVariable = endPoint.WithPathParameter(builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GetAssetById(LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
+        public static void GetAssetById(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerSingleAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.getAssetsById;
 
@@ -332,9 +508,9 @@ namespace LootLocker
                 for (int i = 1; i < data.getRequests.Count; i++)
                     builtAssets += "," + data.getRequests[i];
 
-            string getVariable = string.Format(endPoint.endPoint, builtAssets);
+            string getVariable = endPoint.WithPathParameter(builtAssets);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete : (Action<LootLockerResponse>)((serverResponse) => {
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (Action<LootLockerResponse>)((serverResponse) => {
 
                 LootLockerAssetResponse assetListResponse = LootLockerResponse.Deserialize<LootLockerAssetResponse>(serverResponse);
                 LootLockerSingleAssetResponse singleAssetResponse = new LootLockerSingleAssetResponse();
@@ -350,54 +526,49 @@ namespace LootLocker
             }));
         }
 
-        public void ResetAssetCalls()
-        {
-            LootLockerAssetRequest.lastId = 0;
-        }
-
-        public static void GetAssetInformation(LootLockerGetRequest data, Action<LootLockerCommonAsset> onComplete)
+        public static void GetAssetInformation(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerCommonAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetInformationForOneorMoreAssets;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void ListFavouriteAssets(Action<LootLockerFavouritesListResponse> onComplete)
+        public static void ListFavouriteAssets(string forPlayerWithUlid, Action<LootLockerFavouritesListResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.listingFavouriteAssets;
 
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void AddFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void AddFavouriteAsset(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.addingFavouriteAssets;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void RemoveFavouriteAsset(LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
+        public static void RemoveFavouriteAsset(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.removingFavouriteAssets;
 
-            string getVariable = string.Format(endPoint.endPoint, data.getRequests[0]);
+            string getVariable = endPoint.WithPathParameter(data.getRequests[0]);
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
-        public static void GrantAssetToPlayerInventory(LootLockerGrantAssetRequest data, Action<LootLockerGrantAssetResponse> onComplete)
+        public static void GrantAssetToPlayerInventory(string forPlayerWithUlid, LootLockerGrantAssetRequest data, Action<LootLockerGrantAssetResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.grantAssetToPlayerInventory;
 
             string json = LootLockerJson.SerializeObject(data);
 
-            LootLockerServerRequest.CallAPI(endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
     }

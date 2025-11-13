@@ -1,0 +1,328 @@
+
+using System;
+using System.Collections.Generic;
+using LootLocker;
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json.Linq;
+#endif
+
+namespace LootLockerTestConfigurationUtils
+{
+    public class LootLockerTestMetadata
+    {
+
+        public static void PerformMetadataOperations(LootLockerTestMetadataSources Source, string SourceID, List<LootLockerTestMetadataOperation> OperationsToPerform, Action<LootLockerTestMetadataOperationsResponse> onComplete)
+        {
+            List<LootLockerTestInternalMetadataOperationWithStringEnums> entries = new List<LootLockerTestInternalMetadataOperationWithStringEnums>();
+            foreach (var op in OperationsToPerform)
+            {
+                entries.Add(new LootLockerTestInternalMetadataOperationWithStringEnums(op));
+            }
+
+            LootLockerTestInternalMetadataOperationRequest request = new LootLockerTestInternalMetadataOperationRequest
+            {
+                source = Source.ToString().ToLower(),
+                source_id = SourceID,
+                entries = entries.ToArray()
+            };
+
+            string json = LootLockerJson.SerializeObject(request);
+
+            LootLockerAdminRequest.Send(LootLockerTestConfigurationEndpoints.metadataOperations.endPoint, LootLockerEndPoints.metadataOperations.httpMethod, json, (serverResponse) =>
+            {
+                LootLockerResponse.Deserialize<LootLockerTestMetadataOperationsResponse>(onComplete, serverResponse);
+            }, true);
+        }
+
+        /// <summary>
+        /// Possible metadata sources
+        /// </summary>
+        public enum LootLockerTestMetadataSources
+        {
+            reward = 0,
+            leaderboard = 1,
+            catalog_item = 2,
+            progression = 3,
+            currency = 4,
+            player = 5,
+            self = 6,
+            asset = 7,
+        };
+
+        /// <summary>
+        /// Possible metadata types
+        /// </summary>
+        public enum LootLockerTestMetadataTypes
+        {
+            String = 0,
+            Number = 1,
+            Bool = 2,
+            Json = 3,
+            Base64 = 4,
+        };
+
+        /// <summary>
+        /// Possible metadata actions
+        /// </summary>
+        public enum LootLockerTestMetadataActions
+        {
+            create = 0,
+            update = 1,
+            delete = 2,
+            create_or_update = 3, // Alias for upsert (same thing)
+            upsert = 4,
+        };
+        
+        /// <summary>
+        ///</summary>
+        public class LootLockerTestMetadataBase64Value
+        {
+            /// <summary>
+            /// The type of content that the base64 string encodes. Could be for example "image/jpeg" if it is a base64 encoded jpeg, or "application/x-redacted" if loading of files has been disabled
+            ///</summary>
+            public string content_type { get; set; }
+            /// <summary>
+            /// The encoded content in the form of a Base64 String. If this is unexpectedly empty, check if Content_type is set to "application/x-redacted". If it is, then the request for metadata was made with the ignoreFiles parameter set to true
+            ///</summary>
+            public string content { get; set; }
+
+        }
+
+        /// <summary>
+        ///</summary>
+        public class LootLockerTestMetadataEntry
+        {
+            /// <summary>
+            /// The value of the metadata in base object format (unparsed). To use this as the type specified by the Type field, parse it using the corresponding TryGetValueAs<Type> method in C++ or using the LootLockerTestMetadataValueParser node in Blueprints.
+            ///</summary>
+            public object value { get; set; }
+            /// <summary>
+            /// The metadata key
+            ///</summary>
+            public string key { get; set; }
+            /// <summary>
+            /// The type of value this metadata contains. Use this to know how to parse the value.
+            ///</summary>
+            public LootLockerTestMetadataTypes type { get; set; }
+            /// <summary>
+            /// List of tags applied to this metadata entry
+            ///</summary>
+            public string[] tags { get; set; }
+            /// <summary>
+            /// The access level set for this metadata entry. Valid values are game_api.read, game_api.write and player.read (only applicable for player metadata and means that the metadata entry is readable for players except the owner), though no values are required.
+            /// Note that different sources can allow or disallow a subset of these values.
+            /// </summary>
+            public string[] access { get; set; }
+            /// <summary>
+            /// Get the value as a String. Returns true if value could be parsed in which case output contains the value in string format, returns false if parsing failed.
+            ///</summary>
+            public bool TryGetValueAsString(out string output)
+            {
+                output = value.ToString();
+                return true;
+            }
+            /// <summary>
+            /// Get the value as a double. Returns true if value could be parsed in which case output contains the value in double format, returns false if parsing failed which can happen if the value is not numeric, the conversion under or overflows, or the string value precision is larger than can be dealt within a double.
+            ///</summary>
+            public bool TryGetValueAsDouble(out double output)
+            {
+                try
+                {
+                    string doubleAsString = value.ToString();
+                    return double.TryParse(doubleAsString, out output);
+                }
+                catch (InvalidCastException)
+                {
+                    output = 0.0;
+                    return false;
+                }
+            }
+            /// <summary>
+            /// Get the value as an integer. Returns true if value could be parsed in which case output contains the value in integer format, returns false if parsing failed which can happen if the value is not numeric or the conversion under or overflows
+            ///</summary>
+            public bool TryGetValueAsInteger(out int output)
+            {
+                try
+                {
+                    string intAsString = value.ToString();
+                    return int.TryParse(intAsString, out output);
+                }
+                catch (InvalidCastException)
+                {
+                    output = 0;
+                    return false;
+                }
+            }
+            /// <summary>
+            /// Get the value as a boolean. Returns true if value could be parsed in which case output contains the value in boolean format, returns false if parsing failed which can happen if the string is not a convertible to a boolean.
+            ///</summary>
+            public bool TryGetValueAsBool(out bool output)
+            {
+                try
+                {
+                    string boolAsString = value.ToString();
+                    return bool.TryParse(boolAsString, out output);
+                }
+                catch (InvalidCastException)
+                {
+                    output = false;
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Get the value as the specified type. Returns true if value could be parsed in which case output contains the parsed object, returns false if parsing failed which can happen if the value is not a valid json object string convertible to the specified object.
+            ///</summary>
+            public bool TryGetValueAsType<T>(out T output)
+            {
+                return LootLockerJson.TryDeserializeObject<T>(LootLockerJson.SerializeObject(value), out output);
+            }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            /// <summary>
+            /// Get the value as a Json Object. Returns true if value could be parsed in which case output contains the value in Json Object format, returns false if parsing failed which can happen if the value is not a valid json object string.
+            ///</summary>
+            public bool TryGetValueAsJson(out JObject output)
+            {
+                return TryGetValueAsType(out output);
+            }
+
+            /// <summary>
+            /// Get the value as a Json Array. Returns true if value could be parsed in which case output contains the value in Json Array format, returns false if parsing failed which can happen if the value is not a valid json array string.
+            ///</summary>
+            public bool TryGetValueAsJsonArray(out JArray output)
+            {
+                output = JArray.Parse(value.ToString());
+                return output != null;
+            }
+#else
+
+            /// <summary>
+            /// Get the value as a Json Object (a dictionary of string keys to object values). Returns true if value could be parsed in which case output contains the value in Json Object format, returns false if parsing failed which can happen if the value is not a valid json object string.
+            ///</summary>
+            public bool TryGetValueAsJson(out Dictionary<string, object> output)
+            {
+                return TryGetValueAsType(out output) && output != null;
+            }
+
+            /// <summary>
+            /// Get the value as a Json Array. Returns true if value could be parsed in which case output contains the value in Json Array format, returns false if parsing failed which can happen if the value is not a valid json array string.
+            ///</summary>
+            public bool TryGetValueAsJsonArray(out object[] output)
+            {
+                if (value.GetType() == typeof(object[]))
+                {
+                    output = (object[])value;
+                    return true;
+                }
+                return LootLockerJson.TryDeserializeObject<object[]>(value.ToString(), out output);
+            }
+#endif
+            /// <summary>
+            /// Get the value as a LootLockerTestMetadataBase64Value object. Returns true if value could be parsed in which case output contains the FLootLockerTestMetadataBase64Value, returns false if parsing failed.
+            ///</summary>
+            public bool TryGetValueAsBase64(out LootLockerTestMetadataBase64Value output)
+            {
+                return TryGetValueAsType(out output);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerTestMetadataOperation : LootLockerTestMetadataEntry
+        {
+            /// <summary>
+            /// The type of action to perform for this metadata operation
+            /// </summary>
+            public LootLockerTestMetadataActions action { get; set; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerTestInternalMetadataOperationWithStringEnums : LootLockerTestMetadataOperation
+        {
+            public LootLockerTestInternalMetadataOperationWithStringEnums(LootLockerTestMetadataOperation other)
+            {
+                this.key = other.key;
+                this.type = other.type.ToString().ToLower();
+                this.value = other.value;
+                this.tags = other.tags;
+                this.access = other.access;
+                this.action = other.action == LootLockerTestMetadataActions.create_or_update ? "upsert" : other.action.ToString().ToLower();
+            }
+
+            public new string type { get; set; }
+            public new string action { get; set; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerTestInternalMetadataOperationRequest
+        {
+            /// <summary>
+            /// The type of source that the source id refers to
+            /// </summary>
+            public string source { get; set; }
+            /// <summary>
+            /// The id of the specific source that the set operation was taken on, note that if source is set to self then this should also be set to "self"
+            /// </summary>
+            public string source_id { get; set; }
+            /// <summary>
+            /// List of operations to perform for the given source
+            /// </summary>
+            public LootLockerTestInternalMetadataOperationWithStringEnums[] entries { get; set; }
+        }
+
+        public class LootLockerTestMetadataOperationErrorKeyTypePair
+        {
+            /// <summary>
+            /// The metadata key that the operation error refers to
+            /// </summary>
+            public string key { get; set; }
+            /// <summary>
+            /// The type of value that the set operation was for
+            /// </summary>
+            public LootLockerTestMetadataTypes type { get; set; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerTestMetadataOperationError
+        {
+            /// <summary>
+            /// The type of action that this metadata operation was
+            /// </summary>
+            public LootLockerTestMetadataActions action { get; set; }
+            /// <summary>
+            /// The error message describing why this metadata set operation failed
+            /// </summary>
+            public string error { get; set; }
+            /// <summary>
+            /// The key and type of value that the operation was for
+            /// </summary>
+            public LootLockerTestMetadataOperationErrorKeyTypePair entry { get; set; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public class LootLockerTestMetadataOperationsResponse : LootLockerResponse
+        {
+            /// <summary>
+            /// The type of source that the source id refers to
+            /// </summary>
+            public LootLockerTestMetadataSources source { get; set; }
+            /// <summary>
+            /// The id of the specific source that the set operation was taken on, note that if source is set to self then this will also be set to "self"
+            /// </summary>
+            public string source_id { get; set; }
+            /// <summary>
+            /// A list of errors (if any) that occurred when executing the provided metadata actions
+            /// </summary>
+            public LootLockerTestMetadataOperationError[] errors { get; set; }
+        }
+
+    }
+
+
+}

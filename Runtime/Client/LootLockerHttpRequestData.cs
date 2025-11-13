@@ -70,6 +70,14 @@ namespace LootLocker.HTTP
         /// A generated id for this request, it is a combination of hashes for the endpoint, headers and content
         /// </summary>
         public string RequestId { get; set; }
+        /// <summary>
+        /// The ulid of the player that this request is executed on behalf of
+        /// </summary>
+        public string ForPlayerWithUlid { get; set; }
+        /// <summary>
+        /// When this request was started
+        /// </summary>
+        public DateTime RequestStartTime { get; set; }
 
 
         /// <summary>
@@ -79,7 +87,14 @@ namespace LootLocker.HTTP
         {
             foreach(var listener in Listeners)
             {
-                listener?.Invoke(response);
+                try
+                {
+                    listener?.Invoke(response);
+                }
+                catch (Exception e)
+                {
+                    LootLockerLogger.Log($"Exception thrown in HTTP request listener for request id {RequestId}. Exception was: {e}.", LootLockerLogger.LogLevel.Error);
+                }
             }
             HaveListenersBeenInvoked = true;
         }
@@ -104,7 +119,7 @@ namespace LootLocker.HTTP
         }
 
         #region Factory Methods
-        public static LootLockerHTTPRequestData MakeFileRequest(string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName, string fileContentType, Dictionary<string, string> body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
+        public static LootLockerHTTPRequestData MakeFileRequest(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, byte[] file, string fileName, string fileContentType, Dictionary<string, string> body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
             LootLockerHTTPRequestContent content = null;
             if (LootLockerHTTPMethod.PUT == httpMethod)
@@ -116,6 +131,7 @@ namespace LootLocker.HTTP
                 content = new LootLockerFileRequestContent(file, fileName, body);
             }
             return _MakeRequestDataWithContent(
+                    forPlayerWithUlid,
                     content,
                     endPoint,
                     httpMethod,
@@ -126,19 +142,23 @@ namespace LootLocker.HTTP
                     queryParams);
         }
 
-        public static LootLockerHTTPRequestData MakeJsonRequest(string endPoint, LootLockerHTTPMethod httpMethod, string body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
+        public static LootLockerHTTPRequestData MakeJsonRequest(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, string body, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
-            return _MakeRequestDataWithContent(new LootLockerJsonBodyRequestContent(string.IsNullOrEmpty(body) ? "{}" : body), endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, queryParams);
+            return _MakeRequestDataWithContent(forPlayerWithUlid, new LootLockerJsonBodyRequestContent(string.IsNullOrEmpty(body) ? "{}" : body), endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, queryParams);
         }
 
-        public static LootLockerHTTPRequestData MakeNoContentRequest(string endPoint, LootLockerHTTPMethod httpMethod, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
+        public static LootLockerHTTPRequestData MakeNoContentRequest(string forPlayerWithUlid, string endPoint, LootLockerHTTPMethod httpMethod, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
-            return _MakeRequestDataWithContent(new LootLockerHTTPRequestContent(), endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, queryParams);
+            return _MakeRequestDataWithContent(forPlayerWithUlid, new LootLockerHTTPRequestContent(), endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, queryParams);
         }
 
-        private static LootLockerHTTPRequestData _MakeRequestDataWithContent(LootLockerHTTPRequestContent content, string endPoint, LootLockerHTTPMethod httpMethod, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
+        private static LootLockerHTTPRequestData _MakeRequestDataWithContent(string forPlayerWithUlid, LootLockerHTTPRequestContent content, string endPoint, LootLockerHTTPMethod httpMethod, Action<LootLockerResponse> onComplete, bool useAuthToken, LootLockerCallerRole callerRole, Dictionary<string, string> additionalHeaders, Dictionary<string, string> queryParams)
         {
-            Dictionary<string, string> headers = InitializeHeadersWithSessionToken(callerRole, useAuthToken);
+            if (string.IsNullOrEmpty(forPlayerWithUlid) && useAuthToken)
+            {
+                forPlayerWithUlid = LootLockerStateData.GetDefaultPlayerULID();
+            }
+            Dictionary<string, string> headers = InitializeHeadersWithSessionToken(callerRole, useAuthToken, forPlayerWithUlid);
 
             if (LootLockerConfig.current != null)
                 headers.Add(LootLockerConfig.current.dateVersion.key, LootLockerConfig.current.dateVersion.value);
@@ -155,7 +175,7 @@ namespace LootLocker.HTTP
                 headers = null; // Force extra headers to null if empty dictionary was supplied
             }
             string headersString = "";
-            foreach(var header in headers)
+            foreach(var header in headers ?? new Dictionary<string, string>())
             {
                 headersString += $"|{header.Key}:{header.Value}";
             }
@@ -175,15 +195,18 @@ namespace LootLocker.HTTP
                 Listeners = new List<Action<LootLockerResponse>> { onComplete },
                 HaveListenersBeenInvoked = false,
                 FormattedURL = formattedUrl,
-                RequestId = requestId
+                RequestId = requestId,
+                ForPlayerWithUlid = forPlayerWithUlid,
+                RequestStartTime = DateTime.Now
             };
         }
         #endregion
 
         #region Helper Methods
-        private static Dictionary<string, string> InitializeHeadersWithSessionToken(LootLockerCallerRole callerRole, bool useAuthToken)
+        private static Dictionary<string, string> InitializeHeadersWithSessionToken(LootLockerCallerRole callerRole, bool useAuthToken, string forPlayerWithUlid)
         {
             var headers = new Dictionary<string, string>();
+
             if (useAuthToken)
             {
                 if (callerRole == LootLockerCallerRole.Admin)
@@ -195,9 +218,13 @@ namespace LootLocker.HTTP
                     }
 #endif
                 }
-                else if (!string.IsNullOrEmpty(LootLockerConfig.current.token))
+                else
                 {
-                    headers.Add("x-session-token", LootLockerConfig.current.token);
+                    var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+                    if (playerData != null && !string.IsNullOrEmpty(playerData.SessionToken))
+                    {
+                        headers.Add("x-session-token", playerData.SessionToken);
+                    }
                 }
             }
             return headers;
@@ -226,24 +253,7 @@ namespace LootLocker.HTTP
                     break;
             }
 
-            return (urlBase + trimmedEndpoint + GetQueryParameterStringFromDictionary(queryParams)).Trim();
-        }
-
-        public static string GetQueryParameterStringFromDictionary(Dictionary<string, string> queryDict)
-        {
-            if (queryDict == null || queryDict.Count == 0) return string.Empty;
-
-            string query = "?";
-
-            foreach (KeyValuePair<string, string> pair in queryDict)
-            {
-                if (query.Length > 1)
-                    query += "&";
-
-                query += pair.Key + "=" + pair.Value;
-            }
-
-            return query;
+            return (urlBase + trimmedEndpoint + new LootLocker.Utilities.HTTP.QueryParamaterBuilder(queryParams).ToString()).Trim();
         }
         #endregion
     }

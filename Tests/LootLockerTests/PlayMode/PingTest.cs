@@ -1,10 +1,12 @@
 using System.Collections;
 using LootLocker;
 using LootLocker.Requests;
-using UnityEngine.TestTools;
 using LootLockerTestConfigurationUtils;
-using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
+using System.ComponentModel;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace LootLockerTests.PlayMode
 {
@@ -13,7 +15,6 @@ namespace LootLockerTests.PlayMode
         private LootLockerTestGame gameUnderTest = null;
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
-        private static readonly string TestClassName = "PingTest";
         private bool SetupFailed = false;
 
         [UnitySetUp]
@@ -21,6 +22,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
             if (!LootLockerConfig.ClearSettings())
             {
                 Debug.LogError("Could not clear LootLocker config");
@@ -28,7 +30,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: TestClassName + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -63,11 +65,14 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             gameUnderTest?.InitializeLootLockerSDK();
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -84,11 +89,14 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, NUnit.Framework.Category("LootLocker"), NUnit.Framework.Category("LootLockerCI"), NUnit.Framework.Category("LootLockerCIFast")]
         public IEnumerator Ping_WithSession_Succeeds()
         {
             // Setup Succeeded
@@ -117,7 +125,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotNull(pingResponse.date, "Ping response contained no date");
         }
 
-        [UnityTest]
+        [UnityTest, NUnit.Framework.Category("LootLocker"), NUnit.Framework.Category("LootLockerCI")]
         public IEnumerator Ping_WithoutSession_Fails()
         {
             // Setup Succeeded

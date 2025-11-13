@@ -24,6 +24,7 @@ namespace LootLockerTests.PlayMode
         {
             TestCounter++;
             configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
             {
@@ -32,7 +33,7 @@ namespace LootLockerTests.PlayMode
 
             // Create game
             bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: "GuestSessionTest" + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
             {
                 if (!success)
                 {
@@ -124,11 +125,14 @@ namespace LootLockerTests.PlayMode
                 leaderboardCreated = true;
             });
             yield return new WaitUntil(() => leaderboardCreated);
+            
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
             if (gameUnderTest != null)
             {
                 bool gameDeletionCallCompleted = false;
@@ -145,11 +149,14 @@ namespace LootLockerTests.PlayMode
                 yield return new WaitUntil(() => gameDeletionCallCompleted);
             }
 
+            LootLockerStateData.ClearAllSavedStates();
+
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator SubmitScore_SubmitToPlayerLeaderboard_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -172,7 +179,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(submittedScore, actualResponse.score, "Score was not as submitted");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator SubmitScore_SubmitToGenericLeaderboard_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -197,7 +204,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(submittedScore, actualResponse.score, "Score was not as submitted");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator SubmitScore_AttemptSubmitOnOverwriteScore_DoesNotUpdateScoreWhenScoreIsLower()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -230,7 +237,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(actualResponse.score, secondResponse.score, "Score got updated, even though it was smaller");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator SubmitScore_AttemptSubmitOnOverwriteScore_UpdatesScoreWhenScoreIsHigher()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -263,7 +270,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(actualResponse.score + 1, secondResponse.score, "Score did not get updated, even though it was higher");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator SubmitScore_SubmitOnOverwriteScoreWhenOverwriteIsAllowed_UpdatesScore()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -319,7 +326,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(secondResponse.success, "SubmitScore failed");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator SubmitScore_SubmitToLeaderboardWithMetadata_Succeeds()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -343,7 +350,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(submittedMetadata, actualResponse.metadata, "Metadata was not as expected");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator SubmitScore_SubmitMetadataToLeaderboardWithoutMetadata_IgnoresMetadata()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");

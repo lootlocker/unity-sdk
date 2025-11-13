@@ -13,7 +13,6 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace LootLockerTests.PlayMode {
-[Ignore("Stage can't handle asset creation, check back in 2025 to enable")]
 public class NotificationTests
 {
     private static int TestCounter = 0;
@@ -31,6 +30,7 @@ public class NotificationTests
         SetupFailed = false;
         gameUnderTest = null;
         configCopy = LootLockerConfig.current;
+        Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
         if (!LootLockerConfig.ClearSettings())
         {
@@ -38,7 +38,7 @@ public class NotificationTests
         }
 
         bool gameCreationCallCompleted = false;
-        LootLockerTestGame.CreateGame(testName: "NotificationTest" + TestCounter, onComplete: (success, errorMessage, game) =>
+        LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter, onComplete: (success, errorMessage, game) =>
         {
             if (!success)
             {
@@ -103,11 +103,14 @@ public class NotificationTests
             invokeCompleted = true;
         });
         yield return new WaitUntil(() => invokeCompleted);
+        
+        Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
     }
 
     [UnityTearDown]
     public IEnumerator TearDown()
     {
+        Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
         if (gameUnderTest != null)
         {
             bool gameDeletionCallCompleted = false;
@@ -124,8 +127,11 @@ public class NotificationTests
             yield return new WaitUntil(() => gameDeletionCallCompleted);
         }
 
+        LootLockerStateData.ClearAllSavedStates();
+
         LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-            configCopy.currentDebugLevel, configCopy.allowTokenRefresh);
+            configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+        Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
     }
 
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
@@ -201,7 +207,7 @@ public class NotificationTests
         onComplete?.Invoke(triggerCreated, errorMessage, createdTrigger);
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
     public IEnumerator Notifications_ListWithDefaultParametersWhenLessThanDefaultPageSize_ReturnsAllNotifications()
     {
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -226,12 +232,13 @@ public class NotificationTests
             Assert.AreEqual(LootLocker.LootLockerStaticStrings.LootLockerNotificationTypes.PullRewardAcquired, notification.Notification_type, "Type was not as expected");
             Assert.AreEqual(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, notification.Source, "Source was not as expected");
             Assert.AreEqual(LootLockerNotificationPriority.medium, notification.Priority, "Priority was not as expected");
-            switch (notification.Content.Body.Kind)
+            Assert.IsTrue(notification.Content.TryGetContentBodyAsRewardNotification(out var rewardBody));
+            switch (rewardBody.Kind)
             {
                 case LootLockerNotificationContentKind.asset:
                 {
-                    Assert.IsNotEmpty(notification.Content.Body.Asset.Asset_ulid, "No ulid parsed for asset");
-                    Assert.IsNotEmpty(notification.Content.Body.Asset.Details.Name, "No name was parsed for asset");
+                    Assert.IsNotEmpty(rewardBody.Asset.Asset_ulid, "No ulid parsed for asset");
+                    Assert.IsNotEmpty(rewardBody.Asset.Details.Name, "No name was parsed for asset");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key], "Notification trigger key was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Id], "Notification trigger id was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Limit], "Notification trigger limit was empty");
@@ -248,7 +255,7 @@ public class NotificationTests
         }
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
     public IEnumerator Notifications_ListNotificationsWithPaginationParameters_ReturnsCorrectPage()
     {
         // Given
@@ -322,7 +329,7 @@ public class NotificationTests
         }
     }
 
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
     public IEnumerator Notifications_MarkAllNotificationsAsRead_AllNotificationsMarkedAsRead()
     {
         // Given
@@ -373,7 +380,7 @@ public class NotificationTests
         }
     }
     
-    [UnityTest]
+    [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
     public IEnumerator Notifications_MarkSpecificNotificationsAsRead_SpecifiedNotificationsMarkedAsRead()
     {
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -434,7 +441,7 @@ public class NotificationTests
         Assert.AreEqual(listResponse.Notifications.Length - notificationIdsToMarkAsRead.Count(), listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Notifications_MarkSpecificNotificationsAsReadUsingConvenienceMethod_SpecifiedNotificationsMarkedAsRead()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -490,7 +497,7 @@ public class NotificationTests
             Assert.AreEqual(listResponse.Notifications.Length - 1, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator Notifications_MarkAllNotificationsAsReadUsingConvenienceMethod_SpecifiedNotificationsMarkedAsRead()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -555,7 +562,9 @@ public class NotificationTests
             Assert.AreEqual(CreatedTriggers.Count - notificationIdsToMarkAsRead.Length, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-        [UnityTest]
+
+        //TODO: Populate with new types
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Notifications_ConvenienceLookupTable_CanLookUpAllNotificationTypes()
         {
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
@@ -629,6 +638,93 @@ public class NotificationTests
             Assert.AreEqual(googlePlayStoreNotification1Id, googlePlayStoreNotifications[0].Id, "The retrieved Google Play store notification id was not as expected");
 
             yield break;
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Notifications_SendCustomNotificationsFromConsoleAndListNotifications_ListsAndParsesCustomNotificationsSuccessfully()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            var customLLCurrencySentInNotifications = new LootLockerCurrency
+            {
+                code = "aCode",
+                created_at = DateTime.Now.ToString(),
+                game_api_writes_enabled = false,
+                id = "anID",
+                name = "aName",
+                published_at = DateTime.Now.ToString()
+            };
+
+            bool notificationSent = false;
+            LootLockerTestConfigurationNotifications.SendCustomNotification("ll.test.notification_object", LootLockerNotificationPriority.high.ToString(), LootLockerStateData.GetDefaultPlayerULID(), customLLCurrencySentInNotifications, null,
+                sendNotificationResponse =>
+            {
+                Assert.IsTrue(sendNotificationResponse.success);
+                notificationSent = true;
+            });
+            yield return new WaitUntil(() => notificationSent);
+            notificationSent = false;
+            LootLockerTestConfigurationNotifications.SendCustomNotification("ll.test.notification_string", LootLockerNotificationPriority.high.ToString(), LootLockerStateData.GetDefaultPlayerULID(), "aTestString", null,
+                sendNotificationResponse =>
+                {
+                    Assert.IsTrue(sendNotificationResponse.success);
+                    notificationSent = true;
+                });
+            yield return new WaitUntil(() => notificationSent);
+            notificationSent = false;
+            LootLockerTestConfigurationNotifications.SendCustomNotification("ll.test.notification_doublearray", LootLockerNotificationPriority.high.ToString(), LootLockerStateData.GetDefaultPlayerULID(), (new double[] { 0.1d, 2.222d }).Cast<object>().ToArray(), null,
+                sendNotificationResponse =>
+                {
+                    Assert.IsTrue(sendNotificationResponse.success);
+                    notificationSent = true;
+                });
+            yield return new WaitUntil(() => notificationSent);
+
+            // When
+            bool requestCompleted = false;
+            LootLockerListNotificationsResponse response = null;
+            LootLockerSDKManager.ListNotifications(false, null, null, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LootLockerAdminApi, 25, 0, (res) =>
+            {
+                response = res;
+                requestCompleted = true;
+            });
+            yield return new WaitUntil(() => requestCompleted);
+
+            // Then
+            Assert.IsTrue(response.success, "Failed to list notifications");
+            Assert.IsNotNull(response.Notifications, "Notifications list is null");
+            Assert.AreEqual(3, response.Notifications.Length, "Notifications list is not of expected length");
+            Assert.AreEqual(3, response.Pagination.total, "Notifications total is not of expected length");
+
+            foreach (LootLockerNotification notification in response.Notifications)
+            {
+                Assert.IsTrue(notification.Notification_type.Contains("ll.test.notification_"), "Type was not as expected");
+                Assert.AreEqual(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LootLockerAdminApi, notification.Source, "Source was not as expected");
+                Assert.AreEqual(LootLockerNotificationPriority.high, notification.Priority, "Priority was not as expected");
+                if (notification.Notification_type.Contains("object"))
+                {
+                    Assert.IsTrue(notification.Content.TryGetContentBodyAsType(out LootLockerCurrency outCurrency));
+                    Assert.AreEqual(customLLCurrencySentInNotifications.id, outCurrency.id);
+                    Assert.AreEqual(customLLCurrencySentInNotifications.created_at, outCurrency.created_at);
+                }
+                else if (notification.Notification_type.Contains("string"))
+                {
+                    Assert.IsTrue(notification.Content.TryGetContentBodyAsString(out string outString));
+                    Assert.AreEqual("aTestString", outString);
+                }
+                else if (notification.Notification_type.Contains("doublearray"))
+                {
+                    Assert.IsTrue(notification.Content.TryGetContentBodyAsDoubleArray(out double[] outDoubleArray));
+                    Assert.AreEqual(2, outDoubleArray.Length);
+                    Assert.AreEqual(0.1d, outDoubleArray[0]);
+                    Assert.AreEqual(2.222d, outDoubleArray[1]);
+
+                    Assert.IsTrue(response.TryGetNotificationsByIdentifyingValue("ll.test.notification_doublearray", out var convenientNotifications));
+                    Assert.AreEqual(1, convenientNotifications.Length);
+                    Assert.AreEqual(notification.Id, convenientNotifications[0].Id);
+                }
+            }
         }
 
         private static LootLockerNotification GenerateLootLockerNotification(string notificationId, string source, string identifyingValue)
@@ -727,7 +823,7 @@ public class NotificationTests
                 Content = new LootLockerNotificationContent
                 {
                     Context = context,
-                    Body = new LootLockerNotificationContentBody
+                    Body = new LootLockerNotificationContentRewardBody
                     {
                         Kind = LootLockerNotificationContentKind.currency,
                         Asset = null,

@@ -53,7 +53,7 @@ namespace LootLockerTestConfigurationUtils
             var userDate = DateTime.Now.ToString("yyyy-MM-dd-HH") + "h";
             var userName = "testrun+" + userDate;
             var password = userName;
-            var userEmail = "sdk+ci-" + userName + "@lootlocker.com";
+            var userEmail = "unity+ci-" + userName + "@lootlocker.com";
 
             bool isTargetingProduction = LootLockerConfig.IsTargetingProductionEnvironment();
             if (isTargetingProduction)

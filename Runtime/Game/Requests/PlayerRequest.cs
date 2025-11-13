@@ -8,83 +8,6 @@ using LLlibs.ZeroDepJson;
 
 namespace LootLocker.Requests
 {
-    #region DEPRECATED Legacy Player Info
-    public class LootLockerGetPlayerInfoResponse : LootLockerResponse
-    {
-        public int? account_balance { get; set; }
-        public int? xp { get; set; }
-        public int? level { get; set; }
-        public string ulid { get; set; }
-        public LootLockerLevel_Thresholds level_thresholds { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerOtherPlayerInfoRequest : LootLockerGetRequest
-    {
-        public LootLockerOtherPlayerInfoRequest(string playerID, string platform = "")
-        {
-            getRequests.Add(playerID);
-            if (platform != "")
-            {
-                getRequests.Add(platform);
-            }
-        }
-    }
-    #endregion
-
-
-    #region DEPRECATED Legacy Progressions
-    [Serializable]
-    public class LootLockerXpSubmitResponse : LootLockerResponse
-    {
-        public LootLockerXp xp { get; set; }
-        public LootLockerLevel[] levels { get; set; }
-        public bool check_grant_notifications { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXpResponse : LootLockerResponse
-    {
-        public int? xp { get; set; }
-        public int? level { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerXp
-    {
-        public int? previous { get; set; }
-        public int? current { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerLevel
-    {
-        public int? level { get; set; }
-        public int? xp_threshold { get; set; }
-    }
-    [Serializable]
-    public class LootLockerXpSubmitRequest
-    {
-        public int? points;
-
-        public LootLockerXpSubmitRequest(int points)
-        {
-            this.points = points;
-        }
-    }
-
-    [Serializable]
-    public class LootLockerXpRequest : LootLockerGetRequest
-    {
-        public LootLockerXpRequest()
-        {
-            getRequests.Clear();
-            getRequests.Add(LootLockerConfig.current.deviceID);
-            getRequests.Add(CurrentPlatform.GetString());
-        }
-    }
-    #endregion
-
     //==================================================
     // Data Definitions
     //==================================================
@@ -109,7 +32,7 @@ namespace LootLocker.Requests
     {
         public uint player_id { get; set; }
         public string player_public_uid { get; set; }
-        public string player_ulid { get; set; }
+        public string ulid { get; set; }
         public string name { get; set; }
         public string last_active_platform { get; set; }
         public string platform_player_id { get; set; }
@@ -152,6 +75,29 @@ namespace LootLocker.Requests
         public float balance { get; set; }
     }
 
+    /// <summary>
+    /// A simplified view of an inventory item
+    /// </summary>
+    public class LootLockerSimpleInventoryItem
+    {
+        /// <summary>
+        /// The asset id of the inventory item
+        /// </summary>
+        public int asset_id { get; set; }
+        /// <summary>
+        /// The instance id of the inventory item
+        /// </summary>
+        public int instance_id { get; set; }
+        /// <summary>
+        /// The acquisition source of the inventory item
+        /// </summary>
+        public string acquisition_source { get; set; }
+        /// <summary>
+        /// The acquisition date of the inventory item
+        /// </summary>
+        public DateTime? acquisition_date { get; set; }
+    }
+
     public class LootLockerRewardObject
     {
         public int instance_id { get; set; }
@@ -169,6 +115,10 @@ namespace LootLocker.Requests
         /// When this player was first created
         /// </summary>
         public DateTime created_at { get; set; }
+        /// <summary>
+        /// The last time this player logged in
+        /// </summary>
+        public DateTime last_seen { get; set; }
         /// <summary>
         /// The name of the player expressly configured through a SetPlayerName call
         /// </summary>
@@ -196,24 +146,6 @@ namespace LootLocker.Requests
         public string name { get; set; }
     }
 
-    public class LookupPlayerNamesRequest
-    {
-        public ulong[] player_ids { get; set; }
-        public string[] player_public_uids { get; set; }
-        public ulong[] steam_ids { get; set; }
-        public ulong[] psn_ids { get; set; }
-        public string[] xbox_ids { get; set; }
-
-        public LookupPlayerNamesRequest()
-        {
-            player_ids = new ulong[] { };
-            player_public_uids = new string[] { };
-            steam_ids = new ulong[] { };
-            psn_ids = new ulong[] { };
-            xbox_ids = new string[] { };
-        }
-    }
-
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
         public ulong[] player_ids { get; set; }
@@ -224,12 +156,6 @@ namespace LootLocker.Requests
             player_ids = new ulong[] { };
             player_public_uids = new string[] { };
         }
-    }
-
-    public class LootLockerPlayerFileRequest
-    {
-        public string purpose { get; set; }
-        public string path_to_file { get; set; }
     }
 
     /// <summary>
@@ -248,6 +174,21 @@ namespace LootLocker.Requests
         /// A list of public uids to look up. These ids are in the form of UIDs
         /// </summary>
         public string[] player_public_uid { get; set; }
+    }
+
+    /// <summary>
+    /// Request to list a player's simplified inventory with the given filters
+    /// </summary>
+    public class LootLockerListSimplifiedInventoryRequest
+    {
+        /// <summary>
+        /// A list of asset ids to filter the inventory items by
+        /// </summary>
+        public int[] asset_ids { get; set; }
+        /// <summary>
+        /// A list of context ids to filter the inventory items by
+        /// </summary>
+        public int[] context_ids { get; set; }
     }
 
     //==================================================
@@ -298,6 +239,22 @@ namespace LootLocker.Requests
     public class LootLockerInventoryResponse : LootLockerResponse
     {
         public LootLockerInventory[] inventory { get; set; }
+    }
+
+    /// <summary>
+    /// The response class for simplified inventory requests
+    /// </summary>
+    [Serializable]
+    public class LootLockerSimpleInventoryResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// List of simplified inventory items according to the requested filters
+        /// </summary>
+        public LootLockerSimpleInventoryItem[] items { get; set; }
+        /// <summary>
+        /// Pagination information for the response
+        /// </summary>
+        public LootLockerExtendedPagination pagination { get; set; }
     }
     
     public class LootLockerPlayerFilesResponse : LootLockerResponse
@@ -357,57 +314,36 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public static void LookupPlayerNames(LookupPlayerNamesRequest lookupPlayerNamesRequest, Action<PlayerNameLookupResponse> onComplete)
+        public static void LookupPlayerNames(string forPlayerWithUlid, string idType, string[] identifiers, Action<PlayerNameLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayerNames;
 
-            var getVariable = endPoint.endPoint + "?";
-
-            foreach (var playerID in lookupPlayerNamesRequest.player_ids)
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            foreach (string identifier in identifiers)
             {
-                getVariable += $"player_id={playerID}&";
+                queryParams.Add(idType, identifier);
             }
 
-            foreach (var playerPublicUID in lookupPlayerNamesRequest.player_public_uids)
-            {
-                getVariable += $"player_public_uid={playerPublicUID}&";
-            }
-
-            foreach (var steamID in lookupPlayerNamesRequest.steam_ids)
-            {
-                getVariable += $"steam_id={steamID}&";
-            }
-
-            foreach (var psnID in lookupPlayerNamesRequest.psn_ids)
-            {
-                getVariable += $"psn_id={psnID}&";
-            }
-
-            foreach (var xboxID in lookupPlayerNamesRequest.xbox_ids)
-            {
-                getVariable += $"xbox_id={xboxID}&";
-            }
-
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
-        public static void LookupPlayer1stPartyPlatformIDs(LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
+        public static void LookupPlayer1stPartyPlatformIDs(string forPlayerWithUlid, LookupPlayer1stPartyPlatformIDsRequest lookupPlayer1stPartyPlatformIDsRequest, Action<Player1stPartyPlatformIDsLookupResponse> onComplete)
         {
             var endPoint = LootLockerEndPoints.lookupPlayer1stPartyPlatformIDs;
 
-            var getVariable = endPoint.endPoint + "?";
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
 
             foreach (var playerID in lookupPlayer1stPartyPlatformIDsRequest.player_ids)
             {
-                getVariable += $"player_id={playerID}&";
+                queryParams.Add("player_id", playerID);
             }
 
             foreach (var playerPublicUID in lookupPlayer1stPartyPlatformIDsRequest.player_public_uids)
             {
-                getVariable += $"player_public_uid={playerPublicUID}&";
+                queryParams.Add("player_public_uid", playerPublicUID);
             }
 
-            LootLockerServerRequest.CallAPI(getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
