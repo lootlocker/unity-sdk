@@ -261,7 +261,7 @@ namespace LootLocker
         private static string webSocketUrl;
 
         // Connection settings
-        private const float PING_INTERVAL = 3f;
+        private const float PING_INTERVAL = 20f;
         private const float RECONNECT_DELAY = 5f;
         private const int MAX_RECONNECT_ATTEMPTS = 5;
 
