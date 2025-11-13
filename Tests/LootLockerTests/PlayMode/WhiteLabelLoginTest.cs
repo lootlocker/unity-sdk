@@ -285,7 +285,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(loginResponse.LoginResponse.SessionToken, "No session token found from login");
 
             //When
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             bool pingRequestCompleted = false;
             LootLockerPingResponse pingResponse = null;
@@ -341,7 +341,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(loginResponse.SessionResponse.session_token, "No session token found from login");
 
             //When
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             bool postResetSessionRequestCompleted = false;
             LootLockerSessionResponse postResetSessionResponse = null;

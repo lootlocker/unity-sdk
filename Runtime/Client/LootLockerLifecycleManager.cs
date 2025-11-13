@@ -86,6 +86,21 @@ namespace LootLocker
         private static readonly object _instanceLock = new object();
 
         /// <summary>
+        /// Automatically initialize the lifecycle manager when the application starts.
+        /// This ensures all services are ready before any game code runs.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void AutoInitialize()
+        {
+            if (_instance == null && Application.isPlaying)
+            {
+                LootLockerLogger.Log("Auto-initializing LootLocker LifecycleManager on application start", LootLockerLogger.LogLevel.Debug);
+                // Access the Instance property to trigger lazy initialization
+                _ = Instance;
+            }
+        }
+
+        /// <summary>
         /// Get or create the lifecycle manager instance
         /// </summary>
         public static LootLockerLifecycleManager Instance
@@ -121,6 +136,8 @@ namespace LootLocker
         {
             if (_instance != null) return;
 
+            LootLockerLogger.Log("Creating LootLocker LifecycleManager GameObject and initializing services", LootLockerLogger.LogLevel.Debug);
+            
             var gameObject = new GameObject("LootLockerLifecycleManager");
             _instance = gameObject.AddComponent<LootLockerLifecycleManager>();
             _instanceId = _instance.GetInstanceID();
@@ -136,6 +153,8 @@ namespace LootLocker
             
             // Register and initialize all services immediately
             _instance._RegisterAndInitializeAllServices();
+            
+            LootLockerLogger.Log("LootLocker LifecycleManager initialization complete", LootLockerLogger.LogLevel.Debug);
         }
 
         public static IEnumerator CleanUpOldInstances()
@@ -213,6 +232,8 @@ namespace LootLocker
 #endif
         };
         private bool _isInitialized = false;
+        private bool _serviceHealthMonitoringEnabled = true;
+        private Coroutine _healthMonitorCoroutine = null;
         private static LifecycleManagerState _state = LifecycleManagerState.Ready;
         private readonly object _serviceLock = new object();
 
@@ -299,7 +320,7 @@ namespace LootLocker
             if (_state != LifecycleManagerState.Ready || _instance == null)
             {
                 // Don't allow unregistration during shutdown/reset/initialization to prevent circular dependencies
-                LootLockerLogger.Log($"Ignoring unregister request for {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Ignoring unregister request for {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Debug);
                 return;
             }
             
@@ -319,7 +340,7 @@ namespace LootLocker
         {
             if (_state != LifecycleManagerState.Ready || _instance == null)
             {
-                LootLockerLogger.Log($"Ignoring reset request for {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Ignoring reset request for {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Debug);
                 return;
             }
             
@@ -365,7 +386,7 @@ namespace LootLocker
             {
                 if (_isInitialized)
                 {
-                    LootLockerLogger.Log("Services already registered and initialized", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log("Services already registered and initialized", LootLockerLogger.LogLevel.Debug);
                     return;
                 }
 
@@ -373,31 +394,53 @@ namespace LootLocker
                 
                 try
                 {
-                    LootLockerLogger.Log("Registering and initializing all services...", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log("Registering and initializing all services...", LootLockerLogger.LogLevel.Debug);
 
-                    // Register and initialize core services in defined order
-                    foreach (var serviceType in _serviceInitializationOrder)
-                    {
-                        if (serviceType == typeof(RateLimiter))
-                            _RegisterAndInitializeNonMonoBehaviourService<RateLimiter>();
-                        else if (serviceType == typeof(LootLockerEventSystem))
-                            _RegisterAndInitializeService<LootLockerEventSystem>();
-                        else if (serviceType == typeof(LootLockerHTTPClient))
-                            _RegisterAndInitializeService<LootLockerHTTPClient>();
+                    // Register and initialize core services in defined order with dependency injection
+                    
+                    // 1. Initialize RateLimiter first (no dependencies)
+                    var rateLimiter = _RegisterAndInitializeService<RateLimiter>();
+                    
+                    // 2. Initialize EventSystem (no dependencies)  
+                    var eventSystem = _RegisterAndInitializeService<LootLockerEventSystem>();
+                    
+                    // 3. Initialize StateData (no dependencies)
+                    var stateData = _RegisterAndInitializeService<LootLockerStateData>();
+                    
+                    // 4. Initialize HTTPClient and set RateLimiter dependency
+                    var httpClient = _RegisterAndInitializeService<LootLockerHTTPClient>();
+                    httpClient.SetRateLimiter(rateLimiter);
+                    
+                    // 5. Set up StateData event subscriptions after both services are ready
+                    stateData.SetEventSystem(eventSystem);
+                    
 #if LOOTLOCKER_ENABLE_PRESENCE
-                        else if (serviceType == typeof(LootLockerPresenceManager))
-                            _RegisterAndInitializeService<LootLockerPresenceManager>();
+                    // 5. Initialize PresenceManager (no special dependencies)
+                    _RegisterAndInitializeService<LootLockerPresenceManager>();
 #endif
-                    }
 
                     // Note: RemoteSessionPoller is registered on-demand only when needed
 
                     _isInitialized = true;
-                    LootLockerLogger.Log("All services registered and initialized successfully", LootLockerLogger.LogLevel.Verbose);
+                    
+                    // Change state to Ready before finishing initialization
+                    _state = LifecycleManagerState.Ready;
+                    
+                    // Start service health monitoring
+                    if (_serviceHealthMonitoringEnabled && Application.isPlaying)
+                    {
+                        _healthMonitorCoroutine = StartCoroutine(ServiceHealthMonitor());
+                    }
+                    
+                    LootLockerLogger.Log("LifecycleManager initialization complete", LootLockerLogger.LogLevel.Debug);
                 }
                 finally
                 {
-                    _state = LifecycleManagerState.Ready; // Always reset the state
+                    // State is already set to Ready above, only set to Error if we had an exception
+                    if (_state == LifecycleManagerState.Initializing)
+                    {
+                        _state = LifecycleManagerState.Ready; // Fallback in case of unexpected path
+                    }
                 }
             }
         }
@@ -405,31 +448,17 @@ namespace LootLocker
         /// <summary>
         /// Register and immediately initialize a specific MonoBehaviour service
         /// </summary>
-        private void _RegisterAndInitializeService<T>() where T : MonoBehaviour, ILootLockerService
+        private T _RegisterAndInitializeService<T>() where T : MonoBehaviour, ILootLockerService
         {
             if (_HasService<T>())
             {
-                LootLockerLogger.Log($"Service {typeof(T).Name} already registered", LootLockerLogger.LogLevel.Verbose);
-                return;
+                LootLockerLogger.Log($"Service {typeof(T).Name} already registered", LootLockerLogger.LogLevel.Debug);
+                return _GetService<T>();
             }
 
             var service = gameObject.AddComponent<T>();
             _RegisterServiceAndInitialize(service);
-        }
-
-        /// <summary>
-        /// Register and immediately initialize a specific non-MonoBehaviour service
-        /// </summary>
-        private void _RegisterAndInitializeNonMonoBehaviourService<T>() where T : class, ILootLockerService, new()
-        {
-            if (_HasService<T>())
-            {
-                LootLockerLogger.Log($"Service {typeof(T).Name} already registered", LootLockerLogger.LogLevel.Verbose);
-                return;
-            }
-
-            var service = new T();
-            _RegisterServiceAndInitialize(service);
+            return service;
         }
 
         /// <summary>
@@ -455,15 +484,15 @@ namespace LootLocker
 
                 _services[serviceType] = service;
                 
-                LootLockerLogger.Log($"Registered service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Registered service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
 
                 // Always initialize immediately upon registration
                 try
                 {
-                    LootLockerLogger.Log($"Initializing service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log($"Initializing service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
                     service.Initialize();
                     _initializationOrder.Add(service);
-                    LootLockerLogger.Log($"Successfully initialized service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log($"Successfully initialized service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
                 }
                 catch (Exception ex)
                 {
@@ -501,7 +530,7 @@ namespace LootLocker
                 var serviceType = typeof(T);
                 if (_services.TryGetValue(serviceType, out var service))
                 {
-                    LootLockerLogger.Log($"Unregistering service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log($"Unregistering service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
 
                     try
                     {
@@ -524,7 +553,7 @@ namespace LootLocker
 #endif
                         }
 
-                        LootLockerLogger.Log($"Successfully unregistered service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                        LootLockerLogger.Log($"Successfully unregistered service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
                     }
                     catch (Exception ex)
                     {
@@ -567,11 +596,11 @@ namespace LootLocker
             
             try
             {
-                LootLockerLogger.Log($"Resetting service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Resetting service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
                 
                 service.Reset();
                 
-                LootLockerLogger.Log($"Successfully reset service: {service.ServiceName}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Successfully reset service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
             }
             catch (Exception ex)
             {
@@ -626,7 +655,7 @@ namespace LootLocker
             if (_state == LifecycleManagerState.Quitting) return; // Prevent multiple calls
             
             _state = LifecycleManagerState.Quitting;
-            LootLockerLogger.Log("Application is quitting, notifying services and marking lifecycle manager for shutdown", LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log("Application is quitting, notifying services and marking lifecycle manager for shutdown", LootLockerLogger.LogLevel.Debug);
             
             // Create a snapshot of services to avoid collection modification during iteration
             ILootLockerService[] serviceSnapshot;
@@ -666,7 +695,14 @@ namespace LootLocker
                 
                 try
                 {
-                    LootLockerLogger.Log("Resetting all services...", LootLockerLogger.LogLevel.Verbose);
+                    // Stop health monitoring during reset
+                    if (_healthMonitorCoroutine != null)
+                    {
+                        StopCoroutine(_healthMonitorCoroutine);
+                        _healthMonitorCoroutine = null;
+                    }
+                    
+                    LootLockerLogger.Log("Resetting all services...", LootLockerLogger.LogLevel.Debug);
 
                     // Reset services in reverse order of initialization
                     // This ensures dependencies are torn down in the correct order
@@ -684,10 +720,7 @@ namespace LootLocker
                     _initializationOrder.Clear();
                     _isInitialized = false;
                     
-                    // Coordinate with global state systems
-                    _ResetCoordinatedSystems();
-                    
-                    LootLockerLogger.Log("All services reset and collections cleared", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log("All services reset and collections cleared", LootLockerLogger.LogLevel.Debug);
                 }
                 finally
                 {
@@ -697,23 +730,141 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Reset coordinated systems that are not services but need lifecycle coordination
+        /// Service health monitoring coroutine - checks service health and restarts failed services
         /// </summary>
-        private void _ResetCoordinatedSystems()
+        private IEnumerator ServiceHealthMonitor()
         {
+            const float healthCheckInterval = 30.0f; // Check every 30 seconds
+            
+            while (_serviceHealthMonitoringEnabled && Application.isPlaying)
+            {
+                yield return new WaitForSeconds(healthCheckInterval);
+                
+                if (_state != LifecycleManagerState.Ready)
+                {
+                    continue; // Skip health checks during initialization/reset
+                }
+
+                lock (_serviceLock)
+                {
+                    // Check each service health
+                    var servicesToRestart = new List<Type>();
+                    
+                    foreach (var serviceEntry in _services)
+                    {
+                        var serviceType = serviceEntry.Key;
+                        var service = serviceEntry.Value;
+                        
+                        if (service == null)
+                        {
+                            LootLockerLogger.Log($"Service {serviceType.Name} is null - marking for restart", LootLockerLogger.LogLevel.Warning);
+                            servicesToRestart.Add(serviceType);
+                            continue;
+                        }
+                        
+                        try
+                        {
+                            // Check if service is still initialized
+                            if (!service.IsInitialized)
+                            {
+                                LootLockerLogger.Log($"Service {service.ServiceName} is no longer initialized - attempting restart", LootLockerLogger.LogLevel.Warning);
+                                servicesToRestart.Add(serviceType);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LootLockerLogger.Log($"Error checking health of service {serviceType.Name}: {ex.Message} - marking for restart", LootLockerLogger.LogLevel.Error);
+                            servicesToRestart.Add(serviceType);
+                        }
+                    }
+                    
+                    // Restart failed services
+                    foreach (var serviceType in servicesToRestart)
+                    {
+                        _RestartService(serviceType);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Restart a specific service that has failed
+        /// </summary>
+        private void _RestartService(Type serviceType)
+        {
+            if (_state != LifecycleManagerState.Ready)
+            {
+                return;
+            }
+
             try
             {
-                LootLockerLogger.Log("Resetting coordinated systems (StateData)...", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Attempting to restart failed service: {serviceType.Name}", LootLockerLogger.LogLevel.Warning);
                 
-                // Reset state data - this manages player sessions and state
-                // We do this after services are reset but before marking as ready
-                LootLockerStateData.Reset();
+                // Remove the failed service
+                if (_services.ContainsKey(serviceType))
+                {
+                    var failedService = _services[serviceType];
+                    if (failedService != null)
+                    {
+                        _initializationOrder.Remove(failedService);
+                        
+                        // Clean up the failed service if it's a MonoBehaviour
+                        if (failedService is MonoBehaviour component)
+                        {
+#if UNITY_EDITOR
+                            DestroyImmediate(component);
+#else
+                            Destroy(component);
+#endif
+                        }
+                    }
+                    _services.Remove(serviceType);
+                }
                 
-                LootLockerLogger.Log("Coordinated systems reset complete", LootLockerLogger.LogLevel.Verbose);
+                // Recreate and reinitialize the service based on its type
+                if (serviceType == typeof(RateLimiter))
+                {
+                    _RegisterAndInitializeService<RateLimiter>();
+                }
+                else if (serviceType == typeof(LootLockerHTTPClient))
+                {
+                    var rateLimiter = _GetService<RateLimiter>();
+                    var httpClient = _RegisterAndInitializeService<LootLockerHTTPClient>();
+                    httpClient.SetRateLimiter(rateLimiter);
+                }
+                else if (serviceType == typeof(LootLockerEventSystem))
+                {
+                    var eventSystem = _RegisterAndInitializeService<LootLockerEventSystem>();
+                    // Re-establish StateData event subscriptions if both services exist
+                    var stateData = _GetService<LootLockerStateData>();
+                    if (stateData != null)
+                    {
+                        stateData.SetEventSystem(eventSystem);
+                    }
+                }
+                else if (serviceType == typeof(LootLockerStateData))
+                {
+                    var stateData = _RegisterAndInitializeService<LootLockerStateData>();
+                    // Set up event subscriptions if EventSystem exists
+                    var eventSystem = _GetService<LootLockerEventSystem>();
+                    if (eventSystem != null)
+                    {
+                        stateData.SetEventSystem(eventSystem);
+                    }
+                }
+#if LOOTLOCKER_ENABLE_PRESENCE
+                else if (serviceType == typeof(LootLockerPresenceManager))
+                {
+                    _RegisterAndInitializeService<LootLockerPresenceManager>();
+                }
+#endif
+                
+                LootLockerLogger.Log($"Successfully restarted service: {serviceType.Name}", LootLockerLogger.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error resetting coordinated systems: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Failed to restart service {serviceType.Name}: {ex.Message}", LootLockerLogger.LogLevel.Error);
             }
         }
 
@@ -784,6 +935,33 @@ namespace LootLocker
         {
             ResetService<T>();
         }
+
+        /// <summary>
+        /// Enable or disable service health monitoring
+        /// </summary>
+        /// <param name="enabled">Whether to enable health monitoring</param>
+        public static void SetServiceHealthMonitoring(bool enabled)
+        {
+            if (_instance != null)
+            {
+                _instance._serviceHealthMonitoringEnabled = enabled;
+                
+                if (enabled && _instance._healthMonitorCoroutine == null && Application.isPlaying)
+                {
+                    _instance._healthMonitorCoroutine = _instance.StartCoroutine(_instance.ServiceHealthMonitor());
+                }
+                else if (!enabled && _instance._healthMonitorCoroutine != null)
+                {
+                    _instance.StopCoroutine(_instance._healthMonitorCoroutine);
+                    _instance._healthMonitorCoroutine = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if service health monitoring is enabled
+        /// </summary>
+        public static bool IsServiceHealthMonitoringEnabled => _instance?._serviceHealthMonitoringEnabled ?? false;
 
         #endregion
     }

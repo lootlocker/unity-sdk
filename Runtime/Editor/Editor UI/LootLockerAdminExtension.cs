@@ -300,12 +300,6 @@ namespace LootLocker.Extension
             SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
         }
         #endregion
-
-        private void OnDestroy()
-        {
-            // Reset through lifecycle manager instead
-            LootLockerLifecycleManager.ResetInstance();
-        }
     }
 }
 #endif

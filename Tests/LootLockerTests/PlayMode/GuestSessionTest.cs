@@ -294,7 +294,7 @@ namespace LootLockerTests.PlayMode
             });
             yield return new WaitUntil(() => guestSessionCompleted);
             guestSessionCompleted = false;
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             LootLockerSDKManager.StartGuestSession((response) =>
             {
@@ -303,7 +303,7 @@ namespace LootLockerTests.PlayMode
             });
             yield return new WaitUntil(() => guestSessionCompleted);
             guestSessionCompleted = false;
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             LootLockerSDKManager.StartGuestSession((response) =>
             {
@@ -312,7 +312,7 @@ namespace LootLockerTests.PlayMode
             });
             yield return new WaitUntil(() => guestSessionCompleted);
             guestSessionCompleted = false;
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             //Then
             Assert.IsNotNull(player1Ulid);
@@ -341,7 +341,7 @@ namespace LootLockerTests.PlayMode
             var player1Data = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(player1Ulid);
             player1Data.CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.WhiteLabel);
             LootLockerStateData.SetPlayerData(player1Data);
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             LootLockerSDKManager.StartGuestSession((response) =>
             {
@@ -353,7 +353,7 @@ namespace LootLockerTests.PlayMode
             player2Data.CurrentPlatform = LootLockerAuthPlatform.GetPlatformRepresentation(LL_AuthPlatforms.WhiteLabel);
             LootLockerStateData.SetPlayerData(player1Data);
             guestSessionCompleted = false;
-            LootLockerStateData.Reset();
+            LootLockerStateData.UnloadState();
 
             LootLockerSDKManager.StartGuestSession((response) =>
             {

@@ -93,14 +93,6 @@ namespace LootLocker
             Get(); // Ensure service is initialized
         }
 
-        public static void ResetInstance()
-        {
-            lock (_instanceLock)
-            {
-                _instance = null;
-            }
-        }
-
         #endregion
 
         #region Legacy Implementation

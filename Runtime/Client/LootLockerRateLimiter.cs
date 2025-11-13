@@ -1,5 +1,6 @@
 ﻿
 using System;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,7 +10,7 @@ namespace LootLocker
     /// <summary>
     /// Rate limiter service for managing HTTP request rate limiting
     /// </summary>
-    public class RateLimiter : ILootLockerService
+    public class RateLimiter : MonoBehaviour, ILootLockerService
     {
         #region ILootLockerService Implementation
         

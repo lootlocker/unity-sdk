@@ -29,14 +29,35 @@ namespace LootLocker
             // Initialize presence configuration
             isEnabled = LootLockerConfig.IsPresenceEnabledForCurrentPlatform();
             
-            // Subscribe to session events
-            SubscribeToSessionEvents();
+            IsInitialized = true;
+            LootLockerLogger.Log("LootLockerPresenceManager initialized", LootLockerLogger.LogLevel.Debug);
+            
+            // Defer event subscriptions and auto-connect to avoid circular dependencies during service initialization
+            StartCoroutine(DeferredInitialization());
+        }
+        
+        /// <summary>
+        /// Perform deferred initialization after services are fully ready
+        /// </summary>
+        private IEnumerator DeferredInitialization()
+        {
+            // Wait a frame to ensure all services are fully initialized
+            yield return null;
+            
+            // Subscribe to session events (handle errors separately)
+            try
+            {
+                SubscribeToSessionEvents();
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Error subscribing to session events: {ex.Message}", LootLockerLogger.LogLevel.Error);
+            }
             
             // Auto-connect existing active sessions if enabled
-            StartCoroutine(AutoConnectExistingSessions());
+            yield return StartCoroutine(AutoConnectExistingSessions());
             
-            IsInitialized = true;
-            LootLockerLogger.Log("LootLockerPresenceManager initialized", LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log("LootLockerPresenceManager deferred initialization complete", LootLockerLogger.LogLevel.Debug);
         }
 
         void ILootLockerService.Reset()
@@ -66,13 +87,13 @@ namespace LootLocker
             if (pauseStatus)
             {
                 // App paused - disconnect for battery optimization
-                LootLockerLogger.Log("App paused - disconnecting presence sessions", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log("App paused - disconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
                 DisconnectAll();
             }
             else
             {
                 // App resumed - reconnect
-                LootLockerLogger.Log("App resumed - reconnecting presence sessions", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log("App resumed - reconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
                 StartCoroutine(AutoConnectExistingSessions());
             }
         }
@@ -87,21 +108,23 @@ namespace LootLocker
             if (hasFocus)
             {
                 // App regained focus - use existing AutoConnectExistingSessions logic
-                LootLockerLogger.Log("App returned to foreground - reconnecting presence sessions", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log("App returned to foreground - reconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
                 StartCoroutine(AutoConnectExistingSessions());
             }
             else
             {
                 // App lost focus - disconnect all active sessions to save battery
-                LootLockerLogger.Log("App went to background - disconnecting all presence sessions for battery optimization", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log("App went to background - disconnecting all presence sessions for battery optimization", LootLockerLogger.LogLevel.Debug);
                 DisconnectAll();
             }
         }
 
         void ILootLockerService.HandleApplicationQuit()
         {
+            isShuttingDown = true;
+            
             // Cleanup all connections and subscriptions
-            DisconnectAll();
+            DisconnectAllInternal(); // Use internal method to avoid service registry access
             UnsubscribeFromSessionEvents();
             _connectedSessions?.Clear();
         }
@@ -169,7 +192,7 @@ namespace LootLocker
                             // Check if already connecting
                             if (connectingClients.Contains(state.ULID))
                             {
-                                LootLockerLogger.Log($"Presence already connecting for session: {state.ULID}, skipping auto-connect", LootLockerLogger.LogLevel.Verbose);
+                                LootLockerLogger.Log($"Presence already connecting for session: {state.ULID}, skipping auto-connect", LootLockerLogger.LogLevel.Debug);
                                 shouldConnect = false;
                             }
                             else if (!activeClients.ContainsKey(state.ULID))
@@ -185,19 +208,19 @@ namespace LootLocker
                                 if (clientState == LootLockerPresenceConnectionState.Failed ||
                                     clientState == LootLockerPresenceConnectionState.Disconnected)
                                 {
-                                    LootLockerLogger.Log($"Auto-connect found failed/disconnected client for {state.ULID}, will reconnect", LootLockerLogger.LogLevel.Verbose);
+                                    LootLockerLogger.Log($"Auto-connect found failed/disconnected client for {state.ULID}, will reconnect", LootLockerLogger.LogLevel.Debug);
                                     shouldConnect = true;
                                 }
                                 else
                                 {
-                                    LootLockerLogger.Log($"Presence already active or in progress for session: {state.ULID} (state: {clientState}), skipping auto-connect", LootLockerLogger.LogLevel.Verbose);
+                                    LootLockerLogger.Log($"Presence already active or in progress for session: {state.ULID} (state: {clientState}), skipping auto-connect", LootLockerLogger.LogLevel.Debug);
                                 }
                             }
                         }
 
                         if (shouldConnect)
                         {
-                            LootLockerLogger.Log($"Auto-connecting presence for existing session: {state.ULID}", LootLockerLogger.LogLevel.Verbose);
+                            LootLockerLogger.Log($"Auto-connecting presence for existing session: {state.ULID}", LootLockerLogger.LogLevel.Debug);
                             ConnectPresence(state.ULID);
                             
                             // Small delay between connections to avoid overwhelming the system
@@ -221,6 +244,7 @@ namespace LootLocker
         private readonly object activeClientsLock = new object(); // Thread safety for activeClients dictionary
         private bool isEnabled = true;
         private bool autoConnectEnabled = true;
+        private bool isShuttingDown = false; // Track if we're shutting down to prevent double disconnect
 
         #endregion
 
@@ -317,9 +341,23 @@ namespace LootLocker
             var playerData = eventData.playerData;
             if (playerData != null && !string.IsNullOrEmpty(playerData.ULID))
             {
-                LootLockerLogger.Log($"Session started event received for {playerData.ULID}, auto-connecting presence", LootLockerLogger.LogLevel.Verbose);
-                ConnectPresence(playerData.ULID);
+                LootLockerLogger.Log($"Session started event received for {playerData.ULID}, auto-connecting presence", LootLockerLogger.LogLevel.Debug);
+                
+                // Start auto-connect in a coroutine to avoid blocking the event thread
+                StartCoroutine(AutoConnectPresenceCoroutine(playerData));
             }
+        }
+
+        /// <summary>
+        /// Coroutine to handle auto-connecting presence after session events
+        /// </summary>
+        private System.Collections.IEnumerator AutoConnectPresenceCoroutine(LootLockerPlayerData playerData)
+        {
+            // Yield one frame to let the session event complete fully
+            yield return null;
+            
+            // Now attempt to connect presence
+            ConnectPresenceWithPlayerData(playerData);
         }
 
         /// <summary>
@@ -335,7 +373,7 @@ namespace LootLocker
             var playerData = eventData.playerData;
             if (playerData != null && !string.IsNullOrEmpty(playerData.ULID))
             {
-                LootLockerLogger.Log($"Session refreshed event received for {playerData.ULID}, reconnecting presence with new token", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Session refreshed event received for {playerData.ULID}, reconnecting presence with new token", LootLockerLogger.LogLevel.Debug);
                 
                 // Disconnect existing connection first, then reconnect with new session token
                 DisconnectPresence(playerData.ULID, (disconnectSuccess, disconnectError) => {
@@ -344,7 +382,7 @@ namespace LootLocker
                         // Only reconnect if auto-connect is enabled
                         if (autoConnectEnabled)
                         {
-                            LootLockerLogger.Log($"Reconnecting presence for {playerData.ULID} with refreshed session token", LootLockerLogger.LogLevel.Verbose);
+                            LootLockerLogger.Log($"Reconnecting presence for {playerData.ULID} with refreshed session token", LootLockerLogger.LogLevel.Debug);
                             ConnectPresence(playerData.ULID);
                         }
                     }
@@ -363,8 +401,8 @@ namespace LootLocker
         {
             if (!string.IsNullOrEmpty(eventData.playerUlid))
             {
-                LootLockerLogger.Log($"Session ended event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Verbose);
-                DisconnectPresence(eventData.playerUlid);
+                LootLockerLogger.Log($"Session ended event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Debug);
+                DisconnectPresenceForEvent(eventData.playerUlid);
             }
         }
 
@@ -375,20 +413,22 @@ namespace LootLocker
         {
             if (!string.IsNullOrEmpty(eventData.playerUlid))
             {
-                LootLockerLogger.Log($"Session expired event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Verbose);
-                DisconnectPresence(eventData.playerUlid);
+                LootLockerLogger.Log($"Session expired event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Debug);
+                DisconnectPresenceForEvent(eventData.playerUlid);
             }
         }
 
         /// <summary>
         /// Handle local session deactivated events
+        /// Note: If this is part of a session end flow, presence will already be disconnected by OnSessionEndedEvent
+        /// This handler only disconnects presence for local state management scenarios
         /// </summary>
         private void OnLocalSessionDeactivatedEvent(LootLockerLocalSessionDeactivatedEventData eventData)
         {
             if (!string.IsNullOrEmpty(eventData.playerUlid))
             {
-                LootLockerLogger.Log($"Local session deactivated event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Verbose);
-                DisconnectPresence(eventData.playerUlid);
+                LootLockerLogger.Log($"Local session deactivated event received for {eventData.playerUlid}, disconnecting presence", LootLockerLogger.LogLevel.Debug);
+                DisconnectPresenceForEvent(eventData.playerUlid);
             }
         }
 
@@ -406,7 +446,7 @@ namespace LootLocker
             var playerData = eventData.playerData;
             if (playerData != null && !string.IsNullOrEmpty(playerData.ULID))
             {
-                LootLockerLogger.Log($"Session activated event received for {playerData.ULID}, auto-connecting presence", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Session activated event received for {playerData.ULID}, auto-connecting presence", LootLockerLogger.LogLevel.Debug);
                 ConnectPresence(playerData.ULID);
             }
         }
@@ -492,8 +532,78 @@ namespace LootLocker
             if (!instance.isEnabled)
             {
                 var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
-                LootLockerLogger.Log($"Presence disabled for current platform: {currentPlatform}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Presence disabled for current platform: {currentPlatform}", LootLockerLogger.LogLevel.Debug);
                 return;
+            }
+        }
+
+        /// <summary>
+        /// Connect presence using player data directly (used by event handlers to avoid StateData lookup issues)
+        /// </summary>
+        private static void ConnectPresenceWithPlayerData(LootLockerPlayerData playerData, LootLockerPresenceCallback onComplete = null)
+        {
+            var instance = Get();
+            
+            if (!instance.isEnabled)
+            {
+                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
+                string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
+                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
+                onComplete?.Invoke(false, errorMessage);
+                return;
+            }
+
+            // Use the provided player data directly
+            if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
+            {
+                LootLockerLogger.Log("Cannot connect presence: No valid session token found in player data", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(false, "No valid session token found in player data");
+                return;
+            }
+
+            string ulid = playerData.ULID;
+            if (string.IsNullOrEmpty(ulid))
+            {
+                LootLockerLogger.Log("Cannot connect presence: No valid player ULID found in player data", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(false, "No valid player ULID found in player data");
+                return;
+            }
+
+            lock (instance.activeClientsLock)
+            {
+                // Check if already connected for this player
+                if (instance.activeClients.ContainsKey(ulid))
+                {
+                    LootLockerLogger.Log($"Presence already connected for player {ulid}", LootLockerLogger.LogLevel.Debug);
+                    onComplete?.Invoke(true, "Already connected");
+                    return;
+                }
+
+                // Create new presence client as a GameObject component
+                var clientGameObject = new GameObject($"PresenceClient_{ulid}");
+                clientGameObject.transform.SetParent(instance.transform);
+                var client = clientGameObject.AddComponent<LootLockerPresenceClient>();
+                instance.activeClients[ulid] = client;
+
+                LootLockerLogger.Log($"Connecting presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
+
+                // Initialize the client with player data, then connect
+                client.Initialize(playerData.ULID, playerData.SessionToken);
+                client.Connect((success, error) =>
+                {
+                    if (!success)
+                    {
+                        // Use proper disconnect method to clean up GameObject and remove from dictionary
+                        DisconnectPresence(ulid);
+                        LootLockerLogger.Log($"Failed to connect presence for player {ulid}: {error}", LootLockerLogger.LogLevel.Error);
+                    }
+                    else
+                    {
+                        LootLockerLogger.Log($"Successfully connected presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
+                    }
+                    
+                    onComplete?.Invoke(success, error);
+                });
             }
         }
 
@@ -508,7 +618,7 @@ namespace LootLocker
             {
                 var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
                 string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
-                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(false, errorMessage);
                 return;
             }
@@ -535,7 +645,7 @@ namespace LootLocker
                 // Check if already connecting
                 if (instance.connectingClients.Contains(ulid))
                 {
-                    LootLockerLogger.Log($"Presence client for {ulid} is already being connected, skipping new connection attempt", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log($"Presence client for {ulid} is already being connected, skipping new connection attempt", LootLockerLogger.LogLevel.Debug);
                     onComplete?.Invoke(false, "Already connecting");
                     return;
                 }
@@ -555,7 +665,7 @@ namespace LootLocker
                     if (existingClient.IsConnecting ||
                         existingClient.IsAuthenticating)
                     {
-                        LootLockerLogger.Log($"Presence client for {ulid} is already in progress (state: {state}), skipping new connection attempt", LootLockerLogger.LogLevel.Verbose);
+                        LootLockerLogger.Log($"Presence client for {ulid} is already in progress (state: {state}), skipping new connection attempt", LootLockerLogger.LogLevel.Debug);
                         onComplete?.Invoke(false, $"Already in progress (state: {state})");
                         return;
                     }
@@ -587,7 +697,11 @@ namespace LootLocker
                 client.Initialize(ulid, playerData.SessionToken);
 
                 // Subscribe to events
-                client.OnConnectionStateChanged += (state, error) => OnConnectionStateChanged?.Invoke(ulid, state, error);
+                client.OnConnectionStateChanged += (state, error) => {
+                    OnConnectionStateChanged?.Invoke(ulid, state, error);
+                    // Auto-cleanup disconnected/failed clients
+                    instance.HandleClientStateChange(ulid, state);
+                };
                 client.OnMessageReceived += (message, messageType) => OnMessageReceived?.Invoke(ulid, message, messageType);
                 client.OnPingReceived += (pingResponse) => OnPingReceived?.Invoke(ulid, pingResponse);
             }
@@ -676,30 +790,119 @@ namespace LootLocker
         }
 
         /// <summary>
+        /// Shared method for disconnecting presence due to session events
+        /// Uses connection state to prevent race conditions and multiple disconnect attempts
+        /// </summary>
+        private void DisconnectPresenceForEvent(string playerUlid)
+        {
+            if (string.IsNullOrEmpty(playerUlid))
+            {
+                return;
+            }
+
+            LootLockerPresenceClient client = null;
+            
+            lock (activeClientsLock)
+            {
+                if (!activeClients.TryGetValue(playerUlid, out client))
+                {
+                    LootLockerLogger.Log($"No active presence client found for {playerUlid}, skipping disconnect", LootLockerLogger.LogLevel.Debug);
+                    return;
+                }
+                
+                // Check connection state to prevent multiple disconnect attempts
+                var connectionState = client.ConnectionState;
+                if (connectionState == LootLockerPresenceConnectionState.Disconnected ||
+                    connectionState == LootLockerPresenceConnectionState.Failed)
+                {
+                    LootLockerLogger.Log($"Presence client for {playerUlid} is already disconnected or failed (state: {connectionState}), cleaning up", LootLockerLogger.LogLevel.Debug);
+                    activeClients.Remove(playerUlid);
+                    UnityEngine.Object.Destroy(client);
+                    return;
+                }
+                
+                // Remove from activeClients immediately to prevent other events from trying to disconnect
+                activeClients.Remove(playerUlid);
+            }
+
+            // Disconnect outside the lock to avoid blocking other operations
+            if (client != null)
+            {
+                client.Disconnect((success, error) => {
+                    if (!success)
+                    {
+                        LootLockerLogger.Log($"Error disconnecting presence for {playerUlid}: {error}", LootLockerLogger.LogLevel.Debug);
+                    }
+                    UnityEngine.Object.Destroy(client);
+                });
+            }
+        }
+
+        /// <summary>
         /// Disconnect all presence connections
         /// </summary>
         public static void DisconnectAll()
         {
             var instance = Get();
-            
+            instance.DisconnectAllInternal();
+        }
+
+        /// <summary>
+        /// Internal method to disconnect all clients without accessing service registry
+        /// Used during shutdown to avoid service lookup issues
+        /// </summary>
+        private void DisconnectAllInternal()
+        {
             List<string> ulidsToDisconnect;
-            lock (instance.activeClientsLock)
+            lock (activeClientsLock)
             {
-                ulidsToDisconnect = new List<string>(instance.activeClients.Keys);
+                ulidsToDisconnect = new List<string>(activeClients.Keys);
                 // Clear connecting clients as we're disconnecting everything
-                instance.connectingClients.Clear();
+                connectingClients.Clear();
             }
             
             foreach (var ulid in ulidsToDisconnect)
             {
-                DisconnectPresence(ulid);
+                DisconnectPresenceInternal(ulid);
+            }
+        }
+
+        /// <summary>
+        /// Internal method to disconnect a specific presence client without accessing service registry
+        /// Used during shutdown to avoid service lookup issues
+        /// </summary>
+        private void DisconnectPresenceInternal(string playerUlid)
+        {
+            if (string.IsNullOrEmpty(playerUlid))
+            {
+                return;
+            }
+
+            LootLockerPresenceClient client = null;
+            
+            lock (activeClientsLock)
+            {
+                if (!activeClients.ContainsKey(playerUlid))
+                {
+                    return;
+                }
+
+                client = activeClients[playerUlid];
+                activeClients.Remove(playerUlid);
+            }
+
+            if (client != null)
+            {
+                // During shutdown, just disconnect and destroy without callbacks
+                client.Disconnect();
+                UnityEngine.Object.Destroy(client.gameObject);
             }
         }
 
         /// <summary>
         /// Update presence status for a specific player
         /// </summary>
-        public static void UpdatePresenceStatus(string status, string metadata = null, string playerUlid = null, LootLockerPresenceCallback onComplete = null)
+        public static void UpdatePresenceStatus(string status, Dictionary<string, string> metadata = null, string playerUlid = null, LootLockerPresenceCallback onComplete = null)
         {
             var instance = Get();
             if (!instance.isEnabled)
@@ -758,7 +961,7 @@ namespace LootLocker
         /// </summary>
         public static bool IsPresenceConnected(string playerUlid = null)
         {
-            return GetPresenceConnectionState(playerUlid) == LootLockerPresenceConnectionState.Authenticated;
+            return GetPresenceConnectionState(playerUlid) == LootLockerPresenceConnectionState.Active;
         }
 
         /// <summary>
@@ -802,12 +1005,83 @@ namespace LootLocker
 
             lock (instance.activeClientsLock)
             {
-                if (string.IsNullOrEmpty(ulid) || !instance.activeClients.ContainsKey(ulid))
+                if (string.IsNullOrEmpty(ulid))
+                {
+                    return null;
+                }
+                
+                if (!instance.activeClients.ContainsKey(ulid))
                 {
                     return null;
                 }
 
-                return instance.activeClients[ulid].ConnectionStats;
+                var client = instance.activeClients[ulid];
+                return client.ConnectionStats;
+            }
+        }
+
+        /// <summary>
+        /// Get the last status that was sent for a specific player
+        /// </summary>
+        /// <param name="playerUlid">Optional: The player's ULID. If not provided, uses the default player</param>
+        /// <returns>The last sent status string, or null if no client is found or no status has been sent</returns>
+        public static string GetLastSentStatus(string playerUlid = null)
+        {
+            var instance = Get();
+            string ulid = playerUlid;
+            if (string.IsNullOrEmpty(ulid))
+            {
+                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
+                ulid = playerData?.ULID;
+            }
+
+            lock (instance.activeClientsLock)
+            {
+                if (string.IsNullOrEmpty(ulid))
+                {
+                    return null;
+                }
+                
+                if (!instance.activeClients.ContainsKey(ulid))
+                {
+                    return null;
+                }
+
+                var client = instance.activeClients[ulid];
+                return client.LastSentStatus;
+            }
+        }
+
+        #endregion
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Handle client state changes for automatic cleanup
+        /// </summary>
+        private void HandleClientStateChange(string playerUlid, LootLockerPresenceConnectionState newState)
+        {
+            // Auto-cleanup clients that become disconnected or failed
+            if (newState == LootLockerPresenceConnectionState.Disconnected ||
+                newState == LootLockerPresenceConnectionState.Failed)
+            {
+                LootLockerLogger.Log($"Auto-cleaning up presence client for {playerUlid} due to state change: {newState}", LootLockerLogger.LogLevel.Debug);
+                
+                // Clean up the client from our tracking
+                LootLockerPresenceClient clientToCleanup = null;
+                lock (activeClientsLock)
+                {
+                    if (activeClients.TryGetValue(playerUlid, out clientToCleanup))
+                    {
+                        activeClients.Remove(playerUlid);
+                    }
+                }
+                
+                // Destroy the GameObject to fully clean up resources
+                if (clientToCleanup != null)
+                {
+                    UnityEngine.Object.Destroy(clientToCleanup.gameObject);
+                }
             }
         }
 
@@ -817,11 +1091,29 @@ namespace LootLocker
 
         private void OnDestroy()
         {
-            UnsubscribeFromSessionEvents();
-            
-            DisconnectAll();
+            if (!isShuttingDown)
+            {
+                UnsubscribeFromSessionEvents();
+                
+                // Use internal method to avoid service registry access during shutdown
+                DisconnectAllInternal();
+            }
 
-            LootLockerLifecycleManager.UnregisterService<LootLockerPresenceManager>();
+            // Only unregister if the LifecycleManager exists and we're actually registered
+            // During application shutdown, services may already be reset
+            try
+            {
+                if (LootLockerLifecycleManager.Instance != null && 
+                    LootLockerLifecycleManager.HasService<LootLockerPresenceManager>())
+                {
+                    LootLockerLifecycleManager.UnregisterService<LootLockerPresenceManager>();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                // Ignore unregistration errors during shutdown
+                LootLockerLogger.Log($"Error unregistering PresenceManager during shutdown (this is expected): {ex.Message}", LootLockerLogger.LogLevel.Debug);
+            }
         }
 
         #endregion
