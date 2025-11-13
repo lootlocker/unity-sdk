@@ -1,4 +1,3 @@
-#if !LOOTLOCKER_LEGACY_HTTP_STACK
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -1168,4 +1167,3 @@ namespace LootLocker
         #endregion
     }
 }
-#endif
