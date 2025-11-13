@@ -69,11 +69,17 @@ namespace LootLocker
         /// The ULID of the player whose session ended
         /// </summary>
         public string playerUlid { get; set; }
+        
+        /// <summary>
+        /// Whether local state should be cleared for this player
+        /// </summary>
+        public bool clearLocalState { get; set; }
 
-        public LootLockerSessionEndedEventData(string playerUlid) 
+        public LootLockerSessionEndedEventData(string playerUlid, bool clearLocalState = false) 
             : base(LootLockerEventType.SessionEnded)
         {
             this.playerUlid = playerUlid;
+            this.clearLocalState = clearLocalState;
         }
     }
 
@@ -180,7 +186,7 @@ namespace LootLocker
             logEvents = false;
             IsInitialized = true;
             
-            LootLockerLogger.Log("LootLockerEventSystem initialized", LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log("LootLockerEventSystem initialized", LootLockerLogger.LogLevel.Debug);
         }
 
         void ILootLockerService.Reset()
@@ -238,31 +244,14 @@ namespace LootLocker
                 return _instance;
             }
         }
-
-        public static void ResetInstance()
-        {
-            lock (_instanceLock)
-            {
-                _instance = null;
-            }
-        }
         
-        #endregion
-
-#if UNITY_EDITOR
-        [UnityEditor.InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(UnityEditor.EnterPlayModeOptions options)
-        {
-            ResetInstance();
-        }
-#endif
-
         #endregion
 
         #region Private Fields
 
-        // Event storage with weak references to prevent memory leaks
-        private Dictionary<LootLockerEventType, List<WeakReference>> eventSubscribers = new Dictionary<LootLockerEventType, List<WeakReference>>();
+        // Event storage with strong references to prevent premature GC
+        // Using regular List instead of WeakReference to avoid delegate GC issues
+        private Dictionary<LootLockerEventType, List<object>> eventSubscribers = new Dictionary<LootLockerEventType, List<object>>();
         private readonly object eventSubscribersLock = new object(); // Thread safety for event subscribers
 
         // Configuration
@@ -318,13 +307,71 @@ namespace LootLocker
             {
                 if (!instance.eventSubscribers.ContainsKey(eventType))
                 {
-                    instance.eventSubscribers[eventType] = new List<WeakReference>();
+                    instance.eventSubscribers[eventType] = new List<object>();
                 }
 
-                // Clean up dead references before adding new one
-                instance.CleanupDeadReferences(eventType);
+                // Add new subscription with strong reference to prevent GC issues
+                instance.eventSubscribers[eventType].Add(handler);
+                
+                if (instance.logEvents)
+                {
+                    LootLockerLogger.Log($"Subscribed to {eventType}, total subscribers: {instance.eventSubscribers[eventType].Count}", LootLockerLogger.LogLevel.Debug);
+                }
+            }
+        }
 
-                instance.eventSubscribers[eventType].Add(new WeakReference(handler));
+        /// <summary>
+        /// Instance method to subscribe to events without triggering circular dependency through GetInstance()
+        /// Used during initialization when we already have the EventSystem instance
+        /// </summary>
+        public void SubscribeInstance<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
+        {
+            if (!isEnabled || handler == null)
+                return;
+
+            lock (eventSubscribersLock)
+            {
+                if (!eventSubscribers.ContainsKey(eventType))
+                {
+                    eventSubscribers[eventType] = new List<object>();
+                }
+
+                // Add new subscription with strong reference to prevent GC issues
+                eventSubscribers[eventType].Add(handler);
+                
+                if (logEvents)
+                {
+                    LootLockerLogger.Log($"SubscribeInstance to {eventType}, total subscribers: {eventSubscribers[eventType].Count}", LootLockerLogger.LogLevel.Debug);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribe from a specific event type with typed handler using this instance
+        /// </summary>
+        public void UnsubscribeInstance<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
+        {
+            if (!eventSubscribers.ContainsKey(eventType))
+                return;
+
+            lock (eventSubscribersLock)
+            {
+                // Find and remove the matching handler
+                var subscribers = eventSubscribers[eventType];
+                for (int i = subscribers.Count - 1; i >= 0; i--)
+                {
+                    if (subscribers[i].Equals(handler))
+                    {
+                        subscribers.RemoveAt(i);
+                        break;
+                    }
+                }
+                
+                // Clean up empty lists
+                if (subscribers.Count == 0)
+                {
+                    eventSubscribers.Remove(eventType);
+                }
             }
         }
 
@@ -339,11 +386,19 @@ namespace LootLocker
 
             lock (instance.eventSubscribersLock)
             {
-                // Clean up dead references and remove matching handler
-                instance.CleanupDeadReferencesAndRemove(eventType, handler);
+                // Find and remove the matching handler
+                var subscribers = instance.eventSubscribers[eventType];
+                for (int i = subscribers.Count - 1; i >= 0; i--)
+                {
+                    if (subscribers[i].Equals(handler))
+                    {
+                        subscribers.RemoveAt(i);
+                        break;
+                    }
+                }
                 
                 // Clean up empty lists
-                if (instance.eventSubscribers[eventType].Count == 0)
+                if (subscribers.Count == 0)
                 {
                     instance.eventSubscribers.Remove(eventType);
                 }
@@ -361,37 +416,15 @@ namespace LootLocker
 
             LootLockerEventType eventType = eventData.eventType;
 
-            // Log event if enabled
-            if (instance.logEvents)
-            {
-                LootLockerLogger.Log($"LootLocker Event: {eventType} at {eventData.timestamp}", LootLockerLogger.LogLevel.Verbose);
-            }
-
             if (!instance.eventSubscribers.ContainsKey(eventType))
                 return;
 
-            // Get live subscribers and clean up dead references
+            // Get subscribers - no need for WeakReference handling with strong references
             List<object> liveSubscribers = new List<object>();
             lock (instance.eventSubscribersLock)
             {
-                // Clean up dead references first
-                instance.CleanupDeadReferences(eventType);
-                
-                // Then collect live subscribers
                 var subscribers = instance.eventSubscribers[eventType];
-                foreach (var weakRef in subscribers)
-                {
-                    if (weakRef.IsAlive)
-                    {
-                        liveSubscribers.Add(weakRef.Target);
-                    }
-                }
-
-                // Clean up empty event type
-                if (subscribers.Count == 0)
-                {
-                    instance.eventSubscribers.Remove(eventType);
-                }
+                liveSubscribers.AddRange(subscribers);
             }
 
             // Trigger event handlers outside the lock
@@ -409,6 +442,11 @@ namespace LootLocker
                     LootLockerLogger.Log($"Error in event handler for {eventType}: {ex.Message}", LootLockerLogger.LogLevel.Error);
                 }
             }
+
+            if (instance.logEvents)
+            {
+                LootLockerLogger.Log($"LootLocker Event: {eventType} at {eventData.timestamp}. Notified {liveSubscribers.Count} subscribers", LootLockerLogger.LogLevel.Debug);
+            }
         }
 
         /// <summary>
@@ -423,82 +461,7 @@ namespace LootLocker
             }
         }
 
-        /// <summary>
-        /// Clean up all dead references across all event types
-        /// </summary>
-        public static void CleanupAllDeadReferences()
-        {
-            var instance = GetInstance();
-            lock (instance.eventSubscribersLock)
-            {
-                var eventTypesToRemove = new List<LootLockerEventType>();
-                
-                foreach (var eventType in instance.eventSubscribers.Keys)
-                {
-                    instance.CleanupDeadReferences(eventType);
-                    
-                    // Mark empty event types for removal
-                    if (instance.eventSubscribers[eventType].Count == 0)
-                    {
-                        eventTypesToRemove.Add(eventType);
-                    }
-                }
-                
-                // Remove empty event types
-                foreach (var eventType in eventTypesToRemove)
-                {
-                    instance.eventSubscribers.Remove(eventType);
-                }
-            }
-        }
-
         #endregion
-
-        #region Private Methods
-
-        /// <summary>
-        /// Clean up dead references for a specific event type (called within lock)
-        /// </summary>
-        private void CleanupDeadReferences(LootLockerEventType eventType)
-        {
-            if (!eventSubscribers.ContainsKey(eventType))
-                return;
-
-            var subscribers = eventSubscribers[eventType];
-            for (int i = subscribers.Count - 1; i >= 0; i--)
-            {
-                if (!subscribers[i].IsAlive)
-                {
-                    subscribers.RemoveAt(i);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Clean up dead references and remove a specific handler (called within lock)
-        /// </summary>
-        private void CleanupDeadReferencesAndRemove(LootLockerEventType eventType, object targetHandler)
-        {
-            if (!eventSubscribers.ContainsKey(eventType))
-                return;
-
-            var subscribers = eventSubscribers[eventType];
-            for (int i = subscribers.Count - 1; i >= 0; i--)
-            {
-                var weakRef = subscribers[i];
-                if (!weakRef.IsAlive)
-                {
-                    // Remove dead reference
-                    subscribers.RemoveAt(i);
-                }
-                else if (ReferenceEquals(weakRef.Target, targetHandler))
-                {
-                    // Remove matching handler
-                    subscribers.RemoveAt(i);
-                    break;
-                }
-            }
-        }
 
         /// <summary>
         /// Clear all event subscribers
@@ -506,7 +469,10 @@ namespace LootLocker
         public static void ClearAllSubscribers()
         {
             var instance = GetInstance();
-            instance.eventSubscribers.Clear();
+            lock (instance.eventSubscribersLock)
+            {
+                instance.eventSubscribers.Clear();
+            }
         }
 
         /// <summary>
@@ -516,10 +482,13 @@ namespace LootLocker
         {
             var instance = GetInstance();
             
-            if (instance.eventSubscribers.ContainsKey(eventType))
-                return instance.eventSubscribers[eventType].Count;
-                
-            return 0;
+            lock (instance.eventSubscribersLock)
+            {
+                if (instance.eventSubscribers.ContainsKey(eventType))
+                    return instance.eventSubscribers[eventType].Count;
+                    
+                return 0;
+            }
         }
 
         #endregion
@@ -547,9 +516,11 @@ namespace LootLocker
         /// <summary>
         /// Helper method to trigger session ended event
         /// </summary>
-        public static void TriggerSessionEnded(string playerUlid)
+        /// <param name="playerUlid">The player whose session ended</param>
+        /// <param name="clearLocalState">Whether to clear local state for this player</param>
+        public static void TriggerSessionEnded(string playerUlid, bool clearLocalState = false)
         {
-            var eventData = new LootLockerSessionEndedEventData(playerUlid);
+            var eventData = new LootLockerSessionEndedEventData(playerUlid, clearLocalState);
             TriggerEvent(eventData);
         }
 

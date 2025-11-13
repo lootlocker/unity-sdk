@@ -21,13 +21,6 @@ namespace LootLocker.Requests
 {
     public partial class LootLockerSDKManager
     {
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            initialized = false;
-        }
-#endif
 
         /// <summary>
         /// Stores which platform the player currently has a session for.
@@ -39,13 +32,12 @@ namespace LootLocker.Requests
         }
 
         #region Init
-        private static bool initialized;
         
         static bool Init()
         {
             // Initialize the lifecycle manager which will set up HTTP client
             var _ = LootLockerLifecycleManager.Instance;
-            return LoadConfig();
+            return LootLockerConfig.ValidateSettings();
         }
 
         /// <summary>
@@ -58,27 +50,23 @@ namespace LootLocker.Requests
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info)
         {
-            // Initialize the lifecycle manager which will set up HTTP client
+            // Create new settings first
+            bool configResult = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel);
+            if (!configResult)
+            {
+                return false;
+            }
+            
+            // Reset and reinitialize the lifecycle manager with new settings
+            LootLockerLifecycleManager.ResetInstance();
             var _ = LootLockerLifecycleManager.Instance;
-            return LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel: logLevel);
+            
+            return LootLockerLifecycleManager.IsReady;
         }
 
         static bool LoadConfig()
         {
-            initialized = false;
-            if (LootLockerConfig.current == null)
-            {
-                LootLockerLogger.Log("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
-                return false;
-            }
-            if (string.IsNullOrEmpty(LootLockerConfig.current.apiKey))
-            {
-                LootLockerLogger.Log("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, bool onDevelopmentMode, string domainKey)", LootLockerLogger.LogLevel.Error);
-                return false;
-            }
-            
-            initialized = true;
-            return initialized;
+            return LootLockerConfig.ValidateSettings();
         }
 
         /// <summary>
@@ -101,20 +89,20 @@ namespace LootLocker.Requests
         /// <returns>True if initialized, false otherwise.</returns>
         public static bool CheckInitialized(bool skipSessionCheck = false, string forPlayerWithUlid = null)
         {
-            if (!initialized)
+            // Check if lifecycle manager exists and is ready, if not try to initialize
+            if (!LootLockerLifecycleManager.IsReady)
             {
-                LootLockerStateData.Reset();
                 if (!Init())
                 {
                     return false;
                 }
-            }
-
-            // Ensure the lifecycle manager is ready after config initialization
-            if (!LootLockerLifecycleManager.IsReady)
-            {
-                LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment or ensure LootLockerConfig.current is properly set.", LootLockerLogger.LogLevel.Warning);
-                return false;
+                
+                // Double check that initialization succeeded
+                if (!LootLockerLifecycleManager.IsReady)
+                {
+                    LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment or ensure LootLockerConfig.current is properly set.", LootLockerLogger.LogLevel.Warning);
+                    return false;
+                }
             }
 
             if (skipSessionCheck)
@@ -166,9 +154,6 @@ namespace LootLocker.Requests
             
             // Reset the lifecycle manager which will reset all managed services and coordinate with StateData
             LootLockerLifecycleManager.ResetInstance();
-            
-            // Mark as uninitialized so next call requires re-initialization
-            initialized = false;
             
             LootLockerLogger.Log("LootLocker SDK reset complete", LootLockerLogger.LogLevel.Info);
         }
@@ -1078,7 +1063,7 @@ namespace LootLocker.Requests
                             SessionOptionals = Optionals
                         };
                         
-                        LootLockerEventSystem.TriggerSessionStarted(playerData);
+                        LootLockerEventSystem.TriggerSessionRefreshed(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1181,7 +1166,7 @@ namespace LootLocker.Requests
                             SessionOptionals = Optionals
                         };
                         
-                        LootLockerEventSystem.TriggerSessionStarted(playerData);
+                        LootLockerEventSystem.TriggerSessionRefreshed(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1339,7 +1324,7 @@ namespace LootLocker.Requests
                             SessionOptionals = Optionals
                         };
                         
-                        LootLockerEventSystem.TriggerSessionStarted(playerData);
+                        LootLockerEventSystem.TriggerSessionRefreshed(playerData);
                     }
 
                     onComplete?.Invoke(response);
@@ -1439,7 +1424,7 @@ namespace LootLocker.Requests
                     var response = LootLockerAppleGameCenterSessionResponse.Deserialize<LootLockerAppleGameCenterSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionRefreshed(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1570,7 +1555,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerEpicSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionRefreshed(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1703,7 +1688,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerMetaSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionRefreshed(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1845,7 +1830,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerDiscordSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionRefreshed(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
@@ -1896,14 +1881,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        if (clearLocalState)
-                        {
-                            ClearLocalSession(serverResponse.requestContext.player_ulid);
-                        }
-                        else
-                        {
-                            LootLockerStateData.SetPlayerULIDToInactive(serverResponse.requestContext.player_ulid);
-                        }
+                        LootLockerEventSystem.TriggerSessionEnded(serverResponse.requestContext.player_ulid, clearLocalState);
                     }
 
                     onComplete?.Invoke(response);
@@ -1925,7 +1903,7 @@ namespace LootLocker.Requests
 
 #if LOOTLOCKER_ENABLE_PRESENCE
         /// <summary>
-        /// Start the Presence WebSocket connection for real-time status updates
+        /// Manually start the Presence WebSocket connection for real-time status updates. The SDK auto handles this by default.
         /// This will automatically authenticate using the current session token
         /// </summary>
         /// <param name="onConnectionStateChanged">Callback for connection state changes</param>
@@ -1958,7 +1936,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Stop the Presence WebSocket connection for a specific player
+        /// Manually stop the Presence WebSocket connection for a specific player. The SDK auto handles this by default.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void StopPresence(string forPlayerWithUlid = null)
@@ -1967,7 +1945,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Stop all Presence WebSocket connections
+        /// Manually stop all Presence WebSocket connections. The SDK auto handles this by default.
         /// </summary>
         public static void StopAllPresence()
         {
@@ -1981,31 +1959,11 @@ namespace LootLocker.Requests
         /// <param name="metadata">Optional metadata to include with the status</param>
         /// <param name="onComplete">Callback for the result of the operation</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UpdatePresenceStatus(string status, string metadata = null, Action<bool> onComplete = null, string forPlayerWithUlid = null)
+        public static void UpdatePresenceStatus(string status, Dictionary<string, string> metadata = null, Action<bool> onComplete = null, string forPlayerWithUlid = null)
         {
             LootLockerPresenceManager.UpdatePresenceStatus(status, metadata, forPlayerWithUlid, (success, error) => {
                 onComplete?.Invoke(success);
             });
-        }
-
-        /// <summary>
-        /// Send a ping to keep the Presence connection alive
-        /// </summary>
-        /// <param name="onComplete">Callback for the result of the ping</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void SendPresencePing(Action<bool> onComplete = null, string forPlayerWithUlid = null)
-        {
-            var client = LootLockerPresenceManager.GetPresenceClient(forPlayerWithUlid);
-            if (client != null)
-            {
-                client.SendPing((success, error) => {
-                    onComplete?.Invoke(success);
-                });
-            }
-            else
-            {
-                onComplete?.Invoke(false);
-            }
         }
 
         /// <summary>
@@ -2022,21 +1980,30 @@ namespace LootLocker.Requests
         /// Check if Presence is connected and authenticated for a specific player
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <returns>True if connected and authenticated, false otherwise</returns>
+        /// <returns>True if connected and active, false otherwise</returns>
         public static bool IsPresenceConnected(string forPlayerWithUlid = null)
         {
             return LootLockerPresenceManager.IsPresenceConnected(forPlayerWithUlid);
         }
 
         /// <summary>
-        /// Get the active Presence client instance for a specific player
-        /// Use this to subscribe to events or access advanced functionality
+        /// Get statistics about the Presence connection for a specific player
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <returns>The active LootLockerPresenceClient instance, or null if not connected</returns>
-        public static LootLockerPresenceClient GetPresenceClient(string forPlayerWithUlid = null)
+        /// <returns>Connection statistics</returns>
+        public static LootLockerPresenceConnectionStats GetPresenceConnectionStats(string forPlayerWithUlid)
         {
-            return LootLockerPresenceManager.GetPresenceClient(forPlayerWithUlid);
+            return LootLockerPresenceManager.GetPresenceConnectionStats(forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Get the last status that was sent for a specific player
+        /// </summary>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>The last sent status string, or null if no client is found or no status has been sent</returns>
+        public static string GetPresenceLastSentStatus(string forPlayerWithUlid = null)
+        {
+            return LootLockerPresenceManager.GetLastSentStatus(forPlayerWithUlid);
         }
 
         /// <summary>
@@ -2045,6 +2012,10 @@ namespace LootLocker.Requests
         /// <param name="enabled">Whether to enable presence</param>
         public static void SetPresenceEnabled(bool enabled)
         {
+            if(LootLockerPresenceManager.IsEnabled && !enabled)
+            {
+                LootLockerPresenceManager.DisconnectAll();
+            }
             LootLockerPresenceManager.IsEnabled = enabled;
         }
 
@@ -2468,7 +2439,7 @@ namespace LootLocker.Requests
                     var response = LootLockerResponse.Deserialize<LootLockerRefreshRemoteSessionResponse>(serverResponse);
                     if (response.success)
                     {
-                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionRefreshed(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,

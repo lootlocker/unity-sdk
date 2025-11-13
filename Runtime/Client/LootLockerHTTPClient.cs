@@ -147,19 +147,28 @@ namespace LootLocker
                 ExecutionItemsNeedingRefresh = new UniqueList<string>();
                 OngoingIdsToCleanUp = new List<string>();
                 
-                // Cache RateLimiter reference to avoid service lookup on every request
-                _cachedRateLimiter = LootLockerLifecycleManager.GetService<RateLimiter>();
-                if (_cachedRateLimiter == null)
-                {
-                    LootLockerLogger.Log("HTTPClient failed to initialize: RateLimiter service is not available", LootLockerLogger.LogLevel.Error);
-                    IsInitialized = false;
-                    return;
-                }
+                // RateLimiter will be set via SetRateLimiter() if available
                 
                 IsInitialized = true;
                 _instance = this;
             }
             LootLockerLogger.Log("LootLockerHTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
+        }
+
+        /// <summary>
+        /// Set the RateLimiter dependency for this HTTPClient
+        /// </summary>
+        public void SetRateLimiter(RateLimiter rateLimiter)
+        {
+            _cachedRateLimiter = rateLimiter;
+            if (rateLimiter != null)
+            {
+                LootLockerLogger.Log("HTTPClient rate limiting enabled", LootLockerLogger.LogLevel.Verbose);
+            }
+            else
+            {
+                LootLockerLogger.Log("HTTPClient rate limiting disabled", LootLockerLogger.LogLevel.Verbose);
+            }
         }
 
         void ILootLockerService.Reset()
@@ -308,14 +317,6 @@ namespace LootLocker
         
         #endregion
 
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            // Reset through lifecycle manager instead
-            LootLockerLifecycleManager.ResetInstance();
-        }
-#endif
         #endregion
 
         #region Configuration and Properties
@@ -339,7 +340,7 @@ namespace LootLocker
         private List<string> CompletedRequestIDs = new List<string>();
         private UniqueList<string> ExecutionItemsNeedingRefresh = new UniqueList<string>();
         private List<string> OngoingIdsToCleanUp = new List<string>();
-        private RateLimiter _cachedRateLimiter; // Cached reference to avoid service lookup on every request
+        private RateLimiter _cachedRateLimiter; // Optional RateLimiter - if null, rate limiting is disabled
         
         // Memory management constants
         private const int MAX_COMPLETED_REQUEST_HISTORY = 100;
@@ -563,7 +564,7 @@ namespace LootLocker
 
         private bool CreateAndSendRequest(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            // Use cached RateLimiter reference for performance (avoids service lookup on every request)
+            // Rate limiting is optional - if no RateLimiter is set, requests proceed without rate limiting
             if (_cachedRateLimiter?.AddRequestAndCheckIfRateLimitHit() == true)
             {
                 CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, _cachedRateLimiter.GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid));
@@ -730,6 +731,7 @@ namespace LootLocker
             if (playerData == null)
             {
                 LootLockerLogger.Log($"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", LootLockerLogger.LogLevel.Warning);
+                LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                 onSessionRefreshedCallback?.Invoke(LootLockerResponseFactory.Failure<LootLockerSessionResponse>(401, $"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", refreshForPlayerUlid), refreshForPlayerUlid, forExecutionItemId);
                 yield break;
             }
@@ -816,6 +818,7 @@ namespace LootLocker
                 case LL_AuthPlatforms.Steam:
                     {
                         LootLockerLogger.Log($"Token has expired and token refresh is not supported for {playerData.CurrentPlatform.PlatformFriendlyString}", LootLockerLogger.LogLevel.Warning);
+                        LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                         newSessionResponse =
                             LootLockerResponseFactory
                                 .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
@@ -826,6 +829,7 @@ namespace LootLocker
                 default:
                     {
                         LootLockerLogger.Log($"Token refresh for platform {playerData.CurrentPlatform.PlatformFriendlyString} not supported", LootLockerLogger.LogLevel.Error);
+                        LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                         newSessionResponse =
                             LootLockerResponseFactory
                                 .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
@@ -853,6 +857,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
                 {
                     // Session refresh failed so abort call chain
+                    LootLockerEventSystem.TriggerSessionExpired(executionItem.RequestData.ForPlayerWithUlid);
                     CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
                     return;
                 }

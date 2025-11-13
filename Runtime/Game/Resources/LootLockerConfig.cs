@@ -297,6 +297,26 @@ namespace LootLocker
             return true;
         }
 
+        /// <summary>
+        /// Validate the current configuration settings
+        /// </summary>
+        /// <returns>True if configuration is valid, false otherwise</returns>
+        public static bool ValidateSettings()
+        {
+            if (current == null)
+            {
+                LootLockerLogger.Log("SDK could not find settings, please contact support \n You can also set config manually by calling Init(string apiKey, string gameVersion, string domainKey)", LootLockerLogger.LogLevel.Error);
+                return false;
+            }
+            if (string.IsNullOrEmpty(current.apiKey))
+            {
+                LootLockerLogger.Log("API Key has not been set, set it in project settings or manually calling Init(string apiKey, string gameVersion, string domainKey)", LootLockerLogger.LogLevel.Error);
+                return false;
+            }
+            
+            return true;
+        }
+
         public static bool ClearSettings()
         {
             _current.apiKey = null;
@@ -318,13 +338,16 @@ namespace LootLocker
         {
             string urlCore = GetUrlCore();
             string startOfUrl = urlCore.Contains("localhost") ? "http://" : UrlProtocol;
+            string wssStartOfUrl = urlCore.Contains("localhost") ? "ws://" : WssProtocol;
             if (!string.IsNullOrEmpty(domainKey))
             {
                 startOfUrl += domainKey + ".";
+                wssStartOfUrl += domainKey + ".";
             }
             adminUrl = startOfUrl + urlCore + AdminUrlAppendage;
             playerUrl = startOfUrl + urlCore + PlayerUrlAppendage;
             userUrl = startOfUrl + urlCore + UserUrlAppendage;
+            webSocketBaseUrl = wssStartOfUrl + urlCore + UserUrlAppendage;
             baseUrl = startOfUrl + urlCore;
         }
 
@@ -352,6 +375,7 @@ namespace LootLocker
         public string game_version = "1.0.0.0";
         [HideInInspector] public string sdk_version = "";
         [HideInInspector] private static readonly string UrlProtocol = "https://";
+        [HideInInspector] private static readonly string WssProtocol = "wss://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
         [HideInInspector] private static string UrlCoreOverride =
 #if LOOTLOCKER_TARGET_STAGE_ENV
@@ -438,6 +462,7 @@ namespace LootLocker
         [HideInInspector] public string adminUrl = UrlProtocol + GetUrlCore() + AdminUrlAppendage;
         [HideInInspector] public string playerUrl = UrlProtocol + GetUrlCore() + PlayerUrlAppendage;
         [HideInInspector] public string userUrl = UrlProtocol + GetUrlCore() + UserUrlAppendage;
+        [HideInInspector] public string webSocketBaseUrl = WssProtocol + GetUrlCore() + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;

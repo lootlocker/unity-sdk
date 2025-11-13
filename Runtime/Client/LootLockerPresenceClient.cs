@@ -24,7 +24,7 @@ namespace LootLocker
         Connecting,
         Connected,
         Authenticating,
-        Authenticated,
+        Active,
         Reconnecting,
         Failed
     }
@@ -65,9 +65,9 @@ namespace LootLocker
     public class LootLockerPresenceStatusRequest
     {
         public string status { get; set; }
-        public string metadata { get; set; }
+        public Dictionary<string, string> metadata { get; set; }
 
-        public LootLockerPresenceStatusRequest(string status, string metadata = null)
+        public LootLockerPresenceStatusRequest(string status, Dictionary<string, string> metadata = null)
         {
             this.status = status;
             this.metadata = metadata;
@@ -81,11 +81,11 @@ namespace LootLocker
     public class LootLockerPresencePingRequest
     {
         public string type { get; set; } = "ping";
-        public long timestamp { get; set; }
+        public DateTime timestamp { get; set; }
 
         public LootLockerPresencePingRequest()
         {
-            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            timestamp = DateTime.UtcNow;
         }
     }
 
@@ -116,7 +116,7 @@ namespace LootLocker
     [Serializable]
     public class LootLockerPresencePingResponse : LootLockerPresenceResponse
     {
-        public long timestamp { get; set; }
+        public DateTime timestamp { get; set; }
     }
 
     /// <summary>
@@ -125,6 +125,21 @@ namespace LootLocker
     [Serializable]
     public class LootLockerPresenceConnectionStats
     {
+        /// <summary>
+        /// The player ULID this connection belongs to
+        /// </summary>
+        public string playerUlid { get; set; }
+
+        /// <summary>
+        /// Current connection state
+        /// </summary>
+        public LootLockerPresenceConnectionState connectionState { get; set; }
+
+        /// <summary>
+        /// The last status that was sent to the server (e.g., "online", "in_game", "away")
+        /// </summary>
+        public string lastSentStatus { get; set; }
+
         /// <summary>
         /// Current round-trip latency to LootLocker in milliseconds
         /// </summary>
@@ -158,7 +173,18 @@ namespace LootLocker
         /// <summary>
         /// Packet loss percentage (0-100)
         /// </summary>
-        public float packetLossPercentage => totalPingsSent > 0 ? ((totalPingsSent - totalPongsReceived) / (float)totalPingsSent) * 100f : 0f;
+        public float packetLossPercentage 
+        { 
+            get 
+            { 
+                if (totalPingsSent <= 0) return 0f;
+                
+                // Handle case where more pongs are received than pings sent (shouldn't happen, but handle gracefully)
+                if (totalPongsReceived >= totalPingsSent) return 0f;
+                
+                return ((totalPingsSent - totalPongsReceived) / (float)totalPingsSent) * 100f;
+            } 
+        }
 
         /// <summary>
         /// When the connection was established
@@ -169,6 +195,23 @@ namespace LootLocker
         /// How long the connection has been active
         /// </summary>
         public TimeSpan connectionDuration => DateTime.UtcNow - connectionStartTime;
+
+        /// <summary>
+        /// Returns a formatted string representation of the connection statistics
+        /// </summary>
+        public override string ToString()
+        {
+            return $"LootLocker Presence Connection Statistics\n" +
+                   $"  Player ID: {playerUlid}\n" +
+                   $"  Connection State: {connectionState}\n" +
+                   $"  Last Status: {lastSentStatus}\n" +
+                   $"  Current Latency: {currentLatencyMs:F1} ms\n" +
+                   $"  Average Latency: {averageLatencyMs:F1} ms\n" +
+                   $"  Min/Max Latency: {minLatencyMs:F1} ms / {maxLatencyMs:F1} ms\n" +
+                   $"  Packet Loss: {packetLossPercentage:F1}%\n" +
+                   $"  Pings Sent/Received: {totalPingsSent}/{totalPongsReceived}\n" +
+                   $"  Connection Duration: {connectionDuration:hh\\:mm\\:ss}";
+        }
     }
 
     #endregion
@@ -211,13 +254,14 @@ namespace LootLocker
         private CancellationTokenSource cancellationTokenSource;
         private readonly ConcurrentQueue<string> receivedMessages = new ConcurrentQueue<string>();
 
-        private LootLockerPresenceConnectionState connectionState = LootLockerPresenceConnectionState.Initializing;
+        private LootLockerPresenceConnectionState connectionState = LootLockerPresenceConnectionState.Disconnected;
         private string playerUlid;
         private string sessionToken;
-        private static string webSocketBaseUrl;
+        private string lastSentStatus; // Track the last status sent to the server
+        private static string webSocketUrl;
 
         // Connection settings
-        private const float PING_INTERVAL = 25f;
+        private const float PING_INTERVAL = 3f;
         private const float RECONNECT_DELAY = 5f;
         private const int MAX_RECONNECT_ATTEMPTS = 5;
 
@@ -237,9 +281,10 @@ namespace LootLocker
         private Coroutine pingCoroutine;
         private bool isDestroying = false;
         private bool isDisposed = false;
+        private bool isExpectedDisconnect = false; // Track if disconnect is expected (due to session end)
 
         // Latency tracking
-        private readonly Queue<long> pendingPingTimestamps = new Queue<long>();
+        private readonly Queue<DateTime> pendingPingTimestamps = new Queue<DateTime>();
         private readonly Queue<float> recentLatencies = new Queue<float>();
         private const int MAX_LATENCY_SAMPLES = 10;
         private LootLockerPresenceConnectionStats connectionStats = new LootLockerPresenceConnectionStats
@@ -277,9 +322,9 @@ namespace LootLocker
         public LootLockerPresenceConnectionState ConnectionState => connectionState;
 
         /// <summary>
-        /// Whether the client is connected and authenticated
+        /// Whether the client is connected and active (authenticated and operational)
         /// </summary>
-        public bool IsConnectedAndAuthenticated => connectionState == LootLockerPresenceConnectionState.Authenticated;
+        public bool IsConnectedAndAuthenticated => connectionState == LootLockerPresenceConnectionState.Active;
 
         /// <summary>
         /// Whether the client is currently connecting or reconnecting
@@ -297,6 +342,11 @@ namespace LootLocker
         /// The player ULID this client is associated with
         /// </summary>
         public string PlayerUlid => playerUlid;
+
+        /// <summary>
+        /// The last status that was sent to the server (e.g., "online", "in_game", "away")
+        /// </summary>
+        public string LastSentStatus => lastSentStatus;
 
         /// <summary>
         /// Get connection statistics including latency to LootLocker
@@ -439,6 +489,24 @@ namespace LootLocker
         /// </summary>
         internal void Disconnect(LootLockerPresenceCallback onComplete = null)
         {
+            // Prevent multiple disconnect attempts
+            if (isDestroying || isDisposed)
+            {
+                onComplete?.Invoke(true, null);
+                return;
+            }
+            
+            // Check if already disconnected
+            if (connectionState == LootLockerPresenceConnectionState.Disconnected ||
+                connectionState == LootLockerPresenceConnectionState.Failed)
+            {
+                LootLockerLogger.Log($"Presence client already in disconnected state: {connectionState}", LootLockerLogger.LogLevel.Debug);
+                onComplete?.Invoke(true, null);
+                return;
+            }
+            
+            // Mark as expected disconnect to prevent error logging for server-side aborts
+            isExpectedDisconnect = true;
             shouldReconnect = false;
             StartCoroutine(DisconnectCoroutine(onComplete));
         }
@@ -446,13 +514,17 @@ namespace LootLocker
         /// <summary>
         /// Send a status update to the Presence service
         /// </summary>
-        internal void UpdateStatus(string status, string metadata = null, LootLockerPresenceCallback onComplete = null)
+        internal void UpdateStatus(string status, Dictionary<string, string> metadata = null, LootLockerPresenceCallback onComplete = null)
         {
             if (!IsConnectedAndAuthenticated)
             {
                 onComplete?.Invoke(false, "Not connected and authenticated");
                 return;
             }
+
+            // Track the status being sent
+            lastSentStatus = status;
+            connectionStats.lastSentStatus = status;
 
             var statusRequest = new LootLockerPresenceStatusRequest(status, metadata);
             StartCoroutine(SendMessageCoroutine(LootLockerJson.SerializeObject(statusRequest), onComplete));
@@ -463,17 +535,20 @@ namespace LootLocker
         /// </summary>
         internal void SendPing(LootLockerPresenceCallback onComplete = null)
         {
+            LootLockerLogger.Log($"SendPing called. Connected: {IsConnectedAndAuthenticated}, State: {connectionState}", LootLockerLogger.LogLevel.Debug);
+            
             if (!IsConnectedAndAuthenticated)
             {
+                LootLockerLogger.Log("Not sending ping - not connected and authenticated", LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(false, "Not connected and authenticated");
                 return;
             }
 
             var pingRequest = new LootLockerPresencePingRequest();
+            LootLockerLogger.Log($"Sending ping with timestamp {pingRequest.timestamp}", LootLockerLogger.LogLevel.Debug);
             
             // Track the ping timestamp for latency calculation
             pendingPingTimestamps.Enqueue(pingRequest.timestamp);
-            connectionStats.totalPingsSent++;
 
             // Clean up old pending pings (in case pongs are lost)
             while (pendingPingTimestamps.Count > 10)
@@ -481,7 +556,32 @@ namespace LootLocker
                 pendingPingTimestamps.Dequeue();
             }
 
-            StartCoroutine(SendMessageCoroutine(LootLockerJson.SerializeObject(pingRequest), onComplete));
+            StartCoroutine(SendMessageCoroutine(LootLockerJson.SerializeObject(pingRequest), (success, error) => {
+                if (success)
+                {
+                    // Only count the ping as sent if it was actually sent successfully
+                    connectionStats.totalPingsSent++;
+                }
+                else
+                {
+                    // Remove the timestamp since the ping failed to send
+                    if (pendingPingTimestamps.Count > 0)
+                    {
+                        // Remove the most recent timestamp (the one we just added)
+                        var tempQueue = new Queue<DateTime>();
+                        while (pendingPingTimestamps.Count > 1)
+                        {
+                            tempQueue.Enqueue(pendingPingTimestamps.Dequeue());
+                        }
+                        if (pendingPingTimestamps.Count > 0) pendingPingTimestamps.Dequeue(); // Remove the failed ping
+                        while (tempQueue.Count > 0)
+                        {
+                            pendingPingTimestamps.Enqueue(tempQueue.Dequeue());
+                        }
+                    }
+                }
+                onComplete?.Invoke(success, error);
+            }));
         }
 
         #endregion
@@ -528,7 +628,7 @@ namespace LootLocker
 
             ChangeConnectionState(LootLockerPresenceConnectionState.Connected);
 
-            // Initialize connection stats
+            // Initialize connection stats BEFORE starting to listen for messages
             InitializeConnectionStats();
 
             // Start listening for messages
@@ -546,8 +646,8 @@ namespace LootLocker
                 yield break;
             }
 
-            // Start ping routine
-            StartPingRoutine();
+            // Ping routine will be started after authentication is successful
+            // See HandleAuthenticationResponse method
 
             reconnectAttempts = 0;
             onComplete?.Invoke(true);
@@ -561,9 +661,9 @@ namespace LootLocker
                 cancellationTokenSource = new CancellationTokenSource();
 
                 // Cache base URL on first use to avoid repeated string operations
-                if (string.IsNullOrEmpty(webSocketBaseUrl))
+                if (string.IsNullOrEmpty(webSocketUrl))
                 {
-                    webSocketBaseUrl = LootLockerConfig.current.url.Replace("https://", "wss://").Replace("http://", "ws://");
+                    webSocketUrl = LootLockerConfig.current.webSocketBaseUrl + "/presence/v1";
                 }
                 return true;
             }
@@ -576,8 +676,8 @@ namespace LootLocker
 
         private IEnumerator ConnectWebSocketCoroutine(LootLockerPresenceCallback onComplete)
         {
-            var uri = new Uri($"{webSocketBaseUrl}/game/presence/v1");
-            LootLockerLogger.Log($"Connecting to Presence WebSocket: {uri}", LootLockerLogger.LogLevel.Verbose);
+            var uri = new Uri(webSocketUrl);
+            LootLockerLogger.Log($"Connecting to Presence WebSocket: {uri}", LootLockerLogger.LogLevel.Debug);
 
             // Start WebSocket connection in background
             var connectTask = webSocket.ConnectAsync(uri, cancellationTokenSource.Token);
@@ -605,6 +705,9 @@ namespace LootLocker
 
         private void InitializeConnectionStats()
         {
+            connectionStats.playerUlid = this.playerUlid;
+            connectionStats.connectionState = this.connectionState;
+            connectionStats.lastSentStatus = this.lastSentStatus;
             connectionStats.connectionStartTime = DateTime.UtcNow;
             connectionStats.totalPingsSent = 0;
             connectionStats.totalPongsReceived = 0;
@@ -631,6 +734,13 @@ namespace LootLocker
 
         private IEnumerator DisconnectCoroutine(LootLockerPresenceCallback onComplete = null)
         {
+            // Don't attempt disconnect if already destroyed
+            if (isDestroying || isDisposed)
+            {
+                onComplete?.Invoke(true, null);
+                yield break;
+            }
+
             // Stop ping routine
             if (pingCoroutine != null)
             {
@@ -640,13 +750,82 @@ namespace LootLocker
 
             // Close WebSocket connection
             bool closeSuccess = true;
-            if (webSocket != null && webSocket.State == WebSocketState.Open)
+            if (webSocket != null)
             {
-                cancellationTokenSource?.Cancel();
-                var closeTask = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, 
-                    "Client disconnecting", CancellationToken.None);
+                yield return StartCoroutine(CloseWebSocketCoroutine((success) => closeSuccess = success));
+            }
+
+            // Always cleanup regardless of close success
+            yield return StartCoroutine(CleanupConnectionCoroutine());
+
+            ChangeConnectionState(LootLockerPresenceConnectionState.Disconnected);
+            
+            // Reset expected disconnect flag
+            isExpectedDisconnect = false;
+            
+            onComplete?.Invoke(closeSuccess, closeSuccess ? null : "Error during disconnect");
+        }
+
+        private IEnumerator CloseWebSocketCoroutine(System.Action<bool> onComplete)
+        {
+            bool closeSuccess = true;
+            System.Threading.Tasks.Task closeTask = null;
+            
+            try
+            {
+                // Check if WebSocket is already closed/aborted by server
+                if (webSocket.State == WebSocketState.Aborted || 
+                    webSocket.State == WebSocketState.Closed)
+                {
+                    LootLockerLogger.Log($"WebSocket already closed by server (state: {webSocket.State}), cleanup complete", LootLockerLogger.LogLevel.Debug);
+                    onComplete?.Invoke(true);
+                    yield break;
+                }
                 
-                // Wait for close with timeout
+                // Only attempt to close if the WebSocket is in a valid state for closing
+                if (webSocket.State == WebSocketState.Open || 
+                    webSocket.State == WebSocketState.CloseReceived ||
+                    webSocket.State == WebSocketState.CloseSent)
+                {
+                    // Don't cancel the token before close - let the close complete normally
+                    closeTask = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, 
+                        "Client disconnecting", CancellationToken.None);
+                }
+                else
+                {
+                    LootLockerLogger.Log($"WebSocket in unexpected state {webSocket.State}, treating as already closed", LootLockerLogger.LogLevel.Debug);
+                    onComplete?.Invoke(true);
+                    yield break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // If we get an exception during close (like WebSocket aborted), treat it as already closed
+                if (ex.Message.Contains("invalid state") || ex.Message.Contains("Aborted"))
+                {
+                    if (isExpectedDisconnect)
+                    {
+                        LootLockerLogger.Log($"WebSocket was closed by server during session end - this is normal", LootLockerLogger.LogLevel.Debug);
+                    }
+                    else
+                    {
+                        LootLockerLogger.Log($"WebSocket was aborted by server unexpectedly: {ex.Message}", LootLockerLogger.LogLevel.Debug);
+                    }
+                    closeSuccess = true; // Treat server-side abort as successful close
+                }
+                else
+                {
+                    closeSuccess = false;
+                    LootLockerLogger.Log($"Error during WebSocket disconnect: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                }
+                
+                onComplete?.Invoke(closeSuccess);
+                yield break;
+            }
+            
+            // Wait for close task completion outside of try-catch to allow yield
+            if (closeTask != null)
+            {
                 float timeoutSeconds = 5f;
                 float elapsed = 0f;
                 
@@ -656,18 +835,64 @@ namespace LootLocker
                     yield return null;
                 }
 
-                if (closeTask.IsFaulted)
+                try
                 {
-                    closeSuccess = false;
-                    LootLockerLogger.Log($"Error during disconnect: {closeTask.Exception?.Message}", LootLockerLogger.LogLevel.Error);
+                    if (closeTask.IsFaulted)
+                    {
+                        var exception = closeTask.Exception?.InnerException ?? closeTask.Exception;
+                        if (exception?.Message.Contains("invalid state") == true || 
+                            exception?.Message.Contains("Aborted") == true)
+                        {
+                            if (isExpectedDisconnect)
+                            {
+                                LootLockerLogger.Log("WebSocket close completed - session ended as expected", LootLockerLogger.LogLevel.Debug);
+                            }
+                            else
+                            {
+                                LootLockerLogger.Log($"WebSocket was aborted during close task: {exception.Message}", LootLockerLogger.LogLevel.Debug);
+                            }
+                            closeSuccess = true; // Treat server-side abort during close as successful
+                        }
+                        else
+                        {
+                            closeSuccess = false;
+                            if (isExpectedDisconnect)
+                            {
+                                LootLockerLogger.Log($"Error during expected disconnect: {exception?.Message}", LootLockerLogger.LogLevel.Debug);
+                            }
+                            else
+                            {
+                                LootLockerLogger.Log($"Error during disconnect: {exception?.Message}", LootLockerLogger.LogLevel.Error);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Catch any exceptions that occur while checking the task result
+                    if (isExpectedDisconnect)
+                    {
+                        LootLockerLogger.Log($"Exception during expected disconnect task check: {ex.Message}", LootLockerLogger.LogLevel.Debug);
+                    }
+                    else
+                    {
+                        LootLockerLogger.Log($"Exception during disconnect task check: {ex.Message}", LootLockerLogger.LogLevel.Debug);
+                    }
+                    closeSuccess = true; // Treat exceptions during expected disconnect as success
                 }
             }
-
-            // Always cleanup regardless of close success
-            yield return StartCoroutine(CleanupConnectionCoroutine());
-
-            ChangeConnectionState(LootLockerPresenceConnectionState.Disconnected);
-            onComplete?.Invoke(closeSuccess, closeSuccess ? null : "Error during disconnect");
+            
+            // Cancel operations after close is complete
+            try
+            {
+                cancellationTokenSource?.Cancel();
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Error cancelling token source: {ex.Message}", LootLockerLogger.LogLevel.Debug);
+            }
+            
+            onComplete?.Invoke(closeSuccess);
         }
 
         private IEnumerator CleanupConnectionCoroutine()
@@ -729,7 +954,7 @@ namespace LootLocker
 
             if (sendTask.IsCompleted && !sendTask.IsFaulted)
             {
-                LootLockerLogger.Log($"Sent Presence message: {message}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Sent Presence message: {message}", LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(true);
             }
             else
@@ -760,17 +985,30 @@ namespace LootLocker
                 {
                     // Handle receive error
                     var exception = receiveTask.Exception?.GetBaseException();
-                    if (exception is OperationCanceledException)
+                    if (exception is OperationCanceledException || exception is TaskCanceledException)
                     {
-                        LootLockerLogger.Log("Presence WebSocket listening cancelled", LootLockerLogger.LogLevel.Verbose);
+                        if (isExpectedDisconnect)
+                        {
+                            LootLockerLogger.Log("Presence WebSocket listening cancelled due to session end", LootLockerLogger.LogLevel.Debug);
+                        }
+                        else
+                        {
+                            LootLockerLogger.Log("Presence WebSocket listening cancelled", LootLockerLogger.LogLevel.Debug);
+                        }
                     }
                     else
                     {
-                        LootLockerLogger.Log($"Error listening for Presence messages: {exception?.Message}", LootLockerLogger.LogLevel.Error);
+                        string errorMessage = exception?.Message ?? "Unknown error";
+                        LootLockerLogger.Log($"Error listening for Presence messages: {errorMessage}", LootLockerLogger.LogLevel.Warning);
                         
-                        if (shouldReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS)
+                        // Only attempt reconnect for unexpected disconnects
+                        if (shouldReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS && !isExpectedDisconnect)
                         {
-                            StartCoroutine(ScheduleReconnectCoroutine());
+                            // Use longer delay for server-side connection termination
+                            bool isServerSideClose = errorMessage.Contains("remote party closed the WebSocket connection without completing the close handshake");
+                            float reconnectDelay = isServerSideClose ? RECONNECT_DELAY * 2f : RECONNECT_DELAY;
+                            
+                            StartCoroutine(ScheduleReconnectCoroutine(reconnectDelay));
                         }
                     }
                     break;
@@ -785,7 +1023,17 @@ namespace LootLocker
                 }
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    LootLockerLogger.Log("Presence WebSocket closed by server", LootLockerLogger.LogLevel.Verbose);
+                    if (isExpectedDisconnect)
+                    {
+                        LootLockerLogger.Log("Presence WebSocket closed by server during session end", LootLockerLogger.LogLevel.Debug);
+                    }
+                    else
+                    {
+                        LootLockerLogger.Log("Presence WebSocket closed by server", LootLockerLogger.LogLevel.Debug);
+                    }
+                    
+                    // Notify manager that this client is disconnected so it can clean up
+                    ChangeConnectionState(LootLockerPresenceConnectionState.Disconnected);
                     break;
                 }
             }
@@ -795,7 +1043,7 @@ namespace LootLocker
         {
             try
             {
-                LootLockerLogger.Log($"Received Presence message: {message}", LootLockerLogger.LogLevel.Verbose);
+                LootLockerLogger.Log($"Received Presence message: {message}", LootLockerLogger.LogLevel.Debug);
 
                 // Determine message type
                 var messageType = DetermineMessageType(message);
@@ -846,8 +1094,14 @@ namespace LootLocker
             {
                 if (message.Contains("authenticated"))
                 {
-                    ChangeConnectionState(LootLockerPresenceConnectionState.Authenticated);
-                    LootLockerLogger.Log("Presence authentication successful", LootLockerLogger.LogLevel.Verbose);
+                    ChangeConnectionState(LootLockerPresenceConnectionState.Active);
+                    LootLockerLogger.Log("Presence authentication successful", LootLockerLogger.LogLevel.Debug);
+                    
+                    // Start ping routine now that we're active
+                    StartPingRoutine();
+                    
+                    // Reset reconnect attempts on successful authentication
+                    reconnectAttempts = 0;
                 }
                 else
                 {
@@ -867,21 +1121,27 @@ namespace LootLocker
                 var pongResponse = LootLockerJson.DeserializeObject<LootLockerPresencePingResponse>(message);
                 
                 // Calculate latency if we have matching ping timestamp
-                if (pendingPingTimestamps.Count > 0 && pongResponse.timestamp > 0)
+                if (pendingPingTimestamps.Count > 0 && pongResponse?.timestamp != default(DateTime))
                 {
-                    var pongReceivedTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    var pongReceivedTime = DateTime.UtcNow;
                     var pingTimestamp = pendingPingTimestamps.Dequeue();
                     
-                    // Calculate round-trip time
-                    var latencyMs = pongReceivedTime - pingTimestamp;
+                    // Calculate round-trip time in milliseconds
+                    var latencyMs = (long)(pongReceivedTime - pingTimestamp).TotalMilliseconds;
                     
                     if (latencyMs >= 0) // Sanity check
                     {
                         UpdateLatencyStats(latencyMs);
                     }
+                    
+                    // Only count the pong if we had a matching ping timestamp
+                    connectionStats.totalPongsReceived++;
+                }
+                else
+                {
+                    LootLockerLogger.Log("Received pong without matching ping timestamp, likely from previous connection", LootLockerLogger.LogLevel.Debug);
                 }
                 
-                connectionStats.totalPongsReceived++;
                 OnPingReceived?.Invoke(pongResponse);
             }
             catch (Exception ex)
@@ -927,7 +1187,7 @@ namespace LootLocker
         private void HandleGeneralMessage(string message)
         {
             // This method can be extended for other specific message types
-            LootLockerLogger.Log($"Received general presence message: {message}", LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log($"Received general presence message: {message}", LootLockerLogger.LogLevel.Debug);
         }
 
         private void ChangeConnectionState(LootLockerPresenceConnectionState newState, string error = null)
@@ -937,7 +1197,18 @@ namespace LootLocker
                 var previousState = connectionState;
                 connectionState = newState;
 
-                LootLockerLogger.Log($"Presence connection state changed: {previousState} -> {newState}", LootLockerLogger.LogLevel.Verbose);
+                // Update connection stats with new state
+                connectionStats.connectionState = newState;
+
+                LootLockerLogger.Log($"Presence connection state changed: {previousState} -> {newState}", LootLockerLogger.LogLevel.Debug);
+
+                // Stop ping routine if we're no longer active
+                if (newState != LootLockerPresenceConnectionState.Active && pingCoroutine != null)
+                {
+                    LootLockerLogger.Log("Stopping ping routine due to connection state change", LootLockerLogger.LogLevel.Debug);
+                    StopCoroutine(pingCoroutine);
+                    pingCoroutine = null;
+                }
 
                 OnConnectionStateChanged?.Invoke(newState, error);
             }
@@ -945,29 +1216,51 @@ namespace LootLocker
 
         private void StartPingRoutine()
         {
+            LootLockerLogger.Log("Starting presence ping routine after authentication", LootLockerLogger.LogLevel.Debug);
+            
             if (pingCoroutine != null)
             {
+                LootLockerLogger.Log("Stopping existing ping coroutine", LootLockerLogger.LogLevel.Debug);
                 StopCoroutine(pingCoroutine);
             }
 
+            LootLockerLogger.Log($"Starting ping routine. Authenticated: {IsConnectedAndAuthenticated}, Destroying: {isDestroying}", LootLockerLogger.LogLevel.Debug);
             pingCoroutine = StartCoroutine(PingRoutine());
         }
 
         private IEnumerator PingRoutine()
         {
+            LootLockerLogger.Log("Starting presence ping routine", LootLockerLogger.LogLevel.Debug);
+            
+            // Send an immediate ping after authentication to help maintain connection
+            if (IsConnectedAndAuthenticated && !isDestroying)
+            {
+                LootLockerLogger.Log("Sending initial presence ping", LootLockerLogger.LogLevel.Debug);
+                SendPing();
+            }
+            
             while (IsConnectedAndAuthenticated && !isDestroying)
             {
                 float pingInterval = GetEffectivePingInterval();
+                LootLockerLogger.Log($"Waiting {pingInterval} seconds before next ping. Connected: {IsConnectedAndAuthenticated}, Destroying: {isDestroying}", LootLockerLogger.LogLevel.Debug);
                 yield return new WaitForSeconds(pingInterval);
 
                 if (IsConnectedAndAuthenticated && !isDestroying)
                 {
+                    LootLockerLogger.Log("Sending presence ping", LootLockerLogger.LogLevel.Debug);
                     SendPing(); // Use callback version instead of async
                 }
+                else
+                {
+                    LootLockerLogger.Log($"Ping routine stopping. Connected: {IsConnectedAndAuthenticated}, Destroying: {isDestroying}", LootLockerLogger.LogLevel.Debug);
+                    break;
+                }
             }
+            
+            LootLockerLogger.Log("Presence ping routine ended", LootLockerLogger.LogLevel.Debug);
         }
 
-        private IEnumerator ScheduleReconnectCoroutine()
+        private IEnumerator ScheduleReconnectCoroutine(float customDelay = -1f)
         {
             if (!shouldReconnect || isDestroying || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
             {
@@ -975,9 +1268,10 @@ namespace LootLocker
             }
 
             reconnectAttempts++;
-            LootLockerLogger.Log($"Scheduling Presence reconnect attempt {reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS} in {RECONNECT_DELAY} seconds", LootLockerLogger.LogLevel.Verbose);
+            float delayToUse = customDelay > 0 ? customDelay : RECONNECT_DELAY;
+            LootLockerLogger.Log($"Scheduling Presence reconnect attempt {reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS} in {delayToUse} seconds", LootLockerLogger.LogLevel.Debug);
 
-            yield return new WaitForSeconds(RECONNECT_DELAY);
+            yield return new WaitForSeconds(delayToUse);
 
             if (shouldReconnect && !isDestroying)
             {
