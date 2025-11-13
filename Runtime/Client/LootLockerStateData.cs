@@ -31,57 +31,189 @@ namespace LootLocker
         public Dictionary<string, string> WhiteLabelEmailToPlayerUlidMap { get; set; } = new Dictionary<string, string>();
     }
 
-    public class LootLockerStateData
+    /// <summary>
+    /// Manages player state data persistence and session lifecycle
+    /// Now an instantiable service for better architecture and dependency management
+    /// </summary>
+    public class LootLockerStateData : MonoBehaviour, ILootLockerService
     {
-        public LootLockerStateData()
+        #region ILootLockerService Implementation
+
+        public bool IsInitialized { get; private set; } = false;
+        public string ServiceName => "StateData";
+
+        void ILootLockerService.Initialize()
         {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            if (IsInitialized) return;
+            
+            // Event subscriptions will be set up via SetEventSystem() method
+            // to avoid circular dependency during LifecycleManager initialization
+            
+            IsInitialized = true;
+            
+            LootLockerLogger.Log("LootLockerStateData service initialized", LootLockerLogger.LogLevel.Verbose);
         }
 
-        //==================================================
-        // Event Subscription
-        //==================================================
-        private static bool _eventSubscriptionsInitialized = false;
-
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void Initialize()
+        /// <summary>
+        /// Set the EventSystem dependency and subscribe to events
+        /// </summary>
+        public void SetEventSystem(LootLockerEventSystem eventSystem)
         {
-            // Ensure we only subscribe once, even after domain reloads
-            if (_eventSubscriptionsInitialized)
+            if (eventSystem != null)
             {
-                return;
+                // Subscribe to session started events using the provided EventSystem instance
+                eventSystem.SubscribeInstance<LootLockerSessionStartedEventData>(
+                    LootLockerEventType.SessionStarted,
+                    OnSessionStartedEvent
+                );
+                
+                // Subscribe to session refreshed events using the provided EventSystem instance
+                eventSystem.SubscribeInstance<LootLockerSessionRefreshedEventData>(
+                    LootLockerEventType.SessionRefreshed,
+                    OnSessionRefreshedEvent
+                );
+                
+                // Subscribe to session ended events using the provided EventSystem instance
+                eventSystem.SubscribeInstance<LootLockerSessionEndedEventData>(
+                    LootLockerEventType.SessionEnded,
+                    OnSessionEndedEvent
+                );
+                
+                LootLockerLogger.Log("StateData event subscriptions established", LootLockerLogger.LogLevel.Debug);
             }
+        }
 
-            // Subscribe to session started events to automatically save player data
-            LootLockerEventSystem.Subscribe<LootLockerSessionStartedEventData>(
+        void ILootLockerService.Reset()
+        {
+            // Unsubscribe from events using static methods (safe during reset)
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
                 OnSessionStartedEvent
             );
+            
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionRefreshedEventData>(
+                LootLockerEventType.SessionRefreshed,
+                OnSessionRefreshedEvent
+            );
+            
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionEndedEventData>(
+                LootLockerEventType.SessionEnded,
+                OnSessionEndedEvent
+            );
 
-            _eventSubscriptionsInitialized = true;
+            IsInitialized = false;
+
+            lock (_instanceLock)
+            {
+                _instance = null;
+            }
         }
+
+        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+        {
+            // StateData doesn't need to handle pause events
+        }
+
+        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+        {
+            // StateData doesn't need to handle focus events
+        }
+
+        void ILootLockerService.HandleApplicationQuit()
+        {
+            // Clean up any pending operations - Reset will handle event unsubscription
+        }
+
+        #endregion
+
+        #region Singleton Management
+        
+        private static LootLockerStateData _instance;
+        private static readonly object _instanceLock = new object();
+
+        /// <summary>
+        /// Get the StateData service instance through the LifecycleManager.
+        /// Services are automatically registered and initialized on first access if needed.
+        /// </summary>
+        private static LootLockerStateData GetInstance()
+        {
+            if (_instance != null)
+            {
+                return _instance;
+            }
+            
+            lock (_instanceLock)
+            {
+                if (_instance == null)
+                {
+                    // Register with LifecycleManager (will auto-initialize if needed)
+                    _instance = LootLockerLifecycleManager.GetService<LootLockerStateData>();
+                }
+                return _instance;
+            }
+        }
+        
+        #endregion
 
         /// <summary>
         /// Handle session started events by saving the player data
         /// </summary>
-        private static void OnSessionStartedEvent(LootLockerSessionStartedEventData eventData)
+        private void OnSessionStartedEvent(LootLockerSessionStartedEventData eventData)
         {
+            LootLockerLogger.Log("LootLockerStateData: Handling SessionStarted event for player " + eventData?.playerData?.ULID, LootLockerLogger.LogLevel.Debug);
             if (eventData?.playerData != null)
             {
                 SetPlayerData(eventData.playerData);
             }
         }
 
+        /// <summary>
+        /// Handle session refreshed events by updating the player data
+        /// </summary>
+        private void OnSessionRefreshedEvent(LootLockerSessionRefreshedEventData eventData)
+        {
+            LootLockerLogger.Log("LootLockerStateData: Handling SessionRefreshed event for player " + eventData?.playerData?.ULID, LootLockerLogger.LogLevel.Debug);
+            if (eventData?.playerData != null)
+            {
+                SetPlayerData(eventData.playerData);
+            }
+        }
+
+        /// <summary>
+        /// Handle session ended events by managing local state appropriately
+        /// </summary>
+        private void OnSessionEndedEvent(LootLockerSessionEndedEventData eventData)
+        {
+            if (eventData == null || string.IsNullOrEmpty(eventData.playerUlid))
+            {
+                return;
+            }
+
+            LootLockerLogger.Log($"LootLockerStateData: Handling SessionEnded event for player {eventData.playerUlid}, clearLocalState: {eventData.clearLocalState}", LootLockerLogger.LogLevel.Debug);
+            
+            if (eventData.clearLocalState)
+            {
+                // Clear all saved state for this player
+                ClearSavedStateForPlayerWithULID(eventData.playerUlid);
+            }
+            else
+            {
+                // Just set the player to inactive (remove from active players)
+                SetPlayerULIDToInactive(eventData.playerUlid);
+            }
+        }
+
         //==================================================
         // Writer
         //==================================================
-        private static ILootLockerStateWriter _stateWriter =
+        private ILootLockerStateWriter _stateWriter =
             #if LOOTLOCKER_DISABLE_PLAYERPREFS
                 new LootLockerNullStateWriter();
             #else
                 new LootLockerPlayerPrefsStateWriter();
             #endif
-        public static void overrideStateWriter(ILootLockerStateWriter newWriter)
+        
+        public void OverrideStateWriter(ILootLockerStateWriter newWriter)
         {
             if (newWriter != null)
             {
@@ -99,15 +231,15 @@ namespace LootLocker
         //==================================================
         // Actual state
         //==================================================
-        private static LootLockerStateMetaData ActiveMetaData = null;
-        private static Dictionary<string, LootLockerPlayerData> ActivePlayerData = new Dictionary<string, LootLockerPlayerData>();
+        private LootLockerStateMetaData ActiveMetaData = null;
+        private Dictionary<string, LootLockerPlayerData> ActivePlayerData = new Dictionary<string, LootLockerPlayerData>();
 
         #region Private Methods
         //==================================================
         // Private Methods
         //==================================================
 
-        private static void LoadMetaDataFromPlayerPrefsIfNeeded()
+        private void _LoadMetaDataFromPlayerPrefsIfNeeded()
         {
             if (ActiveMetaData != null)
             {
@@ -127,16 +259,16 @@ namespace LootLocker
                 ActiveMetaData.DefaultPlayer = ActiveMetaData.SavedPlayerStateULIDs[0];
             }
 
-            SaveMetaDataToPlayerPrefs();
+            _SaveMetaDataToPlayerPrefs();
         }
 
-        private static void SaveMetaDataToPlayerPrefs()
+        private void _SaveMetaDataToPlayerPrefs()
         {
             string metadataJson = LootLockerJson.SerializeObject(ActiveMetaData);
             _stateWriter.SetString(MetaDataSaveSlot, metadataJson);
         }
 
-        private static void SavePlayerDataToPlayerPrefs(string playerULID)
+        private void _SavePlayerDataToPlayerPrefs(string playerULID)
         {
             if (!ActivePlayerData.TryGetValue(playerULID, out var playerData))
             {
@@ -147,14 +279,14 @@ namespace LootLocker
             _stateWriter.SetString($"{PlayerDataSaveSlot}_{playerULID}", playerDataJson);
         }
 
-        private static bool LoadPlayerDataFromPlayerPrefs(string playerULID)
+        private bool _LoadPlayerDataFromPlayerPrefs(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID))
             {
                 return false;
             }
 
-            if (!SaveStateExistsForPlayer(playerULID))
+            if (!_SaveStateExistsForPlayer(playerULID))
             {
                 return false;
             }
@@ -177,28 +309,37 @@ namespace LootLocker
 
         #endregion // Private Methods
 
-        #region Public Methods
+        #region Private Instance Methods (Used by Static Interface)
         //==================================================
-        // Public Methods
+        // Private Instance Methods (Used by Static Interface)
         //==================================================
-        public static bool SaveStateExistsForPlayer(string playerULID)
+        
+        private void _OverrideStateWriter(ILootLockerStateWriter newWriter)
+        {
+            if (newWriter != null)
+            {
+                _stateWriter = newWriter;
+            }
+        }
+        
+        private bool _SaveStateExistsForPlayer(string playerULID)
         {
             return _stateWriter.HasKey($"{PlayerDataSaveSlot}_{playerULID}");
         }
 
-        public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
+        private LootLockerPlayerData _GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID))
             {
                 return new LootLockerPlayerData();
             }
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return new LootLockerPlayerData();
             }
 
-            if (!SaveStateExistsForPlayer(playerULID))
+            if (!_SaveStateExistsForPlayer(playerULID))
             {
                 return new LootLockerPlayerData();
             }
@@ -217,9 +358,9 @@ namespace LootLocker
         }
 
         [CanBeNull]
-        public static LootLockerPlayerData GetStateForPlayerOrDefaultStateOrEmpty(string playerULID)
+        private LootLockerPlayerData _GetStateForPlayerOrDefaultStateOrEmpty(string playerULID)
         {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return null;
@@ -239,7 +380,7 @@ namespace LootLocker
                 return data;
             }
 
-            if (LoadPlayerDataFromPlayerPrefs(playerULIDToGetDataFor))
+            if (_LoadPlayerDataFromPlayerPrefs(playerULIDToGetDataFor))
             {
                 if (ActivePlayerData.TryGetValue(playerULIDToGetDataFor, out var data2))
                 {
@@ -253,9 +394,9 @@ namespace LootLocker
             return null;
         }
 
-        public static string GetDefaultPlayerULID()
+        private string _GetDefaultPlayerULID()
         {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return string.Empty;
@@ -264,44 +405,44 @@ namespace LootLocker
             return ActiveMetaData.DefaultPlayer;
         }
 
-        public static bool SetDefaultPlayerULID(string playerULID)
+        private bool _SetDefaultPlayerULID(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID) || !SaveStateExistsForPlayer(playerULID))
             {
                 return false;
             }
 
-            if (!ActivePlayerData.ContainsKey(playerULID) && !LoadPlayerDataFromPlayerPrefs(playerULID))
+            if (!ActivePlayerData.ContainsKey(playerULID) && !_LoadPlayerDataFromPlayerPrefs(playerULID))
             {
                 return false;
             }
 
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return false;
             }
 
             ActiveMetaData.DefaultPlayer = playerULID;
-            SaveMetaDataToPlayerPrefs();
+            _SaveMetaDataToPlayerPrefs();
             return true;
         }
 
-        public static bool SetPlayerData(LootLockerPlayerData updatedPlayerData)
+        private bool _SetPlayerData(LootLockerPlayerData updatedPlayerData)
         {
             if (updatedPlayerData == null || string.IsNullOrEmpty(updatedPlayerData.ULID))
             {
                 return false;
             }
 
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return false;
             }
 
             ActivePlayerData[updatedPlayerData.ULID] = updatedPlayerData;
-            SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
+            _SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
             ActiveMetaData.SavedPlayerStateULIDs.AddUnique(updatedPlayerData.ULID);
             if (!string.IsNullOrEmpty(updatedPlayerData.WhiteLabelEmail))
             {
@@ -309,21 +450,21 @@ namespace LootLocker
             }
             if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
             {
-                SetDefaultPlayerULID(updatedPlayerData.ULID);
+                _SetDefaultPlayerULID(updatedPlayerData.ULID);
             }
-            SaveMetaDataToPlayerPrefs();
+            _SaveMetaDataToPlayerPrefs();
 
             return true;
         }
 
-        public static bool ClearSavedStateForPlayerWithULID(string playerULID)
+        private bool _ClearSavedStateForPlayerWithULID(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID))
             {
                 return false;
             }
 
-            if (!SaveStateExistsForPlayer(playerULID))
+            if (!_SaveStateExistsForPlayer(playerULID))
             {
                 return true;
             }
@@ -331,7 +472,7 @@ namespace LootLocker
             ActivePlayerData.Remove(playerULID);
             _stateWriter.DeleteKey($"{PlayerDataSaveSlot}_{playerULID}");
 
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData != null)
             {
                 ActiveMetaData.SavedPlayerStateULIDs.Remove(playerULID);
@@ -345,17 +486,17 @@ namespace LootLocker
                 {
                     ActiveMetaData.WhiteLabelEmailToPlayerUlidMap.Remove(playerData?.WhiteLabelEmail);
                 }
-                SaveMetaDataToPlayerPrefs();
+                _SaveMetaDataToPlayerPrefs();
             }
             
             LootLockerEventSystem.TriggerLocalSessionDeactivated(playerULID);
             return true;
         }
 
-        public static List<string> ClearAllSavedStates()
+        private List<string> _ClearAllSavedStates()
         {
             List<string> removedULIDs = new List<string>();
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return removedULIDs;
@@ -364,21 +505,21 @@ namespace LootLocker
             List<string> ulidsToRemove = new List<string>(ActiveMetaData.SavedPlayerStateULIDs);
             foreach (string ULID in ulidsToRemove)
             {
-                if (ClearSavedStateForPlayerWithULID(ULID))
+                if (_ClearSavedStateForPlayerWithULID(ULID))
                 {
                     removedULIDs.Add(ULID);
                 }
             }
 
             ActiveMetaData = new LootLockerStateMetaData();
-            SaveMetaDataToPlayerPrefs();
+            _SaveMetaDataToPlayerPrefs();
             return removedULIDs;
         }
 
-        public static List<string> ClearAllSavedStatesExceptForPlayer(string playerULID)
+        private List<string> _ClearAllSavedStatesExceptForPlayer(string playerULID)
         {
             List<string> removedULIDs = new List<string>();
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return removedULIDs;
@@ -389,18 +530,18 @@ namespace LootLocker
             {
                 if (!ULID.Equals(playerULID, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (ClearSavedStateForPlayerWithULID(ULID))
+                    if (_ClearSavedStateForPlayerWithULID(ULID))
                     {
                         removedULIDs.Add(ULID);
                     }
                 }
             }
 
-            SetDefaultPlayerULID(playerULID);
+            _SetDefaultPlayerULID(playerULID);
             return removedULIDs;
         }
 
-        public static void SetPlayerULIDToInactive(string playerULID)
+        private void _SetPlayerULIDToInactive(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID) || !ActivePlayerData.ContainsKey(playerULID))
             {
@@ -411,16 +552,16 @@ namespace LootLocker
             LootLockerEventSystem.TriggerLocalSessionDeactivated(playerULID);
         }
 
-        public static void SetAllPlayersToInactive()
+        private void _SetAllPlayersToInactive()
         {
             var activePlayers = ActivePlayerData.Keys.ToList();
             foreach (string playerULID in activePlayers)
             {
-                SetPlayerULIDToInactive(playerULID);
+                _SetPlayerULIDToInactive(playerULID);
             }
         }
 
-        public static void SetAllPlayersToInactiveExceptForPlayer(string playerULID)
+        private void _SetAllPlayersToInactiveExceptForPlayer(string playerULID)
         {
             if (string.IsNullOrEmpty(playerULID))
             {
@@ -430,20 +571,20 @@ namespace LootLocker
             var keysToRemove = ActivePlayerData.Keys.Where(key => !key.Equals(playerULID, StringComparison.OrdinalIgnoreCase)).ToList();
             foreach (string key in keysToRemove)
             {
-                SetPlayerULIDToInactive(key);
+                _SetPlayerULIDToInactive(key);
             }
 
-            SetDefaultPlayerULID(playerULID);
+            _SetDefaultPlayerULID(playerULID);
         }
 
-        public static List<string> GetActivePlayerULIDs()
+        private List<string> _GetActivePlayerULIDs()
         {
             return ActivePlayerData.Keys.ToList();
         }
 
-        public static List<string> GetCachedPlayerULIDs()
+        private List<string> _GetCachedPlayerULIDs()
         {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return new List<string>();
@@ -452,9 +593,9 @@ namespace LootLocker
         }
 
         [CanBeNull]
-        public static string GetPlayerUlidFromWLEmail(string email)
+        private string _GetPlayerUlidFromWLEmail(string email)
         {
-            LoadMetaDataFromPlayerPrefsIfNeeded();
+            _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
                 return null;
@@ -464,11 +605,129 @@ namespace LootLocker
             return playerUlid;
         }
 
-        public static void Reset()
+        private void _UnloadState()
         {
-            SetAllPlayersToInactive();
             ActiveMetaData = null;
+            ActivePlayerData.Clear();
         }
+
+        #endregion // Private Instance Methods
+
+        #region Unity Lifecycle
+
+        private void OnDestroy()
+        {
+            // Unsubscribe from events on destruction using static methods
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
+                LootLockerEventType.SessionStarted,
+                OnSessionStartedEvent
+            );
+            
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionRefreshedEventData>(
+                LootLockerEventType.SessionRefreshed,
+                OnSessionRefreshedEvent
+            );
+            
+            LootLockerEventSystem.Unsubscribe<LootLockerSessionEndedEventData>(
+                LootLockerEventType.SessionEnded,
+                OnSessionEndedEvent
+            );
+        }
+
+        #endregion
+
+        #region Static Methods
+        //==================================================
+        // Static Methods (Primary Interface)
+        //==================================================
+        
+        public static void overrideStateWriter(ILootLockerStateWriter newWriter)
+        {
+            GetInstance()._OverrideStateWriter(newWriter);
+        }
+        
+        public static bool SaveStateExistsForPlayer(string playerULID)
+        {
+            return GetInstance()._SaveStateExistsForPlayer(playerULID);
+        }
+
+        public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
+        {
+            return GetInstance()._GetPlayerDataForPlayerWithUlidWithoutChangingState(playerULID);
+        }
+
+        [CanBeNull]
+        public static LootLockerPlayerData GetStateForPlayerOrDefaultStateOrEmpty(string playerULID)
+        {
+            return GetInstance()._GetStateForPlayerOrDefaultStateOrEmpty(playerULID);
+        }
+
+        public static string GetDefaultPlayerULID()
+        {
+            return GetInstance()._GetDefaultPlayerULID();
+        }
+
+        public static bool SetDefaultPlayerULID(string playerULID)
+        {
+            return GetInstance()._SetDefaultPlayerULID(playerULID);
+        }
+
+        public static bool SetPlayerData(LootLockerPlayerData updatedPlayerData)
+        {
+            return GetInstance()._SetPlayerData(updatedPlayerData);
+        }
+
+        public static bool ClearSavedStateForPlayerWithULID(string playerULID)
+        {
+            return GetInstance()._ClearSavedStateForPlayerWithULID(playerULID);
+        }
+
+        public static List<string> ClearAllSavedStates()
+        {
+            return GetInstance()._ClearAllSavedStates();
+        }
+
+        public static List<string> ClearAllSavedStatesExceptForPlayer(string playerULID)
+        {
+            return GetInstance()._ClearAllSavedStatesExceptForPlayer(playerULID);
+        }
+
+        public static void SetPlayerULIDToInactive(string playerULID)
+        {
+            GetInstance()._SetPlayerULIDToInactive(playerULID);
+        }
+
+        public static void SetAllPlayersToInactive()
+        {
+            GetInstance()._SetAllPlayersToInactive();
+        }
+
+        public static void SetAllPlayersToInactiveExceptForPlayer(string playerULID)
+        {
+            GetInstance()._SetAllPlayersToInactiveExceptForPlayer(playerULID);
+        }
+
+        public static List<string> GetActivePlayerULIDs()
+        {
+            return GetInstance()._GetActivePlayerULIDs();
+        }
+
+        public static List<string> GetCachedPlayerULIDs()
+        {
+            return GetInstance()._GetCachedPlayerULIDs();
+        }
+
+        [CanBeNull]
+        public static string GetPlayerUlidFromWLEmail(string email)
+        {
+            return GetInstance()._GetPlayerUlidFromWLEmail(email);
+        }
+
+        public static void UnloadState()
+        {
+            GetInstance()._UnloadState();
+        }
+
+        #endregion // Static Methods
     }
-    #endregion // Public Methods
 }
