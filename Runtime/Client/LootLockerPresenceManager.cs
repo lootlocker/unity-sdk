@@ -44,6 +44,11 @@ namespace LootLocker
             // Wait a frame to ensure all services are fully initialized
             yield return null;
             
+            if (!isEnabled)
+            {
+                yield break;
+            }
+            
             // Subscribe to session events (handle errors separately)
             try
             {
