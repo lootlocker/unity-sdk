@@ -171,22 +171,6 @@ namespace LootLocker
         public int totalPongsReceived { get; set; }
 
         /// <summary>
-        /// Packet loss percentage (0-100)
-        /// </summary>
-        public float packetLossPercentage 
-        { 
-            get 
-            { 
-                if (totalPingsSent <= 0) return 0f;
-                
-                // Handle case where more pongs are received than pings sent (shouldn't happen, but handle gracefully)
-                if (totalPongsReceived >= totalPingsSent) return 0f;
-                
-                return ((totalPingsSent - totalPongsReceived) / (float)totalPingsSent) * 100f;
-            } 
-        }
-
-        /// <summary>
         /// When the connection was established
         /// </summary>
         public DateTime connectionStartTime { get; set; }
@@ -208,7 +192,6 @@ namespace LootLocker
                    $"  Current Latency: {currentLatencyMs:F1} ms\n" +
                    $"  Average Latency: {averageLatencyMs:F1} ms\n" +
                    $"  Min/Max Latency: {minLatencyMs:F1} ms / {maxLatencyMs:F1} ms\n" +
-                   $"  Packet Loss: {packetLossPercentage:F1}%\n" +
                    $"  Pings Sent/Received: {totalPingsSent}/{totalPongsReceived}\n" +
                    $"  Connection Duration: {connectionDuration:hh\\:mm\\:ss}";
         }
@@ -279,6 +262,7 @@ namespace LootLocker
         private bool shouldReconnect = true;
         private int reconnectAttempts = 0;
         private Coroutine pingCoroutine;
+        private Coroutine statusUpdateCoroutine; // Track active status update coroutine
         private bool isDestroying = false;
         private bool isDisposed = false;
         private bool isExpectedDisconnect = false; // Track if disconnect is expected (due to session end)
@@ -329,8 +313,7 @@ namespace LootLocker
         /// <summary>
         /// Whether the client is currently connecting or reconnecting
         /// </summary>
-        public bool IsConnecting => connectionState == LootLockerPresenceConnectionState.Initializing ||
-                                   connectionState == LootLockerPresenceConnectionState.Connecting || 
+        public bool IsConnecting => connectionState == LootLockerPresenceConnectionState.Connecting || 
                                    connectionState == LootLockerPresenceConnectionState.Reconnecting;
 
         /// <summary>
@@ -452,6 +435,7 @@ namespace LootLocker
         {
             this.playerUlid = playerUlid;
             this.sessionToken = sessionToken;
+            ChangeConnectionState(LootLockerPresenceConnectionState.Initializing);
         }
 
         /// <summary>
@@ -518,7 +502,14 @@ namespace LootLocker
         {
             if (!IsConnectedAndAuthenticated)
             {
-                onComplete?.Invoke(false, "Not connected and authenticated");
+                // Stop any existing status update coroutine before starting a new one
+                if (statusUpdateCoroutine != null)
+                {
+                    StopCoroutine(statusUpdateCoroutine);
+                    statusUpdateCoroutine = null;
+                }
+                
+                statusUpdateCoroutine = StartCoroutine(WaitForConnectionAndUpdateStatus(status, metadata, onComplete));
                 return;
             }
 
@@ -528,6 +519,29 @@ namespace LootLocker
 
             var statusRequest = new LootLockerPresenceStatusRequest(status, metadata);
             StartCoroutine(SendMessageCoroutine(LootLockerJson.SerializeObject(statusRequest), onComplete));
+        }
+
+        private IEnumerator WaitForConnectionAndUpdateStatus(string status, Dictionary<string, string> metadata = null, LootLockerPresenceCallback onComplete = null)
+        {
+            int maxWaitTimes = 10;
+            int waitCount = 0;
+            while(!IsConnectedAndAuthenticated && waitCount < maxWaitTimes)
+            {
+                yield return new WaitForSeconds(0.1f);
+                waitCount++;
+            }
+            
+            // Clear the tracked coroutine reference when we're done
+            statusUpdateCoroutine = null;
+            
+            if (IsConnectedAndAuthenticated)
+            {
+                UpdateStatus(status, metadata, onComplete);
+            }
+            else
+            {
+                onComplete?.Invoke(false, "Not connected and authenticated after wait");
+            }
         }
 
         /// <summary>
@@ -746,6 +760,13 @@ namespace LootLocker
             {
                 StopCoroutine(pingCoroutine);
                 pingCoroutine = null;
+            }
+
+            // Stop any pending status update routine
+            if (statusUpdateCoroutine != null)
+            {
+                StopCoroutine(statusUpdateCoroutine);
+                statusUpdateCoroutine = null;
             }
 
             // Close WebSocket connection
@@ -1136,10 +1157,6 @@ namespace LootLocker
                     
                     // Only count the pong if we had a matching ping timestamp
                     connectionStats.totalPongsReceived++;
-                }
-                else
-                {
-                    LootLockerLogger.Log("Received pong without matching ping timestamp, likely from previous connection", LootLockerLogger.LogLevel.Debug);
                 }
                 
                 OnPingReceived?.Invoke(pongResponse);

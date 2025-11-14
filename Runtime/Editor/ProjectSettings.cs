@@ -101,7 +101,7 @@ namespace LootLocker.Admin
                 if (match.Success)
                 {
                     string regexKey = match.Value;
-                    Debug.LogWarning("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + regexKey);
+                    LootLockerLogger.Log("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + regexKey, LootLockerLogger.LogLevel.Info);
                     gameSettings.domainKey = regexKey;
                     m_CustomSettings.FindProperty("domainKey").stringValue = regexKey;
                 }

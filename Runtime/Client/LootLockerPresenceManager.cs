@@ -43,7 +43,7 @@ namespace LootLocker
         {
             // Wait a frame to ensure all services are fully initialized
             yield return null;
-            
+
             if (!isEnabled)
             {
                 yield break;
@@ -348,6 +348,13 @@ namespace LootLocker
             {
                 LootLockerLogger.Log($"Session started event received for {playerData.ULID}, auto-connecting presence", LootLockerLogger.LogLevel.Debug);
                 
+                // Create and initialize client immediately, but defer connection
+                var client = CreateAndInitializePresenceClient(playerData);
+                if (client == null)
+                {
+                    return;
+                }
+
                 // Start auto-connect in a coroutine to avoid blocking the event thread
                 StartCoroutine(AutoConnectPresenceCoroutine(playerData));
             }
@@ -361,8 +368,21 @@ namespace LootLocker
             // Yield one frame to let the session event complete fully
             yield return null;
             
-            // Now attempt to connect presence
-            ConnectPresenceWithPlayerData(playerData);
+            var instance = Get();
+
+            LootLockerPresenceClient existingClient = null;
+
+            lock (instance.activeClientsLock)
+            {
+                // Check if already connected for this player
+                if (instance.activeClients.ContainsKey(playerData.ULID))
+                {
+                    existingClient = instance.activeClients[playerData.ULID];
+                }
+            }
+            
+            // Now attempt to connect the pre-created client
+            ConnectExistingPresenceClient(playerData.ULID, existingClient);
         }
 
         /// <summary>
@@ -525,91 +545,22 @@ namespace LootLocker
         #region Public Methods
 
         /// <summary>
-        /// Initialize the presence manager (called automatically by SDK)
-        /// </summary>
-        internal static void Initialize()
-        {
-            var instance = Get(); // This will create the instance if it doesn't exist
-            
-            // Set enabled state from config once at initialization
-            instance.isEnabled = LootLockerConfig.IsPresenceEnabledForCurrentPlatform();
-            
-            if (!instance.isEnabled)
-            {
-                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
-                LootLockerLogger.Log($"Presence disabled for current platform: {currentPlatform}", LootLockerLogger.LogLevel.Debug);
-                return;
-            }
-        }
-
-        /// <summary>
         /// Connect presence using player data directly (used by event handlers to avoid StateData lookup issues)
         /// </summary>
         private static void ConnectPresenceWithPlayerData(LootLockerPlayerData playerData, LootLockerPresenceCallback onComplete = null)
         {
             var instance = Get();
             
-            if (!instance.isEnabled)
+            // Create and initialize the client
+            var client = instance.CreateAndInitializePresenceClient(playerData);
+            if (client == null)
             {
-                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
-                string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
-                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
-                onComplete?.Invoke(false, errorMessage);
+                onComplete?.Invoke(false, "Failed to create or initialize presence client");
                 return;
             }
 
-            // Use the provided player data directly
-            if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
-            {
-                LootLockerLogger.Log("Cannot connect presence: No valid session token found in player data", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(false, "No valid session token found in player data");
-                return;
-            }
-
-            string ulid = playerData.ULID;
-            if (string.IsNullOrEmpty(ulid))
-            {
-                LootLockerLogger.Log("Cannot connect presence: No valid player ULID found in player data", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(false, "No valid player ULID found in player data");
-                return;
-            }
-
-            lock (instance.activeClientsLock)
-            {
-                // Check if already connected for this player
-                if (instance.activeClients.ContainsKey(ulid))
-                {
-                    LootLockerLogger.Log($"Presence already connected for player {ulid}", LootLockerLogger.LogLevel.Debug);
-                    onComplete?.Invoke(true, "Already connected");
-                    return;
-                }
-
-                // Create new presence client as a GameObject component
-                var clientGameObject = new GameObject($"PresenceClient_{ulid}");
-                clientGameObject.transform.SetParent(instance.transform);
-                var client = clientGameObject.AddComponent<LootLockerPresenceClient>();
-                instance.activeClients[ulid] = client;
-
-                LootLockerLogger.Log($"Connecting presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
-
-                // Initialize the client with player data, then connect
-                client.Initialize(playerData.ULID, playerData.SessionToken);
-                client.Connect((success, error) =>
-                {
-                    if (!success)
-                    {
-                        // Use proper disconnect method to clean up GameObject and remove from dictionary
-                        DisconnectPresence(ulid);
-                        LootLockerLogger.Log($"Failed to connect presence for player {ulid}: {error}", LootLockerLogger.LogLevel.Error);
-                    }
-                    else
-                    {
-                        LootLockerLogger.Log($"Successfully connected presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
-                    }
-                    
-                    onComplete?.Invoke(success, error);
-                });
-            }
+            // Connect the client
+            instance.ConnectExistingPresenceClient(playerData.ULID, client, onComplete);
         }
 
         /// <summary>
@@ -1088,6 +1039,92 @@ namespace LootLocker
                     UnityEngine.Object.Destroy(clientToCleanup.gameObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates and initializes a presence client without connecting it
+        /// </summary>
+        private LootLockerPresenceClient CreateAndInitializePresenceClient(LootLockerPlayerData playerData)
+        {
+            var instance = Get();
+            
+            if (!instance.isEnabled)
+            {
+                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
+                string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
+                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
+                return null;
+            }
+
+            // Use the provided player data directly
+            if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
+            {
+                LootLockerLogger.Log("Cannot create presence client: No valid session token found in player data", LootLockerLogger.LogLevel.Error);
+                return null;
+            }
+
+            string ulid = playerData.ULID;
+            if (string.IsNullOrEmpty(ulid))
+            {
+                LootLockerLogger.Log("Cannot create presence client: No valid player ULID found in player data", LootLockerLogger.LogLevel.Error);
+                return null;
+            }
+
+            lock (instance.activeClientsLock)
+            {
+                // Check if already connected for this player
+                if (instance.activeClients.ContainsKey(ulid))
+                {
+                    LootLockerLogger.Log($"Presence already connected for player {ulid}", LootLockerLogger.LogLevel.Debug);
+                    return instance.activeClients[ulid];
+                }
+
+                // Create new presence client as a GameObject component
+                var clientGameObject = new GameObject($"PresenceClient_{ulid}");
+                clientGameObject.transform.SetParent(instance.transform);
+                var client = clientGameObject.AddComponent<LootLockerPresenceClient>();
+                
+                // Initialize the client with player data (but don't connect yet)
+                client.Initialize(playerData.ULID, playerData.SessionToken);
+                
+                // Add to active clients immediately
+                instance.activeClients[ulid] = client;
+                
+                LootLockerLogger.Log($"Created and initialized presence client for player {ulid}", LootLockerLogger.LogLevel.Debug);
+                return client;
+            }
+        }
+
+        /// <summary>
+        /// Connects an existing presence client
+        /// </summary>
+        private void ConnectExistingPresenceClient(string ulid, LootLockerPresenceClient client, LootLockerPresenceCallback onComplete = null)
+        {
+            if (client == null)
+            {
+                LootLockerLogger.Log($"Cannot connect presence: Client is null for player {ulid}", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(false, "Client is null");
+                return;
+            }
+
+            LootLockerLogger.Log($"Connecting presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
+
+            // Connect the client
+            client.Connect((success, error) =>
+            {
+                if (!success)
+                {
+                    // Use proper disconnect method to clean up GameObject and remove from dictionary
+                    DisconnectPresence(ulid);
+                    LootLockerLogger.Log($"Failed to connect presence for player {ulid}: {error}", LootLockerLogger.LogLevel.Error);
+                }
+                else
+                {
+                    LootLockerLogger.Log($"Successfully connected presence for player {ulid}", LootLockerLogger.LogLevel.Debug);
+                }
+                
+                onComplete?.Invoke(success, error);
+            });
         }
 
         #endregion
