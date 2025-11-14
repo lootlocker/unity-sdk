@@ -1,4 +1,3 @@
-#if !LOOTLOCKER_LEGACY_HTTP_STACK
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -77,6 +76,10 @@ namespace LootLocker
          */
         public int MaxOngoingRequests = 50;
         /*
+         * The maximum size of the request queue before new requests are rejected
+         */
+        public int MaxQueueSize = 5000;
+        /*
          * The threshold of number of requests outstanding to use for warning about the building queue
          */
         public int ChokeWarningThreshold = 500;
@@ -84,6 +87,10 @@ namespace LootLocker
          * Whether to deny incoming requests when the HTTP client is already handling too many requests
          */
         public bool DenyIncomingRequestsWhenBackedUp = true;
+        /*
+         * Whether to log warnings when requests are denied due to queue limits
+         */
+        public bool LogQueueRejections = true;
 
         public LootLockerHTTPClientConfiguration()
         {
@@ -91,8 +98,10 @@ namespace LootLocker
             IncrementalBackoffFactor = 2;
             InitialRetryWaitTimeInMs = 50;
             MaxOngoingRequests = 50;
+            MaxQueueSize = 1000;
             ChokeWarningThreshold = 500;
             DenyIncomingRequestsWhenBackedUp = true;
+            LogQueueRejections = true;
         }
 
         public LootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
@@ -101,16 +110,162 @@ namespace LootLocker
             IncrementalBackoffFactor = incrementalBackoffFactor;
             InitialRetryWaitTimeInMs = initialRetryWaitTime;
             MaxOngoingRequests = 50;
+            MaxQueueSize = 1000;
             ChokeWarningThreshold = 500;
             DenyIncomingRequestsWhenBackedUp = true;
+            LogQueueRejections = true;
         }
     }
 
     #if UNITY_EDITOR
     [ExecuteInEditMode]
     #endif
-    public class LootLockerHTTPClient : MonoBehaviour
+    public class LootLockerHTTPClient : MonoBehaviour, ILootLockerService
     {
+        #region ILootLockerService Implementation
+
+        public bool IsInitialized { get; private set; } = false;
+        public string ServiceName => "HTTPClient";
+
+        void ILootLockerService.Initialize()
+        {
+            if (IsInitialized) return;
+
+            lock (_instanceLock)
+            {            
+                // Initialize HTTP client configuration
+                if (configuration == null)
+                {
+                    configuration = new LootLockerHTTPClientConfiguration();
+                }
+                
+                // Initialize request tracking
+                CurrentlyOngoingRequests = new Dictionary<string, bool>();
+                HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
+                CompletedRequestIDs = new List<string>();
+                ExecutionItemsNeedingRefresh = new UniqueList<string>();
+                OngoingIdsToCleanUp = new List<string>();
+                
+                // RateLimiter will be set via SetRateLimiter() if available
+                
+                IsInitialized = true;
+                _instance = this;
+            }
+            LootLockerLogger.Log("LootLockerHTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
+        }
+
+        /// <summary>
+        /// Set the RateLimiter dependency for this HTTPClient
+        /// </summary>
+        public void SetRateLimiter(RateLimiter rateLimiter)
+        {
+            _cachedRateLimiter = rateLimiter;
+            if (rateLimiter != null)
+            {
+                LootLockerLogger.Log("HTTPClient rate limiting enabled", LootLockerLogger.LogLevel.Verbose);
+            }
+            else
+            {
+                LootLockerLogger.Log("HTTPClient rate limiting disabled", LootLockerLogger.LogLevel.Verbose);
+            }
+        }
+
+        void ILootLockerService.Reset()
+        {
+            // Abort all ongoing requests and notify callbacks
+            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client reset");
+            
+            // Clear all collections
+            ClearAllCollections();
+
+            // Clear cached references
+            _cachedRateLimiter = null;
+
+            IsInitialized = false;
+
+            lock (_instanceLock)
+            {
+                _instance = null;
+            }
+        }
+
+        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+        {
+            // HTTP client doesn't need special pause handling
+        }
+
+        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+        {
+            // HTTP client doesn't need special focus handling
+        }
+
+        void ILootLockerService.HandleApplicationQuit()
+        {
+            // Abort all ongoing requests and notify callbacks
+            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client destruction");
+            
+            // Clear all collections
+            ClearAllCollections();
+            
+            // Clear cached references
+            _cachedRateLimiter = null;
+        }
+
+        #endregion
+
+        #region Private Cleanup Methods
+
+        /// <summary>
+        /// Aborts all ongoing requests, disposes resources, and notifies callbacks with the given reason
+        /// </summary>
+        private void AbortAllOngoingRequestsWithCallback(string abortReason)
+        {
+            if (HTTPExecutionQueue != null)
+            {
+                foreach (var kvp in HTTPExecutionQueue)
+                {
+                    var executionItem = kvp.Value;
+                    if (executionItem != null && !executionItem.Done && !executionItem.RequestData.HaveListenersBeenInvoked)
+                    {
+                        // Abort the web request if it's active
+                        if (executionItem.WebRequest != null)
+                        {
+                            executionItem.WebRequest.Abort();
+                            executionItem.WebRequest.Dispose();
+                        }
+                        
+                        // Notify callbacks that the request was aborted
+                        var abortedResponse = LootLockerResponseFactory.ClientError<LootLockerResponse>(
+                            abortReason, 
+                            executionItem.RequestData.ForPlayerWithUlid, 
+                            executionItem.RequestData.RequestStartTime
+                        );
+                        
+                        executionItem.RequestData.CallListenersWithResult(abortedResponse);
+                    }
+                    else if (executionItem?.WebRequest != null)
+                    {
+                        // Even if done, still dispose the web request to prevent memory leaks
+                        executionItem.WebRequest.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears all internal collections and tracking data
+        /// </summary>
+        private void ClearAllCollections()
+        {
+            CurrentlyOngoingRequests?.Clear();
+            HTTPExecutionQueue?.Clear();
+            CompletedRequestIDs?.Clear();
+            ExecutionItemsNeedingRefresh?.Clear();
+            OngoingIdsToCleanUp?.Clear();
+        }
+
+        #endregion
+
         #region Configuration
 
         private static LootLockerHTTPClientConfiguration configuration = new LootLockerHTTPClientConfiguration();
@@ -131,74 +286,39 @@ namespace LootLocker
         #endregion
 
         #region Instance Handling
+
+        #region Singleton Management
+        
         private static LootLockerHTTPClient _instance;
-        private static int _instanceId = 0;
-        private GameObject _hostingGameObject = null;
+        private static readonly object _instanceLock = new object();
 
-        public static void Instantiate()
-        {
-            if (!_instance)
-            {
-                var gameObject = new GameObject("LootLockerHTTPClient");
-
-                _instance = gameObject.AddComponent<LootLockerHTTPClient>();
-                _instanceId = _instance.GetInstanceID();
-                _instance._hostingGameObject = gameObject;
-                _instance.StartCoroutine(CleanUpOldInstances());
-                if (Application.isPlaying)
-                    DontDestroyOnLoad(_instance.gameObject);
-            }
-        }
-
-        public static IEnumerator CleanUpOldInstances()
-        {
-#if UNITY_2020_1_OR_NEWER
-            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsByType<LootLockerHTTPClient>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-#else
-            LootLockerHTTPClient[] serverApis = GameObject.FindObjectsOfType<LootLockerHTTPClient>();
-#endif
-            foreach (LootLockerHTTPClient serverApi in serverApis)
-            {
-                if (serverApi && _instanceId != serverApi.GetInstanceID() && serverApi._hostingGameObject)
-                {
-#if UNITY_EDITOR
-                    DestroyImmediate(serverApi._hostingGameObject);
-#else
-                    Destroy(serverApi._hostingGameObject);
-#endif
-                }
-            }
-            yield return null;
-        }
-
-        public static void ResetInstance()
-        {
-            if (!_instance) return;
-#if UNITY_EDITOR
-            DestroyImmediate(_instance.gameObject);
-#else
-            Destroy(_instance.gameObject);
-#endif
-            _instance = null;
-            _instanceId = 0;
-        }
-
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-        {
-            ResetInstance();
-        }
-#endif
-
+        /// <summary>
+        /// Get the HTTPClient service instance through the LifecycleManager.
+        /// Services are automatically registered and initialized on first access if needed.
+        /// </summary>
         public static LootLockerHTTPClient Get()
         {
-            if (!_instance)
+            if (_instance != null)
             {
-                Instantiate();
+                return _instance;
             }
-            return _instance;
+            
+            lock (_instanceLock)
+            {
+                if (_instance == null)
+                {
+                    // Register with LifecycleManager (will auto-initialize if needed)
+                    _instance = LootLockerLifecycleManager.GetService<LootLockerHTTPClient>();
+                }
+                return _instance;
+            }
         }
+        
+        #endregion
+
+        #endregion
+
+        #region Configuration and Properties
 
         public void OverrideConfiguration(LootLockerHTTPClientConfiguration configuration)
         {
@@ -214,24 +334,36 @@ namespace LootLocker
         }
         #endregion
 
+        #region Private Fields
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
         private List<string> CompletedRequestIDs = new List<string>();
         private UniqueList<string> ExecutionItemsNeedingRefresh = new UniqueList<string>();
         private List<string> OngoingIdsToCleanUp = new List<string>();
+        private RateLimiter _cachedRateLimiter; // Optional RateLimiter - if null, rate limiting is disabled
+        
+        // Memory management constants
+        private const int MAX_COMPLETED_REQUEST_HISTORY = 100;
+        private const int CLEANUP_THRESHOLD = 500;
+        private DateTime _lastCleanupTime = DateTime.MinValue;
+        private const int CLEANUP_INTERVAL_SECONDS = 30;
+        #endregion
+
+        #region Class Logic
 
         private void OnDestroy()
         {
-            foreach(var executionItem in HTTPExecutionQueue.Values)
-            {
-                if(executionItem != null && executionItem.WebRequest != null)
-                {
-                    executionItem.Dispose();
-                }
-            }
+            // Abort all ongoing requests and notify callbacks
+            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client destruction");
+            
+            // Clear all collections
+            ClearAllCollections();
         }
 
         void Update()
         {
+            // Periodic cleanup to prevent memory leaks
+            PerformPeriodicCleanup();
+            
             // Process the execution queue
             foreach (var executionItem in HTTPExecutionQueue.Values)
             {
@@ -396,10 +528,28 @@ namespace LootLocker
             //Always wait 1 frame before starting any request to the server to make sure the requester code has exited the main thread.
             yield return null;
 
+            // Check if queue has reached maximum size
+            if (configuration.DenyIncomingRequestsWhenBackedUp && HTTPExecutionQueue.Count >= configuration.MaxQueueSize)
+            {
+                string errorMessage = $"Request was denied because the queue has reached its maximum size ({configuration.MaxQueueSize})";
+                if (configuration.LogQueueRejections)
+                {
+                    LootLockerLogger.Log($"HTTP queue full: {HTTPExecutionQueue.Count}/{configuration.MaxQueueSize} requests queued", LootLockerLogger.LogLevel.Warning);
+                }
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime));
+                yield break;
+            }
+
+            // Check for choke warning threshold
             if (configuration.DenyIncomingRequestsWhenBackedUp && (HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > configuration.ChokeWarningThreshold)
             {
                 // Execution queue is backed up, deny request
-                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Request was denied because there are currently too many requests in queue", request.ForPlayerWithUlid, request.RequestStartTime));
+                string errorMessage = $"Request was denied because there are currently too many requests in queue ({HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count} queued, threshold: {configuration.ChokeWarningThreshold})";
+                if (configuration.LogQueueRejections)
+                {
+                    LootLockerLogger.Log($"HTTP queue backed up: {HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count} requests queued", LootLockerLogger.LogLevel.Warning);
+                }
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime));
                 yield break;
             }
 
@@ -413,9 +563,10 @@ namespace LootLocker
 
         private bool CreateAndSendRequest(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            if (RateLimiter.Get().AddRequestAndCheckIfRateLimitHit())
+            // Rate limiting is optional - if no RateLimiter is set, requests proceed without rate limiting
+            if (_cachedRateLimiter?.AddRequestAndCheckIfRateLimitHit() == true)
             {
-                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, RateLimiter.Get().GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid));
+                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, _cachedRateLimiter.GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid));
                 return false;
             }
 
@@ -579,6 +730,7 @@ namespace LootLocker
             if (playerData == null)
             {
                 LootLockerLogger.Log($"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", LootLockerLogger.LogLevel.Warning);
+                LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                 onSessionRefreshedCallback?.Invoke(LootLockerResponseFactory.Failure<LootLockerSessionResponse>(401, $"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", refreshForPlayerUlid), refreshForPlayerUlid, forExecutionItemId);
                 yield break;
             }
@@ -665,6 +817,7 @@ namespace LootLocker
                 case LL_AuthPlatforms.Steam:
                     {
                         LootLockerLogger.Log($"Token has expired and token refresh is not supported for {playerData.CurrentPlatform.PlatformFriendlyString}", LootLockerLogger.LogLevel.Warning);
+                        LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                         newSessionResponse =
                             LootLockerResponseFactory
                                 .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
@@ -675,6 +828,7 @@ namespace LootLocker
                 default:
                     {
                         LootLockerLogger.Log($"Token refresh for platform {playerData.CurrentPlatform.PlatformFriendlyString} not supported", LootLockerLogger.LogLevel.Error);
+                        LootLockerEventSystem.TriggerSessionExpired(refreshForPlayerUlid);
                         newSessionResponse =
                             LootLockerResponseFactory
                                 .TokenExpiredError<LootLockerSessionResponse>(refreshForPlayerUlid);
@@ -702,6 +856,7 @@ namespace LootLocker
                 if (string.IsNullOrEmpty(tokenAfterRefresh) || tokenBeforeRefresh.Equals(playerData.SessionToken))
                 {
                     // Session refresh failed so abort call chain
+                    LootLockerEventSystem.TriggerSessionExpired(executionItem.RequestData.ForPlayerWithUlid);
                     CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
                     return;
                 }
@@ -723,6 +878,8 @@ namespace LootLocker
                 executionItem.IsWaitingForSessionRefresh = false;
             }
         }
+
+        #endregion
 
         #region Session Refresh Helper Methods
 
@@ -954,7 +1111,59 @@ namespace LootLocker
             }
             return errorData;
         }
+        
+        /// <summary>
+        /// Performs periodic cleanup to prevent memory leaks from completed requests
+        /// </summary>
+        private void PerformPeriodicCleanup()
+        {
+            var now = DateTime.UtcNow;
+            
+            // Only cleanup if enough time has passed or if we're over the threshold
+            if ((now - _lastCleanupTime).TotalSeconds < CLEANUP_INTERVAL_SECONDS && 
+                HTTPExecutionQueue.Count < CLEANUP_THRESHOLD)
+            {
+                return;
+            }
+            
+            _lastCleanupTime = now;
+            CleanupCompletedRequests();
+        }
+        
+        /// <summary>
+        /// Removes completed requests from the execution queue to free memory
+        /// </summary>
+        private void CleanupCompletedRequests()
+        {
+            var requestsToRemove = new List<string>();
+            
+            // Find all completed requests
+            foreach (var kvp in HTTPExecutionQueue)
+            {
+                if (kvp.Value.Done)
+                {
+                    requestsToRemove.Add(kvp.Key);
+                }
+            }
+            
+            // Remove completed requests
+            foreach (var requestId in requestsToRemove)
+            {
+                HTTPExecutionQueue.Remove(requestId);
+            }
+            
+            // Trim completed request history if it gets too large
+            while (CompletedRequestIDs.Count > MAX_COMPLETED_REQUEST_HISTORY)
+            {
+                CompletedRequestIDs.RemoveAt(0);
+            }
+            
+            if (requestsToRemove.Count > 0)
+            {
+                LootLockerLogger.Log($"Cleaned up {requestsToRemove.Count} completed HTTP requests. Queue size: {HTTPExecutionQueue.Count}", 
+                    LootLockerLogger.LogLevel.Verbose);
+            }
+        }
         #endregion
     }
 }
-#endif

@@ -336,6 +336,10 @@ namespace LootLocker
         // Broadcasts
         [Header("Broadcasts")]
         public static EndPointClass ListBroadcasts = new EndPointClass("broadcasts/v1", LootLockerHTTPMethod.GET);
+
+        // Presence (WebSocket)
+        [Header("Presence")]
+        public static EndPointClass presenceWebSocket = new EndPointClass("presence/v1", LootLockerHTTPMethod.GET);
     }
 
     [Serializable]
