@@ -446,7 +446,11 @@ namespace LootLocker.LogViewer
 
             var jsonField = new TextField { value = prettifiedJson, isReadOnly = true, multiline = true };
             jsonField.AddToClassList("log-message-field");
-            jsonField.style.whiteSpace = WhiteSpace.PreWrap;
+            #if UNITY_6000_0_OR_NEWER
+                jsonField.style.whiteSpace = WhiteSpace.PreWrap;
+            #else
+                jsonField.style.whiteSpace = WhiteSpace.Normal;
+            #endif
             jsonContainer.Add(jsonField);
             
             foldout.RegisterValueChangedCallback(evt =>
