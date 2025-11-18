@@ -141,22 +141,22 @@ namespace LootLocker
         public string lastSentStatus { get; set; }
 
         /// <summary>
-        /// Current round-trip latency to LootLocker in milliseconds
+        /// Current one-way latency to LootLocker in milliseconds
         /// </summary>
         public float currentLatencyMs { get; set; }
 
         /// <summary>
-        /// Average latency over the last few pings in milliseconds
+        /// Average one-way latency over the last few pings in milliseconds
         /// </summary>
         public float averageLatencyMs { get; set; }
 
         /// <summary>
-        /// Minimum recorded latency in milliseconds
+        /// Minimum recorded one-way latency in milliseconds
         /// </summary>
         public float minLatencyMs { get; set; }
 
         /// <summary>
-        /// Maximum recorded latency in milliseconds
+        /// Maximum recorded one-way latency in milliseconds
         /// </summary>
         public float maxLatencyMs { get; set; }
 
@@ -1167,9 +1167,10 @@ namespace LootLocker
             }
         }
 
-        private void UpdateLatencyStats(long latencyMs)
+        private void UpdateLatencyStats(long roundTripMs)
         {
-            var latency = (float)latencyMs;
+            // Convert round-trip time to one-way latency (industry standard)
+            var latency = (float)roundTripMs / 2.0f;
             
             // Update current latency
             connectionStats.currentLatencyMs = latency;
