@@ -921,32 +921,6 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Get the presence client for a specific player
-        /// </summary>
-        /// <param name="playerUlid">Optional : Get the client for the specified player. If not supplied, the default player will be used.</param>
-        /// <returns>The active LootLockerPresenceClient instance, or null if not connected</returns>
-        public static LootLockerPresenceClient GetPresenceClient(string playerUlid = null)
-        {
-            var instance = Get();
-            string ulid = playerUlid;
-            if (string.IsNullOrEmpty(ulid))
-            {
-                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
-                ulid = playerData?.ULID;
-            }
-
-            lock (instance.activeClientsLock)
-            {
-                if (string.IsNullOrEmpty(ulid) || !instance.activeClients.ContainsKey(ulid))
-                {
-                    return null;
-                }
-
-                return instance.activeClients[ulid];
-            }
-        }
-
-        /// <summary>
         /// Get connection statistics including latency to LootLocker for a specific player
         /// </summary>
         public static LootLockerPresenceConnectionStats GetPresenceConnectionStats(string playerUlid = null)
