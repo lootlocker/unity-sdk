@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.PackageManager;
@@ -94,7 +95,15 @@ namespace LootLocker
                 }
                 else if (args[i] == "-gameversion")
                 {
-                    game_version = args[i + 1];
+                    string versionValue = args[i + 1];
+                    if (IsSemverString(versionValue))
+                    {
+                        game_version = versionValue;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Invalid game version format: '{versionValue}'. Game version must follow Semantic Versioning pattern X.Y.Z.B (e.g., 1.0.0 or 1.0.0.0). See https://docs.lootlocker.com/the-basics/core-concepts/glossary#game-version");
+                    }
                 }
                 else if (args[i] == "-timeout")
                 {
@@ -147,6 +156,11 @@ namespace LootLocker
                 }
             }
 #endif
+        }
+
+        private static bool IsSemverString(string str)
+        {
+            return Regex.IsMatch(str, @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
 
 #if UNITY_EDITOR
