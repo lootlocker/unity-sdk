@@ -214,10 +214,6 @@ namespace LootLocker
 
         #endregion
 
-        #region Instance Handling
-
-        /// <summary>
-        /// Get the EventSystem service instance through the LifecycleManager
         #region Singleton Management
         
         private static LootLockerEventSystem _instance;
@@ -299,25 +295,7 @@ namespace LootLocker
         /// </summary>
         public static void Subscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
-            var instance = GetInstance();
-            if (!instance.isEnabled || handler == null)
-                return;
-
-            lock (instance.eventSubscribersLock)
-            {
-                if (!instance.eventSubscribers.ContainsKey(eventType))
-                {
-                    instance.eventSubscribers[eventType] = new List<object>();
-                }
-
-                // Add new subscription with strong reference to prevent GC issues
-                instance.eventSubscribers[eventType].Add(handler);
-                
-                if (instance.logEvents)
-                {
-                    LootLockerLogger.Log($"Subscribed to {eventType}, total subscribers: {instance.eventSubscribers[eventType].Count}", LootLockerLogger.LogLevel.Debug);
-                }
-            }
+            GetInstance().SubscribeInstance(eventType, handler);
         }
 
         /// <summary>
@@ -380,29 +358,7 @@ namespace LootLocker
         /// </summary>
         public static void Unsubscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
-            var instance = GetInstance();
-            if (!instance.eventSubscribers.ContainsKey(eventType))
-                return;
-
-            lock (instance.eventSubscribersLock)
-            {
-                // Find and remove the matching handler
-                var subscribers = instance.eventSubscribers[eventType];
-                for (int i = subscribers.Count - 1; i >= 0; i--)
-                {
-                    if (subscribers[i].Equals(handler))
-                    {
-                        subscribers.RemoveAt(i);
-                        break;
-                    }
-                }
-                
-                // Clean up empty lists
-                if (subscribers.Count == 0)
-                {
-                    instance.eventSubscribers.Remove(eventType);
-                }
-            }
+            GetInstance().UnsubscribeInstance(eventType, handler);
         }
 
         /// <summary>
@@ -419,16 +375,15 @@ namespace LootLocker
             if (!instance.eventSubscribers.ContainsKey(eventType))
                 return;
 
-            // Get subscribers - no need for WeakReference handling with strong references
-            List<object> liveSubscribers = new List<object>();
+            // Get a copy of subscribers to avoid lock contention during event handling
+            List<object> subscribers;
             lock (instance.eventSubscribersLock)
             {
-                var subscribers = instance.eventSubscribers[eventType];
-                liveSubscribers.AddRange(subscribers);
+                subscribers = new List<object>(instance.eventSubscribers[eventType]);
             }
 
             // Trigger event handlers outside the lock
-            foreach (var subscriber in liveSubscribers)
+            foreach (var subscriber in subscribers)
             {
                 try
                 {
@@ -445,7 +400,7 @@ namespace LootLocker
 
             if (instance.logEvents)
             {
-                LootLockerLogger.Log($"LootLocker Event: {eventType} at {eventData.timestamp}. Notified {liveSubscribers.Count} subscribers", LootLockerLogger.LogLevel.Debug);
+                LootLockerLogger.Log($"LootLocker Event: {eventType} at {eventData.timestamp}. Notified {subscribers.Count} subscribers", LootLockerLogger.LogLevel.Debug);
             }
         }
 
@@ -460,8 +415,6 @@ namespace LootLocker
                 instance.eventSubscribers.Remove(eventType);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Clear all event subscribers
@@ -561,5 +514,6 @@ namespace LootLocker
         }
 
         #endregion
+
     }
 }
