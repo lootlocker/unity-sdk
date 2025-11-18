@@ -74,6 +74,12 @@ namespace LootLocker
             string[] args = System.Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
             {
+                // Ensure there's a next argument for value parameters
+                if (i + 1 >= args.Length)
+                {
+                    continue;
+                }
+
                 if (args[i] == "-apikey")
                 {
                     apiKey = args[i + 1];
@@ -85,6 +91,59 @@ namespace LootLocker
                 else if (args[i] == "-lootlockerurl")
                 {
                     UrlCoreOverride = args[i + 1];
+                }
+                else if (args[i] == "-gameversion")
+                {
+                    game_version = args[i + 1];
+                }
+                else if (args[i] == "-timeout")
+                {
+                    if (float.TryParse(args[i + 1], out float timeout))
+                    {
+                        clientSideRequestTimeOut = timeout;
+                    }
+                }
+                else if (args[i] == "-loglevel")
+                {
+                    if (System.Enum.TryParse<LootLockerLogger.LogLevel>(args[i + 1], true, out LootLockerLogger.LogLevel level))
+                    {
+                        logLevel = level;
+                    }
+                }
+                else if (args[i] == "-prettifyjson")
+                {
+                    if (bool.TryParse(args[i + 1], out bool prettify))
+                    {
+                        prettifyJson = prettify;
+                    }
+                }
+                else if (args[i] == "-obfuscatelogs")
+                {
+                    if (bool.TryParse(args[i + 1], out bool obfuscate))
+                    {
+                        obfuscateLogs = obfuscate;
+                    }
+                }
+                else if (args[i] == "-logerrorsaswarnings")
+                {
+                    if (bool.TryParse(args[i + 1], out bool errorsAsWarnings))
+                    {
+                        logErrorsAsWarnings = errorsAsWarnings;
+                    }
+                }
+                else if (args[i] == "-loginbuilds")
+                {
+                    if (bool.TryParse(args[i + 1], out bool inBuilds))
+                    {
+                        logInBuilds = inBuilds;
+                    }
+                }
+                else if (args[i] == "-allowtokenrefresh")
+                {
+                    if (bool.TryParse(args[i + 1], out bool allowRefresh))
+                    {
+                        allowTokenRefresh = allowRefresh;
+                    }
                 }
             }
 #endif
