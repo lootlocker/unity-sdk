@@ -243,16 +243,6 @@ namespace LootLocker
         private const float RECONNECT_DELAY = 5f;
         private const int MAX_RECONNECT_ATTEMPTS = 5;
 
-        // Battery optimization settings
-        private float GetEffectivePingInterval()
-        {
-            if (LootLockerConfig.ShouldUseBatteryOptimizations() && LootLockerConfig.current.mobilePresenceUpdateInterval > 0)
-            {
-                return LootLockerConfig.current.mobilePresenceUpdateInterval;
-            }
-            return PING_INTERVAL;
-        }
-
         // State tracking
         private bool shouldReconnect = true;
         private int reconnectAttempts = 0;
@@ -1264,7 +1254,7 @@ namespace LootLocker
             
             while (IsConnectedAndAuthenticated && !isDestroying)
             {
-                float pingInterval = GetEffectivePingInterval();
+                float pingInterval = PING_INTERVAL;
                 LootLockerLogger.Log($"Waiting {pingInterval} seconds before next ping. Connected: {IsConnectedAndAuthenticated}, Destroying: {isDestroying}", LootLockerLogger.LogLevel.Debug);
                 yield return new WaitForSeconds(pingInterval);
 
