@@ -137,6 +137,44 @@ namespace LootLocker
         }
     }
 
+#if LOOTLOCKER_ENABLE_PRESENCE
+    /// <summary>
+    /// Event data for presence connection state changed events
+    /// </summary>
+    [Serializable]
+    public class LootLockerPresenceConnectionStateChangedEventData : LootLockerEventData
+    {
+        /// <summary>
+        /// The ULID of the player whose presence connection state changed
+        /// </summary>
+        public string playerUlid { get; set; }
+        
+        /// <summary>
+        /// The previous connection state
+        /// </summary>
+        public LootLockerPresenceConnectionState previousState { get; set; }
+        
+        /// <summary>
+        /// The new connection state
+        /// </summary>
+        public LootLockerPresenceConnectionState newState { get; set; }
+        
+        /// <summary>
+        /// Error message if the state change was due to an error
+        /// </summary>
+        public string errorMessage { get; set; }
+
+        public LootLockerPresenceConnectionStateChangedEventData(string playerUlid, LootLockerPresenceConnectionState previousState, LootLockerPresenceConnectionState newState, string errorMessage = null) 
+            : base(LootLockerEventType.PresenceConnectionStateChanged)
+        {
+            this.playerUlid = playerUlid;
+            this.previousState = previousState;
+            this.newState = newState;
+            this.errorMessage = errorMessage;
+        }
+    }
+#endif
+
     #endregion
 
     #region Event Delegates
@@ -161,7 +199,12 @@ namespace LootLocker
         SessionEnded,
         SessionExpired,
         LocalSessionDeactivated,
-        LocalSessionActivated
+        LocalSessionActivated,
+        
+#if LOOTLOCKER_ENABLE_PRESENCE
+        // Presence Events
+        PresenceConnectionStateChanged
+#endif
     }
 
     #endregion
@@ -406,6 +449,8 @@ namespace LootLocker
 
         /// <summary>
         /// Clear all subscribers for a specific event type
+        /// WARNING: This is for internal SDK use only. It will clear ALL subscribers including internal SDK subscriptions.
+        /// External code should use explicit Unsubscribe() calls instead.
         /// </summary>
         public static void ClearSubscribers(LootLockerEventType eventType)
         {
@@ -418,6 +463,8 @@ namespace LootLocker
 
         /// <summary>
         /// Clear all event subscribers
+        /// WARNING: This is for internal SDK use only. It will clear ALL subscribers including internal SDK subscriptions.
+        /// External code should use explicit Unsubscribe() calls instead.
         /// </summary>
         public static void ClearAllSubscribers()
         {
@@ -512,6 +559,17 @@ namespace LootLocker
             var eventData = new LootLockerLocalSessionActivatedEventData(playerData);
             TriggerEvent(eventData);
         }
+
+#if LOOTLOCKER_ENABLE_PRESENCE
+        /// <summary>
+        /// Helper method to trigger presence connection state changed event
+        /// </summary>
+        public static void TriggerPresenceConnectionStateChanged(string playerUlid, LootLockerPresenceConnectionState previousState, LootLockerPresenceConnectionState newState, string errorMessage = null)
+        {
+            var eventData = new LootLockerPresenceConnectionStateChangedEventData(playerUlid, previousState, newState, errorMessage);
+            TriggerEvent(eventData);
+        }
+#endif
 
         #endregion
 

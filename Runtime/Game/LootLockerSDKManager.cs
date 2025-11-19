@@ -1899,49 +1899,65 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Event System
+
+        /// <summary>
+        /// Subscribe to SDK events using the unified event system
+        /// </summary>
+        /// <typeparam name="T">The event data type</typeparam>
+        /// <param name="eventType">The event type to subscribe to</param>
+        /// <param name="handler">The event handler</param>
+        public static void Subscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
+        {
+            LootLockerEventSystem.Subscribe(eventType, handler);
+        }
+
+        /// <summary>
+        /// Unsubscribe from SDK events
+        /// </summary>
+        /// <typeparam name="T">The event data type</typeparam>
+        /// <param name="eventType">The event type to unsubscribe from</param>
+        /// <param name="handler">The event handler to remove</param>
+        public static void Unsubscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
+        {
+            LootLockerEventSystem.Unsubscribe(eventType, handler);
+        }
+
+        #endregion
+
         #region Presence
 
 #if LOOTLOCKER_ENABLE_PRESENCE
         /// <summary>
         /// Manually start the Presence WebSocket connection for real-time status updates. The SDK auto handles this by default.
-        /// This will automatically authenticate using the current session token
+        /// This will automatically authenticate using the current session token.
         /// </summary>
-        /// <param name="onConnectionStateChanged">Callback for connection state changes</param>
-        /// <param name="onMessageReceived">Callback for all presence messages</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="onComplete">Callback indicating whether the connection and authentication succeeded</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void StartPresence(
-            LootLockerPresenceConnectionStateChanged onConnectionStateChanged = null,
-            LootLockerPresenceMessageReceived onMessageReceived = null,
+            LootLockerPresenceCallback onComplete = null,
             string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
-                onConnectionStateChanged?.Invoke(forPlayerWithUlid, LootLockerPresenceConnectionState.Failed, "SDK not initialized");
+                onComplete?.Invoke(false, "SDK not initialized");
                 return;
             }
 
-            // Subscribe to events if provided
-            if (onConnectionStateChanged != null)
-                LootLockerPresenceManager.OnConnectionStateChanged += onConnectionStateChanged;
-            if (onMessageReceived != null)
-                LootLockerPresenceManager.OnMessageReceived += onMessageReceived;
-
-            // Connect
-            LootLockerPresenceManager.ConnectPresence(forPlayerWithUlid, (success, error) => {
-                if (!success)
-                {
-                    onConnectionStateChanged?.Invoke(forPlayerWithUlid, LootLockerPresenceConnectionState.Failed, error ?? "Failed to start connection");
-                }
-            });
+            // Connect with simple completion callback
+            LootLockerPresenceManager.ConnectPresence(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
-        /// Manually stop the Presence WebSocket connection for a specific player. The SDK auto handles this by default.
+        /// Manually stop the Presence WebSocket connection. The SDK auto handles this by default.
         /// </summary>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void StopPresence(string forPlayerWithUlid = null)
+        /// <param name="onComplete">Optional callback indicating whether the disconnection succeeded</param>
+        /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void StopPresence(
+            LootLockerPresenceCallback onComplete = null,
+            string forPlayerWithUlid = null)
         {
-            LootLockerPresenceManager.DisconnectPresence(forPlayerWithUlid);
+            LootLockerPresenceManager.DisconnectPresence(forPlayerWithUlid, onComplete);
         }
 
         /// <summary>
