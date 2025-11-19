@@ -565,8 +565,7 @@ namespace LootLocker
             
             if (!instance.isEnabled)
             {
-                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
-                string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
+                string errorMessage = "Presence is disabled. Enable it in Project Settings > LootLocker SDK > Presence Settings or use SetPresenceEnabled(true).";
                 LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(false, errorMessage);
                 return;
@@ -648,7 +647,7 @@ namespace LootLocker
                 // Subscribe to client events - client will trigger events directly
                 // Note: Event unsubscription happens automatically when GameObject is destroyed
                 client.OnConnectionStateChanged += (previousState, newState, error) => 
-                    OnClientConnectionStateChanged(ulid, previousState, newState, error);
+                    Get().OnClientConnectionStateChanged(ulid, previousState, newState, error);
             }
             catch (Exception ex)
             {
@@ -1025,8 +1024,7 @@ namespace LootLocker
             
             if (!instance.isEnabled)
             {
-                var currentPlatform = LootLockerConfig.GetCurrentPresencePlatform();
-                string errorMessage = $"Presence is disabled for current platform: {currentPlatform}. Enable it in Project Settings > LootLocker SDK > Presence Settings.";
+                string errorMessage = "Presence is disabled. Enable it in Project Settings > LootLocker SDK > Presence Settings or use SetPresenceEnabled(true).";
                 LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
                 return null;
             }

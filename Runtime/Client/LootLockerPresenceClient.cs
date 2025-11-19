@@ -588,7 +588,7 @@ namespace LootLocker
         {
             if (isDestroying || isDisposed || string.IsNullOrEmpty(sessionToken))
             {
-                onComplete?.Invoke(false, "Invalid state or session token");
+                HandleConnectionError("Invalid state or session token");
                 yield break;
             }
 
