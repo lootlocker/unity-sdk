@@ -1977,7 +1977,7 @@ namespace LootLocker.Requests
         /// Get a list of player ULIDs that currently have active Presence connections
         /// </summary>
         /// <returns>Collection of player ULIDs that have active presence connections</returns>
-        public static List<string> ListPresenceConnections()
+        public static IEnumerable<string> ListPresenceConnections()
         {
             return LootLockerPresenceManager.ActiveClientUlids;
         }
