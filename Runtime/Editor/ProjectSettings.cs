@@ -177,9 +177,7 @@ namespace LootLocker.Admin
             }
             EditorGUILayout.Space();
 
-#if LOOTLOCKER_ENABLE_PRESENCE
             DrawPresenceSettings();
-#endif
         }
 
         private static bool IsSemverString(string str)
@@ -188,9 +186,9 @@ namespace LootLocker.Admin
                 @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
 
-#if LOOTLOCKER_ENABLE_PRESENCE
         private void DrawPresenceSettings()
         {
+#if LOOTLOCKER_ENABLE_PRESENCE
             EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
@@ -207,15 +205,9 @@ namespace LootLocker.Admin
             {
                 EditorGUILayout.Space();
                 
-                // Information about runtime control
-                EditorGUILayout.LabelField("Runtime Control", EditorStyles.label);
-                EditorGUILayout.HelpBox("These are default settings that can be overridden using SDK methods. You can use that to control presence behavior differently for different platforms.", MessageType.Info);
-                
-                EditorGUILayout.Space();
-                
                 // Auto-connect toggle
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"));
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect"));
                 if (EditorGUI.EndChangeCheck())
                 {
                     gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;
@@ -223,18 +215,20 @@ namespace LootLocker.Admin
                 
                 // Auto-disconnect on focus change toggle
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"));
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Disconnect on Pause/Focus Loss"));
                 if (EditorGUI.EndChangeCheck())
                 {
                     gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
                 }
 
                 EditorGUILayout.Space();
+
+                EditorGUILayout.HelpBox("These are default settings that can be overridden using SDK methods. You can use that to control presence behavior differently for different platforms.", MessageType.Info);
             }
 
             EditorGUILayout.Space();
-        }
 #endif
+        }
 
         [SettingsProvider]
         public static SettingsProvider CreateProvider()

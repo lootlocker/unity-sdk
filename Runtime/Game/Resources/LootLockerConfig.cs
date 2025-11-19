@@ -414,7 +414,6 @@ namespace LootLocker
         public bool allowTokenRefresh = true;
 
 #if LOOTLOCKER_ENABLE_PRESENCE
-        [Header("Presence Settings")]
         [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
         public bool enablePresence = true;
         
