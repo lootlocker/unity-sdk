@@ -1929,12 +1929,13 @@ namespace LootLocker.Requests
 
 #if LOOTLOCKER_ENABLE_PRESENCE
         /// <summary>
-        /// Manually start the Presence WebSocket connection for real-time status updates. The SDK auto handles this by default.
-        /// This will automatically authenticate using the current session token.
+        /// Force start the Presence WebSocket connection manually. 
+        /// This will override the automatic presence management and manually establish a connection.
+        /// Use this when you need precise control over presence connections, otherwise let the SDK auto-manage.
         /// </summary>
         /// <param name="onComplete">Callback indicating whether the connection and authentication succeeded</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void StartPresence(
+        public static void ForceStartPresenceConnection(
             LootLockerPresenceCallback onComplete = null,
             string forPlayerWithUlid = null)
         {
@@ -1949,11 +1950,13 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Manually stop the Presence WebSocket connection. The SDK auto handles this by default.
+        /// Force stop the Presence WebSocket connection manually.
+        /// This will override the automatic presence management and manually disconnect.
+        /// Use this when you need precise control over presence connections, otherwise let the SDK auto-manage.
         /// </summary>
         /// <param name="onComplete">Optional callback indicating whether the disconnection succeeded</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void StopPresence(
+        public static void ForceStopPresenceConnection(
             LootLockerPresenceCallback onComplete = null,
             string forPlayerWithUlid = null)
         {
@@ -1961,9 +1964,11 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Manually stop all Presence WebSocket connections. The SDK auto handles this by default.
+        /// Force stop all Presence WebSocket connections manually.
+        /// This will override the automatic presence management and disconnect all active connections.
+        /// Use this when you need to immediately disconnect all presence connections.
         /// </summary>
-        public static void StopAllPresence()
+        public static void ForceStopAllPresenceConnections()
         {
             LootLockerPresenceManager.DisconnectAll();
         }
