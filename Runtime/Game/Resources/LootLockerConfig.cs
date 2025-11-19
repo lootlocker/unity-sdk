@@ -392,66 +392,6 @@ namespace LootLocker
             return string.IsNullOrEmpty(UrlCoreOverride) || UrlCoreOverride.Equals(UrlCore);
 
         }
-
-#if LOOTLOCKER_ENABLE_PRESENCE
-        /// <summary>
-        /// Check if presence is enabled for the current platform
-        /// </summary>
-        public static bool IsPresenceEnabledForCurrentPlatform()
-        {
-            if (!current.enablePresence)
-                return false;
-
-            var currentPlatform = GetCurrentPresencePlatform();
-            return (current.enabledPresencePlatforms & currentPlatform) != 0;
-        }
-
-        /// <summary>
-        /// Get the presence platform enum for the current runtime platform
-        /// </summary>
-        public static LootLockerPresencePlatforms GetCurrentPresencePlatform()
-        {
-#if UNITY_EDITOR
-            return LootLockerPresencePlatforms.UnityEditor;
-#elif UNITY_STANDALONE_WIN
-            return LootLockerPresencePlatforms.Windows;
-#elif UNITY_STANDALONE_OSX
-            return LootLockerPresencePlatforms.MacOS;
-#elif UNITY_STANDALONE_LINUX
-            return LootLockerPresencePlatforms.Linux;
-#elif UNITY_IOS
-            return LootLockerPresencePlatforms.iOS;
-#elif UNITY_ANDROID
-            return LootLockerPresencePlatforms.Android;
-#elif UNITY_WEBGL
-            return LootLockerPresencePlatforms.WebGL;
-#elif UNITY_PS4
-            return LootLockerPresencePlatforms.PlayStation4;
-#elif UNITY_PS5
-            return LootLockerPresencePlatforms.PlayStation5;
-#elif UNITY_XBOXONE
-            return LootLockerPresencePlatforms.XboxOne;
-#elif UNITY_GAMECORE_XBOXSERIES
-            return LootLockerPresencePlatforms.XboxSeriesXS;
-#elif UNITY_SWITCH
-            return LootLockerPresencePlatforms.NintendoSwitch;
-#else
-            return LootLockerPresencePlatforms.None;
-#endif
-        }
-
-        /// <summary>
-        /// Check if current platform should use battery optimizations
-        /// </summary>
-        public static bool ShouldUseBatteryOptimizations()
-        {
-            if (!current.enableMobileBatteryOptimizations)
-                return false;
-
-            var platform = GetCurrentPresencePlatform();
-            return (platform & LootLockerPresencePlatforms.AllMobile) != 0;
-        }
-#endif
         [HideInInspector] private static readonly string UrlAppendage = "/v1";
         [HideInInspector] private static readonly string AdminUrlAppendage = "/admin";
         [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
@@ -475,18 +415,14 @@ namespace LootLocker
 
 #if LOOTLOCKER_ENABLE_PRESENCE
         [Header("Presence Settings")]
-        [Tooltip("Enable WebSocket presence system")]
+        [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
         public bool enablePresence = true;
         
-        [Tooltip("Platforms where WebSocket presence should be enabled")]
-        public LootLockerPresencePlatforms enabledPresencePlatforms = LootLockerPresencePlatforms.RecommendedPlatforms;
+        [Tooltip("Automatically connect presence when sessions are started. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
+        public bool enablePresenceAutoConnect = true;
         
-        [Tooltip("Enable battery optimizations for mobile platforms (connection throttling, etc.)")]
-        public bool enableMobileBatteryOptimizations = true;
-        
-        [Tooltip("Seconds between presence updates on mobile to save battery (0 = no throttling)")]
-        [Range(0f, 60f)]
-        public float mobilePresenceUpdateInterval = 10f;
+        [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
+        public bool enablePresenceAutoDisconnectOnFocusChange = false;
 #endif
 
 #if UNITY_EDITOR

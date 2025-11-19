@@ -25,9 +25,9 @@ namespace LootLocker
         void ILootLockerService.Initialize()
         {
             if (IsInitialized) return;
-            
-            // Initialize presence configuration
-            isEnabled = LootLockerConfig.IsPresenceEnabledForCurrentPlatform();
+            isEnabled = LootLockerConfig.current.enablePresence;
+            autoConnectEnabled = LootLockerConfig.current.enablePresenceAutoConnect;
+            autoDisconnectOnFocusChange = LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange;
             
             IsInitialized = true;
             LootLockerLogger.Log("LootLockerPresenceManager initialized", LootLockerLogger.LogLevel.Debug);
@@ -86,19 +86,19 @@ namespace LootLocker
         {
             if(!IsInitialized)
                 return;
-            if (!LootLockerConfig.ShouldUseBatteryOptimizations() || !isEnabled)
+            if (!autoDisconnectOnFocusChange || !isEnabled)
                 return;
 
             if (pauseStatus)
             {
-                // App paused - disconnect for battery optimization
-                LootLockerLogger.Log("App paused - disconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
+                // App paused - disconnect all presence connections to save battery/resources
+                LootLockerLogger.Log("Application paused - disconnecting all presence connections (auto-disconnect enabled)", LootLockerLogger.LogLevel.Debug);
                 DisconnectAll();
             }
             else
             {
-                // App resumed - reconnect
-                LootLockerLogger.Log("App resumed - reconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
+                // App resumed - reconnect presence connections
+                LootLockerLogger.Log("Application resumed - will reconnect presence connections", LootLockerLogger.LogLevel.Debug);
                 StartCoroutine(AutoConnectExistingSessions());
             }
         }
@@ -107,19 +107,19 @@ namespace LootLocker
         {
             if(!IsInitialized)
                 return;
-            if (!LootLockerConfig.ShouldUseBatteryOptimizations() || !isEnabled)
+            if (!autoDisconnectOnFocusChange || !isEnabled)
                 return;
 
             if (hasFocus)
             {
-                // App regained focus - use existing AutoConnectExistingSessions logic
-                LootLockerLogger.Log("App returned to foreground - reconnecting presence sessions", LootLockerLogger.LogLevel.Debug);
+                // App gained focus - ensure presence is reconnected
+                LootLockerLogger.Log("Application gained focus - ensuring presence connections (auto-disconnect enabled)", LootLockerLogger.LogLevel.Debug);
                 StartCoroutine(AutoConnectExistingSessions());
             }
             else
             {
-                // App lost focus - disconnect all active sessions to save battery
-                LootLockerLogger.Log("App went to background - disconnecting all presence sessions for battery optimization", LootLockerLogger.LogLevel.Debug);
+                // App lost focus - disconnect presence to save resources
+                LootLockerLogger.Log("Application lost focus - disconnecting presence (auto-disconnect enabled)", LootLockerLogger.LogLevel.Debug);
                 DisconnectAll();
             }
         }
@@ -249,6 +249,7 @@ namespace LootLocker
         private readonly object activeClientsLock = new object(); // Thread safety for activeClients dictionary
         private bool isEnabled = true;
         private bool autoConnectEnabled = true;
+        private bool autoDisconnectOnFocusChange = false; // Developer-configurable setting for focus-based disconnection
         private bool isShuttingDown = false; // Track if we're shutting down to prevent double disconnect
 
         #endregion
@@ -504,6 +505,17 @@ namespace LootLocker
         {
             get => Get().autoConnectEnabled;
             set => Get().autoConnectEnabled = value;
+        }
+
+        /// <summary>
+        /// Whether presence should automatically disconnect when the application loses focus or is paused.
+        /// When enabled, presence will disconnect when the app goes to background and reconnect when it returns to foreground.
+        /// Useful for saving battery on mobile or managing resources.
+        /// </summary>
+        public static bool AutoDisconnectOnFocusChange
+        {
+            get => Get().autoDisconnectOnFocusChange;
+            set => Get().autoDisconnectOnFocusChange = value;
         }
 
         /// <summary>
