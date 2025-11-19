@@ -204,13 +204,8 @@ namespace LootLocker
     /// <summary>
     /// Delegate for connection state changes
     /// </summary>
-    public delegate void LootLockerPresenceConnectionStateChanged(string playerUlid, LootLockerPresenceConnectionState newState, string error = null);
+    public delegate void LootLockerPresenceConnectionStateChanged(string playerUlid, LootLockerPresenceConnectionState previousState, LootLockerPresenceConnectionState newState, string error = null);
     
-    /// <summary>
-    /// Delegate for general presence messages
-    /// </summary>
-    public delegate void LootLockerPresenceMessageReceived(string playerUlid, string message, LootLockerPresenceMessageType messageType);
-
     /// <summary>
     /// Delegate for ping responses
     /// </summary>
@@ -266,6 +261,7 @@ namespace LootLocker
         private bool isDestroying = false;
         private bool isDisposed = false;
         private bool isExpectedDisconnect = false; // Track if disconnect is expected (due to session end)
+        private LootLockerPresenceCallback pendingConnectionCallback; // Store callback until authentication completes
 
         // Latency tracking
         private readonly Queue<DateTime> pendingPingTimestamps = new Queue<DateTime>();
@@ -284,12 +280,7 @@ namespace LootLocker
         /// <summary>
         /// Event fired when the connection state changes
         /// </summary>
-        public event System.Action<LootLockerPresenceConnectionState, string> OnConnectionStateChanged;
-
-        /// <summary>
-        /// Event fired when any presence message is received
-        /// </summary>
-        public event System.Action<string, LootLockerPresenceMessageType> OnMessageReceived;
+        public event System.Action<LootLockerPresenceConnectionState, LootLockerPresenceConnectionState, string> OnConnectionStateChanged;
 
         /// <summary>
         /// Event fired when a ping response is received
@@ -464,8 +455,9 @@ namespace LootLocker
 
             shouldReconnect = true;
             reconnectAttempts = 0;
+            pendingConnectionCallback = onComplete;
 
-            StartCoroutine(ConnectCoroutine(onComplete));
+            StartCoroutine(ConnectCoroutine());
         }
 
         /// <summary>
@@ -602,7 +594,7 @@ namespace LootLocker
 
         #region Private Methods
 
-        private IEnumerator ConnectCoroutine(LootLockerPresenceCallback onComplete = null)
+        private IEnumerator ConnectCoroutine()
         {
             if (isDestroying || isDisposed || string.IsNullOrEmpty(sessionToken))
             {
@@ -622,7 +614,7 @@ namespace LootLocker
             bool initSuccess = InitializeWebSocket();
             if (!initSuccess)
             {
-                HandleConnectionError("Failed to initialize WebSocket", onComplete);
+                HandleConnectionError("Failed to initialize WebSocket");
                 yield break;
             }
 
@@ -636,35 +628,20 @@ namespace LootLocker
 
             if (!connectionSuccess)
             {
-                HandleConnectionError(connectionError ?? "Connection failed", onComplete);
+                HandleConnectionError(connectionError ?? "Connection failed");
                 yield break;
             }
 
             ChangeConnectionState(LootLockerPresenceConnectionState.Connected);
+            reconnectAttempts = 0;
 
-            // Initialize connection stats BEFORE starting to listen for messages
             InitializeConnectionStats();
 
             // Start listening for messages
             StartCoroutine(ListenForMessagesCoroutine());
 
             // Send authentication
-            bool authSuccess = false;
-            yield return StartCoroutine(AuthenticateCoroutine((success, error) => {
-                authSuccess = success;
-            }));
-
-            if (!authSuccess)
-            {
-                HandleConnectionError("Authentication failed", onComplete);
-                yield break;
-            }
-
-            // Ping routine will be started after authentication is successful
-            // See HandleAuthenticationResponse method
-
-            reconnectAttempts = 0;
-            onComplete?.Invoke(true);
+            yield return StartCoroutine(AuthenticateCoroutine());
         }
 
         private bool InitializeWebSocket()
@@ -733,17 +710,29 @@ namespace LootLocker
             pendingPingTimestamps.Clear();
         }
 
-        private void HandleConnectionError(string errorMessage, LootLockerPresenceCallback onComplete)
+        private void HandleConnectionError(string errorMessage)
         {
             LootLockerLogger.Log($"Failed to connect to Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Error);
             ChangeConnectionState(LootLockerPresenceConnectionState.Failed, errorMessage);
+            
+            // Invoke pending callback on error
+            pendingConnectionCallback?.Invoke(false, errorMessage);
+            pendingConnectionCallback = null;
             
             if (shouldReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS)
             {
                 StartCoroutine(ScheduleReconnectCoroutine());
             }
+        }
 
-            onComplete?.Invoke(false, errorMessage);
+        private void HandleAuthenticationError(string errorMessage)
+        {
+            LootLockerLogger.Log($"Failed to authenticate Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Error);
+            ChangeConnectionState(LootLockerPresenceConnectionState.Failed, errorMessage);
+            
+            // Invoke pending callback on error
+            pendingConnectionCallback?.Invoke(false, errorMessage);
+            pendingConnectionCallback = null;
         }
 
         private IEnumerator DisconnectCoroutine(LootLockerPresenceCallback onComplete = null)
@@ -935,11 +924,11 @@ namespace LootLocker
             yield return null;
         }
 
-        private IEnumerator AuthenticateCoroutine(LootLockerPresenceCallback onComplete = null)
+        private IEnumerator AuthenticateCoroutine()
         {
             if (webSocket?.State != WebSocketState.Open)
             {
-                onComplete?.Invoke(false, "WebSocket not open for authentication");
+                HandleAuthenticationError("WebSocket not open for authentication");
                 yield break;
             }
 
@@ -948,7 +937,12 @@ namespace LootLocker
             var authRequest = new LootLockerPresenceAuthRequest(sessionToken);
             string jsonPayload = LootLockerJson.SerializeObject(authRequest);
 
-            yield return StartCoroutine(SendMessageCoroutine(jsonPayload, onComplete));
+            yield return StartCoroutine(SendMessageCoroutine(jsonPayload, (bool success, string error) => {
+                if (!success) {
+                    HandleAuthenticationError(error ?? "Failed to send authentication message");
+                    return;
+                }
+            }));
         }
 
         private IEnumerator SendMessageCoroutine(string message, LootLockerPresenceCallback onComplete = null)
@@ -1069,9 +1063,6 @@ namespace LootLocker
                 // Determine message type
                 var messageType = DetermineMessageType(message);
 
-                // Fire general message event
-                OnMessageReceived?.Invoke(message, messageType);
-
                 // Handle specific message types
                 switch (messageType)
                 {
@@ -1123,15 +1114,29 @@ namespace LootLocker
                     
                     // Reset reconnect attempts on successful authentication
                     reconnectAttempts = 0;
+                    
+                    // Invoke pending connection callback on successful authentication
+                    pendingConnectionCallback?.Invoke(true, null);
+                    pendingConnectionCallback = null;
                 }
                 else
                 {
-                    ChangeConnectionState(LootLockerPresenceConnectionState.Failed, "Authentication failed");
+                    string errorMessage = "Authentication failed";
+                    ChangeConnectionState(LootLockerPresenceConnectionState.Failed, errorMessage);
+                    
+                    // Invoke pending connection callback on authentication failure
+                    pendingConnectionCallback?.Invoke(false, errorMessage);
+                    pendingConnectionCallback = null;
                 }
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error handling authentication response: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                string errorMessage = $"Error handling authentication response: {ex.Message}";
+                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Error);
+                
+                // Invoke pending callback on exception
+                pendingConnectionCallback?.Invoke(false, errorMessage);
+                pendingConnectionCallback = null;
             }
         }
 
@@ -1228,7 +1233,7 @@ namespace LootLocker
                     pingCoroutine = null;
                 }
 
-                OnConnectionStateChanged?.Invoke(newState, error);
+                OnConnectionStateChanged?.Invoke(previousState, newState, error);
             }
         }
 

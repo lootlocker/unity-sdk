@@ -478,25 +478,6 @@ namespace LootLocker
 
         #endregion
 
-        #region Public Events
-
-        /// <summary>
-        /// Event fired when any presence connection state changes
-        /// </summary>
-        public static event LootLockerPresenceConnectionStateChanged OnConnectionStateChanged;
-
-        /// <summary>
-        /// Event fired when any presence message is received
-        /// </summary>
-        public static event LootLockerPresenceMessageReceived OnMessageReceived;
-
-        /// <summary>
-        /// Event fired when any ping response is received
-        /// </summary>
-        public static event LootLockerPresencePingReceived OnPingReceived;
-
-        #endregion
-
         #region Public Properties
 
         /// <summary>
@@ -652,14 +633,10 @@ namespace LootLocker
                 client = instance.gameObject.AddComponent<LootLockerPresenceClient>();
                 client.Initialize(ulid, playerData.SessionToken);
 
-                // Subscribe to events
-                client.OnConnectionStateChanged += (state, error) => {
-                    OnConnectionStateChanged?.Invoke(ulid, state, error);
-                    // Auto-cleanup disconnected/failed clients
-                    instance.HandleClientStateChange(ulid, state);
-                };
-                client.OnMessageReceived += (message, messageType) => OnMessageReceived?.Invoke(ulid, message, messageType);
-                client.OnPingReceived += (pingResponse) => OnPingReceived?.Invoke(ulid, pingResponse);
+                // Subscribe to client events - client will trigger events directly
+                // Note: Event unsubscription happens automatically when GameObject is destroyed
+                client.OnConnectionStateChanged += (previousState, newState, error) => 
+                    OnClientConnectionStateChanged(ulid, previousState, newState, error);
             }
             catch (Exception ex)
             {
@@ -1013,6 +990,18 @@ namespace LootLocker
                     UnityEngine.Object.Destroy(clientToCleanup.gameObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle connection state changed events from individual presence clients
+        /// </summary>
+        private void OnClientConnectionStateChanged(string playerUlid, LootLockerPresenceConnectionState previousState, LootLockerPresenceConnectionState newState, string error)
+        {
+            // First handle internal cleanup and management
+            HandleClientStateChange(playerUlid, newState);
+            
+            // Then notify external systems via the unified event system
+            LootLockerEventSystem.TriggerPresenceConnectionStateChanged(playerUlid, previousState, newState, error);
         }
 
         /// <summary>
