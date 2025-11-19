@@ -1974,6 +1974,15 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get a list of player ULIDs that currently have active Presence connections
+        /// </summary>
+        /// <returns>Collection of player ULIDs that have active presence connections</returns>
+        public static List<string> ListPresenceConnections()
+        {
+            return LootLockerPresenceManager.ActiveClientUlids;
+        }
+
+        /// <summary>
         /// Update the player's presence status
         /// </summary>
         /// <param name="status">The status to set (e.g., "online", "in_game", "away")</param>
@@ -2022,7 +2031,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>The last sent status string, or null if no client is found or no status has been sent</returns>
-        public static string GetPresenceLastSentStatus(string forPlayerWithUlid = null)
+        public static string GetCurrentPresenceStatus(string forPlayerWithUlid = null)
         {
             return LootLockerPresenceManager.GetLastSentStatus(forPlayerWithUlid);
         }
@@ -2041,12 +2050,50 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Check if presence system is currently enabled
+        /// </summary>
+        /// <returns>True if enabled, false otherwise</returns>
+        public static bool IsPresenceEnabled()
+        {
+            return LootLockerPresenceManager.IsEnabled;
+        }
+
+        /// <summary>
         /// Enable or disable automatic presence connection when sessions start
         /// </summary>
         /// <param name="enabled">Whether to auto-connect presence</param>
         public static void SetPresenceAutoConnectEnabled(bool enabled)
         {
             LootLockerPresenceManager.AutoConnectEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Check if automatic presence connections are enabled
+        /// </summary>
+        /// <returns>True if auto-connect is enabled, false otherwise</returns>
+        public static bool IsPresenceAutoConnectEnabled()
+        {
+            return LootLockerPresenceManager.AutoConnectEnabled;
+        }
+
+        /// <summary>
+        /// Enable or disable automatic presence disconnection when the application loses focus or is paused.
+        /// When enabled, presence connections will automatically disconnect when the app goes to background
+        /// and reconnect when it returns to foreground. Useful for saving battery on mobile or managing resources.
+        /// </summary>
+        /// <param name="enabled">True to enable auto-disconnect on focus change, false to disable</param>
+        public static void SetPresenceAutoDisconnectOnFocusChangeEnabled(bool enabled)
+        {
+            LootLockerPresenceManager.AutoDisconnectOnFocusChange = enabled;
+        }
+
+        /// <summary>
+        /// Check if automatic presence disconnection on focus change is enabled
+        /// </summary>
+        /// <returns>True if auto-disconnect on focus change is enabled, false otherwise</returns>
+        public static bool IsPresenceAutoDisconnectOnFocusChangeEnabled()
+        {
+            return LootLockerPresenceManager.AutoDisconnectOnFocusChange;
         }
 #endif
 
