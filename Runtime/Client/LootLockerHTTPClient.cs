@@ -29,11 +29,11 @@ namespace LootLocker
                 {
                     LootLockerLogger.Log("Payloads can not be sent in GET, HEAD, or OPTIONS requests. Attempted to send a body to: " + httpMethod.ToString() + " " + endPoint, LootLockerLogger.LogLevel.Warning);
                 }
-                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeNoContentRequest(forPlayerWithUlid, endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+                LootLockerHTTPClient.Get()?.ScheduleRequest(LootLockerHTTPRequestData.MakeNoContentRequest(forPlayerWithUlid, endPoint, httpMethod, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
             else
             {
-                LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeJsonRequest(forPlayerWithUlid, endPoint, httpMethod, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+                LootLockerHTTPClient.Get()?.ScheduleRequest(LootLockerHTTPRequestData.MakeJsonRequest(forPlayerWithUlid, endPoint, httpMethod, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
             }
         }
 
@@ -46,7 +46,7 @@ namespace LootLocker
                 return;
             }
 
-            LootLockerHTTPClient.Get().ScheduleRequest(LootLockerHTTPRequestData.MakeFileRequest(forPlayerWithUlid, endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
+            LootLockerHTTPClient.Get()?.ScheduleRequest(LootLockerHTTPRequestData.MakeFileRequest(forPlayerWithUlid, endPoint, httpMethod, file, fileName, fileContentType, body, onComplete, useAuthToken, callerRole, additionalHeaders, null));
         }
         
         public static void UploadFile(string forPlayerWithUlid, EndPointClass endPoint, byte[] file, string fileName = "file", string fileContentType = "text/plain", Dictionary<string, string> body = null, Action<LootLockerResponse> onComplete = null, bool useAuthToken = true, LootLockerCallerRole callerRole = LootLocker.LootLockerEnums.LootLockerCallerRole.User, Dictionary<string, string> additionalHeaders = null)
@@ -173,7 +173,10 @@ namespace LootLocker
         void ILootLockerService.Reset()
         {
             // Abort all ongoing requests and notify callbacks
-            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client reset");
+            if (HTTPExecutionQueue != null)
+            {
+                AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client reset");
+            }
             
             // Clear all collections
             ClearAllCollections();
