@@ -465,15 +465,15 @@ jobs:
       - name: Enable beta features
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;${{ VARS.CURRENT_BETA_FEATURES }}/g' TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Enable Presence Compile flag but disable auto connect
+        run: |
+          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_ENABLE_PRESENCE/g' TestProject/ProjectSettings/ProjectSettings.asset
+          echo "PRESENCE_CONFIG=-enable_presence true -enable_presence_auto_connect false -enable_presence_auto_disconnect_on_focus_change false" >> $GITHUB_ENV
       - name: Set the project to use Newtonsoft json
         if: ${{ ENV.JSON_LIBRARY == 'newtonsoft' }}
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_USE_NEWTONSOFTJSON/g' TestProject/ProjectSettings/ProjectSettings.asset
           sed -i -e 's/"nunit.framework.dll"/"nunit.framework.dll",\n\t\t"Newtonsoft.Json.dll"/g' sdk/Tests/LootLockerTests/PlayMode/PlayModeTests.asmdef
-      - name: Enable Presence
-        if: ${{ ENV.ENABLE_PRESENCE == 'false' }}
-        run: |
-          sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_ENABLE_PRESENCE/g' TestProject/ProjectSettings/ProjectSettings.asset
       - name: Set LootLocker to target stage environment
         if: ${{ ENV.TARGET_ENVIRONMENT == 'STAGE' }}
         run: |
@@ -520,7 +520,7 @@ jobs:
           checkName: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
           artifactsPath: ${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }} ${{ ENV.TEST_CATEGORY }}
+          customParameters: -lootlockerurl ${{ ENV.LOOTLOCKER_URL }} ${{ ENV.USER_COMMANDLINE_ARGUMENTS }} ${{ ENV.TEST_CATEGORY }} ${{ ENV.PRESENCE_CONFIG }}
           useHostNetwork: true
       ####### CLEANUP ###########
       - name: Bring down Go Backend
