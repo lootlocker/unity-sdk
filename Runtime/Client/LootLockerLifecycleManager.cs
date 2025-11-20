@@ -415,7 +415,7 @@ namespace LootLocker
                     stateData.SetEventSystem(eventSystem);
                     
 #if LOOTLOCKER_ENABLE_PRESENCE
-                    // 5. Initialize PresenceManager (no special dependencies)
+                    // 6. Initialize PresenceManager (no special dependencies)
                     _RegisterAndInitializeService<LootLockerPresenceManager>();
 #endif
 
