@@ -183,6 +183,7 @@ namespace LootLocker
                         allowTokenRefresh = allowRefresh;
                     }
                 }
+#if LOOTLOCKER_ENABLE_PRESENCE
                 else if (args[i] == "-enablepresence")
                 {
                     if (bool.TryParse(args[i + 1], out bool enablePresence))
@@ -204,6 +205,7 @@ namespace LootLocker
                         this.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
                     }
                 }
+#endif
             }
 #endif
         }
