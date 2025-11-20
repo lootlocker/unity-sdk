@@ -98,7 +98,7 @@ namespace LootLocker
             IncrementalBackoffFactor = 2;
             InitialRetryWaitTimeInMs = 50;
             MaxOngoingRequests = 50;
-            MaxQueueSize = 1000;
+            MaxQueueSize = 5000;
             ChokeWarningThreshold = 500;
             DenyIncomingRequestsWhenBackedUp = true;
             LogQueueRejections = true;
