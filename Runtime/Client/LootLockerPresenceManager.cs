@@ -67,8 +67,8 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
-            // Disconnect all presence connections
-            DisconnectAll();
+            // Use internal method to avoid service registry access during shutdown
+            DisconnectAllInternal();
             
             // Unsubscribe from events
             UnsubscribeFromSessionEvents();
@@ -370,6 +370,10 @@ namespace LootLocker
             yield return null;
             
             var instance = Get();
+            if (instance == null)
+            {
+                yield break;
+            }
 
             LootLockerPresenceClient existingClient = null;
 
@@ -486,7 +490,7 @@ namespace LootLocker
         /// </summary>
         public static bool IsEnabled
         {
-            get => Get().isEnabled;
+            get => Get()?.isEnabled ?? false;
             set 
             {
                 var instance = Get();
@@ -503,8 +507,8 @@ namespace LootLocker
         /// </summary>
         public static bool AutoConnectEnabled
         {
-            get => Get().autoConnectEnabled;
-            set => Get().autoConnectEnabled = value;
+            get => Get()?.autoConnectEnabled ?? false;
+            set { var instance = Get(); if (instance != null) instance.autoConnectEnabled = value; }
         }
 
         /// <summary>
@@ -514,8 +518,8 @@ namespace LootLocker
         /// </summary>
         public static bool AutoDisconnectOnFocusChange
         {
-            get => Get().autoDisconnectOnFocusChange;
-            set => Get().autoDisconnectOnFocusChange = value;
+            get => Get()?.autoDisconnectOnFocusChange ?? false;
+            set { var instance = Get(); if (instance != null) instance.autoDisconnectOnFocusChange = value; }
         }
 
         /// <summary>
@@ -526,6 +530,8 @@ namespace LootLocker
             get
             {
                 var instance = Get();
+                if (instance == null) return new List<string>();
+                
                 lock (instance.activeClientsLock)
                 {
                     return new List<string>(instance.activeClients.Keys);
@@ -562,6 +568,11 @@ namespace LootLocker
         public static void ConnectPresence(string playerUlid = null, LootLockerPresenceCallback onComplete = null)
         {
             var instance = Get();
+            if (instance == null)
+            {
+                onComplete?.Invoke(false, "PresenceManager not available");
+                return;
+            }
             
             if (!instance.isEnabled)
             {
@@ -647,7 +658,7 @@ namespace LootLocker
                 // Subscribe to client events - client will trigger events directly
                 // Note: Event unsubscription happens automatically when GameObject is destroyed
                 client.OnConnectionStateChanged += (previousState, newState, error) => 
-                    Get().OnClientConnectionStateChanged(ulid, previousState, newState, error);
+                    Get()?.OnClientConnectionStateChanged(ulid, previousState, newState, error);
             }
             catch (Exception ex)
             {
@@ -693,6 +704,12 @@ namespace LootLocker
         public static void DisconnectPresence(string playerUlid = null, LootLockerPresenceCallback onComplete = null)
         {
             var instance = Get();
+            if (instance == null)
+            {
+                onComplete?.Invoke(false, "PresenceManager not available");
+                return;
+            }
+            
             string ulid = playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
@@ -787,8 +804,7 @@ namespace LootLocker
         /// </summary>
         public static void DisconnectAll()
         {
-            var instance = Get();
-            instance.DisconnectAllInternal();
+            Get()?.DisconnectAllInternal();
         }
 
         /// <summary>
@@ -849,6 +865,12 @@ namespace LootLocker
         public static void UpdatePresenceStatus(string status, Dictionary<string, string> metadata = null, string playerUlid = null, LootLockerPresenceCallback onComplete = null)
         {
             var instance = Get();
+            if (instance == null)
+            {
+                onComplete?.Invoke(false, "PresenceManager not available");
+                return;
+            }
+            
             if (!instance.isEnabled)
             {
                 onComplete?.Invoke(false, "Presence system is disabled");
@@ -882,6 +904,8 @@ namespace LootLocker
         public static LootLockerPresenceConnectionState GetPresenceConnectionState(string playerUlid = null)
         {
             var instance = Get();
+            if (instance == null) return LootLockerPresenceConnectionState.Disconnected;
+            
             string ulid = playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
@@ -914,6 +938,8 @@ namespace LootLocker
         public static LootLockerPresenceConnectionStats GetPresenceConnectionStats(string playerUlid = null)
         {
             var instance = Get();
+            if (instance == null) return new LootLockerPresenceConnectionStats();
+            
             string ulid = playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
@@ -946,6 +972,8 @@ namespace LootLocker
         public static string GetLastSentStatus(string playerUlid = null)
         {
             var instance = Get();
+            if (instance == null) return string.Empty;
+            
             string ulid = playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
@@ -1021,6 +1049,7 @@ namespace LootLocker
         private LootLockerPresenceClient CreateAndInitializePresenceClient(LootLockerPlayerData playerData)
         {
             var instance = Get();
+            if (instance == null) return null;
             
             if (!instance.isEnabled)
             {

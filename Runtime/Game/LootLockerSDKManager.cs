@@ -116,12 +116,12 @@ namespace LootLocker.Requests
 #if LOOTLOCKER_ENABLE_HTTP_CONFIGURATION_OVERRIDE
         public static void _OverrideLootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
         {
-            LootLockerHTTPClient.Get().OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
+            LootLockerHTTPClient.Get()?.OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
         }
 
         public static void _OverrideLootLockerCertificateHandler(CertificateHandler certificateHandler)
         {
-            LootLockerHTTPClient.Get().OverrideCertificateHandler(certificateHandler);
+            LootLockerHTTPClient.Get()?.OverrideCertificateHandler(certificateHandler);
         }
 #endif
 

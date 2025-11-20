@@ -234,7 +234,7 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
-            ClearAllSubscribers();
+            ClearAllSubscribersInternal();
             isEnabled = true;
             logEvents = false;
             IsInitialized = false;
@@ -252,7 +252,7 @@ namespace LootLocker
 
         void ILootLockerService.HandleApplicationQuit()
         {
-            ClearAllSubscribers();
+            ClearAllSubscribersInternal();
         }
 
         #endregion
@@ -306,8 +306,8 @@ namespace LootLocker
         /// </summary>
         public static bool IsEnabled
         {
-            get => GetInstance().isEnabled;
-            set => GetInstance().isEnabled = value;
+            get => GetInstance()?.isEnabled ?? false;
+            set { var instance = GetInstance(); if (instance != null) instance.isEnabled = value; }
         }
 
         /// <summary>
@@ -315,8 +315,8 @@ namespace LootLocker
         /// </summary>
         public static bool LogEvents
         {
-            get => GetInstance().logEvents;
-            set => GetInstance().logEvents = value;
+            get => GetInstance()?.logEvents ?? false;
+            set { var instance = GetInstance(); if (instance != null) instance.logEvents = value; }
         }
 
         #endregion
@@ -338,7 +338,7 @@ namespace LootLocker
         /// </summary>
         public static void Subscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
-            GetInstance().SubscribeInstance(eventType, handler);
+            GetInstance()?.SubscribeInstance(eventType, handler);
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace LootLocker
         /// </summary>
         public static void Unsubscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
-            GetInstance().UnsubscribeInstance(eventType, handler);
+            GetInstance()?.UnsubscribeInstance(eventType, handler);
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace LootLocker
         public static void TriggerEvent<T>(T eventData) where T : LootLockerEventData
         {
             var instance = GetInstance();
-            if (!instance.isEnabled || eventData == null)
+            if (instance == null || !instance.isEnabled || eventData == null)
                 return;
 
             LootLockerEventType eventType = eventData.eventType;
@@ -455,9 +455,23 @@ namespace LootLocker
         public static void ClearSubscribers(LootLockerEventType eventType)
         {
             var instance = GetInstance();
+            if (instance == null) return;
+            
             lock (instance.eventSubscribersLock)
             {
                 instance.eventSubscribers.Remove(eventType);
+            }
+        }
+
+        /// <summary>
+        /// Internal method to clear all subscribers without accessing service registry
+        /// Used during shutdown to avoid service lookup issues
+        /// </summary>
+        private void ClearAllSubscribersInternal()
+        {
+            lock (eventSubscribersLock)
+            {
+                eventSubscribers?.Clear();
             }
         }
 
@@ -468,11 +482,7 @@ namespace LootLocker
         /// </summary>
         public static void ClearAllSubscribers()
         {
-            var instance = GetInstance();
-            lock (instance.eventSubscribersLock)
-            {
-                instance.eventSubscribers.Clear();
-            }
+            GetInstance()?.ClearAllSubscribersInternal();
         }
 
         /// <summary>
@@ -481,6 +491,7 @@ namespace LootLocker
         public static int GetSubscriberCount(LootLockerEventType eventType)
         {
             var instance = GetInstance();
+            if (instance == null) return 0;
             
             lock (instance.eventSubscribersLock)
             {
