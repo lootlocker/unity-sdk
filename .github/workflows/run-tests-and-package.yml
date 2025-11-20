@@ -468,7 +468,7 @@ jobs:
       - name: Enable Presence Compile flag but disable auto connect
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_ENABLE_PRESENCE/g' TestProject/ProjectSettings/ProjectSettings.asset
-          echo "PRESENCE_CONFIG=-enable_presence true -enable_presence_auto_connect false -enable_presence_auto_disconnect_on_focus_change false" >> $GITHUB_ENV
+          echo "PRESENCE_CONFIG=-enablepresence true -enablepresenceautoconnect false -enablepresenceautodisconnectonfocuschange false" >> $GITHUB_ENV
       - name: Set the project to use Newtonsoft json
         if: ${{ ENV.JSON_LIBRARY == 'newtonsoft' }}
         run: |

@@ -183,6 +183,27 @@ namespace LootLocker
                         allowTokenRefresh = allowRefresh;
                     }
                 }
+                else if (args[i] == "-enablepresence")
+                {
+                    if (bool.TryParse(args[i + 1], out bool enablePresence))
+                    {
+                        enablePresence = enablePresence;
+                    }
+                }
+                else if (args[i] == "-enablepresenceautoconnect")
+                {
+                    if (bool.TryParse(args[i + 1], out bool enablePresenceAutoConnect))
+                    {
+                        enablePresenceAutoConnect = enablePresenceAutoConnect;
+                    }
+                }
+                else if (args[i] == "-enablepresenceautodisconnectonfocuschange")
+                {
+                    if (bool.TryParse(args[i + 1], out bool enablePresenceAutoDisconnectOnFocusChange))
+                    {
+                        enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
+                    }
+                }
             }
 #endif
         }
