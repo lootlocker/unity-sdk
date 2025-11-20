@@ -187,21 +187,21 @@ namespace LootLocker
                 {
                     if (bool.TryParse(args[i + 1], out bool enablePresence))
                     {
-                        enablePresence = enablePresence;
+                        this.enablePresence = enablePresence;
                     }
                 }
                 else if (args[i] == "-enablepresenceautoconnect")
                 {
                     if (bool.TryParse(args[i + 1], out bool enablePresenceAutoConnect))
                     {
-                        enablePresenceAutoConnect = enablePresenceAutoConnect;
+                        this.enablePresenceAutoConnect = enablePresenceAutoConnect;
                     }
                 }
                 else if (args[i] == "-enablepresenceautodisconnectonfocuschange")
                 {
                     if (bool.TryParse(args[i + 1], out bool enablePresenceAutoDisconnectOnFocusChange))
                     {
-                        enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
+                        this.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
                     }
                 }
             }

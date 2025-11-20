@@ -1114,6 +1114,8 @@ namespace LootLocker.Requests
                             WalletID = response.wallet_id,
                             SessionOptionals = Optionals
                         };
+                        
+                        LootLockerEventSystem.TriggerSessionStarted(playerData);
                     }
 
                     onComplete?.Invoke(response);
