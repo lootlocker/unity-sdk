@@ -210,11 +210,17 @@ namespace LootLocker
                 LootLockerLogger.Log("Resetting RemoteSessionPoller", LootLockerLogger.LogLevel.Verbose);
                 
                 // Cancel all ongoing processes
-                foreach (var process in _remoteSessionsProcesses.Values)
+                if (_remoteSessionsProcesses != null)
                 {
-                    process.ShouldCancel = true;
+                    foreach (var process in _remoteSessionsProcesses.Values)
+                    {
+                        if (process != null)
+                        {
+                            process.ShouldCancel = true;
+                        }
+                    }
+                    _remoteSessionsProcesses.Clear();
                 }
-                _remoteSessionsProcesses.Clear();
 
                 IsInitialized = false;
                 _instance = null;
@@ -279,14 +285,14 @@ namespace LootLocker
                 float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
+                return GetInstance()?._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
-                    timeOutAfterMinutes, forPlayerWithUlid);
+                    timeOutAfterMinutes, forPlayerWithUlid) ?? Guid.Empty;
             }
 
             public static void CancelRemoteSessionProcess(Guid processGuid)
             {
-                GetInstance()._CancelRemoteSessionProcess(processGuid);
+                GetInstance()?._CancelRemoteSessionProcess(processGuid);
             }
 
             #endregion
@@ -315,11 +321,12 @@ namespace LootLocker
 
             private static void AddRemoteSessionProcess(Guid processGuid, LootLockerRemoteSessionProcess processData)
             {
-                GetInstance()._remoteSessionsProcesses.Add(processGuid, processData);
+                GetInstance()?._remoteSessionsProcesses.Add(processGuid, processData);
             }
             private static void RemoveRemoteSessionProcess(Guid processGuid)
             {
                 var i = GetInstance();
+                if (i == null) return;
                 i._remoteSessionsProcesses.Remove(processGuid);
                 
                 // Auto-cleanup: if no more processes are running, unregister the service

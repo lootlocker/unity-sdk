@@ -85,7 +85,6 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
-            // Unsubscribe from events using static methods (safe during reset)
             LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
                 OnSessionStartedEvent
@@ -617,7 +616,7 @@ namespace LootLocker
 
         private void OnDestroy()
         {
-            // Unsubscribe from events on destruction using static methods
+            // Unsubscribe from events on destruction
             LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
                 OnSessionStartedEvent
@@ -643,89 +642,89 @@ namespace LootLocker
         
         public static void overrideStateWriter(ILootLockerStateWriter newWriter)
         {
-            GetInstance()._OverrideStateWriter(newWriter);
+            GetInstance()?._OverrideStateWriter(newWriter);
         }
         
         public static bool SaveStateExistsForPlayer(string playerULID)
         {
-            return GetInstance()._SaveStateExistsForPlayer(playerULID);
+            return GetInstance()?._SaveStateExistsForPlayer(playerULID) ?? false;
         }
 
         public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
         {
-            return GetInstance()._GetPlayerDataForPlayerWithUlidWithoutChangingState(playerULID);
+            return GetInstance()?._GetPlayerDataForPlayerWithUlidWithoutChangingState(playerULID) ?? new LootLockerPlayerData();
         }
 
         [CanBeNull]
         public static LootLockerPlayerData GetStateForPlayerOrDefaultStateOrEmpty(string playerULID)
         {
-            return GetInstance()._GetStateForPlayerOrDefaultStateOrEmpty(playerULID);
+            return GetInstance()?._GetStateForPlayerOrDefaultStateOrEmpty(playerULID);
         }
 
         public static string GetDefaultPlayerULID()
         {
-            return GetInstance()._GetDefaultPlayerULID();
+            return GetInstance()?._GetDefaultPlayerULID() ?? string.Empty;
         }
 
         public static bool SetDefaultPlayerULID(string playerULID)
         {
-            return GetInstance()._SetDefaultPlayerULID(playerULID);
+            return GetInstance()?._SetDefaultPlayerULID(playerULID) ?? false;
         }
 
         public static bool SetPlayerData(LootLockerPlayerData updatedPlayerData)
         {
-            return GetInstance()._SetPlayerData(updatedPlayerData);
+            return GetInstance()?._SetPlayerData(updatedPlayerData) ?? false;
         }
 
         public static bool ClearSavedStateForPlayerWithULID(string playerULID)
         {
-            return GetInstance()._ClearSavedStateForPlayerWithULID(playerULID);
+            return GetInstance()?._ClearSavedStateForPlayerWithULID(playerULID) ?? false;
         }
 
         public static List<string> ClearAllSavedStates()
         {
-            return GetInstance()._ClearAllSavedStates();
+            return GetInstance()?._ClearAllSavedStates() ?? new List<string>();
         }
 
         public static List<string> ClearAllSavedStatesExceptForPlayer(string playerULID)
         {
-            return GetInstance()._ClearAllSavedStatesExceptForPlayer(playerULID);
+            return GetInstance()?._ClearAllSavedStatesExceptForPlayer(playerULID) ?? new List<string>();
         }
 
         public static void SetPlayerULIDToInactive(string playerULID)
         {
-            GetInstance()._SetPlayerULIDToInactive(playerULID);
+            GetInstance()?._SetPlayerULIDToInactive(playerULID);
         }
 
         public static void SetAllPlayersToInactive()
         {
-            GetInstance()._SetAllPlayersToInactive();
+            GetInstance()?._SetAllPlayersToInactive();
         }
 
         public static void SetAllPlayersToInactiveExceptForPlayer(string playerULID)
         {
-            GetInstance()._SetAllPlayersToInactiveExceptForPlayer(playerULID);
+            GetInstance()?._SetAllPlayersToInactiveExceptForPlayer(playerULID);
         }
 
         public static List<string> GetActivePlayerULIDs()
         {
-            return GetInstance()._GetActivePlayerULIDs();
+            return GetInstance()?._GetActivePlayerULIDs() ?? new List<string>();
         }
 
         public static List<string> GetCachedPlayerULIDs()
         {
-            return GetInstance()._GetCachedPlayerULIDs();
+            return GetInstance()?._GetCachedPlayerULIDs() ?? new List<string>();
         }
 
         [CanBeNull]
         public static string GetPlayerUlidFromWLEmail(string email)
         {
-            return GetInstance()._GetPlayerUlidFromWLEmail(email);
+            return GetInstance()?._GetPlayerUlidFromWLEmail(email);
         }
 
         public static void UnloadState()
         {
-            GetInstance()._UnloadState();
+            GetInstance()?._UnloadState();
         }
 
         #endregion // Static Methods
