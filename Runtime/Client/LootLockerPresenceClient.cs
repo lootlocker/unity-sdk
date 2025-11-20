@@ -218,8 +218,6 @@ namespace LootLocker
 
     #endregion
 
-    // LootLockerPresenceManager moved to LootLockerPresenceManager.cs
-
     /// <summary>
     /// Individual WebSocket client for LootLocker Presence feature
     /// Managed internally by LootLockerPresenceManager
