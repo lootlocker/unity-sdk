@@ -69,6 +69,8 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            int i = 0;
+            yield return new WaitUntil(() => LootLockerSDKManager.CheckInitialized(true) || ++i > 20_000);
 
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
