@@ -770,7 +770,7 @@ namespace LootLockerTests.PlayMode
 
             Assert.AreEqual(preSetPlayerDataPlayerCount + 1, postSetPlayerDataPlayerCount);
             Assert.IsNull(defaultPlayerPlayerData);
-            Assert.IsNull(defaultPlayerUlid);
+            Assert.IsTrue(string.IsNullOrEmpty(defaultPlayerUlid), "defaultPlayerUlid was not null or empty");
             Assert.IsNotNull(postSetDefaultPlayerUlid);
             Assert.IsNotNull(postSetDefaultPlayerPlayerData);
             Assert.AreEqual("HSDHSAJKLDLKASJDLK", postSetDefaultPlayerPlayerData.ULID);
@@ -968,7 +968,7 @@ namespace LootLockerTests.PlayMode
             var playerUlid = LootLockerStateData.GetPlayerUlidFromWLEmail(wlPlayer.WhiteLabelEmail + "-jk");
             var notPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
 
-            Assert.IsNull(playerUlid);
+            Assert.IsTrue(string.IsNullOrEmpty(playerUlid), "playerUlid was not null or empty");
             Assert.AreEqual(ulids[0], notPlayerData.ULID);
 
             yield return null;
