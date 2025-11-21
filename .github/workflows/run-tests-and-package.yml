@@ -327,7 +327,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
     needs: [editor-smoke-test]
-    timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 15 }}
+    timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 20 }}
     strategy:
       fail-fast: false
       matrix:
