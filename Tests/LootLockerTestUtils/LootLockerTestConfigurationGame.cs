@@ -236,6 +236,14 @@ namespace LootLockerTestConfigurationUtils
             });
         }
 
+        public void EnablePresence(bool advancedMode, Action<bool /*success*/, string /*errorMessage*/> onComplete)
+        {
+            LootLockerTestConfigurationTitleConfig.UpdateGameConfig(LootLockerTestConfigurationTitleConfig.TitleConfigKeys.global_player_presence, true, advancedMode, response =>
+            {
+                onComplete?.Invoke(response.success, response.errorData?.message);
+            });
+        }
+
     }
 
     public class CreateGameRequest

@@ -68,6 +68,24 @@ namespace LootLockerTests.PlayMode
             {
                 yield break;
             }
+
+            bool enablePresenceCompleted = false;
+            gameUnderTest?.EnablePresence(true, (success, errorMessage) =>
+            {
+                if (!success)
+                {
+                    Debug.LogError(errorMessage);
+                    SetupFailed = true;
+                }
+                enablePresenceCompleted = true;
+            });
+
+            yield return new WaitUntil(() => enablePresenceCompleted);
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
             int i = 0;
             yield return new WaitUntil(() => LootLockerSDKManager.CheckInitialized(true) || ++i > 20_000);
