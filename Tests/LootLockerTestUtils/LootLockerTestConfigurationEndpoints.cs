@@ -107,6 +107,10 @@ namespace LootLockerTestConfigurationUtils
 
         [Header("LootLocker Admin API Metadata Operations")]
         public static EndPointClass metadataOperations = new EndPointClass("game/#GAMEID#/metadata", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin Title Config Operations")]
+        public static EndPointClass getTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+        public static EndPointClass updateTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }
