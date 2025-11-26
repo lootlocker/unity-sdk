@@ -132,11 +132,13 @@ namespace LootLockerTests.PlayMode
         }
 
         private TestRateLimiter _rateLimiterUnderTest = null;
+        private GameObject _rateLimiterGameObject = null;
 
         [UnitySetUp]
         public IEnumerator UnitySetUp()
         {
-            _rateLimiterUnderTest = new TestRateLimiter();
+            _rateLimiterGameObject = new GameObject("TestRateLimiterGO");
+            _rateLimiterUnderTest = _rateLimiterGameObject.AddComponent<TestRateLimiter>();
             _rateLimiterUnderTest.SetTime(new DateTime(2021, 1, 1, 0, 0, 0));
             yield return null;
         }
@@ -145,6 +147,11 @@ namespace LootLockerTests.PlayMode
         public IEnumerator UnityTearDown()
         {
             // Cleanup
+            if (_rateLimiterGameObject != null)
+            {
+                GameObject.DestroyImmediate(_rateLimiterGameObject);
+                _rateLimiterGameObject = null;
+            }
             _rateLimiterUnderTest = null;
             yield return null;
         }
