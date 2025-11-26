@@ -468,7 +468,7 @@ namespace LootLocker
         {
             if (service == null)
             {
-                LootLockerLogger.Log($"Cannot register null service of type {typeof(T).Name}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Cannot register null service of type {typeof(T).Name}", LootLockerLogger.LogLevel.Warning);
                 return;
             }
 
@@ -496,7 +496,7 @@ namespace LootLocker
                 }
                 catch (Exception ex)
                 {
-                    LootLockerLogger.Log($"Failed to initialize service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.Log($"Failed to initialize service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 }
             }
         }
@@ -557,7 +557,7 @@ namespace LootLocker
                     }
                     catch (Exception ex)
                     {
-                        LootLockerLogger.Log($"Error unregistering service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                        LootLockerLogger.Log($"Error unregistering service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                     }
                 }
             }
@@ -604,7 +604,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error resetting service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error resetting service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
         }
 
@@ -625,7 +625,7 @@ namespace LootLocker
                     }
                     catch (Exception ex)
                     {
-                        LootLockerLogger.Log($"Error in OnApplicationPause for service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                        LootLockerLogger.Log($"Error in OnApplicationPause for service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                     }
                 }
             }
@@ -644,7 +644,7 @@ namespace LootLocker
                     }
                     catch (Exception ex)
                     {
-                        LootLockerLogger.Log($"Error in OnApplicationFocus for service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                        LootLockerLogger.Log($"Error in OnApplicationFocus for service {service.ServiceName}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                     }
                 }
             }
@@ -675,7 +675,7 @@ namespace LootLocker
                 }
                 catch (Exception ex)
                 {
-                    LootLockerLogger.Log($"Error notifying service {service.ServiceName} of application quit: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.Log($"Error notifying service {service.ServiceName} of application quit: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 }
             }
         }
@@ -773,7 +773,7 @@ namespace LootLocker
                         }
                         catch (Exception ex)
                         {
-                            LootLockerLogger.Log($"Error checking health of service {serviceType.Name}: {ex.Message} - marking for restart", LootLockerLogger.LogLevel.Error);
+                            LootLockerLogger.Log($"Error checking health of service {serviceType.Name}: {ex.Message} - marking for restart", LootLockerLogger.LogLevel.Warning);
                             servicesToRestart.Add(serviceType);
                         }
                     }
@@ -864,7 +864,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Failed to restart service {serviceType.Name}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Failed to restart service {serviceType.Name}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
         }
 
