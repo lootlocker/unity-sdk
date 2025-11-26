@@ -616,6 +616,10 @@ namespace LootLocker
 
         private void OnDestroy()
         {
+            if (!LootLockerLifecycleManager.HasService<LootLockerEventSystem>())
+            {
+                return;
+            }
             // Unsubscribe from events on destruction
             LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
