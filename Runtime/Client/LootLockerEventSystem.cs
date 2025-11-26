@@ -508,7 +508,7 @@ namespace LootLocker
 
         private void OnDestroy()
         {
-            ClearAllSubscribers();
+            ClearAllSubscribersInternal();
         }
 
         #endregion
