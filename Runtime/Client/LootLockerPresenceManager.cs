@@ -302,6 +302,10 @@ namespace LootLocker
         /// </summary>
         private void UnsubscribeFromSessionEvents()
         {
+            if (!LootLockerLifecycleManager.HasService<LootLockerEventSystem>() || isShuttingDown)
+            {
+                return;
+            }
             LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
                 OnSessionStartedEvent
