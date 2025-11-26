@@ -109,6 +109,8 @@ namespace LootLockerTests.PlayMode
             });
 
             yield return new WaitUntil(() => sessionEnded);
+            LootLockerSDKManager.ResetSDK();
+            yield return LootLockerLifecycleManager.CleanUpOldInstances();
 
             LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
                 configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
@@ -118,7 +120,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_WithValidSessionAndPresenceEnabled_ConnectsSuccessfully()
         {
             if (SetupFailed)
@@ -176,7 +178,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_UpdateStatus_UpdatesSuccessfully()
         {
             if (SetupFailed)
@@ -238,7 +240,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_DisconnectPresence_DisconnectsCleanly()
         {
             if (SetupFailed)
@@ -299,7 +301,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_WithAutoConnect_ConnectsOnSessionStart()
         {
             if (SetupFailed)
@@ -336,7 +338,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_WithoutSession_FailsGracefully()
         {
             if (SetupFailed)
@@ -372,7 +374,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
         public IEnumerator PresenceConnection_WhenDisabled_DoesNotConnect()
         {
             if (SetupFailed)

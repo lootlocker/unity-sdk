@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using LootLocker.Requests;
 #if UNITY_EDITOR
@@ -820,39 +819,7 @@ namespace LootLocker
             
             foreach (var ulid in ulidsToDisconnect)
             {
-                DisconnectPresenceInternal(ulid);
-            }
-        }
-
-        /// <summary>
-        /// Internal method to disconnect a specific presence client without accessing service registry
-        /// Used during shutdown to avoid service lookup issues
-        /// </summary>
-        private void DisconnectPresenceInternal(string playerUlid)
-        {
-            if (string.IsNullOrEmpty(playerUlid))
-            {
-                return;
-            }
-
-            LootLockerPresenceClient client = null;
-            
-            lock (activeClientsLock)
-            {
-                if (!activeClients.ContainsKey(playerUlid))
-                {
-                    return;
-                }
-
-                client = activeClients[playerUlid];
-                activeClients.Remove(playerUlid);
-            }
-
-            if (client != null)
-            {
-                // During shutdown, just disconnect and destroy without callbacks
-                client.Disconnect();
-                UnityEngine.Object.Destroy(client.gameObject);
+                _DisconnectPresenceForUlid(ulid);
             }
         }
 
