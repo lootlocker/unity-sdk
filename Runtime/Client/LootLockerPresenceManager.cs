@@ -55,7 +55,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error subscribing to session events: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error subscribing to session events: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
             
             // Auto-connect existing active sessions if enabled
@@ -421,7 +421,7 @@ namespace LootLocker
                     }
                     else
                     {
-                        LootLockerLogger.Log($"Failed to disconnect presence during session refresh for {playerData.ULID}: {disconnectError}", LootLockerLogger.LogLevel.Error);
+                        LootLockerLogger.Log($"Failed to disconnect presence during session refresh for {playerData.ULID}: {disconnectError}", LootLockerLogger.LogLevel.Warning);
                     }
                 });
             }
@@ -589,7 +589,7 @@ namespace LootLocker
             var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
             if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
             {
-                LootLockerLogger.Log("Cannot connect presence: No valid session token found", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log("Cannot connect presence: No valid session token found", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, "No valid session token found");
                 return;
             }
@@ -597,7 +597,7 @@ namespace LootLocker
             string ulid = playerData.ULID;
             if (string.IsNullOrEmpty(ulid))
             {
-                LootLockerLogger.Log("Cannot connect presence: No valid player ULID found", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log("Cannot connect presence: No valid player ULID found", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, "No valid player ULID found");
                 return;
             }
@@ -681,7 +681,7 @@ namespace LootLocker
                 {
                     UnityEngine.Object.Destroy(client);
                 }
-                LootLockerLogger.Log($"Failed to create presence client for {ulid}: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Failed to create presence client for {ulid}: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, $"Failed to create presence client: {ex.Message}");
                 return;
             }
@@ -1029,14 +1029,14 @@ namespace LootLocker
             // Use the provided player data directly
             if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
             {
-                LootLockerLogger.Log("Cannot create presence client: No valid session token found in player data", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log("Cannot create presence client: No valid session token found in player data", LootLockerLogger.LogLevel.Warning);
                 return null;
             }
 
             string ulid = playerData.ULID;
             if (string.IsNullOrEmpty(ulid))
             {
-                LootLockerLogger.Log("Cannot create presence client: No valid player ULID found in player data", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log("Cannot create presence client: No valid player ULID found in player data", LootLockerLogger.LogLevel.Warning);
                 return null;
             }
 
@@ -1072,7 +1072,7 @@ namespace LootLocker
         {
             if (client == null)
             {
-                LootLockerLogger.Log($"Cannot connect presence: Client is null for player {ulid}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Cannot connect presence: Client is null for player {ulid}", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, "Client is null");
                 return;
             }
@@ -1086,7 +1086,7 @@ namespace LootLocker
                 {
                     // Use proper disconnect method to clean up GameObject and remove from dictionary
                     DisconnectPresence(ulid);
-                    LootLockerLogger.Log($"Failed to connect presence for player {ulid}: {error}", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.Log($"Failed to connect presence for player {ulid}: {error}", LootLockerLogger.LogLevel.Warning);
                 }
                 else
                 {

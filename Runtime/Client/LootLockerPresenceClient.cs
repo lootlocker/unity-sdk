@@ -399,7 +399,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error during synchronous cleanup: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error during synchronous cleanup: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
         }
 
@@ -648,7 +648,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Failed to initialize WebSocket: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Failed to initialize WebSocket: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 return false;
             }
         }
@@ -700,7 +700,7 @@ namespace LootLocker
 
         private void HandleConnectionError(string errorMessage)
         {
-            LootLockerLogger.Log($"Failed to connect to Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Error);
+            LootLockerLogger.Log($"Failed to connect to Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Warning);
             ChangeConnectionState(LootLockerPresenceConnectionState.Failed, errorMessage);
             
             // Invoke pending callback on error
@@ -715,7 +715,7 @@ namespace LootLocker
 
         private void HandleAuthenticationError(string errorMessage)
         {
-            LootLockerLogger.Log($"Failed to authenticate Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Error);
+            LootLockerLogger.Log($"Failed to authenticate Presence WebSocket: {errorMessage}", LootLockerLogger.LogLevel.Warning);
             ChangeConnectionState(LootLockerPresenceConnectionState.Failed, errorMessage);
             
             // Invoke pending callback on error
@@ -814,7 +814,7 @@ namespace LootLocker
                 else
                 {
                     closeSuccess = false;
-                    LootLockerLogger.Log($"Error during WebSocket disconnect: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                    LootLockerLogger.Log($"Error during WebSocket disconnect: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 }
                 
                 onComplete?.Invoke(closeSuccess);
@@ -860,7 +860,7 @@ namespace LootLocker
                             }
                             else
                             {
-                                LootLockerLogger.Log($"Error during disconnect: {exception?.Message}", LootLockerLogger.LogLevel.Error);
+                                LootLockerLogger.Log($"Error during disconnect: {exception?.Message}", LootLockerLogger.LogLevel.Warning);
                             }
                         }
                     }
@@ -906,7 +906,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error during cleanup: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error during cleanup: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
             
             yield return null;
@@ -963,7 +963,7 @@ namespace LootLocker
             else
             {
                 string error = sendTask.Exception?.GetBaseException()?.Message ?? "Send timeout";
-                LootLockerLogger.Log($"Failed to send Presence message: {error}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Failed to send Presence message: {error}", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, error);
             }
         }
@@ -1070,7 +1070,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error processing Presence message: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error processing Presence message: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
         }
 
@@ -1120,7 +1120,7 @@ namespace LootLocker
             catch (Exception ex)
             {
                 string errorMessage = $"Error handling authentication response: {ex.Message}";
-                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Warning);
                 
                 // Invoke pending callback on exception
                 pendingConnectionCallback?.Invoke(false, errorMessage);
@@ -1156,7 +1156,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                LootLockerLogger.Log($"Error handling pong response: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                LootLockerLogger.Log($"Error handling pong response: {ex.Message}", LootLockerLogger.LogLevel.Warning);
             }
         }
 
@@ -1192,7 +1192,7 @@ namespace LootLocker
 
         private void HandleErrorResponse(string message)
         {
-            LootLockerLogger.Log($"Received presence error: {message}", LootLockerLogger.LogLevel.Error);
+            LootLockerLogger.Log($"Received presence error: {message}", LootLockerLogger.LogLevel.Warning);
         }
 
         private void HandleGeneralMessage(string message)
