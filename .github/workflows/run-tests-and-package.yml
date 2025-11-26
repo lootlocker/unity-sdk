@@ -465,10 +465,10 @@ jobs:
       - name: Enable beta features
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;${{ VARS.CURRENT_BETA_FEATURES }}/g' TestProject/ProjectSettings/ProjectSettings.asset
-      - name: Enable Presence Compile flag but disable auto connect
+      - name: Enable Presence Compile flag but disable runtime presence usage by default
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;LOOTLOCKER_ENABLE_PRESENCE/g' TestProject/ProjectSettings/ProjectSettings.asset
-          echo "PRESENCE_CONFIG=-enablepresence true -enablepresenceautoconnect false -enablepresenceautodisconnectonfocuschange false" >> $GITHUB_ENV
+          echo "PRESENCE_CONFIG=-enablepresence false -enablepresenceautoconnect false -enablepresenceautodisconnectonfocuschange false" >> $GITHUB_ENV
       - name: Set the project to use Newtonsoft json
         if: ${{ ENV.JSON_LIBRARY == 'newtonsoft' }}
         run: |

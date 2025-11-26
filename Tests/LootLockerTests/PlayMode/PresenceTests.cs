@@ -120,7 +120,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_WithValidSessionAndPresenceEnabled_ConnectsSuccessfully()
         {
             if (SetupFailed)
@@ -178,7 +178,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_UpdateStatus_UpdatesSuccessfully()
         {
             if (SetupFailed)
@@ -240,7 +240,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_DisconnectPresence_DisconnectsCleanly()
         {
             if (SetupFailed)
@@ -301,7 +301,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_WithAutoConnect_ConnectsOnSessionStart()
         {
             if (SetupFailed)
@@ -338,7 +338,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_WithoutSession_FailsGracefully()
         {
             if (SetupFailed)
@@ -374,7 +374,7 @@ namespace LootLockerTests.PlayMode
             yield return null;
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerPresence")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         public IEnumerator PresenceConnection_WhenDisabled_DoesNotConnect()
         {
             if (SetupFailed)
