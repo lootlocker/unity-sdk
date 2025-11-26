@@ -110,6 +110,16 @@ namespace LootLockerTests.PlayMode
 
             gameUnderTest?.InitializeLootLockerSDK();
 
+            float setupTimeout = Time.time + 10f;
+
+            yield return new WaitUntil(() => LootLockerSDKManager.CheckInitialized(true) || setupTimeout < Time.time);
+            if (!LootLockerSDKManager.CheckInitialized(true))
+            {
+                Debug.LogError("LootLocker SDK failed to initialize in setup");
+                SetupFailed = true;
+                yield break;
+            }
+
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
