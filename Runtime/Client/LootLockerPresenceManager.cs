@@ -497,11 +497,9 @@ namespace LootLocker
             set 
             {
                 var instance = Get();
-                if (!value && instance.isEnabled)
-                {
-                    DisconnectAll();
-                }
-                instance.isEnabled = value;
+                if(!instance)
+                    return;
+                instance.SetPresenceEnabled(value);
             }
         }
 
@@ -511,7 +509,7 @@ namespace LootLocker
         public static bool AutoConnectEnabled
         {
             get => Get()?.autoConnectEnabled ?? false;
-            set { var instance = Get(); if (instance != null) instance.autoConnectEnabled = value; }
+            set { var instance = Get(); if (instance != null) instance.SetAutoConnectEnabled(value); }
         }
 
         /// <summary>
@@ -545,25 +543,6 @@ namespace LootLocker
         #endregion
 
         #region Public Methods
-
-        /// <summary>
-        /// Connect presence using player data directly (used by event handlers to avoid StateData lookup issues)
-        /// </summary>
-        private static void ConnectPresenceWithPlayerData(LootLockerPlayerData playerData, LootLockerPresenceCallback onComplete = null)
-        {
-            var instance = Get();
-            
-            // Create and initialize the client
-            var client = instance.CreateAndInitializePresenceClient(playerData);
-            if (client == null)
-            {
-                onComplete?.Invoke(false, "Failed to create or initialize presence client");
-                return;
-            }
-
-            // Connect the client
-            instance.ConnectExistingPresenceClient(playerData.ULID, client, onComplete);
-        }
 
         /// <summary>
         /// Connect presence for a specific player session
@@ -969,6 +948,38 @@ namespace LootLocker
         #endregion
 
         #region Private Helper Methods
+
+        private void SetPresenceEnabled(bool enabled)
+        {
+            bool changingState = isEnabled != enabled;
+            isEnabled = enabled;
+            if(changingState && enabled && autoConnectEnabled)
+            {
+                SubscribeToSessionEvents();
+                StartCoroutine(AutoConnectExistingSessions());
+            } 
+            else if (changingState && !enabled)
+            {
+                UnsubscribeFromSessionEvents();
+                DisconnectAllInternal();
+            }
+        }
+
+        private void SetAutoConnectEnabled(bool enabled)
+        {
+            bool changingState = autoConnectEnabled != enabled;
+            autoConnectEnabled = enabled;
+            if(changingState && enabled)
+            {
+                SubscribeToSessionEvents();
+                StartCoroutine(AutoConnectExistingSessions());
+            } 
+            else if (changingState && !enabled)
+            {
+                UnsubscribeFromSessionEvents();
+                DisconnectAllInternal();
+            }
+        }
 
         /// <summary>
         /// Handle client state changes for automatic cleanup
