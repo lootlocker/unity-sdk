@@ -10,36 +10,6 @@ using UnityEngine;
 
 namespace LootLocker
 {
-#if LOOTLOCKER_ENABLE_PRESENCE
-    /// <summary>
-    /// Platforms where WebSocket presence can be enabled
-    /// </summary>
-    [System.Flags]
-    public enum LootLockerPresencePlatforms
-    {
-        None = 0,
-        Windows = 1 << 0,
-        MacOS = 1 << 1,
-        Linux = 1 << 2,
-        iOS = 1 << 3,
-        Android = 1 << 4,
-        WebGL = 1 << 5,
-        PlayStation4 = 1 << 6,
-        PlayStation5 = 1 << 7,
-        XboxOne = 1 << 8,
-        XboxSeriesXS = 1 << 9,
-        NintendoSwitch = 1 << 10,
-        UnityEditor = 1 << 11,
-        
-        // Convenient presets
-        AllDesktop = Windows | MacOS | Linux,
-        AllMobile = iOS | Android,
-        AllConsoles = PlayStation4 | PlayStation5 | XboxOne | XboxSeriesXS | NintendoSwitch,
-        AllPlatforms = AllDesktop | AllMobile | AllConsoles | WebGL | UnityEditor,
-        RecommendedPlatforms = AllDesktop | AllConsoles | UnityEditor // Exclude mobile and WebGL by default for battery/compatibility
-    }
-#endif
-
     public class LootLockerConfig : ScriptableObject
     {
 
@@ -438,7 +408,7 @@ namespace LootLocker
 
 #if LOOTLOCKER_ENABLE_PRESENCE
         [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
-        public bool enablePresence = true;
+        public bool enablePresence = false;
         
         [Tooltip("Automatically connect presence when sessions are started. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
         public bool enablePresenceAutoConnect = true;

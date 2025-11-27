@@ -266,7 +266,7 @@ namespace LootLocker
         {
             if (_state == LifecycleManagerState.Quitting || _state == LifecycleManagerState.Resetting)
             {
-                LootLockerLogger.Log($"Cannot access service {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Warning);
+                LootLockerLogger.Log($"Access of service {typeof(T).Name} during {_state.ToString().ToLower()} was requested but denied", LootLockerLogger.LogLevel.Debug);
                 return null;
             }
             
