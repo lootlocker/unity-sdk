@@ -1,4 +1,4 @@
-# Lootlocker White Label Prefab
+# LootLocker White Label Prefab
 
 # Prerequisites
 - LootLocker SDK installed and configured
