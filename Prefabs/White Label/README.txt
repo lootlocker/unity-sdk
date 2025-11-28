@@ -13,7 +13,7 @@ There are two ways of adding the Prefab to your game:
 
 # Styling
 The White Label Prefab can be styled by creating a new LootLocker Style Asset.
-- Right Click in your Project view -> Create -> Lootlocker -> Style Asset
+- Right Click in your Project view -> Create -> LootLocker -> Style Asset
 	- Or duplicate one of the existing Style Assets located in this folder
 - Add or replace the images and variables in the Style Asset to tweak it to your liking
 - To Apply your changes, go to Window -> LootLocker -> Prefab -> Apply Style Asset
