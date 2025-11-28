@@ -2,7 +2,7 @@
 
 # Prerequisites
 - LootLocker SDK installed and configured
-- White Label Configured in the Lootlocker Web Console
+- White Label Configured in the LootLocker Web Console
 	- https://console.lootlocker.com/settings/platforms/white_label_login
 
 
