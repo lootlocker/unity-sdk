@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.PackageManager;
@@ -74,6 +75,12 @@ namespace LootLocker
             string[] args = System.Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
             {
+                // Ensure there's a next argument for value parameters
+                if (i + 1 >= args.Length)
+                {
+                    continue;
+                }
+
                 if (args[i] == "-apikey")
                 {
                     apiKey = args[i + 1];
@@ -86,8 +93,74 @@ namespace LootLocker
                 {
                     UrlCoreOverride = args[i + 1];
                 }
+                else if (args[i] == "-gameversion")
+                {
+                    string versionValue = args[i + 1];
+                    if (IsSemverString(versionValue))
+                    {
+                        game_version = versionValue;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Invalid game version format: '{versionValue}'. Game version must follow Semantic Versioning pattern X.Y.Z.B (e.g., 1.0.0 or 1.0.0.0). See https://docs.lootlocker.com/the-basics/core-concepts/glossary#game-version");
+                    }
+                }
+                else if (args[i] == "-timeout")
+                {
+                    if (float.TryParse(args[i + 1], out float timeout))
+                    {
+                        clientSideRequestTimeOut = timeout;
+                    }
+                }
+                else if (args[i] == "-loglevel")
+                {
+                    if (System.Enum.TryParse<LootLockerLogger.LogLevel>(args[i + 1], true, out LootLockerLogger.LogLevel level))
+                    {
+                        logLevel = level;
+                    }
+                }
+                else if (args[i] == "-prettifyjson")
+                {
+                    if (bool.TryParse(args[i + 1], out bool prettify))
+                    {
+                        prettifyJson = prettify;
+                    }
+                }
+                else if (args[i] == "-obfuscatelogs")
+                {
+                    if (bool.TryParse(args[i + 1], out bool obfuscate))
+                    {
+                        obfuscateLogs = obfuscate;
+                    }
+                }
+                else if (args[i] == "-logerrorsaswarnings")
+                {
+                    if (bool.TryParse(args[i + 1], out bool errorsAsWarnings))
+                    {
+                        logErrorsAsWarnings = errorsAsWarnings;
+                    }
+                }
+                else if (args[i] == "-loginbuilds")
+                {
+                    if (bool.TryParse(args[i + 1], out bool inBuilds))
+                    {
+                        logInBuilds = inBuilds;
+                    }
+                }
+                else if (args[i] == "-allowtokenrefresh")
+                {
+                    if (bool.TryParse(args[i + 1], out bool allowRefresh))
+                    {
+                        allowTokenRefresh = allowRefresh;
+                    }
+                }
             }
 #endif
+        }
+
+        private static bool IsSemverString(string str)
+        {
+            return Regex.IsMatch(str, @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
 
 #if UNITY_EDITOR
