@@ -101,6 +101,18 @@ namespace LootLocker.Extension
         private Toggle logErrorsAsWarningsToggle, logInBuildsToggle, allowTokenRefreshToggle;
         #endregion
 
+        #region SDK Tools
+        [MenuItem("Window/LootLocker/Tools/Clear Local Player Data", false, 101)]
+        public static void ClearLocalPlayerData()
+        {
+            if (!EditorUtility.DisplayDialog("Clear Local Player Data", "Are you sure you want to clear all local player data? This action cannot be undone.", "Yes", "No"))
+            {
+                return;
+            }
+            LootLockerStateData.ClearAllSavedStates();
+        }
+        #endregion
+
         #region Window Management
         [MenuItem("Window/LootLocker/Manage", false, 100)]
         public static void Run()
@@ -300,11 +312,6 @@ namespace LootLocker.Extension
             SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
         }
         #endregion
-
-        private void OnDestroy()
-        {
-            LootLockerHTTPClient.ResetInstance();
-        }
     }
 }
 #endif

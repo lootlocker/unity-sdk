@@ -110,6 +110,16 @@ namespace LootLockerTests.PlayMode
 
             gameUnderTest?.InitializeLootLockerSDK();
 
+            float setupTimeout = Time.time + 10f;
+
+            yield return new WaitUntil(() => LootLockerSDKManager.CheckInitialized(true) || setupTimeout < Time.time);
+            if (!LootLockerSDKManager.CheckInitialized(true))
+            {
+                Debug.LogError("LootLocker SDK failed to initialize in setup");
+                SetupFailed = true;
+                yield break;
+            }
+
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
 
@@ -770,7 +780,7 @@ namespace LootLockerTests.PlayMode
 
             Assert.AreEqual(preSetPlayerDataPlayerCount + 1, postSetPlayerDataPlayerCount);
             Assert.IsNull(defaultPlayerPlayerData);
-            Assert.IsNull(defaultPlayerUlid);
+            Assert.IsTrue(string.IsNullOrEmpty(defaultPlayerUlid), "defaultPlayerUlid was not null or empty");
             Assert.IsNotNull(postSetDefaultPlayerUlid);
             Assert.IsNotNull(postSetDefaultPlayerPlayerData);
             Assert.AreEqual("HSDHSAJKLDLKASJDLK", postSetDefaultPlayerPlayerData.ULID);
@@ -968,7 +978,7 @@ namespace LootLockerTests.PlayMode
             var playerUlid = LootLockerStateData.GetPlayerUlidFromWLEmail(wlPlayer.WhiteLabelEmail + "-jk");
             var notPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
 
-            Assert.IsNull(playerUlid);
+            Assert.IsTrue(string.IsNullOrEmpty(playerUlid), "playerUlid was not null or empty");
             Assert.AreEqual(ulids[0], notPlayerData.ULID);
 
             yield return null;

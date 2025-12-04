@@ -136,6 +136,7 @@ namespace LootLockerTestConfigurationUtils
             string adminToken = LootLockerConfig.current.adminToken;
             bool result = LootLockerSDKManager.Init(GetApiKeyForActiveEnvironment(), GameVersion, GameDomainKey, LootLockerLogger.LogLevel.Debug);
             LootLockerConfig.current.adminToken = adminToken;
+            LootLockerSDKManager.ClearAllPlayerCaches();
             return result;
         }
 
@@ -232,6 +233,14 @@ namespace LootLockerTestConfigurationUtils
                 {
                     onComplete?.Invoke(false, response.errorData?.message, null);
                 }
+            });
+        }
+
+        public void EnablePresence(bool advancedMode, Action<bool /*success*/, string /*errorMessage*/> onComplete)
+        {
+            LootLockerTestConfigurationTitleConfig.UpdateGameConfig(LootLockerTestConfigurationTitleConfig.TitleConfigKeys.global_player_presence, true, advancedMode, response =>
+            {
+                onComplete?.Invoke(response.success, response.errorData?.message);
             });
         }
 

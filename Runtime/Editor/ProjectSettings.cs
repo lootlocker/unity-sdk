@@ -101,7 +101,7 @@ namespace LootLocker.Admin
                 if (match.Success)
                 {
                     string regexKey = match.Value;
-                    Debug.LogWarning("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + regexKey);
+                    LootLockerLogger.Log("You accidentally used the domain url instead of the domain key,\nWe took the domain key from the url.: " + regexKey, LootLockerLogger.LogLevel.Info);
                     gameSettings.domainKey = regexKey;
                     m_CustomSettings.FindProperty("domainKey").stringValue = regexKey;
                 }
@@ -176,12 +176,58 @@ namespace LootLocker.Admin
                 gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
             }
             EditorGUILayout.Space();
+
+            DrawPresenceSettings();
         }
 
         private static bool IsSemverString(string str)
         {
             return Regex.IsMatch(str,
                 @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
+        }
+
+        private void DrawPresenceSettings()
+        {
+#if LOOTLOCKER_ENABLE_PRESENCE
+            EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+
+            // Enable presence toggle
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresence"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.enablePresence = m_CustomSettings.FindProperty("enablePresence").boolValue;
+            }
+
+            // Only show sub-settings if presence is enabled
+            if (gameSettings.enablePresence)
+            {
+                EditorGUILayout.Space();
+                
+                // Auto-connect toggle
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;
+                }
+                
+                // Auto-disconnect on focus change toggle
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Disconnect on Pause/Focus Loss"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
+                }
+
+                EditorGUILayout.Space();
+
+                EditorGUILayout.HelpBox("These are default settings that can be overridden using SDK methods. You can use that to control presence behavior differently for different platforms.", MessageType.Info);
+            }
+
+            EditorGUILayout.Space();
+#endif
         }
 
         [SettingsProvider]

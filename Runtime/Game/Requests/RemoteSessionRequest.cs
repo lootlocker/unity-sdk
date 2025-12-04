@@ -190,39 +190,85 @@ namespace LootLocker
 {
     public partial class LootLockerAPIManager
     {
-        public class RemoteSessionPoller : MonoBehaviour
+        public class RemoteSessionPoller : MonoBehaviour, ILootLockerService
         {
-            #region Singleton Setup
-            private static RemoteSessionPoller _instance;
-            protected static RemoteSessionPoller GetInstance()
+            #region ILootLockerService Implementation
+
+            public bool IsInitialized { get; private set; }
+            public string ServiceName => "RemoteSessionPoller";
+
+            void ILootLockerService.Initialize()
             {
-                if (_instance == null)
+                if (IsInitialized) return;
+                IsInitialized = true;
+            }
+
+            void ILootLockerService.Reset()
+            {
+                
+                // Cancel all ongoing processes
+                if (_remoteSessionsProcesses != null)
                 {
-                    _instance = new GameObject("LootLockerRemoteSessionPoller").AddComponent<RemoteSessionPoller>();
+                    foreach (var process in _remoteSessionsProcesses.Values)
+                    {
+                        if (process != null)
+                        {
+                            process.ShouldCancel = true;
+                        }
+                    }
+                    _remoteSessionsProcesses.Clear();
                 }
 
-                if (Application.isPlaying)
-                    DontDestroyOnLoad(_instance.gameObject);
+                IsInitialized = false;
+                _instance = null;
+            }
+
+            void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+            {
+                // RemoteSessionPoller doesn't need special pause handling
+            }
+
+            void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+            {
+                // RemoteSessionPoller doesn't need special focus handling
+            }
+
+            void ILootLockerService.HandleApplicationQuit()
+            {
+                ((ILootLockerService)this).Reset();
+            }
+
+            #endregion
+
+            #region Hybrid Singleton Pattern
+
+            private static RemoteSessionPoller _instance;
+            private static readonly object _instanceLock = new object();
+
+            protected static RemoteSessionPoller GetInstance()
+            {
+                if (_instance != null)
+                {
+                    return _instance;
+                }
+
+                lock (_instanceLock)
+                {
+                    if (_instance == null)
+                    {
+                        // Register the service on-demand if not already registered
+                        if (!LootLockerLifecycleManager.HasService<RemoteSessionPoller>())
+                        {
+                            LootLockerLifecycleManager.RegisterService<RemoteSessionPoller>();
+                        }
+                        
+                        // Get service from LifecycleManager
+                        _instance = LootLockerLifecycleManager.GetService<RemoteSessionPoller>();
+                    }
+                }
 
                 return _instance;
             }
-
-            protected static bool DestroyInstance()
-            {
-                if (_instance == null)
-                    return false;
-                Destroy(_instance.gameObject);
-                _instance = null;
-                return true;
-            }
-
-#if UNITY_EDITOR
-            [InitializeOnEnterPlayMode]
-            static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
-            {
-                DestroyInstance();
-            }
-#endif
 
             #endregion
 
@@ -236,14 +282,14 @@ namespace LootLocker
                 float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                return GetInstance()._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
+                return GetInstance()?._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
-                    timeOutAfterMinutes, forPlayerWithUlid);
+                    timeOutAfterMinutes, forPlayerWithUlid) ?? Guid.Empty;
             }
 
             public static void CancelRemoteSessionProcess(Guid processGuid)
             {
-                GetInstance()._CancelRemoteSessionProcess(processGuid);
+                GetInstance()?._CancelRemoteSessionProcess(processGuid);
             }
 
             #endregion
@@ -272,15 +318,35 @@ namespace LootLocker
 
             private static void AddRemoteSessionProcess(Guid processGuid, LootLockerRemoteSessionProcess processData)
             {
-                GetInstance()._remoteSessionsProcesses.Add(processGuid, processData);
+                GetInstance()?._remoteSessionsProcesses.Add(processGuid, processData);
             }
             private static void RemoveRemoteSessionProcess(Guid processGuid)
             {
                 var i = GetInstance();
+                if (i == null) return;
                 i._remoteSessionsProcesses.Remove(processGuid);
+                
+                // Auto-cleanup: if no more processes are running, unregister the service
                 if (i._remoteSessionsProcesses.Count <= 0)
                 {
-                    DestroyInstance();
+                    CleanupServiceWhenDone();
+                }
+            }
+
+            /// <summary>
+            /// Cleanup and unregister the RemoteSessionPoller service when all processes are complete
+            /// </summary>
+            private static void CleanupServiceWhenDone()
+            {
+                if (LootLockerLifecycleManager.HasService<RemoteSessionPoller>())
+                {
+                    LootLockerLogger.Log("All remote session processes complete - cleaning up RemoteSessionPoller", LootLockerLogger.LogLevel.Debug);
+                    
+                    // Reset our local cache first
+                    _instance = null;
+                    
+                    // Remove the service from LifecycleManager
+                    LootLockerLifecycleManager.UnregisterService<RemoteSessionPoller>();
                 }
             }
 
@@ -488,7 +554,7 @@ namespace LootLocker
 
                     if (response.lease_status == LootLockerRemoteSessionLeaseStatus.Authorized)
                     {
-                        LootLockerStateData.SetPlayerData(new LootLockerPlayerData
+                        LootLockerEventSystem.TriggerSessionStarted(new LootLockerPlayerData
                         {
                             SessionToken = response.session_token,
                             RefreshToken = response.refresh_token,
