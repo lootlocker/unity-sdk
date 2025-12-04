@@ -225,7 +225,6 @@ namespace LootLocker
             if (IsInitialized) return;
             
             // Initialize event system configuration
-            isEnabled = true;
             logEvents = false;
             IsInitialized = true;
             
@@ -235,7 +234,6 @@ namespace LootLocker
         void ILootLockerService.Reset()
         {
             ClearAllSubscribersInternal();
-            isEnabled = true;
             logEvents = false;
             IsInitialized = false;
         }
@@ -294,21 +292,13 @@ namespace LootLocker
         private readonly object eventSubscribersLock = new object(); // Thread safety for event subscribers
 
         // Configuration
-        private bool isEnabled = true;
         private bool logEvents = false;
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        /// Whether the event system is enabled
-        /// </summary>
-        public static bool IsEnabled
-        {
-            get => GetInstance()?.isEnabled ?? false;
-            set { var instance = GetInstance(); if (instance != null) instance.isEnabled = value; }
-        }
+
 
         /// <summary>
         /// Whether to log events to the console for debugging
@@ -347,7 +337,7 @@ namespace LootLocker
         /// </summary>
         public void SubscribeInstance<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
-            if (!isEnabled || handler == null)
+            if (handler == null)
                 return;
 
             lock (eventSubscribersLock)
@@ -410,7 +400,7 @@ namespace LootLocker
         public static void TriggerEvent<T>(T eventData) where T : LootLockerEventData
         {
             var instance = GetInstance();
-            if (instance == null || !instance.isEnabled || eventData == null)
+            if (instance == null || eventData == null)
                 return;
 
             LootLockerEventType eventType = eventData.eventType;

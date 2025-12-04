@@ -273,11 +273,11 @@ namespace LootLocker
             // CRITICAL: Prevent circular dependency during initialization
             if (_state == LifecycleManagerState.Initializing)
             {
-                LootLockerLogger.Log($"Service {typeof(T).Name} requested during LifecycleManager initialization - this could cause deadlock. Returning null.", LootLockerLogger.LogLevel.Warning);
+                LootLockerLogger.Log($"Service {typeof(T).Name} requested during LifecycleManager initialization - this could cause deadlock. Returning null.", LootLockerLogger.LogLevel.Info);
                 return null;
             }
             
-            var instance = Instance; // This will trigger auto-initialization if needed
+            var instance = Instance;
             if (instance == null)
             {
                 LootLockerLogger.Log($"Cannot access service {typeof(T).Name} - LifecycleManager is not available", LootLockerLogger.LogLevel.Warning);
@@ -302,7 +302,6 @@ namespace LootLocker
                 return false;
             }
             
-            // Allow HasService checks during initialization (safe, read-only)
             var instance = _instance ?? Instance;
             if (instance == null)
             {
@@ -319,7 +318,7 @@ namespace LootLocker
         {
             if (_state != LifecycleManagerState.Ready || _instance == null)
             {
-                // Don't allow unregistration during shutdown/reset/initialization to prevent circular dependencies
+                // Ignore unregistration during shutdown/reset/initialization to prevent circular dependencies
                 LootLockerLogger.Log($"Ignoring unregister request for {typeof(T).Name} during {_state.ToString().ToLower()}", LootLockerLogger.LogLevel.Debug);
                 return;
             }
@@ -394,7 +393,6 @@ namespace LootLocker
                 
                 try
                 {
-                    LootLockerLogger.Log("Registering and initializing all services...", LootLockerLogger.LogLevel.Debug);
 
                     // Register and initialize core services in defined order with dependency injection
                     
@@ -452,7 +450,6 @@ namespace LootLocker
         {
             if (_HasService<T>())
             {
-                LootLockerLogger.Log($"Service {typeof(T).Name} already registered", LootLockerLogger.LogLevel.Debug);
                 return _GetService<T>();
             }
 
@@ -468,7 +465,6 @@ namespace LootLocker
         {
             if (service == null)
             {
-                LootLockerLogger.Log($"Cannot register null service of type {typeof(T).Name}", LootLockerLogger.LogLevel.Warning);
                 return;
             }
 
@@ -478,7 +474,6 @@ namespace LootLocker
             {
                 if (_services.ContainsKey(serviceType))
                 {
-                    LootLockerLogger.Log($"Service {service.ServiceName} of type {serviceType.Name} is already registered", LootLockerLogger.LogLevel.Warning);
                     return;
                 }
 
@@ -522,7 +517,6 @@ namespace LootLocker
         {
             if(!_HasService<T>())
             {
-                LootLockerLogger.Log($"Service of type {typeof(T).Name} is not registered, cannot unregister", LootLockerLogger.LogLevel.Warning);
                 return;
             }
             lock (_serviceLock)
@@ -530,8 +524,6 @@ namespace LootLocker
                 var serviceType = typeof(T);
                 if (_services.TryGetValue(serviceType, out var service))
                 {
-                    LootLockerLogger.Log($"Unregistering service: {service.ServiceName}", LootLockerLogger.LogLevel.Debug);
-
                     try
                     {
                         // Reset the service
@@ -567,7 +559,6 @@ namespace LootLocker
         {
             if (!_HasService<T>())
             {
-                LootLockerLogger.Log($"Service of type {typeof(T).Name} is not registered, cannot reset", LootLockerLogger.LogLevel.Warning);
                 return;
             }
 
@@ -578,7 +569,6 @@ namespace LootLocker
                 {
                     if (service == null)
                     {
-                        LootLockerLogger.Log($"Service {typeof(T).Name} reference is null, cannot reset", LootLockerLogger.LogLevel.Warning);
                         return;
                     }
 
@@ -701,8 +691,6 @@ namespace LootLocker
                         StopCoroutine(_healthMonitorCoroutine);
                         _healthMonitorCoroutine = null;
                     }
-                    
-                    LootLockerLogger.Log("Resetting all services...", LootLockerLogger.LogLevel.Debug);
 
                     // Reset services in reverse order of initialization
                     // This ensures dependencies are torn down in the correct order
@@ -757,7 +745,6 @@ namespace LootLocker
                         
                         if (service == null)
                         {
-                            LootLockerLogger.Log($"Service {serviceType.Name} is null - marking for restart", LootLockerLogger.LogLevel.Warning);
                             servicesToRestart.Add(serviceType);
                             continue;
                         }
@@ -767,13 +754,11 @@ namespace LootLocker
                             // Check if service is still initialized
                             if (!service.IsInitialized)
                             {
-                                LootLockerLogger.Log($"Service {service.ServiceName} is no longer initialized - attempting restart", LootLockerLogger.LogLevel.Warning);
                                 servicesToRestart.Add(serviceType);
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            LootLockerLogger.Log($"Error checking health of service {serviceType.Name}: {ex.Message} - marking for restart", LootLockerLogger.LogLevel.Warning);
                             servicesToRestart.Add(serviceType);
                         }
                     }
@@ -904,27 +889,6 @@ namespace LootLocker
         #endregion
 
         #region Helper Methods
-
-        /// <summary>
-        /// Get service initialization status for debugging
-        /// </summary>
-        public static Dictionary<string, bool> GetServiceStatuses()
-        {
-            var statuses = new Dictionary<string, bool>();
-            
-            if (_instance != null)
-            {
-                lock (_instance._serviceLock)
-                {
-                    foreach (var service in _instance._services.Values)
-                    {
-                        statuses[service.ServiceName] = service.IsInitialized;
-                    }
-                }
-            }
-
-            return statuses;
-        }
 
         /// <summary>
         /// Reset a specific service by its type. This is useful for clearing state without unregistering the service.

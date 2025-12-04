@@ -90,7 +90,12 @@ namespace LootLocker
         /*
          * Whether to log warnings when requests are denied due to queue limits
          */
-        public bool LogQueueRejections = true;
+        public bool LogQueueRejections = 
+#if UNITY_EDITOR
+            true;
+#else
+            false;
+#endif
 
         public LootLockerHTTPClientConfiguration()
         {
@@ -101,7 +106,12 @@ namespace LootLocker
             MaxQueueSize = 5000;
             ChokeWarningThreshold = 500;
             DenyIncomingRequestsWhenBackedUp = true;
-            LogQueueRejections = true;
+            LogQueueRejections = 
+#if UNITY_EDITOR
+                true;
+#else
+                false;
+#endif
         }
 
         public LootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
@@ -110,10 +120,15 @@ namespace LootLocker
             IncrementalBackoffFactor = incrementalBackoffFactor;
             InitialRetryWaitTimeInMs = initialRetryWaitTime;
             MaxOngoingRequests = 50;
-            MaxQueueSize = 1000;
+            MaxQueueSize = 5000;
             ChokeWarningThreshold = 500;
             DenyIncomingRequestsWhenBackedUp = true;
-            LogQueueRejections = true;
+            LogQueueRejections = 
+#if UNITY_EDITOR
+                true;
+#else
+                false;
+#endif
         }
     }
 
