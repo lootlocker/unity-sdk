@@ -200,14 +200,11 @@ namespace LootLocker
             void ILootLockerService.Initialize()
             {
                 if (IsInitialized) return;
-
-                LootLockerLogger.Log("Initializing RemoteSessionPoller", LootLockerLogger.LogLevel.Verbose);
                 IsInitialized = true;
             }
 
             void ILootLockerService.Reset()
             {
-                LootLockerLogger.Log("Resetting RemoteSessionPoller", LootLockerLogger.LogLevel.Verbose);
                 
                 // Cancel all ongoing processes
                 if (_remoteSessionsProcesses != null)
@@ -343,7 +340,7 @@ namespace LootLocker
             {
                 if (LootLockerLifecycleManager.HasService<RemoteSessionPoller>())
                 {
-                    LootLockerLogger.Log("All remote session processes complete - cleaning up RemoteSessionPoller", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log("All remote session processes complete - cleaning up RemoteSessionPoller", LootLockerLogger.LogLevel.Debug);
                     
                     // Reset our local cache first
                     _instance = null;

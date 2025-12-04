@@ -33,7 +33,6 @@ namespace LootLocker
 
     /// <summary>
     /// Manages player state data persistence and session lifecycle
-    /// Now an instantiable service for better architecture and dependency management
     /// </summary>
     public class LootLockerStateData : MonoBehaviour, ILootLockerService
     {
@@ -50,8 +49,6 @@ namespace LootLocker
             // to avoid circular dependency during LifecycleManager initialization
             
             IsInitialized = true;
-            
-            LootLockerLogger.Log("LootLockerStateData service initialized", LootLockerLogger.LogLevel.Verbose);
         }
 
         /// <summary>
@@ -61,25 +58,20 @@ namespace LootLocker
         {
             if (eventSystem != null)
             {
-                // Subscribe to session started events using the provided EventSystem instance
                 eventSystem.SubscribeInstance<LootLockerSessionStartedEventData>(
                     LootLockerEventType.SessionStarted,
                     OnSessionStartedEvent
                 );
                 
-                // Subscribe to session refreshed events using the provided EventSystem instance
                 eventSystem.SubscribeInstance<LootLockerSessionRefreshedEventData>(
                     LootLockerEventType.SessionRefreshed,
                     OnSessionRefreshedEvent
                 );
-                
-                // Subscribe to session ended events using the provided EventSystem instance
+            
                 eventSystem.SubscribeInstance<LootLockerSessionEndedEventData>(
                     LootLockerEventType.SessionEnded,
                     OnSessionEndedEvent
                 );
-                
-                LootLockerLogger.Log("StateData event subscriptions established", LootLockerLogger.LogLevel.Debug);
             }
         }
 
@@ -145,7 +137,6 @@ namespace LootLocker
             {
                 if (_instance == null)
                 {
-                    // Register with LifecycleManager (will auto-initialize if needed)
                     _instance = LootLockerLifecycleManager.GetService<LootLockerStateData>();
                 }
                 return _instance;
@@ -159,7 +150,6 @@ namespace LootLocker
         /// </summary>
         private void OnSessionStartedEvent(LootLockerSessionStartedEventData eventData)
         {
-            LootLockerLogger.Log("LootLockerStateData: Handling SessionStarted event for player " + eventData?.playerData?.ULID, LootLockerLogger.LogLevel.Debug);
             if (eventData?.playerData != null)
             {
                 SetPlayerData(eventData.playerData);
@@ -171,7 +161,6 @@ namespace LootLocker
         /// </summary>
         private void OnSessionRefreshedEvent(LootLockerSessionRefreshedEventData eventData)
         {
-            LootLockerLogger.Log("LootLockerStateData: Handling SessionRefreshed event for player " + eventData?.playerData?.ULID, LootLockerLogger.LogLevel.Debug);
             if (eventData?.playerData != null)
             {
                 SetPlayerData(eventData.playerData);
@@ -179,7 +168,7 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Handle session ended events by managing local state appropriately
+        /// Handle session ended events
         /// </summary>
         private void OnSessionEndedEvent(LootLockerSessionEndedEventData eventData)
         {
@@ -187,8 +176,6 @@ namespace LootLocker
             {
                 return;
             }
-
-            LootLockerLogger.Log($"LootLockerStateData: Handling SessionEnded event for player {eventData.playerUlid}, clearLocalState: {eventData.clearLocalState}", LootLockerLogger.LogLevel.Debug);
             
             if (eventData.clearLocalState)
             {

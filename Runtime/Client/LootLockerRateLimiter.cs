@@ -19,7 +19,6 @@ namespace LootLocker
 
         /// <summary>
         /// Initialize the rate limiter service. 
-        /// The rate limiter is always ready to use and doesn't require special initialization.
         /// </summary>
         public void Initialize()
         {
@@ -97,7 +96,13 @@ namespace LootLocker
 
         protected int GetMaxRequestsInSingleBucket()
         {
-            return MaxRequestsPerBucketOnMovingAverage;
+            int maxRequests = 0;
+            foreach (var t in buckets)
+            {
+                maxRequests = Math.Max(maxRequests, t);
+            }
+
+            return maxRequests;
         }
 
         protected readonly int[] buckets = new int[RateLimitMovingAverageBucketCount];
@@ -110,7 +115,7 @@ namespace LootLocker
 
         protected virtual DateTime GetTimeNow()
         {
-            return DateTime.UtcNow; // Use UTC for timezone-independent behavior
+            return DateTime.UtcNow;
         }
 
         public int GetSecondsLeftOfRateLimit()
@@ -199,5 +204,5 @@ namespace LootLocker
     
     #endregion
     }
-    
+
 }
