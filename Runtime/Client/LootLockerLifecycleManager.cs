@@ -167,7 +167,7 @@ namespace LootLocker
         [UnityEditor.InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(UnityEditor.EnterPlayModeOptions options)
         {
-            ResetInstance();
+            TeardownInstance();
         }
 #endif
 
