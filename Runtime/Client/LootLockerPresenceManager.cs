@@ -948,6 +948,7 @@ namespace LootLocker
             #if !LOOTLOCKER_ENABLE_PRESENCE
                 LootLockerLogger.Log("Cannot enable Presence: LOOTLOCKER_ENABLE_PRESENCE is not defined in this build.", LootLockerLogger.LogLevel.Warning);
                 return;
+            #pragma warning disable CS0162 // Unreachable code detected
             #endif
             bool changingState = isEnabled != enabled;
             isEnabled = enabled;
@@ -961,6 +962,9 @@ namespace LootLocker
                 UnsubscribeFromSessionEvents();
                 DisconnectAllInternal();
             }
+            #if !LOOTLOCKER_ENABLE_PRESENCE
+            #pragma warning restore CS0162 // Unreachable code detected
+            #endif
         }
 
         private void SetAutoConnectEnabled(bool enabled)
@@ -968,6 +972,7 @@ namespace LootLocker
             #if !LOOTLOCKER_ENABLE_PRESENCE
                 LootLockerLogger.Log("Cannot enable Presence auto connect: LOOTLOCKER_ENABLE_PRESENCE is not defined in this build.", LootLockerLogger.LogLevel.Warning);
                 return;
+            #pragma warning disable CS0162 // Unreachable code detected
             #endif
             bool changingState = autoConnectEnabled != enabled;
             autoConnectEnabled = enabled;
@@ -981,6 +986,9 @@ namespace LootLocker
                 UnsubscribeFromSessionEvents();
                 DisconnectAllInternal();
             }
+            #if !LOOTLOCKER_ENABLE_PRESENCE
+            #pragma warning restore CS0162 // Unreachable code detected
+            #endif
         }
 
         /// <summary>
