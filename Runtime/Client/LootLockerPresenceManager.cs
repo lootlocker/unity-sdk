@@ -1,4 +1,3 @@
-#if LOOTLOCKER_ENABLE_PRESENCE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,9 +42,15 @@ namespace LootLocker
         void ILootLockerService.Initialize()
         {
             if (IsInitialized) return;
-            isEnabled = LootLockerConfig.current.enablePresence;
-            autoConnectEnabled = LootLockerConfig.current.enablePresenceAutoConnect;
-            autoDisconnectOnFocusChange = LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange;
+            #if LOOTLOCKER_ENABLE_PRESENCE
+                isEnabled = LootLockerConfig.current.enablePresence;
+                autoConnectEnabled = LootLockerConfig.current.enablePresenceAutoConnect;
+                autoDisconnectOnFocusChange = LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange;
+            #else
+                isEnabled = false;
+                autoConnectEnabled = false;
+                autoDisconnectOnFocusChange = false;
+            #endif
             
             IsInitialized = true;
             
@@ -244,6 +249,10 @@ namespace LootLocker
         /// </summary>
         private void SubscribeToSessionEvents()
         {
+            if (!isEnabled || !LootLockerLifecycleManager.HasService<LootLockerEventSystem>()) 
+            {
+                return;
+            }
             // Subscribe to session started events
             LootLockerEventSystem.Subscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
@@ -543,7 +552,11 @@ namespace LootLocker
 
             if (!instance.isEnabled)
             {
-                string errorMessage = "Presence is disabled. Enable it in Project Settings > LootLocker SDK > Presence Settings or use SetPresenceEnabled(true).";
+                #if LOOTLOCKER_ENABLE_PRESENCE
+                    string errorMessage = "Presence is disabled. Enable it in Project Settings > LootLocker SDK > Presence Settings or use SetPresenceEnabled(true).";
+                #else
+                    string errorMessage = "Presence is disabled in this build. Please enable LOOTLOCKER_ENABLE_PRESENCE to use presence features.";
+                #endif
                 LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(false, errorMessage);
                 return;
@@ -563,13 +576,6 @@ namespace LootLocker
             {
                 LootLockerLogger.Log("Cannot connect presence: No valid player ULID found", LootLockerLogger.LogLevel.Warning);
                 onComplete?.Invoke(false, "No valid player ULID found");
-                return;
-            }
-
-            // Early out if presence is not enabled (redundant, but ensures future-proofing)
-            if (!IsEnabled)
-            {
-                onComplete?.Invoke(false, "Presence is disabled");
                 return;
             }
 
@@ -939,6 +945,10 @@ namespace LootLocker
 
         private void SetPresenceEnabled(bool enabled)
         {
+            #if !LOOTLOCKER_ENABLE_PRESENCE
+                LootLockerLogger.Log("Cannot enable Presence: LOOTLOCKER_ENABLE_PRESENCE is not defined in this build.", LootLockerLogger.LogLevel.Warning);
+                return;
+            #endif
             bool changingState = isEnabled != enabled;
             isEnabled = enabled;
             if(changingState && enabled && autoConnectEnabled)
@@ -955,6 +965,10 @@ namespace LootLocker
 
         private void SetAutoConnectEnabled(bool enabled)
         {
+            #if !LOOTLOCKER_ENABLE_PRESENCE
+                LootLockerLogger.Log("Cannot enable Presence auto connect: LOOTLOCKER_ENABLE_PRESENCE is not defined in this build.", LootLockerLogger.LogLevel.Warning);
+                return;
+            #endif
             bool changingState = autoConnectEnabled != enabled;
             autoConnectEnabled = enabled;
             if(changingState && isEnabled && enabled)
@@ -1108,4 +1122,3 @@ namespace LootLocker
         #endregion
     }
 }
-#endif
