@@ -94,6 +94,7 @@ namespace LootLocker
             }
         }
 
+        // TODO: Handle pause/focus better to avoid concurrency issues
         void ILootLockerService.HandleApplicationPause(bool pauseStatus)
         {
             if(!IsInitialized || !autoDisconnectOnFocusChange || !isEnabled)
@@ -115,9 +116,7 @@ namespace LootLocker
 
         void ILootLockerService.HandleApplicationFocus(bool hasFocus)
         {
-            if(!IsInitialized)
-                return;
-            if (!autoDisconnectOnFocusChange || !isEnabled)
+            if(!IsInitialized || !autoDisconnectOnFocusChange || !isEnabled)
                 return;
 
             if (hasFocus)
@@ -1083,6 +1082,7 @@ namespace LootLocker
         {
             if (!isShuttingDown)
             {
+                isShuttingDown = true;
                 UnsubscribeFromSessionEvents();
                 
                 DisconnectAllInternal();
