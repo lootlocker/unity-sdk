@@ -137,7 +137,7 @@ namespace LootLocker
         }
     }
 
-#if LOOTLOCKER_ENABLE_PRESENCE
+
     /// <summary>
     /// Event data for presence connection state changed events
     /// </summary>
@@ -173,7 +173,6 @@ namespace LootLocker
             this.errorMessage = errorMessage;
         }
     }
-#endif
 
     #endregion
 
@@ -200,11 +199,8 @@ namespace LootLocker
         SessionExpired,
         LocalSessionDeactivated,
         LocalSessionActivated,
-        
-#if LOOTLOCKER_ENABLE_PRESENCE
         // Presence Events
         PresenceConnectionStateChanged
-#endif
     }
 
     #endregion
@@ -560,8 +556,6 @@ namespace LootLocker
             var eventData = new LootLockerLocalSessionActivatedEventData(playerData);
             TriggerEvent(eventData);
         }
-
-#if LOOTLOCKER_ENABLE_PRESENCE
         /// <summary>
         /// Helper method to trigger presence connection state changed event
         /// </summary>
@@ -570,7 +564,6 @@ namespace LootLocker
             var eventData = new LootLockerPresenceConnectionStateChangedEventData(playerUlid, previousState, newState, errorMessage);
             TriggerEvent(eventData);
         }
-#endif
 
         #endregion
 
