@@ -57,9 +57,7 @@ namespace LootLocker.Requests
                 return false;
             }
             
-            // Reset and reinitialize the lifecycle manager with new settings
             LootLockerLifecycleManager.ResetInstance();
-            var _ = LootLockerLifecycleManager.Instance;
             
             return LootLockerLifecycleManager.IsReady;
         }
@@ -151,8 +149,7 @@ namespace LootLocker.Requests
         public static void ResetSDK()
         {
             LootLockerLogger.Log("Resetting LootLocker SDK - all services and state will be cleared", LootLockerLogger.LogLevel.Info);
-            
-            // Reset the lifecycle manager which will reset all managed services and coordinate with StateData
+
             LootLockerLifecycleManager.ResetInstance();
             
             LootLockerLogger.Log("LootLocker SDK reset complete", LootLockerLogger.LogLevel.Info);
