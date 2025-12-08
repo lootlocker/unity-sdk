@@ -187,6 +187,35 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
+            Cleanup("Request was aborted due to HTTP client reset");
+        }
+
+        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
+        {
+            // HTTP client doesn't need special pause handling
+        }
+
+        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
+        {
+            // HTTP client doesn't need special focus handling
+        }
+
+        void ILootLockerService.HandleApplicationQuit()
+        {
+            Cleanup("Request was aborted due to HTTP client destruction");
+        }
+
+        #endregion
+
+        #region Private Cleanup Methods
+
+        private void Cleanup(string reason) 
+        {
+            if (!IsInitialized || _instance == null)
+            {
+                return;
+            }
+            
             // Abort all ongoing requests and notify callbacks
             if (HTTPExecutionQueue != null)
             {
@@ -205,33 +234,8 @@ namespace LootLocker
             {
                 _instance = null;
             }
+
         }
-
-        void ILootLockerService.HandleApplicationPause(bool pauseStatus)
-        {
-            // HTTP client doesn't need special pause handling
-        }
-
-        void ILootLockerService.HandleApplicationFocus(bool hasFocus)
-        {
-            // HTTP client doesn't need special focus handling
-        }
-
-        void ILootLockerService.HandleApplicationQuit()
-        {
-            // Abort all ongoing requests and notify callbacks
-            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client destruction");
-            
-            // Clear all collections
-            ClearAllCollections();
-            
-            // Clear cached references
-            _cachedRateLimiter = null;
-        }
-
-        #endregion
-
-        #region Private Cleanup Methods
 
         /// <summary>
         /// Aborts all ongoing requests, disposes resources, and notifies callbacks with the given reason
@@ -303,8 +307,6 @@ namespace LootLocker
         };
         #endregion
 
-        #region Instance Handling
-
         #region Singleton Management
         
         private static LootLockerHTTPClient _instance;
@@ -332,8 +334,6 @@ namespace LootLocker
             }
         }
         
-        #endregion
-
         #endregion
 
         #region Configuration and Properties
@@ -370,11 +370,7 @@ namespace LootLocker
 
         private void OnDestroy()
         {
-            // Abort all ongoing requests and notify callbacks
-            AbortAllOngoingRequestsWithCallback("Request was aborted due to HTTP client destruction");
-            
-            // Clear all collections
-            ClearAllCollections();
+            Cleanup("Request was aborted due to HTTP client destruction");
         }
 
         void Update()
