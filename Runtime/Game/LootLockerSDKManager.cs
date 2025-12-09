@@ -78,8 +78,6 @@ namespace LootLocker.Requests
             return !string.IsNullOrEmpty(playerData?.SessionToken);
         }
 
-
-
         /// <summary>
         /// Utility function to check if the sdk has been initialized
         /// </summary>
@@ -98,7 +96,7 @@ namespace LootLocker.Requests
                 // Double check that initialization succeeded
                 if (!LootLockerLifecycleManager.IsReady)
                 {
-                    LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment or ensure LootLockerConfig.current is properly set.", LootLockerLogger.LogLevel.Warning);
+                    LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment.", LootLockerLogger.LogLevel.Warning);
                     return false;
                 }
             }
@@ -133,13 +131,7 @@ namespace LootLocker.Requests
             LootLockerStateData.overrideStateWriter(stateWriter);
         }
         #endif
-
-        /// <summary>
-        /// Reset all SDK services and state. 
-        /// This will reset all managed services through the lifecycle manager and clear local state.
-        /// Call this if you need to completely reinitialize the SDK without restarting the application.
-        /// Note: After calling this method, you will need to re-authenticate and reinitialize.
-        /// </summary>
+        
         /// <summary>
         /// Reset the entire LootLocker SDK, clearing all services and state.
         /// This will terminate all ongoing requests and reset all cached data.
@@ -1931,12 +1923,12 @@ namespace LootLocker.Requests
         /// Force start the Presence WebSocket connection manually. 
         /// This will override the automatic presence management and manually establish a connection.
         /// Use this when you need precise control over presence connections, otherwise let the SDK auto-manage.
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="onComplete">Callback indicating whether the connection and authentication succeeded</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ForceStartPresenceConnection(
-            LootLockerPresenceCallback onComplete = null,
-            string forPlayerWithUlid = null)
+        public static void ForceStartPresenceConnection(LootLockerPresenceCallback onComplete = null, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -1952,12 +1944,12 @@ namespace LootLocker.Requests
         /// Force stop the Presence WebSocket connection manually.
         /// This will override the automatic presence management and manually disconnect.
         /// Use this when you need precise control over presence connections, otherwise let the SDK auto-manage.
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="onComplete">Optional callback indicating whether the disconnection succeeded</param>
         /// <param name="forPlayerWithUlid">Optional: Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void ForceStopPresenceConnection(
-            LootLockerPresenceCallback onComplete = null,
-            string forPlayerWithUlid = null)
+        public static void ForceStopPresenceConnection(LootLockerPresenceCallback onComplete = null, string forPlayerWithUlid = null)
         {
             LootLockerPresenceManager.DisconnectPresence(forPlayerWithUlid, onComplete);
         }
@@ -1966,6 +1958,8 @@ namespace LootLocker.Requests
         /// Force stop all Presence WebSocket connections manually.
         /// This will override the automatic presence management and disconnect all active connections.
         /// Use this when you need to immediately disconnect all presence connections.
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         public static void ForceStopAllPresenceConnections()
         {
@@ -1974,6 +1968,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get a list of player ULIDs that currently have active Presence connections
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <returns>Collection of player ULIDs that have active presence connections</returns>
         public static IEnumerable<string> ListPresenceConnections()
@@ -1983,6 +1979,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Update the player's presence status
+        /// 
+        /// NOTE: To use this the *advanced* presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="status">The status to set (e.g., "online", "in_game", "away")</param>
         /// <param name="metadata">Optional metadata to include with the status</param>
@@ -1997,6 +1995,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get the current Presence connection state for a specific player
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>The current connection state</returns>
@@ -2007,6 +2007,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Check if Presence is connected and authenticated for a specific player
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>True if connected and active, false otherwise</returns>
@@ -2017,6 +2019,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get statistics about the Presence connection for a specific player
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>Connection statistics</returns>
@@ -2027,6 +2031,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Get the last status that was sent for a specific player
+        /// 
+        /// NOTE: To use this the *advanced* presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>The last sent status string, or null if no client is found or no status has been sent</returns>
@@ -2037,19 +2043,19 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Enable or disable the entire Presence system
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="enabled">Whether to enable presence</param>
         public static void SetPresenceEnabled(bool enabled)
         {
-            if(LootLockerPresenceManager.IsEnabled && !enabled)
-            {
-                LootLockerPresenceManager.DisconnectAll();
-            }
             LootLockerPresenceManager.IsEnabled = enabled;
         }
 
         /// <summary>
         /// Check if presence system is currently enabled
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <returns>True if enabled, false otherwise</returns>
         public static bool IsPresenceEnabled()
@@ -2059,6 +2065,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Enable or disable automatic presence connection when sessions start
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="enabled">Whether to auto-connect presence</param>
         public static void SetPresenceAutoConnectEnabled(bool enabled)
@@ -2068,6 +2076,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Check if automatic presence connections are enabled
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <returns>True if auto-connect is enabled, false otherwise</returns>
         public static bool IsPresenceAutoConnectEnabled()
@@ -2079,6 +2089,8 @@ namespace LootLocker.Requests
         /// Enable or disable automatic presence disconnection when the application loses focus or is paused.
         /// When enabled, presence connections will automatically disconnect when the app goes to background
         /// and reconnect when it returns to foreground. Useful for saving battery on mobile or managing resources.
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="enabled">True to enable auto-disconnect on focus change, false to disable</param>
         public static void SetPresenceAutoDisconnectOnFocusChangeEnabled(bool enabled)
@@ -2088,6 +2100,8 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// Check if automatic presence disconnection on focus change is enabled
+        /// 
+        /// NOTE: To use this the presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <returns>True if auto-disconnect on focus change is enabled, false otherwise</returns>
         public static bool IsPresenceAutoDisconnectOnFocusChangeEnabled()

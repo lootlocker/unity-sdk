@@ -174,6 +174,19 @@ namespace LootLocker
         }
     }
 
+    /// <summary>
+    /// Event data for event system reset events
+    /// </summary>
+    [Serializable]
+    public class LootLockerEventSystemResetEventData : LootLockerEventData
+    {
+        string message { get; set; } = "The LootLocker Event System has been reset and all subscribers have been cleared. If you were subscribed to events, you will need to re-subscribe.";
+        public LootLockerEventSystemResetEventData() 
+            : base(LootLockerEventType.EventSystemReset)
+        {
+        }
+    }
+
     #endregion
 
     #region Event Delegates
@@ -200,7 +213,9 @@ namespace LootLocker
         LocalSessionDeactivated,
         LocalSessionActivated,
         // Presence Events
-        PresenceConnectionStateChanged
+        PresenceConnectionStateChanged,
+        // Meta Events
+        EventSystemReset
     }
 
     #endregion
@@ -443,6 +458,12 @@ namespace LootLocker
         /// </summary>
         private void ClearAllSubscribersInternal()
         {
+            var resetEventData = new LootLockerEventSystemResetEventData();
+            try {
+                TriggerEvent(resetEventData);
+            } catch (Exception ex) {
+                LootLockerLogger.Log($"Error in subscriber to event system reset event: {ex.Message}. Ignored as it is up to subscribers to handle", LootLockerLogger.LogLevel.Debug);
+            }
             lock (eventSubscribersLock)
             {
                 eventSubscribers?.Clear();

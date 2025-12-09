@@ -282,9 +282,20 @@ namespace LootLocker
                 float timeOutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                return GetInstance()?._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
+                var instance = GetInstance();
+                if (instance == null)
+                {
+                    remoteSessionCompleted?.Invoke(new LootLockerStartRemoteSessionResponse
+                    {
+                        success = false,
+                        lease_status = LootLockerRemoteSessionLeaseStatus.Failed,
+                        errorData = new LootLockerErrorData { message = "Failed to start remote session with continual polling: RemoteSessionPoller instance could not be created." }
+                    });
+                    return Guid.Empty;
+                }
+                return instance._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
-                    timeOutAfterMinutes, forPlayerWithUlid) ?? Guid.Empty;
+                    timeOutAfterMinutes, forPlayerWithUlid);
             }
 
             public static void CancelRemoteSessionProcess(Guid processGuid)
@@ -315,11 +326,7 @@ namespace LootLocker
 
             private readonly Dictionary<Guid, LootLockerRemoteSessionProcess> _remoteSessionsProcesses =
                 new Dictionary<Guid, LootLockerRemoteSessionProcess>();
-
-            private static void AddRemoteSessionProcess(Guid processGuid, LootLockerRemoteSessionProcess processData)
-            {
-                GetInstance()?._remoteSessionsProcesses.Add(processGuid, processData);
-            }
+                
             private static void RemoveRemoteSessionProcess(Guid processGuid)
             {
                 var i = GetInstance();
@@ -460,7 +467,7 @@ namespace LootLocker
                     Intent = leaseIntent,
                     forPlayerWithUlid = forPlayerWithUlid
                 };
-                AddRemoteSessionProcess(processGuid, lootLockerRemoteSessionProcess);
+                _remoteSessionsProcesses.Add(processGuid, lootLockerRemoteSessionProcess);
 
                 LootLockerAPIManager.GetGameInfo(gameInfoResponse =>
                 {
