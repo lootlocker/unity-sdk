@@ -286,17 +286,22 @@ namespace LootLocker
                     
                     // 3. Initialize StateData (no dependencies)
                     var stateData = _RegisterAndInitializeService<LootLockerStateData>();
+                    if (eventSystem != null) 
+                    {
+                        stateData.SetEventSystem(eventSystem);
+                    }
                     
                     // 4. Initialize HTTPClient and set RateLimiter dependency
                     var httpClient = _RegisterAndInitializeService<LootLockerHTTPClient>();
                     httpClient.SetRateLimiter(rateLimiter);
                     
-                    // 5. Set up StateData event subscriptions after both services are ready
-                    stateData.SetEventSystem(eventSystem);
-                    
 #if LOOTLOCKER_ENABLE_PRESENCE
-                    // 6. Initialize PresenceManager (no special dependencies)
-                    _RegisterAndInitializeService<LootLockerPresenceManager>();
+                    // 5. Initialize PresenceManager (no special dependencies)
+                    var presenceManager = _RegisterAndInitializeService<LootLockerPresenceManager>();
+                    if (eventSystem != null)
+                    {
+                        presenceManager.SetEventSystem(eventSystem);
+                    }
 #endif
 
                     _isInitialized = true;
@@ -626,6 +631,11 @@ namespace LootLocker
                     {
                         stateData.SetEventSystem(eventSystem);
                     }
+                    var presenceManager = _GetService<LootLockerPresenceManager>();
+                    if (presenceManager != null)
+                    {
+                        presenceManager.SetEventSystem(eventSystem);
+                    }
                 }
                 else if (serviceType == typeof(LootLockerStateData))
                 {
@@ -640,7 +650,12 @@ namespace LootLocker
 #if LOOTLOCKER_ENABLE_PRESENCE
                 else if (serviceType == typeof(LootLockerPresenceManager))
                 {
-                    _RegisterAndInitializeService<LootLockerPresenceManager>();
+                    var presenceManager = _RegisterAndInitializeService<LootLockerPresenceManager>();
+                    var eventSystem = _GetService<LootLockerEventSystem>();
+                    if (eventSystem != null)
+                    {
+                        presenceManager.SetEventSystem(eventSystem);
+                    }
                 }
 #endif
                 
