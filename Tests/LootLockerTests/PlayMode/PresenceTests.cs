@@ -146,7 +146,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(sessionResponse.success, $"Session should start successfully. Error: {sessionResponse.errorData?.message}");
 
             // Test presence connection
-            bool presenceConnected = false;
+            bool presenceConnectCallCompleted = false;
             bool connectionSuccess = false;
             string connectionError = null;
 
@@ -154,10 +154,10 @@ namespace LootLockerTests.PlayMode
             {
                 connectionSuccess = success;
                 connectionError = error;
-                presenceConnected = true;
+                presenceConnectCallCompleted = true;
             });
 
-            yield return new WaitUntil(() => presenceConnected);
+            yield return new WaitUntil(() => presenceConnectCallCompleted);
             Assert.IsTrue(connectionSuccess, $"Presence connection should succeed. Error: {connectionError}");
 
             // Wait a moment for connection to stabilize

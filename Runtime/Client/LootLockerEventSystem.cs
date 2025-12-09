@@ -223,8 +223,6 @@ namespace LootLocker
             // Initialize event system configuration
             logEvents = false;
             IsInitialized = true;
-            
-            LootLockerLogger.Log("LootLockerEventSystem initialized", LootLockerLogger.LogLevel.Debug);
         }
 
         void ILootLockerService.Reset()
@@ -310,21 +308,19 @@ namespace LootLocker
         #region Public Methods
 
         /// <summary>
-        /// Initialize the event system (called automatically by SDK)
-        /// </summary>
-        internal static void Initialize()
-        {
-            // Services are now registered through LootLockerLifecycleManager.InitializeAllServices()
-            // This method is kept for backwards compatibility but does nothing during registration
-            GetInstance(); // This will retrieve the already-registered service
-        }
-
-        /// <summary>
         /// Subscribe to a specific event type with typed event data
         /// </summary>
         public static void Subscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
         {
             GetInstance()?.SubscribeInstance(eventType, handler);
+        }
+
+        /// <summary>
+        /// Unsubscribe from a specific event type with typed handler
+        /// </summary>
+        public static void Unsubscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
+        {
+            GetInstance()?.UnsubscribeInstance(eventType, handler);
         }
 
         /// <summary>
@@ -380,14 +376,6 @@ namespace LootLocker
                     eventSubscribers.Remove(eventType);
                 }
             }
-        }
-
-        /// <summary>
-        /// Unsubscribe from a specific event type with typed handler
-        /// </summary>
-        public static void Unsubscribe<T>(LootLockerEventType eventType, LootLockerEventHandler<T> handler) where T : LootLockerEventData
-        {
-            GetInstance()?.UnsubscribeInstance(eventType, handler);
         }
 
         /// <summary>
