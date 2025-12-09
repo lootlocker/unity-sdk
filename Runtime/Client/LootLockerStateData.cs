@@ -77,6 +77,10 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
+            if(!IsInitialized || !LootLockerLifecycleManager.HasService<LootLockerEventSystem>()) 
+            {
+                return;
+            }
             LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
                 LootLockerEventType.SessionStarted,
                 OnSessionStartedEvent
@@ -112,7 +116,7 @@ namespace LootLocker
 
         void ILootLockerService.HandleApplicationQuit()
         {
-            // Clean up any pending operations - Reset will handle event unsubscription
+            ((ILootLockerService)this).Reset();
         }
 
         #endregion
@@ -192,7 +196,7 @@ namespace LootLocker
         //==================================================
         // Writer
         //==================================================
-        private ILootLockerStateWriter _stateWriter =
+        private static ILootLockerStateWriter _stateWriter =
             #if LOOTLOCKER_DISABLE_PLAYERPREFS
                 new LootLockerNullStateWriter();
             #else
@@ -598,33 +602,6 @@ namespace LootLocker
         }
 
         #endregion // Private Instance Methods
-
-        #region Unity Lifecycle
-
-        private void OnDestroy()
-        {
-            if (!LootLockerLifecycleManager.HasService<LootLockerEventSystem>())
-            {
-                return;
-            }
-            // Unsubscribe from events on destruction
-            LootLockerEventSystem.Unsubscribe<LootLockerSessionStartedEventData>(
-                LootLockerEventType.SessionStarted,
-                OnSessionStartedEvent
-            );
-            
-            LootLockerEventSystem.Unsubscribe<LootLockerSessionRefreshedEventData>(
-                LootLockerEventType.SessionRefreshed,
-                OnSessionRefreshedEvent
-            );
-            
-            LootLockerEventSystem.Unsubscribe<LootLockerSessionEndedEventData>(
-                LootLockerEventType.SessionEnded,
-                OnSessionEndedEvent
-            );
-        }
-
-        #endregion
 
         #region Static Methods
         //==================================================
