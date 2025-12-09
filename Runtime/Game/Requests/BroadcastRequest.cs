@@ -245,7 +245,7 @@ namespace LootLocker.Requests
                 translatedBroadcast.language_codes = new string[internalBroadcast.languages?.Length ?? 0];
                 translatedBroadcast.languages = new Dictionary<string, LootLockerBroadcastLanguage>();
 
-                for (int j = 0; j < internalBroadcast.languages.Length; j++)
+                for (int j = 0; j < internalBroadcast?.languages?.Length; j++)
                 {
                     var internalLang = internalBroadcast.languages[j];
                     if (internalLang == null || string.IsNullOrEmpty(internalLang.language_code))
