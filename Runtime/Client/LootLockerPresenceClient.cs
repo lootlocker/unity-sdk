@@ -220,15 +220,6 @@ namespace LootLocker
 
         #endregion
 
-        #region Public Events
-
-        /// <summary>
-        /// Event fired when the connection state changes
-        /// </summary>
-        public event System.Action<LootLockerPresenceConnectionState /* Previous State */, LootLockerPresenceConnectionState /* Current State */, string /* Error Message */> OnConnectionStateChanged;
-
-        #endregion
-
         #region Public Properties
 
         /// <summary>
@@ -1105,7 +1096,8 @@ namespace LootLocker
                     pingCoroutine = null;
                 }
 
-                OnConnectionStateChanged?.Invoke(previousState, newState, error);
+                // Then notify external systems via the unified event system
+                LootLockerEventSystem.TriggerPresenceConnectionStateChanged(playerUlid, previousState, newState, error);
             }
         }
 
