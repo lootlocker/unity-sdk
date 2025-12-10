@@ -295,14 +295,12 @@ namespace LootLocker
                     var httpClient = _RegisterAndInitializeService<LootLockerHTTPClient>();
                     httpClient.SetRateLimiter(rateLimiter);
                     
-#if LOOTLOCKER_ENABLE_PRESENCE
                     // 5. Initialize PresenceManager (no special dependencies)
                     var presenceManager = _RegisterAndInitializeService<LootLockerPresenceManager>();
                     if (eventSystem != null)
                     {
                         presenceManager.SetEventSystem(eventSystem);
                     }
-#endif
 
                     _isInitialized = true;
                     
@@ -647,7 +645,6 @@ namespace LootLocker
                         stateData.SetEventSystem(eventSystem);
                     }
                 }
-#if LOOTLOCKER_ENABLE_PRESENCE
                 else if (serviceType == typeof(LootLockerPresenceManager))
                 {
                     var presenceManager = _RegisterAndInitializeService<LootLockerPresenceManager>();
@@ -657,7 +654,6 @@ namespace LootLocker
                         presenceManager.SetEventSystem(eventSystem);
                     }
                 }
-#endif
                 
                 LootLockerLogger.Log($"Successfully restarted service: {serviceType.Name}", LootLockerLogger.LogLevel.Info);
             }

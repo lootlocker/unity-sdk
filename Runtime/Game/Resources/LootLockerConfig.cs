@@ -153,7 +153,6 @@ namespace LootLocker
                         allowTokenRefresh = allowRefresh;
                     }
                 }
-#if LOOTLOCKER_ENABLE_PRESENCE
                 else if (args[i] == "-enablepresence")
                 {
                     if (bool.TryParse(args[i + 1], out bool enablePresence))
@@ -175,7 +174,6 @@ namespace LootLocker
                         this.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
                     }
                 }
-#endif
             }
 #endif
         }
@@ -405,8 +403,6 @@ namespace LootLocker
         public bool logErrorsAsWarnings = false;
         public bool logInBuilds = false;
         public bool allowTokenRefresh = true;
-
-#if LOOTLOCKER_ENABLE_PRESENCE
         [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
         public bool enablePresence = false;
         
@@ -415,7 +411,6 @@ namespace LootLocker
         
         [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
         public bool enablePresenceAutoDisconnectOnFocusChange = false;
-#endif
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]

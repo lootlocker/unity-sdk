@@ -1917,8 +1917,6 @@ namespace LootLocker.Requests
         #endregion
 
         #region Presence
-
-#if LOOTLOCKER_ENABLE_PRESENCE
         /// <summary>
         /// Force start the Presence WebSocket connection manually. 
         /// This will override the automatic presence management and manually establish a connection.
@@ -2108,7 +2106,6 @@ namespace LootLocker.Requests
         {
             return LootLockerPresenceManager.AutoDisconnectOnFocusChange;
         }
-#endif
 
         #endregion
 

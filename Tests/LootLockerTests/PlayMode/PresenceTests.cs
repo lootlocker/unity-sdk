@@ -1,4 +1,3 @@
-#if LOOTLOCKER_ENABLE_PRESENCE
 using System;
 using System.Collections;
 using System.Linq;
@@ -415,4 +414,3 @@ namespace LootLockerTests.PlayMode
         }
     }
 }
-#endif
