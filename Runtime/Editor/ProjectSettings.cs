@@ -188,7 +188,6 @@ namespace LootLocker.Admin
 
         private void DrawPresenceSettings()
         {
-#if LOOTLOCKER_ENABLE_PRESENCE
             EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
@@ -227,7 +226,6 @@ namespace LootLocker.Admin
             }
 
             EditorGUILayout.Space();
-#endif
         }
 
         [SettingsProvider]
