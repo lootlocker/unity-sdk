@@ -191,6 +191,12 @@ namespace LootLocker.Admin
             EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
+            if(gameSettings.enablePresence) 
+            {
+                EditorGUILayout.HelpBox("This may incur additional costs and needs to be enabled for your game. \nContact us to enable presence features.", MessageType.Info);
+                EditorGUILayout.Space();
+            }
+
             // Enable presence toggle
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresence"));
@@ -214,15 +220,13 @@ namespace LootLocker.Admin
                 
                 // Auto-disconnect on focus change toggle
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Disconnect on Pause/Focus Loss"));
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Pause Presence"));
                 if (EditorGUI.EndChangeCheck())
                 {
                     gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
                 }
 
                 EditorGUILayout.Space();
-
-                EditorGUILayout.HelpBox("These are default settings that can be overridden using SDK methods. You can use that to control presence behavior differently for different platforms.", MessageType.Info);
             }
 
             EditorGUILayout.Space();
