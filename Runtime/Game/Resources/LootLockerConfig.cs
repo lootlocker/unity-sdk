@@ -411,6 +411,9 @@ namespace LootLocker
         
         [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
         public bool enablePresenceAutoDisconnectOnFocusChange = false;
+        
+        [Tooltip("Enable presence functionality while in the Unity Editor. Disable this if you don't want development to affect presence data.")]
+        public bool enablePresenceInEditor = true;
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]
