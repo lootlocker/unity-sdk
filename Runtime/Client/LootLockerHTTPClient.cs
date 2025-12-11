@@ -739,7 +739,7 @@ namespace LootLocker
 
         private IEnumerator RefreshSession(string refreshForPlayerUlid, string forExecutionItemId, Action<LootLockerSessionResponse, string, string> onSessionRefreshedCallback)
         {
-            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(refreshForPlayerUlid);
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(refreshForPlayerUlid);
             if (playerData == null)
             {
                 LootLockerLogger.Log($"No stored player data for player with ulid {refreshForPlayerUlid}. Can't refresh session.", LootLockerLogger.LogLevel.Warning);
@@ -863,6 +863,12 @@ namespace LootLocker
                     LootLockerLogger.Log($"Session refresh callback ulid {forPlayerWithUlid} does not match the execution item ulid {executionItem.RequestData.ForPlayerWithUlid}. Ignoring.", LootLockerLogger.LogLevel.Error);
                     return;
                 }
+                if (newSessionResponse == null || !newSessionResponse.success)
+                {
+                    LootLockerLogger.Log($"Session refresh failed for player with ulid {forPlayerWithUlid}.", LootLockerLogger.LogLevel.Error);
+                    return;
+                }
+
                 var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
                 string tokenBeforeRefresh = executionItem.RequestData.ExtraHeaders.TryGetValue("x-session-token", out var existingToken) ? existingToken : "";
                 string tokenAfterRefresh = playerData?.SessionToken;
@@ -923,19 +929,19 @@ namespace LootLocker
 
         private static bool CanRefreshUsingRefreshToken(LootLockerHTTPRequestData cachedRequest)
         {
-            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.ForPlayerWithUlid);
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(cachedRequest.ForPlayerWithUlid);
             if (!LootLockerAuthPlatformSettings.PlatformsWithRefreshTokens.Contains(playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform))
             {
                 return false;
             }
             // The failed request isn't a refresh session request but we have a refresh token stored, so try to refresh the session automatically before failing
             string json = cachedRequest.Content.dataType == LootLockerHTTPRequestDataType.JSON ? ((LootLockerJsonBodyRequestContent)cachedRequest.Content).jsonBody : null;
-            return (string.IsNullOrEmpty(json) || !json.Contains("refresh_token")) && !string.IsNullOrEmpty(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(cachedRequest.ForPlayerWithUlid)?.RefreshToken);
+            return (string.IsNullOrEmpty(json) || !json.Contains("refresh_token")) && !string.IsNullOrEmpty(playerData?.RefreshToken);
         }
 
         private static bool CanStartNewSessionUsingCachedAuthData(string forPlayerWithUlid)
         {
-            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid);
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             if (playerData == null)
             {
                 return false;
