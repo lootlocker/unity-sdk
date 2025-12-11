@@ -885,7 +885,9 @@ namespace LootLocker
                 // Check connection state to prevent multiple disconnect attempts
                 var connectionState = client.ConnectionState;
                 if (connectionState == LootLockerPresenceConnectionState.Disconnected ||
-                    connectionState == LootLockerPresenceConnectionState.Failed)
+                    connectionState == LootLockerPresenceConnectionState.Failed ||
+                    connectionState == LootLockerPresenceConnectionState.Destroying ||
+                    connectionState == LootLockerPresenceConnectionState.Destroyed)
                 {
                     alreadyDisconnectedOrFailed = true;
                 }
