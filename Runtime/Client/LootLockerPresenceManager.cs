@@ -1060,6 +1060,8 @@ namespace LootLocker
                 _DisconnectAll();
             }
 
+            if(!LootLockerLifecycleManager.IsReady) return;
+
             // Only unregister if the LifecycleManager exists and we're actually registered
             // During application shutdown, services may already be reset
             try

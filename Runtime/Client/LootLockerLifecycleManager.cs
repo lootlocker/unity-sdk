@@ -144,7 +144,7 @@ namespace LootLocker
 #endif
             foreach (LootLockerLifecycleManager manager in managers)
             {
-                if (manager != null && _instanceId != manager.GetInstanceID() && manager.gameObject != null)
+                if (manager != null && _instanceId != manager.GetInstanceID() && manager.gameObject != null && ((LootLockerLifecycleManager)manager)._isInitialized)
                 {
 #if UNITY_EDITOR
                     DestroyImmediate(manager.gameObject);
@@ -474,8 +474,6 @@ namespace LootLocker
         private void OnApplicationQuit()
         {
             if (_state == LifecycleManagerState.Quitting) return; // Prevent multiple calls
-
-            TeardownInstance();
             
             ILootLockerService[] serviceSnapshot;
             lock (_serviceLock)
@@ -496,6 +494,8 @@ namespace LootLocker
                     LootLockerLogger.Log($"Error notifying service {service.ServiceName} of application quit: {ex.Message}", LootLockerLogger.LogLevel.Warning);
                 }
             }
+
+            TeardownInstance();
         }
 
         private void OnDestroy()
