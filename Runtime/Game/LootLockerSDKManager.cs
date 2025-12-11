@@ -74,6 +74,10 @@ namespace LootLocker.Requests
         /// <returns>True if a token is found, false otherwise.</returns>
         private static bool CheckActiveSession(string forPlayerWithUlid = null)
         {
+            if(string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             return !string.IsNullOrEmpty(playerData?.SessionToken);
         }
