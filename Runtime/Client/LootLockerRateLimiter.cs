@@ -32,9 +32,7 @@ namespace LootLocker
         /// Call this when you want to start fresh with rate limiting tracking.
         /// </summary>
         public void Reset()
-        {
-            LootLockerLogger.Log("Resetting RateLimiter service", LootLockerLogger.LogLevel.Verbose);
-            
+        {            
             // Reset all rate limiting state with null safety
             if (buckets != null)
                 Array.Clear(buckets, 0, buckets.Length);
