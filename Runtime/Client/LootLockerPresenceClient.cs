@@ -25,7 +25,9 @@ namespace LootLocker
         Authenticating,
         Active,
         Reconnecting,
-        Failed
+        Failed,
+        Destroying,
+        Destroyed
     }
 
     #endregion
@@ -202,8 +204,6 @@ namespace LootLocker
         private Coroutine pingCoroutine;
         private Coroutine statusUpdateCoroutine;
         private Coroutine webSocketListenerCoroutine;
-        private bool isDestroying = false;
-        private bool isDisposed = false;
         private bool isClientInitiatedDisconnect = false; // Track if disconnect is expected (due to session end)
         private LootLockerPresenceCallback pendingConnectionCallback; // Store callback until authentication completes
 
@@ -254,7 +254,13 @@ namespace LootLocker
         /// <summary>
         /// Get connection statistics including latency to LootLocker
         /// </summary>
-        public LootLockerPresenceConnectionStats ConnectionStats => connectionStats;
+        public LootLockerPresenceConnectionStats ConnectionStats { 
+            get {
+                connectionStats.connectionState = connectionState;
+                return connectionStats;
+            }
+            set { connectionStats = value; }
+        }
 
         #endregion
 
@@ -271,7 +277,6 @@ namespace LootLocker
 
         private void OnDestroy()
         {
-            isDestroying = true;
             Dispose();
         }
 
@@ -281,9 +286,10 @@ namespace LootLocker
         /// </summary>
         public void Dispose()
         {
-            if (isDisposed) return;
-            
-            isDisposed = true;
+            if (connectionState == LootLockerPresenceConnectionState.Destroying || connectionState == LootLockerPresenceConnectionState.Destroyed) return;
+
+            ChangeConnectionState(LootLockerPresenceConnectionState.Destroying);  
+
             shouldReconnect = false;
 
             StopCoroutines();
@@ -296,7 +302,7 @@ namespace LootLocker
             pendingPingTimestamps.Clear();
             recentLatencies.Clear();
 
-            ChangeConnectionState(LootLockerPresenceConnectionState.Disconnected);            
+            ChangeConnectionState(LootLockerPresenceConnectionState.Destroyed);        
         }
         
         /// <summary>
@@ -383,9 +389,10 @@ namespace LootLocker
         /// </summary>
         internal void Connect(LootLockerPresenceCallback onComplete = null)
         {
-            if (isDisposed)
+            if (connectionState == LootLockerPresenceConnectionState.Destroying ||
+                connectionState == LootLockerPresenceConnectionState.Destroyed)
             {
-                onComplete?.Invoke(false, "Client has been disposed");
+                onComplete?.Invoke(false, "Client has been destroyed");
                 return;
             }
             
@@ -415,17 +422,11 @@ namespace LootLocker
         internal void Disconnect(LootLockerPresenceCallback onComplete = null)
         {
             // Prevent multiple disconnect attempts
-            if (isDestroying || isDisposed)
-            {
-                onComplete?.Invoke(true, null);
-                return;
-            }
-            
-            // Check if already disconnected
-            if (connectionState == LootLockerPresenceConnectionState.Disconnected ||
+            if (connectionState == LootLockerPresenceConnectionState.Destroying ||
+                connectionState == LootLockerPresenceConnectionState.Destroyed ||
+                connectionState == LootLockerPresenceConnectionState.Disconnected ||
                 connectionState == LootLockerPresenceConnectionState.Failed)
             {
-                LootLockerLogger.Log($"Presence client already in disconnected state: {connectionState}", LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(true, null);
                 return;
             }
@@ -537,9 +538,10 @@ namespace LootLocker
 
         private IEnumerator ConnectCoroutine()
         {
-            if (isDestroying || isDisposed)
+            if (connectionState == LootLockerPresenceConnectionState.Destroying ||
+                connectionState == LootLockerPresenceConnectionState.Destroyed)
             {
-                HandleConnectionError("Presence client is destroying or disposed");
+                HandleConnectionError("Presence client is destroyed");
                 yield break;
             }
             if (string.IsNullOrEmpty(sessionToken))
@@ -646,7 +648,8 @@ namespace LootLocker
         private IEnumerator DisconnectCoroutine(LootLockerPresenceCallback onComplete = null)
         {
             // Don't attempt disconnect if already destroyed
-            if (isDestroying || isDisposed)
+            if (connectionState == LootLockerPresenceConnectionState.Destroying ||
+                connectionState == LootLockerPresenceConnectionState.Destroyed)
             {
                 onComplete?.Invoke(true, null);
                 yield break;
@@ -873,9 +876,9 @@ namespace LootLocker
                 var receiveTask = webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), 
                     cancellationTokenSource.Token);
 
-                yield return new WaitUntil(() => receiveTask.IsCompleted || receiveTask.IsFaulted || isDestroying || isDisposed);
+                yield return new WaitUntil(() => receiveTask.IsCompleted || receiveTask.IsFaulted || connectionState == LootLockerPresenceConnectionState.Destroying || connectionState == LootLockerPresenceConnectionState.Destroyed);
 
-                if(isDestroying || isDisposed)
+                if(connectionState == LootLockerPresenceConnectionState.Destroying || connectionState == LootLockerPresenceConnectionState.Destroyed)
                 {
                     yield break;
                 }
@@ -1084,15 +1087,7 @@ namespace LootLocker
                 // Update connection stats with new state
                 connectionStats.connectionState = newState;
 
-                LootLockerLogger.Log($"Presence connection state changed: {previousState} -> {newState}", LootLockerLogger.LogLevel.Debug);
-
-                // Stop ping routine if we're no longer active
-                if (newState != LootLockerPresenceConnectionState.Active && pingCoroutine != null)
-                {
-                    LootLockerLogger.Log("Stopping ping routine due to connection state change", LootLockerLogger.LogLevel.Debug);
-                    StopCoroutine(pingCoroutine);
-                    pingCoroutine = null;
-                }
+                LootLockerLogger.Log($"Presence state changed from {previousState} to {newState} for player {playerUlid}", LootLockerLogger.LogLevel.Debug);
 
                 // Then notify external systems via the unified event system
                 LootLockerEventSystem.TriggerPresenceConnectionStateChanged(playerUlid, previousState, newState, error);
@@ -1102,18 +1097,16 @@ namespace LootLocker
         private IEnumerator PingCoroutine()
         {
             
-            while (IsConnectedAndAuthenticated && !isDestroying)
+            while (IsConnectedAndAuthenticated)
             {
                 SendPing();
                 yield return new WaitForSeconds(PING_INTERVAL);
             }
-            
-            LootLockerLogger.Log($"Ping routine ended. Connected: {IsConnectedAndAuthenticated}, Destroying: {isDestroying}", LootLockerLogger.LogLevel.Debug);
         }
 
         private IEnumerator ScheduleReconnectCoroutine(float customDelay = -1f)
         {
-            if (!shouldReconnect || isDestroying || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
+            if (!shouldReconnect || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
             {
                 yield break;
             }
@@ -1121,10 +1114,11 @@ namespace LootLocker
             reconnectAttempts++;
             float delayToUse = customDelay > 0 ? customDelay : RECONNECT_DELAY;
             LootLockerLogger.Log($"Scheduling Presence reconnect attempt {reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS} in {delayToUse} seconds", LootLockerLogger.LogLevel.Debug);
+            ChangeConnectionState(LootLockerPresenceConnectionState.Reconnecting);
 
             yield return new WaitForSeconds(delayToUse);
 
-            if (shouldReconnect && !isDestroying)
+            if (shouldReconnect && connectionState == LootLockerPresenceConnectionState.Reconnecting)
             {
                 StartCoroutine(ConnectCoroutine());
             }
