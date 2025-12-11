@@ -227,6 +227,16 @@ namespace LootLocker.Admin
                 }
 
                 EditorGUILayout.Space();
+                
+                // Enable presence in editor toggle
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceInEditor"), new GUIContent("Enable Presence in Editor"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    gameSettings.enablePresenceInEditor = m_CustomSettings.FindProperty("enablePresenceInEditor").boolValue;
+                }
+
+                EditorGUILayout.Space();
             }
 
             EditorGUILayout.Space();
