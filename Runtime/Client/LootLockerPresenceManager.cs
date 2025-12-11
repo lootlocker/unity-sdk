@@ -131,9 +131,14 @@ namespace LootLocker
         void ILootLockerService.Initialize()
         {
             if (IsInitialized) return;
+
+            #if UNITY_EDITOR
+                _isEnabled = LootLockerConfig.current.enablePresence && LootLockerConfig.current.enablePresenceInEditor;
+            #else
                 _isEnabled = LootLockerConfig.current.enablePresence;
-                _autoConnectEnabled = LootLockerConfig.current.enablePresenceAutoConnect;
-                _autoDisconnectOnFocusChange = LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange;
+            #endif
+            _autoConnectEnabled = LootLockerConfig.current.enablePresenceAutoConnect;
+            _autoDisconnectOnFocusChange = LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange;
             
             IsInitialized = true;
         }
