@@ -520,8 +520,13 @@ namespace LootLocker
                 return;
             }
 
+            if (string.IsNullOrEmpty(playerUlid))
+            {
+                playerUlid = LootLockerStateData.GetDefaultPlayerULID();
+            }
+
             // Get player data
-            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid);
             if (playerData == null || string.IsNullOrEmpty(playerData.SessionToken))
             {
                 LootLockerLogger.Log("Cannot connect presence: No valid session token found", LootLockerLogger.LogLevel.Warning);
@@ -635,8 +640,7 @@ namespace LootLocker
             string ulid = playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
-                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
-                ulid = playerData?.ULID;
+                ulid = LootLockerStateData.GetDefaultPlayerULID();
             }
 
             // Use shared internal disconnect logic
@@ -791,49 +795,51 @@ namespace LootLocker
             
             foreach (var ulid in activePlayerUlids)
             {
-                if (!string.IsNullOrEmpty(ulid))
+                if (string.IsNullOrEmpty(ulid))
                 {
-                    var state = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(ulid);
-                    if (state == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
+                
+                var state = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(ulid);
+                if (state == null)
+                {
+                    continue;
+                }
 
-                    // Check if we already have an active or in-progress presence client for this ULID
-                    bool shouldConnect = false;
-                    lock (_activeClientsLock)
+                // Check if we already have an active or in-progress presence client for this ULID
+                bool shouldConnect = false;
+                lock (_activeClientsLock)
+                {
+                    // Check if already connecting
+                    if (_connectingClients.Contains(state.ULID))
                     {
-                        // Check if already connecting
-                        if (_connectingClients.Contains(state.ULID))
-                        {
-                            shouldConnect = false;
-                        }
-                        else if (!_activeClients.ContainsKey(state.ULID))
+                        shouldConnect = false;
+                    }
+                    else if (!_activeClients.ContainsKey(state.ULID))
+                    {
+                        shouldConnect = true;
+                    }
+                    else
+                    {
+                        // Check if existing client is in a failed or disconnected state
+                        var existingClient = _activeClients[state.ULID];
+                        var clientState = existingClient.ConnectionState;
+                        
+                        if (clientState == LootLockerPresenceConnectionState.Failed ||
+                            clientState == LootLockerPresenceConnectionState.Disconnected)
                         {
                             shouldConnect = true;
                         }
-                        else
-                        {
-                            // Check if existing client is in a failed or disconnected state
-                            var existingClient = _activeClients[state.ULID];
-                            var clientState = existingClient.ConnectionState;
-                            
-                            if (clientState == LootLockerPresenceConnectionState.Failed ||
-                                clientState == LootLockerPresenceConnectionState.Disconnected)
-                            {
-                                shouldConnect = true;
-                            }
-                        }
                     }
+                }
 
-                    if (shouldConnect)
-                    {
-                        LootLockerLogger.Log($"Auto-connecting presence for existing session: {state.ULID}", LootLockerLogger.LogLevel.Debug);
-                        ConnectPresence(state.ULID);
-                        
-                        // Small delay between connections to avoid overwhelming the system
-                        yield return new WaitForSeconds(0.1f);
-                    }
+                if (shouldConnect)
+                {
+                    LootLockerLogger.Log($"Auto-connecting presence for existing session: {state.ULID}", LootLockerLogger.LogLevel.Debug);
+                    ConnectPresence(state.ULID);
+                    
+                    // Small delay between connections to avoid overwhelming the system
+                    yield return new WaitForSeconds(0.1f);
                 }
             }
         }
@@ -1023,15 +1029,10 @@ namespace LootLocker
 
         private LootLockerPresenceClient _GetPresenceClientForUlid(string playerUlid)
         {
-            string ulid = playerUlid;
+            string ulid = string.IsNullOrEmpty(playerUlid) ? LootLockerStateData.GetDefaultPlayerULID() : playerUlid;
             if (string.IsNullOrEmpty(ulid))
             {
-                var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid);
-                if(playerData == null)
-                {
-                    return null;
-                }
-                ulid = playerData?.ULID;
+                return null;
             }
 
             lock (_activeClientsLock)

@@ -153,7 +153,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the information from the stored state for the player with the specified ULID.
         /// </summary>
-        /// <returns>The data stored for the specified player. Will be empty if no data is found.</returns>
+        /// <returns>The data stored for the specified player. Will be null if no data is found.</returns>
         public static LootLockerPlayerData GetPlayerDataForPlayerWithUlid(string playerUlid)
         {
             return LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid);
