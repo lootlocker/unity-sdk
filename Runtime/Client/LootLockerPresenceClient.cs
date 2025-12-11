@@ -69,11 +69,9 @@ namespace LootLocker
     public class LootLockerPresencePingRequest
     {
         public string type { get; set; } = "ping";
-        public DateTime timestamp { get; set; }
 
         public LootLockerPresencePingRequest()
         {
-            timestamp = DateTime.UtcNow;
         }
     }
 
@@ -497,7 +495,7 @@ namespace LootLocker
             var pingRequest = new LootLockerPresencePingRequest();
             
             // Track the ping timestamp for latency calculation
-            pendingPingTimestamps.Enqueue(pingRequest.timestamp);
+            pendingPingTimestamps.Enqueue(DateTime.UtcNow);
 
             // Clean up old pending pings (in case pongs are lost)
             while (pendingPingTimestamps.Count > 10)

@@ -458,6 +458,7 @@ namespace LootLocker
         /// </summary>
         private void ClearAllSubscribersInternal()
         {
+            if(eventSubscribers == null || eventSubscribers.Count == 0) return;
             var resetEventData = new LootLockerEventSystemResetEventData();
             try {
                 TriggerEvent(resetEventData);

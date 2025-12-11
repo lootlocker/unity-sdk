@@ -584,16 +584,17 @@ namespace LootLocker.Requests
                 // Start a new guest session with a new identifier if there is no default player to use or if that player is already playing
                 StartGuestSession(null, onComplete);
                 return;
-            } 
-            else if (LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.CurrentPlatform.Platform != LL_AuthPlatforms.Guest)
+            }
+
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(defaultPlayerUlid);
+            if (playerData?.CurrentPlatform.Platform != LL_AuthPlatforms.Guest)
             {
                 // Also start a new guest session with a new identifier if the default player is not playing but isn't a guest user
-                LootLockerStateData.SetPlayerULIDToInactive(defaultPlayerUlid);
                 StartGuestSession(null, onComplete);
                 return;
             }
 
-            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultPlayerUlid)?.Identifier, onComplete, Optionals);
+            StartGuestSession(playerData?.Identifier, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
         /// <summary>
@@ -616,7 +617,9 @@ namespace LootLocker.Requests
                 return;
             }
 
-            StartGuestSession(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.Identifier, onComplete, Optionals ?? LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(forPlayerWithUlid)?.SessionOptionals);
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
+
+            StartGuestSession(playerData?.Identifier, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
         /// <summary>
