@@ -260,14 +260,20 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => sessionStarted);
 
             // Connect presence
-            bool presenceConnected = false;
+            bool presenceConnectCallSucceeded = false;
+            string presenceConnectionMessage = null;
+            bool presenceConnectCallCompleted = false;
             LootLockerSDKManager.ForceStartPresenceConnection((success, error) =>
             {
-                presenceConnected = true;
+                presenceConnectCallSucceeded = success;
+                presenceConnectionMessage = error;
+                presenceConnectCallCompleted = true;
             });
 
-            yield return new WaitUntil(() => presenceConnected);
+            yield return new WaitUntil(() => presenceConnectCallCompleted);
             yield return new WaitForSeconds(1f);
+
+            Assert.IsTrue(presenceConnectCallSucceeded, $"Presence connection should succeed before disconnect test. Error: {presenceConnectionMessage}");
 
             // Verify connection
             Assert.IsTrue(LootLockerSDKManager.IsPresenceConnected(), "Should be connected before disconnect test");

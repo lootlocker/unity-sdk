@@ -321,17 +321,17 @@ namespace LootLocker
         {
             if (string.IsNullOrEmpty(playerULID))
             {
-                return new LootLockerPlayerData();
+                return null;
             }
             _LoadMetaDataFromPlayerPrefsIfNeeded();
             if (ActiveMetaData == null)
             {
-                return new LootLockerPlayerData();
+                return null;
             }
 
             if (!_SaveStateExistsForPlayer(playerULID))
             {
-                return new LootLockerPlayerData();
+                return null;
             }
 
             if (ActivePlayerData.TryGetValue(playerULID, out var data))
@@ -342,7 +342,7 @@ namespace LootLocker
             string playerDataJson = _stateWriter.GetString($"{PlayerDataSaveSlot}_{playerULID}");
             if (!LootLockerJson.TryDeserializeObject(playerDataJson, out LootLockerPlayerData parsedPlayerData))
             {
-                return new LootLockerPlayerData();
+                return null;
             }
             return parsedPlayerData;
         }
@@ -620,7 +620,7 @@ namespace LootLocker
 
         public static LootLockerPlayerData GetPlayerDataForPlayerWithUlidWithoutChangingState(string playerULID)
         {
-            return GetInstance()?._GetPlayerDataForPlayerWithUlidWithoutChangingState(playerULID) ?? new LootLockerPlayerData();
+            return GetInstance()?._GetPlayerDataForPlayerWithUlidWithoutChangingState(playerULID);
         }
 
         [CanBeNull]
