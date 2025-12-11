@@ -622,10 +622,9 @@ namespace LootLocker
                 return HTTPExecutionQueueProcessingResult.Completed_Success;
             }
 
-            var playerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(executionItem.RequestData.ForPlayerWithUlid);
-
             if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
+                var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(executionItem.RequestData.ForPlayerWithUlid);
                 if (ShouldRefreshSession(executionItem, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
                 {
                     return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
