@@ -187,6 +187,15 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Make the state for the player with the specified ULID to be "active".
+        /// </summary>
+        /// <returns>Whether the player was successfully activated or not</returns>
+        public static bool MakePlayerActive(string playerUlid)
+        {
+            return !string.IsNullOrEmpty(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid)?.ULID);
+        }
+
+        /// <summary>
         /// Make the state for the player with the specified ULID to be "inactive".
         /// 
         /// This will not delete the state, but it will remove it from the list of active players.
