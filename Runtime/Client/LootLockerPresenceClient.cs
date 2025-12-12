@@ -247,6 +247,11 @@ namespace LootLocker
         public string PlayerUlid => playerUlid;
 
         /// <summary>
+        /// The session token this client is using for authentication
+        /// </summary>
+        public string SessionToken => sessionToken;
+
+        /// <summary>
         /// The last status that was sent to the server (e.g., "online", "in_game", "away")
         /// </summary>
         public string LastSentStatus => ConnectionStats.lastSentStatus;
@@ -382,6 +387,14 @@ namespace LootLocker
             this.playerUlid = playerUlid;
             this.sessionToken = sessionToken;
             ChangeConnectionState(LootLockerPresenceConnectionState.Initializing);
+        }
+
+        /// <summary>
+        /// Update the session token for this client (used during token refresh)
+        /// </summary>
+        internal void UpdateSessionToken(string newSessionToken)
+        {
+            this.sessionToken = newSessionToken;
         }
 
         /// <summary>
@@ -983,6 +996,14 @@ namespace LootLocker
 
                 pingCoroutine = StartCoroutine(PingCoroutine());
                 
+                // Auto-resend last status if we have one
+                if (!string.IsNullOrEmpty(connectionStats.lastSentStatus))
+                {
+                    LootLockerLogger.Log($"Auto-resending last status '{connectionStats.lastSentStatus}' after reconnection", LootLockerLogger.LogLevel.Debug);
+                    // Use a coroutine to avoid blocking the authentication flow
+                    StartCoroutine(AutoResendLastStatusCoroutine());
+                }
+                
                 // Reset reconnect attempts on successful authentication
                 reconnectAttempts = 0;
             }
@@ -1121,6 +1142,33 @@ namespace LootLocker
             if (shouldReconnect && connectionState == LootLockerPresenceConnectionState.Reconnecting)
             {
                 StartCoroutine(ConnectCoroutine());
+            }
+        }
+
+        /// <summary>
+        /// Coroutine to auto-resend the last status after successful reconnection
+        /// </summary>
+        private IEnumerator AutoResendLastStatusCoroutine()
+        {
+            // Wait a frame to ensure we're fully connected
+            yield return null;
+            
+            // Double-check we're still connected and have a status to send
+            if (IsConnectedAndAuthenticated && !string.IsNullOrEmpty(connectionStats.lastSentStatus))
+            {
+                // Find the last sent metadata if any
+                // Note: We don't store metadata currently, so we'll resend with null metadata
+                // This could be enhanced later if metadata preservation is needed
+                UpdateStatus(connectionStats.lastSentStatus, null, (success, error) => {
+                    if (success)
+                    {
+                        LootLockerLogger.Log($"Successfully auto-resent status '{connectionStats.lastSentStatus}' after reconnection", LootLockerLogger.LogLevel.Debug);
+                    }
+                    else
+                    {
+                        LootLockerLogger.Log($"Failed to auto-resend status after reconnection: {error}", LootLockerLogger.LogLevel.Warning);
+                    }
+                });
             }
         }
 

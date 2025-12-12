@@ -47,11 +47,25 @@ namespace LootLocker.Requests
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
         /// <param name="domainKey">Extra key needed for some endpoints, can be found by going to https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="logLevel">What log level to use for the SDKs internal logging</param>
+        /// <param name="logInBuilds">If true, logs will also be printed in builds. If false, logs will only be printed in the editor.</param>
+        /// <param name="errorsAsWarnings">If true, errors will be logged as warnings instead of errors.</param>
+        /// <param name="allowTokenRefresh">If true, the SDK will attempt to refresh tokens automatically.</param>
+        /// <param name="prettifyJson">If true, JSON logs will be prettified.</param>
+        /// <param name="obfuscateLogs">If true, sensitive information in logs will be obfuscated.</param>
+        /// <param name="enablePresence">If true, presence features will be enabled.</param>
+        /// <param name="enablePresenceAutoConnect">If true, presence will auto-connect.</param>
+        /// <param name="enablePresenceAutoDisconnectOnFocusChange">If true, presence will auto-disconnect on focus change.</param>
+        /// <param name="enablePresenceInEditor">If true, presence will be enabled in the editor.</param>
+        /// 
         /// <returns>True if initialized successfully, false otherwise</returns>
-        public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info)
+        public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, 
+            bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = true, bool prettifyJson = false, bool obfuscateLogs = true, 
+            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true)
         {
             // Create new settings first
-            bool configResult = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, logLevel);
+            bool configResult = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, 
+                logLevel, logInBuilds, errorsAsWarnings, allowTokenRefresh, prettifyJson, obfuscateLogs, 
+                enablePresence, enablePresenceAutoConnect, enablePresenceAutoDisconnectOnFocusChange, enablePresenceInEditor);
             if (!configResult)
             {
                 return false;
@@ -7911,7 +7925,7 @@ namespace LootLocker.Requests
             if (PerPage > 0)
                 queryParams.Add("per_page", PerPage.ToString());
 
-            string endpointWithParams = LootLockerEndPoints.listOutgoingFriendRequests.endPoint + queryParams.ToString();
+            string endpointWithParams = LootLockerEndPoints.listBlockedPlayers.endPoint + queryParams.ToString();
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }

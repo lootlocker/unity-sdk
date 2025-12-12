@@ -145,9 +145,7 @@ namespace LootLockerTests.PlayMode
 
             LootLockerStateData.ClearAllSavedStates();
 
-            LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings,
-                configCopy.allowTokenRefresh);
+            LootLockerConfig.CreateNewSettings(configCopy);
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
             #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
             LootLockerSDKManager.SetStateWriter(new LootLockerPlayerPrefsStateWriter());

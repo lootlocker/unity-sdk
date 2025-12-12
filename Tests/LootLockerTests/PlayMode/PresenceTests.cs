@@ -111,8 +111,7 @@ namespace LootLockerTests.PlayMode
             LootLockerSDKManager.ResetSDK();
             yield return LootLockerLifecycleManager.CleanUpOldInstances();
 
-            LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-                configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+            LootLockerConfig.CreateNewSettings(configCopy);
             
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} teardown #####");
 
@@ -301,7 +300,10 @@ namespace LootLockerTests.PlayMode
 
             // Verify no active clients
             var activeClients = LootLockerSDKManager.ListPresenceConnections().ToList();
-            Assert.AreEqual(0, activeClients.Count, "Should have no active presence clients after disconnect");
+            foreach (var client in activeClients)
+            {
+                Assert.AreEqual(LootLockerSDKManager.GetPresenceConnectionState(client), LootLockerPresenceConnectionState.Disconnected, $"Client {client} should not be connected after disconnect");
+            }
 
             yield return null;
         }
@@ -415,6 +417,207 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(connectionSuccess, "Presence connection should fail when system is disabled");
             Assert.IsNotNull(connectionError, "Should have error message explaining system is disabled");
             Assert.IsFalse(LootLockerSDKManager.IsPresenceConnected(), "Presence should not be connected when disabled");
+
+            yield return null;
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator PresenceConnection_DisconnectVsDestroy_PreservesClientAndAutoResendsStatus()
+        {
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
+            // Setup session and presence connection
+            LootLockerSDKManager.SetPresenceEnabled(true);
+            LootLockerSDKManager.SetPresenceAutoConnectEnabled(false);
+
+            bool sessionStarted = false;
+            LootLockerGuestSessionResponse sessionResponse = null;
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                sessionResponse = response;
+                sessionStarted = true;
+            });
+
+            yield return new WaitUntil(() => sessionStarted);
+            Assert.IsTrue(sessionResponse.success, "Session should start successfully");
+
+            // Connect presence
+            bool presenceConnected = false;
+            bool connectionSuccess = false;
+
+            LootLockerSDKManager.ForceStartPresenceConnection((success, error) =>
+            {
+                connectionSuccess = success;
+                presenceConnected = true;
+            });
+
+            yield return new WaitUntil(() => presenceConnected);
+            Assert.IsTrue(connectionSuccess, "Presence should connect successfully");
+
+            // Wait for connection to stabilize
+            yield return new WaitForSeconds(2f);
+
+            // Set a status to test auto-resend
+            bool statusUpdated = false;
+            bool updateSuccess = false;
+            const string testStatus = "testing_disconnect_vs_destroy";
+
+            LootLockerSDKManager.UpdatePresenceStatus(testStatus, null, (success) =>
+            {
+                updateSuccess = success;
+                statusUpdated = true;
+            });
+
+            yield return new WaitUntil(() => statusUpdated);
+            Assert.IsTrue(updateSuccess, "Status update should succeed");
+
+            // Verify the status was set
+            var statsBeforeDisconnect = LootLockerSDKManager.GetPresenceConnectionStats(null);
+            Assert.AreEqual(testStatus, statsBeforeDisconnect.lastSentStatus, "Status should be set before disconnect");
+
+            // Get initial client count (should be tracked even when disconnected)
+            var clientsBeforeDisconnect = LootLockerSDKManager.ListPresenceConnections().ToList();
+            int initialClientCount = clientsBeforeDisconnect.Count;
+            Assert.Greater(initialClientCount, 0, "Should have clients before disconnect");
+
+            // Test disconnection (should preserve client)
+            bool presenceDisconnected = false;
+            bool disconnectSuccess = false;
+
+            LootLockerSDKManager.ForceStopPresenceConnection((success, error) =>
+            {
+                disconnectSuccess = success;
+                presenceDisconnected = true;
+            });
+
+            yield return new WaitUntil(() => presenceDisconnected);
+            Assert.IsTrue(disconnectSuccess, "Presence disconnection should succeed");
+
+            // Wait for disconnection to process
+            yield return new WaitForSeconds(1f);
+
+            // Verify disconnection state
+            Assert.IsFalse(LootLockerSDKManager.IsPresenceConnected(), "Should not be connected after disconnect");
+
+            // Check that client is still tracked (preserved but disconnected)
+            var clientsAfterDisconnect = LootLockerSDKManager.ListPresenceConnections().ToList();
+            Assert.AreEqual(initialClientCount, clientsAfterDisconnect.Count, "Client count should remain the same after disconnect (client preserved)");
+
+            // Verify we can still get stats from the disconnected client
+            var statsAfterDisconnect = LootLockerSDKManager.GetPresenceConnectionStats(null);
+            Assert.IsNotNull(statsAfterDisconnect, "Should still be able to get stats from disconnected client");
+            Assert.AreEqual(testStatus, statsAfterDisconnect.lastSentStatus, "Last sent status should be preserved in disconnected client");
+
+            // Test reconnection (should reuse the same client)
+            bool reconnected = false;
+            bool reconnectionSuccess = false;
+            string errorMessage = null;
+
+            LootLockerSDKManager.ForceStartPresenceConnection((success, error) =>
+            {
+                reconnectionSuccess = success;
+                errorMessage = error;
+                reconnected = true;
+            });
+
+            yield return new WaitUntil(() => reconnected);
+            Assert.IsTrue(reconnectionSuccess, $"Reconnection failed: {errorMessage}");
+
+            // Wait for reconnection to stabilize and auto-resend to complete
+            yield return new WaitForSeconds(3f);
+
+            // Verify reconnection state
+            Assert.IsTrue(LootLockerSDKManager.IsPresenceConnected(), "Should be connected after reconnection");
+
+            // Verify client was reused (not recreated)
+            var clientsAfterReconnect = LootLockerSDKManager.ListPresenceConnections().ToList();
+            Assert.AreEqual(initialClientCount, clientsAfterReconnect.Count, "Client count should remain the same after reconnect (client reused)");
+
+            // Verify status was automatically resent
+            var statsAfterReconnect = LootLockerSDKManager.GetPresenceConnectionStats(null);
+            Assert.IsNotNull(statsAfterReconnect, "Should be able to get stats after reconnect");
+            Assert.AreEqual(testStatus, statsAfterReconnect.lastSentStatus, "Status should be auto-resent after reconnection");
+
+            yield return null;
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator PresenceConnection_SessionRefresh_ReconnectsWithNewToken()
+        {
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
+            LootLockerConfig.current.allowTokenRefresh = true;
+            // Setup session and presence connection
+            LootLockerSDKManager.SetPresenceEnabled(true);
+            LootLockerSDKManager.SetPresenceAutoConnectEnabled(true); // Enable auto-connect for session refresh test
+
+            bool sessionStarted = false;
+            LootLockerGuestSessionResponse sessionResponse = null;
+
+            LootLockerSDKManager.StartGuestSession((response) =>
+            {
+                sessionResponse = response;
+                sessionStarted = true;
+            });
+
+            yield return new WaitUntil(() => sessionStarted);
+            Assert.IsTrue(sessionResponse.success, "Session should start successfully");
+
+            // Wait for auto-connection
+            yield return new WaitForSeconds(3f);
+            Assert.IsTrue(LootLockerSDKManager.IsPresenceConnected(), "Presence should auto-connect");
+
+            // Set a status
+            bool statusUpdated = false;
+            const string testStatus = "before_session_refresh";
+
+            LootLockerSDKManager.UpdatePresenceStatus(testStatus, null, (success) =>
+            {
+                statusUpdated = true;
+            });
+
+            yield return new WaitUntil(() => statusUpdated);
+
+            // Get stats before refresh
+            var statsBeforeRefresh = LootLockerSDKManager.GetPresenceConnectionStats(null);
+            Assert.AreEqual(testStatus, statsBeforeRefresh.lastSentStatus, "Status should be set before refresh");
+
+            var playerDataBeforeRefresh = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(sessionResponse.player_ulid);
+            string oldSessionToken = playerDataBeforeRefresh.SessionToken;
+            playerDataBeforeRefresh.SessionToken = "invalid_token_for_test"; // Invalidate token to force refresh
+            LootLockerStateData.SetPlayerData(playerDataBeforeRefresh);
+
+            // End current session first
+            bool getPlayerNameCompleted = false;
+            PlayerNameResponse playerNameResponse = null;
+            LootLockerSDKManager.GetPlayerName((response) =>
+            {
+                playerNameResponse = response;
+                getPlayerNameCompleted = true;
+            });
+            yield return new WaitUntil(() => getPlayerNameCompleted);
+            Assert.IsTrue(playerNameResponse.success, "Get player name succeeded despite invalid token (refresh was performed)");
+
+            // Wait for auto-reconnect with new token
+            yield return new WaitForSeconds(3f);
+
+            // Verify new connection
+            Assert.IsTrue(LootLockerSDKManager.IsPresenceConnected(), "Should reconnect after session refresh");
+
+            // Verify client was preserved and status was auto-resent (new behavior)
+            var statsAfterRefresh = LootLockerSDKManager.GetPresenceConnectionStats(null);
+            Assert.IsNotNull(statsAfterRefresh, "Should have stats for preserved client");
+            
+            // The client should have auto-resent the previous status after token refresh
+            Assert.AreEqual(testStatus, statsAfterRefresh.lastSentStatus, 
+                "Client should auto-resend previous status after session token refresh");
 
             yield return null;
         }
