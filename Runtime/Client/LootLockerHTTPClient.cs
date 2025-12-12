@@ -625,7 +625,10 @@ namespace LootLocker
             if (ShouldRetryRequest(executionItem.WebRequest.responseCode, executionItem.RequestData.TimesRetried) && !(executionItem.WebRequest.responseCode == 401 && !IsAuthorizedRequest(executionItem)))
             {
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(executionItem.RequestData.ForPlayerWithUlid);
-                if (ShouldRefreshSession(executionItem, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform) && (CanRefreshUsingRefreshToken(executionItem.RequestData) || CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid)))
+                bool shouldRefreshSession = ShouldRefreshSession(executionItem, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform);
+                bool canRefreshWithToken = CanRefreshUsingRefreshToken(executionItem.RequestData);
+                bool canReAuth = CanStartNewSessionUsingCachedAuthData(executionItem.RequestData.ForPlayerWithUlid);
+                if (shouldRefreshSession && (canRefreshWithToken || canReAuth))
                 {
                     return HTTPExecutionQueueProcessingResult.NeedsSessionRefresh;
                 }
@@ -909,7 +912,10 @@ namespace LootLocker
 
         private static bool ShouldRefreshSession(LootLockerHTTPExecutionQueueItem request, LL_AuthPlatforms platform)
         {
-            return IsAuthorizedGameRequest(request) && (request.WebRequest?.responseCode == 401 || request.WebRequest?.responseCode == 403) && LootLockerConfig.current.allowTokenRefresh && !new List<LL_AuthPlatforms>{ LL_AuthPlatforms.Steam, LL_AuthPlatforms.NintendoSwitch, LL_AuthPlatforms.None }.Contains(platform);
+            bool isAuthorized = IsAuthorizedRequest(request);
+            bool isRefreshableResponseCode = (request.WebRequest?.responseCode == 401 || request.WebRequest?.responseCode == 403);
+            bool isRefreshablePlatform = LootLockerConfig.current.allowTokenRefresh && !new List<LL_AuthPlatforms>{ LL_AuthPlatforms.Steam, LL_AuthPlatforms.NintendoSwitch, LL_AuthPlatforms.None }.Contains(platform);
+            return isAuthorized && isRefreshableResponseCode && isRefreshablePlatform;
         }
 
         private static bool IsAuthorizedRequest(LootLockerHTTPExecutionQueueItem request)

@@ -266,18 +266,60 @@ namespace LootLocker
         }
 #endif
 
-        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false)
+        public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, 
+            bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false, bool obfuscateLogs = true, 
+            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true)
         {
             _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
+            _current.domainKey = domainKey;
             _current.logLevel = logLevel;
-            _current.prettifyJson = prettifyJson;
             _current.logInBuilds = logInBuilds;
             _current.logErrorsAsWarnings = errorsAsWarnings;
             _current.allowTokenRefresh = allowTokenRefresh;
-            _current.domainKey = domainKey;
+            _current.prettifyJson = prettifyJson;
+            _current.obfuscateLogs = obfuscateLogs;
+            _current.enablePresence = enablePresence;
+            _current.enablePresenceAutoConnect = enablePresenceAutoConnect;
+            _current.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
+            _current.enablePresenceInEditor = enablePresenceInEditor;
+#if UNITY_EDITOR
+            _current.adminToken = null;
+#endif //UNITY_EDITOR
+#if LOOTLOCKER_COMMANDLINE_SETTINGS
+            _current.CheckForSettingOverrides();
+#endif
+            _current.ConstructUrls();
+            return true;
+        }
+
+        public static bool CreateNewSettings(LootLockerConfig newConfig)
+        {
+            if(newConfig == null)
+            {
+                return false;
+            }
+            _current = Get();
+            if (_current == null)
+            {
+                return false;
+            }
+
+            _current.apiKey = newConfig.apiKey;
+            _current.game_version = newConfig.game_version;
+            _current.domainKey = newConfig.domainKey;
+            _current.logLevel = newConfig.logLevel;
+            _current.logInBuilds = newConfig.logInBuilds;
+            _current.logErrorsAsWarnings = newConfig.logErrorsAsWarnings;
+            _current.allowTokenRefresh = newConfig.allowTokenRefresh;
+            _current.prettifyJson = newConfig.prettifyJson;
+            _current.obfuscateLogs = newConfig.obfuscateLogs;
+            _current.enablePresence = newConfig.enablePresence;
+            _current.enablePresenceAutoConnect = newConfig.enablePresenceAutoConnect;
+            _current.enablePresenceAutoDisconnectOnFocusChange = newConfig.enablePresenceAutoDisconnectOnFocusChange;
+            _current.enablePresenceInEditor = newConfig.enablePresenceInEditor;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
@@ -319,6 +361,10 @@ namespace LootLocker
             _current.obfuscateLogs = true;
             _current.allowTokenRefresh = true;
             _current.domainKey = null;
+            _current.enablePresence = false;
+            _current.enablePresenceAutoConnect = true;
+            _current.enablePresenceAutoDisconnectOnFocusChange = false;
+            _current.enablePresenceInEditor = true;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
