@@ -109,6 +109,12 @@ namespace LootLocker
         /// </summary>
         public static LootLockerPresenceManager Get()
         {
+            // During Unity shutdown, don't create new instances
+            if (!Application.isPlaying)
+            {
+                return _instance;
+            }
+
             if (_instance != null)
             {
                 return _instance;
@@ -173,7 +179,10 @@ namespace LootLocker
 
         void ILootLockerService.Reset()
         {
-            _DestroyAllClients();
+            if (!_isShuttingDown)
+            {
+                _DestroyAllClients();
+            }
             
             _UnsubscribeFromEvents();
             
@@ -221,11 +230,14 @@ namespace LootLocker
 
         void ILootLockerService.HandleApplicationQuit()
         {
-            _isShuttingDown = true;
-            
-            _UnsubscribeFromEvents();
-            _DestroyAllClients();
-            _connectedSessions?.Clear();
+            if (!_isShuttingDown)
+            {
+                _isShuttingDown = true;
+                
+                _UnsubscribeFromEvents();
+                _DestroyAllClients();
+                _connectedSessions?.Clear();
+            }
         }
 
         #endregion
@@ -814,6 +826,12 @@ namespace LootLocker
         /// </summary>
         public static LootLockerPresenceConnectionStats GetPresenceConnectionStats(string playerUlid = null)
         {
+            // Return empty stats during shutdown to prevent service access
+            if (!Application.isPlaying)
+            {
+                return new LootLockerPresenceConnectionStats();
+            }
+
             var instance = Get();
             if (instance == null) return new LootLockerPresenceConnectionStats();
             
@@ -953,7 +971,14 @@ namespace LootLocker
                 _connectingClients.Clear();
             }
 
-            // Destroy all clients outside the lock
+            // During Unity shutdown, don't destroy objects manually to avoid conflicts with LifecycleManager
+            if (!Application.isPlaying || _isShuttingDown)
+            {
+                // Just clear the collections, let Unity handle object destruction during shutdown
+                return;
+            }
+
+            // Destroy all clients outside the lock (only during normal operation)
             foreach (var client in clientsToDestroy)
             {
                 if (client != null)
@@ -1353,14 +1378,22 @@ namespace LootLocker
 
         private void OnDestroy()
         {
+            // During Unity shutdown, avoid any complex operations
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
             if (!_isShuttingDown)
             {
                 _isShuttingDown = true;
                 _UnsubscribeFromEvents();
                 
+                // Only destroy clients if we're not in Unity shutdown
                 _DestroyAllClients();
             }
 
+            // Skip lifecycle manager operations during shutdown
             if(!LootLockerLifecycleManager.IsReady) return;
 
             // Only unregister if the LifecycleManager exists and we're actually registered
