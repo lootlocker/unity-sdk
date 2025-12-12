@@ -12,6 +12,11 @@ namespace LootLocker
     public enum LifecycleManagerState
     {
         /// <summary>
+        /// Manager is not initialized or has been destroyed - can be recreated
+        /// </summary>
+        Uninitialized,
+        
+        /// <summary>
         /// Normal operation - services can be accessed and managed
         /// </summary>
         Ready,
@@ -132,6 +137,9 @@ namespace LootLocker
                     _instanceId = 0;
                     _hostingGameObject = null;
                 }
+                
+                // Set to Uninitialized after teardown to allow recreation
+                _state = LifecycleManagerState.Uninitialized;
             }
         }
 
@@ -180,7 +188,7 @@ namespace LootLocker
         private bool _isInitialized = false;
         private bool _serviceHealthMonitoringEnabled = true;
         private Coroutine _healthMonitorCoroutine = null;
-        private static LifecycleManagerState _state = LifecycleManagerState.Ready;
+        private static LifecycleManagerState _state = LifecycleManagerState.Uninitialized;
         private readonly object _serviceLock = new object();
 
         /// <summary>
