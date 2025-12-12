@@ -318,6 +318,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
+
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             if (playerData == null || !playerData.Identifier.Equals(deviceId))
             {
@@ -1041,6 +1046,11 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refresh_token))
             {
+
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -1211,6 +1221,11 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGooglePlayGamesSessionResponse>(null));
                 return;
             }
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             if (string.IsNullOrEmpty(playerData?.RefreshToken))
             {
@@ -1304,6 +1319,11 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refresh_token))
             {
+
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -1423,6 +1443,11 @@ namespace LootLocker.Requests
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAppleGameCenterSessionResponse>(null));
                 return;
+            }
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
             }
 
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
@@ -1553,6 +1578,11 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refresh_token))
             {
+
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -1686,6 +1716,10 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refresh_token))
             {
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -1793,6 +1827,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             if (string.IsNullOrEmpty(playerData?.RefreshToken))
             {
@@ -1828,6 +1867,11 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refresh_token))
             {
+
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -2535,6 +2579,11 @@ namespace LootLocker.Requests
 
             if (string.IsNullOrEmpty(refreshToken))
             {
+
+                if (string.IsNullOrEmpty(forPlayerWithUlid))
+                {
+                    forPlayerWithUlid = GetDefaultPlayerUlid();
+                }
                 var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
                 if (string.IsNullOrEmpty(playerData?.RefreshToken))
                 {
@@ -2733,6 +2782,11 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
+
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             string existingSessionEmail = playerData?.WhiteLabelEmail;
             string existingSessionToken = playerData?.WhiteLabelToken;
@@ -2843,6 +2897,11 @@ namespace LootLocker.Requests
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSessionResponse>(null));
                 return;
+            }
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
             }
 
             string email = null;
@@ -3345,6 +3404,11 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<PlayerNameResponse>("Setting the Player name to 'Player' is not allowed", forPlayerWithUlid));
                 return;
 
+            }
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
             }
 
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
@@ -4618,6 +4682,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetOtherPlayersClassLoadout(string playerID, Action<LootLockerClassLoadoutResponse> onComplete, string forPlayerWithUlid = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             GetOtherPlayersClassLoadout(playerID, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform, onComplete, forPlayerWithUlid);
         }
@@ -4852,6 +4921,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetCurrentLoadoutToOtherClass(string playerID, Action<LootLockerGetCurrentLoadoutToDefaultClassResponse> onComplete, string forPlayerWithUlid = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             GetCurrentLoadoutToOtherClass(playerID, playerData == null ? LL_AuthPlatforms.None : playerData.CurrentPlatform.Platform, onComplete, forPlayerWithUlid);
         }
@@ -8020,6 +8094,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowers(Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             ListFollowers(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
@@ -8032,6 +8111,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowersPaginated(string Cursor, int Count, Action<LootLockerListFollowersResponse> onComplete, string forPlayerWithUlid = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             ListFollowersPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
         }
@@ -8082,6 +8166,11 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowing(Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
         {
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             ListFollowing(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
@@ -8095,6 +8184,10 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowingPaginated(string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
         {
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             ListFollowingPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
         }
@@ -8921,6 +9014,10 @@ namespace LootLocker.Requests
         /// <returns>The platform that was last used by the user</returns>
         public static LL_AuthPlatforms GetLastActivePlatform(string forPlayerWithUlid = null)
         {
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             if (playerData == null)
             {
