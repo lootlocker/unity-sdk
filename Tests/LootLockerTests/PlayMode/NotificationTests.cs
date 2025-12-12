@@ -129,8 +129,7 @@ public class NotificationTests
 
         LootLockerStateData.ClearAllSavedStates();
 
-        LootLockerConfig.CreateNewSettings(configCopy.apiKey, configCopy.game_version, configCopy.domainKey,
-            configCopy.logLevel, configCopy.logInBuilds, configCopy.logErrorsAsWarnings, configCopy.allowTokenRefresh);
+        LootLockerConfig.CreateNewSettings(configCopy);
         Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
     }
 
@@ -562,8 +561,6 @@ public class NotificationTests
             Assert.AreEqual(CreatedTriggers.Count - notificationIdsToMarkAsRead.Length, listUnreadNotificationsAfterMarkAsReadResponse.Notifications.Length, "Not all notifications that were marked as read actually were");
         }
 
-
-        //TODO: Populate with new types
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Notifications_ConvenienceLookupTable_CanLookUpAllNotificationTypes()
         {

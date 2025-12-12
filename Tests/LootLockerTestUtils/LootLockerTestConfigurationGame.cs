@@ -134,7 +134,7 @@ namespace LootLockerTestConfigurationUtils
         public bool InitializeLootLockerSDK()
         {
             string adminToken = LootLockerConfig.current.adminToken;
-            bool result = LootLockerSDKManager.Init(GetApiKeyForActiveEnvironment(), GameVersion, GameDomainKey, LootLockerLogger.LogLevel.Debug);
+            bool result = LootLockerSDKManager.Init(GetApiKeyForActiveEnvironment(), GameVersion, GameDomainKey, LootLockerLogger.LogLevel.Debug, false, false, true, true, false, false, true, false, true);
             LootLockerConfig.current.adminToken = adminToken;
             LootLockerSDKManager.ClearAllPlayerCaches();
             return result;
