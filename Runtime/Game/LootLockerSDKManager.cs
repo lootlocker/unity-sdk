@@ -2052,7 +2052,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Update the player's presence status
         /// 
-        /// NOTE: To use this the *advanced* presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
+        /// NOTE: To use this the rich presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="status">The status to set (e.g., "online", "in_game", "away")</param>
         /// <param name="metadata">Optional metadata to include with the status</param>
@@ -2104,7 +2104,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Get the last status that was sent for a specific player
         /// 
-        /// NOTE: To use this the *advanced* presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
+        /// NOTE: To use this the rich presence feature must be enabled for your game. Contact LootLocker support if you need assistance.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>The last sent status string, or null if no client is found or no status has been sent</returns>

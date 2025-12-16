@@ -236,9 +236,9 @@ namespace LootLockerTestConfigurationUtils
             });
         }
 
-        public void EnablePresence(bool advancedMode, Action<bool /*success*/, string /*errorMessage*/> onComplete)
+        public void EnablePresence(bool enableRichPresence, Action<bool /*success*/, string /*errorMessage*/> onComplete)
         {
-            LootLockerTestConfigurationTitleConfig.UpdateGameConfig(LootLockerTestConfigurationTitleConfig.TitleConfigKeys.global_player_presence, true, advancedMode, response =>
+            LootLockerTestConfigurationTitleConfig.UpdateGameConfig(LootLockerTestConfigurationTitleConfig.TitleConfigKeys.global_player_presence, true, enableRichPresence, response =>
             {
                 onComplete?.Invoke(response.success, response.errorData?.message);
             });
