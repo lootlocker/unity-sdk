@@ -32,7 +32,7 @@ namespace LootLockerTestConfigurationUtils
             }, true);
         }
 
-        public static void UpdateGameConfig(TitleConfigKeys ConfigKey, bool Enabled, bool AdvancedMode, Action<LootLockerResponse> onComplete)
+        public static void UpdateGameConfig(TitleConfigKeys ConfigKey, bool Enabled, bool EnableRichPresence, Action<LootLockerResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
@@ -44,7 +44,7 @@ namespace LootLockerTestConfigurationUtils
             LootLockerTestConfigurationTitleConfig.PresenceTitleConfigRequest request = new LootLockerTestConfigurationTitleConfig.PresenceTitleConfigRequest
             {
                 enabled = Enabled,
-                advanced_mode = AdvancedMode
+                advanced_mode = EnableRichPresence
             };
             string json = LootLockerJson.SerializeObject(request);
             LootLockerAdminRequest.Send(endpoint, LootLockerTestConfigurationEndpoints.updateTitleConfig.httpMethod, json, onComplete: (serverResponse) =>
