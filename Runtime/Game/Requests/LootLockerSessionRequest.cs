@@ -15,6 +15,10 @@ namespace LootLocker.Requests
         /// Timezone in IANA format. If not supplied, will be set to UTC.
         /// </summary>
         public string timezone { get; set; } = null;
+        /// <summary>
+        /// The name of the player (same as set by SetPlayerName). If not supplied, will be left blank.
+        /// </summary>
+        public string player_name { get; set; } = null;
     }
 
     public class LootLockerSteamSessionRequest
@@ -162,6 +166,10 @@ namespace LootLocker.Requests
         /// The id of the wallet for this account
         /// </summary>
         public string wallet_id { get; set; }
+        /// <summary>
+        /// Any errors that occurred during the request, for example if a player name was supplied in optionals but was invalid.
+        /// </summary>
+        public string[] errors { get; set; }
     }
 
     public class LootLockerGuestSessionResponse : LootLockerSessionResponse
