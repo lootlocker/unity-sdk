@@ -7789,6 +7789,34 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// List friends that are on the specified platform for the currently logged in player 
+        /// </summary>
+        /// <param name="Platform">The platform to filter friends by (e.g., "Steam", "Xbox", "PlayStation")</param>
+        /// <param name="PerPage">The number of results to return per page</param>
+        /// <param name="Page">The page number to return</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListFriendsByPlatform(LL_AuthPlatforms Platform, int PerPage, int Page, Action<LootLockerListFriendsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListFriendsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (Page > 0)
+                queryParams.Add("page", Page.ToString());
+            if (PerPage > 0)
+                queryParams.Add("per_page", PerPage.ToString());
+            queryParams.Add("platform", LootLockerAuthPlatform.GetPlatformRepresentation(Platform).PlatformString);
+
+            string endpointWithParams = LootLockerEndPoints.listFriends.endPoint + queryParams.ToString();
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// <summary>
         /// Get a specific friend of the currently logged in player
         /// </summary>
         /// <param name="friendPlayerULID">The ULID of the player for whom to get friend information</param>
