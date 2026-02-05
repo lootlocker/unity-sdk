@@ -10,62 +10,173 @@ using UnityEngine;
 
 namespace LootLocker
 {
+    [Serializable]
     public class LootLockerConfig : ScriptableObject
     {
+        public static readonly string PackageShortName = "LL"; // Standard is LL
+        private static readonly string PackageName = "LootLocker"; // Standard is LootLocker
+        private static readonly string SettingsName = $"{PackageName}Config";
+        private static readonly string ConfigFolderName = $"{PackageName}SDK";
+        private static readonly string ConfigAssetName = $"{SettingsName}.asset";
+        private static readonly string ConfigAssetsPath = $"Assets/{ConfigFolderName}/Resources/Config/{ConfigAssetName}";
+        private static readonly string ConfigResourceFolder = $"{Application.dataPath}/{ConfigFolderName}/Resources/Config";
+        private static readonly string ConfigFileIdentifier = ""; // Optional extra package id if you want to be able to switch between multiple configurations
+        private static readonly string ConfigFileExtension = ".bytes";
+        private static readonly string ConfigFileName = $"{SettingsName}" + (string.IsNullOrEmpty(ConfigFileIdentifier) ? "" : $"-{ConfigFileIdentifier}");
+        private static readonly string ConfigFilePath = $"Assets/{ConfigFolderName}/Resources/Config/{ConfigFileName}{ConfigFileExtension}";
 
-        private static LootLockerConfig settingsInstance;
 
-        public virtual string SettingName { get { return "LootLockerConfig"; } }
+#region User Config Variables
+        /** 
+         * User Config Variables
+         * These are the variables that are exposed and recommended to change by the user
+         */
+        public string apiKey;
+#if UNITY_EDITOR
+        [HideInInspector] public string adminToken = null;
+#endif
+        [HideInInspector] public string domainKey;
+        public string game_version = "1.0.0.0";
+        [HideInInspector] public string sdk_version = "";
+        public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
+        // Write JSON in a pretty and indented format when logging
+        public bool prettifyJson = true;
+        [HideInInspector] public bool obfuscateLogs = true;
+        public bool logErrorsAsWarnings = false;
+        public bool logInBuilds = false;
+        public bool allowTokenRefresh = true;
+        [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
+        public bool enablePresence = false;
+        
+        [Tooltip("Automatically connect presence when sessions are started. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
+        public bool enablePresenceAutoConnect = true;
+        
+        [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
+        public bool enablePresenceAutoDisconnectOnFocusChange = false;
+        
+        [Tooltip("Enable presence functionality while in the Unity Editor. Disable this if you don't want development to affect presence data.")]
+        public bool enablePresenceInEditor = true;
 
+#endregion
+
+#region Internal logic and configuration
         public static LootLockerConfig Get()
         {
-            if (settingsInstance != null)
+            if (_current != null)
             {
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
-                settingsInstance.CheckForSettingOverrides();
+                _current.CheckForSettingOverrides();
 #endif
-                settingsInstance.ConstructUrls();
-                return settingsInstance;
+                _current.ConstructUrls();
+                return _current;
+            }
+
+            var fileConfig = CheckForFileConfig();
+            if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
+            {
+                if(!File.Exists(ConfigAssetsPath))
+                {
+                    CreateConfigFile();                    
+                }
+                else
+                {
+                    _current = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
+                }
+                _current.sdk_version = fileConfig.sdk_version;
+                _current.apiKey = fileConfig.api_key;
+                _current.game_version = fileConfig.game_version;
+                _current.domainKey = fileConfig.domain_key;
+                _current.enablePresence = fileConfig.enable_presence;
+                _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
+                _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
+                _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
+                _current.logLevel = fileConfig.log_level;
+                _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
+                _current.logInBuilds = fileConfig.log_in_builds;
+                _current.allowTokenRefresh = fileConfig.allow_token_refresh;
+                _current.prettifyJson = fileConfig.prettify_json;
+                _current.obfuscateLogs = fileConfig.obfuscate_logs;
+                _current.adminToken = null;
+                
+                return _current;
             }
 
             //Try to load it
-            settingsInstance = Resources.Load<LootLockerConfig>("Config/LootLockerConfig");
+            _current = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
 
 #if UNITY_EDITOR
             // Could not be loaded, create it
-            if (settingsInstance == null)
+            if (_current == null)
             {
-                // Create a new Config
-                LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
-
-                // Folder needs to exist for Unity to be able to create an asset in it
-                string dir = Application.dataPath+ "/LootLockerSDK/Resources/Config";
-
-                // If directory does not exist, create it
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-
-                // Create config asset
-                string configAssetPath = "Assets/LootLockerSDK/Resources/Config/LootLockerConfig.asset";
-                AssetDatabase.CreateAsset(newConfig, configAssetPath);
-                EditorApplication.delayCall += AssetDatabase.SaveAssets;
-                AssetDatabase.Refresh();
-                settingsInstance = newConfig;
+                CreateConfigFile();
             }
 
 #else
-            if (settingsInstance == null)
+            if (_current == null)
             {
-                throw new ArgumentException("LootLocker config does not exist. To fix this, play once in the Unity Editor before making a build.");
+                throw new ArgumentException($"{ConfigFolderName} config does not exist. To fix this, play once in the Unity Editor before making a build.");
             }
 #endif
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
-            settingsInstance.CheckForSettingOverrides();
+            _current.CheckForSettingOverrides();
 #endif
-            settingsInstance.ConstructUrls();
-            return settingsInstance;
+            _current.ConstructUrls();
+            return _current;
+        }
+
+        private static ExternalFileConfig CheckForFileConfig()
+        {
+            ExternalFileConfig fileConfig = null;
+            try {
+                if(!File.Exists(ConfigFilePath))
+                {
+                    return fileConfig;
+                }
+                AssetDatabase.ImportAsset(ConfigFilePath);
+                TextAsset configTextAsset = Resources.Load<TextAsset>($"Config/{ConfigFileName}");
+                if(configTextAsset != null)
+                {
+                    var encryptedBase64 = configTextAsset.text;
+                    if (!LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(encryptedBase64))
+                    {
+                        fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(configTextAsset.text);
+                        if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
+                        {
+                            return fileConfig;
+                        }
+                        return null;
+                    }
+                    var decryptedConfigJson = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.SimpleDecryptFromBase64(encryptedBase64);
+                    fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(decryptedConfigJson);
+                    if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
+                    {
+                        return fileConfig;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return fileConfig;
+            }
+            return fileConfig;            
+        }
+
+        private static void CreateConfigFile()
+        {
+            // Create a new Config
+            LootLockerConfig newConfig = ScriptableObject.CreateInstance<LootLockerConfig>();
+
+            // If directory does not exist, create it
+            if (!Directory.Exists(ConfigResourceFolder))
+            {
+                Directory.CreateDirectory(ConfigResourceFolder);
+            }
+
+            // Create config asset
+            AssetDatabase.CreateAsset(newConfig, ConfigAssetsPath);
+            EditorApplication.delayCall += AssetDatabase.SaveAssets;
+            AssetDatabase.Refresh();
+            _current = newConfig;
         }
 
         private void CheckForSettingOverrides()
@@ -185,9 +296,8 @@ namespace LootLocker
 
 #if UNITY_EDITOR
         [InitializeOnLoadMethod]
-        static void CreateConfigFile()
+        static void InitializeOnLoad()
         {
-
             // Get the path to the project directory
             string projectPath = Application.dataPath;
 
@@ -201,15 +311,17 @@ namespace LootLocker
                 Get();
                 EditorPrefs.SetBool(configFileEditorPref, true);
             }
+
+            StoreSDKVersion();
         }
 
         protected static ListRequest ListInstalledPackagesRequest;
 
-        [InitializeOnLoadMethod]
         static void StoreSDKVersion()
         {
-            if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) &&
-                 !LootLockerConfig.current.sdk_version.Equals("N/A")) || ListInstalledPackagesRequest != null)
+            if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A")) 
+                || ListInstalledPackagesRequest != null
+                || File.Exists(ConfigFilePath) /*Configured through config file, read sdk version there*/)
             {
                 return;
             }
@@ -404,13 +516,7 @@ namespace LootLocker
         }
 
         public (string key, string value) dateVersion = ("LL-Version", "2021-03-01");
-        public string apiKey;
-#if UNITY_EDITOR
-        [HideInInspector] public string adminToken = null;
-#endif
-        [HideInInspector] public string domainKey;
-        public string game_version = "1.0.0.0";
-        [HideInInspector] public string sdk_version = "";
+
         [HideInInspector] private static readonly string UrlProtocol = "https://";
         [HideInInspector] private static readonly string WssProtocol = "wss://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
@@ -442,24 +548,6 @@ namespace LootLocker
         [HideInInspector] public string webSocketBaseUrl = WssProtocol + GetUrlCore() + UserUrlAppendage;
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
-        public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
-        // Write JSON in a pretty and indented format when logging
-        public bool prettifyJson = true;
-        [HideInInspector] public bool obfuscateLogs = true;
-        public bool logErrorsAsWarnings = false;
-        public bool logInBuilds = false;
-        public bool allowTokenRefresh = true;
-        [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
-        public bool enablePresence = false;
-        
-        [Tooltip("Automatically connect presence when sessions are started. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
-        public bool enablePresenceAutoConnect = true;
-        
-        [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
-        public bool enablePresenceAutoDisconnectOnFocusChange = false;
-        
-        [Tooltip("Enable presence functionality while in the Unity Editor. Disable this if you don't want development to affect presence data.")]
-        public bool enablePresenceInEditor = true;
 
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]
@@ -468,5 +556,6 @@ namespace LootLocker
             _current = null;
         }
 #endif
+#endregion
     }
 }
