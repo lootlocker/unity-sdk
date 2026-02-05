@@ -166,7 +166,7 @@ namespace LootLocker
                 IsInitialized = true;
                 _instance = this;
             }
-            LootLockerLogger.Log("LootLockerHTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
+            LootLockerLogger.Log("HTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
         }
 
         /// <summary>
@@ -464,7 +464,7 @@ namespace LootLocker
 
             if((HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count) > configuration.ChokeWarningThreshold)
             {
-                LootLockerLogger.Log($"LootLocker HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'", LootLockerLogger.LogLevel.Warning);
+                LootLockerLogger.Log($"HTTP Execution Queue is overloaded. Requests currently waiting for execution: '{(HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count)}'", LootLockerLogger.LogLevel.Warning);
             }
         }
 

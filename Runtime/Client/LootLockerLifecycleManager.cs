@@ -59,7 +59,7 @@ namespace LootLocker
         {
             if (_instance == null && Application.isPlaying)
             {
-                LootLockerLogger.Log("Auto-initializing LootLocker LifecycleManager on application start", LootLockerLogger.LogLevel.Debug);
+                LootLockerLogger.Log("Auto-initializing LifecycleManager on application start", LootLockerLogger.LogLevel.Debug);
                 Instantiate();
             }
         }

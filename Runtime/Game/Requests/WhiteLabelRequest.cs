@@ -83,8 +83,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelLoginResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelLoginResponse>("Domain key must be set in settings", null));
 
                 return;
             }
@@ -109,8 +109,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelVerifySessionResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelVerifySessionResponse>("Domain key must be set in settings", null));
 
                 return;
             }
@@ -132,8 +132,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelSignupResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelSignupResponse>("Domain key must be set in settings", null));
 
                 return;
             }
@@ -149,8 +149,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Domain key must be set in settings", null));
 
                 return;
             }
@@ -165,8 +165,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Domain key must be set in settings", null));
 
                 return;
             }
@@ -181,8 +181,8 @@ namespace LootLocker
 
             if (LootLockerConfig.current.domainKey.Length == 0)
             {
-                LootLockerLogger.Log("LootLocker domain key must be set in settings", LootLockerLogger.LogLevel.Error);
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("LootLocker domain key must be set in settings", null));
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Domain key must be set in settings", null));
 
                 return;
             }
