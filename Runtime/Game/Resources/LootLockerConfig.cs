@@ -346,7 +346,7 @@ namespace LootLocker
                     if (package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
-                        LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                        LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                         return;
                     }
                 }
@@ -354,7 +354,7 @@ namespace LootLocker
                 if (File.Exists("Assets/LootLockerSDK/package.json"))
                 {
                     LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
-                    LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                    LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                     return;
                 }
 
@@ -367,7 +367,7 @@ namespace LootLocker
                         if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
                         {
                             LootLockerConfig.current.sdk_version = packageDescription.version;
-                            LootLockerLogger.Log($"LootLocker Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                            LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                             return;
                         }
                     }

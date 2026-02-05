@@ -114,7 +114,7 @@ namespace LootLocker.Requests
                 // Double check that initialization succeeded
                 if (!LootLockerLifecycleManager.IsReady)
                 {
-                    LootLockerLogger.Log("LootLocker services are still initializing. Please try again in a moment.", LootLockerLogger.LogLevel.Warning);
+                    LootLockerLogger.Log("The SDK services are still initializing. Please try again in a moment.", LootLockerLogger.LogLevel.Warning);
                     return false;
                 }
             }
@@ -158,11 +158,11 @@ namespace LootLocker.Requests
         /// </summary>
         public static void ResetSDK()
         {
-            LootLockerLogger.Log("Resetting LootLocker SDK - all services and state will be cleared", LootLockerLogger.LogLevel.Info);
+            LootLockerLogger.Log("Resetting SDK - all services and state will be cleared", LootLockerLogger.LogLevel.Info);
 
             LootLockerLifecycleManager.ResetInstance();
             
-            LootLockerLogger.Log("LootLocker SDK reset complete", LootLockerLogger.LogLevel.Info);
+            LootLockerLogger.Log("SDK reset complete", LootLockerLogger.LogLevel.Info);
         }
         #endregion
 
