@@ -124,9 +124,10 @@ namespace LootLocker.LogViewer
         public void Log(LootLockerLogger.LogLevel logLevel, string message)
         {
             // Skip regular HTTP log lines (let the enriched HTTP log handle it)
-            if (message.StartsWith("[LL HTTP]") || message.StartsWith("[LL HTTP RESPONSE]"))
+            if (message.Contains("[HTTP]") || message.Contains("[HTTP RESPONSE]"))
                 return;
-            var logEntry = new LogEntry { level = logLevel, message = message, Timestamp = DateTime.Now };
+            string labelFreeMessage = message.Replace(LootLockerLogger.GetLogLabel(), "").Trim();
+            var logEntry = new LogEntry { level = logLevel, message = labelFreeMessage, Timestamp = DateTime.Now };
             logEntries.Add(logEntry);
             allLogEntries.Add(logEntry);
             if (logEntries.Count > MAX_LOG_ENTRIES)
@@ -199,15 +200,15 @@ namespace LootLocker.LogViewer
                             var sb = new System.Text.StringBuilder();
                             if (http.Response?.success ?? false)
                             {
-                                sb.AppendLine($"[LL HTTP] {http.Method} request to {http.Url} succeeded");
+                                sb.AppendLine($"[HTTP] {http.Method} request to {http.Url} succeeded");
                             }
                             else if (!string.IsNullOrEmpty(http.Response?.errorData?.message) && http.Response?.errorData?.message.Length < 40)
                             {
-                                sb.AppendLine($"[LL HTTP] {http.Method} request to {http.Url} failed with message {http.Response.errorData.message} ({http.StatusCode})");
+                                sb.AppendLine($"[HTTP] {http.Method} request to {http.Url} failed with message {http.Response.errorData.message} ({http.StatusCode})");
                             }
                             else
                             {
-                                sb.AppendLine($"[LL HTTP] {http.Method} request to {http.Url} failed (details in expanded log) ({http.StatusCode})");
+                                sb.AppendLine($"[HTTP] {http.Method} request to {http.Url} failed (details in expanded log) ({http.StatusCode})");
                             }
                             sb.AppendLine($"Duration: {http.DurationSeconds:n4}s");
                             sb.AppendLine("Request Headers:");
