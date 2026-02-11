@@ -132,14 +132,29 @@ namespace LootLocker
                 {
                     return fileConfig;
                 }
-                AssetDatabase.ImportAsset(ConfigFilePath);
-                TextAsset configTextAsset = Resources.Load<TextAsset>($"Config/{ConfigFileName}");
+                AssetDatabase.ImportAsset(ConfigFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                AssetDatabase.Refresh();
+                
+                TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(ConfigFilePath);
+                
+                // Fallback: if Unity asset system isn't ready, read file directly from disk
+                string configText = null;
                 if(configTextAsset != null)
                 {
-                    var encryptedBase64 = configTextAsset.text;
+                    configText = configTextAsset.text;
+                }
+                else
+                {
+                    // Direct file read as fallback
+                    configText = File.ReadAllText(ConfigFilePath);
+                }
+                
+                if(!string.IsNullOrEmpty(configText))
+                {
+                    var encryptedBase64 = configText;
                     if (!LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(encryptedBase64))
                     {
-                        fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(configTextAsset.text);
+                        fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(configText);
                         if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
                         {
                             return fileConfig;
@@ -153,9 +168,13 @@ namespace LootLocker
                         return fileConfig;
                     }
                 }
+                else
+                {
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                UnityEngine.Debug.LogError("Error while checking for file config: " + ex.Message);
                 return fileConfig;
             }
             return fileConfig;            
