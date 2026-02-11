@@ -5526,7 +5526,6 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GrantAssetToPlayerInventory(forPlayerWithUlid, data, onComplete);
         }
 
-        #endregion
         /// <summary>
         /// List assets with default parameters (no filters, first page, default page size).
         /// </summary>
@@ -5577,6 +5576,8 @@ namespace LootLocker.Requests
                 });
         }
 
+        #endregion
+        
         #region AssetInstance
         /// <summary>
         /// Get all key/value pairs for all asset instances.
