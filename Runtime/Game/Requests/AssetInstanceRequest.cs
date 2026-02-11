@@ -21,13 +21,6 @@ namespace LootLocker.Requests
         public LootLockerStorage storage { get; set; }
     }
 
-    public class LootLockerStorage
-    {
-        public int id { get; set; }
-        public string key { get; set; }
-        public string value { get; set; }
-    }
-
 
     public class LootLockerAssetDefaultResponse : LootLockerResponse
     {
