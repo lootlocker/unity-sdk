@@ -179,7 +179,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Request to list a player's simplified inventory with the given filters
     /// </summary>
-    public class LootLockerListSimplifiedInventoryRequest
+    public class LootLockerListSimplifiedFilters
     {
         /// <summary>
         /// A list of asset ids to filter the inventory items by
@@ -189,6 +189,17 @@ namespace LootLocker.Requests
         /// A list of context ids to filter the inventory items by
         /// </summary>
         public int[] context_ids { get; set; }
+    }
+
+    /// <summary>
+    /// Request to list a player's simplified inventory with the given filters
+    /// </summary>
+    public class LootLockerListSimplifiedInventoryRequest
+    {
+        /// <summary>
+        /// The filters to apply to the inventory listing. If null, no filters will be applied and the full inventory will be returned
+        /// </summary>
+        public LootLockerListSimplifiedFilters filters { get; set; }
     }
 
     //==================================================
