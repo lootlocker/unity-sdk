@@ -407,7 +407,7 @@ jobs:
         run: |
           cd go-backend
           echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
-          go run . jobs migrate
+      #    go run . jobs migrate
       - name: Run Go Backend
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
