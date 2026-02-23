@@ -78,3 +78,7 @@ To set up the tests, you must add our package to the manifest.json `testables` u
 Once you have done this, you can go into Unity and go to `Window` -> `General` -> `Test Runner`. This will open a new window which should already include all the tests available, Then all you have to do is press `Run All` and the tests will begin.
 
 If you are running the tests towards the LootLocker production environment you will need to provide a username and password to an existing user either by setting the values directly in LootLockerTestConfigurationUser::GetProductionUser or via command line arguments -adminemail and -adminpassword. Bear in mind that your tests will be rate limited when running towards production (and in general this is a bad idea).
+
+## Internal developer docs
+- Architecture & structure: [docs/architecture.md](docs/architecture.md)
+- Coding Agent guardrails: [.github/agent-docs/guardrails.md](.github/agent-docs/guardrails.md)
