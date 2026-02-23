@@ -11,6 +11,13 @@ namespace LootLockerTestConfigurationUtils
         public string reward_id { get; set; }
     }
 
+    public class LootLockerTestTriggerRequest
+    {
+        public LootLockerTestTrigger trigger { get; set; }
+
+        public string[] segments { get; set; }
+    }
+
     public static class LootLockerTestConfigurationTrigger
     {
         public static void CreateTrigger(string key, string name, int limit, string rewardId, Action<LootLockerResponse> onComplete)
@@ -21,12 +28,16 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            var request = new LootLockerTestTrigger
+            var request = new LootLockerTestTriggerRequest
             {
-                key = key,
-                name = name,
-                limit = limit,
-                reward_id = rewardId
+                trigger = new LootLockerTestTrigger
+                {
+                    key = key,
+                    name = name,
+                    limit = limit,
+                    reward_id = rewardId
+                },
+                segments = new string[] { }
             };
 
             string json = LootLockerJson.SerializeObject(request);
