@@ -390,9 +390,9 @@ jobs:
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
           cd devenv
-          mage env:setupsilent dev false false
-          mage env:upsilent dev
-          mage deps:installsilent dev
+          mage env:setup dev false false
+          mage env:up dev
+          mage deps:install dev
       - name: Setup Go to use access token for private repos
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         env:
