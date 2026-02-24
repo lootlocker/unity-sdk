@@ -392,7 +392,6 @@ jobs:
           cd devenv
           mage env:setup dev false false
           mage env:up dev
-          mage deps:install dev
       - name: Setup Go to use access token for private repos
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         env:
@@ -529,7 +528,7 @@ jobs:
         if: always()
         run: |
           cd devenv
-          mage env:downsilent dev
+          mage env:down dev
       - name: Upload logs
         uses: actions/upload-artifact@v4
         if: always()
