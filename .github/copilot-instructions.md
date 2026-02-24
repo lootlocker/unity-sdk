@@ -13,3 +13,10 @@ Follow these rules for any work in this repo:
 ## Architecture references
 - Repo structure + “where do I implement X?”: `.github/instructions/architecture.md`
 - Guardrails (agent operating rules): `.github/instructions/guardrails.md`
+
+## Conventions & style
+- Coding conventions & style guide: `.github/instructions/style-guide.md`
+- Patterns cookbook (templates): `.github/instructions/patterns.md`
+- Path-specific instructions:
+	- Public API surface (`Runtime/Game/LootLockerSDKManager.cs`): `.github/instructions/Runtime/Game/LootLockerSDKManager.cs.instructions.md`
+	- Request implementations (`Runtime/Game/Requests/**`): `.github/instructions/Runtime/Game/Requests.instructions.md`
