@@ -3,7 +3,7 @@
 - Repo layout: **UPM package at repository root** (customers receive an `Assets/` wrapper via CI packaging).
 - Public entrypoint: `Runtime/Game/LootLockerSDKManager.cs`
 
-For agent operating rules, see: `.github/agent-docs/guardrails.md`.
+For agent operating rules, see: `.github/instructions/guardrails.md`.
 
 ## Repository map (root)
 - `Runtime/` — Shippable SDK code (runtime + editor-guarded pieces). Main entrypoint is in `Runtime/Game/`.
@@ -74,19 +74,14 @@ Shared response base + errors:
 ### Samples
 - `Samples~/LootLockerExamples/` — UPM samples + `LootLockerExamples.asmdef`.
 
-## Architectural boundaries / invariants (observed)
+## Related instructions (rules live elsewhere)
 
-### Runtime must be build-safe
-- Any `UnityEditor` usage is expected to be behind `#if UNITY_EDITOR` guards.
-- Editor-only implementations should live under `Runtime/Editor/`.
+This document is intentionally focused on **structure and navigation** (where things live).
 
-### Public API discipline
-- Adding/changing public methods in `LootLockerSDKManager` changes the customer-facing surface area.
-- Prefer keeping helper types/methods `internal`/`private` unless they are intentionally part of the public SDK.
-
-### Search-first to avoid duplication
-- Requests, response DTOs, and shared helpers are frequently co-located (especially under `Runtime/Game/Requests/`).
-- Before introducing new utilities or DTOs, search for existing equivalents.
+For behavioral rules, conventions, and safety constraints, follow:
+- `.github/instructions/guardrails.md` (change discipline + operational rules)
+- `.github/instructions/style-guide.md` (repo-wide coding conventions)
+- Path-specific instruction files under `.github/instructions/**.instructions.md` (highest priority for matching paths)
 
 ## Where do I implement X?
 
@@ -104,14 +99,8 @@ Shared response base + errors:
 | Add/adjust tests | `Tests/LootLockerTests/PlayMode/` (tests) and `Tests/LootLockerTestUtils/` (shared config) |
 | Add/adjust samples | `Samples~/LootLockerExamples/` |
 
-## Common pitfalls
-- Duplication: search under `Runtime/Game/Requests/` and `Runtime/Client/` before adding new helpers.
-- Accidental API surface growth: avoid adding new `public` types/methods unless that is the goal.
-- Drive-by refactors: keep PRs narrow; large reshuffles make review harder and increase risk.
-- Editor leakage: keep `UnityEditor` references guarded and editor-only code inside `Runtime/Editor/`.
-
 ## Links
-- Coding Agent guardrails: `.github/agent-docs/guardrails.md`
+- Coding Agent guardrails: `.github/instructions/guardrails.md`
 
 ## Future expansion (placeholders)
 - Build & test (to be filled by later tasks)
