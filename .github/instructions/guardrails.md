@@ -27,4 +27,6 @@ If a change would require guessing architecture, conventions, or customer-facing
 - Stop and ask for clarification rather than inventing a new pattern.
 
 ## Reference
-- Architecture & structure overview: `docs/architecture.md`
+- Architecture & structure overview: `.github/instructions/architecture.md`
+- Style Guide: `.github/instructions/style-guide.md`
+- Code patterns: `.github/instructions/patterns.md`
