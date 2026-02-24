@@ -11,5 +11,5 @@ Follow these rules for any work in this repo:
 - Search first to avoid duplicating helpers/utilities.
 
 ## Architecture references
-- Repo structure + “where do I implement X?”: `docs/architecture.md`
-- Guardrails (agent operating rules): `.github/agent-docs/guardrails.md`
+- Repo structure + “where do I implement X?”: `.github/instructions/architecture.md`
+- Guardrails (agent operating rules): `.github/instructions/guardrails.md`
