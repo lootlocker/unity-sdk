@@ -31,7 +31,7 @@ Prefer extending existing public methods when:
 - You are adding a small optional behavior that fits an existing concept.
 - The change can be represented as an optional parameter with a safe default.
 
-## 1.3 When and how to deprecate
+### 1.3 When and how to deprecate
 
 Go through a deprecation flow when:
 - A public method/DTO is going out of support.
@@ -39,7 +39,7 @@ Go through a deprecation flow when:
 
 Deprecations are done by marking the method/DTO with `[Obsolete("This method is deprecated, please use <Replacement method if applicable>")] // Deprecation date <today's date>`.
 Deprecations should be done in their own commits and explicitly stated.
-Deperecations also require mention in release notes as well as an update of user facing documentation.
+Deprecations also require mention in release notes as well as an update of user facing documentation.
 
 ### 1.4 Visibility defaults
 
