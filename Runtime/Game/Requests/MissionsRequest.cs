@@ -27,6 +27,55 @@ namespace LootLocker.Requests
         public LootLockerCheckpointTimes[] checkpoint_times { get; set; }
     }
 
+    [Serializable]
+    public class LootLockerGoals
+    {
+        public LootLockerGold gold { get; set; }
+        public LootLockerSilver silver { get; set; }
+        public LootLockerBronze bronze { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerGold
+    {
+        public string goal { get; set; }
+        public string points { get; set; }
+        public LootLockerCommonAsset[] assets { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerSilver
+    {
+        public string goal { get; set; }
+        public string points { get; set; }
+        public object[] assets { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerBronze
+    {
+        public string goal { get; set; }
+        public string points { get; set; }
+        public object[] assets { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerCheckpoint
+    {
+        public int index { get; set; }
+        public int time { get; set; }
+        public string your_key { get; set; }
+        public string your_second_key { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerCheckpointTimes
+    {
+        public int index { get; set; }
+        public int time { get; set; }
+        public int score { get; set; }
+    }
+
     public class LootLockerFinishMissionRequest : LootLockerGetRequest
     {
         public string signature { get; set; }

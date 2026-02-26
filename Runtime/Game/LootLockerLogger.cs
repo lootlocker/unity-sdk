@@ -8,6 +8,9 @@ namespace LootLocker
     {
         public static LootLockerLogger _instance = null;
 
+        private static readonly string LL_LOG_LABEL = $"[{LootLockerConfig.PackageShortName}]";
+        private static string LogLabel = LL_LOG_LABEL;
+
         private Dictionary<string, LootLockerLogListener> logListeners = new Dictionary<string, LootLockerLogListener>();
         private class LogRecord
         {
@@ -33,6 +36,16 @@ namespace LootLocker
             , None
         }
 
+        public static string GetLogLabel()
+        {
+            return LogLabel;
+        }
+
+        public static void SetLogLabel(string newLabel)
+        {
+            LogLabel = newLabel;
+        }
+
         /// <summary>
         /// Log message with the specified loglevel
         /// </summary>
@@ -44,6 +57,7 @@ namespace LootLocker
             {
                 return;
             }
+            string prependedMessage = $"{LogLabel} {message}";
 
             Action<string> logger;
             switch (logLevel)
@@ -73,14 +87,14 @@ namespace LootLocker
 
             if(logger != null)
             {
-                logger(message);
+                logger(prependedMessage);
             }
 
             if(_instance == null)
             {
                 _instance = new LootLockerLogger();
             }
-            _instance.RecordAndBroadcastMessage(message, logLevel);
+            _instance.RecordAndBroadcastMessage(prependedMessage, logLevel);
         }
 
         private static bool ShouldLog(LogLevel logLevel)
@@ -228,15 +242,15 @@ namespace LootLocker
             var sb = new System.Text.StringBuilder();
             if (entry.Response?.success ?? false)
             {
-                sb.AppendLine($"[LL HTTP] {entry.Method} request to {entry.Url} succeeded");
+                sb.AppendLine($"[HTTP] {entry.Method} request to {entry.Url} succeeded");
             }
             else if (!string.IsNullOrEmpty(entry.Response?.errorData?.message) && entry.Response?.errorData?.message.Length < 40)
             {
-                sb.AppendLine($"[LL HTTP] {entry.Method} request to {entry.Url} failed with message {entry.Response.errorData.message} ({entry.StatusCode})");
+                sb.AppendLine($"[HTTP] {entry.Method} request to {entry.Url} failed with message {entry.Response.errorData.message} ({entry.StatusCode})");
             }
             else
             {
-                sb.AppendLine($"[LL HTTP] {entry.Method} request to {entry.Url} failed (details in expanded log) ({entry.StatusCode})");
+                sb.AppendLine($"[HTTP] {entry.Method} request to {entry.Url} failed (details in expanded log) ({entry.StatusCode})");
             }
             sb.AppendLine($"Duration: {entry.DurationSeconds:n4}s");
             sb.AppendLine("Request Headers:");

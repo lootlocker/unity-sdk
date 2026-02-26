@@ -171,7 +171,9 @@ namespace LootLocker.Extension
             if (game.created_at == default(System.DateTime) || game.created_at == null) return false;
             var cutoff = new System.DateTime(2025, 3, 10);
             return game.created_at >= cutoff;
-        }        void SwapEnvironment()
+        }        
+        
+        void SwapEnvironment()
         {
             if (isLoadingKeys)
             {

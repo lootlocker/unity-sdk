@@ -52,29 +52,6 @@ namespace LootLocker.Requests
         public string Asset { get; set; }
     }
 
-    [Serializable]
-    public class LootLockerRental
-    {
-        public bool is_rental { get; set; }
-        public string time_left { get; set; }
-        public string duration { get; set; }
-        public string is_active { get; set; }
-    }
-
-    public class LootLockerInventory
-    {
-        public int instance_id { get; set; }
-        public int? variation_id { get; set; }
-        public string rental_option_id { get; set; }
-        public string acquisition_source { get; set; }
-        public DateTime? acquisition_date { get; set; }
-        public LootLockerCommonAsset asset { get; set; }
-        public LootLockerRental rental { get; set; }
-
-
-        public float balance { get; set; }
-    }
-
     /// <summary>
     /// A simplified view of an inventory item
     /// </summary>
@@ -244,12 +221,6 @@ namespace LootLocker.Requests
     public class LootLockerBalanceResponse : LootLockerResponse
     {
         public int? balance { get; set; }
-    }
-
-    [Serializable]
-    public class LootLockerInventoryResponse : LootLockerResponse
-    {
-        public LootLockerInventory[] inventory { get; set; }
     }
 
     /// <summary>

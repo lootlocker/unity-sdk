@@ -432,7 +432,7 @@ namespace LootLocker
 
             if (instance.logEvents)
             {
-                LootLockerLogger.Log($"LootLocker Event: {eventType} at {eventData.timestamp}. Notified {subscribers.Count} subscribers", LootLockerLogger.LogLevel.Debug);
+                LootLockerLogger.Log($"Triggered Event: {eventType} at {eventData.timestamp}. Notified {subscribers.Count} subscribers", LootLockerLogger.LogLevel.Debug);
             }
         }
 
