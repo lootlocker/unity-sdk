@@ -123,7 +123,7 @@ namespace LootLocker
             _current.ConstructUrls();
             return _current;
         }
-
+        
         private static ExternalFileConfig CheckForFileConfig()
         {
             ExternalFileConfig fileConfig = null;
@@ -174,7 +174,7 @@ namespace LootLocker
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError("Error while checking for file config: " + ex.Message);
+                LootLockerLogger.Log("Error while checking for file config: " + ex.Message, LootLockerLogger.LogLevel.Error);
                 return fileConfig;
             }
             return fileConfig;            
@@ -188,7 +188,15 @@ namespace LootLocker
             // If directory does not exist, create it
             if (!Directory.Exists(ConfigResourceFolder))
             {
-                Directory.CreateDirectory(ConfigResourceFolder);
+                try
+                {
+                    Directory.CreateDirectory(ConfigResourceFolder);
+                }
+                catch (Exception ex)
+                {
+                    LootLockerLogger.Log($"Failed to create config directory at path '{ConfigResourceFolder}'. Config asset will not be created. Exception: {ex}", LootLockerLogger.LogLevel.Error);
+                    return;
+                }
             }
 
             // Create config asset
