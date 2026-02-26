@@ -133,20 +133,15 @@ namespace LootLocker.Extension
         void CreateNewAPIKey()
         {
             int gameId = LootLockerEditorData.GetSelectedGame();
-            if (gameId == 0)
+            if (gameId == 0 || !gameData.ContainsKey(gameId))
             {
                 ShowPopup("Error", "No active Game found!");
                 return;
             }
 
-            if (isStage && gameData.ContainsKey(gameId))
-            {
-                gameId = gameData[gameId].development.id;
-            }
-
             ShowLoadingAndExecute(() =>
             {
-                LootLockerAdminManager.GenerateKey(gameId, newApiKeyName.value, "game", (onComplete) =>
+                LootLockerAdminManager.GenerateKey(gameData[gameId].development.id, newApiKeyName.value, "game", (onComplete) =>
                 {
                     if (!onComplete.success)
                     {
@@ -168,16 +163,15 @@ namespace LootLocker.Extension
             if (apiKeyList != null) apiKeyList.Clear();
             
             int gameID = LootLockerEditorData.GetSelectedGame();
-            if (isStage && gameData.ContainsKey(gameID))
+            if (gameID == 0 || !gameData.ContainsKey(gameID))
             {
-                gameID = gameData[gameID].development.id;
+                ShowPopup("Error", "No active Game found!");
+                return;
             }
-            
-            isLoadingKeys = true;
 
             ShowLoadingAndExecute(() =>
             {
-                LootLockerAdminManager.GetAllKeys(gameID, (onComplete) =>
+                LootLockerAdminManager.GetAllKeys(gameData[gameID].development.id, (onComplete) =>
                 {
                     if (!onComplete.success)
                     {
@@ -190,8 +184,6 @@ namespace LootLocker.Extension
                     {
                         APIKeyTemplate(key);
                     }
-
-                    isLoadingKeys = false;
                     HideLoading();
                 });
             });
