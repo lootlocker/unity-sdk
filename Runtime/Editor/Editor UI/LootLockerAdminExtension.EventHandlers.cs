@@ -67,9 +67,6 @@ namespace LootLocker.Extension
             gameName.text = selectedGameData.name;
             UpdateLicenseCountdownUI();
 
-            LootLockerEditorData.SetEnvironmentStage();
-            isStage = true;
-
             ShowLoadingAndExecute(() =>
             {
                 LootLockerAdminManager.GetGameDomainKey(LootLockerEditorData.GetSelectedGame(), (onComplete) =>
@@ -96,7 +93,7 @@ namespace LootLocker.Extension
 
             LootLockerConfig.current.apiKey = target.name;
             SwapNewSelectedKey();
-            ShowPopup("API Key Selected", $"API Key {target.name} is now active.");
+            ShowPopup("API Key Selected", $"API Key {target.name} is now active.", Color.green);
         }
 
         private void LicenseCountdownIconClick(MouseDownEvent evt)
@@ -125,9 +122,10 @@ namespace LootLocker.Extension
             EditorApplication.QueuePlayerLoopUpdate();
         }
 
-        private void ShowPopup(string title, string message)
+        private void ShowPopup(string title, string message, Color? titleColor = null)
         {
             if (popupTitle != null) popupTitle.text = title;
+            if (titleColor.HasValue && popupTitle != null) popupTitle.style.color = titleColor.Value;
             if (popupMessage != null) popupMessage.text = message;
             if (popup != null) popup.style.display = DisplayStyle.Flex;
         }

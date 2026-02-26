@@ -12,8 +12,6 @@ namespace LootLocker.Extension
     public partial class LootLockerAdminExtension : EditorWindow
     {
         #region State Variables
-        private bool isStage = true;
-        private bool isLoadingKeys = false;
         private Dictionary<int, LootLocker.Extension.DataTypes.Game> gameData = new Dictionary<int, LootLocker.Extension.DataTypes.Game>();
         private DateTime gameDataRefreshTime;
         private readonly int gameDataCacheExpirationTimeMinutes = 1;
@@ -30,8 +28,6 @@ namespace LootLocker.Extension
 
         #region Style Colors
         [Header("Colors")]
-        private StyleColor stage;
-        private StyleColor live;
         private StyleColor defaultButton;
         #endregion
 
@@ -39,11 +35,6 @@ namespace LootLocker.Extension
         // Basic UI elements
         private Label gameName;
         private Label securityWarning;
-
-        // Environment
-        private VisualElement environmentBackground, environmentHandle;
-        private VisualElement environmentElement;
-        private Label environmentTitle;
 
         // Flows
         private VisualElement activeFlow;
@@ -163,42 +154,6 @@ namespace LootLocker.Extension
         #endregion
 
         #region Flow Management
-        private bool IsStageOnlyGame()
-        {
-            int selectedGameId = LootLockerEditorData.GetSelectedGame();
-            if (!gameData.ContainsKey(selectedGameId)) return false;
-            var game = gameData[selectedGameId];
-            if (game.created_at == default(System.DateTime) || game.created_at == null) return false;
-            var cutoff = new System.DateTime(2025, 3, 10);
-            return game.created_at >= cutoff;
-        }        void SwapEnvironment()
-        {
-            if (isLoadingKeys)
-            {
-                if (popup != null && popupTitle != null && popupMessage != null)
-                {
-                    popupTitle.text = "Error";
-                    popupMessage.text = "Please wait...";
-                    popup.style.display = DisplayStyle.Flex;
-                }
-                if (loadingPage != null) loadingPage.style.display = DisplayStyle.None;
-                return;
-            }
-
-            isStage = !isStage;
-            RefreshAPIKeys();
-
-            if (isStage)
-            {
-                LootLockerEditorData.SetEnvironmentStage();
-            }
-            else
-            {
-                LootLockerEditorData.SetEnvironmentLive();
-            }
-
-            UpdateEnvironmentUI();
-        }
 
         void SwapFlows(VisualElement newFlow)
         {
@@ -257,7 +212,6 @@ namespace LootLocker.Extension
             if (emailField != null) emailField.value = "";
             if (passwordField != null) passwordField.value = "";
             SetMenuVisibility(apiKey: false, changeGame: false, logout: true);
-            if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
             if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
             CreateGameButtons();
         }
@@ -270,20 +224,6 @@ namespace LootLocker.Extension
             SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
             if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.Flex;
 
-            // Show environment switcher only for non-stage-only games
-            if (environmentElement != null && environmentBackground != null && environmentHandle != null && environmentTitle != null)
-            {
-                if (!IsStageOnlyGame())
-                {
-                    environmentElement.style.display = DisplayStyle.Flex;
-                    environmentBackground.style.display = DisplayStyle.Flex;
-                    environmentHandle.style.display = DisplayStyle.Flex;
-                }
-                else
-                {
-                    environmentElement.style.display = DisplayStyle.None;
-                }
-            }
             RefreshAPIKeys();
         }
 
@@ -292,7 +232,6 @@ namespace LootLocker.Extension
             if (settingsBtn != null) settingsBtn.style.display = DisplayStyle.Flex;
             if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
             SetMenuVisibility(apiKey: true, changeGame: true, logout: true);
-            if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
             if (createApiKeyWindow != null) createApiKeyWindow.style.display = DisplayStyle.None;
             LoadSettingsUI();
         }

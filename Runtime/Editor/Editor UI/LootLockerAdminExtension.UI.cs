@@ -32,7 +32,7 @@ namespace LootLocker.Extension
             if (visualTree == null)
             {
                 // Try to load from Packages
-                visualTree = EditorGUIUtility.Load("Packages/com.lootlocker.lootlockersdk/Runtime/Editor UI/LootLockerAdminExtension.uxml") as VisualTreeAsset;
+                visualTree = EditorGUIUtility.Load("Packages/com.lootlocker.lootlockersdk/Runtime/Editor/Editor UI/LootLockerAdminExtension.uxml") as VisualTreeAsset;
             }
             if (visualTree == null)
             {
@@ -53,7 +53,6 @@ namespace LootLocker.Extension
             InitializeStyleColors();
             InitializeUIReferences(root);
             InitializeEventHandlers();
-            InitializeEnvironmentUI();
             InitializeLoadingIcon(root);
             InitializeLicenseCountdownUI(root);
         }
@@ -69,19 +68,11 @@ namespace LootLocker.Extension
 
         private void InitializeStyleColors()
         {
-            live.value = new Color(0.749f, 0.325f, 0.098f, 1);
-            stage.value = new Color(0.094f, 0.749f, 0.352f, 1);
             defaultButton.value = new Color(0.345f, 0.345f, 0.345f, 1);
         }
 
         private void InitializeUIReferences(VisualElement root)
         {
-            // Environment
-            environmentBackground = root.Q<VisualElement>("SwitchBackground");
-            environmentHandle = root.Q<VisualElement>("Handle");
-            environmentElement = root.Q<VisualElement>("Environment");
-            environmentTitle = root.Q<Label>("EnvironmentTitle");
-
             // Basic UI elements
             gameName = root.Q<Label>("GameName");
             menu = root.Q<VisualElement>("MenuBar");
@@ -157,7 +148,6 @@ namespace LootLocker.Extension
         private void SetInitialDisplayStates()
         {
             if (menuLogoutBtn != null) menuLogoutBtn.style.display = DisplayStyle.None;
-            if (environmentElement != null) environmentElement.style.display = DisplayStyle.None;
             if (menu != null) menu.style.display = DisplayStyle.None;
             if (loginFlow != null) loginFlow.style.display = DisplayStyle.None;
             if (mfaFlow != null) mfaFlow.style.display = DisplayStyle.None;
@@ -169,9 +159,6 @@ namespace LootLocker.Extension
 
         private void InitializeEventHandlers()
         {
-            // Environment switcher
-            if (environmentBackground != null) environmentBackground.AddManipulator(new Clickable(evt => SwapEnvironment()));
-            if (environmentHandle != null) environmentHandle.AddManipulator(new Clickable(evt => SwapEnvironment()));
 
             // Menu buttons
             if (menuLogoutBtn != null) menuLogoutBtn.clickable.clicked += ConfirmLogout;
@@ -215,14 +202,6 @@ namespace LootLocker.Extension
             if (allowTokenRefreshToggle != null) allowTokenRefreshToggle.RegisterValueChangedCallback(evt => SaveAllowTokenRefresh(evt.newValue));
         }
 
-        private void InitializeEnvironmentUI()
-        {
-            if (environmentBackground != null) environmentBackground.tooltip = "Stage";
-            
-            isStage = LootLockerEditorData.IsEnvironmentStage();
-            UpdateEnvironmentUI();
-        }
-
         private void InitializeLoadingIcon(VisualElement root)
         {
             loadingPage = root.Q<VisualElement>("LoadingBackground");
@@ -259,22 +238,6 @@ namespace LootLocker.Extension
             licenseCountdownLabel = root.Q<Label>("LicenseCountdownLabel");
             licenseCountdownIcon = root.Q<Image>("LicenseCountdownIcon");
             if (licenseCountdownContainer != null) licenseCountdownContainer.style.display = DisplayStyle.None;
-        }
-
-        public void UpdateEnvironmentUI()
-        {
-            if (isStage)
-            {
-                if (environmentHandle != null) environmentHandle.style.alignSelf = Align.FlexStart;
-                if (environmentBackground != null) environmentBackground.style.backgroundColor = stage;
-                if (environmentTitle != null) environmentTitle.text = "Environment: Stage";
-            }
-            else
-            {
-                if (environmentHandle != null) environmentHandle.style.alignSelf = Align.FlexEnd;
-                if (environmentBackground != null) environmentBackground.style.backgroundColor = live;
-                if (environmentTitle != null) environmentTitle.text = "Environment: Live";
-            }
         }
 
         public void SetupSettingsButton()

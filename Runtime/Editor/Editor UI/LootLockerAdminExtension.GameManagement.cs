@@ -72,7 +72,7 @@ namespace LootLocker.Extension
             if (button.name == LootLockerConfig.current.apiKey)
             {
                 button.style.borderRightColor = button.style.borderLeftColor = 
-                    button.style.borderTopColor = button.style.borderBottomColor = stage;
+                    button.style.borderTopColor = button.style.borderBottomColor = new Color(0.094f, 0.749f, 0.352f, 1);
                 button.style.backgroundColor = new StyleColor(new Color(0.2f, 0.5f, 0.2f, 1f));
             }
             
@@ -106,7 +106,7 @@ namespace LootLocker.Extension
                 if (key.name == LootLockerConfig.current.apiKey)
                 {
                     key.style.borderRightColor = key.style.borderLeftColor = 
-                        key.style.borderTopColor = key.style.borderBottomColor = stage;
+                        key.style.borderTopColor = key.style.borderBottomColor = new Color(0.094f, 0.749f, 0.352f, 1);
                     key.style.backgroundColor = new StyleColor(new Color(0.2f, 0.5f, 0.2f, 1f));
                 }
                 else
