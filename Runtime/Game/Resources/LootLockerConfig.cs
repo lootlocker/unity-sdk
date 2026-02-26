@@ -415,9 +415,7 @@ namespace LootLocker
         [HideInInspector] private static readonly string WssProtocol = "wss://";
         [HideInInspector] private static readonly string UrlCore = "api.lootlocker.com";
         [HideInInspector] private static string UrlCoreOverride =
-#if LOOTLOCKER_TARGET_STAGE_ENV
-           "api.stage.internal.dev.lootlocker.cloud";
-#elif LOOTLOCKER_TARGET_LOCAL_ENV
+#if LOOTLOCKER_TARGET_LOCAL_ENV
            "localhost:8080";
 #else
             null;
