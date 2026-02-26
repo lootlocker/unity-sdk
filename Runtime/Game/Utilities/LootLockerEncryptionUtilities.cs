@@ -6,6 +6,7 @@ namespace LootLocker.Utilities.Encryption
 {
     public class LootLockerEncryptionUtilities
     {
+        // We are satisfied with a hardcoded key for this simple encryption, as it's not meant to be highly secure, just obfuscate data.
         private static readonly byte[] Key = {
             0x81, 0x71, 0xF7, 0xD6, 0xE5, 0xC4, 0xB3, 0xA2,
             0x8A, 0x9B, 0xAC, 0xBD, 0xCE, 0xDF, 0xE0, 0xF1
