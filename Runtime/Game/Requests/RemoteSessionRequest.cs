@@ -71,7 +71,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The Game Key configured for the game
         /// </summary>
-        public string game_key { get; set; } = LootLockerConfig.current.apiKey;
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
         /// <summary>
         /// The Game Version configured for the game
         /// </summary>
@@ -93,7 +93,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The api key configured for this game
         /// </summary>
-        public string game_key => LootLockerConfig.current.apiKey?.ToString();
+        public string game_api_key => LootLockerConfig.current.apiKey?.ToString();
         /// <summary>
         /// The refresh token used to refresh this session
         /// </summary>
