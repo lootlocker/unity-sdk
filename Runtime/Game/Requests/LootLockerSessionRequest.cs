@@ -31,7 +31,7 @@ namespace LootLocker.Requests
 
     public class LootLockerPlaystationNetworkVerificationRequest
     {
-        public string key { get; set; } = LootLockerConfig.current.apiKey;
+        public string game_api_key { get; set; } = LootLockerConfig.current.apiKey;
         public string platform { get; set; } = "psn";
         public string token { get; set; }
         public int psn_issuer_id { get; set; } = 256; // Default to production
@@ -54,7 +54,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string platform { get; set; }
         public string player_identifier { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
@@ -78,7 +78,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerWhiteLabelSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string email { get; set; }
         public string token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
@@ -235,7 +235,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerNintendoSwitchSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string nsa_id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -250,7 +250,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerEpicSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -265,7 +265,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerEpicRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -280,7 +280,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerMetaSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         
         public string user_id { get; set; }
@@ -292,7 +292,7 @@ namespace LootLocker.Requests
     [Serializable]
     public class LootLockerMetaRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -300,7 +300,7 @@ namespace LootLocker.Requests
 
     public class LootLockerXboxOneSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string xbox_user_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -314,7 +314,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGoogleSignInSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string id_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -343,7 +343,7 @@ namespace LootLocker.Requests
 
     public class LootLockerGoogleRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -384,7 +384,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAppleSignInSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string apple_authorization_code { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -398,7 +398,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAppleRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -412,7 +412,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAppleGameCenterSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         public string bundle_id { get; private set; }
         public string player_id { get; private set; }
@@ -436,7 +436,7 @@ namespace LootLocker.Requests
 
     public class LootLockerAppleGameCenterRefreshSessionRequest : LootLockerGetRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string game_version => LootLockerConfig.current.game_version;
         public string refresh_token { get; private set; }
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -449,7 +449,7 @@ namespace LootLocker.Requests
     }
     public class LootLockerDiscordSessionRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string access_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
@@ -463,7 +463,7 @@ namespace LootLocker.Requests
 
     public class LootLockerDiscordRefreshSessionRequest
     {
-        public string game_key => LootLockerConfig.current.apiKey;
+        public string game_api_key => LootLockerConfig.current.apiKey;
         public string refresh_token { get; set; }
         public string game_version => LootLockerConfig.current.game_version;
         public LootLockerSessionOptionals optionals { get; set; } = null;
