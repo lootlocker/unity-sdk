@@ -11,7 +11,6 @@ namespace LootLocker.Extension
         private static string adminToken = prefix + "AdminToken";
         private static string selectedGameID = prefix + "SelectedGameID";
         private static string selectedGameName = prefix + "SelectedGameName";
-        private static string environment = prefix + "Environment";
         private static string firstTimeWelcome = prefix + "FirstTimeWelcome";
         private static string newSession = prefix + "NewSession";
 
@@ -20,7 +19,6 @@ namespace LootLocker.Extension
             EditorPrefs.DeleteKey(adminToken);
             EditorPrefs.DeleteKey(selectedGameID);
             EditorPrefs.DeleteKey(selectedGameName);
-            EditorPrefs.DeleteKey(environment);
             EditorPrefs.DeleteKey(firstTimeWelcome);
             EditorPrefs.DeleteKey(newSession);
         }
@@ -54,21 +52,6 @@ namespace LootLocker.Extension
         public static string GetSelectedGameName()
         {
             return EditorPrefs.GetString(selectedGameName);
-        }
-
-        public static void SetEnvironmentStage()
-        {
-            EditorPrefs.SetString(environment, "Stage");
-        }
-
-        public static void SetEnvironmentLive()
-        {
-            EditorPrefs.SetString(environment, "Live");
-        }
-
-        public static bool IsEnvironmentStage()
-        {
-            return EditorPrefs.GetString(environment).Equals("Stage");
         }
 
         public static bool ShouldAutoShowWindow()
