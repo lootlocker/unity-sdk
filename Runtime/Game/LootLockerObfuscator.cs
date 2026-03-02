@@ -33,6 +33,8 @@ namespace LootLocker
         private static readonly List<ObfuscationDetails> FieldsToObfuscate = new List<ObfuscationDetails>
         {
             new ObfuscationDetails("game_key", '*', 4, 3, false),
+            new ObfuscationDetails("game_api_key", '*', 4, 3, false),
+            new ObfuscationDetails("api_key", '*', 4, 3, false),
             new ObfuscationDetails("email"),
             new ObfuscationDetails("password", '*', 0, 0),
             new ObfuscationDetails("domain_key"),
