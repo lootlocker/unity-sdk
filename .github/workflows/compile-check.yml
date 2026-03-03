@@ -1,0 +1,132 @@
+name: Compile Check
+run-name: "Compile Check on ${{ github.ref_name }} (${{ github.sha }})"
+
+# Runs on every push to work branches so agents (and humans) get fast compilation
+# feedback without waiting for the full CI pipeline.
+# See .github/instructions/verification.md for details.
+on:
+  push:
+    branches:
+      - 'feat/**'
+      - 'fix/**'
+      - 'docs/**'
+      - 'refactor/**'
+      - 'chore/**'
+      - 'test/**'
+      - 'scout/**'
+      - 'ci/**'
+  workflow_dispatch:
+    inputs:
+      unityVersion:
+        description: "Unity version to use (leave empty to use AGENT_CHECK_UNITY_VERSION variable)"
+        type: string
+        default: ""
+
+jobs:
+  compilation-check:
+    name: Verify SDK compiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout SDK
+        uses: actions/checkout@v4
+        with:
+          path: sdk
+
+      - name: Create minimal test project
+        run: |
+          mkdir -p TestProject/Assets TestProject/Packages TestProject/ProjectSettings
+
+          # Package manifest — local reference to the SDK, no external secrets needed
+          cat > TestProject/Packages/manifest.json <<'EOF'
+          {
+            "dependencies": {
+              "com.lootlocker.lootlockersdk": "file:../../sdk"
+            }
+          }
+          EOF
+
+          # Minimal ProjectSettings — no game keys or environment settings required
+          printf '%%YAML 1.1\n%%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  companyName: LootLockerSDKVerification\n  productName: LootLockerSDKVerification\n' \
+            > TestProject/ProjectSettings/ProjectSettings.asset
+
+          # Include Samples so they are also compiled
+          if [ -d "sdk/Samples~/LootLockerExamples" ]; then
+            cp -r sdk/Samples~/LootLockerExamples TestProject/Assets/
+          fi
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: TestProject/Library
+          key: Library-compile-check-${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
+          restore-keys: |
+            Library-compile-check-
+
+      - name: Compile SDK (edit-mode via Unity test runner)
+        id: compile
+        continue-on-error: true
+        uses: game-ci/unity-test-runner@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: TestProject
+          unityVersion: ${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Compile Check (${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }})
+
+      - name: Report compilation errors
+        if: always()
+        run: |
+          # game-ci writes the Unity editor log to artifacts/ alongside test results.
+          # If it wrote a log file, parse it; otherwise skip gracefully.
+          LOG_FILE=$(grep -rl "compilationhadfailure: True" artifacts/ 2>/dev/null | head -1)
+
+          if [ -z "$LOG_FILE" ]; then
+            if [ "${{ steps.compile.outcome }}" = "failure" ]; then
+              echo "::warning::Compile step failed but no Unity log file found in artifacts/ to parse."
+              echo "## ⚠️ Compile step failed — no parseable log found" >> "$GITHUB_STEP_SUMMARY"
+              echo "Check the raw step output above for details." >> "$GITHUB_STEP_SUMMARY"
+            fi
+            exit 0
+          fi
+
+          # Extract standard MSBuild-style CS compiler errors:
+          #   /github/workspace/sdk/Some/File.cs(line,col): error CSxxxx: message
+          ERRORS=$(grep -E "^.+\([0-9]+,[0-9]+\): error CS[0-9]+:" "$LOG_FILE" \
+            | sed 's|/github/workspace/sdk/||g')
+
+          if [ -z "$ERRORS" ]; then
+            # Compile step may have failed for a non-CS-error reason; still report it
+            if [ "${{ steps.compile.outcome }}" = "failure" ]; then
+              echo "::error::Compile step failed but no CS errors were extracted from the log."
+            fi
+            exit 0
+          fi
+
+          # ── Job Summary (compact card, ideal for agent consumption) ──────────
+          {
+            echo "## ❌ Compilation Errors"
+            echo ""
+            echo "| File | Line | Error |"
+            echo "| ---- | ---- | ----- |"
+            while IFS= read -r line; do
+              if [[ "$line" =~ ^(.*)\(([0-9]+),[0-9]+\):\ error\ (CS[0-9]+):\ (.+)$ ]]; then
+                echo "| \`${BASH_REMATCH[1]}\` | ${BASH_REMATCH[2]} | **${BASH_REMATCH[3]}**: ${BASH_REMATCH[4]} |"
+              fi
+            done <<< "$ERRORS"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # ── Inline annotations (show up in PR diff and Annotations panel) ────
+          while IFS= read -r line; do
+            if [[ "$line" =~ ^(.*)\(([0-9]+),([0-9]+)\):\ error\ (CS[0-9]+):\ (.+)$ ]]; then
+              echo "::error file=sdk/${BASH_REMATCH[1]},line=${BASH_REMATCH[2]},col=${BASH_REMATCH[3]}::${BASH_REMATCH[4]}: ${BASH_REMATCH[5]}"
+            fi
+          done <<< "$ERRORS"
+
+          # Propagate failure so the job still turns red
+          exit 1
