@@ -11,7 +11,7 @@ When you push commits to a work branch the **`Compile Check`** workflow
 (`.github/workflows/compile-check.yml`) runs automatically and verifies:
 
 1. All SDK C# code compiles without errors (including Samples).
-2. All editor-mode tests in `Tests/` pass.
+2. The configured Unity **editmode** tests pass (see the workflow for exact coverage).
 
 ### Workflow to follow after each batch of commits
 
@@ -45,6 +45,8 @@ Fix the reported errors and push again.
 1. Unity is installed locally (any Unity **2019.2+** version works; best to match the
    project's minimum version in `package.json`).
 2. You have a `unity-dev-settings.json` at the repo root (gitignored).
+3. Python 3 is installed and available on your `PATH` as `python3` (used by the
+   local verification scripts to parse `unity-dev-settings.json`).
 
 ### One-time setup
 

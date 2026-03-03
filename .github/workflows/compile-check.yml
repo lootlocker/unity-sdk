@@ -27,6 +27,8 @@ jobs:
     name: Verify SDK compiles
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      UNITY_VERSION: ${{ github.event.inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
 
     steps:
       - name: Checkout SDK
@@ -60,7 +62,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: TestProject/Library
-          key: Library-compile-check-${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
+          key: Library-compile-check-${{ env.UNITY_VERSION }}
           restore-keys: |
             Library-compile-check-
 
@@ -74,10 +76,10 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: TestProject
-          unityVersion: ${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
+          unityVersion: ${{ env.UNITY_VERSION }}
           testMode: editmode
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Compile Check (${{ inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }})
+          checkName: Compile Check (${{ env.UNITY_VERSION }})
 
       - name: Report compilation errors
         if: always()
