@@ -15,6 +15,7 @@ on:
       - 'test/**'
       - 'scout/**'
       - 'ci/**'
+      - 'copilot/**'
   workflow_dispatch:
     inputs:
       unityVersion:
