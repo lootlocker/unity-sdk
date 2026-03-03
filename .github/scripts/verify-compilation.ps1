@@ -194,33 +194,42 @@ Write-Step "-----------------------------------"
 Write-Step ""
 
 # Determine outcome from log content:
-#   - Any "error CS####" line      => compilation failed
-#   - "Tundra build success" found => compilation succeeded (Unity may still exit non-zero
+#   - Any "error CS####" line                          => compilation failed
+#   - "Tundra build failed" marker                     => compilation failed
+#   - No compiler errors and Unity exit code 0         => compilation succeeded (even if no Tundra marker)
+#   - "Tundra build success" found                     => compilation succeeded (Unity may still exit non-zero
 #     due to unrelated project setup issues unrelated to the SDK)
-#   - Neither found                => fall back to Unity exit code
 if ($compileErrors.Count -gt 0) {
     Write-Fail "COMPILATION FAILED ($($compileErrors.Count) compiler error(s))"
     Write-Step "Full log: $LogFile"
     exit 1
 }
-elseif ($tundraSuccess) {
-    Write-Ok "COMPILATION SUCCEEDED"
-    if ($unityExitCode -ne 0) {
-        Write-Warn "Note: Unity exited with code $unityExitCode after compilation (likely unrelated project setup - not an SDK issue)."
-    }
-}
-elseif ($tundraFailure -or $unityExitCode -ne 0) {
-    # Print any error/warning lines we can find to help diagnose the issue
+elseif ($tundraFailure) {
+    # Explicit Tundra failure should be treated as a hard failure regardless of exit code
     if ($logLines) {
         $logLines | Select-String -Pattern "error CS\d+|Scripts have compiler errors|error:" | Select-String -NotMatch "Licensing::" |
             ForEach-Object { Write-Host $_.Line }
     }
-    $reason = if ($tundraFailure) { "Tundra build failed" } else { "exit code: $unityExitCode" }
-    Write-Fail "COMPILATION FAILED ($reason)"
+    Write-Fail "COMPILATION FAILED (Tundra build failed)"
     Write-Step "Full log: $LogFile"
     exit 1
 }
+elseif ($unityExitCode -eq 0) {
+    # Treat a clean Unity exit with no compiler errors as success, even if we did not see a Tundra marker
+    Write-Ok "COMPILATION SUCCEEDED"
+}
+elseif ($tundraSuccess) {
+    Write-Ok "COMPILATION SUCCEEDED"
+    Write-Warn "Note: Unity exited with code $unityExitCode after compilation (likely unrelated project setup - not an SDK issue)."
+}
 else {
-    Write-Warn "UNKNOWN: could not determine compilation result from log. Check: $LogFile"
+    # Non-zero Unity exit code with no clear Tundra success/failure marker; surface diagnostics and fail
+    if ($logLines) {
+        $logLines | Select-String -Pattern "error CS\d+|Scripts have compiler errors|error:" | Select-String -NotMatch "Licensing::" |
+            ForEach-Object { Write-Host $_.Line }
+    }
+    $reason = "exit code: $unityExitCode"
+    Write-Fail "COMPILATION FAILED ($reason)"
+    Write-Step "Full log: $LogFile"
     exit 1
 }
