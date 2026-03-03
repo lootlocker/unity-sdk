@@ -60,6 +60,13 @@ crashlytics-build.properties
 
 .DS_Store
 
+# Local Unity SDK dev settings (machine-specific, contains path to Unity installation)
+unity-dev-settings.json
+unity-dev-settings.json.meta
+
+# Temporary verification project created by .github/scripts/verify-compilation.*
+Temp~/
+
 #IDE generated files
 .idea
 .vscode

@@ -14,6 +14,17 @@ Follow these rules for any work in this repo:
 - Repo structure + “where do I implement X?”: `.github/instructions/architecture.md`
 - Guardrails (agent operating rules): `.github/instructions/guardrails.md`
 
+## Verification (compile & test before PR)
+- How to verify changes (local + CI): `.github/instructions/verification.md`
+  - Cloud agent: push to work branch → wait for **Compile Check** workflow.
+  - Local: run `.github/scripts/verify-compilation.sh` (Linux/macOS) or `.github\scripts\verify-compilation.ps1` (Windows) after creating `unity-dev-settings.json` from the example:
+    ```json
+    {
+      "unity_executable": "<absolute path to Unity binary>",
+      "test_project_path": ""
+    }
+    ```
+
 ## Conventions & style
 - Coding conventions & style guide: `.github/instructions/style-guide.md`
 - Patterns cookbook (templates): `.github/instructions/patterns.md`
