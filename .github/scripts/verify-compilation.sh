@@ -35,8 +35,8 @@ if [[ -z "$UNITY_EXE" ]]; then
   echo -e "${RED}ERROR:${NC} 'unity_executable' is empty in unity-dev-settings.json."
   exit 1
 fi
-if [[ ! -f "$UNITY_EXE" && ! -x "$UNITY_EXE" ]]; then
-  echo -e "${RED}ERROR:${NC} Unity executable not found: $UNITY_EXE"
+if [[ ! -f "$UNITY_EXE" || ! -x "$UNITY_EXE" ]]; then
+  echo -e "${RED}ERROR:${NC} Unity executable not found or not executable: $UNITY_EXE"
   exit 1
 fi
 
@@ -141,18 +141,22 @@ if [[ -n "$COMPILE_ERRORS" ]]; then
   ERROR_COUNT=$(echo "$COMPILE_ERRORS" | wc -l | tr -d ' ')
   echo -e "${RED}COMPILATION FAILED${NC} (${ERROR_COUNT} compiler error(s))"
   exit 1
+elif [[ "$TUNDRA_FAILURE" -gt 0 ]]; then
+  # Explicit Tundra failure is a hard fail regardless of exit code
+  echo "$LOG_CONTENT" | grep -E "error CS[0-9]+|Scripts have compiler errors|error:" | grep -v "Licensing::" || true
+  echo -e "${RED}COMPILATION FAILED${NC} (Tundra build failed)"
+  exit 1
 elif [[ "$TUNDRA_SUCCESS" -gt 0 ]]; then
   echo -e "${GREEN}COMPILATION SUCCEEDED${NC}"
   if [[ $UNITY_EXIT_CODE -ne 0 ]]; then
     echo -e "${YELLOW}Note: Unity exited with code $UNITY_EXIT_CODE after compilation (likely unrelated project setup - not an SDK issue).${NC}"
   fi
-elif [[ "$TUNDRA_FAILURE" -gt 0 || $UNITY_EXIT_CODE -ne 0 ]]; then
-  # Print any diagnosable lines
-  echo "$LOG_CONTENT" | grep -E "error CS[0-9]+|Scripts have compiler errors|error:" | grep -v "Licensing::" || true
-  REASON=$( [[ "$TUNDRA_FAILURE" -gt 0 ]] && echo "Tundra build failed" || echo "exit code: $UNITY_EXIT_CODE" )
-  echo -e "${RED}COMPILATION FAILED${NC} ($REASON)"
-  exit 1
+elif [[ $UNITY_EXIT_CODE -eq 0 ]]; then
+  # No Tundra marker but Unity exited cleanly with no compiler errors — treat as success
+  echo -e "${GREEN}COMPILATION SUCCEEDED${NC}"
 else
-  echo -e "${YELLOW}UNKNOWN:${NC} could not determine compilation result from log."
+  # Non-zero exit, no Tundra success, no compiler errors extracted — surface diagnostics
+  echo "$LOG_CONTENT" | grep -E "error CS[0-9]+|Scripts have compiler errors|error:" | grep -v "Licensing::" || true
+  echo -e "${RED}COMPILATION FAILED${NC} (exit code: $UNITY_EXIT_CODE)"
   exit 1
 fi
