@@ -22,6 +22,22 @@ Unless the task explicitly asks for it, do **not**:
 - Runtime code must be build-safe (no unguarded `UnityEditor` dependencies).
 - Put editor tooling under `Runtime/Editor/` (this repo’s editor-only area) and/or guard editor-only code with `#if UNITY_EDITOR`.
 
+## Verification (compilation & tests)
+Before opening a PR, verify that changes compile and pass tests. See
+`.github/instructions/verification.md` for the full procedure. In short:
+
+- **Cloud agent**: push to your work branch and wait for the **`Compile Check`**
+  workflow (`.github/workflows/agent-sanity-check.yml`) to go green.
+- **Local**: run `.github/scripts/verify-compilation.sh` (Linux/macOS) or
+  `.github\scripts\verify-compilation.ps1` (Windows), after setting up
+  `unity-dev-settings.json` from the provided example:
+    ```json
+    {
+      "unity_executable": "<absolute path to Unity binary>",
+      "test_project_path": ""
+    }
+    ```  
+
 ## When unsure
 If a change would require guessing architecture, conventions, or customer-facing API behavior:
 - Stop and ask for clarification rather than inventing a new pattern.
