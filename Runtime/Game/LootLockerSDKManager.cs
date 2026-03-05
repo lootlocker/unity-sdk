@@ -5312,14 +5312,15 @@ namespace LootLocker.Requests
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
+        /// <param name="contextID">Only get assets for a specific context</param>
+        public static void GetAssetsOriginal(int assetCount, Action<LootLockerAssetResponse> onComplete, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null, int contextID = 0)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAssetResponse>(forPlayerWithUlid));
                 return;
             }
-            LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
+            LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
         /// <summary>
@@ -5332,7 +5333,8 @@ namespace LootLocker.Requests
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
+        /// <param name="contextID">Only get assets for a specific context</param>
+        public static void GetAssetListWithCount(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null, int contextID = 0)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -5348,7 +5350,7 @@ namespace LootLocker.Requests
                 }
 
                 onComplete?.Invoke(response);
-            }, assetCount, null, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
+            }, assetCount, null, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
         /// <summary>
@@ -5361,7 +5363,8 @@ namespace LootLocker.Requests
         /// <param name="assetFilters">A Dictionary<string, string> of custom filters to use when retrieving assets</param>
         /// <param name="UGCCreatorPlayerID">Only get assets created by a specific player</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null)
+        /// <param name="contextID">Only get assets for a specific context</param>
+        public static void GetAssetNextList(int assetCount, Action<LootLockerAssetResponse> onComplete, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null, int UGCCreatorPlayerID = 0, string forPlayerWithUlid = null, int contextID = 0)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -5377,7 +5380,7 @@ namespace LootLocker.Requests
                         LootLockerAssetRequest.lastId = response.assets.Last()?.id != null ? response.assets.Last().id : 0;
                 }
                 onComplete?.Invoke(response);
-            }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters, UGCCreatorPlayerID);
+            }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
         /// <summary>
