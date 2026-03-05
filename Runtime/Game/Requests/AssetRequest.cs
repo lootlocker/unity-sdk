@@ -399,7 +399,7 @@ namespace LootLocker
         }
 
         public static void GetAssetsOriginal(string forPlayerWithUlid, Action<LootLockerAssetResponse> onComplete, int assetCount, int? idOfLastAsset = null, List<LootLocker.LootLockerEnums.AssetFilter> filter = null, bool includeUGC = false, Dictionary<string, string> assetFilters = null,
-            int UGCCreatorPlayerID = 0)
+            int UGCCreatorPlayerID = 0, int contextId = 0)
         {
             EndPointClass endPoint = LootLockerEndPoints.gettingAssetListWithCount;
             string getVariable = endPoint.WithPathParameter(assetCount);
@@ -435,7 +435,7 @@ namespace LootLocker
                 getVariable += tempEndpoint;
             }
 
-            if (assetFilters != null)
+            if (assetFilters != null && assetFilters.Count > 0)
             {
                 KeyValuePair<string, string> keys = assetFilters.First();
                 filterString = $"{keys.Key}={keys.Value}";
@@ -448,6 +448,12 @@ namespace LootLocker
                 }
 
                 tempEndpoint = $"&asset_filters={filterString}";
+                getVariable += tempEndpoint;
+            }
+
+            if (contextId > 0)
+            {
+                tempEndpoint = $"&context_id={contextId}";
                 getVariable += tempEndpoint;
             }
 
