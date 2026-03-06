@@ -6994,6 +6994,28 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Refund one or more entitlements by their IDs.
+        ///
+        /// Submits a refund request for the specified entitlement IDs. Assets associated with the
+        /// entitlements will be removed from the player's inventory where possible, the original
+        /// purchase currency will be credited back, and any currency rewards tied to the entitlement
+        /// will be clawed back. The response includes details on what was reversed and any warnings
+        /// for items that could not be fully reversed.
+        /// </summary>
+        /// <param name="entitlementIds"> The IDs of the entitlements to refund </param>
+        /// <param name="onComplete"> onComplete Action for handling the response </param>
+        /// <param name="forPlayerWithUlid"> Optional : Execute the request for the specified player. If not supplied, the default player will be used. </param>
+        public static void RefundByEntitlementIds(string[] entitlementIds, Action<LootLockerRefundByEntitlementIdsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerRefundByEntitlementIdsResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.RefundByEntitlementIds(forPlayerWithUlid, entitlementIds, onComplete);
+        }
+
 #endregion
 
         #region Collectables
