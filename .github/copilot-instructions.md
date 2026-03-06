@@ -31,6 +31,15 @@ Follow these rules for any work in this repo:
 - Path-specific instructions:
   - Public API surface (`Runtime/Game/LootLockerSDKManager.cs`): `.github/instructions/Runtime/Game/LootLockerSDKManager.cs.instructions.md`
   - Request implementations (`Runtime/Game/Requests/**`): `.github/instructions/Runtime/Game/Requests.instructions.md`
+  - PlayMode tests (`Tests/LootLockerTests/PlayMode/**`): `.github/instructions/Tests/LootLockerTests/PlayMode.instructions.md`
+  - Test utilities (`Tests/LootLockerTestUtils/**`): `.github/instructions/Tests/LootLockerTestUtils.instructions.md`
+
+## Testing
+- How to write and run tests: `.github/instructions/testing.md`
+  - Local: `.github\scripts\run-tests.ps1 -TestCategory LootLockerCIFast`
+  - Cloud agent: **Actions → Run Tests → Run workflow** (supports `testCategory` and `testFilter` inputs).
+- How to use tests for debugging (temporary debug tests): `.github/instructions/debugging.md`
+  - Use `Category("LootLockerDebug")` for temporary debug tests; **always delete before committing**.
 
 ## Issue Tracking & Lifecycle
 - Full lifecycle rules (status updates, PR linking, DoD): `.github/instructions/implementation-lifecycle.md`
