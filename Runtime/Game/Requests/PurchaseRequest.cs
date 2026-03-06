@@ -25,6 +25,19 @@ namespace LootLocker.LootLockerEnums
         RefundedSuspectedFraud,
         RefundedFriendlyFraud
     }
+
+    /// <summary>
+    /// The possible statuses of an async purchase entitlement
+    /// </summary>
+    public enum LootLockerAsyncPurchaseStatus
+    {
+        /// <summary>The purchase is still being processed</summary>
+        pending,
+        /// <summary>The purchase completed successfully and items have been granted</summary>
+        active,
+        /// <summary>The purchase failed; see the error field for the reason</summary>
+        failed
+    }
 }
 
 namespace LootLocker.Requests
@@ -247,19 +260,6 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
-    /// The possible statuses of an async purchase entitlement
-    /// </summary>
-    public enum LootLockerAsyncPurchaseStatus
-    {
-        /// <summary>The purchase is still being processed</summary>
-        pending,
-        /// <summary>The purchase completed successfully and items have been granted</summary>
-        active,
-        /// <summary>The purchase failed; see the error field for the reason</summary>
-        failed
-    }
-
-    /// <summary>
     /// Response returned when an async purchase is successfully initiated or retried (HTTP 202)
     /// </summary>
     public class LootLockerAsyncPurchaseInitiatedResponse : LootLockerResponse
@@ -432,7 +432,7 @@ namespace LootLocker
                 float timeoutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                pollingIntervalSeconds = Math.Max(1.0f, pollingIntervalSeconds);
+                pollingIntervalSeconds = Mathf.Max(1.0f, pollingIntervalSeconds);
                 var instance = GetInstance();
                 if (instance == null)
                 {
