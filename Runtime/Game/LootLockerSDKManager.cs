@@ -6994,6 +6994,38 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// <summary>
+        /// Refund one or more previously purchased items by their entitlement IDs.
+        ///
+        /// On success, the response contains:
+        /// - player_inventory_events: the assets removed from (or skipped in) the player's inventory
+        /// - currency_refunded: currency credited back to the player's wallet (the purchase price returned)
+        /// - currency_clawback: currency debited from the player's wallet (currency rewards from the entitlement reclaimed)
+        /// - warnings: any conditions that could not be fully reversed (e.g. non-reversible rewards, insufficient funds). A non-empty warnings list does not mean the refund failed.
+        /// </summary>
+        /// <param name="entitlementIds">The list of entitlement IDs to refund</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerRefundByEntitlementIdsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RefundByEntitlementIds(string[] entitlementIds, Action<LootLockerRefundByEntitlementIdsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerRefundByEntitlementIdsResponse>(forPlayerWithUlid));
+                return;
+            }
+            if (entitlementIds == null || entitlementIds.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerRefundByEntitlementIdsResponse>("entitlementIds must not be null or empty", forPlayerWithUlid));
+                return;
+            }
+            var body = LootLockerJson.SerializeObject(new LootLockerRefundByEntitlementIdsRequest
+            {
+                entitlement_ids = entitlementIds
+            });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.refundByEntitlementIds.endPoint, LootLockerEndPoints.refundByEntitlementIds.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
 #endregion
 
         #region Collectables

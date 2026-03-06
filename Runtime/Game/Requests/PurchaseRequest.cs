@@ -243,6 +243,139 @@ namespace LootLocker.Requests
         /// </summary>
         public string entitlement_id { get; set; }
     }
+
+    //==================================================
+    // Refund Data Definitions
+    //==================================================
+
+    /// <summary>
+    /// Request to refund items by their entitlement IDs
+    /// </summary>
+    public class LootLockerRefundByEntitlementIdsRequest
+    {
+        /// <summary>
+        /// The list of entitlement IDs to refund
+        /// </summary>
+        public string[] entitlement_ids { get; set; }
+    }
+
+    /// <summary>
+    /// Describes an asset that was added or removed from the player's inventory as part of a refund
+    /// </summary>
+    public class LootLockerRefundInventoryEvent
+    {
+        /// <summary>
+        /// The legacy numeric ID of the asset
+        /// </summary>
+        public ulong asset_id { get; set; }
+        /// <summary>
+        /// Display name of the asset
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The action taken on this asset: "removed" if the asset was successfully taken back from the player's inventory, "skipped" if it could not be removed (e.g. already consumed or transferred)
+        /// </summary>
+        public string action { get; set; }
+    }
+
+    /// <summary>
+    /// A currency amount credited or debited as part of a refund
+    /// </summary>
+    public class LootLockerRefundCurrencyEntry
+    {
+        /// <summary>
+        /// The ULID of the currency
+        /// </summary>
+        public string currency_id { get; set; }
+        /// <summary>
+        /// Short code identifying the currency (e.g. "gold", "gems")
+        /// </summary>
+        public string currency_code { get; set; }
+        /// <summary>
+        /// The amount credited or debited, represented as a string to support arbitrary precision
+        /// </summary>
+        public string amount { get; set; }
+    }
+
+    /// <summary>
+    /// A reward that could not be reversed as part of a refund
+    /// </summary>
+    public class LootLockerRefundNonReversibleReward
+    {
+        /// <summary>
+        /// The kind of reward: "progression_points" (points were added to a progression) or "progression_reset" (a progression was reset to its initial state)
+        /// </summary>
+        public string kind { get; set; }
+        /// <summary>
+        /// The ULID of the progression that was affected
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// Display name of the progression
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The number of points that were granted and cannot be reversed. Only present for "progression_points"
+        /// </summary>
+        public string amount { get; set; }
+    }
+
+    /// <summary>
+    /// A warning detail for a specific condition encountered during refund processing
+    /// </summary>
+    public class LootLockerRefundWarningDetail
+    {
+        /// <summary>
+        /// The warning category: "non_reversible_rewards", "insufficient_funds", "already_refunded", or "refund_failed"
+        /// </summary>
+        public string type { get; set; }
+        /// <summary>
+        /// Human-readable explanation of the warning
+        /// </summary>
+        public string message { get; set; }
+        /// <summary>
+        /// The specific rewards that could not be reversed. Only present when type is "non_reversible_rewards"
+        /// </summary>
+        public LootLockerRefundNonReversibleReward[] rewards { get; set; }
+    }
+
+    /// <summary>
+    /// Warnings encountered during refund processing for a particular entitlement
+    /// </summary>
+    public class LootLockerRefundWarning
+    {
+        /// <summary>
+        /// The entitlement ULID this warning applies to
+        /// </summary>
+        public string entitlement_id { get; set; }
+        /// <summary>
+        /// One or more warning conditions for this entitlement
+        /// </summary>
+        public LootLockerRefundWarningDetail[] details { get; set; }
+    }
+
+    /// <summary>
+    /// Response from refunding items by entitlement IDs
+    /// </summary>
+    public class LootLockerRefundByEntitlementIdsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Assets that were added or removed from the player's inventory as part of the refund
+        /// </summary>
+        public LootLockerRefundInventoryEvent[] player_inventory_events { get; set; }
+        /// <summary>
+        /// Currency amounts credited back to the player's wallet (i.e. the purchase price being returned)
+        /// </summary>
+        public LootLockerRefundCurrencyEntry[] currency_refunded { get; set; }
+        /// <summary>
+        /// Currency amounts debited from the player's wallet (i.e. currency rewards from the entitlement being reclaimed)
+        /// </summary>
+        public LootLockerRefundCurrencyEntry[] currency_clawback { get; set; }
+        /// <summary>
+        /// Warnings encountered during refund processing, grouped by entitlement. A non-empty warnings array does not mean the refund failed — it means some aspects could not be fully reversed.
+        /// </summary>
+        public LootLockerRefundWarning[] warnings { get; set; }
+    }
 }
 
 namespace LootLocker
