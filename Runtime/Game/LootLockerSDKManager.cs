@@ -6995,6 +6995,151 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Initiate an async purchase of a single catalog item using a specified wallet.
+        /// The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status.
+        /// Use InitiateAndPollAsyncPurchaseSingleCatalogItem for an automatic polling experience.
+        /// </summary>
+        /// <param name="walletId">The id of the wallet to use for the purchase</param>
+        /// <param name="itemId">The catalog listing id of the item to purchase</param>
+        /// <param name="quantity">The quantity of the item to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void InitiateAsyncPurchaseSingleCatalogItem(string walletId, string itemId, int quantity, Action<LootLockerAsyncPurchaseInitiatedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            InitiateAsyncPurchaseCatalogItems(walletId, new LootLockerCatalogItemAndQuantityPair[]
+            {
+                new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = itemId, quantity = quantity }
+            }, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Initiate an async purchase of one or more catalog items using a specified wallet.
+        /// The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status.
+        /// Use InitiateAndPollAsyncPurchaseCatalogItems for an automatic polling experience.
+        /// </summary>
+        /// <param name="walletId">The id of the wallet to use for the purchase</param>
+        /// <param name="items">The catalog items with quantities to purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void InitiateAsyncPurchaseCatalogItems(string walletId, LootLockerCatalogItemAndQuantityPair[] items, Action<LootLockerAsyncPurchaseInitiatedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAsyncPurchaseInitiatedResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.InitiateAsyncPurchase(forPlayerWithUlid, walletId, items, onComplete);
+        }
+
+        /// <summary>
+        /// Get the status of an async purchase
+        /// </summary>
+        /// <param name="entitlementId">The entitlement id returned when initiating the async purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetAsyncPurchaseStatus(string entitlementId, Action<LootLockerAsyncPurchaseStatusResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAsyncPurchaseStatusResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.GetAsyncPurchaseStatus(forPlayerWithUlid, entitlementId, onComplete);
+        }
+
+        /// <summary>
+        /// Retry a failed async purchase
+        /// </summary>
+        /// <param name="entitlementId">The entitlement id of the failed purchase</param>
+        /// <param name="walletId">The id of the wallet to use for the retry</param>
+        /// <param name="items">The catalog items with quantities from the original purchase</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RetryAsyncPurchase(string entitlementId, string walletId, LootLockerCatalogItemAndQuantityPair[] items, Action<LootLockerAsyncPurchaseInitiatedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAsyncPurchaseInitiatedResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.RetryAsyncPurchase(forPlayerWithUlid, entitlementId, walletId, items, onComplete);
+        }
+
+        /// <summary>
+        /// Initiate an async purchase of a single catalog item and automatically poll until it reaches a terminal state.
+        /// While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.
+        /// </summary>
+        /// <param name="walletId">The id of the wallet to use for the purchase</param>
+        /// <param name="itemId">The catalog listing id of the item to purchase</param>
+        /// <param name="quantity">The quantity of the item to purchase</param>
+        /// <param name="onStatusUpdate">Optional: Called on each poll while the purchase is pending</param>
+        /// <param name="onComplete">Called when the purchase reaches a terminal state</param>
+        /// <param name="pollingIntervalSeconds">Optional: How often to poll in seconds (minimum 1)</param>
+        /// <param name="timeoutAfterMinutes">Optional: How many minutes before the process times out</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>A Guid identifying this process. Pass it to CancelAsyncPurchasePolling to cancel early.</returns>
+        public static Guid InitiateAndPollAsyncPurchaseSingleCatalogItem(
+            string walletId,
+            string itemId,
+            int quantity,
+            Action<LootLockerAsyncPurchaseStatusResponse> onStatusUpdate,
+            Action<LootLockerAsyncPurchaseStatusResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeoutAfterMinutes = 5.0f,
+            string forPlayerWithUlid = null)
+        {
+            return InitiateAndPollAsyncPurchaseCatalogItems(
+                walletId,
+                new LootLockerCatalogItemAndQuantityPair[]
+                {
+                    new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = itemId, quantity = quantity }
+                },
+                onStatusUpdate,
+                onComplete,
+                pollingIntervalSeconds,
+                timeoutAfterMinutes,
+                forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Initiate an async purchase of one or more catalog items and automatically poll until it reaches a terminal state.
+        /// While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.
+        /// </summary>
+        /// <param name="walletId">The id of the wallet to use for the purchase</param>
+        /// <param name="items">The catalog items with quantities to purchase</param>
+        /// <param name="onStatusUpdate">Optional: Called on each poll while the purchase is pending</param>
+        /// <param name="onComplete">Called when the purchase reaches a terminal state</param>
+        /// <param name="pollingIntervalSeconds">Optional: How often to poll in seconds (minimum 1)</param>
+        /// <param name="timeoutAfterMinutes">Optional: How many minutes before the process times out</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <returns>A Guid identifying this process. Pass it to CancelAsyncPurchasePolling to cancel early.</returns>
+        public static Guid InitiateAndPollAsyncPurchaseCatalogItems(
+            string walletId,
+            LootLockerCatalogItemAndQuantityPair[] items,
+            Action<LootLockerAsyncPurchaseStatusResponse> onStatusUpdate,
+            Action<LootLockerAsyncPurchaseStatusResponse> onComplete,
+            float pollingIntervalSeconds = 1.0f,
+            float timeoutAfterMinutes = 5.0f,
+            string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAsyncPurchaseStatusResponse>(forPlayerWithUlid));
+                return Guid.Empty;
+            }
+            return LootLockerAPIManager.AsyncPurchasePoller.StartAsyncPurchasePolling(walletId, items, onStatusUpdate, onComplete, pollingIntervalSeconds, timeoutAfterMinutes, forPlayerWithUlid);
+        }
+
+        /// <summary>
+        /// Cancel an ongoing async purchase polling process
+        /// </summary>
+        /// <param name="processGuid">The Guid returned by InitiateAndPollAsyncPurchaseCatalogItems or InitiateAndPollAsyncPurchaseSingleCatalogItem</param>
+        public static void CancelAsyncPurchasePolling(Guid processGuid)
+        {
+            LootLockerAPIManager.AsyncPurchasePoller.CancelAsyncPurchasePolling(processGuid);
+        }
+
+        /// <summary>
         /// Refund one or more entitlements by their IDs.
         ///
         /// Submits a refund request for the specified entitlement IDs. Assets associated with the

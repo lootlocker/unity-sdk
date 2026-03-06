@@ -218,6 +218,10 @@ namespace LootLocker
         public static EndPointClass querySteamPurchaseRedemptionStatus = new EndPointClass("store/steam/redeem/query", LootLockerHTTPMethod.POST);
         public static EndPointClass finalizeSteamPurchaseRedemption = new EndPointClass("store/steam/redeem/finalise", LootLockerHTTPMethod.POST);
 
+        public static EndPointClass initiateAsyncPurchase = new EndPointClass("purchase/inspired-ibex/v1", LootLockerHTTPMethod.POST);
+        public static EndPointClass pollAsyncPurchaseStatus = new EndPointClass("purchase/inspired-ibex/v1/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass retryAsyncPurchase = new EndPointClass("purchase/inspired-ibex/v1/{0}/retry", LootLockerHTTPMethod.POST);
+
         public static EndPointClass refundByEntitlementIds = new EndPointClass("refund/v1", LootLockerHTTPMethod.POST);
 
         // Triggers
