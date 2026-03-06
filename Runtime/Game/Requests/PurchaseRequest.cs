@@ -23,6 +23,43 @@ namespace LootLocker.LootLockerEnums
         RefundedSuspectedFraud,
         RefundedFriendlyFraud
     }
+
+    /// <summary>
+    /// The action taken on a player inventory item as part of a refund
+    /// </summary>
+    public enum LootLockerRefundInventoryEventAction
+    {
+        /// <summary>The item was successfully removed from the player's inventory</summary>
+        removed = 0,
+        /// <summary>The item could not be removed (e.g. already consumed) and was left in place</summary>
+        skipped = 1,
+    }
+
+    /// <summary>
+    /// The kind of non-reversible reward that was granted alongside an entitlement
+    /// </summary>
+    public enum LootLockerRefundNonReversibleRewardKind
+    {
+        /// <summary>Points were added to a progression and cannot be taken back</summary>
+        progression_points = 0,
+        /// <summary>A progression was reset to its initial state and cannot be undone</summary>
+        progression_reset = 1,
+    }
+
+    /// <summary>
+    /// The category of a per-entitlement warning returned during a refund
+    /// </summary>
+    public enum LootLockerRefundWarningType
+    {
+        /// <summary>Rewards granted that cannot be automatically clawed back</summary>
+        non_reversible_rewards = 0,
+        /// <summary>The player does not have enough currency balance to cover the clawback</summary>
+        insufficient_funds = 1,
+        /// <summary>The entitlement was already refunded before this request</summary>
+        already_refunded = 2,
+        /// <summary>The entitlement could not be refunded due to an unexpected error</summary>
+        refund_failed = 3,
+    }
 }
 
 namespace LootLocker.Requests
@@ -269,9 +306,9 @@ namespace LootLocker.Requests
         /// </summary>
         public string name { get; set; }
         /// <summary>
-        /// "removed" if taken back from inventory, "skipped" if it could not be removed (e.g. already consumed)
+        /// The action taken on this item: removed if taken back from inventory, skipped if it could not be removed (e.g. already consumed)
         /// </summary>
-        public string action { get; set; }
+        public LootLockerRefundInventoryEventAction action { get; set; }
     }
 
     /// <summary>
@@ -299,10 +336,9 @@ namespace LootLocker.Requests
     public class LootLockerRefundNonReversibleReward
     {
         /// <summary>
-        /// "progression_points": points were added to a progression.
-        /// "progression_reset": a progression was reset to its initial state.
+        /// The kind of non-reversible reward: progression_points if points were added to a progression, progression_reset if a progression was reset to its initial state
         /// </summary>
-        public string kind { get; set; }
+        public LootLockerRefundNonReversibleRewardKind kind { get; set; }
         /// <summary>
         /// The ULID of the progression that was affected
         /// </summary>
@@ -323,13 +359,9 @@ namespace LootLocker.Requests
     public class LootLockerRefundWarningDetail
     {
         /// <summary>
-        /// The warning category:
-        /// "non_reversible_rewards": rewards granted that cannot be automatically clawed back.
-        /// "insufficient_funds": the player does not have enough currency balance to cover the clawback.
-        /// "already_refunded": the entitlement was already refunded before this request.
-        /// "refund_failed": the entitlement could not be refunded due to an unexpected error.
+        /// The warning category: non_reversible_rewards if rewards granted cannot be automatically clawed back, insufficient_funds if the player does not have enough currency balance to cover the clawback, already_refunded if the entitlement was already refunded before this request, refund_failed if the entitlement could not be refunded due to an unexpected error
         /// </summary>
-        public string type { get; set; }
+        public LootLockerRefundWarningType type { get; set; }
         /// <summary>
         /// Human-readable explanation of the warning
         /// </summary>
