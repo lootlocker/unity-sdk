@@ -23,6 +23,43 @@ namespace LootLocker.LootLockerEnums
         RefundedSuspectedFraud,
         RefundedFriendlyFraud
     }
+
+    /// <summary>
+    /// The action taken on a player inventory item as part of a refund
+    /// </summary>
+    public enum LootLockerRefundInventoryEventAction
+    {
+        /// <summary>The item was successfully removed from the player's inventory</summary>
+        removed = 0,
+        /// <summary>The item could not be removed (e.g. already consumed) and was left in place</summary>
+        skipped = 1,
+    }
+
+    /// <summary>
+    /// The kind of non-reversible reward that was granted alongside an entitlement
+    /// </summary>
+    public enum LootLockerRefundNonReversibleRewardKind
+    {
+        /// <summary>Points were added to a progression and cannot be taken back</summary>
+        progression_points = 0,
+        /// <summary>A progression was reset to its initial state and cannot be undone</summary>
+        progression_reset = 1,
+    }
+
+    /// <summary>
+    /// The category of a per-entitlement warning returned during a refund
+    /// </summary>
+    public enum LootLockerRefundWarningType
+    {
+        /// <summary>Rewards granted that cannot be automatically clawed back</summary>
+        non_reversible_rewards = 0,
+        /// <summary>The player does not have enough currency balance to cover the clawback</summary>
+        insufficient_funds = 1,
+        /// <summary>The entitlement was already refunded before this request</summary>
+        already_refunded = 2,
+        /// <summary>The entitlement could not be refunded due to an unexpected error</summary>
+        refund_failed = 3,
+    }
 }
 
 namespace LootLocker.Requests
@@ -243,6 +280,136 @@ namespace LootLocker.Requests
         /// </summary>
         public string entitlement_id { get; set; }
     }
+
+    /// <summary>
+    /// Request to refund one or more entitlements by their IDs.
+    /// </summary>
+    public class LootLockerRefundByEntitlementIdsRequest
+    {
+        /// <summary>
+        /// The IDs of the entitlements to refund
+        /// </summary>
+        public string[] entitlement_ids { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the action taken on a player inventory item during a refund.
+    /// </summary>
+    public class LootLockerRefundPlayerInventoryEvent
+    {
+        /// <summary>
+        /// The legacy numeric asset ID
+        /// </summary>
+        public ulong asset_id { get; set; }
+        /// <summary>
+        /// Display name of the asset
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The action taken on this item: removed if taken back from inventory, skipped if it could not be removed (e.g. already consumed)
+        /// </summary>
+        public LootLockerRefundInventoryEventAction action { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a currency entry (amount credited or debited) as part of a refund
+    /// </summary>
+    public class LootLockerRefundCurrencyEntry
+    {
+        /// <summary>
+        /// The ULID of the currency
+        /// </summary>
+        public string currency_id { get; set; }
+        /// <summary>
+        /// Short code identifying the currency (e.g. "gold", "gems")
+        /// </summary>
+        public string currency_code { get; set; }
+        /// <summary>
+        /// The amount credited or debited, as a string to support arbitrary precision
+        /// </summary>
+        public string amount { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a non-reversible reward that was granted alongside an entitlement and could not be clawed back
+    /// </summary>
+    public class LootLockerRefundNonReversibleReward
+    {
+        /// <summary>
+        /// The kind of non-reversible reward: progression_points if points were added to a progression, progression_reset if a progression was reset to its initial state
+        /// </summary>
+        public LootLockerRefundNonReversibleRewardKind kind { get; set; }
+        /// <summary>
+        /// The ULID of the progression that was affected
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// Display name of the progression
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The number of points that were granted and cannot be reversed. Only present for kind "progression_points".
+        /// </summary>
+        public string amount { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a single warning detail for a refund
+    /// </summary>
+    public class LootLockerRefundWarningDetail
+    {
+        /// <summary>
+        /// The warning category: non_reversible_rewards if rewards granted cannot be automatically clawed back, insufficient_funds if the player does not have enough currency balance to cover the clawback, already_refunded if the entitlement was already refunded before this request, refund_failed if the entitlement could not be refunded due to an unexpected error
+        /// </summary>
+        public LootLockerRefundWarningType type { get; set; }
+        /// <summary>
+        /// Human-readable explanation of the warning
+        /// </summary>
+        public string message { get; set; }
+        /// <summary>
+        /// The specific rewards that could not be reversed. Only present when type is "non_reversible_rewards".
+        /// </summary>
+        public LootLockerRefundNonReversibleReward[] rewards { get; set; }
+    }
+
+    /// <summary>
+    /// Warnings for a specific entitlement during refund processing
+    /// </summary>
+    public class LootLockerRefundWarning
+    {
+        /// <summary>
+        /// The entitlement this warning applies to
+        /// </summary>
+        public string entitlement_id { get; set; }
+        /// <summary>
+        /// One or more warning conditions for this entitlement
+        /// </summary>
+        public LootLockerRefundWarningDetail[] details { get; set; }
+    }
+
+    /// <summary>
+    /// Response from the refund by entitlement IDs endpoint
+    /// </summary>
+    public class LootLockerRefundByEntitlementIdsResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Assets that were added or removed from the player's inventory as part of the refund.
+        /// </summary>
+        public LootLockerRefundPlayerInventoryEvent[] player_inventory_events { get; set; }
+        /// <summary>
+        /// Currency amounts credited back to the player's wallet (the purchase price being returned).
+        /// </summary>
+        public LootLockerRefundCurrencyEntry[] currency_refunded { get; set; }
+        /// <summary>
+        /// Currency amounts debited from the player's wallet (currency rewards from the entitlement being reclaimed).
+        /// </summary>
+        public LootLockerRefundCurrencyEntry[] currency_clawback { get; set; }
+        /// <summary>
+        /// Warnings encountered during refund processing, grouped by entitlement.
+        /// A non-empty warnings array does not mean the refund failed — it means some aspects could not be fully reversed.
+        /// </summary>
+        public LootLockerRefundWarning[] warnings { get; set; }
+    }
 }
 
 namespace LootLocker
@@ -266,6 +433,18 @@ namespace LootLocker
             string getVariable = endPoint.WithPathParameter(lootLockerGetRequest.getRequests[0]);
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void RefundByEntitlementIds(string forPlayerWithUlid, string[] entitlementIds, Action<LootLockerRefundByEntitlementIdsResponse> onComplete)
+        {
+            if (entitlementIds == null || entitlementIds.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerRefundByEntitlementIdsResponse>(forPlayerWithUlid));
+                return;
+            }
+            EndPointClass endPoint = LootLockerEndPoints.refundByEntitlementIds;
+            var body = LootLockerJson.SerializeObject(new LootLockerRefundByEntitlementIdsRequest { entitlement_ids = entitlementIds });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
     }
 }
