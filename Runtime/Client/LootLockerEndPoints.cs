@@ -218,6 +218,8 @@ namespace LootLocker
         public static EndPointClass querySteamPurchaseRedemptionStatus = new EndPointClass("store/steam/redeem/query", LootLockerHTTPMethod.POST);
         public static EndPointClass finalizeSteamPurchaseRedemption = new EndPointClass("store/steam/redeem/finalise", LootLockerHTTPMethod.POST);
 
+        public static EndPointClass refundByEntitlementIds = new EndPointClass("refund/v1", LootLockerHTTPMethod.POST);
+
         // Triggers
         public static EndPointClass InvokeTriggers = new EndPointClass("triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST);
 
