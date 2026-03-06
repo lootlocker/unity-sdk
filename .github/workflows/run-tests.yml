@@ -1,0 +1,172 @@
+name: Run Tests
+run-name: "Run Tests on ${{ github.ref_name }} (category: ${{ inputs.testCategory || 'LootLockerCIFast' }}, filter: ${{ inputs.testFilter || '(none)' }})"
+
+# Runs the SDK's PlayMode integration tests.
+#
+# Triggered:
+#   - Manually via workflow_dispatch (primary use-case for agents and developers).
+#   - Automatically on push to test/** branches (for iterating on test work).
+#
+# The tests create real LootLocker games via the admin API; they handle their own
+# authentication using time-scoped auto-generated credentials, so no pre-provisioned
+# admin secrets are needed for stage environments.
+#
+# See .github/instructions/testing.md for full documentation.
+on:
+  push:
+    branches:
+      - 'test/**'
+  workflow_dispatch:
+    inputs:
+      testCategory:
+        description: >
+          NUnit category to run.
+          Options: LootLockerCIFast, LootLockerCI, LootLocker, LootLockerDebug.
+          Leave empty to run LootLockerCIFast.
+        type: string
+        default: "LootLockerCIFast"
+      testFilter:
+        description: >
+          Optional NUnit test name filter (class name, method name, or regex).
+          Example: "LeaderboardTest" or "Leaderboard_ListTopTen_Succeeds".
+          Combined with testCategory using AND logic when both are supplied.
+        type: string
+        default: ""
+      unityVersion:
+        description: "Unity version to use (leave empty to use AGENT_CHECK_UNITY_VERSION variable)"
+        type: string
+        default: ""
+
+jobs:
+  run-tests:
+    name: Run SDK PlayMode tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      UNITY_VERSION: ${{ github.event.inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
+      TEST_CATEGORY: ${{ github.event.inputs.testCategory || 'LootLockerCIFast' }}
+      TEST_FILTER: ${{ github.event.inputs.testFilter || '' }}
+
+    steps:
+      - name: Checkout SDK
+        uses: actions/checkout@v4
+        with:
+          path: sdk
+
+      - name: Create test project
+        run: |
+          mkdir -p TestProject/Assets TestProject/Packages TestProject/ProjectSettings
+
+          # Package manifest — local SDK reference + testables so Unity imports test assemblies
+          cat > TestProject/Packages/manifest.json <<'EOF'
+          {
+            "dependencies": {
+              "com.lootlocker.lootlockersdk": "file:../../sdk"
+            },
+            "testables": [
+              "com.lootlocker.lootlockersdk"
+            ]
+          }
+          EOF
+
+          printf '%%YAML 1.1\n%%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  companyName: LootLockerSDKVerification\n  productName: LootLockerSDKVerification\n' \
+            > TestProject/ProjectSettings/ProjectSettings.asset
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: TestProject/Library
+          key: Library-run-tests-${{ env.UNITY_VERSION }}
+          restore-keys: |
+            Library-run-tests-
+            Library-compile-check-
+
+      - name: Build custom parameters string
+        id: params
+        run: |
+          PARAMS=""
+          if [ -n "${{ env.TEST_CATEGORY }}" ]; then
+            PARAMS="$PARAMS -testCategory ${{ env.TEST_CATEGORY }}"
+          fi
+          if [ -n "${{ env.TEST_FILTER }}" ]; then
+            PARAMS="$PARAMS -testFilter \"${{ env.TEST_FILTER }}\""
+          fi
+          echo "custom_params=$PARAMS" >> "$GITHUB_OUTPUT"
+
+      - name: Run PlayMode tests
+        id: tests
+        continue-on-error: true
+        uses: game-ci/unity-test-runner@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: TestProject
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: playmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: "Run Tests (${{ env.UNITY_VERSION }}) — ${{ env.TEST_CATEGORY }}"
+          customParameters: ${{ steps.params.outputs.custom_params }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ env.UNITY_VERSION }}
+          path: artifacts/
+
+      - name: Report test results in Job Summary
+        if: always()
+        run: |
+          RESULTS_FILE=$(find artifacts/ -name "*.xml" -print -quit 2>/dev/null || true)
+
+          if [ -z "$RESULTS_FILE" ]; then
+            if [ "${{ steps.tests.outcome }}" = "failure" ]; then
+              echo "## ⚠️ Test run failed — no results file found" >> "$GITHUB_STEP_SUMMARY"
+              echo "Check the raw step output for details." >> "$GITHUB_STEP_SUMMARY"
+            fi
+            exit 0
+          fi
+
+          # Extract summary counts from NUnit XML <test-run> element
+          TOTAL=$(grep -oP 'total="\K[0-9]+' "$RESULTS_FILE" | head -1)
+          PASSED=$(grep -oP 'passed="\K[0-9]+' "$RESULTS_FILE" | head -1)
+          FAILED=$(grep -oP 'failed="\K[0-9]+' "$RESULTS_FILE" | head -1)
+          SKIPPED=$(grep -oP 'skipped="\K[0-9]+' "$RESULTS_FILE" | head -1)
+
+          if [ "${FAILED:-0}" -gt 0 ]; then
+            echo "## ❌ Test Results — $FAILED failure(s)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ✅ Test Results — all passed" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Total | ${TOTAL:-?} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Passed | ${PASSED:-?} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Failed | ${FAILED:-?} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Skipped | ${SKIPPED:-?} |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${FAILED:-0}" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Failed tests" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            # Extract failure details: test name + first line of message
+            python3 - "$RESULTS_FILE" >> "$GITHUB_STEP_SUMMARY" <<'PYEOF'
+          import sys, xml.etree.ElementTree as ET
+          tree = ET.parse(sys.argv[1])
+          for tc in tree.iter('test-case'):
+              if tc.get('result') == 'Failed':
+                  name = tc.get('name', '(unknown)')
+                  msg_el = tc.find('.//message')
+                  msg = (msg_el.text or '').strip().split('\n')[0] if msg_el is not None else ''
+                  print(f'- **{name}**: {msg}')
+          PYEOF
+          fi
+
+          # Propagate failure so the job turns red on test failures
+          if [ "${FAILED:-0}" -gt 0 ]; then
+            exit 1
+          fi
