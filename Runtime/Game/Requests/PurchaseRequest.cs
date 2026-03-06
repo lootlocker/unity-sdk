@@ -27,6 +27,19 @@ namespace LootLocker.LootLockerEnums
     }
 
     /// <summary>
+    /// The possible statuses of an async purchase entitlement
+    /// </summary>
+    public enum LootLockerAsyncPurchaseStatus
+    {
+        /// <summary>The purchase is still being processed</summary>
+        pending,
+        /// <summary>The purchase completed successfully and items have been granted</summary>
+        active,
+        /// <summary>The purchase failed; see the error field for the reason</summary>
+        failed
+    }
+
+    /// <summary>
     /// The action taken on a player inventory item as part of a refund
     /// </summary>
     public enum LootLockerRefundInventoryEventAction
@@ -281,19 +294,6 @@ namespace LootLocker.Requests
         /// The id of the entitlement to finalize the purchase for
         /// </summary>
         public string entitlement_id { get; set; }
-    }
-
-    /// <summary>
-    /// The possible statuses of an async purchase entitlement
-    /// </summary>
-    public enum LootLockerAsyncPurchaseStatus
-    {
-        /// <summary>The purchase is still being processed</summary>
-        pending,
-        /// <summary>The purchase completed successfully and items have been granted</summary>
-        active,
-        /// <summary>The purchase failed; see the error field for the reason</summary>
-        failed
     }
 
     /// <summary>
@@ -599,7 +599,7 @@ namespace LootLocker
                 float timeoutAfterMinutes = 5.0f,
                 string forPlayerWithUlid = null)
             {
-                pollingIntervalSeconds = Math.Max(1.0f, pollingIntervalSeconds);
+                pollingIntervalSeconds = Mathf.Max(1.0f, pollingIntervalSeconds);
                 var instance = GetInstance();
                 if (instance == null)
                 {
