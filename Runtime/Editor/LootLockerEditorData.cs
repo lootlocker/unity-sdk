@@ -21,6 +21,8 @@ namespace LootLocker.Extension
             EditorPrefs.DeleteKey(selectedGameName);
             EditorPrefs.DeleteKey(firstTimeWelcome);
             EditorPrefs.DeleteKey(newSession);
+            // Delete legacy environment key used by older versions so resets fully clear LootLocker editor state
+            EditorPrefs.DeleteKey(PlayerSettings.productGUID.ToString() + ".LootLocker.Environment");
         }
 
         public static void SetAdminToken(string _adminToken)
