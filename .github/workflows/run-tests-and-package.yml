@@ -84,10 +84,6 @@ jobs:
       - name: Configure LootLocker to take keys by commandline
         run: |
           sed -i 's/NO_LOOTLOCKER_COMMANDLINE_SETTINGS/LOOTLOCKER_COMMANDLINE_SETTINGS/' unity-sdk-smoketest-project/ProjectSettings/ProjectSettings.asset
-      - name: Configure LootLocker to target stage environment
-        if: ${{ env.LL_USE_STAGE == 'true' }}
-        run: |
-          sed -i 's/NO_LOOTLOCKER_TARGET_STAGE_ENV/LOOTLOCKER_TARGET_STAGE_ENV/' unity-sdk-smoketest-project/ProjectSettings/ProjectSettings.asset
       - uses: actions/cache@v4
         with:
           path: unity-sdk-smoketest-project/Library
