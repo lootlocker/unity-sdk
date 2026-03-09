@@ -120,6 +120,13 @@ namespace LootLockerTestConfigurationUtils
         public static EndPointClass createCurrencyDenomination = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/denominations", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
         public static EndPointClass enableCurrencyGameWrites = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/enable-game-writes", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
 
+        [Header("LootLocker Admin API Catalog Operations")]
+        public static EndPointClass createCatalog = new EndPointClass("game/#GAMEID#/catalog", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createCatalogItem = new EndPointClass("game/#GAMEID#/catalog/item", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass toggleCatalogItemPurchasable = new EndPointClass("game/#GAMEID#/catalog/item/{0}", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
+        public static EndPointClass addPriceToCatalogItem = new EndPointClass("game/#GAMEID#/catalog/price", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
+        public static EndPointClass publishCatalog = new EndPointClass("game/#GAMEID#/catalogs/inspired-ibex/v1/catalog/{0}/publish", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
         [Header("LootLocker Admin API Balance Operations")]
         public static EndPointClass adminCreditBalance = new EndPointClass("game/#GAMEID#/balances/credit", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
