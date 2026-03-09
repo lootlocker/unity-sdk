@@ -144,6 +144,12 @@ if (-not [string]::IsNullOrWhiteSpace($TestFilter)) {
     $UnityArgs += @("-testFilter", $TestFilter)
 }
 
+$AdminEmail    = $Settings.admin_email
+$AdminPassword = $Settings.admin_password
+if (-not [string]::IsNullOrWhiteSpace($AdminEmail) -and -not [string]::IsNullOrWhiteSpace($AdminPassword)) {
+    $UnityArgs += @("-adminemail", $AdminEmail, "-adminpassword", $AdminPassword)
+}
+
 # ---------------------------------------------------------------------------
 # 4. Run Unity test runner
 # ---------------------------------------------------------------------------
