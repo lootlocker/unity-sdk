@@ -115,6 +115,11 @@ namespace LootLockerTestConfigurationUtils
         public static EndPointClass getTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
         public static EndPointClass updateTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
+        [Header("LootLocker Admin API Currency & Economy Operations")]
+        public static EndPointClass createCurrency = new EndPointClass("game/#GAMEID#/currencies/currency", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createCurrencyDenomination = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/denominations", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass enableCurrencyGameWrites = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/enable-game-writes", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
+
         [Header("LootLocker Admin API Balance Operations")]
         public static EndPointClass adminCreditBalance = new EndPointClass("game/#GAMEID#/balances/credit", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
