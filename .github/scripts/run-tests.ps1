@@ -56,8 +56,6 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot     = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $SettingsFile = Join-Path $RepoRoot "unity-dev-settings.json"
 $TempProject  = Join-Path $RepoRoot "Temp~\TestProject"
-$ResultsFile  = Join-Path $TempProject "TestResults.xml"
-$LogFile      = Join-Path $TempProject "test-run.log"
 
 function Write-Step { param([string]$Msg) Write-Host $Msg }
 function Write-Ok   { param([string]$Msg) Write-Host $Msg -ForegroundColor Green }
@@ -79,8 +77,9 @@ if (-not (Test-Path $SettingsFile)) {
     exit 1
 }
 
-$Settings = Get-Content $SettingsFile -Raw | ConvertFrom-Json
-$UnityExe  = $Settings.unity_executable
+$Settings      = Get-Content $SettingsFile -Raw | ConvertFrom-Json
+$UnityExe      = $Settings.unity_executable
+$CustomProject = $Settings.test_project_path
 
 if ([string]::IsNullOrWhiteSpace($UnityExe)) {
     Write-Fail "ERROR: 'unity_executable' is empty in unity-dev-settings.json."
@@ -92,7 +91,7 @@ if (-not (Test-Path $UnityExe)) {
 }
 
 # ---------------------------------------------------------------------------
-# 2. Create / refresh the test project if needed
+# 2. Determine / create the test project
 # ---------------------------------------------------------------------------
 function Initialize-TestProject {
     Write-Step "Creating test project at Temp~/TestProject ..."
@@ -118,11 +117,25 @@ function Initialize-TestProject {
     [IO.File]::WriteAllText((Join-Path $TempProject 'ProjectSettings\ProjectSettings.asset'), $psContent)
 }
 
-if ($Force -or -not (Test-Path (Join-Path $TempProject "Packages\manifest.json"))) {
+if (-not [string]::IsNullOrWhiteSpace($CustomProject) -and (Test-Path $CustomProject)) {
+    $ProjectPath = (Resolve-Path $CustomProject).Path
+    Write-Step "Using custom project: $ProjectPath"
+
+    # Bust the cached LootLocker assemblies so Tundra always rebuilds from the current source.
+    $artifactsPath = Join-Path $ProjectPath "Library\Bee\artifacts"
+    Get-ChildItem $artifactsPath -Recurse -Filter "*lootlocker*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+    $scriptAssemblies = Join-Path $ProjectPath "Library\ScriptAssemblies"
+    Get-ChildItem $scriptAssemblies -Filter "*lootlocker*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+} elseif ($Force -or -not (Test-Path (Join-Path $TempProject "Packages\manifest.json"))) {
     Initialize-TestProject
+    $ProjectPath = $TempProject
 } else {
     Write-Step "Reusing existing test project at Temp~/TestProject (use -Force to recreate)."
+    $ProjectPath = $TempProject
 }
+
+$ResultsFile = Join-Path $ProjectPath "TestResults.xml"
+$LogFile     = Join-Path $ProjectPath "test-run.log"
 
 # ---------------------------------------------------------------------------
 # 3. Build Unity arguments
@@ -130,8 +143,7 @@ if ($Force -or -not (Test-Path (Join-Path $TempProject "Packages\manifest.json")
 $UnityArgs = @(
     "-batchmode",
     "-nographics",
-    "-projectPath", $TempProject,
-    "-logFile", $LogFile,
+    "-projectPath", $ProjectPath,
     "-runTests",
     "-testPlatform", $TestMode,
     "-testResults", $ResultsFile
@@ -155,17 +167,38 @@ if (-not [string]::IsNullOrWhiteSpace($AdminEmail) -and -not [string]::IsNullOrW
 # ---------------------------------------------------------------------------
 Write-Step ""
 Write-Step "Unity:    $UnityExe"
-Write-Step "Project:  $TempProject"
+Write-Step "Project:  $ProjectPath"
 Write-Step "Mode:     $TestMode"
 if (-not [string]::IsNullOrWhiteSpace($TestCategory)) { Write-Step "Category: $TestCategory" }
 if (-not [string]::IsNullOrWhiteSpace($TestFilter))   { Write-Step "Filter:   $TestFilter" }
 Write-Step "Results:  $ResultsFile"
-Write-Step "Log:      $LogFile"
 Write-Step ""
 
 if (-not (Test-Path (Split-Path $LogFile))) { New-Item -ItemType Directory -Path (Split-Path $LogFile) -Force | Out-Null }
-if (Test-Path $LogFile)    { Remove-Item $LogFile    -Force }
+
+# If the canonical log file is locked (e.g. open in an editor), write Unity's log to a
+# temp file instead so Unity always gets a writable path.
+$ActiveLogFile = $LogFile
+if (Test-Path $LogFile) {
+    try {
+        $fs = [System.IO.File]::Open($LogFile, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        $fs.Close()
+        Remove-Item $LogFile -Force
+    } catch {
+        $ActiveLogFile = [System.IO.Path]::Combine((Split-Path $LogFile), "test-run.tmp.log")
+        Write-Warn "Log file is held open by another process; Unity will log to test-run.tmp.log"
+    }
+}
+Write-Step "Log:      $ActiveLogFile"
 if (Test-Path $ResultsFile) { Remove-Item $ResultsFile -Force }
+
+$UnityArgs += @("-logFile", $ActiveLogFile)
+
+$prevEAP = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+& $UnityExe @UnityArgs
+$script:unityExitCode = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 1 }
+$ErrorActionPreference = $prevEAP
 
 # ---------------------------------------------------------------------------
 # 4a. Warm-up pass - open the project and quit so Unity fully builds the
@@ -224,7 +257,7 @@ Write-Step "--- Test results -----------------------------------------"
 
 if ([string]::IsNullOrWhiteSpace($resultsContent)) {
     Write-Fail "No test results file found. Unity may have crashed or timed out."
-    Write-Step "Check the log: $LogFile"
+    Write-Step "Check the log: $ActiveLogFile"
     exit 1
 }
 
