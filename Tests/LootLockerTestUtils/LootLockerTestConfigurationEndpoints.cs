@@ -114,6 +114,12 @@ namespace LootLockerTestConfigurationUtils
         [Header("LootLocker Admin Title Config Operations")]
         public static EndPointClass getTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
         public static EndPointClass updateTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Balance Operations")]
+        public static EndPointClass adminCreditBalance = new EndPointClass("game/#GAMEID#/balances/credit", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Game Config")]
+        public static EndPointClass setGameConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }
