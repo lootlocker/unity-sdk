@@ -114,23 +114,20 @@ namespace LootLockerTestConfigurationUtils
 
         private static void GetProductionUser(out string userName, out string password)
         {
-            //NOTE: Set these if you want to run towards production locally
             userName = "";
             password = "";
-#if LOOTLOCKER_COMMANDLINE_SETTINGS
-                string[] args = System.Environment.GetCommandLineArgs();
-                for (int i = 0; i < args.Length; i++)
+            string[] args = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "-adminemail")
                 {
-                    if (args[i] == "-adminemail")
-                    {
-                        userName = args[i + 1];
-                    }
-                    else if (args[i] == "-adminpassword")
-                    {
-                        password = args[i + 1];
-                    }
+                    userName = args[i + 1];
                 }
-#endif
+                else if (args[i] == "-adminpassword")
+                {
+                    password = args[i + 1];
+                }
+            }
         }
 
         private static void FinalizeSignIn(LootLockerTestUser user, string token, string userName, string userEmail, string password, string userDate)
