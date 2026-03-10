@@ -3194,7 +3194,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// List player inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
-        /// <param name="request">Request object containing any filters to apply to the inventory listing.</param>
+        /// <param name="request">Request object containing filters and optional includes (set <c>request.includes.metadata = true</c> to include metadata entries per item).</param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>
         public static void ListPlayerInventory(LootLockerListSimplifiedInventoryRequest request, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
@@ -3226,7 +3226,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// List character inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
-        /// <param name="request">Request object containing any filters to apply to the inventory listing.</param>
+        /// <param name="request">Request object containing filters and optional includes (set <c>request.includes.metadata = true</c> to include metadata entries per item).</param>
         /// <param name="characterId">Optional : Filter inventory by character ID.</param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>

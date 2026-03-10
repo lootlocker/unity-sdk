@@ -137,6 +137,24 @@ namespace LootLockerTestConfigurationUtils
             }, onComplete);
         }
 
+        public static void AdminGrantAssetToPlayerInventory(int playerId, int assetId, Action<LootLockerResponse> onComplete)
+        {
+            if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
+            {
+                onComplete?.Invoke(null);
+                return;
+            }
+
+            var request = new LootLockerTestAdminGrantAssetRequest { asset_id = assetId };
+            string json = LootLockerJson.SerializeObject(request);
+            string endpoint = string.Format(LootLockerTestConfigurationEndpoints.adminGrantAssetToPlayerInventory.endPoint, playerId);
+
+            LootLockerAdminRequest.Send(endpoint, LootLockerTestConfigurationEndpoints.adminGrantAssetToPlayerInventory.httpMethod, json, onComplete: (serverResponse) =>
+            {
+                onComplete?.Invoke(serverResponse);
+            }, true);
+        }
+
         public static void UpdateAsset(string assetJson, int assetId, Action<LootLockerResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
@@ -171,6 +189,11 @@ namespace LootLockerTestConfigurationUtils
                 onComplete?.Invoke(response);
             }, true);
         }
+    }
+
+    public class LootLockerTestAdminGrantAssetRequest
+    {
+        public int asset_id { get; set; }
     }
 
     public class LootLockerTestAssetResponse : LootLockerResponse
