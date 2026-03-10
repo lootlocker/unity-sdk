@@ -165,7 +165,7 @@ $ErrorActionPreference = $prevEAP
 # 5. Wait for Unity to finish writing the results file
 # ---------------------------------------------------------------------------
 $resultsContent = ""
-for ($i = 0; $i -lt 360; $i++) {
+for ($i = 0; $i -lt 1800; $i++) {
     Start-Sleep -Milliseconds 500
     if (-not (Test-Path $ResultsFile)) { continue }
     try {
