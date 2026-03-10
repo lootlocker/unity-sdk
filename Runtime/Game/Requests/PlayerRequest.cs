@@ -96,6 +96,10 @@ namespace LootLocker.Requests
         /// The acquisition date of the inventory item
         /// </summary>
         public DateTime? acquisition_date { get; set; }
+        /// <summary>
+        /// Metadata entries for this inventory item when requested
+        /// </summary>
+        public LootLockerMetadataEntry[] metadata { get; set; }
     }
 
     public class LootLockerRewardObject
@@ -192,10 +196,25 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Includes to add extra data to simplified inventory responses
+    /// </summary>
+    public class LootLockerListSimplifiedInventoryIncludes
+    {
+        /// <summary>
+        /// If set to true, response will include metadata for inventory items
+        /// </summary>
+        public bool metadata { get; set; } = false;
+    }
+
+    /// <summary>
     /// Request to list a player's simplified inventory with the given filters
     /// </summary>
     public class LootLockerListSimplifiedInventoryRequest
     {
+        /// <summary>
+        /// Includes for the simplified inventory response
+        /// </summary>
+        public LootLockerListSimplifiedInventoryIncludes includes { get; set; } = new LootLockerListSimplifiedInventoryIncludes();
         /// <summary>
         /// The filters to apply to the inventory listing. If null, no filters will be applied and the full inventory will be returned
         /// </summary>
