@@ -1,5 +1,8 @@
 ﻿using LootLocker.Requests;
+using LootLocker.Utilities;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace LootLocker.Requests
 {
@@ -75,7 +78,18 @@ namespace LootLocker
             EndPointClass endPoint = LootLockerEndPoints.getAllKeyValuePairs;
             string getVariable = endPoint.endPoint;
 
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { 
+                LootLockerGetAllKeyValuePairsResponse response = LootLockerResponse.Deserialize<LootLockerGetAllKeyValuePairsResponse>(serverResponse);
+                
+                if (response.success && !string.IsNullOrEmpty(response.text))
+                {
+                    var streamedResult = LootLockerJson.DeserializeStreamedResponse<LootLockerInstanceStoragePair>(response.text);
+                    response.streamedObjectCount = streamedResult.streamedObjectCount;
+                    response.keypairs = streamedResult.objects;
+                }
+                
+                onComplete?.Invoke(response);
+            });
         }
 
         public static void GetAllKeyValuePairsToAnInstance(string forPlayerWithUlid, LootLockerGetRequest data, Action<LootLockerAssetDefaultResponse> onComplete)
