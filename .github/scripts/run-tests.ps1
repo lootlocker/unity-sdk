@@ -1,4 +1,4 @@
-#Requires -Version 5.0
+﻿#Requires -Version 5.0
 <#
 .SYNOPSIS
     Runs LootLocker SDK PlayMode tests against a local Unity installation.
@@ -24,7 +24,7 @@
     Supports Unity's "-testFilter" regex syntax.
 
 .PARAMETER TestMode
-    Unity test platform — PlayMode (default) or EditMode.
+    Unity test platform - PlayMode (default) or EditMode.
 
 .PARAMETER Force
     If specified, always recreates the temporary test project even if it already exists.
@@ -97,7 +97,13 @@ if (-not (Test-Path $UnityExe)) {
 function Initialize-TestProject {
     Write-Step "Creating test project at Temp~/TestProject ..."
 
-    if (Test-Path $TempProject) { Remove-Item $TempProject -Recurse -Force }
+    if (Test-Path $TempProject) {
+        # Clear read-only attributes Unity sets on Library files before deleting
+        Get-ChildItem $TempProject -Recurse -Force -ErrorAction SilentlyContinue |
+            Where-Object { $_.Attributes -band [IO.FileAttributes]::ReadOnly } |
+            ForEach-Object { $_.Attributes = $_.Attributes -band (-bnot [IO.FileAttributes]::ReadOnly) }
+        Remove-Item $TempProject -Recurse -Force -ErrorAction SilentlyContinue
+    }
     New-Item -ItemType Directory -Path (Join-Path $TempProject "Assets")          -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $TempProject "Packages")        -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $TempProject "ProjectSettings")  -Force | Out-Null
@@ -155,17 +161,44 @@ if (-not (Test-Path (Split-Path $LogFile))) { New-Item -ItemType Directory -Path
 if (Test-Path $LogFile)    { Remove-Item $LogFile    -Force }
 if (Test-Path $ResultsFile) { Remove-Item $ResultsFile -Force }
 
-$prevEAP = $ErrorActionPreference
-$ErrorActionPreference = 'Continue'
-& $UnityExe @UnityArgs
-$script:unityExitCode = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 1 }
-$ErrorActionPreference = $prevEAP
+# ---------------------------------------------------------------------------
+# 4a. Warm-up pass - open the project and quit so Unity fully builds the
+#     Library before the test run. Without this, PlayMode tests on a fresh
+#     project can hit "referenced script (Unknown)" during scene load because
+#     the backup scene is written before script compilation completes.
+#     Uses Start-Process with a timeout so a hung Unity does not block forever.
+# ---------------------------------------------------------------------------
+$WarmupMarker = Join-Path $TempProject "Library\ScriptAssemblies"
+if (-not (Test-Path $WarmupMarker)) {
+    Write-Step "Warming up project (first-time Library build, up to 10 min) ..."
+    $WarmupLog = Join-Path $TempProject "warmup.log"
+    $warmupProc = Start-Process -FilePath $UnityExe `
+        -ArgumentList @("-batchmode", "-nographics", "-projectPath", $TempProject, "-logFile", $WarmupLog, "-quit") `
+        -PassThru -NoNewWindow
+    $warmupProc.WaitForExit(600000) | Out-Null   # wait up to 10 minutes
+    if (-not $warmupProc.HasExited) {
+        Write-Warn "Warm-up did not finish in time -- killing Unity and proceeding anyway."
+        $warmupProc | Stop-Process -Force -ErrorAction SilentlyContinue
+    }
+    Write-Step "Warm-up complete."
+}
+
+# Use Start-Process + WaitForExit so the shell blocks regardless of whether
+# Unity.exe is a GUI-subsystem or console-subsystem executable.
+$unityProc = Start-Process -FilePath $UnityExe -ArgumentList $UnityArgs -PassThru -NoNewWindow
+if ($null -ne $unityProc) {
+    $unityProc.WaitForExit()
+    $script:unityExitCode = $unityProc.ExitCode
+} else {
+    $script:unityExitCode = 1
+}
 
 # ---------------------------------------------------------------------------
 # 5. Wait for Unity to finish writing the results file
+#    (short retry loop to handle any OS file-flush delay after exit)
 # ---------------------------------------------------------------------------
 $resultsContent = ""
-for ($i = 0; $i -lt 1800; $i++) {
+for ($i = 0; $i -lt 20; $i++) {
     Start-Sleep -Milliseconds 500
     if (-not (Test-Path $ResultsFile)) { continue }
     try {
