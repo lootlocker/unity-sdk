@@ -85,9 +85,21 @@ namespace LootLocker.Requests
         /// </summary>
         public int asset_id { get; set; }
         /// <summary>
+        /// The asset ulid of the inventory item
+        /// </summary>
+        public string asset_ulid { get; set; }
+        /// <summary>
+        /// The name of the asset
+        /// </summary>
+        public string asset_name { get; set; }
+        /// <summary>
         /// The instance id of the inventory item
         /// </summary>
         public int instance_id { get; set; }
+        /// <summary>
+        /// The ulid of the inventory item
+        /// </summary>
+        public string ulid { get; set; }
         /// <summary>
         /// The acquisition source of the inventory item
         /// </summary>
@@ -188,11 +200,26 @@ namespace LootLocker.Requests
         /// <summary>
         /// A list of asset ids to filter the inventory items by
         /// </summary>
-        public int[] asset_ids { get; set; }
+        public int[] asset_ids { get; set; } = System.Array.Empty<int>();
         /// <summary>
         /// A list of context ids to filter the inventory items by
         /// </summary>
-        public int[] context_ids { get; set; }
+        public int[] context_ids { get; set; } = System.Array.Empty<int>();
+    }
+
+    /// <summary>
+    /// What metadata to include in simplified inventory responses when requested by the client. If no keys are specified, all metadata will be included when metadata is requested in the includes section of the request
+    /// </summary>
+    public class LootLockerListSimplifiedInventoryMetadataIncludes
+    {
+        /// <summary>
+        /// A list of metadata keys to include in the response when metadata is requested. If this list is empty, all metadata will be included when metadata is requested in the includes section of the request
+        /// </summary>
+        public string[] keys { get; set; } = System.Array.Empty<string>();
+        /// <summary>
+        /// A boolean value indicating whether all metadata should be included in the response when metadata is requested. This will be true if the keys list is empty, and false if the keys list contains any entries. This value is ignored if metadata is not requested in the includes section of the request
+        /// </summary>
+        public bool all { get { return keys.Length == 0; } set { } }
     }
 
     /// <summary>
@@ -201,9 +228,9 @@ namespace LootLocker.Requests
     public class LootLockerListSimplifiedInventoryIncludes
     {
         /// <summary>
-        /// If set to true, response will include metadata for inventory items
+        /// Whether to include metadata for inventory items in the response. If true, metadata will be included according to the keys specified in the metadata includes section of the request. If false, no metadata will be included for inventory items in the response
         /// </summary>
-        public bool metadata { get; set; } = false;
+        public LootLockerListSimplifiedInventoryMetadataIncludes metadata { get; set; } = null;
     }
 
     /// <summary>
@@ -218,7 +245,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The filters to apply to the inventory listing. If null, no filters will be applied and the full inventory will be returned
         /// </summary>
-        public LootLockerListSimplifiedFilters filters { get; set; }
+        public LootLockerListSimplifiedFilters filters { get; set; } = new LootLockerListSimplifiedFilters();
     }
 
     //==================================================
