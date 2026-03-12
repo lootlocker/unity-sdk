@@ -23,7 +23,6 @@ jobs:
   editor-smoke-test:
     name: Test SDK in Editor
     runs-on: [ubuntu-latest]
-    if: ${{ false == true }}
     needs: []
     timeout-minutes: 10
     env: 
@@ -324,7 +323,7 @@ jobs:
     name: Run the integration tests
     runs-on: ubuntu-latest
     if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
-    #needs: [editor-smoke-test]
+    needs: [editor-smoke-test]
     timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 15 }}
     strategy:
       fail-fast: false
