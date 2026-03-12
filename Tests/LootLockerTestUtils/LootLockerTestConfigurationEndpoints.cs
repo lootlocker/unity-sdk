@@ -106,7 +106,7 @@ namespace LootLockerTestConfigurationUtils
         public static EndPointClass sendCustomNotification = new EndPointClass("game/#GAMEID#/notifications/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Inventory Operations")]
-        public static EndPointClass adminGrantAssetToPlayerInventory = new EndPointClass("/v1/game/#GAMEID#/player/{0}/inventory/grant", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass adminGrantAssetToPlayerInventory = new EndPointClass("/game/#GAMEID#/player/{0}/inventory/grant", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Metadata Operations")]
         public static EndPointClass metadataOperations = new EndPointClass("game/#GAMEID#/metadata", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);

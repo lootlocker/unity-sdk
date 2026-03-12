@@ -17,6 +17,7 @@ namespace LootLockerTests.PlayMode
         private static int TestCounter = 0;
         private bool SetupFailed = false;
         private int createdAssetId = 0;
+        private int createdAssetContextId = 0;
         private string createdAssetUlid = string.Empty;
         private int sessionPlayerId = 0;
 
@@ -80,6 +81,7 @@ namespace LootLockerTests.PlayMode
                     SetupFailed = true;
                 }
                 contextId = contextResponse?.contexts?[0].id ?? 0;
+                createdAssetContextId = contextId;
                 getAssetContextsCallCompleted = true;
             });
             yield return new WaitUntil(() => getAssetContextsCallCompleted);
@@ -132,6 +134,7 @@ namespace LootLockerTests.PlayMode
             {
                 yield break;
             }
+            yield return new WaitForSeconds(5);
 
             bool guestLoginCompleted = false;
             LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
@@ -188,7 +191,6 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         [Timeout(360_000)]
-        [Ignore("Blocked by backend issue lootlocker/index#1384 - metadata on fast inventory endpoint not yet deployed")]
         public IEnumerator PlayerInventory_ListPlayerInventoryWithMetadataInclude_ReturnsMetadata()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
@@ -198,11 +200,12 @@ namespace LootLockerTests.PlayMode
             {
                 includes = new LootLockerListSimplifiedInventoryIncludes
                 {
-                    metadata = true,
+                    metadata = new LootLockerListSimplifiedInventoryMetadataIncludes(), // all = true (no keys specified)
                 },
                 filters = new LootLockerListSimplifiedFilters
                 {
                     asset_ids = new[] { createdAssetId },
+                    context_ids = new[] { createdAssetContextId },
                 },
             };
 
@@ -231,7 +234,7 @@ namespace LootLockerTests.PlayMode
             {
                 filters = new LootLockerListSimplifiedFilters
                 {
-                    asset_ids = new[] { createdAssetId },
+                    asset_ids = new[] { createdAssetId }, context_ids = new[] { createdAssetContextId }
                 },
             };
 
