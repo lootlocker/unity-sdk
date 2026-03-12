@@ -524,7 +524,7 @@ jobs:
       - name: Bring down Go Backend
         if: always()
         run: |
-          kill $(ps aux | grep '[g]o run .' | awk '{print $2}')
+          kill $(ps aux | grep '[g]o-backend' | grep -v grep | awk '{print $2}') || true
       - name: Bring down devenv
         if: always()
         run: |
