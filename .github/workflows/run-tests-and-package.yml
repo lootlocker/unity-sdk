@@ -406,12 +406,17 @@ jobs:
         run: |
           cd go-backend
           echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
+      - name: Build Go Backend
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          cd go-backend
+          go build -o go-backend .
       - name: Run Go Backend
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
           mkdir logs
           cd go-backend
-          go run . > ../logs/go-backend.log 2>&1 &
+          ./go-backend > ../logs/go-backend.log 2>&1 &
       - name: Wait for Go backend ready healthcheck
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
