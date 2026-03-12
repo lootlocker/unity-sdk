@@ -3194,7 +3194,14 @@ namespace LootLocker.Requests
         /// <summary>
         /// List player inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
-        /// <param name="request">Request object containing filters and optional includes (set <c>request.includes.metadata = true</c> to include metadata entries per item).</param>
+        /// <param name="request">
+        /// Request object containing filters and optional metadata includes.
+        /// To include metadata in the response, assign <c>request.includes.metadata</c> to a <c>LootLockerListSimplifiedInventoryMetadataIncludes</c> instance:
+        /// <list type="bullet">
+        /// <item><description>To fetch all metadata keys: <c>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes()</c> (empty <c>keys</c> array sets <c>all</c> to <c>true</c> automatically)</description></item>
+        /// <item><description>To fetch specific metadata keys: <c>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes { keys = new[] { "key1", "key2" } }</c> (non-empty <c>keys</c> sets <c>all</c> to <c>false</c> automatically)</description></item>
+        /// </list>
+        /// </param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>
         public static void ListPlayerInventory(LootLockerListSimplifiedInventoryRequest request, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
@@ -3226,7 +3233,14 @@ namespace LootLocker.Requests
         /// <summary>
         /// List character inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
-        /// <param name="request">Request object containing filters and optional includes (set <c>request.includes.metadata = true</c> to include metadata entries per item).</param>
+        /// <param name="request">
+        /// Request object containing filters and optional metadata includes.
+        /// To include metadata in the response, assign <c>request.includes.metadata</c> to a <c>LootLockerListSimplifiedInventoryMetadataIncludes</c> instance:
+        /// <list type="bullet">
+        /// <item><description>To fetch all metadata keys: <c>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes()</c> (empty <c>keys</c> array sets <c>all</c> to <c>true</c> automatically)</description></item>
+        /// <item><description>To fetch specific metadata keys: <c>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes { keys = new[] { "key1", "key2" } }</c> (non-empty <c>keys</c> sets <c>all</c> to <c>false</c> automatically)</description></item>
+        /// </list>
+        /// </param>
         /// <param name="characterId">Optional : Filter inventory by character ID.</param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>
