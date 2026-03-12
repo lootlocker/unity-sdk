@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -12,6 +14,23 @@ using UnityEditor;
 
 namespace LootLocker
 {
+    /// <summary>
+    /// Generic result structure for streamed JSON responses.
+    /// Contains the count and array of parsed objects from a streaming endpoint.
+    /// </summary>
+    /// <typeparam name="T">The type of objects in the streamed response</typeparam>
+    public struct LootLockerStreamedResponse<T>
+    {
+        public int streamedObjectCount;
+        public T[] objects;
+
+        public LootLockerStreamedResponse(int count, T[] objects)
+        {
+            this.streamedObjectCount = count;
+            this.objects = objects;
+        }
+    }
+
     public static class LootLockerJsonSettings
     {
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -161,6 +180,87 @@ namespace LootLocker
                 output = default(T);
                 return false;
             }
+        }
+
+        public static Dictionary<string, object>[] DeserializeJsonObjectArrayToDictionaryArray(string json)
+        {
+            return Json.Deserialize<Dictionary<string, object>[]>(json, LootLockerJsonSettings.Default);
+        }
+
+        /// <summary>
+        /// Parses a streamed JSON response containing concatenated objects with metadata.
+        /// The expected format is: {obj1},{obj2},...,{objN},{"streamedObjectCount":N}
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize the streamed objects into</typeparam>
+        /// <param name="streamedJson">The raw streamed JSON string</param>
+        /// <returns>A structured result containing the count and parsed objects</returns>
+        public static LootLockerStreamedResponse<T> DeserializeStreamedResponse<T>(string streamedJson)
+        {
+            if (string.IsNullOrEmpty(streamedJson))
+            {
+                return new LootLockerStreamedResponse<T>(0, new T[0]);
+            }
+
+            try
+            {
+                // Convert concatenated JSON objects into a valid JSON array format
+                string jsonArray = "[" + streamedJson + "]";
+                Dictionary<string, object>[] streamedObjects = DeserializeJsonObjectArrayToDictionaryArray(jsonArray);
+                
+                if (streamedObjects == null || streamedObjects.Length == 0)
+                {
+                    return new LootLockerStreamedResponse<T>(0, new T[0]);
+                }
+
+                // Extract metadata from the last object
+                var metadataObject = streamedObjects[streamedObjects.Length - 1];
+                int streamedObjectCount = ExtractStreamedObjectCount(metadataObject);
+                
+                // Parse the actual data objects (excluding the metadata object)
+                T[] parsedObjects = ParseStreamedObjects<T>(streamedObjects, streamedObjectCount);
+                
+                return new LootLockerStreamedResponse<T>(streamedObjectCount, parsedObjects);
+            }
+            catch (Exception)
+            {
+                return new LootLockerStreamedResponse<T>(0, new T[0]);
+            }
+        }
+
+        private static int ExtractStreamedObjectCount(Dictionary<string, object> metadataObject)
+        {
+            if (metadataObject?.ContainsKey("streamedObjectCount") == true && 
+                metadataObject["streamedObjectCount"] != null)
+            {
+                return Convert.ToInt32(metadataObject["streamedObjectCount"]);
+            }
+            return 0;
+        }
+
+        private static T[] ParseStreamedObjects<T>(Dictionary<string, object>[] streamedObjects, int count)
+        {
+            var parsedObjects = new List<T>();
+            
+            int objectsToParse = Math.Min(count, streamedObjects.Length - 1); // Exclude metadata object
+            for (int i = 0; i < objectsToParse; i++)
+            {
+                try
+                {
+                    string objectJson = SerializeObject(streamedObjects[i]);
+                    var parsedObject = DeserializeObject<T>(objectJson);
+                    if (parsedObject != null)
+                    {
+                        parsedObjects.Add(parsedObject);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Skip malformed objects rather than failing the entire response
+                    continue;
+                }
+            }
+            
+            return parsedObjects.ToArray();
         }
 
         public static string PrettifyJsonString(string json)
