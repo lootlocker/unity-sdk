@@ -387,7 +387,7 @@ jobs:
         run: |
           cd devenv
           mage env:setup dev false false
-          mage env:up dev
+          mage env:upCI dev
       - name: Setup Go to use access token for private repos
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         env:
