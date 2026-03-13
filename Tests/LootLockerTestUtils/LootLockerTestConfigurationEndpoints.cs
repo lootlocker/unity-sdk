@@ -114,6 +114,24 @@ namespace LootLockerTestConfigurationUtils
         [Header("LootLocker Admin Title Config Operations")]
         public static EndPointClass getTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
         public static EndPointClass updateTitleConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Currency & Economy Operations")]
+        public static EndPointClass createCurrency = new EndPointClass("game/#GAMEID#/currencies/currency", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createCurrencyDenomination = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/denominations", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass enableCurrencyGameWrites = new EndPointClass("game/#GAMEID#/currencies/currency/{0}/enable-game-writes", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Catalog Operations")]
+        public static EndPointClass createCatalog = new EndPointClass("game/#GAMEID#/catalog", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createCatalogItem = new EndPointClass("game/#GAMEID#/catalog/item", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass toggleCatalogItemPurchasable = new EndPointClass("game/#GAMEID#/catalog/item/{0}", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
+        public static EndPointClass addPriceToCatalogItem = new EndPointClass("game/#GAMEID#/catalog/price", LootLockerHTTPMethod.PUT, LootLockerCallerRole.Admin);
+        public static EndPointClass publishCatalog = new EndPointClass("game/#GAMEID#/catalogs/inspired-ibex/v1/catalog/{0}/publish", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Balance Operations")]
+        public static EndPointClass adminCreditBalance = new EndPointClass("game/#GAMEID#/balances/credit", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Game Config")]
+        public static EndPointClass setGameConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }
