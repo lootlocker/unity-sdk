@@ -123,7 +123,7 @@ if (-not [string]::IsNullOrWhiteSpace($CustomProject) -and (Test-Path $CustomPro
 
     # Bust the cached LootLocker assemblies so Tundra always rebuilds from the current source.
     $artifactsPath = Join-Path $ProjectPath "Library\Bee\artifacts"
-    Get-ChildItem $artifactsPath -Recurse -Filter "*lootlocker*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+    Get-ChildItem $artifactsPath -Recurse -Filter "*lootlocker*" -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     $scriptAssemblies = Join-Path $ProjectPath "Library\ScriptAssemblies"
     Get-ChildItem $scriptAssemblies -Filter "*lootlocker*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 } elseif ($Force -or -not (Test-Path (Join-Path $TempProject "Packages\manifest.json"))) {
@@ -194,12 +194,6 @@ if (Test-Path $ResultsFile) { Remove-Item $ResultsFile -Force }
 
 $UnityArgs += @("-logFile", $ActiveLogFile)
 
-$prevEAP = $ErrorActionPreference
-$ErrorActionPreference = 'Continue'
-& $UnityExe @UnityArgs
-$script:unityExitCode = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 1 }
-$ErrorActionPreference = $prevEAP
-
 # ---------------------------------------------------------------------------
 # 4a. Warm-up pass - open the project and quit so Unity fully builds the
 #     Library before the test run. Without this, PlayMode tests on a fresh
@@ -224,7 +218,7 @@ if (-not (Test-Path $WarmupMarker)) {
 
 # Use Start-Process + WaitForExit so the shell blocks regardless of whether
 # Unity.exe is a GUI-subsystem or console-subsystem executable.
-$unityProc = Start-Process -FilePath $UnityExe -ArgumentList $UnityArgs -PassThru -NoNewWindow
+$unityProc = Start-Process -FilePath $UnityExe -ArgumentList ($UnityArgs | ForEach-Object { if ($_ -match ' ') { '"' + $_ + '"' } else { $_ } }) -PassThru -NoNewWindow
 if ($null -ne $unityProc) {
     $unityProc.WaitForExit()
     $script:unityExitCode = $unityProc.ExitCode

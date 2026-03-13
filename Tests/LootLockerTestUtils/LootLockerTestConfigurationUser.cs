@@ -119,11 +119,11 @@ namespace LootLockerTestConfigurationUtils
             string[] args = System.Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] == "-adminemail")
+                if (args[i] == "-adminemail" && i + 1 < args.Length)
                 {
                     userName = args[i + 1];
                 }
-                else if (args[i] == "-adminpassword")
+                else if (args[i] == "-adminpassword" && i + 1 < args.Length)
                 {
                     password = args[i + 1];
                 }
