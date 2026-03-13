@@ -14,17 +14,17 @@ namespace LootLockerTests.PlayMode
 {
     public class AsyncPurchaseTests
     {
-        private LootLockerTestGame _gameUnderTest = null;
-        private LootLockerConfig _configCopy = null;
+        private LootLockerTestGame gameUnderTest = null;
+        private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
         private bool SetupFailed = false;
 
-        private string _paymentCurrencyId = "";
-        private string _rewardCurrencyId = "";
-        private int _assetId = 0;
-        private string _walletId = "";
-        private string _assetCatalogListingId = "";
-        private string _currencyCatalogListingId = "";
+        private string paymentCurrencyId = "";
+        private string rewardCurrencyId = "";
+        private int assetId = 0;
+        private string walletId = "";
+        private string assetCatalogListingId = "";
+        private string currencyCatalogListingId = "";
 
         private const int DenominationValue = 100;
         private const int CurrencyPriceForAsset = 100;
@@ -36,7 +36,7 @@ namespace LootLockerTests.PlayMode
         public IEnumerator Setup()
         {
             TestCounter++;
-            _configCopy = LootLockerConfig.current;
+            configCopy = LootLockerConfig.current;
             Debug.Log($"##### Start of {GetType().Name} test no.{TestCounter} setup #####");
 
             if (!LootLockerConfig.ClearSettings())
@@ -55,18 +55,18 @@ namespace LootLockerTests.PlayMode
                 }
                 else
                 {
-                    _gameUnderTest = game;
+                    gameUnderTest = game;
                 }
                 gameCreated = true;
             });
             yield return new WaitUntil(() => gameCreated);
             if (SetupFailed) { yield break; }
 
-            _gameUnderTest.SwitchToStageEnvironment();
+            gameUnderTest.SwitchToStageEnvironment();
 
             // Enable guest login
             bool platformEnabled = false;
-            _gameUnderTest.EnableGuestLogin((success, errorMsg) =>
+            gameUnderTest.EnableGuestLogin((success, errorMsg) =>
             {
                 if (!success)
                 {
@@ -79,7 +79,7 @@ namespace LootLockerTests.PlayMode
             if (SetupFailed) { yield break; }
 
             // Initialize SDK
-            Assert.IsTrue(_gameUnderTest.InitializeLootLockerSDK(), "Failed to initialize LootLocker SDK");
+            Assert.IsTrue(gameUnderTest.InitializeLootLockerSDK(), "Failed to initialize LootLocker SDK");
 
             // Enable player-requested refunds on the game
             bool refundsEnabled = false;
@@ -106,7 +106,7 @@ namespace LootLockerTests.PlayMode
                 }
                 else
                 {
-                    _paymentCurrencyId = response.id;
+                    paymentCurrencyId = response.id;
                 }
                 paymentCurrencyCreated = true;
             });
@@ -124,7 +124,7 @@ namespace LootLockerTests.PlayMode
                 }
                 else
                 {
-                    _rewardCurrencyId = response.id;
+                    rewardCurrencyId = response.id;
                 }
                 rewardCurrencyCreated = true;
             });
@@ -133,7 +133,7 @@ namespace LootLockerTests.PlayMode
 
             // Enable game API writes on the reward currency (required for catalog item creation)
             bool gameWritesEnabled = false;
-            LootLockerTestCurrency.EnableCurrencyGameWrites(_rewardCurrencyId, response =>
+            LootLockerTestCurrency.EnableCurrencyGameWrites(rewardCurrencyId, response =>
             {
                 if (response == null || !response.success)
                 {
@@ -176,7 +176,7 @@ namespace LootLockerTests.PlayMode
                 }
                 else
                 {
-                    _assetId = response.asset.id;
+                    assetId = response.asset.id;
                     assetUlid = response.asset.ulid;
                 }
                 assetCreated = true;
@@ -186,7 +186,7 @@ namespace LootLockerTests.PlayMode
 
             // Activate asset so it can be purchased
             bool assetActivated = false;
-            LootLockerTestAssets.ActivateAsset(_assetId, response =>
+            LootLockerTestAssets.ActivateAsset(assetId, response =>
             {
                 if (response == null || !response.success)
                 {
@@ -253,7 +253,7 @@ namespace LootLockerTests.PlayMode
             // Create currency catalog item (entity_kind="currency", entity_id=rewardCurrencyId, amount=DenominationValue)
             bool currencyItemCreated = false;
             string currencyCatalogItemId = "";
-            LootLockerTestCatalog.CreateCatalogItem(catalogId, _rewardCurrencyId, "currency", response =>
+            LootLockerTestCatalog.CreateCatalogItem(catalogId, rewardCurrencyId, "currency", response =>
             {
                 if (response == null || !response.success)
                 {
@@ -285,7 +285,7 @@ namespace LootLockerTests.PlayMode
 
             // Add price to asset catalog item (priced in TestGold)
             bool assetPriceAdded = false;
-            LootLockerTestCatalog.AddPriceToCatalogItem(assetCatalogItemId, _paymentCurrencyId, CurrencyPriceForAsset.ToString(), response =>
+            LootLockerTestCatalog.AddPriceToCatalogItem(assetCatalogItemId, paymentCurrencyId, CurrencyPriceForAsset.ToString(), response =>
             {
                 if (response == null || !response.success)
                 {
@@ -299,7 +299,7 @@ namespace LootLockerTests.PlayMode
 
             // Add price to currency catalog item (priced in TestGold)
             bool currencyPriceAdded = false;
-            LootLockerTestCatalog.AddPriceToCatalogItem(currencyCatalogItemId, _paymentCurrencyId, CurrencyPriceForCurrencyReward.ToString(), response =>
+            LootLockerTestCatalog.AddPriceToCatalogItem(currencyCatalogItemId, paymentCurrencyId, CurrencyPriceForCurrencyReward.ToString(), response =>
             {
                 if (response == null || !response.success)
                 {
@@ -336,7 +336,7 @@ namespace LootLockerTests.PlayMode
                 }
                 else
                 {
-                    _walletId = response.wallet_id;
+                    walletId = response.wallet_id;
                 }
                 guestLoginDone = true;
             });
@@ -345,7 +345,7 @@ namespace LootLockerTests.PlayMode
 
             // Credit player with initial TestGold balance via admin API
             bool creditDone = false;
-            LootLockerTestGameAdmin.AdminCreditBalance(_walletId, _paymentCurrencyId, InitialBalance.ToString(), response =>
+            LootLockerTestGameAdmin.AdminCreditBalance(walletId, paymentCurrencyId, InitialBalance.ToString(), response =>
             {
                 if (response == null || !response.success)
                 {
@@ -371,12 +371,12 @@ namespace LootLockerTests.PlayMode
                     foreach (var entry in response.entries)
                     {
                         if (entry.entity_id == assetUlid)
-                            _assetCatalogListingId = entry.catalog_listing_id;
-                        else if (entry.entity_id == _rewardCurrencyId)
-                            _currencyCatalogListingId = entry.catalog_listing_id;
+                            assetCatalogListingId = entry.catalog_listing_id;
+                        else if (entry.entity_id == rewardCurrencyId)
+                            currencyCatalogListingId = entry.catalog_listing_id;
                     }
 
-                    if (string.IsNullOrEmpty(_assetCatalogListingId) || string.IsNullOrEmpty(_currencyCatalogListingId))
+                    if (string.IsNullOrEmpty(assetCatalogListingId) || string.IsNullOrEmpty(currencyCatalogListingId))
                     {
                         Debug.LogError("Could not find one or more catalog listing IDs in catalog items response");
                         SetupFailed = true;
@@ -385,6 +385,7 @@ namespace LootLockerTests.PlayMode
                 catalogItemsListed = true;
             });
             yield return new WaitUntil(() => catalogItemsListed);
+            if (SetupFailed) { yield break; }
 
             Debug.Log($"##### Start of {GetType().Name} test no.{TestCounter} test case #####");
         }
@@ -394,23 +395,23 @@ namespace LootLockerTests.PlayMode
         {
             Debug.Log($"##### End of {GetType().Name} test no.{TestCounter} test case #####");
 
-            if (_gameUnderTest != null)
+            if (gameUnderTest != null)
             {
                 bool gameDeletionDone = false;
-                _gameUnderTest.DeleteGame((success, errorMsg) =>
+                gameUnderTest.DeleteGame((success, errorMsg) =>
                 {
                     if (!success)
                     {
                         Debug.LogError($"Failed to delete game: {errorMsg}");
                     }
-                    _gameUnderTest = null;
+                    gameUnderTest = null;
                     gameDeletionDone = true;
                 });
                 yield return new WaitUntil(() => gameDeletionDone);
             }
 
             LootLockerStateData.ClearAllSavedStates();
-            LootLockerConfig.CreateNewSettings(_configCopy);
+            LootLockerConfig.CreateNewSettings(configCopy);
             Debug.Log($"##### End of {GetType().Name} test no.{TestCounter} tear down #####");
         }
 
@@ -422,11 +423,11 @@ namespace LootLockerTests.PlayMode
             // Initiate a single purchase containing both catalog items (asset + currency reward)
             LootLockerAsyncPurchaseInitiatedResponse initiatedResponse = null;
             LootLockerSDKManager.InitiateAsyncPurchaseCatalogItems(
-                _walletId,
+                walletId,
                 new[]
                 {
-                    new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = _assetCatalogListingId, quantity = 1 },
-                    new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = _currencyCatalogListingId, quantity = 1 }
+                    new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = assetCatalogListingId, quantity = 1 },
+                    new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = currencyCatalogListingId, quantity = 1 }
                 },
                 r => initiatedResponse = r);
             yield return new WaitUntil(() => initiatedResponse != null);
@@ -457,11 +458,11 @@ namespace LootLockerTests.PlayMode
 
             // Verify TestGold was debited for both items
             LootLockerListBalancesForWalletResponse balancesResponse = null;
-            LootLockerSDKManager.ListBalancesInWallet(_walletId, r => balancesResponse = r);
+            LootLockerSDKManager.ListBalancesInWallet(walletId, r => balancesResponse = r);
             yield return new WaitUntil(() => balancesResponse != null);
 
             Assert.IsTrue(balancesResponse.success, $"ListBalancesInWallet failed: {balancesResponse.errorData?.message}");
-            var goldBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == _paymentCurrencyId);
+            var goldBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == paymentCurrencyId);
             Assert.IsNotNull(goldBalance, "TestGold balance entry not found after purchase");
             Assert.AreEqual(
                 InitialBalance - CurrencyPriceForAsset - CurrencyPriceForCurrencyReward,
@@ -477,8 +478,8 @@ namespace LootLockerTests.PlayMode
             // Buy the currency reward item and wait for automatic polling to complete
             LootLockerAsyncPurchaseStatusResponse completedResponse = null;
             LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem(
-                _walletId,
-                _currencyCatalogListingId,
+                walletId,
+                currencyCatalogListingId,
                 1,
                 onStatusUpdate: null,
                 onComplete: r => completedResponse = r);
@@ -491,19 +492,19 @@ namespace LootLockerTests.PlayMode
 
             // Verify both the debit and the currency reward in a single balances request
             LootLockerListBalancesForWalletResponse balancesResponse = null;
-            LootLockerSDKManager.ListBalancesInWallet(_walletId, r => balancesResponse = r);
+            LootLockerSDKManager.ListBalancesInWallet(walletId, r => balancesResponse = r);
             yield return new WaitUntil(() => balancesResponse != null);
 
             Assert.IsTrue(balancesResponse.success, $"ListBalancesInWallet failed: {balancesResponse.errorData?.message}");
 
-            var goldBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == _paymentCurrencyId);
+            var goldBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == paymentCurrencyId);
             Assert.IsNotNull(goldBalance, "TestGold balance entry not found after purchase");
             Assert.AreEqual(
                 InitialBalance - CurrencyPriceForCurrencyReward,
                 int.Parse(goldBalance.amount),
                 "TestGold balance was not correctly debited after currency reward purchase");
 
-            var gemsBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == _rewardCurrencyId);
+            var gemsBalance = balancesResponse.balances?.FirstOrDefault(b => b.currency?.id == rewardCurrencyId);
             Assert.IsNotNull(gemsBalance, "TestGems balance entry not found after currency reward purchase");
             Assert.AreEqual(
                 DenominationValue,
@@ -518,8 +519,8 @@ namespace LootLockerTests.PlayMode
 
             LootLockerAsyncPurchaseStatusResponse cancelledResponse = null;
             Guid pollGuid = LootLockerSDKManager.InitiateAndPollAsyncPurchaseCatalogItems(
-                _walletId,
-                new[] { new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = _assetCatalogListingId, quantity = 1 } },
+                walletId,
+                new[] { new LootLockerCatalogItemAndQuantityPair { catalog_listing_id = assetCatalogListingId, quantity = 1 } },
                 onStatusUpdate: null,
                 onComplete: r => cancelledResponse = r);
 
@@ -543,8 +544,8 @@ namespace LootLockerTests.PlayMode
             // Buy the asset item and wait for it to reach an active state
             LootLockerAsyncPurchaseStatusResponse purchaseCompleted = null;
             LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem(
-                _walletId,
-                _assetCatalogListingId,
+                walletId,
+                assetCatalogListingId,
                 1,
                 onStatusUpdate: null,
                 onComplete: r => purchaseCompleted = r);
@@ -564,7 +565,7 @@ namespace LootLockerTests.PlayMode
 
             Assert.IsTrue(inventoryBefore.success, $"GetInventory failed: {inventoryBefore.errorData?.message}");
             Assert.IsTrue(
-                inventoryBefore.inventory?.Any(item => item.asset?.id == _assetId) == true,
+                inventoryBefore.inventory?.Any(item => item.asset?.id == assetId) == true,
                 "Expected purchased asset to appear in player inventory before refund");
 
             // Refund the purchase
@@ -578,7 +579,7 @@ namespace LootLockerTests.PlayMode
                 "Expected currency_refunded to be present in the refund response");
             Assert.IsTrue(refundResponse.currency_refunded.Length > 0,
                 "Expected at least one currency_refunded entry");
-            var goldRefund = refundResponse.currency_refunded.FirstOrDefault(c => c.currency_id == _paymentCurrencyId);
+            var goldRefund = refundResponse.currency_refunded.FirstOrDefault(c => c.currency_id == paymentCurrencyId);
             Assert.IsNotNull(goldRefund,
                 "Expected a TestGold entry in currency_refunded");
             Assert.AreEqual(CurrencyPriceForAsset.ToString(), goldRefund.amount,
