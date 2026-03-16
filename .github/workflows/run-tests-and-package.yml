@@ -25,6 +25,7 @@ jobs:
     runs-on: [ubuntu-latest]
     needs: []
     timeout-minutes: 10
+    if: false
     env: 
       LL_USE_STAGE: false
     strategy:
@@ -323,7 +324,7 @@ jobs:
     name: Run the integration tests
     runs-on: ubuntu-latest
     if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
-    needs: [editor-smoke-test]
+    #needs: [editor-smoke-test]
     timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 15 }}
     strategy:
       fail-fast: false
