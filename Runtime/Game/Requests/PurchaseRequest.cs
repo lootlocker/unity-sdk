@@ -455,6 +455,32 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerRefundWarning[] warnings { get; set; }
     }
+
+    /// <summary>
+    /// Request to create a Stripe Checkout session for a catalog item
+    /// </summary>
+    public class LootLockerCreateStripeCheckoutSessionRequest
+    {
+        /// <summary>
+        /// The ULID of the catalog item to purchase
+        /// </summary>
+        public string catalog_item_id { get; set; }
+        /// <summary>
+        /// The display name of the item shown on the Stripe Checkout page
+        /// </summary>
+        public string item_name { get; set; }
+    }
+
+    /// <summary>
+    /// Response from creating a Stripe Checkout session
+    /// </summary>
+    public class LootLockerCreateStripeCheckoutSessionResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// The URL of the Stripe-hosted checkout page. Open this in a browser or webview to let the player complete the payment.
+        /// </summary>
+        public string url { get; set; }
+    }
 }
 
 namespace LootLocker
@@ -804,6 +830,16 @@ namespace LootLocker
             EndPointClass endPoint = LootLockerEndPoints.refundByEntitlementIds;
             var body = LootLockerJson.SerializeObject(new LootLockerRefundByEntitlementIdsRequest { entitlement_ids = entitlementIds });
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
+        }
+
+        public static void CreateStripeCheckoutSession(string forPlayerWithUlid, string catalogItemId, string itemName, Action<LootLockerCreateStripeCheckoutSessionResponse> onComplete)
+        {
+            var body = LootLockerJson.SerializeObject(new LootLockerCreateStripeCheckoutSessionRequest
+            {
+                catalog_item_id = catalogItemId,
+                item_name = itemName
+            });
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.createStripeCheckoutSession.endPoint, LootLockerEndPoints.createStripeCheckoutSession.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
     }
 }
