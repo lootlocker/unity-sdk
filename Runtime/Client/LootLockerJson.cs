@@ -124,6 +124,82 @@ namespace LootLocker
                 return json;
             }
         }
+
+            /// <summary>
+            /// Parses a streamed JSON response containing concatenated objects with metadata.
+            /// The expected format is: {obj1},{obj2},...,{objN},{"streamedObjectCount":N}
+            /// </summary>
+            /// <typeparam name="T">The type to deserialize the streamed objects into</typeparam>
+            /// <param name="streamedJson">The raw streamed JSON string</param>
+            /// <returns>A structured result containing the count and parsed objects</returns>
+            public static LootLockerStreamedResponse<T> DeserializeStreamedResponse<T>(string streamedJson)
+            {
+                if (string.IsNullOrEmpty(streamedJson))
+                {
+                    return new LootLockerStreamedResponse<T>(0, new T[0]);
+                }
+
+                try
+                {
+                    // Convert concatenated JSON objects into a valid JSON array format
+                    string jsonArray = "[" + streamedJson + "]";
+                    Dictionary<string, object>[] streamedObjects = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(jsonArray, LootLockerJsonSettings.Default);
+
+                    if (streamedObjects == null || streamedObjects.Length == 0)
+                    {
+                        return new LootLockerStreamedResponse<T>(0, new T[0]);
+                    }
+
+                    // Extract metadata from the last object
+                    var metadataObject = streamedObjects[streamedObjects.Length - 1];
+                    int streamedObjectCount = ExtractStreamedObjectCount(metadataObject);
+
+                    // Parse the actual data objects (excluding the metadata object)
+                    T[] parsedObjects = ParseStreamedObjects<T>(streamedObjects, streamedObjectCount);
+
+                    return new LootLockerStreamedResponse<T>(streamedObjectCount, parsedObjects);
+                }
+                catch (Exception)
+                {
+                    return new LootLockerStreamedResponse<T>(0, new T[0]);
+                }
+            }
+
+            private static int ExtractStreamedObjectCount(Dictionary<string, object> metadataObject)
+            {
+                if (metadataObject?.ContainsKey("streamedObjectCount") == true &&
+                    metadataObject["streamedObjectCount"] != null)
+                {
+                    return Convert.ToInt32(metadataObject["streamedObjectCount"]);
+                }
+                return 0;
+            }
+
+            private static T[] ParseStreamedObjects<T>(Dictionary<string, object>[] streamedObjects, int count)
+            {
+                var parsedObjects = new List<T>();
+
+                int objectsToParse = Math.Min(count, streamedObjects.Length - 1); // Exclude metadata object
+                for (int i = 0; i < objectsToParse; i++)
+                {
+                    try
+                    {
+                        string objectJson = JsonConvert.SerializeObject(streamedObjects[i], LootLockerJsonSettings.Default);
+                        var parsedObject = JsonConvert.DeserializeObject<T>(objectJson, LootLockerJsonSettings.Default);
+                        if (parsedObject != null)
+                        {
+                            parsedObjects.Add(parsedObject);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Skip malformed objects rather than failing the entire response
+                        continue;
+                    }
+                }
+
+                return parsedObjects.ToArray();
+            }
 #else //LOOTLOCKER_USE_NEWTONSOFTJSON
         public static string SerializeObject(object obj)
         {
