@@ -1055,6 +1055,12 @@ namespace LootLocker
                 webRequest.SetRequestHeader("LL-SDK-Version", LootLockerConfig.current.sdk_version);
             }
 
+            webRequest.SetRequestHeader("LL-Request-Id", request.RequestId);
+            if (request.TimesRetried > 0)
+            {
+                webRequest.SetRequestHeader("LL-Retry-Attempt", request.TimesRetried.ToString());
+            }
+
             if (request.ExtraHeaders != null)
             {
                 foreach (KeyValuePair<string, string> pair in request.ExtraHeaders)
