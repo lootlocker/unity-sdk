@@ -40,6 +40,57 @@ namespace LootLockerTests.PlayMode
                 "Not deserialized, does not contain player_identifier value");
         }
 
+            [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+            public void StreamedResponse_ParsesMultipleObjectsAndCount()
+            {
+                // Given
+                string streamedJson = "{\"id\":1,\"name\":\"A\"},{\"id\":2,\"name\":\"B\"},{\"streamedObjectCount\":2}";
+
+                // When
+                var result = LootLockerJson.DeserializeStreamedResponse<TestStreamedObject>(streamedJson);
+
+                // Then
+                Assert.AreEqual(2, result.streamedObjectCount);
+                Assert.AreEqual(2, result.objects.Length);
+                Assert.AreEqual(1, result.objects[0].id);
+                Assert.AreEqual("A", result.objects[0].name);
+                Assert.AreEqual(2, result.objects[1].id);
+                Assert.AreEqual("B", result.objects[1].name);
+            }
+
+            [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+            public void StreamedResponse_HandlesEmptyInput()
+            {
+                // When
+                var result = LootLockerJson.DeserializeStreamedResponse<TestStreamedObject>("");
+
+                // Then
+                Assert.AreEqual(0, result.streamedObjectCount);
+                Assert.IsNotNull(result.objects);
+                Assert.AreEqual(0, result.objects.Length);
+            }
+
+            [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+            public void StreamedResponse_HandlesMalformedSegments()
+            {
+                // Given
+                string streamedJson = "{\"id\":1,\"name\":\"A\"},{{malformed}},{\"streamedObjectCount\":2}";
+
+                // When
+                var result = LootLockerJson.DeserializeStreamedResponse<TestStreamedObject>(streamedJson);
+
+                // Then
+                Assert.AreEqual(2, result.streamedObjectCount);
+                Assert.AreEqual(1, result.objects.Length); // Only valid object parsed
+                Assert.AreEqual(1, result.objects[0].id);
+                Assert.AreEqual("A", result.objects[0].name);
+            }
+
+            public class TestStreamedObject
+            {
+                public int id { get; set; }
+                public string name { get; set; }
+            }
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_DeserializingComplexArrayJson_Succeeds()
         {
