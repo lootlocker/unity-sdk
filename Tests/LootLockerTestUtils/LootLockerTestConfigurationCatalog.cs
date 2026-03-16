@@ -49,12 +49,16 @@ namespace LootLockerTestConfigurationUtils
                 onComplete?.Invoke(null);
                 return;
             }
-            string metadataKey = entityKind switch
+            string metadataKey = null;
+            switch (entityKind)
             {
-                "currency" => "purchased_amount",
-                "progression_points" => "progression_points_amount",
-                _ => null
-            };
+                case "currency":
+                    metadataKey = "purchased_amount";
+                    break;
+                case "progression_points":
+                    metadataKey = "progression_points_amount";
+                    break;
+            }
             var request = new LootLockerTestCreateCatalogItemRequest
             {
                 game_id = LootLockerAdminRequest.ActiveGameId,
