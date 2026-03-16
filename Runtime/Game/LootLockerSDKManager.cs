@@ -7176,6 +7176,28 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RefundByEntitlementIds(forPlayerWithUlid, entitlementIds, onComplete);
         }
 
+        /// <summary>
+        /// Create a Stripe Checkout session for a catalog item.
+        ///
+        /// This initiates a Stripe-hosted checkout flow. The response contains a <c>url</c> — open it in
+        /// a browser or webview so the player can complete the payment on Stripe's hosted checkout page.
+        ///
+        /// Stripe in-app purchases must be configured in the LootLocker dashboard for this to work.
+        /// </summary>
+        /// <param name="catalogItemId">The ULID of the catalog item to purchase</param>
+        /// <param name="itemName">The display name of the item shown on the Stripe Checkout page</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreateStripeCheckoutSession(string catalogItemId, string itemName, Action<LootLockerCreateStripeCheckoutSessionResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCreateStripeCheckoutSessionResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.CreateStripeCheckoutSession(forPlayerWithUlid, catalogItemId, itemName, onComplete);
+        }
+
 #endregion
 
         #region Collectables
