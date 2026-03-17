@@ -958,6 +958,7 @@ namespace LootLocker
 
         private void ProcessReceivedMessage(string message)
         {
+            LootLockerLogger.Log($"Processing received Presence message: {message}", LootLockerLogger.LogLevel.Debug);
             try
             {   
                 if (message.Contains("authenticated"))
