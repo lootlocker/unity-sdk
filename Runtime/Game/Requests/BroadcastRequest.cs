@@ -50,7 +50,7 @@ namespace LootLocker.Requests
     {
         /// <summary>
         /// The key for this localization entry
-        /// Some keys are system defined, eg. ll.headline, ll.body, ll.image_url, ll.action
+        /// Some keys are system defined, eg. ll.headline, ll.body, ll.image_url, ll.action, ll.action_name
         /// </summary>
         public string key { get; set; }
         /// <summary>
@@ -99,6 +99,10 @@ namespace LootLocker.Requests
         /// The action for this broadcast message
         /// </summary>
         public string action { get; set; }
+        /// <summary>
+        /// The action name for this broadcast message
+        /// </summary>
+        public string action_name { get; set; }
         /// <summary>
         /// List of the keys available in the localizations dictionary
         /// </summary>
@@ -271,6 +275,9 @@ namespace LootLocker.Requests
                                 break;
                             case "ll.action":
                                 lang.action = internalLang.localizations[k].value;
+                                break;
+                            case "ll.action_name":
+                                lang.action_name = internalLang.localizations[k].value;
                                 break;
                             default:
                                 localizationKeys.Add(internalLang.localizations[k].key);
