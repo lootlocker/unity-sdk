@@ -7179,8 +7179,9 @@ namespace LootLocker.Requests
         /// <summary>
         /// Create a Stripe Checkout session for a catalog item.
         ///
-        /// This initiates a Stripe-hosted checkout flow. The response contains a <c>url</c> — open it in
+        /// This initiates a Stripe-hosted checkout flow. The response contains a <c>checkout_link</c> — open it in
         /// a browser or webview so the player can complete the payment on Stripe's hosted checkout page.
+        /// The response also contains an <c>entitlement_id</c> which can be used to track the purchase progress via the entitlements endpoint.
         ///
         /// Stripe in-app purchases must be configured in the LootLocker dashboard for this to work.
         /// </summary>
