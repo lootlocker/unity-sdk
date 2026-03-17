@@ -479,7 +479,11 @@ namespace LootLocker.Requests
         /// <summary>
         /// The URL of the Stripe-hosted checkout page. Open this in a browser or webview to let the player complete the payment.
         /// </summary>
-        public string url { get; set; }
+        public string checkout_link { get; set; }
+        /// <summary>
+        /// The ULID of the entitlement in LootLocker tied to this purchase. Use this to track the purchase progress via the entitlements endpoint.
+        /// </summary>
+        public string entitlement_id { get; set; }
     }
 }
 
