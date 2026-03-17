@@ -13,7 +13,7 @@ namespace LootLockerTests.PlayMode
         public void Broadcasts_DeserializingBroadcasts_PopulatesConvenienceResponseObject()
         {
             // Given
-            string json = "{\"broadcasts\":[{\"id\":\"01K4QGQTNHTXHM9ET5238NB4NF\",\"name\":\"Broadcast no 5\",\"game_name\":\"MetaDataTest Aug24\",\"games\":[{\"id\":93893,\"name\":\"MetaDataTest Aug24\"}],\"publication_settings\":[{\"start\":\"2025-09-09T11:12:00Z\",\"end\":\"2025-09-11T15:15:00Z\",\"tz\":\"UTC\"}],\"languages\":[{\"language_code\":\"en\",\"localizations\":[{\"key\":\"ll.headline\",\"value\":\"Broadcast Title\"},{\"key\":\"ll.image_url\",\"value\":\"https://google.com\"},{\"key\":\"ll.action\",\"value\":\"window.open(\\\"/some/page\\\")\"},{\"key\":\"ll.body\",\"value\":\"Broadcast content\"},{\"key\":\"extra-key\",\"value\":\"extra-value\"},{\"key\":\"final-toll\",\"value\":\"troll toll\"},{\"key\":\"what are the requirements here?\",\"value\":\"{ \\\"i-dont-know\\\": true }\"}]},{\"language_code\":\"sv\",\"localizations\":[{\"key\":\"ll.headline\",\"value\":\"Meddelandetitel\"},{\"key\":\"ll.image_url\",\"value\":\"https://feet.com\"},{\"key\":\"ll.action\",\"value\":\"window.open(\\\"/some/page\\\")\"},{\"key\":\"ll.body\",\"value\":\"Lite innehåll\"},{\"key\":\"🤩🤩 Hello 🤩🤩\",\"value\":\"kjhasdkjah\"}]}]}],\"pagination\":{\"errors\":null,\"per_page\":10,\"offset\":0,\"total\":1,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
+            string json = "{\"broadcasts\":[{\"id\":\"01K4QGQTNHTXHM9ET5238NB4NF\",\"name\":\"Broadcast no 5\",\"game_name\":\"MetaDataTest Aug24\",\"games\":[{\"id\":93893,\"name\":\"MetaDataTest Aug24\"}],\"publication_settings\":[{\"start\":\"2025-09-09T11:12:00Z\",\"end\":\"2025-09-11T15:15:00Z\",\"tz\":\"UTC\"}],\"languages\":[{\"language_code\":\"en\",\"localizations\":[{\"key\":\"ll.headline\",\"value\":\"Broadcast Title\"},{\"key\":\"ll.image_url\",\"value\":\"https://google.com\"},{\"key\":\"ll.action\",\"value\":\"window.open(\\\"/some/page\\\")\"},{\"key\":\"ll.action_name\",\"value\":\"Play Now\"},{\"key\":\"ll.body\",\"value\":\"Broadcast content\"},{\"key\":\"extra-key\",\"value\":\"extra-value\"},{\"key\":\"final-toll\",\"value\":\"troll toll\"},{\"key\":\"what are the requirements here?\",\"value\":\"{ \\\"i-dont-know\\\": true }\"}]},{\"language_code\":\"sv\",\"localizations\":[{\"key\":\"ll.headline\",\"value\":\"Meddelandetitel\"},{\"key\":\"ll.image_url\",\"value\":\"https://feet.com\"},{\"key\":\"ll.action\",\"value\":\"window.open(\\\"/some/page\\\")\"},{\"key\":\"ll.action_name\",\"value\":\"Spela nu\"},{\"key\":\"ll.body\",\"value\":\"Lite innehåll\"},{\"key\":\"🤩🤩 Hello 🤩🤩\",\"value\":\"kjhasdkjah\"}]}]}],\"pagination\":{\"errors\":null,\"per_page\":10,\"offset\":0,\"total\":1,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
 
             // When
             var deserialized =
@@ -45,6 +45,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(enLang.headline, "Broadcast Title");
             Assert.AreEqual(enLang.image_url, "https://google.com");
             Assert.AreEqual(enLang.action, "window.open(\"/some/page\")");
+            Assert.AreEqual(enLang.action_name, "Play Now");
             Assert.AreEqual(enLang.body, "Broadcast content");
             Assert.AreEqual(3, enLang.localizations.Count);
             Assert.AreEqual(3, enLang.localization_keys.Length);
@@ -65,6 +66,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(sweLang.headline, "Meddelandetitel");
             Assert.AreEqual(sweLang.image_url, "https://feet.com");
             Assert.AreEqual(sweLang.action, "window.open(\"/some/page\")");
+            Assert.AreEqual(sweLang.action_name, "Spela nu");
             Assert.AreEqual(sweLang.body, "Lite innehåll");
             Assert.AreEqual(1, sweLang.localizations.Count);
             Assert.AreEqual(1, sweLang.localization_keys.Length);
