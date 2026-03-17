@@ -10,6 +10,7 @@ namespace LootLocker.LootLockerEnums
         Trigger_limit_reached = 0,
         Key_not_found = 1,
         Reward_not_found = 2,
+        Player_not_in_segment = 3,
     };
 }
 
