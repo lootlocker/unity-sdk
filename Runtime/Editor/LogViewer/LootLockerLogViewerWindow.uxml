@@ -4,7 +4,10 @@
         <ui:VisualElement name="LogViewerFlow" style="flex-grow: 1; flex-direction: column; padding: 16px; align-items: stretch;">
             <ui:VisualElement name="LogViewerToolbar" style="flex-direction: row; margin-bottom: 10px; align-items: center;">
                 <ui:Button text="← Back" name="LogViewerBackBtn" style="font-size: 12px; padding: 4px 8px; background-color: rgba(80, 80, 80, 0.3); border-color: rgba(120, 120, 120, 0.5); color: rgb(180, 180, 180); margin-right: 10px;" />
-                <ui:Button text="Clear Logs" name="ClearLogsBtn" style="font-size: 12px; padding: 4px 8px; margin-right: 10px;" />
+                <ui:VisualElement name="ClearSplitBtn" class="split-btn" style="margin-right: 10px;">
+                    <ui:Button text="Clear Logs" name="ClearLogsBtn" class="split-btn__main" />
+                    <ui:Button text="▾" name="ClearDropdownBtn" class="split-btn__arrow" />
+                </ui:VisualElement>
                 <ui:Button text="Export" name="ExportLogsBtn" style="font-size: 12px; padding: 4px 8px; margin-right: 10px;" />
                 <ui:VisualElement class="toolbar-group">
                     <ui:Toggle name="AutoScrollToggle" class="toolbar-toggle" />

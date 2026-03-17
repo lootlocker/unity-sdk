@@ -164,3 +164,29 @@
 .log-doc-icon:hover {
     color: #82cfff;
 }
+
+/* Split button (Clear Logs + dropdown arrow) */
+.split-btn {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.split-btn__main {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+    margin: 0;
+}
+
+.split-btn__arrow {
+    font-size: 11px;
+    padding: 4px 6px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.15);
+    min-width: 0;
+    margin: 0;
+}
