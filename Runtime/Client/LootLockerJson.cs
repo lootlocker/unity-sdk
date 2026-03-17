@@ -77,6 +77,16 @@ namespace LootLocker
             return jsonArray;
         }
 
+        public static T[] DeserializeObjectArray<T>(string json)
+        {
+            return DeserializeObjectArray<T>(json, LootLockerJsonSettings.Default);
+        }
+
+        public static T[] DeserializeObjectArray<T>(string json, JsonSerializerSettings options)
+        {
+            return JsonConvert.DeserializeObject<T[]>(json, options ?? LootLockerJsonSettings.Default);
+        }
+
         public static T DeserializeObject<T>(string json)
         {
             return DeserializeObject<T>(json, LootLockerJsonSettings.Default);
@@ -227,6 +237,16 @@ namespace LootLocker
             }
             jsonArray += "]";
             return jsonArray;
+        }
+
+        public static T[] DeserializeObjectArray<T>(string json)
+        {
+            return DeserializeObjectArray<T>(json, LootLockerJsonSettings.Default);
+        }
+
+        public static T[] DeserializeObjectArray<T>(string json, JsonOptions options)
+        {
+            return Json.Deserialize<T[]>(json, options ?? LootLockerJsonSettings.Default);
         }
 
         public static T DeserializeObject<T>(string json)

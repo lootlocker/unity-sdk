@@ -5,20 +5,24 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEditor.Compilation;
 using LootLocker;
 
 namespace LootLocker.LogViewer
 {
     public class LogViewerUI : LootLockerLogListener, LootLockerLogger.ILootLockerHttpLogListener
     {
-        private Button logViewerBackBtn, clearLogsBtn, exportLogsBtn;
+        private Button logViewerBackBtn, clearLogsBtn, exportLogsBtn, clearDropdownBtn;
         private Toggle autoScrollToggle, showAdminToggle;
         private TextField logSearchField;
         private DropdownField logLevelDropdown;
         private ScrollView logScrollView;
         private VisualElement logContainer;
         private Label logStatusLabel;
-        private List<LogEntry> logEntries = new List<LogEntry>();
+        private static List<ILogViewerEntry> s_allLogEntries = new List<ILogViewerEntry>();
+        private static bool s_sessionLoaded = false;
         private List<ILogViewerEntry> filteredLogEntries = new List<ILogViewerEntry>();
         private string logListenerIdentifier;
         private string searchFilter = "";
@@ -27,22 +31,26 @@ namespace LootLocker.LogViewer
         private const int MAX_LOG_ENTRIES = 1000;
         private bool showAllLogLevels = true;
         private bool showAdminRequests = false;
-        private List<LootLockerLogger.LootLockerHttpLogEntry> httpLogEntries = new List<LootLockerLogger.LootLockerHttpLogEntry>();
-        private List<ILogViewerEntry> allLogEntries = new List<ILogViewerEntry>();
+        private bool clearOnPlay = false;
+        private bool clearOnBuild = false;
+        private bool clearOnRecompile = false;
+        private const string EditorPrefsClearOnPlay = "LootLocker_LogViewer_ClearOnPlay";
+        private const string EditorPrefsClearOnBuild = "LootLocker_LogViewer_ClearOnBuild";
+        private const string EditorPrefsClearOnRecompile = "LootLocker_LogViewer_ClearOnRecompile";
+        private const string SessionStateLogEntriesKey = "LootLocker_LogViewer_LogEntries";
+        private const string SessionStateHttpLogEntriesKey = "LootLocker_LogViewer_HttpLogEntries";
         public enum NetworkRequestType { Request, Response, Error }
         public interface ILogViewerEntry { DateTime Timestamp { get; } }
         public class LogEntry : ILogViewerEntry
         {
-            public LootLockerLogger.LogLevel level;
-            public string message;
-            public Color color;
-            public NetworkRequestType? networkType;
+            public LootLockerLogger.LogLevel level { get; set; }
+            public string message { get; set; }
             public DateTime Timestamp { get; set; } = DateTime.Now;
         }
 
         public class HttpLogEntry : ILogViewerEntry
         {
-            public LootLockerLogger.LootLockerHttpLogEntry http;
+            public LootLockerLogger.LootLockerHttpLogEntry http { get; set; }
             public DateTime Timestamp { get; set; } = DateTime.Now;
         }
 
@@ -58,6 +66,10 @@ namespace LootLocker.LogViewer
             logContainer = root.Q<VisualElement>("LogContainer");
             logStatusLabel = root.Q<Label>("LogStatusLabel");
             showAdminToggle = root.Q<Toggle>("ShowAdminToggle");
+            clearDropdownBtn = root.Q<Button>("ClearDropdownBtn");
+            clearOnPlay = EditorPrefs.GetBool(EditorPrefsClearOnPlay, false);
+            clearOnBuild = EditorPrefs.GetBool(EditorPrefsClearOnBuild, false);
+            clearOnRecompile = EditorPrefs.GetBool(EditorPrefsClearOnRecompile, false);
             InitializeLogViewerEventHandlers(onBack);
             SetupLogLevelDropdown();
             RegisterLogListener();
@@ -112,6 +124,29 @@ namespace LootLocker.LogViewer
                     FilterLogs();
                 });
             }
+            if (clearDropdownBtn != null)
+                clearDropdownBtn.clickable.clicked += ShowClearOptionsDropdown;
+        }
+
+        private void ShowClearOptionsDropdown()
+        {
+            var menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Clear on Play"), clearOnPlay, () =>
+            {
+                clearOnPlay = !clearOnPlay;
+                EditorPrefs.SetBool(EditorPrefsClearOnPlay, clearOnPlay);
+            });
+            menu.AddItem(new GUIContent("Clear on Build"), clearOnBuild, () =>
+            {
+                clearOnBuild = !clearOnBuild;
+                EditorPrefs.SetBool(EditorPrefsClearOnBuild, clearOnBuild);
+            });
+            menu.AddItem(new GUIContent("Clear on Recompile"), clearOnRecompile, () =>
+            {
+                clearOnRecompile = !clearOnRecompile;
+                EditorPrefs.SetBool(EditorPrefsClearOnRecompile, clearOnRecompile);
+            });
+            menu.ShowAsContext();
         }
         private void SetupLogLevelDropdown()
         {
@@ -128,20 +163,22 @@ namespace LootLocker.LogViewer
                 return;
             string labelFreeMessage = message.Replace(LootLockerLogger.GetLogLabel(), "").Trim();
             var logEntry = new LogEntry { level = logLevel, message = labelFreeMessage, Timestamp = DateTime.Now };
-            logEntries.Add(logEntry);
-            allLogEntries.Add(logEntry);
-            if (logEntries.Count > MAX_LOG_ENTRIES)
-                logEntries.RemoveAt(0);
-            if (allLogEntries.Count > MAX_LOG_ENTRIES)
-                allLogEntries.RemoveAt(0);
+            s_allLogEntries.Add(logEntry);
+            if (s_allLogEntries.Count > MAX_LOG_ENTRIES)
+                s_allLogEntries.RemoveAt(0);
             FilterLogs(); // Always refresh UI when a new log is added
         }
         public void RegisterLogListener()
         {
             if (string.IsNullOrEmpty(logListenerIdentifier))
             {
+                if (!s_sessionLoaded)
+                    LoadFromSessionState();
                 logListenerIdentifier = LootLockerLogger.RegisterListener(this);
                 LootLockerLogger.RegisterHttpLogListener(this);
+                EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+                LootLockerBuildEvents.OnBuildStarted += OnBuildStarted;
+                CompilationPipeline.compilationStarted += OnCompilationStarted;
             }
         }
         public void UnregisterLogListener()
@@ -150,6 +187,9 @@ namespace LootLocker.LogViewer
             {
                 LootLockerLogger.UnregisterListener(logListenerIdentifier);
                 LootLockerLogger.UnregisterHttpLogListener(this);
+                EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+                LootLockerBuildEvents.OnBuildStarted -= OnBuildStarted;
+                CompilationPipeline.compilationStarted -= OnCompilationStarted;
                 logListenerIdentifier = null;
             }
         }
@@ -157,20 +197,17 @@ namespace LootLocker.LogViewer
         public void OnHttpLog(LootLockerLogger.LootLockerHttpLogEntry entry)
         {
             var httpEntry = new HttpLogEntry { http = entry, Timestamp = DateTime.Now };
-            httpLogEntries.Add(entry);
-            allLogEntries.Add(httpEntry);
-            if (httpLogEntries.Count > MAX_LOG_ENTRIES)
-                httpLogEntries.RemoveAt(0);
-            if (allLogEntries.Count > MAX_LOG_ENTRIES)
-                allLogEntries.RemoveAt(0);
+            s_allLogEntries.Add(httpEntry);
+            if (s_allLogEntries.Count > MAX_LOG_ENTRIES)
+                s_allLogEntries.RemoveAt(0);
             FilterLogs(); // Always refresh UI when a new HTTP log is added
         }
         private void ClearLogs()
         {
-            logEntries.Clear();
             filteredLogEntries.Clear();
-            httpLogEntries.Clear();
-            allLogEntries.Clear();
+            s_allLogEntries.Clear();
+            SessionState.EraseString(SessionStateLogEntriesKey);
+            SessionState.EraseString(SessionStateHttpLogEntriesKey);
             if (logContainer != null) logContainer.Clear();
             UpdateLogStatus();
         }
@@ -249,7 +286,7 @@ namespace LootLocker.LogViewer
         private void FilterLogs()
         {
             filteredLogEntries.Clear();
-            foreach (var entry in allLogEntries)
+            foreach (var entry in s_allLogEntries)
             {
                 if (ShouldShowLogViewerEntry(entry))
                     filteredLogEntries.Add(entry);
@@ -485,20 +522,91 @@ namespace LootLocker.LogViewer
             if (logStatusLabel == null) return;
             string status = $"{filteredLogEntries.Count} total messages";
             bool isFiltering = !showAllLogLevels || !string.IsNullOrEmpty(searchFilter);
-            if (isFiltering && filteredLogEntries.Count != allLogEntries.Count)
+            if (isFiltering && filteredLogEntries.Count != s_allLogEntries.Count)
                 status += $" | {filteredLogEntries.Count} filtered";
-            int networkRequests = filteredLogEntries.OfType<LogEntry>().Count(e => e.networkType == NetworkRequestType.Request);
-            int networkResponses = filteredLogEntries.OfType<LogEntry>().Count(e => e.networkType == NetworkRequestType.Response);
-            int networkErrors = filteredLogEntries.OfType<LogEntry>().Count(e => e.networkType == NetworkRequestType.Error);
             status += $" | HTTP: {filteredLogEntries.OfType<HttpLogEntry>().Count()}";
-            if (networkRequests > 0 || networkResponses > 0 || networkErrors > 0)
-                status += $" | Network: {networkRequests} req, {networkResponses} resp, {networkErrors} errors";
             logStatusLabel.text = status;
+        }
+
+        private void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state != PlayModeStateChange.ExitingEditMode) return;
+            if (clearOnPlay)
+                ClearLogs();
+            else
+                SaveToSessionState();
+        }
+
+        private void OnBuildStarted()
+        {
+            if (clearOnBuild)
+                ClearLogs();
+            else
+                SaveToSessionState();
+        }
+
+        private void OnCompilationStarted(object obj)
+        {
+            // compilationStarted fires before domain reload — save or clear now
+            if (clearOnRecompile)
+                ClearLogs();
+            else
+                SaveToSessionState();
+        }
+
+        private void SaveToSessionState()
+        {
+            List<LogEntry> logEntriesToSave = new List<LogEntry>();
+            List<HttpLogEntry> httpLogEntriesToSave = new List<HttpLogEntry>();
+            foreach (var entry in s_allLogEntries)
+            {
+                if (entry is LogEntry logEntry)
+                    logEntriesToSave.Add(logEntry);
+                else if (entry is HttpLogEntry httpEntry)
+                    httpLogEntriesToSave.Add(httpEntry);
+            }
+            var logEntriesJsonString = LootLockerJson.SerializeObjectArray(logEntriesToSave.ToArray());
+            SessionState.SetString(SessionStateLogEntriesKey, logEntriesJsonString);
+
+            var httpLogEntriesJsonString = LootLockerJson.SerializeObjectArray(httpLogEntriesToSave.ToArray());
+            SessionState.SetString(SessionStateHttpLogEntriesKey, httpLogEntriesJsonString);
+        }
+
+        private void LoadFromSessionState()
+        {
+            var logEntriesJsonString = SessionState.GetString(SessionStateLogEntriesKey, null);
+            if (!string.IsNullOrEmpty(logEntriesJsonString)) {
+                var deserializedLogEntries = LootLockerJson.DeserializeObjectArray<LogEntry>(logEntriesJsonString);
+                s_allLogEntries.AddRange(deserializedLogEntries);
+            }
+
+            var httpLogEntriesJsonString = SessionState.GetString(SessionStateHttpLogEntriesKey, null);
+            if (!string.IsNullOrEmpty(httpLogEntriesJsonString)) {
+                var deserializedHttpLogEntries = LootLockerJson.DeserializeObjectArray<HttpLogEntry>(httpLogEntriesJsonString);
+                s_allLogEntries.AddRange(deserializedHttpLogEntries);
+            }
+
+            FilterLogs(); // Apply initial filter after loading logs
         }
 
         public void Dispose()
         {
             UnregisterLogListener();
+        }
+    }
+
+    internal static class LootLockerBuildEvents
+    {
+        public static event Action OnBuildStarted;
+        internal static void RaiseOnBuildStarted() => OnBuildStarted?.Invoke();
+    }
+
+    internal class LootLockerLogViewerBuildPreprocessor : IPreprocessBuildWithReport
+    {
+        public int callbackOrder => 0;
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            LootLockerBuildEvents.RaiseOnBuildStarted();
         }
     }
 }

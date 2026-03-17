@@ -201,15 +201,15 @@ namespace LootLocker
 
         public class LootLockerHttpLogEntry
         {
-            public string Method;
-            public string Url;
-            public Dictionary<string, string> RequestHeaders;
-            public string RequestBody;
-            public int StatusCode;
-            public Dictionary<string, string> ResponseHeaders;
-            public LootLockerResponse Response;
-            public float DurationSeconds;
-            public DateTime Timestamp;
+            public string Method { get; set; }
+            public string Url { get; set; }
+            public Dictionary<string, string> RequestHeaders { get; set; }
+            public string RequestBody { get; set; }
+            public int StatusCode { get; set; }
+            public Dictionary<string, string> ResponseHeaders { get; set; }
+            public LootLockerResponse Response { get; set; }
+            public float DurationSeconds { get; set; }
+            public DateTime Timestamp { get; set; }
         }
 
         public interface ILootLockerHttpLogListener
