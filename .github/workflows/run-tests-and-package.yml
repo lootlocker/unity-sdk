@@ -766,7 +766,7 @@ jobs:
         with:
           path: unity-sdk
           fetch-depth: 0
-      - uses: lootlocker/upm-release@v1.0.9
+      - uses: lootlocker/upm-release@v1.0.10
         id: make-upm-release
         with:
           username: ${{ secrets.UNITY_EMAIL }}
