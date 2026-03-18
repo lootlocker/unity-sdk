@@ -766,7 +766,7 @@ jobs:
         with:
           path: unity-sdk
           fetch-depth: 0
-      - uses: lootlocker/upm-release@v1.0.8
+      - uses: lootlocker/upm-release@v1.0.9
         id: make-upm-release
         with:
           username: ${{ secrets.UNITY_EMAIL }}
@@ -778,3 +778,9 @@ jobs:
         with:
           name: signed-upm-package
           path: ${{ steps.make-upm-release.outputs.artifact-path }}
+      - name: Upload signing log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upm-release-log
+          path: ${{ steps.make-upm-release.outputs.log-file-path }}
