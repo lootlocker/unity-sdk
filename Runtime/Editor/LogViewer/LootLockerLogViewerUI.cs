@@ -22,7 +22,6 @@ namespace LootLocker.LogViewer
         private VisualElement logContainer;
         private Label logStatusLabel;
         private static List<ILogViewerEntry> s_allLogEntries = new List<ILogViewerEntry>();
-        private static bool s_sessionLoaded = false;
         private List<ILogViewerEntry> filteredLogEntries = new List<ILogViewerEntry>();
         private string logListenerIdentifier;
         private string searchFilter = "";
@@ -72,6 +71,7 @@ namespace LootLocker.LogViewer
             clearOnRecompile = EditorPrefs.GetBool(EditorPrefsClearOnRecompile, false);
             InitializeLogViewerEventHandlers(onBack);
             SetupLogLevelDropdown();
+            LoadFromSessionState();
             RegisterLogListener();
             showAllLogLevels = true;
             showAdminRequests = false;
@@ -168,12 +168,11 @@ namespace LootLocker.LogViewer
                 s_allLogEntries.RemoveAt(0);
             FilterLogs(); // Always refresh UI when a new log is added
         }
+
         public void RegisterLogListener()
         {
             if (string.IsNullOrEmpty(logListenerIdentifier))
             {
-                if (!s_sessionLoaded)
-                    LoadFromSessionState();
                 logListenerIdentifier = LootLockerLogger.RegisterListener(this);
                 LootLockerLogger.RegisterHttpLogListener(this);
                 EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
@@ -518,23 +517,37 @@ namespace LootLocker.LogViewer
         }
 
         private void UpdateLogStatus()
-        {
-            if (logStatusLabel == null) return;
-            string status = $"{filteredLogEntries.Count} total messages";
-            bool isFiltering = !showAllLogLevels || !string.IsNullOrEmpty(searchFilter);
-            if (isFiltering && filteredLogEntries.Count != s_allLogEntries.Count)
-                status += $" | {filteredLogEntries.Count} filtered";
-            status += $" | HTTP: {filteredLogEntries.OfType<HttpLogEntry>().Count()}";
-            logStatusLabel.text = status;
-        }
+         {
+             if (logStatusLabel == null) return;
+             string status = $"{s_allLogEntries.Count} total messages";
+             int shownCount = filteredLogEntries.Count;
+             bool isFiltering = !showAllLogLevels || !string.IsNullOrEmpty(searchFilter);
+             if (isFiltering && filteredLogEntries.Count != s_allLogEntries.Count)
+                 status += $" | {filteredLogEntries.Count} filtered";
+             if (isFiltering && shownCount != s_allLogEntries.Count)
+                 status += $" | {shownCount} shown";
+             status += $" | HTTP: {filteredLogEntries.OfType<HttpLogEntry>().Count()}";
+             logStatusLabel.text = status;
+         }
 
         private void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            if (state != PlayModeStateChange.ExitingEditMode) return;
-            if (clearOnPlay)
-                ClearLogs();
-            else
-                SaveToSessionState();
+             switch (state)
+             {
+                 case PlayModeStateChange.ExitingEditMode:
+                     // Transition: Edit -> Play
+                     if (clearOnPlay)
+                         ClearLogs();
+                     else
+                         SaveToSessionState();
+                     break;
+                 case PlayModeStateChange.ExitingPlayMode:
+                 case PlayModeStateChange.EnteredEditMode:
+                     // Transition: Play -> Edit
+                     if (!clearOnPlay)
+                         SaveToSessionState();
+                     break;
+             }
         }
 
         private void OnBuildStarted()
@@ -570,6 +583,7 @@ namespace LootLocker.LogViewer
 
             var httpLogEntriesJsonString = LootLockerJson.SerializeObjectArray(httpLogEntriesToSave.ToArray());
             SessionState.SetString(SessionStateHttpLogEntriesKey, httpLogEntriesJsonString);
+            s_allLogEntries.Clear(); // Clear in-memory logs after saving to free memory during domain reload
         }
 
         private void LoadFromSessionState()
@@ -579,12 +593,14 @@ namespace LootLocker.LogViewer
                 var deserializedLogEntries = LootLockerJson.DeserializeObjectArray<LogEntry>(logEntriesJsonString);
                 s_allLogEntries.AddRange(deserializedLogEntries);
             }
+            SessionState.EraseString(SessionStateLogEntriesKey); // Clear after loading to free memory
 
             var httpLogEntriesJsonString = SessionState.GetString(SessionStateHttpLogEntriesKey, null);
             if (!string.IsNullOrEmpty(httpLogEntriesJsonString)) {
                 var deserializedHttpLogEntries = LootLockerJson.DeserializeObjectArray<HttpLogEntry>(httpLogEntriesJsonString);
                 s_allLogEntries.AddRange(deserializedHttpLogEntries);
             }
+            SessionState.EraseString(SessionStateHttpLogEntriesKey); // Clear after loading to free memory
 
             FilterLogs(); // Apply initial filter after loading logs
         }
