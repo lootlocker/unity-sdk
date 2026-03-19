@@ -465,10 +465,6 @@ namespace LootLocker.Requests
         /// The ULID of the catalog item to purchase
         /// </summary>
         public string catalog_item_id { get; set; }
-        /// <summary>
-        /// The display name of the item shown on the Stripe Checkout page
-        /// </summary>
-        public string item_name { get; set; }
     }
 
     /// <summary>
@@ -836,12 +832,11 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
 
-        public static void CreateStripeCheckoutSession(string forPlayerWithUlid, string catalogItemId, string itemName, Action<LootLockerCreateStripeCheckoutSessionResponse> onComplete)
+        public static void CreateStripeCheckoutSession(string forPlayerWithUlid, string catalogItemId, Action<LootLockerCreateStripeCheckoutSessionResponse> onComplete)
         {
             var body = LootLockerJson.SerializeObject(new LootLockerCreateStripeCheckoutSessionRequest
             {
-                catalog_item_id = catalogItemId,
-                item_name = itemName
+                catalog_item_id = catalogItemId
             });
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.createStripeCheckoutSession.endPoint, LootLockerEndPoints.createStripeCheckoutSession.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
         }
