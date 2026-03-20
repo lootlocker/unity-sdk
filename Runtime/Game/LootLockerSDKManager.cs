@@ -9243,6 +9243,21 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Get version information for the configured game, including the current version and the full version history.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        public static void GetGameVersion(Action<LootLockerGameVersionResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGameVersionResponse>(""));
+                return;
+            }
+
+            LootLockerAPIManager.GetGameVersion(onComplete);
+        }
+
+        /// <summary>
         /// Get the Platform the user last used. This can be used to know what login method to prompt.
         /// </summary>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>

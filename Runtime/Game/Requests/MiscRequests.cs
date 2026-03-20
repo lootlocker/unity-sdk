@@ -48,6 +48,62 @@ namespace LootLocker.Requests
     {
         public string api_key { get; set; }
     };
+
+    /// <summary>
+    /// Represents a request to get game version information from the LootLocker API.
+    /// </summary>
+    [Serializable]
+    public class LootLockerGameVersionRequest
+    {
+        public string api_key { get; set; }
+    };
+
+    //==================================================
+    // Data Definitions (Game Version)
+    //==================================================
+    /// <summary>
+    /// Represents the current version details for a game in LootLocker.
+    /// </summary>
+    public class LootLockerGameVersionCurrentVersion
+    {
+        // The numerical version number of the current version
+        public int numerical_version { get; set; }
+        // The ULID version identifier of the current version
+        public string version_id { get; set; }
+        // The human-readable name of the current version
+        public string version_name { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an entry in the list of game versions for a game in LootLocker.
+    /// </summary>
+    public class LootLockerGameVersionEntry
+    {
+        // The numerical version number of this version
+        public int numerical_version { get; set; }
+        // The version identifier of this version
+        public string version_id { get; set; }
+        // The human-readable name of this version
+        public string version_name { get; set; }
+        // The version identifier for the version preceding this one
+        public string previous_version_id { get; set; }
+        // The version identifier for the version following this one
+        public string next_version_id { get; set; }
+    }
+
+    //==================================================
+    // Response Definitions (Game Version)
+    //==================================================
+    /// <summary>
+    /// Represents a response from the LootLocker API containing game version information.
+    /// </summary>
+    public class LootLockerGameVersionResponse : LootLockerResponse
+    {
+        // The current version of the game
+        public LootLockerGameVersionCurrentVersion current_version { get; set; }
+        // All versions of the game
+        public LootLockerGameVersionEntry[] versions { get; set; }
+    }
 }
 
 namespace LootLocker
@@ -65,6 +121,12 @@ namespace LootLocker
         {
             string body = LootLockerJson.SerializeObject(new LootLockerGameInfoRequest { api_key = LootLockerConfig.current.apiKey });
             LootLockerServerRequest.CallAPI("", LootLockerEndPoints.gameInfo.endPoint, LootLockerEndPoints.gameInfo.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
+        }
+
+        public static void GetGameVersion(Action<LootLockerGameVersionResponse> onComplete)
+        {
+            string body = LootLockerJson.SerializeObject(new LootLockerGameVersionRequest { api_key = LootLockerConfig.current.apiKey });
+            LootLockerServerRequest.CallAPI("", LootLockerEndPoints.gameVersion.endPoint, LootLockerEndPoints.gameVersion.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false);
         }
     }
 }
