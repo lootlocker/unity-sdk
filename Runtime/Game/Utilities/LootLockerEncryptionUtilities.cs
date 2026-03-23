@@ -18,11 +18,11 @@ namespace LootLocker.Utilities.Encryption
             {
                 aes.Key = Key;                        
                 byte[] iv = aes.IV;
-                using (MemoryStream ms = new())
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    using (CryptoStream cryptoStream = new(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        using (StreamWriter writer = new(cryptoStream))
+                        using (StreamWriter writer = new StreamWriter(cryptoStream))
                         {
                             writer.Write(message);
                         }
@@ -42,11 +42,11 @@ namespace LootLocker.Utilities.Encryption
                 aes.Key = Key;                        
                 byte[] iv = fullCipher.Take(aes.BlockSize / 8).ToArray();
                 byte[] cipherText = fullCipher.Skip(aes.BlockSize / 8).ToArray();
-                using (MemoryStream ms = new(cipherText))
+                using (MemoryStream ms = new MemoryStream(cipherText))
                 {
-                    using (CryptoStream cryptoStream = new(ms, aes.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
+                    using (CryptoStream cryptoStream = new CryptoStream(ms, aes.CreateDecryptor(Key, iv), CryptoStreamMode.Read))
                     {
-                        using (StreamReader reader = new(cryptoStream))
+                        using (StreamReader reader = new StreamReader(cryptoStream))
                         {
                             return reader.ReadToEnd();
                         }
