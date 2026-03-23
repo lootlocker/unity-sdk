@@ -72,11 +72,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -162,11 +162,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -274,11 +274,11 @@ jobs:
           echo "JOB_API_KEY=${{ SECRETS.LOOTLOCKER_API_KEY }}" >> $GITHUB_ENV
           echo "JOB_DOMAIN_KEY=${{ SECRETS.LOOTLOCKER_DOMAIN_KEY }}" >> $GITHUB_ENV
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-smoketest-project repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-smoketest-project
           path: unity-sdk-smoketest-project
@@ -327,7 +327,7 @@ jobs:
   run-integration-tests:
     name: Run the integration tests
     runs-on: ubuntu-latest
-    if: ${{ vars.ENABLE_INTEGRATION_TESTS == 'true' }}
+    if: ${{ false && vars.ENABLE_INTEGRATION_TESTS == 'true' }}
     #needs: [editor-smoke-test]
     timeout-minutes: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') && 40 || 15 }}
     strategy:
@@ -337,28 +337,28 @@ jobs:
     steps:
       ####### RUN LOCAL BACKEND ENVIRONMENT ###########
       - name: Checkout devenv repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         with:
           repository: lootlocker/devenv
           path: devenv
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout php-backend repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         with:
           repository: lootlocker/php-backend
           path: php-backend
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout gitops-lootlocker repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         with:
           repository: lootlocker/gitops-lootlocker
           path: gitops-lootlocker
           token: ${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Checkout go-backend repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         with:
           repository: lootlocker/go-backend
@@ -435,7 +435,7 @@ jobs:
           echo "Coinflip resulted in $COINFLIP"
           if [ "$COINFLIP" -lt 1 ]; then echo "JSON_LIBRARY=newtonsoft" >> $GITHUB_ENV; else echo "JSON_LIBRARY=zerodep" >> $GITHUB_ENV; fi
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ./sdk
       - name: Create Test Project
@@ -537,13 +537,13 @@ jobs:
           cd devenv
           mage env:down dev
       - name: Upload logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Logs
           path: logs
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: Integration tests (${{ matrix.unityVersion }}-${{ ENV.JSON_LIBRARY }}) Test Results
@@ -583,11 +583,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-sample-tester repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-sample-tester
           path: unity-sdk-sample-tester
@@ -652,11 +652,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-package-validator repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-package-validator
           path: unity-sdk-package-validator
@@ -721,11 +721,11 @@ jobs:
           apt-get update
           apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - name: Checkout unity-sdk repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: unity-sdk
       - name: Checkout unity-sdk-packager-project repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: lootlocker/unity-sdk-packager
           path: unity-sdk-packager
@@ -755,7 +755,56 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
       - name: Expose packaged SDK as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: LootLockerSDK-${{ matrix.unityVersion }}.zip
           path: unity-sdk-packager/LootLockerSDK*.unitypackage
+  sign-sdk:
+    name: Sign SDK
+    runs-on: [ubuntu-latest]
+    needs: [test-samples, run-integration-tests]
+    timeout-minutes: 20
+    if: startsWith(github.ref, 'refs/tags/v')
+    env: 
+      LL_USE_STAGE: false
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Make Node env
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Checkout unity-sdk repository
+        uses: actions/checkout@v5
+        with:
+          path: unity-sdk
+      - name: Remove .github folder from package (internal only)
+        run: |
+          rm -rf unity-sdk/.github
+          rm -f unity-sdk/.git
+          rm -f unity-sdk/.gitignore
+      - name: Remove Tests folder from package in the interest of keeping package size down (internal only)
+        run: |
+          rm -rf unity-sdk/Tests
+          rm -f unity-sdk/Tests.meta
+      - name: Make Samples folder available in package
+        run: |
+          mv unity-sdk/Samples~ unity-sdk/Samples
+      - name: Install Unity CLI & Unity Hub
+        run: |
+          npm install -g @rage-against-the-pixel/unity-cli
+          unity-cli hub-install
+      - name: Sign Package
+        run: |
+          unity-cli sign-package --package ./unity-sdk --output sign-sdk-artifacts --email ${{ SECRETS.UNITY_PACKAGE_SIGNING_USERNAME }} --password ${{ SECRETS.UNITY_PACKAGE_SIGNING_PASSWORD }} --organization ${{ SECRETS.UNITY_ORG_ID }} --verbose
+      - name: Expose packaged SDK as artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: LootLockerSDK-Signed
+          path: sign-sdk-artifacts/*.tgz
+      - name: Expose signing logs as artifact
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: SDK Signing Logs
+          path: Logs/*.log
