@@ -19,6 +19,10 @@ on:
         type: string
         default: "localhost:8080"
 
+concurrency:
+  group: run-tests-and-package-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   editor-smoke-test:
     name: Test SDK in Editor
