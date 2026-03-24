@@ -19,7 +19,7 @@ namespace LootLocker
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
         private static readonly string ConfigAssetsPath = $"Assets/{ConfigFolderName}/Resources/Config/{ConfigAssetName}";
-        private static readonly string ConfigResourceFolder = $"{Application.dataPath}/{ConfigFolderName}/Resources/Config";
+        private static string ConfigResourceFolder => $"{Application.dataPath}/{ConfigFolderName}/Resources/Config";
         private static readonly string ConfigFileIdentifier = ""; // Optional extra package id if you want to be able to switch between multiple configurations
         private static readonly string ConfigFileExtension = ".bytes";
         private static readonly string ConfigFileName = $"{SettingsName}" + (string.IsNullOrEmpty(ConfigFileIdentifier) ? "" : $"-{ConfigFileIdentifier}");
