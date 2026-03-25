@@ -71,17 +71,20 @@ namespace LootLocker
                 return _current;
             }
 
+
+            _current = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
+            if (_current == null)
+            {
+#if UNITY_EDITOR
+                CreateConfigFile();
+#else
+                throw new ArgumentException($"{ConfigFolderName} config does not exist. To fix this, play once in the Unity Editor before making a build.");
+#endif
+            }
+
             var fileConfig = CheckForFileConfig();
             if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
             {
-                if(!File.Exists(ConfigAssetsPath))
-                {
-                    CreateConfigFile();                    
-                }
-                else
-                {
-                    _current = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
-                }
                 _current.sdk_version = fileConfig.sdk_version;
                 _current.apiKey = fileConfig.api_key;
                 _current.game_version = fileConfig.game_version;
@@ -99,26 +102,8 @@ namespace LootLocker
 #if UNITY_EDITOR
                 _current.adminToken = null;
 #endif
-                
-                return _current;
             }
 
-            //Try to load it
-            _current = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
-
-#if UNITY_EDITOR
-            // Could not be loaded, create it
-            if (_current == null)
-            {
-                CreateConfigFile();
-            }
-
-#else
-            if (_current == null)
-            {
-                throw new ArgumentException($"{ConfigFolderName} config does not exist. To fix this, play once in the Unity Editor before making a build.");
-            }
-#endif
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             _current.CheckForSettingOverrides();
 #endif
