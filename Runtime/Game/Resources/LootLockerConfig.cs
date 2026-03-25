@@ -96,7 +96,9 @@ namespace LootLocker
                 _current.allowTokenRefresh = fileConfig.allow_token_refresh;
                 _current.prettifyJson = fileConfig.prettify_json;
                 _current.obfuscateLogs = fileConfig.obfuscate_logs;
+#if UNITY_EDITOR
                 _current.adminToken = null;
+#endif
                 
                 return _current;
             }
@@ -132,10 +134,13 @@ namespace LootLocker
                 {
                     return fileConfig;
                 }
+#if UNITY_EDITOR
                 AssetDatabase.ImportAsset(ConfigFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
                 AssetDatabase.Refresh();
-                
                 TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(ConfigFilePath);
+#else
+                TextAsset configTextAsset = null;
+#endif
                 
                 // Fallback: if Unity asset system isn't ready, read file directly from disk
                 string configText = null;
@@ -180,6 +185,7 @@ namespace LootLocker
             return fileConfig;            
         }
 
+#if UNITY_EDITOR
         private static void CreateConfigFile()
         {
             // Create a new Config
@@ -205,6 +211,7 @@ namespace LootLocker
             AssetDatabase.Refresh();
             _current = newConfig;
         }
+#endif
 
         private void CheckForSettingOverrides()
         {
