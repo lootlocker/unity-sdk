@@ -70,3 +70,4 @@ Temp~/
 #IDE generated files
 .idea
 .vscode
+.venv
