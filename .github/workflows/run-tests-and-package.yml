@@ -198,7 +198,7 @@ jobs:
             Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
         id: build-smoke-tests-gameci
-        uses: game-ci/unity-builder@v4.7.0
+        uses: game-ci/unity-builder@v4.8.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
@@ -310,7 +310,7 @@ jobs:
             Library-
       - name: Run Smoke Tests ${{ matrix.unityVersion }}-${{ matrix.testMode }}-${{ matrix.targetPlatform }}
         id: build-smoke-tests-gameci
-        uses: game-ci/unity-builder@v4.7.0
+        uses: game-ci/unity-builder@v4.8.1
         env:
           UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
