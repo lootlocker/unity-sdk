@@ -222,6 +222,12 @@ jobs:
           cat ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt
           grep -q "Run Succeeded" ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt
           exit $?
+      - name: Upload the run log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-test-log-${{ matrix.targetPlatform }}
+          path: ./builds/${{ matrix.targetPlatform }}/smokeTest_Data/LLActorOutput.txt
   webgl-build-smoke-test:
     name: Test SDK in WebGL build
     runs-on: [ubuntu-latest]
