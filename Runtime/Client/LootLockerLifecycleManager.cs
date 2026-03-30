@@ -57,10 +57,20 @@ namespace LootLocker
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoInitialize()
         {
-            if (_instance == null && Application.isPlaying)
+            if (_instance != null || !Application.isPlaying)
+            {
+                return;
+            }
+            try
             {
                 LootLockerLogger.Log("Auto-initializing LifecycleManager on application start", LootLockerLogger.LogLevel.Debug);
                 Instantiate();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LootLocker] LifecycleManager auto-initialization failed: {ex.Message}. Services will be initialized on first use.");
+                _state = LifecycleManagerState.Uninitialized;
+                _instance = null;
             }
         }
 
@@ -294,18 +304,21 @@ namespace LootLocker
                     
                     // 3. Initialize StateData (no dependencies)
                     var stateData = _RegisterAndInitializeService<LootLockerStateData>();
-                    if (eventSystem != null) 
+                    if (stateData != null && eventSystem != null)
                     {
                         stateData.SetEventSystem(eventSystem);
                     }
-                    
+
                     // 4. Initialize HTTPClient and set RateLimiter dependency
                     var httpClient = _RegisterAndInitializeService<LootLockerHTTPClient>();
-                    httpClient.SetRateLimiter(rateLimiter);
+                    if (httpClient != null)
+                    {
+                        httpClient.SetRateLimiter(rateLimiter);
+                    }
                     
                     // 5. Initialize PresenceManager (no special dependencies)
                     var presenceManager = _RegisterAndInitializeService<LootLockerPresenceManager>();
-                    if (eventSystem != null)
+                    if (presenceManager != null && eventSystem != null)
                     {
                         presenceManager.SetEventSystem(eventSystem);
                     }
