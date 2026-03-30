@@ -103,13 +103,18 @@ namespace LootLocker
             {
                 return false;
             }
+            var config = LootLockerConfig.current;
+            if (config == null)
+            {
+                return false;
+            }
 #if !UNITY_EDITOR
-            if(!LootLockerConfig.current.logInBuilds)
+            if(!config.logInBuilds)
             {
                 return false;
             }
 #endif
-            return LootLockerConfig.current == null || LootLockerConfig.current.logLevel <= logLevel;
+            return config.logLevel <= logLevel;
         }
 
         public static string RegisterListener(LootLockerLogListener listener)
