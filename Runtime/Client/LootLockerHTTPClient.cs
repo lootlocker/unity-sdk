@@ -868,7 +868,10 @@ namespace LootLocker
                 }
                 if (newSessionResponse == null || !newSessionResponse.success)
                 {
-                    LootLockerLogger.Log($"Session refresh failed for player with ulid {forPlayerWithUlid}.", LootLockerLogger.LogLevel.Error);
+                    // Session refresh failed so abort call chain
+                    LootLockerLogger.Log($"Session refresh failed for player with ulid {forPlayerWithUlid}.", LootLockerLogger.LogLevel.Warning);
+                    LootLockerEventSystem.TriggerSessionExpired(executionItem.RequestData.ForPlayerWithUlid);
+                    CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.TokenExpiredError<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
                     return;
                 }
 
