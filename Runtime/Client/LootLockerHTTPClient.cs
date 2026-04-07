@@ -157,6 +157,11 @@ namespace LootLocker
                 // Initialize request tracking
                 CurrentlyOngoingRequests = new Dictionary<string, bool>();
                 HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
+                FailedRequestHistory = new List<LootLockerFailedRequestReport>(MAX_FAILED_REQUEST_HISTORY);
+                for (int i = 0; i < MAX_FAILED_REQUEST_HISTORY; i++)
+                {
+                    FailedRequestHistory.Add(null);
+                }
                 CompletedRequestIDs = new List<string>();
                 ExecutionItemsNeedingRefresh = new UniqueList<string>();
                 OngoingIdsToCleanUp = new List<string>();
@@ -165,6 +170,14 @@ namespace LootLocker
                 
                 IsInitialized = true;
                 _instance = this;
+
+                if (!string.IsNullOrEmpty(LootLockerStateData.GetDefaultPlayerULID()))
+                {
+                    if(LootLockerFailureFeedbackCategory.Equals("Not Initialized"))
+                    {
+                        RefreshFailureFeedbackCategoryId((_ignored) => {});                  
+                    }
+                }
             }
             LootLockerLogger.Log("HTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
         }
@@ -260,7 +273,8 @@ namespace LootLocker
                         var abortedResponse = LootLockerResponseFactory.ClientError<LootLockerResponse>(
                             abortReason, 
                             executionItem.RequestData.ForPlayerWithUlid, 
-                            executionItem.RequestData.RequestStartTime
+                            executionItem.RequestData.RequestStartTime,
+                            executionItem.RequestData.RequestId
                         );
                         
                         executionItem.RequestData.CallListenersWithResult(abortedResponse);
@@ -281,6 +295,10 @@ namespace LootLocker
         {
             CurrentlyOngoingRequests?.Clear();
             HTTPExecutionQueue?.Clear();
+            for (int i = 0; i < FailedRequestHistory?.Count; i++)
+            {
+                FailedRequestHistory[i] = null;
+            }
             CompletedRequestIDs?.Clear();
             ExecutionItemsNeedingRefresh?.Clear();
             OngoingIdsToCleanUp?.Clear();
@@ -354,6 +372,7 @@ namespace LootLocker
 
         #region Private Fields
         private Dictionary<string, LootLockerHTTPExecutionQueueItem> HTTPExecutionQueue = new Dictionary<string, LootLockerHTTPExecutionQueueItem>();
+        private List<LootLockerFailedRequestReport> FailedRequestHistory = new List<LootLockerFailedRequestReport>(MAX_FAILED_REQUEST_HISTORY);
         private List<string> CompletedRequestIDs = new List<string>();
         private UniqueList<string> ExecutionItemsNeedingRefresh = new UniqueList<string>();
         private List<string> OngoingIdsToCleanUp = new List<string>();
@@ -364,6 +383,7 @@ namespace LootLocker
         private const int CLEANUP_THRESHOLD = 500;
         private DateTime _lastCleanupTime = DateTime.MinValue;
         private const int CLEANUP_INTERVAL_SECONDS = 30;
+        private const int MAX_FAILED_REQUEST_HISTORY = 30;
         #endregion
 
         #region Class Logic
@@ -490,7 +510,7 @@ namespace LootLocker
                         {
                             if (WebRequestSucceeded(completedRequest.WebRequest))
                             {
-                                CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.Success<LootLockerResponse>((int)completedRequest.WebRequest.responseCode, completedRequest.WebRequest.downloadHandler.text, completedRequest.RequestData.ForPlayerWithUlid));
+                                CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.Success<LootLockerResponse>((int)completedRequest.WebRequest.responseCode, completedRequest.WebRequest.downloadHandler.text, completedRequest.RequestData.ForPlayerWithUlid, completedRequest.RequestData.RequestStartTime, completedRequest.RequestData.RequestId));
                             }
                             else
                             {
@@ -499,7 +519,7 @@ namespace LootLocker
                         }
                         else
                         {
-                            CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.ClientError<LootLockerResponse>("Request completed but no response was present", completedRequest.RequestData.ForPlayerWithUlid));
+                            CallListenersAndMarkDone(completedRequest, LootLockerResponseFactory.ClientError<LootLockerResponse>("Request completed but no response was present", completedRequest.RequestData.ForPlayerWithUlid, completedRequest.RequestData.RequestStartTime, completedRequest.RequestData.RequestId));
                         }
                     }
 
@@ -550,7 +570,7 @@ namespace LootLocker
                 {
                     LootLockerLogger.Log($"HTTP queue full: {HTTPExecutionQueue.Count}/{configuration.MaxQueueSize} requests queued", LootLockerLogger.LogLevel.Warning);
                 }
-                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime));
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime, request.RequestId));
                 yield break;
             }
 
@@ -563,7 +583,7 @@ namespace LootLocker
                 {
                     LootLockerLogger.Log($"HTTP queue backed up: {HTTPExecutionQueue.Count - CurrentlyOngoingRequests.Count} requests queued", LootLockerLogger.LogLevel.Warning);
                 }
-                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime));
+                request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>(errorMessage, request.ForPlayerWithUlid, request.RequestStartTime, request.RequestId));
                 yield break;
             }
 
@@ -580,7 +600,7 @@ namespace LootLocker
             // Rate limiting is optional - if no RateLimiter is set, requests proceed without rate limiting
             if (_cachedRateLimiter?.AddRequestAndCheckIfRateLimitHit() == true)
             {
-                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, _cachedRateLimiter.GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid));
+                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RateLimitExceeded<LootLockerResponse>(executionItem.RequestData.Endpoint, _cachedRateLimiter.GetSecondsLeftOfRateLimit(), executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId));
                 return false;
             }
 
@@ -589,7 +609,7 @@ namespace LootLocker
             executionItem.WebRequest = CreateWebRequest(executionItem.RequestData);
             if (executionItem.WebRequest == null)
             {
-                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {executionItem.RequestData.Endpoint} failed because Unity Web Request could not be created", executionItem.RequestData.ForPlayerWithUlid));
+                CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.ClientError<LootLockerResponse>($"Call to {executionItem.RequestData.Endpoint} failed because Unity Web Request could not be created", executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId));
                 return false;
             }
 
@@ -653,7 +673,7 @@ namespace LootLocker
                     }
                 case HTTPExecutionQueueProcessingResult.Completed_Success:
                     {
-                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.Success<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid));
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.Success<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId));
                     }
                     break;
                 case HTTPExecutionQueueProcessingResult.ShouldBeRetried:
@@ -664,7 +684,7 @@ namespace LootLocker
                             // If the retry after header suggests to retry after we'd have timed out the request then handle it as a failure
                             if (executionItem.RequestStartTime + RetryAfterHeader > LootLockerConfig.current.clientSideRequestTimeOut)
                             {
-                                LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid);
+                                LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId);
                                 response.errorData = ExtractErrorData(response);
                                 if (response.errorData != null)
                                 {
@@ -691,7 +711,7 @@ namespace LootLocker
                     }
                 case HTTPExecutionQueueProcessingResult.Completed_TimedOut:
                     {
-                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RequestTimeOut<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid));
+                        CallListenersAndMarkDone(executionItem, LootLockerResponseFactory.RequestTimeOut<LootLockerResponse>(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId));
                     }
                     break;
                 case HTTPExecutionQueueProcessingResult.Completed_Failed:
@@ -728,10 +748,17 @@ namespace LootLocker
             {
                 LootLockerLogger.Log($"Failed to log HTTP request: {ex}", LootLockerLogger.LogLevel.Warning);
             }
+            
+            response.requestContext = new LootLockerRequestContext(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId);
+            
+            if (response != null && !response.success)
+            {
+                StoreFailedRequestReport(response, executionItem);
+            }
+
             CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
             executionItem.IsWaitingForSessionRefresh = false;
             executionItem.Done = true;
-            response.requestContext = new LootLockerRequestContext(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime);
             executionItem.Response = response;
             if (!CompletedRequestIDs.Contains(executionItem.RequestData.RequestId)) 
             {
@@ -906,6 +933,258 @@ namespace LootLocker
 
         #endregion
 
+        #region Failure Reporting
+        
+        /// <summary>
+        /// Data structure for storing information about failed requests for the purpose of error reporting. This is not used for successful requests to avoid unnecessary memory usage, as successful requests are expected to be much more common than failed requests.
+        /// </summary>
+        public class LootLockerFailedRequestReport
+        {
+            /// <summary>
+            /// Optional field for user provided description of the events leading up to the failed request, to be included in the error report. This can be set by the user when they choose to send an error report for a failed request, but is not required and is not expected to be set in most cases.
+            /// </summary>
+            public string UserDescription { get; set; }
+            /// <summary>
+            /// The unique client identifier for the request.
+            /// </summary>
+            public string ClientRequestId { get; set; }
+            /// <summary>
+            /// The unique server identifier for the request.
+            /// </summary>
+            public string ServerRequestId { get; set; }
+            /// <summary>
+            /// The unique identifier for the trace of the request.
+            /// </summary>
+            public string TraceId { get; set; }
+            /// <summary>
+            /// The HTTP status code returned by the server in response to the request, or 0 if the request did not receive a response.
+            /// </summary>
+            public int StatusCode { get; set; }
+            /// <summary>
+            /// The error message returned by the server in response to the request, or a client-side error message if the request did not receive a response or if an error occurred on the client side before the request was sent.
+            /// </summary>
+            public string Message { get; set; }
+            /// <summary>
+            /// The endpoint that the request was sent to, including path parameters but excluding query parameters.
+            /// </summary>
+            public string Endpoint { get; set; }
+            /// <summary>
+            /// The HTTP method used for the request (e.g. GET, POST, etc.).
+            /// </summary>
+            public string http_method { get; set; }
+            /// <summary>
+            /// The raw JSON body of the response returned by the server, or null if the request did not receive a response or if the response did not have a JSON body. This is stored as a string rather than a deserialized object to avoid unnecessary memory usage, as the response body is not expected to be used in most error reports and can be easily inspected in its raw form in the log viewer.
+            /// </summary>
+            public string ResponseJsonBody { get; set; }
+            /// <summary>
+            /// The headers returned by the server in response to the request, or null if the request did not receive a response. Each header is stored as a string in the format "Header-Name: Header-Value" for easy readability in the log viewer. This is stored as an array of strings rather than a dictionary to avoid unnecessary memory usage, as the headers are not expected to be used in most error reports and can be easily inspected in their raw form in the log viewer.
+            /// </summary>
+            public string[] ResponseHeaders { get; set; }
+            /// <summary>
+            /// The raw JSON body of the request sent to the server, or null if the request did not have a JSON body. This is stored as a string rather than a deserialized object to avoid unnecessary memory usage, as the request body is not expected to be used in most error reports and can be easily inspected in its raw form in the log viewer.
+            /// </summary>
+            public string RequestBody { get; set; }
+            /// <summary>
+            /// The headers sent to the server in the request, or null if no headers were sent. Each header is stored as a string in the format "Header-Name: Header-Value" for easy readability in the log viewer. This is stored as an array of strings rather than a dictionary to avoid unnecessary memory usage, as the headers are not expected to be used in most error reports and can be easily inspected in their raw form in the log viewer.
+            /// </summary>
+            public string[] RequestHeaders { get; set; }
+            /// <summary>
+            /// The number of times the request was retried due to failure before it ultimately failed. This can be useful information for debugging and error analysis, as a high number of retries may indicate an issue with the server or with the client's network connection.
+            /// </summary>
+            public int RetryAttempts { get; set; }
+            /// <summary>
+            /// The duration in seconds from when the request was first sent to when it ultimately failed. This can be useful information for debugging and error analysis, as a long duration may indicate an issue with the server or with the client's network connection.
+            /// </summary>
+            public float RequestDurationSeconds { get; set; }
+            /// <summary>
+            /// The timestamp of when the server responded to the request, or null if the request did not receive a response. This can be useful information for debugging and error analysis, as it can help determine if the failure was due to a server issue (e.g. if the server responded with an error) or a client issue (e.g. if the request did not receive a response).
+            /// </summary>
+            public string ServerTimestamp { get; set; }
+            /// <summary>
+            /// The timestamp of when the request ultimately failed, as recorded by the client. This can be useful information for debugging and error analysis, as it can help determine if the failure was due to a server issue (e.g. if the server responded with an error) or a client issue (e.g. if the request did not receive a response). It can also be useful for analyzing patterns of failures over time.
+            /// </summary>
+            public string ClientTimestamp { get; set; }
+            /// <summary>
+            /// The ULID of the player for whom the request was made. This can be useful information for debugging and error analysis, as it can help determine if the failure was specific to a particular player or if it was a more widespread issue. It can also be useful for analyzing patterns of failures across different players.
+            /// </summary>
+            public string PlayerUlid { get; set; }
+        }
+
+        private static string LootLockerFailureFeedbackCategory = "Not Initialized";
+
+        public bool IsFailureReportingEnabled()
+        {
+            return !string.IsNullOrEmpty(LootLockerFailureFeedbackCategory);
+        }
+
+        public string GetFailureFeedbackCategoryId()
+        {
+            return LootLockerFailureFeedbackCategory;
+        }
+
+        public void RefreshFailureFeedbackCategoryId(Action<bool> value)
+        {
+            if(string.IsNullOrEmpty(LootLockerFailureFeedbackCategory))
+            {
+                value?.Invoke(false);
+                return;
+            }
+            if(LootLockerFailureFeedbackCategory.Equals("Not Initialized"))
+            {
+                LootLockerSDKManager.ListGameFeedbackCategories((feedbackCategoriesResponse) => 
+                {
+                    if(!feedbackCategoriesResponse.success)
+                    {
+                        LootLockerLogger.Log($"Failed to retrieve feedback categories for error report. Status code: {feedbackCategoriesResponse.statusCode} and message: {feedbackCategoriesResponse.errorData.message}", LootLockerLogger.LogLevel.Debug);
+                        LootLockerFailureFeedbackCategory = null;
+                        return;
+                    }
+                    foreach(var cat in feedbackCategoriesResponse.categories)
+                    {
+                        if(cat?.name == "lootlocker_request_failure")
+                        {
+                            LootLockerFailureFeedbackCategory = cat.id;
+                            value?.Invoke(true);
+                            return;
+                        }
+                    }
+                    LootLockerFailureFeedbackCategory = null;
+                    LootLockerLogger.Log($"Failed to find appropriate category to send error report under. Feedback categories retrieved successfully but no category with name 'lootlocker_request_failure' was found. LootLocker Error reporting turned off", LootLockerLogger.LogLevel.Debug);
+                    value?.Invoke(false);
+                }, LootLockerStateData.GetDefaultPlayerULID());
+            }
+            else {
+                // Category is already initialized, just return true
+                value?.Invoke(true);
+            }
+        }
+
+        public bool TryGetFailedRequestReportForRequestId(string requestId, out LootLockerFailedRequestReport report)
+        {
+            report = null;
+            if (FailedRequestHistory == null || FailedRequestHistory.Count == 0)
+            {
+                return false;
+            }
+            foreach(var failedReport in FailedRequestHistory)
+            {
+                if(failedReport != null && failedReport.ClientRequestId.Equals(requestId))
+                {
+                    report = failedReport;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void StoreFailedRequestReport(LootLockerResponse failedResponse, LootLockerHTTPExecutionQueueItem executionItem)
+        {
+            if(string.IsNullOrEmpty(LootLockerFailureFeedbackCategory))
+            {
+                // Auto reporting is disabled, do not store error report
+                return;
+            }
+            if(failedResponse == null || failedResponse.errorData == null)
+            {
+                LootLockerLogger.Log($"Failed response or error data was null, cannot construct valid error report. Player ULID: {executionItem.RequestData.ForPlayerWithUlid}", LootLockerLogger.LogLevel.Debug);
+                return;
+            }
+            if(executionItem == null || executionItem.RequestData == null)
+            {
+                LootLockerLogger.Log($"Execution item or request data was null, cannot construct valid error report. Player ULID: {executionItem?.RequestData?.ForPlayerWithUlid}", LootLockerLogger.LogLevel.Debug);
+                return;
+            }
+
+            if(failedResponse.statusCode == 401)
+            {
+                LootLockerLogger.Log($"Request unauthorized - cannot construct valid error report for a request that was unauthorized. Player ULID: {executionItem.RequestData.ForPlayerWithUlid}", LootLockerLogger.LogLevel.Debug);
+                return;
+            }
+            if(failedResponse.errorData.retry_after_seconds > 0)
+            {
+                LootLockerLogger.Log($"Request throttled - cannot construct valid error report for a request that was throttled. Retry after {failedResponse.errorData.retry_after_seconds} seconds. Player ULID: {executionItem.RequestData.ForPlayerWithUlid}", LootLockerLogger.LogLevel.Debug);
+                return;
+            }
+
+            string failedResponsePlayerUlid = executionItem.RequestData.ForPlayerWithUlid;
+            string requestBody = null;
+            if(executionItem.RequestData.Content != null && executionItem.RequestData.Content.dataType == LootLocker.LootLockerEnums.LootLockerHTTPRequestDataType.JSON)
+            {
+                requestBody = ((LootLockerJsonBodyRequestContent)executionItem.RequestData.Content).jsonBody;
+            }
+
+            var FailedRequestReport = new LootLockerFailedRequestReport
+            {
+                ClientRequestId = executionItem.RequestData.RequestId,
+                ServerRequestId = failedResponse.errorData.request_id,
+                TraceId = failedResponse.errorData.trace_id,
+                StatusCode = failedResponse.statusCode,
+                Message = failedResponse.errorData.message,
+                Endpoint = executionItem.RequestData.FormattedURL,
+                http_method = executionItem.RequestData.HTTPMethod.ToString(),
+                ResponseJsonBody = failedResponse.text,
+                ResponseHeaders = null,
+                RequestBody = requestBody,
+                RequestHeaders = null,
+                RetryAttempts = executionItem.RequestData.TimesRetried,
+                RequestDurationSeconds = Time.time - executionItem.RequestStartTime,
+                ServerTimestamp = "", // We resolve this below
+                ClientTimestamp = (DateTime.Now - TimeSpan.FromSeconds(Time.time - executionItem.RequestStartTime)).ToString("o"), // ISO 8601 format
+                PlayerUlid = failedResponsePlayerUlid
+            };
+            
+            var requestHeaders = executionItem.RequestData.ExtraHeaders;
+            List<string> requestHeadersForReport = new List<string>();
+            if(requestHeaders != null && requestHeaders.Count > 0) {
+                foreach (var requestHeader in requestHeaders)
+                {
+                    requestHeadersForReport.Add($"{requestHeader.Key} : {requestHeader.Value}");
+                }
+            }
+            FailedRequestReport.RequestHeaders = requestHeadersForReport.ToArray();
+
+            var responseHeaders = executionItem.WebRequest?.GetResponseHeaders();
+            List<string> responseHeadersForReport = new List<string>();
+            if(responseHeaders != null && responseHeaders.Count > 0)
+            {
+                foreach (var responseHeader in responseHeaders)
+                {
+                    responseHeadersForReport.Add($"{responseHeader.Key} : {responseHeader.Value}");
+                }
+                if(responseHeaders.TryGetValue("Date", out var serverDate))
+                {
+                    if(DateTime.TryParse(serverDate, out var parsedServerDate))
+                    {
+                        FailedRequestReport.ServerTimestamp = parsedServerDate.ToString("o"); // ISO 8601 format
+                    }
+                }
+            }
+            FailedRequestReport.ResponseHeaders = responseHeadersForReport.ToArray();
+
+
+            DateTime lowestTimeStamp = DateTime.MaxValue;
+            int lowestTimeStampIndex = -1;
+            for (int i = 0; i < FailedRequestHistory?.Count; i++)
+            {
+                if (FailedRequestHistory[i] == null)
+                {
+                    FailedRequestHistory[i] = FailedRequestReport;
+                    return;
+                }
+                var dt = DateTime.Parse(FailedRequestHistory[i].ClientTimestamp);
+                if (dt < lowestTimeStamp)
+                {
+                    lowestTimeStamp = dt;
+                    lowestTimeStampIndex = i;
+                }
+            }
+            if(lowestTimeStampIndex >= 0 && lowestTimeStampIndex < FailedRequestHistory.Count)
+            {
+                FailedRequestHistory[lowestTimeStampIndex] = FailedRequestReport;
+            }
+        }
+        #endregion
+
         #region Session Refresh Helper Methods
 
         private static bool ShouldRetryRequest(long statusCode, int timesRetried)
@@ -986,7 +1265,7 @@ namespace LootLocker
 
         private LootLockerResponse ExtractFailureResponseFromExecutionItem(LootLockerHTTPExecutionQueueItem executionItem)
         {
-            LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid);
+            LootLockerResponse response = LootLockerResponseFactory.Failure<LootLockerResponse>((int)executionItem.WebRequest.responseCode, executionItem.WebRequest.downloadHandler.text, executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId);
             response.errorData = ExtractErrorData(response);
             if (response.errorData != null)
             {
@@ -1014,7 +1293,7 @@ namespace LootLocker
                 case LootLockerHTTPMethod.UPDATE_FILE:
                     if (request.Content.dataType != LootLockerHTTPRequestDataType.FILE)
                     {
-                        request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("File request without file content", request.ForPlayerWithUlid, request.RequestStartTime));
+                        request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("File request without file content", request.ForPlayerWithUlid, request.RequestStartTime, request.RequestId));
                         return null;
                     }
                     webRequest = UnityWebRequest.Post(request.FormattedURL, ((LootLockerFileRequestContent)request.Content).fileForm);
@@ -1039,7 +1318,7 @@ namespace LootLocker
                     }
                     break;
                 default:
-                    request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Unsupported HTTP Method", request.ForPlayerWithUlid, request.RequestStartTime));
+                    request.CallListenersWithResult(LootLockerResponseFactory.ClientError<LootLockerResponse>("Unsupported HTTP Method", request.ForPlayerWithUlid, request.RequestStartTime, request.RequestId));
                     return webRequest;
             }
 
