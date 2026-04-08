@@ -22,14 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write # required for gh release upload
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install Doxygen
-        run: sudo apt-get install -y doxygen graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
 
       - name: Sync navigation table
         run: bash .doxygen/sync-nav.sh
@@ -38,19 +40,32 @@ jobs:
         run: doxygen .doxygen/Doxyfile
 
       - name: Upload docs artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
         uses: actions/upload-artifact@v4
         with:
           name: sdk-docs-${{ github.sha }}
           path: docs/html/
           retention-days: 30
 
+  attach-release:
+    name: Attach docs to release
+    runs-on: ubuntu-latest
+    needs: generate-docs
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sdk-docs-${{ github.sha }}
+          path: docs/html/
+
       - name: Package docs for release
-        if: github.event_name == 'release'
         run: zip -r docs-${{ github.ref_name }}.zip docs/html/
 
       - name: Attach docs to GitHub release
-        if: github.event_name == 'release'
-        run: gh release upload ${{ github.ref_name }} docs-${{ github.ref_name }}.zip
+        run: gh release upload --clobber ${{ github.ref_name }} docs-${{ github.ref_name }}.zip
         env:
           GH_TOKEN: ${{ github.token }}
