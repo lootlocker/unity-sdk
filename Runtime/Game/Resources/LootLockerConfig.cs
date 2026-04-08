@@ -77,6 +77,10 @@ namespace LootLocker
             {
 #if UNITY_EDITOR
                 CreateConfigFile();
+                if (_current == null)
+                {
+                    throw new InvalidOperationException($"{ConfigFolderName} config could not be created or loaded. Please ensure the Resources/Config asset exists and try again.");
+                }
 #else
                 throw new ArgumentException($"{ConfigFolderName} config does not exist. To fix this, play once in the Unity Editor before making a build.");
 #endif
