@@ -69,8 +69,14 @@ namespace LootLocker
             catch (Exception ex)
             {
                 Debug.LogWarning($"[LootLocker] LifecycleManager auto-initialization failed: {ex.Message}. Services will be initialized on first use.");
-                _state = LifecycleManagerState.Uninitialized;
                 _instance = null;
+                _instanceId = 0;
+                if (_hostingGameObject != null)
+                {
+                    Destroy(_hostingGameObject);
+                    _hostingGameObject = null;
+                }
+                _state = LifecycleManagerState.Uninitialized;
             }
         }
 
