@@ -38,6 +38,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing a paginated list of followers for a player.
     /// </summary>
     public class LootLockerListFollowersResponse : LootLockerResponse
     {
@@ -52,6 +53,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing a paginated list of players that the specified player is following.
     /// </summary>
     public class LootLockerListFollowingResponse : LootLockerResponse
     {
@@ -72,6 +74,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response for follow/unfollow operations (follow, unfollow).
     /// </summary>
     public class LootLockerFollowersOperationResponse : LootLockerResponse
     {

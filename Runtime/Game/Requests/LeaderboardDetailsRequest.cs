@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace LootLocker.Requests
 {
+    /// <summary>
+    /// Response containing the full configuration details of a specific leaderboard, including its schedule and rewards.
+    /// </summary>
     public class LootLockerLeaderboardDetailResponse : LootLockerResponse
     {
         /// <summary>
@@ -53,6 +56,9 @@ namespace LootLocker.Requests
         public string ulid { get; set; }
     }
 
+    /// <summary>
+    /// A currency reward attached to a leaderboard, describing the currency and amount to grant when the reward is triggered.
+    /// </summary>
     public class LootLockerLeaderboardRewardCurrency
     {
         /// <summary>
@@ -81,6 +87,9 @@ namespace LootLocker.Requests
         public string currency_id { get; set; }
     }
 
+    /// <summary>
+    /// Details about the currency associated with a leaderboard currency reward.
+    /// </summary>
     public class LootLockerLeaderboardRewardCurrencyDetails
     {
         /// <summary>
@@ -101,6 +110,9 @@ namespace LootLocker.Requests
         public string id { get; set; }
     }
 
+    /// <summary>
+    /// A progression points reward attached to a leaderboard, granting points to a specific progression when triggered.
+    /// </summary>
     public class LootLockerLeaderboardRewardProgression
     {
         /// <summary>
@@ -129,6 +141,9 @@ namespace LootLocker.Requests
         public string reward_id { get; set; }
     }
 
+    /// <summary>
+    /// Details about the progression associated with a leaderboard progression points reward.
+    /// </summary>
     public class LootLockerLeaderboardRewardProgressionDetails
     {
         /// <summary>
@@ -149,6 +164,9 @@ namespace LootLocker.Requests
         public string id { get; set; }
     }
 
+    /// <summary>
+    /// A progression reset reward attached to a leaderboard, resetting a specific progression when triggered.
+    /// </summary>
     public class LootLockerLeaderboardRewardProgressionReset
     {
         /// <summary>
@@ -173,6 +191,9 @@ namespace LootLocker.Requests
         public string reward_id { get; set; }
     }
 
+    /// <summary>
+    /// Details about the progression associated with a leaderboard progression reset reward.
+    /// </summary>
     public class LootLockerLeaderboardRewardProgressionResetDetails
     {
         /// <summary>
@@ -189,6 +210,9 @@ namespace LootLocker.Requests
         public string id { get; set; }
     }
 
+    /// <summary>
+    /// An asset reward attached to a leaderboard, granting a specific asset (or variation or rental) when triggered.
+    /// </summary>
     public class LootLockerLeaderboardRewardAsset
     {
         /// <summary>
@@ -225,6 +249,9 @@ namespace LootLocker.Requests
         public string asset_ulid { get; set; }
     }
 
+    /// <summary>
+    /// Details about the asset associated with a leaderboard asset reward.
+    /// </summary>
     public class LootLockerLeaderboardRewardAssetDetails
     {
         /// <summary>
@@ -261,6 +288,9 @@ namespace LootLocker.Requests
         public string id { get; set; }
     }
 
+    /// <summary>
+    /// A reward attached to a leaderboard. The reward kind determines which reward type field is populated.
+    /// </summary>
     public class LootLockerLeaderboardReward
     {
         /// <summary>
@@ -293,6 +323,9 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardRewardGroup group { get; set; }
     }
 
+    /// <summary>
+    /// Rank range predicates determining which players receive a specific leaderboard reward.
+    /// </summary>
     public class LootLockerLeaderboardRewardPredicates
     {
         /// <summary>
@@ -309,6 +342,9 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardRewardPredicatesArgs args { get; set; }
     }
 
+    /// <summary>
+    /// The rank range arguments for a leaderboard reward predicate, defining the min/max rank boundaries and method.
+    /// </summary>
     public class LootLockerLeaderboardRewardPredicatesArgs
     {
         /// <summary>
@@ -329,6 +365,9 @@ namespace LootLocker.Requests
         public string direction { get; set; }
     }
 
+    /// <summary>
+    /// A group reward attached to a leaderboard, bundling multiple rewards of different types into a single named group.
+    /// </summary>
     public class LootLockerLeaderboardRewardGroup
     {
         /// <summary>
@@ -358,6 +397,9 @@ namespace LootLocker.Requests
     }
 
 
+    /// <summary>
+    /// A single reward entry within a leaderboard reward group, specifying the kind and the associated reward details.
+    /// </summary>
     public class LootLockerLeaderboardGroupRewardAssociations
     {
         /// <summary>
@@ -387,6 +429,9 @@ namespace LootLocker.Requests
 
     }
 
+    /// <summary>
+    /// The reset schedule configuration for a leaderboard, including a cron expression and the next and last reset dates.
+    /// </summary>
     public class LootLockerLeaderboardSchedule
     {
         /// <summary>

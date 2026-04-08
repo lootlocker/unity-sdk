@@ -150,6 +150,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// A key-value pair providing additional context for a notification.
     /// </summary>
     public class LootLockerNotificationContextEntry
     {
@@ -164,6 +165,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// A currency reward attached to a notification.
     /// </summary>
     public class LootLockerNotificationRewardCurrency
     {
@@ -194,6 +196,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about the currency included in a notification reward.
     /// </summary>
     public class LootLockerNotificationRewardCurrencyDetails
     {
@@ -216,6 +219,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A progression points reward attached to a notification.
     /// </summary>
     public class LootLockerNotificationRewardProgression
     {
@@ -246,6 +250,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about the progression included in a notification reward.
     /// </summary>
     public class LootLockerNotificationRewardProgressionDetails
     {
@@ -268,6 +273,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A progression reset reward attached to a notification.
     /// </summary>
     public class LootLockerNotificationRewardProgressionReset
     {
@@ -294,6 +300,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about the progression reset included in a notification reward.
     /// </summary>
     public class LootLockerNotificationRewardProgressionResetDetails
     {
@@ -312,6 +319,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// An asset reward attached to a notification.
     /// </summary>
     public class LootLockerNotificationRewardAsset
     {
@@ -350,6 +358,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about the asset included in a notification reward.
     /// </summary>
     public class LootLockerNotificationRewardAssetDetails
     {
@@ -388,6 +397,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A group reward attached to a notification, containing multiple reward associations.
     /// </summary>
     public class LootLockerNotificationRewardGroup
     {
@@ -418,6 +428,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// An individual reward association within a notification group reward.
     /// </summary>
     public class LootLockerNotificationGroupRewardAssociations
     {
@@ -449,6 +460,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// The reward body of a notification. Use the <see cref="Kind"/> field to determine which reward field is populated.
     /// </summary>
     public class LootLockerNotificationContentRewardBody
     {
@@ -480,6 +492,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// The content of a notification, including context key-value pairs and the reward body.
     /// </summary>
     public class LootLockerNotificationContent
     {
@@ -691,6 +704,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// A single notification for the player, including type, source, priority, content, and read status.
     /// </summary>
     public class LootLockerNotification
     {
@@ -753,6 +767,7 @@ namespace LootLocker.Requests
     //==================================================
     
     /// <summary>
+    /// Request to mark one or more notifications as read.
     /// </summary>
     public class LootLockerReadNotificationsRequest
     {
@@ -767,6 +782,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing a paginated list of notifications for the player.
     /// </summary>
     public class LootLockerListNotificationsResponse : LootLockerResponse
     {
@@ -955,6 +971,7 @@ namespace LootLocker.Requests
         private readonly List<string> UnreadNotifications = new List<string>();
 
         /// <summary>
+        /// Internal lookup entry mapping an identifying key to a notification's index and ID.
         /// </summary>
         private struct LootLockerNotificationLookupTableEntry
         {
@@ -966,6 +983,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response returned after marking notifications as read.
     /// </summary>
     public class LootLockerReadNotificationsResponse : LootLockerResponse
     {

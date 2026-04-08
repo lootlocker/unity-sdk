@@ -7,6 +7,10 @@ namespace LootLocker.Requests
     //==================================================
     // Data Definitions
     //==================================================
+
+    /// <summary>
+    /// Details about a leaderboard's configuration, schedule, and rewards.
+    /// </summary>
     public class LootLockerLeaderboardDetails
     {
         /// <summary>
@@ -55,28 +59,50 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardReward[] rewards { get; set; }
     }
 
+    /// <summary>
+    /// Basic player information as returned in leaderboard entries.
+    /// </summary>
     public class LootLockerPlayer
     {
+        /// <summary>The legacy integer id of the player.</summary>
         public int id { get; set; }
+        /// <summary>The public UID of the player.</summary>
         public string public_uid { get; set; }
+        /// <summary>The display name of the player.</summary>
         public string name { get; set; }
+        /// <summary>The ULID of the player.</summary>
         public string ulid { get; set; }
     }
 
+    /// <summary>
+    /// A single member's entry on a leaderboard, including their rank, score, metadata, and player information.
+    /// </summary>
     public class LootLockerLeaderboardMember
     {
+        /// <summary>The member id used to identify this entry on a generic leaderboard.</summary>
         public string member_id { get; set; }
+        /// <summary>The rank of this member on the leaderboard.</summary>
         public int rank { get; set; }
+        /// <summary>The score of this member.</summary>
         public int score { get; set; }
+        /// <summary>Player information for this member, if the leaderboard is a player leaderboard.</summary>
         public LootLockerPlayer player { get; set; }
+        /// <summary>Optional metadata string attached to this score submission.</summary>
         public string metadata { get; set; }
     }
 
+    /// <summary>
+    /// A player's rank entry across a specific leaderboard, linking the rank details to the leaderboard identifier.
+    /// </summary>
     public class LootLockerLeaderboard
     {
+        /// <summary>The rank details for the player on this leaderboard.</summary>
         public LootLockerLeaderboardMember rank { get; set; }
+        /// <summary>The legacy integer id of the leaderboard.</summary>
         public int leaderboard_id { get; set; }
+        /// <summary>The key used to identify this leaderboard.</summary>
         public string leaderboard_key { get; set; }
+        /// <summary>The ULID of this leaderboard.</summary>
         public string ulid { get; set; }
     }
     
@@ -124,12 +150,20 @@ namespace LootLocker.Requests
         public int score { get; set; }
     }
 
+    /// <summary>
+    /// Pagination state for leaderboard cursor-based pagination.
+    /// </summary>
     public class LootLockerPagination
     {
+        /// <summary>The total number of entries on the leaderboard.</summary>
         public int total { get; set; }
+        /// <summary>The cursor value for the next page of results, or null if on the last page.</summary>
         public int? next_cursor { get; set; }
+        /// <summary>The cursor value for the previous page of results, or null if on the first page.</summary>
         public int? previous_cursor { get; set; }
+        /// <summary>Whether there is a next page of results available.</summary>
         public bool allowNext { get; set; }
+        /// <summary>Whether there is a previous page of results available.</summary>
         public bool allowPrev { get; set; }
     }
 
@@ -158,30 +192,54 @@ namespace LootLocker.Requests
     //==================================================
     // Request Definitions
     //==================================================
+
+    /// <summary>
+    /// Pagination parameters for requesting a range of leaderboard entries.
+    /// </summary>
     public class LootLockerGetRequests
     {
+        /// <summary>The maximum number of entries to return per page.</summary>
         public int count { get; set; }
+        /// <summary>A cursor value specifying the entry after which to begin returning results.</summary>
         public string after { get; set; }
     }
 
+    /// <summary>
+    /// Request to submit or update a score on a leaderboard.
+    /// </summary>
     public class LootLockerSubmitScoreRequest
     {
+        /// <summary>The member id to attribute this score to on a generic leaderboard.</summary>
         public string member_id { get; set; }
+        /// <summary>The score value to submit.</summary>
         public int score { get; set; }
+        /// <summary>Optional metadata string to attach to this score submission.</summary>
         public string metadata { get; set; }
     }
 
+    /// <summary>
+    /// Request to query the theoretical rank a given score would achieve on a leaderboard.
+    /// </summary>
     public class LootLockerQueryScoreRequest
     {
+        /// <summary>The score value to query the rank for.</summary>
         public int score { get; set; }
     }
 
+    /// <summary>
+    /// Request to increment a member's score on a leaderboard by the given amount.
+    /// </summary>
     public class LootLockerIncrementScoreRequest
     {
+        /// <summary>The member id of the entry to increment.</summary>
         public string member_id { get; set; }
+        /// <summary>The amount by which to increment the score.</summary>
         public int amount { get; set; }
     }
 
+    /// <summary>
+    /// Request to retrieve entries from an archived (past) leaderboard.
+    /// </summary>
     [Serializable]
     public class LootLockerLeaderboardArchiveRequest
     {
@@ -199,18 +257,30 @@ namespace LootLocker.Requests
         public string after { get; set; }
     }
 
+    /// <summary>
+    /// Request to fetch the rank of a specific member on a leaderboard.
+    /// </summary>
     public class LootLockerGetMemberRankRequest
     {
+        /// <summary>The key or id of the leaderboard to query.</summary>
         public string leaderboardId { get; set; }
+        /// <summary>The member id to find the rank for.</summary>
         public string member_id { get; set; }
     }
 
+    /// <summary>
+    /// Request to retrieve a paginated score list for a specific leaderboard, with cursor-based pagination state.
+    /// </summary>
     public class LootLockerGetScoreListRequest : LootLockerGetRequests
     {
+        /// <summary>The key of the leaderboard to retrieve scores from.</summary>
         public string leaderboardKey { get; set; }
+        /// <summary>The cursor for the next page of results.</summary>
         public static int? nextCursor { get; set; }
+        /// <summary>The cursor for the previous page of results.</summary>
         public static int? prevCursor { get; set; }
 
+        /// <summary>Resets the pagination cursors to the start of the leaderboard.</summary>
         public static void Reset()
         {
             nextCursor = 0;
@@ -218,12 +288,19 @@ namespace LootLocker.Requests
         }
     }
 
+    /// <summary>
+    /// Request to retrieve leaderboard ranks for all leaderboards a specific member appears on.
+    /// </summary>
     public class LootLockerGetAllMemberRanksRequest : LootLockerGetRequests
     {
+        /// <summary>The legacy integer id of the member to look up.</summary>
         public int member_id { get; set; }
+        /// <summary>The cursor for the next page of results.</summary>
         public static int? nextCursor { get; set; }
+        /// <summary>The cursor for the previous page of results.</summary>
         public static int? prevCursor { get; set; }
 
+        /// <summary>Resets the pagination cursors.</summary>
         public static void Reset()
         {
             nextCursor = 0;
@@ -231,8 +308,12 @@ namespace LootLocker.Requests
         }
     }
 
+    /// <summary>
+    /// Request to retrieve leaderboard scores for a list of specific member ids.
+    /// </summary>
     public class LootLockerGetByListMembersRequest
     {
+        /// <summary>The member ids to retrieve scores for.</summary>
         public string[] members { get; set; }
     }
 
@@ -240,8 +321,9 @@ namespace LootLocker.Requests
     // Response Definitions
     //==================================================
 
-    // <summary>
-    // </summary>
+    /// <summary>
+    /// Response containing a paginated list of leaderboard definitions.
+    /// </summary>
     public class LootLockerListLeaderboardsResponse : LootLockerResponse
     {
         /// <summary>
@@ -249,48 +331,79 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerPaginationResponse<int> pagination { get; set; }
 
-        // <summary>
-        // List of details for the requested leaderboards
-        // </summary>
+        /// <summary>
+        /// List of details for the requested leaderboards
+        /// </summary>
         public LootLockerLeaderboardDetails[] items { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the rank and score for a specific member on a leaderboard.
+    /// </summary>
     public class LootLockerGetMemberRankResponse : LootLockerResponse
     {
-        // we are doing thisfor legacy reasons, since it is no longer being set on the backend
+        /// <summary>The member id for this entry (set for legacy compatibility).</summary>
         public string member_id { get; set; }
+        /// <summary>The rank of this member on the leaderboard.</summary>
         public int rank { get; set; }
+        /// <summary>The score of this member.</summary>
         public int score { get; set; }
+        /// <summary>Player information for this member, if the leaderboard is a player leaderboard.</summary>
         public LootLockerPlayer player { get; set; }
+        /// <summary>Optional metadata string attached to this score submission.</summary>
         public string metadata { get; set; }
     }
 
 
+    /// <summary>
+    /// Response containing the leaderboard entries for a list of specific member ids.
+    /// </summary>
     public class LootLockerGetByListOfMembersResponse : LootLockerResponse
     {
+        /// <summary>The leaderboard entries for the requested members.</summary>
         public LootLockerLeaderboardMember[] members { get; set; }
     }
 
+    /// <summary>
+    /// Response containing a paginated list of scores for a specific leaderboard.
+    /// </summary>
     public class LootLockerGetScoreListResponse : LootLockerResponse
     {
+        /// <summary>Pagination data for this request.</summary>
         public LootLockerPagination pagination { get; set; }
+        /// <summary>The leaderboard entries returned for this page.</summary>
         public LootLockerLeaderboardMember[] items { get; set; }
     }
 
+    /// <summary>
+    /// Response containing all leaderboard ranks for a specific member across all leaderboards.
+    /// </summary>
     public class LootLockerGetAllMemberRanksResponse : LootLockerResponse
     {
+        /// <summary>The leaderboard rank entries for the requested member.</summary>
         public LootLockerLeaderboard[] leaderboards { get; set; }
+        /// <summary>Pagination data for this request.</summary>
         public LootLockerPagination pagination { get; set; }
     }
 
+    /// <summary>
+    /// Response returned after submitting a score to a leaderboard, showing the resulting rank.
+    /// </summary>
     public class LootLockerSubmitScoreResponse : LootLockerResponse
     {
+        /// <summary>The member id of the entry that was submitted or updated.</summary>
         public string member_id { get; set; }
+        /// <summary>The resulting rank of the member after the score was submitted.</summary>
         public int rank { get; set; }
+        /// <summary>The submitted score value.</summary>
         public int score { get; set; }
+        /// <summary>The optional metadata string attached to this submission.</summary>
         public string metadata { get; set; }
     }
 
+    /// <summary>
+    /// Response containing a list of archived (past) leaderboard snapshots.
+    /// </summary>
     public class LootLockerLeaderboardArchiveResponse : LootLockerResponse
     {
         /// <summary>
@@ -299,6 +412,9 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardArchive[] archives { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the paginated entries from a specific archived leaderboard snapshot.
+    /// </summary>
     public class LootLockerLeaderboardArchiveDetailsResponse : LootLockerResponse
     {
         /// <summary>
