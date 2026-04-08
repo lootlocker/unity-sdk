@@ -7,6 +7,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Represents a friend in the friend list
     ///</summary>
     public class LootLockerFriend
     {
@@ -29,6 +30,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Represents an accepted friend with additional friend request metadata
     ///</summary>
     public class LootLockerAcceptedFriend : LootLockerFriend
     {
@@ -43,6 +45,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Represents a player that has been blocked
     ///</summary>
     public class LootLockerBlockedPlayer
     {
@@ -69,6 +72,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing the current player's paginated friend list
     /// </summary>
     public class LootLockerListFriendsResponse : LootLockerResponse
     {
@@ -83,6 +87,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing paginated incoming friend requests for the current player
     /// </summary>
     public class LootLockerListIncomingFriendRequestsResponse : LootLockerResponse
     {
@@ -97,6 +102,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing paginated outgoing friend requests sent by the current player
     /// </summary>
     public class LootLockerListOutgoingFriendRequestsResponse : LootLockerResponse
     {
@@ -111,6 +117,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing details about a specific friend of the current player
     ///</summary>
     public class LootLockerGetFriendResponse : LootLockerResponse
     {
@@ -141,6 +148,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing the paginated list of players blocked by the current player
     /// </summary>
     public class LootLockerListBlockedPlayersResponse : LootLockerResponse
     {
@@ -155,6 +163,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response for friend operations (send/accept/decline/cancel/unfriend/block/unblock)
     /// </summary>
     public class LootLockerFriendsOperationResponse : LootLockerResponse
     {
