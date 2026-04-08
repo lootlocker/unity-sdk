@@ -29,7 +29,7 @@ with open(mainpage_file) as f:
     text = f.read()
 
 updated = re.sub(
-    r'\| Topic \| What it covers \|.*?(?=\n---)',
+    r'\| Topic \| What it covers \|.*?(?=\r?\n---)',
     new_table,
     text,
     flags=re.DOTALL

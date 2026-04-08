@@ -105,7 +105,7 @@ Every callback receives a response object deriving from
 | `success` | `bool` | `true` if the call succeeded |
 | `statusCode` | `int` | HTTP status (200, 401, 422, …) |
 | `errorData` | @ref LootLocker.LootLockerErrorData "LootLockerErrorData" | Populated on failure |
-| `requestContext` | @ref LootLocker.LootLockerRequestContext "LootLockerRequestContext" | Contains contextual information about the request such as who it was made for and the id of the request |
+| `requestContext` | @ref LootLocker.LootLockerRequestContext "LootLockerRequestContext" | Contains contextual information about the request such as who it was made for and the ID of the request |
 | `text` | `string` | Raw JSON body (useful for debugging) |
 
 Always check `response.success` first. Never access payload fields if
