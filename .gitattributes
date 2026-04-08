@@ -1,6 +1,7 @@
 # Exclude development/internal files from distributed archives
 .github/                export-ignore
 .git/                   export-ignore
+.doxygen/               export-ignore
 Tests/                  export-ignore
 Tests.meta              export-ignore
 .editorconfig           export-ignore
