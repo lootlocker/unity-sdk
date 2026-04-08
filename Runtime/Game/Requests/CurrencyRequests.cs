@@ -67,6 +67,7 @@
     //==================================================
 
     /// <summary>
+    /// Response containing a list of all available currencies for this game.
     /// </summary>
     public class LootLockerListCurrenciesResponse : LootLockerResponse
     {
@@ -77,6 +78,7 @@
     };
 
     /// <summary>
+    /// Response containing a list of all denominations for a specific currency.
     /// </summary>
     public class LootLockerListDenominationsResponse : LootLockerResponse
     {

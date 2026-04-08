@@ -40,6 +40,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Request to initiate a remote session lease process.
     /// </summary>
     public class LootLockerLeaseRemoteSessionRequest
     {
@@ -65,6 +66,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to start an authorized remote session using the lease code from a completed lease process.
     /// </summary>
     public class LootLockerStartRemoteSessionRequest
     {
@@ -87,6 +89,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to refresh an existing remote session using a refresh token.
     /// </summary>
     public class LootLockerRefreshRemoteSessionRequest : LootLockerGetRequest
     {
@@ -114,6 +117,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing the lease code and redirect URL for a newly created remote session lease.
     /// </summary>
     public class LootLockerLeaseRemoteSessionResponse : LootLockerResponse
     {
@@ -144,6 +148,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response from polling the status of an ongoing remote session lease process.
     /// </summary>
     public class LootLockerRemoteSessionStatusPollingResponse : LootLockerResponse
     {
@@ -154,6 +159,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response returned when a remote session is successfully started after an authorized lease.
     /// </summary>
     public class LootLockerStartRemoteSessionResponse : LootLockerSessionResponse
     {
@@ -172,6 +178,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response returned after refreshing a remote session with a refresh token.
     /// </summary>
     public class LootLockerRefreshRemoteSessionResponse : LootLockerSessionResponse
     {
