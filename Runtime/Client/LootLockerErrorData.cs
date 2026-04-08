@@ -1,5 +1,9 @@
 ﻿namespace LootLocker
 {
+    /// <summary>
+    /// Error information returned when a LootLocker API call fails.
+    /// Contains error codes, messages, and debugging information for troubleshooting.
+    /// </summary>
     public class LootLockerErrorData
     {
         public LootLockerErrorData(int httpStatusCode, string errorMessage)

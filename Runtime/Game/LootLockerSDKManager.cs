@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -40,6 +40,7 @@ namespace LootLocker.Requests
             return LootLockerConfig.ValidateSettings();
         }
 
+        /// @ingroup Init
         /// <summary>
         /// Manually initialize the SDK.
         /// </summary>
@@ -96,9 +97,11 @@ namespace LootLocker.Requests
             return !string.IsNullOrEmpty(playerData?.SessionToken);
         }
 
+        /// @ingroup Init
         /// <summary>
         /// Utility function to check if the sdk has been initialized
         /// </summary>
+        /// <param name="skipSessionCheck">Optional : When true, skips the check for an active session token. Useful when calling SDK methods that don't require a session.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         /// <returns>True if initialized, false otherwise.</returns>
         public static bool CheckInitialized(bool skipSessionCheck = false, string forPlayerWithUlid = null)
@@ -128,11 +131,13 @@ namespace LootLocker.Requests
         }
 
 #if LOOTLOCKER_ENABLE_HTTP_CONFIGURATION_OVERRIDE
+        /// @ingroup Init
         public static void _OverrideLootLockerHTTPClientConfiguration(int maxRetries, int incrementalBackoffFactor, int initialRetryWaitTime)
         {
             LootLockerHTTPClient.Get()?.OverrideConfiguration(new LootLockerHTTPClientConfiguration(maxRetries, incrementalBackoffFactor, initialRetryWaitTime));
         }
 
+        /// @ingroup Init
         public static void _OverrideLootLockerCertificateHandler(CertificateHandler certificateHandler)
         {
             LootLockerHTTPClient.Get()?.OverrideCertificateHandler(certificateHandler);
@@ -144,12 +149,14 @@ namespace LootLocker.Requests
 
         #region SDK Customization
         #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
+        /// @ingroup SDKCustomization
         public static void SetStateWriter(ILootLockerStateWriter stateWriter)
         {
             LootLockerStateData.overrideStateWriter(stateWriter);
         }
         #endif
         
+        /// @ingroup SDKCustomization
         /// <summary>
         /// Reset the entire LootLocker SDK, clearing all services and state.
         /// This will terminate all ongoing requests and reset all cached data.
@@ -168,6 +175,7 @@ namespace LootLocker.Requests
 
         #region Multi-User Management
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Get the information from the stored state for the player with the specified ULID.
         /// </summary>
@@ -177,6 +185,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Get a list of player ULIDs that have been active since game start (or state initialization).
         /// </summary>
@@ -186,6 +195,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.GetActivePlayerULIDs();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Make the state for the player with the specified ULID to be "active".
         /// </summary>
@@ -195,6 +205,7 @@ namespace LootLocker.Requests
             return !string.IsNullOrEmpty(LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(playerUlid)?.ULID);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Make the state for the player with the specified ULID to be "inactive".
         /// 
@@ -206,6 +217,7 @@ namespace LootLocker.Requests
             LootLockerStateData.SetPlayerULIDToInactive(playerUlid);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Make the state for all currently active players to be "inactive".
         /// 
@@ -216,6 +228,7 @@ namespace LootLocker.Requests
             LootLockerStateData.SetAllPlayersToInactive();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Make the state for all currently active players except the specified player to be "inactive".
         /// 
@@ -227,6 +240,7 @@ namespace LootLocker.Requests
             LootLockerStateData.SetAllPlayersToInactiveExceptForPlayer(playerUlid);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Get a list of player ULIDs that there is a stored state for.
         /// This includes both active and inactive players.
@@ -237,6 +251,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.GetCachedPlayerULIDs();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Get the ULID of the player state that is used as the default state for calls that have no other player specified.
         /// </summary>
@@ -246,6 +261,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.GetDefaultPlayerULID();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Set the player state that is used as the default state for calls that have no other player specified.
         /// </summary>
@@ -256,6 +272,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.SetDefaultPlayerULID(playerUlid);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Get the player state for the player with the specified ULID, or the default player state if the supplied player ULID is empty, or an empty state if none of the previous are present.
         /// </summary>
@@ -266,6 +283,7 @@ namespace LootLocker.Requests
             return LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(playerUlid) ?? new LootLockerPlayerData();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Remove stored state information for the specified player if present (player will need to re-authenticate).
         /// If the player is the default player, the default player will be set to an empty state.
@@ -278,6 +296,7 @@ namespace LootLocker.Requests
             LootLockerStateData.ClearSavedStateForPlayerWithULID(playerUlid);
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Remove all stored state information (players will need to re-authenticate).
         /// This will clear all player states, including the default player state.
@@ -289,6 +308,7 @@ namespace LootLocker.Requests
             LootLockerStateData.ClearAllSavedStates();
         }
 
+        /// @ingroup MultiUserManagement
         /// <summary>
         /// Remove all stored state information except for the specified player (players will need to re-authenticate).
         /// This will clear all player states except for the specified player.
@@ -303,6 +323,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Authentication
+        /// @ingroup Authentication
         /// <summary>
         /// Verify the player's identity with the server and selected platform.
         /// </summary>
@@ -333,6 +354,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Verify(verifyRequest, onComplete);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Playstation Network session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
@@ -381,6 +403,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Playstation Network session. If your token starts with v3, then you should use VerifyPlayerAndStartPlaystationNetworkV3Session instead.
         /// 
@@ -446,6 +469,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Playstation Network session using the v3 version of PSN authentication. If your token starts with v3, then you're using this version.
         /// 
@@ -500,6 +524,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start an Android Network session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
@@ -549,6 +574,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Amazon Luna session
         /// A game can support multiple platforms, but it is recommended that a build only supports one platform.
@@ -597,6 +623,7 @@ namespace LootLocker.Requests
                 false);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a guest session.
         /// </summary>
@@ -629,6 +656,7 @@ namespace LootLocker.Requests
             StartGuestSession(playerData?.Identifier, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a guest session for an already existing player that has previously had active guest sessions on this device
         /// </summary>
@@ -654,6 +682,7 @@ namespace LootLocker.Requests
             StartGuestSession(playerData?.Identifier, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a guest session with an identifier, you can use something like SystemInfo.deviceUniqueIdentifier to tie the account to a device.
         /// </summary>
@@ -703,6 +732,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
@@ -748,6 +778,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a steam session. You can read more on how to setup Steam with LootLocker here; https://docs.lootlocker.com/how-to/authentication/steam
         /// </summary>
@@ -811,6 +842,7 @@ namespace LootLocker.Requests
             return sb.ToString();
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Create a new session for a Nintendo Switch user
         /// The Nintendo Switch platform must be enabled in the web console for this to work.
@@ -861,6 +893,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Create a new session for a Xbox One user
         /// The Xbox One platform must be enabled in the web console for this to work.
@@ -911,6 +944,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Game session for a Google User
         /// The Google sign in platform must be enabled in the web console for this to work.
@@ -961,6 +995,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Game session for a Google User
         /// The Google sign in platform must be enabled in the web console for this to work.
@@ -1013,6 +1048,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Google.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1026,6 +1062,7 @@ namespace LootLocker.Requests
             RefreshGoogleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Google.
         /// If you do not want to manually handle the refresh token we recommend using the RefreshGoogleSession(Action<LootLockerGoogleSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -1101,6 +1138,7 @@ namespace LootLocker.Requests
             );
         }
         
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Google Play Games Services session.
         /// The Google Play Games sign in platform must be enabled in the web console for this to work.
@@ -1153,6 +1191,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Google Play Games
         /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
@@ -1206,6 +1245,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Google Play Games
         /// A response code of 401 (Unauthorized) means the refresh token has expired and you'll need to sign in again
@@ -1236,6 +1276,7 @@ namespace LootLocker.Requests
             RefreshGooglePlayGamesSession(playerData.RefreshToken, onComplete, Optionals ?? playerData?.SessionOptionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Create a new session for Sign in with Apple
         /// The Apple sign in platform must be enabled in the web console for this to work.
@@ -1286,6 +1327,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Apple
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1299,6 +1341,7 @@ namespace LootLocker.Requests
             RefreshAppleSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Apple
         /// If you do not want to manually handle the refresh token we recommend using the RefreshAppleSession(Action<LootLockerAppleSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -1374,6 +1417,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Create a new session for Sign in with Apple Game Center
         /// The Apple Game Center sign in platform must be enabled in the web console for this to work.
@@ -1385,7 +1429,7 @@ namespace LootLocker.Requests
         /// <param name="salt">The salt of the signature generated from Apple Game Center Identity Verification</param>
         /// <param name="timestamp">The timestamp of the verification generated from Apple Game Center Identity Verification</param>
         /// <param name="Optionals">Optional: Additional session options</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type  for handling the response
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAppleGameCenterSessionResponse</param>
         public static void StartAppleGameCenterSession(string bundleId, string playerId, string publicKeyUrl, string signature, string salt, long timestamp, Action<LootLockerAppleGameCenterSessionResponse> onComplete, LootLockerSessionOptionals Optionals = null)
         {
             if (!CheckInitialized(true))
@@ -1429,6 +1473,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Apple Game Center
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1495,6 +1540,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Create a new session for an Epic Online Services (EOS) user
         /// The Epic Games platform must be enabled in the web console for this to work.
@@ -1545,6 +1591,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Epic
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1558,6 +1605,7 @@ namespace LootLocker.Requests
             RefreshEpicSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous session signed in with Epic
         /// If you do not want to manually handle the refresh token we recommend using the RefreshEpicSession(Action<LootLockerEpicSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -1631,6 +1679,7 @@ namespace LootLocker.Requests
             );
         }
         
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Meta / Oculus session
         /// The Meta / Oculus platform must be enabled and configured in the web console for this to work.
@@ -1683,6 +1732,7 @@ namespace LootLocker.Requests
             }, false);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous Meta / Oculus session
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1696,6 +1746,7 @@ namespace LootLocker.Requests
             RefreshMetaSession(null, onComplete, forPlayerWithUlid, Optionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous Meta session
         /// If you do not want to manually handle the refresh token we recommend using the RefreshMetaSession(Action<LootLockerMetaSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -1768,6 +1819,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Start a Discord session.
         /// The Discord platform must be enabled and configured in the web console for this to work.
@@ -1818,6 +1870,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous Discord session
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -1825,6 +1878,7 @@ namespace LootLocker.Requests
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        /// <param name="Optionals">Optional : Additional session options</param>
         public static void RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid = null, LootLockerSessionOptionals Optionals = null)
         {
 
@@ -1847,6 +1901,7 @@ namespace LootLocker.Requests
             RefreshDiscordSession(playerData.RefreshToken, onComplete, forPlayerWithUlid, Optionals);
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Refresh a previous Discord session
         /// If you do not want to manually handle the refresh token we recommend using the RefreshDiscordSession(Action<LootLockerDiscordSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -1920,6 +1975,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// End active session (if any exists)
         /// Succeeds if a session was ended or no sessions were active
@@ -1954,6 +2010,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Authentication
         /// <summary>
         /// Clears client session data. WARNING: This does not end the session in LootLocker servers.
         /// </summary>
@@ -1966,6 +2023,7 @@ namespace LootLocker.Requests
 
         #region Event System
 
+        /// @ingroup EventSystem
         /// <summary>
         /// Subscribe to SDK events using the unified event system
         /// </summary>
@@ -1977,6 +2035,7 @@ namespace LootLocker.Requests
             LootLockerEventSystem.Subscribe(eventType, handler);
         }
 
+        /// @ingroup EventSystem
         /// <summary>
         /// Unsubscribe from SDK events
         /// </summary>
@@ -1991,6 +2050,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Presence
+        /// @ingroup Presence
         /// <summary>
         /// Force start the Presence WebSocket connection manually. 
         /// This will override the automatic presence management and manually establish a connection.
@@ -2012,6 +2072,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.ConnectPresence(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Force stop the Presence WebSocket connection manually.
         /// This will override the automatic presence management and manually disconnect.
@@ -2026,6 +2087,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.DisconnectPresence(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Force stop all Presence WebSocket connections manually.
         /// This will override the automatic presence management and disconnect all active connections.
@@ -2038,6 +2100,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.DisconnectAll();
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Get a list of player ULIDs that currently have active Presence connections
         /// 
@@ -2049,6 +2112,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.ActiveClientUlids;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Update the player's presence status
         /// 
@@ -2065,6 +2129,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Get the current Presence connection state for a specific player
         /// 
@@ -2077,6 +2142,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.GetPresenceConnectionState(forPlayerWithUlid);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Check if Presence is connected and authenticated for a specific player
         /// 
@@ -2089,6 +2155,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.IsPresenceConnected(forPlayerWithUlid);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Get statistics about the Presence connection for a specific player
         /// 
@@ -2101,6 +2168,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.GetPresenceConnectionStats(forPlayerWithUlid);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Get the last status that was sent for a specific player
         /// 
@@ -2113,6 +2181,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.GetLastSentStatus(forPlayerWithUlid);
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Enable or disable the entire Presence system
         /// 
@@ -2124,6 +2193,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.IsEnabled = enabled;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Check if presence system is currently enabled
         /// 
@@ -2135,6 +2205,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.IsEnabled;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Enable or disable automatic presence connection when sessions start
         /// 
@@ -2146,6 +2217,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.AutoConnectEnabled = enabled;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Check if automatic presence connections are enabled
         /// 
@@ -2157,6 +2229,7 @@ namespace LootLocker.Requests
             return LootLockerPresenceManager.AutoConnectEnabled;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Enable or disable automatic presence disconnection when the application loses focus or is paused.
         /// When enabled, presence connections will automatically disconnect when the app goes to background
@@ -2170,6 +2243,7 @@ namespace LootLocker.Requests
             LootLockerPresenceManager.AutoDisconnectOnFocusChange = enabled;
         }
 
+        /// @ingroup Presence
         /// <summary>
         /// Check if automatic presence disconnection on focus change is enabled
         /// 
@@ -2184,6 +2258,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Connected Accounts
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// List identity providers (like Apple, Google, etc.) that are connected to the currently logged in account
         /// </summary>
@@ -2200,6 +2275,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listConnectedAccounts.endPoint, LootLockerEndPoints.listConnectedAccounts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Disconnect account from the currently logged in account
         ///
@@ -2222,6 +2298,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.disconnectAccount.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect a Google Account to the currently logged in LootLocker account allowing that google account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
@@ -2244,6 +2321,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect a Google Account (with a Google Platform specified) to the currently logged in LootLocker account allowing that google account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google account is linked into
@@ -2267,6 +2345,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect an Apple Account (authorized by Rest Sign In) to the currently logged in LootLocker account allowing that google account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Apple account is linked into
@@ -2289,6 +2368,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect a Twitch Account to the currently logged in LootLocker account allowing that Twitch account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Twitch account is linked into
@@ -2311,11 +2391,12 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect an Epic Account to the currently logged in LootLocker account allowing that Epic account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Epic account is linked into
         /// </summary>
-        /// <param name="token">The Token from Epic sign in</param>
+        /// <param name="Token">The Token from Epic sign in</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ConnectEpicAccount(string Token, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
@@ -2333,6 +2414,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect a Playstation Account to the currently logged in LootLocker account allowing that Playstation account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Playstation account is linked into
@@ -2356,6 +2438,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect an Discord Account to the currently logged in LootLocker account allowing that Discord account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Discord account is linked into
@@ -2378,6 +2461,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// Connect an identity provider (authorized using a remote link session) to the currently logged in LootLocker account allowing that authentication method to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Remote Session account is linked into
@@ -2399,6 +2483,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.attachRemoteSessionToAccount.endPoint, LootLockerEndPoints.attachRemoteSessionToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup ConnectedAccounts
         /// <summary>
         /// This endpoint lets you transfer identity providers between two players, provided you have a valid session for both.
         /// The designated identity providers will be transferred FROM the player designated by the `FromPlayerWithUlid` parameter and TO the player designated by the `ToPlayerWithUlid` parameter.
@@ -2470,6 +2555,7 @@ namespace LootLocker.Requests
 
         #region Remote Sessions
 
+        /// @ingroup RemoteSessions
         /// <summary>
         /// Start a remote session
         /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
@@ -2504,6 +2590,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup RemoteSessions
         /// <summary>
         /// Start a remote session for linking
         /// If you want to let your local user sign in using another device then you use this method. First you will get the lease information needed to allow a secondary device to authenticate.
@@ -2541,6 +2628,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup RemoteSessions
         /// <summary>
         /// Cancel an ongoing remote session process
         /// </summary>
@@ -2550,6 +2638,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RemoteSessionPoller.CancelRemoteSessionProcess(guid);
         }
 
+        /// @ingroup RemoteSessions
         /// <summary>
         /// Refresh a previous session signed in remotely.
         /// A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again
@@ -2561,6 +2650,7 @@ namespace LootLocker.Requests
             RefreshRemoteSession(null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup RemoteSessions
         /// <summary>
         /// Refresh a previous session signed in remotely.
         /// If you do not want to manually handle the refresh token we recommend using the RefreshRemoteSession(Action<LootLockerRemoteSessionResponse> onComplete, string forPlayerWithUlid) method.
@@ -2630,6 +2720,7 @@ namespace LootLocker.Requests
 
         private static Dictionary<string /*email*/, string /*token*/> _wllProcessesDictionary = new Dictionary<string, string>();
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// White Label platform must be enabled in the web console for this to work.
@@ -2642,6 +2733,7 @@ namespace LootLocker.Requests
             WhiteLabelLogin(email, password, false, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.
         /// Set remember=true to prolong the session lifetime
@@ -2690,6 +2782,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Create new user using the White Label login system.
         /// White Label platform must be enabled in the web console for this to work.
@@ -2714,6 +2807,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelSignUp(input, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Request a password reset email for the given email address.
         /// White Label platform must be enabled in the web console for this to work.
@@ -2731,6 +2825,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelRequestPasswordReset(email, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Request verify account email for the user.
         /// White Label platform must be enabled in the web console for this to work.
@@ -2749,6 +2844,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelRequestAccountVerification(userID, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Request verify account email for the user.
         /// White Label platform must be enabled in the web console for this to work.
@@ -2767,6 +2863,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.WhiteLabelRequestAccountVerification(email, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Checks for a stored session and if that session is valid.
         /// Depending on response of this method the developer can either start a session using the token, or show a login form.
@@ -2799,6 +2896,7 @@ namespace LootLocker.Requests
             VerifyWhiteLabelSession(existingSessionEmail, existingSessionToken, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Checks for a stored session and if that session is valid.
         /// Depending on response of this method the developer can either start a session using the token, or show a login form.
@@ -2843,6 +2941,7 @@ namespace LootLocker.Requests
             VerifyWhiteLabelSession(existingSessionEmail, existingSessionToken, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Checks if the provided session token is valid for the provided White Label email.
         /// Depending on response of this method the developer can either start a session using the token,
@@ -2884,6 +2983,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Start a LootLocker Session using the cached White Label token and email if any exist
         /// White Label platform must be enabled in the web console for this to work.
@@ -2938,6 +3038,7 @@ namespace LootLocker.Requests
             StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Start a LootLocker Session using the cached White Label token for the specified email if it exist
         /// White Label platform must be enabled in the web console for this to work.
@@ -2991,12 +3092,12 @@ namespace LootLocker.Requests
             StartWhiteLabelSession(new LootLockerWhiteLabelSessionRequest() { email = email, token = token, optionals = Optionals }, onComplete);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Start a LootLocker Session using the provided White Label request.
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>
         /// <param name="sessionRequest">A White Label Session Request with inner values already set</param>
-        /// <param name="Optionals">Optional parameters for the session start request</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerSessionResponse</param>
         public static void StartWhiteLabelSession(LootLockerWhiteLabelSessionRequest sessionRequest, Action<LootLockerSessionResponse> onComplete)
         {
@@ -3039,6 +3140,7 @@ namespace LootLocker.Requests
                 false);
         }
 
+        /// @ingroup WhiteLabel
         /// <summary>
         /// Log in a White Label user with the given email and password combination, verify user, and start a White Label Session. If that succeeds, then also start a LootLocker Session.
         /// The response is nested. The top properties will give the complete success condition and eventual error data. Nested inside the response you can also find the specific responses of the two composite calls using LoginResponse and SessionResponse respectively
@@ -3068,6 +3170,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Player
+        /// @ingroup Player
         /// <summary>
         /// Get information about the currently logged in player such as name and different ids to use for subsequent calls to LootLocker methods
         /// </summary>
@@ -3085,6 +3188,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// List information for one or more other players
         /// </summary>
@@ -3119,6 +3223,7 @@ namespace LootLocker.Requests
                 onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get the players inventory.
         /// </summary>
@@ -3147,6 +3252,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get the players inventory.
         /// </summary>
@@ -3162,6 +3268,7 @@ namespace LootLocker.Requests
             GetInventory(-1, -1, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get the players inventory.
         /// </summary>
@@ -3181,6 +3288,7 @@ namespace LootLocker.Requests
 
         }
 
+        /// @ingroup Player
         /// <summary>
         /// List player inventory with default parameters (no filters, first page, default page size).
         /// </summary>
@@ -3191,6 +3299,7 @@ namespace LootLocker.Requests
             ListPlayerInventory(new LootLockerListSimplifiedInventoryRequest(), 100, 1, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// List player inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
@@ -3204,6 +3313,8 @@ namespace LootLocker.Requests
         /// </param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListPlayerInventory(LootLockerListSimplifiedInventoryRequest request, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
@@ -3220,6 +3331,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// List character inventory with default parameters (no filters, first page, default page size).
         /// </summary>
@@ -3230,6 +3342,7 @@ namespace LootLocker.Requests
             ListCharacterInventory(new LootLockerListSimplifiedInventoryRequest(), 0, 100, 1, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// List character inventory with minimal response data. Due to looking up less data, this endpoint is significantly faster than GetInventory.
         /// </summary>
@@ -3244,6 +3357,8 @@ namespace LootLocker.Requests
         /// <param name="characterId">Optional : Filter inventory by character ID.</param>
         /// <param name="perPage">Optional : Number of items per page.</param>
         /// <param name="page">Optional : Page number to retrieve.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListCharacterInventory(LootLockerListSimplifiedInventoryRequest request, int characterId, int perPage, int page, Action<LootLockerSimpleInventoryResponse> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
@@ -3262,6 +3377,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, LootLockerJson.SerializeObject(request), onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get the amount of credits/currency that the player has.
         /// </summary>
@@ -3279,6 +3395,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get assets that have been given to the currently logged in player since the last time this endpoint was called.
         /// </summary>
@@ -3296,6 +3413,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get asset deactivations for the currently logged in player since the last time this endpoint was called.
         /// </summary>
@@ -3313,6 +3431,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Initiate DLC Migration for the player: https://docs.lootlocker.com/background/live-ops-tools#dlc-migration
         /// 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any. If you only want the ID's of the assets you can also use  GetDLCMigrated(Action<LootLockerDlcResponse> onComplete).
@@ -3331,6 +3450,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get a list of DLC's migrated for the player. This response will only list the asset-ID's of the migrated DLC, if you want more information about the assets, use GetAssetNotification(Action<LootLockerPlayerAssetNotificationsResponse> onComplete) instead.
         /// </summary>
@@ -3348,6 +3468,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Set the players profile to be private. This means that their inventory will not be displayed publicly on Steam and other places.
         /// </summary>
@@ -3365,6 +3486,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Set the players profile to public. This means that their inventory will be displayed publicly on Steam and other places.
         /// </summary>
@@ -3382,6 +3504,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get the logged in players name.
         /// </summary>
@@ -3399,6 +3522,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Set the logged in players name. Max length of a name is 255 characters.
         /// </summary>
@@ -3451,6 +3575,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get players 1st party platform ID's from the provided list of playerID's.
         /// </summary>
@@ -3471,6 +3596,7 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get players 1st party platform ID's from the provided list of playerID's.
         /// </summary>
@@ -3491,6 +3617,7 @@ namespace LootLocker.Requests
             }, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by playerID's.
         /// </summary>
@@ -3514,6 +3641,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_public_uid", stringPlayerIds.ToArray(), onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by public playerID's.
         /// </summary>
@@ -3531,6 +3659,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_public_uid", playerPublicUIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by public playerID's.
         /// </summary>
@@ -3548,6 +3677,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_ulid", playerUlids, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by public playerID's.
         /// </summary>
@@ -3565,6 +3695,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_guest_login_id", guestLoginIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by public playerID's.
         /// </summary>
@@ -3582,6 +3713,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "player_name", playerNames, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by steam ID's
         /// </summary>
@@ -3605,6 +3737,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "steam_id", stringSteamIds.ToArray(), onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by Steam ID's
         /// </summary>
@@ -3622,6 +3755,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "steam_id", steamIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         ///Get player names and important ids of a set of players from their last active platform by PSN ID's
         /// </summary>
@@ -3645,6 +3779,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "psn_id", stringPsnIds.ToArray(), onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by PSN ID's
         /// </summary>
@@ -3662,6 +3797,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "psn_id", psnIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by Xbox ID's
         /// </summary>
@@ -3679,6 +3815,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "xbox_id", xboxIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by Epic Games ID's
         /// </summary>
@@ -3696,6 +3833,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "epic_games_id", epicGamesIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Get player names and important ids of a set of players from their last active platform by Google Play Games ID's
         /// </summary>
@@ -3713,6 +3851,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupPlayerNames(forPlayerWithUlid, "google_play_games_id", googlePlayGamesIds, onComplete);
         }
 
+        /// @ingroup Player
         /// <summary>
         /// Mark the logged in player for deletion. After 30 days the player will be deleted from the system.
         /// </summary>
@@ -3738,6 +3877,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Player files
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Returns a URL where you can access the file. You can get the ID of files when you upload them, or call the list endpoint. 
         /// </summary>
@@ -3757,6 +3897,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Returns all the files that your currently active player own.
         /// </summary>
@@ -3773,9 +3914,11 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.getPlayerFiles.endPoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Returns all public files that the player with the provided playerID owns.
         /// </summary>
+        /// <param name="playerId">The ID of the player whose public files to retrieve</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFilesResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetAllPlayerFiles(int playerId, Action<LootLockerPlayerFilesResponse> onComplete, string forPlayerWithUlid = null)
@@ -3791,6 +3934,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the currently active player.
         /// </summary>
@@ -3832,6 +3976,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file with the provided name and content. The file will be owned by the player with the provided playerID.
         /// It will not be viewable by other players.
@@ -3845,6 +3990,7 @@ namespace LootLocker.Requests
             UploadPlayerFile(pathToFile, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file using a Filestream. The file will be owned by the currently active player.
         /// </summary>
@@ -3885,6 +4031,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file using a Filestream. The file will be owned by the currently active player.
         /// </summary>
@@ -3897,6 +4044,7 @@ namespace LootLocker.Requests
             UploadPlayerFile(fileStream, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
@@ -3927,6 +4075,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Upload a file using a byte array. Can be useful if you want to upload without storing anything on disk. The file will be owned by the currently active player.
         /// </summary>
@@ -3940,6 +4089,7 @@ namespace LootLocker.Requests
             UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerFiles
         ///////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
@@ -3977,6 +4127,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Update an existing player file with a new file using a Filestream. Can be useful if you want to upload without storing anything on disk.
         /// </summary>
@@ -4012,6 +4163,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// Update an existing player file with a new file using a byte array. Can be useful if you want to upload without storing anything on disk.
         /// </summary>
@@ -4036,6 +4188,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup PlayerFiles
         /// <summary>
         /// The file will be deleted immediately and the action can not be reversed. You will get the ID of files when you upload a file, or with GetAllPlayerFiles().
         /// </summary>
@@ -4058,6 +4211,7 @@ namespace LootLocker.Requests
 
         #region Player progressions
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
@@ -4086,6 +4240,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
@@ -4097,6 +4252,7 @@ namespace LootLocker.Requests
             GetPlayerProgressions(count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions the player is currently on.
         /// </summary>
@@ -4107,6 +4263,7 @@ namespace LootLocker.Requests
             GetPlayerProgressions(-1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns a single progression the player is currently on.
         /// </summary>
@@ -4126,6 +4283,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Adds points to a player progression.
         /// </summary>
@@ -4148,6 +4306,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Subtracts points from a player progression.
         /// </summary>
@@ -4170,6 +4329,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Resets a player progression.
         /// </summary>
@@ -4189,6 +4349,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Deletes a player progression.
         /// </summary>
@@ -4208,6 +4369,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Registers a player progression if it doesn't exist. Same as adding 0 points to a progression.
         /// </summary>
@@ -4219,6 +4381,7 @@ namespace LootLocker.Requests
             AddPointsToPlayerProgression(progressionKey, 0, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions that the specified player is currently on.
         /// </summary>
@@ -4248,6 +4411,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions that the specified player is currently on.
         /// </summary>
@@ -4260,6 +4424,7 @@ namespace LootLocker.Requests
             GetOtherPlayersProgressions(playerUlid, count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns multiple progressions that the specified player is currently on.
         /// </summary>
@@ -4271,6 +4436,7 @@ namespace LootLocker.Requests
             GetOtherPlayersProgressions(playerUlid, -1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup PlayerProgressions
         /// <summary>
         /// Returns a single progression that the specified player is currently on.
         /// </summary>
@@ -4295,6 +4461,7 @@ namespace LootLocker.Requests
 
         #region Hero
 
+        /// @ingroup Hero
         /// <summary>
         /// Create a hero with the provided type and name. The hero will be owned by the currently active player.
         /// </summary>
@@ -4321,6 +4488,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateHero(data, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List the heroes with names and character information
         /// </summary>
@@ -4336,6 +4504,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetGameHeroes(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List the heroes that the current player owns
         /// </summary>
@@ -4352,6 +4521,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListPlayerHeroes(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List player that the player with the specified SteamID64 owns
         /// </summary>
@@ -4369,6 +4539,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListOtherPlayersHeroesBySteamID64(forPlayerWithUlid, steamID64, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Create a hero for the current player with the supplied name from the game hero specified with the supplied hero id, asset variation id, and whether to set as default.
         /// </summary>
@@ -4396,6 +4567,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateHeroWithVariation(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Return information about the requested hero on the current player
         /// </summary>
@@ -4413,6 +4585,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetHero(forPlayerWithUlid, heroId, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Get the default hero for the player with the specified SteamID64
         /// </summary>
@@ -4431,6 +4604,7 @@ namespace LootLocker.Requests
 
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Update the name of the hero with the specified id and/or set it as default for the current player
         /// </summary>
@@ -4459,6 +4633,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateHero(forPlayerWithUlid, lootLockerGetRequest, data, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Remove the hero with the specified id from the current players list of heroes.
         /// </summary>
@@ -4476,6 +4651,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeleteHero(forPlayerWithUlid, heroID, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List Asset Instances owned by the specified hero
         /// </summary>
@@ -4493,10 +4669,11 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetHeroInventory(forPlayerWithUlid, heroID, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List the loadout of the specified hero that the current player owns
         /// </summary>
-        /// <param name="heroID">HeroID Id of the hero</param>
+        /// <param name="HeroID">Id of the hero</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerHeroLoadoutResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GetHeroLoadout(int HeroID, Action<LootLockerHeroLoadoutResponse> onComplete, string forPlayerWithUlid = null)
@@ -4510,6 +4687,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetHeroLoadout(forPlayerWithUlid, HeroID, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// List the loadout of the specified hero that the another player owns
         /// </summary>
@@ -4527,6 +4705,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetOtherPlayersHeroLoadout(forPlayerWithUlid, heroID, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Equip the specified Asset Instance to the specified Hero that the current player owns
         /// </summary>
@@ -4551,6 +4730,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AddAssetToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Equip the specified Asset Variation to the specified Hero that the current player owns
         /// </summary>
@@ -4577,6 +4757,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AddAssetVariationToHeroLoadout(forPlayerWithUlid, heroID, data, onComplete);
         }
 
+        /// @ingroup Hero
         /// <summary>
         /// Unequip the specified Asset Instance to the specified Hero that the current player owns
         /// </summary>
@@ -4982,6 +5163,7 @@ namespace LootLocker.Requests
 
         #region Character progressions
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Returns multiple progressions the character is currently on.
         /// </summary>
@@ -5011,6 +5193,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Returns multiple progressions the character is currently on.
         /// </summary>
@@ -5023,6 +5206,7 @@ namespace LootLocker.Requests
             GetCharacterProgressions(characterId, count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Returns multiple progressions the character is currently on.
         /// </summary>
@@ -5034,6 +5218,7 @@ namespace LootLocker.Requests
             GetCharacterProgressions(characterId, -1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Returns a single progression the character is currently on.
         /// </summary>
@@ -5054,6 +5239,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Adds points to a character progression.
         /// </summary>
@@ -5077,6 +5263,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Subtracts points from a character progression.
         /// </summary>
@@ -5100,6 +5287,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Resets a character progression.
         /// </summary>
@@ -5120,6 +5308,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup CharacterProgressions
         /// <summary>
         /// Deletes a character progression.
         /// </summary>
@@ -5143,6 +5332,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region PlayerStorage
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Get the player storage for the currently active player (key/values).
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5159,6 +5349,7 @@ namespace LootLocker.Requests
             }
             LootLockerAPIManager.GetEntirePersistentStorage(forPlayerWithUlid, onComplete);
         }
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Get the player storage as a Dictionary<string, string> for the currently active player (key/values).
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5176,6 +5367,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetEntirePersistentStorage(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Get a specific key from the player storage for the currently active player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5196,6 +5388,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetSingleKeyPersistentStorage(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Update or create a key/value pair in the player storage for the currently active player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5217,6 +5410,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Update or create a key/value pair in the player storage for the currently active player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5239,6 +5433,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Update or create multiple key/value pairs in the player storage for the currently active player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5257,6 +5452,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateOrCreateKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Delete a key from the player storage for the currently active player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5277,6 +5473,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeleteKeyValue(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup PlayerStorage
         /// <summary>
         /// Get the public player storage(key/values) for a specific player.
         /// Note: The Player Metadata feature will over time replace Player Persistent Storage.
@@ -5300,6 +5497,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Assets
+        /// @ingroup Assets
         /// <summary>
         /// Get the available contexts for the game.
         /// </summary>
@@ -5315,6 +5513,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetContext(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get the available assets for the game. Up to 200 at a time.
         /// </summary>
@@ -5337,6 +5536,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAssetsOriginal(forPlayerWithUlid, onComplete, assetCount, idOfLastAsset, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get the available assets for the game. Up to 200 at a time. Includes amount of assets in the response.
         /// </summary>
@@ -5367,6 +5567,7 @@ namespace LootLocker.Requests
             }, assetCount, null, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get the next set of assets after a previous call to GetAssetsOriginal or GetAssetListWithCount.
         /// </summary>
@@ -5397,6 +5598,7 @@ namespace LootLocker.Requests
             }, assetCount, LootLockerAssetRequest.lastId, filter, includeUGC, assetFilters, UGCCreatorPlayerID, contextID);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Reset the last id used in GetAssetNextList().
         /// </summary>
@@ -5405,6 +5607,7 @@ namespace LootLocker.Requests
             LootLockerAssetRequest.lastId = 0;
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get information about a specific asset.
         /// </summary>
@@ -5416,6 +5619,7 @@ namespace LootLocker.Requests
             GetAssetById(assetId, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get information about a specific asset.
         /// </summary>
@@ -5437,6 +5641,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAssetById(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// List the current players favorite assets.
         /// </summary>
@@ -5452,6 +5657,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListFavouriteAssets(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Add an asset to the current players favorite assets.
         /// </summary>
@@ -5470,6 +5676,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AddFavouriteAsset(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Remove an asset from the current players favorite assets.
         /// </summary>
@@ -5488,6 +5695,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RemoveFavouriteAsset(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Get multiple assets by their IDs.
         /// </summary>
@@ -5509,16 +5717,19 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAssetsById(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Grant an Asset to the Player's Inventory.
         /// </summary>
         /// <param name="assetID">The Asset you want to create an Instance of and give to the current player</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGrantAssetResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void GrantAssetToPlayerInventory(int assetID, Action<LootLockerGrantAssetResponse> onComplete, string forPlayerWithUlid = null)
         {
             GrantAssetToPlayerInventory(assetID, null, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// Grant an Asset Instance to the Player's Inventory.
         /// </summary>
@@ -5543,6 +5754,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GrantAssetToPlayerInventory(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// List assets with default parameters (no filters, first page, default page size).
         /// </summary>
@@ -5553,6 +5765,7 @@ namespace LootLocker.Requests
             ListAssets(new LootLockerListAssetsRequest(), onComplete, forPlayerWithUlid: forPlayerWithUlid);
         }
 
+        /// @ingroup Assets
         /// <summary>
         /// List assets with configurable response data. Use this to limit the fields returned in the response and improve performance.
         /// </summary>
@@ -5596,6 +5809,7 @@ namespace LootLocker.Requests
         #endregion
         
         #region AssetInstance
+        /// @ingroup AssetInstance
         /// <summary>
         /// Get all key/value pairs for all asset instances.
         /// </summary>
@@ -5611,6 +5825,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllKeyValuePairs(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Get all key/value pairs for a specific asset instance.
         /// </summary>
@@ -5629,6 +5844,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllKeyValuePairsToAnInstance(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Get a specific key/value pair for a specific asset instance.
         /// </summary>
@@ -5649,6 +5865,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAKeyValuePairById(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Create a new key/value pair for a specific asset instance.
         /// </summary>
@@ -5672,6 +5889,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateKeyValuePair(forPlayerWithUlid, data, createKeyValuePairRequest, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance. Data is provided as key/value pairs.
         /// </summary>
@@ -5697,6 +5915,7 @@ namespace LootLocker.Requests
             createKeyValuePairRequest.storage = temp.ToArray();
             LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(forPlayerWithUlid, request, createKeyValuePairRequest, onComplete);
         }
+        /// @ingroup AssetInstance
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance by key.
         /// </summary>
@@ -5721,6 +5940,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateOneOrMoreKeyValuePair(forPlayerWithUlid, request, createKeyValuePairRequest, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// 
         /// <summary>
         /// Update a specific key/value pair for a specific asset instance by key/value-id.
@@ -5753,6 +5973,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdateKeyValuePairById(forPlayerWithUlid, data, createKeyValuePairRequest, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Delete a specific key/value pair for a specific asset instance by key/value-id.
         /// </summary>
@@ -5773,6 +5994,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeleteKeyValuePair(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Get the drop rates for a loot box asset instance.
         /// </summary>
@@ -5791,6 +6013,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.InspectALootBox(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Open a loot box asset instance. The loot box will be consumed and the contents will be added to the player's inventory.
         /// </summary>
@@ -5809,6 +6032,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.OpenALootBox(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup AssetInstance
         /// <summary>
         /// Delete an Asset Instance from the current Player's Inventory.
         /// </summary>
@@ -5831,6 +6055,7 @@ namespace LootLocker.Requests
         
         #region AssetInstance progressions
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Returns multiple progressions for an asset instance.
         /// </summary>
@@ -5860,6 +6085,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Returns multiple progressions for an asset instance.
         /// </summary>
@@ -5872,6 +6098,7 @@ namespace LootLocker.Requests
             GetAssetInstanceProgressions(assetInstanceId, count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Returns multiple progressions for an asset instance.
         /// </summary>
@@ -5883,6 +6110,7 @@ namespace LootLocker.Requests
             GetAssetInstanceProgressions(assetInstanceId, -1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Returns multiple progressions for an asset instance.
         /// </summary>
@@ -5903,6 +6131,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Adds points to an asset instance progression.
         /// </summary>
@@ -5926,6 +6155,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Subtracts points from an asset instance progression.
         /// </summary>
@@ -5949,6 +6179,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Resets an asset instance progression.
         /// </summary>
@@ -5969,6 +6200,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
+        /// @ingroup AssetInstanceProgressions
         /// <summary>
         /// Deletes an asset instance progression.
         /// </summary>
@@ -6026,6 +6258,7 @@ namespace LootLocker.Requests
             }
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Create a new asset candidate.
         /// </summary>
@@ -6068,6 +6301,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreatingAnAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Update an existing asset candidate.
         /// </summary>
@@ -6114,6 +6348,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.UpdatingAnAssetCandidate(forPlayerWithUlid, data, getRequest, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Delete an asset candidate.
         /// </summary>
@@ -6132,6 +6367,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeletingAnAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Get information about a single asset candidate.
         /// </summary>
@@ -6150,6 +6386,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GettingASingleAssetCandidate(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Get all asset candidates for the current player.
         /// </summary>
@@ -6165,6 +6402,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListingAssetCandidates(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Add a file to an asset candidate.
         /// </summary>
@@ -6199,6 +6437,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AddingFilesToAssetCandidates(forPlayerWithUlid, data, getRequest, onComplete);
         }
 
+        /// @ingroup UserGeneratedContent
         /// <summary>
         /// Remove a file from an asset candidate.
         /// </summary>
@@ -6224,6 +6463,7 @@ namespace LootLocker.Requests
 
         #region Progressions
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
@@ -6252,6 +6492,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
@@ -6263,6 +6504,7 @@ namespace LootLocker.Requests
             GetProgressions(count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progressions.
         /// </summary>
@@ -6273,6 +6515,7 @@ namespace LootLocker.Requests
             GetProgressions(-1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns a single progression.
         /// </summary>
@@ -6292,6 +6535,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progression tiers for the specified progression.
         /// </summary>
@@ -6321,6 +6565,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progression tiers for the specified progression.
         /// </summary>
@@ -6333,6 +6578,7 @@ namespace LootLocker.Requests
             GetProgressionTiers(progressionKey, count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Progressions
         /// <summary>
         /// Returns multiple progression tiers for the specified progression.
         /// </summary>
@@ -6344,6 +6590,7 @@ namespace LootLocker.Requests
             GetProgressionTiers(progressionKey, -1, null, onComplete, forPlayerWithUlid);
         }
         
+        /// @ingroup Progressions
         /// <summary>
         /// Returns a single progression tier for the specified progression.
         /// </summary>
@@ -6368,6 +6615,7 @@ namespace LootLocker.Requests
 
         #region Missions
 
+        /// @ingroup Missions
         /// <summary>
         /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
@@ -6383,6 +6631,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllMissions(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Missions
         /// <summary>
         /// Get information about a single mission. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
@@ -6401,6 +6650,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetMission(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Missions
         /// <summary>
         /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
@@ -6419,6 +6669,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.StartMission(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Missions
         /// <summary>
         /// Finish a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
         /// </summary>
@@ -6456,6 +6707,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Maps
+        /// @ingroup Maps
         /// <summary>
         /// Get all available maps for the current game. Maps are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Maps here; https://docs.lootlocker.com/background/game-systems#maps
         /// </summary>
@@ -6473,6 +6725,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Purchasing
+        /// @ingroup Purchasing
         /// <summary>
         /// This will give you the current status of a purchase. These statuses can be returned;
         /// open - The order is being processed
@@ -6496,6 +6749,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.PollOrderStatus(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Activate a rental asset. This will grant the asset to the player and start the rental timer on the server.
         /// </summary>
@@ -6514,6 +6768,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ActivateRentalAsset(forPlayerWithUlid, data, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Purchase one catalog item using a specified wallet
         /// </summary>
@@ -6534,6 +6789,7 @@ namespace LootLocker.Requests
             LootLockerPurchaseCatalogItems(walletID, items, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Purchase one or more catalog items using a specified wallet
         /// </summary>
@@ -6557,6 +6813,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.purchaseCatalogItem.endPoint, LootLockerEndPoints.purchaseCatalogItem.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Apple App Store for the current player
         /// </summary>
@@ -6580,6 +6837,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Apple App Store for a class that the current player owns
         /// </summary>
@@ -6605,6 +6863,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemAppleAppStorePurchase.endPoint, LootLockerEndPoints.redeemAppleAppStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Google Play Store for the current player
         /// </summary>
@@ -6628,6 +6887,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Google Play Store for a class that the current player owns
         /// </summary>
@@ -6653,6 +6913,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemGooglePlayStorePurchase.endPoint, LootLockerEndPoints.redeemGooglePlayStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Epic Store for the current player
         /// </summary>
@@ -6679,6 +6940,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemEpicStorePurchase.endPoint, LootLockerEndPoints.redeemEpicStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns
         /// </summary>
@@ -6708,6 +6970,7 @@ namespace LootLocker.Requests
         }
 
 #if LOOTLOCKER_BETA_PLAYSTATION_IAP
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Playstation Store for the current player
         /// </summary>
@@ -6754,6 +7017,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemPlayStationStorePurchase.endPoint, LootLockerEndPoints.redeemPlayStationStorePurchase.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Redeem a purchase that was made successfully towards the Playstation Store for a class that the current player owns
         /// </summary>
@@ -6804,6 +7068,7 @@ namespace LootLocker.Requests
         }
 #endif
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item
         /// 
@@ -6882,6 +7147,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item for the specified class
         /// 
@@ -6962,6 +7228,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Check the Steam Purchase status for a given entitlement
         /// 
@@ -6986,6 +7253,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.endPoint, LootLockerEndPoints.querySteamPurchaseRedemptionStatus.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Finalize a started Steam Purchase and subsequently redeem the catalog items that the entitlement refers to
         /// 
@@ -7009,6 +7277,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.finalizeSteamPurchaseRedemption.endPoint, LootLockerEndPoints.finalizeSteamPurchaseRedemption.httpMethod, body, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Initiate an async purchase of a single catalog item using a specified wallet.
         /// The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status.
@@ -7027,6 +7296,7 @@ namespace LootLocker.Requests
             }, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Initiate an async purchase of one or more catalog items using a specified wallet.
         /// The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status.
@@ -7046,6 +7316,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.InitiateAsyncPurchase(forPlayerWithUlid, walletId, items, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Get the status of an async purchase
         /// </summary>
@@ -7062,6 +7333,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAsyncPurchaseStatus(forPlayerWithUlid, entitlementId, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Retry a failed async purchase
         /// </summary>
@@ -7080,6 +7352,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RetryAsyncPurchase(forPlayerWithUlid, entitlementId, walletId, items, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Initiate an async purchase of a single catalog item and automatically poll until it reaches a terminal state.
         /// While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.
@@ -7116,6 +7389,7 @@ namespace LootLocker.Requests
                 forPlayerWithUlid);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Initiate an async purchase of one or more catalog items and automatically poll until it reaches a terminal state.
         /// While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.
@@ -7145,6 +7419,7 @@ namespace LootLocker.Requests
             return LootLockerAPIManager.AsyncPurchasePoller.StartAsyncPurchasePolling(walletId, items, onStatusUpdate, onComplete, pollingIntervalSeconds, timeoutAfterMinutes, forPlayerWithUlid);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Cancel an ongoing async purchase polling process
         /// </summary>
@@ -7154,6 +7429,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.AsyncPurchasePoller.CancelAsyncPurchasePolling(processGuid);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Refund one or more entitlements by their IDs.
         ///
@@ -7176,6 +7452,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.RefundByEntitlementIds(forPlayerWithUlid, entitlementIds, onComplete);
         }
 
+        /// @ingroup Purchasing
         /// <summary>
         /// Create a Stripe Checkout session for a catalog item.
         ///
@@ -7201,6 +7478,7 @@ namespace LootLocker.Requests
 #endregion
 
         #region Collectables
+        /// @ingroup Collectables
         /// <summary>
         /// Get all collectables for the game.
         /// </summary>
@@ -7216,6 +7494,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetCollectables(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Collectables
         /// <summary>
         /// Collect a collectable item. This will grant the collectable to the player.
         /// </summary>
@@ -7238,6 +7517,7 @@ namespace LootLocker.Requests
 
         #region Messages
 
+        /// @ingroup Messages
         /// <summary>
         /// Get the current messages.
         /// </summary>
@@ -7257,6 +7537,7 @@ namespace LootLocker.Requests
 
         #region Triggers
 
+        /// @ingroup Triggers
         /// <summary>
         /// Invoke a set of triggers by key
         ///
@@ -7282,6 +7563,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Leaderboard
+        /// @ingroup Leaderboard
         /// <summary>
         /// List leaderboards with details on each leaderboard
         /// </summary>
@@ -7310,6 +7592,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listLeaderboards.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the current ranking for a specific player on a leaderboard.
         /// </summary>
@@ -7332,6 +7615,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetMemberRank(forPlayerWithUlid, lootLockerGetMemberRankRequest, onComplete);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the current ranking for several members on a specific leaderboard.
         /// </summary>
@@ -7353,6 +7637,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetByListOfMembers(forPlayerWithUlid, request, leaderboardKey, onComplete);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the current ranking for a member on all available leaderboards.
         /// </summary>
@@ -7386,6 +7671,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllMemberRanks(forPlayerWithUlid, request, callback);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the current ranking for a member on all available leaderboards.
         /// </summary>
@@ -7398,6 +7684,7 @@ namespace LootLocker.Requests
             GetAllMemberRanksMain(member_id, count, -1, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the next current rankings for a member on all available leaderboards.
         /// </summary>
@@ -7410,6 +7697,7 @@ namespace LootLocker.Requests
             GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.nextCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the previous ranking for a member on all available leaderboards.
         /// </summary>
@@ -7422,6 +7710,7 @@ namespace LootLocker.Requests
             GetAllMemberRanksMain(member_id, count, int.Parse(LootLockerGetAllMemberRanksRequest.prevCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Reset the calls for getting all member ranks.
         /// </summary>
@@ -7430,6 +7719,7 @@ namespace LootLocker.Requests
             LootLockerGetAllMemberRanksRequest.Reset();
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the current ranking for a member on all available leaderboards.
         /// </summary>
@@ -7453,6 +7743,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetAllMemberRanks(forPlayerWithUlid, request, onComplete);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the entries for a specific leaderboard.
         /// </summary>
@@ -7486,6 +7777,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetScoreList(forPlayerWithUlid, request, callback);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the entries for a specific leaderboard.
         /// </summary>
@@ -7498,6 +7790,7 @@ namespace LootLocker.Requests
             GetScoreList(leaderboardKey, count, -1, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the next entries for a specific leaderboard. Can be called after GetScoreList.
         /// </summary>
@@ -7510,6 +7803,7 @@ namespace LootLocker.Requests
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.nextCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the previous entries for a specific leaderboard. Can be called after GetScoreList or GetNextScoreList.
         /// </summary>
@@ -7522,6 +7816,7 @@ namespace LootLocker.Requests
             GetScoreList(leaderboardKey, count, int.Parse(LootLockerGetScoreListRequest.prevCursor.ToString()), onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Reset the next and previous cursors for the GetScoreList and GetNextScoreList methods.
         /// </summary>
@@ -7530,6 +7825,7 @@ namespace LootLocker.Requests
             LootLockerGetScoreListRequest.Reset();
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Submit a score to a leaderboard.
         /// </summary>
@@ -7543,6 +7839,7 @@ namespace LootLocker.Requests
             SubmitScore(memberId, score, leaderboardKey, "", onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Submit a score to a leaderboard with additional metadata.
         /// </summary>
@@ -7568,6 +7865,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.SubmitScore(forPlayerWithUlid, request, leaderboardKey, onComplete);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Query a leaderboard for which rank a specific score would achieve. Does not submit the score but returns the projected rank.
         /// </summary>
@@ -7594,6 +7892,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Increment an existing score on a leaderboard by the given amount.
         /// </summary>
@@ -7622,6 +7921,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint, requestEndPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// List the archived versions of a leaderboard, containing past rewards, ranks, etc.
         /// </summary>
@@ -7641,6 +7941,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
         /// </summary>
@@ -7652,6 +7953,7 @@ namespace LootLocker.Requests
             GetLeaderboardArchive(key, -1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
         /// </summary>
@@ -7664,6 +7966,7 @@ namespace LootLocker.Requests
             GetLeaderboardArchive(key, count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get the details of a Leaderboard Archive, containing past rewards, ranks, etc
         /// </summary>
@@ -7694,6 +7997,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, tempEndpoint, endPoint.httpMethod, null, ((serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }));        
         }
 
+        /// @ingroup Leaderboard
         /// <summary>
         /// Get data on a leaderboard, check rewards and when it will reset and the last reset time.
         /// </summary>
@@ -7717,6 +8021,7 @@ namespace LootLocker.Requests
 
         #region Drop Tables
 
+        /// @ingroup DropTables
         /// <summary>
         /// Lock a drop table and return information about the assets that were computed.
         /// </summary>
@@ -7735,6 +8040,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ComputeAndLockDropTable(forPlayerWithUlid, tableInstanceId, onComplete, AddAssetDetails, tag);
         }
 
+        /// @ingroup DropTables
         /// <summary>
         /// Lock a drop table and return information about the assets that were computed.
         /// </summary>
@@ -7753,6 +8059,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ComputeAndLockDropTable(forPlayerWithUlid, tableInstanceId, onComplete, AddAssetDetails, tag);
         }
 
+        /// @ingroup DropTables
         /// <summary>
         /// Send a list of id's from a ComputeAndLockDropTable()-call to grant the assets to the player.
         /// </summary>
@@ -7776,6 +8083,7 @@ namespace LootLocker.Requests
 
         #region Reports
 
+        /// @ingroup Reports
         /// <summary>
         /// Retrieves the different types of report possible.
         /// These can be changed in the web interface or through the Admin API.
@@ -7793,6 +8101,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetReportTypes(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Reports
         /// <summary>
         /// Create a report of a player.
         /// </summary>
@@ -7810,6 +8119,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreatePlayerReport(forPlayerWithUlid, input, onComplete);
         }
 
+        /// @ingroup Reports
         /// <summary>
         /// Create a report of an asset.
         /// </summary>
@@ -7827,6 +8137,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.CreateAssetReport(forPlayerWithUlid, input, onComplete);
         }
 
+        /// @ingroup Reports
         /// <summary>
         /// Get removed UGC for the current player. 
         /// If any of their UGC has been removed as a result of reports they will be returned in this method.
@@ -7849,6 +8160,7 @@ namespace LootLocker.Requests
 
         #region Feedback
 
+        /// @ingroup Feedback
         /// <summary>
         /// Returns a list of categories to be used for giving feedback about a certain player.
         /// </summary>
@@ -7859,6 +8171,7 @@ namespace LootLocker.Requests
             ListFeedbackCategories(LootLockerFeedbackTypes.player, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Feedback
         /// <summary>
         /// Returns a list of categories to be used for giving feedback about the game.
         /// </summary>
@@ -7869,6 +8182,7 @@ namespace LootLocker.Requests
             ListFeedbackCategories(LootLockerFeedbackTypes.game, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Feedback
         /// <summary>
         /// Returns a list of categories to be used for giving feedback about a certain ugc asset.
         /// </summary>
@@ -7895,6 +8209,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Feedback
         /// <summary>
         /// Sends a feedback with the given data, will return 204 upon successful request.
         /// </summary>
@@ -7908,6 +8223,7 @@ namespace LootLocker.Requests
             SendFeedback(LootLockerFeedbackTypes.player, ulid, description, category_id, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Feedback
         /// <summary>
         /// Sends a feedback with the given data, will return 204 upon successful request.
         /// </summary>
@@ -7920,6 +8236,7 @@ namespace LootLocker.Requests
             SendFeedback(LootLockerFeedbackTypes.game, "", description, category_id, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Feedback
         /// <summary>
         /// Sends a feedback with the given data, will return 204 upon successful request.
         /// </summary>
@@ -7959,6 +8276,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Friends
+        /// @ingroup Friends
         /// <summary>
         /// List friends for the currently logged in player with default pagination
         /// </summary>
@@ -7969,6 +8287,7 @@ namespace LootLocker.Requests
             ListFriendsPaginated(0, 0, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List friends for the currently logged in player
         /// </summary>
@@ -7995,6 +8314,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List friends that are on the specified platform for the currently logged in player 
         /// </summary>
@@ -8023,6 +8343,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listFriends.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Get a specific friend of the currently logged in player
         /// </summary>
@@ -8042,6 +8363,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.getFriend.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List incoming friend requests for the currently logged in player (friend requests made by others for this player) with default pagination
         /// </summary>
@@ -8052,6 +8374,7 @@ namespace LootLocker.Requests
             ListIncomingFriendRequestsPaginated(0, 0, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List incoming friend requests for the currently logged in player with pagination (friend requests made by others for this player)
         /// </summary>
@@ -8079,6 +8402,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listIncomingFriendReqeusts.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List outgoing friend requests for the currently logged in player (friend requests made by this player)
         /// </summary>
@@ -8090,6 +8414,7 @@ namespace LootLocker.Requests
         }
 
 
+        /// @ingroup Friends
         /// <summary>
         /// List outgoing friend requests for the currently logged in player with pagination (friend requests made by this player)
         /// </summary>
@@ -8116,6 +8441,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listOutgoingFriendRequests.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Send a friend request to the specified player for the currently logged in player
         /// </summary>
@@ -8140,6 +8466,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.sendFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Cancel the outgoing friend request made to the specified player by the currently logged in player
         /// </summary>
@@ -8164,6 +8491,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.cancelOutgoingFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Accept the incoming friend request from the specified player
         /// </summary>
@@ -8188,6 +8516,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.acceptFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Decline the incoming friend request from the specified player
         /// </summary>
@@ -8212,6 +8541,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.declineFriendRequest.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List the players (if any) that are blocked by the currently logged in player with default pagination
         /// </summary>
@@ -8222,6 +8552,7 @@ namespace LootLocker.Requests
             ListBlockedPlayersPaginated(0, 0, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// List the players (if any) that are blocked by the currently logged in player
         /// </summary>
@@ -8248,6 +8579,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpointWithParams, LootLockerEndPoints.listBlockedPlayers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Block the specified player (adding them to the currently logged in players block list and removing them the friend list)
         /// </summary>
@@ -8272,6 +8604,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.blockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Unblock the specified player (remove from the currently logged in players block list)
         /// </summary>
@@ -8296,6 +8629,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.unblockPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Friends
         /// <summary>
         /// Remove the specified player from the currently logged in player's friends list
         /// </summary>
@@ -8322,6 +8656,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Followers
+        /// @ingroup Followers
         /// <summary>
         /// List followers of the currently logged in player with default pagination
         /// </summary>
@@ -8337,6 +8672,7 @@ namespace LootLocker.Requests
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
             ListFollowers(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
+        /// @ingroup Followers
         /// <summary>
         /// List followers of the currently logged in player
         /// </summary>
@@ -8355,6 +8691,7 @@ namespace LootLocker.Requests
             ListFollowersPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Followers
         /// <summary>
         /// List followers that the specified player has with default pagination
         /// </summary>
@@ -8366,6 +8703,7 @@ namespace LootLocker.Requests
             ListFollowersPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
         }
         
+        /// @ingroup Followers
         /// <summary>
         /// List followers that the specified player has
         /// </summary>
@@ -8394,6 +8732,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowers.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         
+        /// @ingroup Followers
         /// <summary>
         /// List what players the currently logged in player is following with default pagination
         /// </summary>
@@ -8410,11 +8749,12 @@ namespace LootLocker.Requests
             ListFollowing(playerData.PublicUID, onComplete, forPlayerWithUlid);
         }
         
+        /// @ingroup Followers
         /// <summary>
         /// List what players the currently logged in player is following
         /// </summary>
         /// <param name="Cursor">Used for pagination, if null or empty string it will return the first page. `next_cursor` will be included in the response if there are more pages.</param>
-        /// <param name="Count">The number of results to return counting from the cursor</
+        /// <param name="Count">The number of results to return counting from the cursor</param>
         /// <param name="onComplete">onComplete Action for handling the response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListFollowingPaginated(string Cursor, int Count, Action<LootLockerListFollowingResponse> onComplete, string forPlayerWithUlid = null)
@@ -8427,6 +8767,7 @@ namespace LootLocker.Requests
             ListFollowingPaginated(playerData.PublicUID, Cursor, Count, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Followers
         /// <summary>
         /// List players that the specified player is following with default pagination
         /// </summary>
@@ -8438,6 +8779,7 @@ namespace LootLocker.Requests
             ListFollowingPaginated(playerPublicUID, null, 0, onComplete, forPlayerWithUlid);
         }
         
+        /// @ingroup Followers
         /// <summary>
         /// List players that the specified player is following
         /// </summary>
@@ -8466,6 +8808,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.listFollowing.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Followers
         /// <summary>
         /// Follow the specified player
         /// </summary>
@@ -8490,6 +8833,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, formattedEndPoint, LootLockerEndPoints.followPlayer.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Followers
         /// <summary>
         /// Unfollow the specified player
         /// </summary>
@@ -8516,6 +8860,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Currency
+        /// @ingroup Currency
         /// <summary>
         /// Get a list of available currencies for the game
         /// </summary>
@@ -8532,6 +8877,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listCurrencies.endPoint, LootLockerEndPoints.listCurrencies.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Currency
         /// <summary>
         /// Get details about the specified currency
         /// </summary>
@@ -8551,6 +8897,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getCurrencyDetails.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Currency
         /// <summary>
         /// Get a list of the denominations available for a specific currency
         /// </summary>
@@ -8573,6 +8920,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Balances
+        /// @ingroup Balances
         /// <summary>
         /// Get a list of balances in a specified wallet
         /// </summary>
@@ -8591,6 +8939,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listBalancesInWallet.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Balances
         /// <summary>
         /// Get information about a specified wallet
         /// </summary>
@@ -8609,6 +8958,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.getWalletByWalletId.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Balances
         /// <summary>
         /// Get information about a wallet for a specified holder
         /// </summary>
@@ -8660,6 +9010,7 @@ namespace LootLocker.Requests
             );
         }
 
+        /// @ingroup Balances
         /// <summary>
         /// Credit (increase) the specified amount of the provided currency to the provided wallet
         /// </summary>
@@ -8681,6 +9032,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.creditBalanceToWallet.endPoint, LootLockerEndPoints.creditBalanceToWallet.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Balances
         /// <summary>
         /// Debit (decrease) the specified amount of the provided currency to the provided wallet
         /// </summary>
@@ -8705,6 +9057,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Catalog
+        /// @ingroup Catalog
         /// <summary>
         /// List the catalogs available for the game
         /// </summary>
@@ -8721,6 +9074,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listCatalogs.endPoint, LootLockerEndPoints.listCatalogs.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
+        /// @ingroup Catalog
         /// <summary>
         /// List the items available in a specific catalog
         /// </summary>
@@ -8750,6 +9104,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.deprecatedListCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesResponse(serverResponse)); });
         }
 
+        /// @ingroup Catalog
         /// <summary>
         /// List the items available in a specific catalog
         /// </summary>
@@ -8780,6 +9135,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Entitlements
+        /// @ingroup Entitlements
         /// <summary>
         /// List this player's historical entitlements
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
@@ -8815,6 +9171,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Entitlements
         /// <summary>
         /// List this player's historical entitlements
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
@@ -8827,6 +9184,7 @@ namespace LootLocker.Requests
             ListEntitlements(count, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Entitlements
         /// <summary>
         /// List this player's historical entitlements
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
@@ -8839,6 +9197,7 @@ namespace LootLocker.Requests
             ListEntitlements(-1, after, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Entitlements
         /// <summary>
         /// List this player's historical entitlements
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
@@ -8850,6 +9209,7 @@ namespace LootLocker.Requests
             ListEntitlements(-1, null, onComplete, forPlayerWithUlid);
         }
 
+        /// @ingroup Entitlements
         /// <summary>
         /// Get a single entitlement, with information about its current status
         /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
@@ -8872,6 +9232,7 @@ namespace LootLocker.Requests
 #endregion
 
         #region Metadata
+        /// @ingroup Metadata
         /// <summary>
         /// List Metadata for the specified source with default pagination
         /// </summary>
@@ -8885,6 +9246,7 @@ namespace LootLocker.Requests
             ListMetadata(Source, SourceID, 0, 0, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// List the requested page of Metadata for the specified source with the specified pagination
         /// </summary>
@@ -8900,6 +9262,7 @@ namespace LootLocker.Requests
             ListMetadataWithTags(Source, SourceID, null, Page, PerPage, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// List Metadata for the specified source that has all of the provided tags, use default pagination
         /// </summary>
@@ -8914,6 +9277,7 @@ namespace LootLocker.Requests
             ListMetadataWithTags(Source, SourceID, Tags, 0, 0, onComplete, IgnoreFiles, forPlayerWithUlid);
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings
         /// </summary>
@@ -8936,6 +9300,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.ListMetadata(forPlayerWithUlid, Source, SourceID, Page, PerPage, null, Tags, IgnoreFiles, onComplete);
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// Get Metadata for the specified source with the given key
         /// </summary>
@@ -8961,6 +9326,7 @@ namespace LootLocker.Requests
             });
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings
         /// </summary>
@@ -8979,6 +9345,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetMultisourceMetadata(forPlayerWithUlid, SourcesAndKeysToGet, IgnoreFiles, onComplete);
         }
 
+        /// @ingroup Metadata
         /// <summary>
         /// Perform the specified metadata operations for the specified source
         /// Note that a subset of the specified operations can fail without the full request failing. Make sure to check the errors array in the response.
@@ -9002,6 +9369,7 @@ namespace LootLocker.Requests
 
         #region Notifications
 
+        /// @ingroup Notifications
         /// <summary>
         /// List notifications without filters and with default pagination settings
         /// </summary>
@@ -9035,18 +9403,16 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup Notifications
         /// <summary>
         /// List notifications according to specified filters and with pagination settings
         /// </summary>
         /// <param name="ShowRead">When set to true, only read notifications will be returned, when set to false only unread notifications will be returned.</param>
         /// <param name="WithPriority">(Optional) Return only notifications with the specified priority. Set to null to not use this filter.</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <param name="OfType">(Optional) Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use. Set to "" or null to not use this filter.</param, string forPlayerWithUlid = null>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        /// <param name="WithSource">(Optional) Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use. Set to "" or null to not use this filter.</param, string forPlayerWithUlid = null>
+        /// <param name="OfType">(Optional) Return only notifications with the specified type. Use static defines in LootLockerStaticStrings.LootLockerNotificationTypes to know what you strings you can use. Set to "" or null to not use this filter.</param>
+        /// <param name="WithSource">(Optional) Return only notifications with the specified source. Use static defines in LootLockerStaticStrings.LootLockerNotificationSources to know what you strings you can use. Set to "" or null to not use this filter.</param>
         /// <param name="PerPage">(Optional) Used together with Page to apply pagination to this request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</param>
         /// <param name="Page">(Optional) Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</param>
-        /// <param name="onComplete"></param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListNotifications(bool ShowRead, LootLockerNotificationPriority? WithPriority, string OfType, string WithSource, int PerPage, int Page, Action<LootLockerListNotificationsResponse> onComplete, string forPlayerWithUlid = null)
@@ -9083,6 +9449,7 @@ namespace LootLocker.Requests
                 });
         }
 
+        /// @ingroup Notifications
         /// <summary>
         /// Mark all unread notifications as read
         ///
@@ -9101,6 +9468,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ReadAllNotifications.endPoint, LootLockerEndPoints.ReadAllNotifications.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup Notifications
         /// <summary>
         /// Mark the specified notifications as read
         /// </summary>
@@ -9126,6 +9494,7 @@ namespace LootLocker.Requests
         #endregion
 
         #region Broadcasts
+        /// @ingroup Broadcasts
         /// <summary>
         /// List broadcasts for this game with default localisation and limit
         /// </summary>
@@ -9142,6 +9511,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup Broadcasts
         /// <summary>
         /// List broadcasts for this game with specified localisation and default limit
         /// </summary>
@@ -9169,6 +9539,7 @@ namespace LootLocker.Requests
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.ListBroadcasts.endPoint, LootLockerEndPoints.ListBroadcasts.httpMethod, null, additionalHeaders: headers, onComplete: (response) => { LootLockerResponse.Deserialize(onComplete, response); });
         }
 
+        /// @ingroup Broadcasts
         /// <summary>
         /// List broadcasts for this game
         /// </summary>
@@ -9211,6 +9582,7 @@ namespace LootLocker.Requests
 
         #region Misc
 
+        /// @ingroup Misc
         /// <summary>
         /// Ping the server, contains information about the current time of the server.
         /// </summary>
@@ -9227,6 +9599,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.Ping(forPlayerWithUlid, onComplete);
         }
 
+        /// @ingroup Misc
         /// <summary>
         ///  Get meta information about the game
         /// </summary>
@@ -9242,6 +9615,7 @@ namespace LootLocker.Requests
             LootLockerAPIManager.GetGameInfo(onComplete);
         }
 
+        /// @ingroup Misc
         /// <summary>
         /// Get the Platform the user last used. This can be used to know what login method to prompt.
         /// </summary>

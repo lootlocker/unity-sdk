@@ -1,0 +1,233 @@
+/**
+ * @file groups.dox
+ * @brief Doxygen group definitions for the LootLocker Unity SDK.
+ *
+ * These groups power the "Topics" navigation tab and give the docs a
+ * feature-oriented entry point rather than a raw class/namespace listing.
+ * Every public method in LootLockerSDKManager.cs is tagged with \\ingroup
+ * so that readers can navigate by feature rather than by file.
+ */
+
+// ---------------------------------------------------------------------------
+// Top-level: SDK lifecycle
+// ---------------------------------------------------------------------------
+
+/// @defgroup Init Initialization
+/// @brief Set up and configure the SDK before starting a session.
+///
+/// Call \c LootLockerSDKManager.Init()
+/// once at game startup, or rely on the LootLocker Settings asset configured in
+/// **Edit → Project Settings → LootLocker SDK**.
+
+/// @defgroup SDKCustomization SDK Customization
+/// @brief Override SDK internals for testing or advanced integration scenarios.
+///
+/// Includes state-writer injection, reset, and lifecycle introspection helpers.
+
+/// @defgroup MultiUserManagement Multi-User Management
+/// @brief Manage concurrent player sessions on a single device.
+///
+/// Switch the active player, query all cached players, clear per-player or
+/// global state, and control which player receives subsequent API calls.
+
+// ---------------------------------------------------------------------------
+// Top-level: Sessions
+// ---------------------------------------------------------------------------
+
+/// @defgroup Authentication Authentication
+/// @brief Start and end player sessions across all supported identity providers.
+///
+/// Covers Guest, White Label, Google, Apple, Nintendo, Xbox, Epic Games,
+/// Android (Google Play), Amazon Luna, PlayStation, and Steam login flows,
+/// as well as session verification and token refresh.
+
+/// @defgroup WhiteLabel White Label Login
+/// @brief Email/password authentication using LootLocker's built-in identity system.
+///
+/// Create accounts, log in, verify email, request password resets, and end
+/// White Label sessions.
+
+/// @defgroup RemoteSessions Remote Sessions
+/// @brief QR-code / deep-link secondary-device login flow.
+///
+/// Start a remote-session lease, poll or subscribe for approval, and cancel
+/// the flow from the primary device.
+
+/// @defgroup ConnectedAccounts Connected Accounts
+/// @brief Link or unlink third-party identity providers to an existing session.
+///
+/// Lets players connect multiple providers (e.g., Steam + Apple) to a single
+/// LootLocker player identity.
+
+// ---------------------------------------------------------------------------
+// Top-level: Presence & Social
+// ---------------------------------------------------------------------------
+
+/// @defgroup Presence Presence
+/// @brief Real-time online/offline visibility and status for players.
+///
+/// Read and update the current player's presence, subscribe to friend
+/// presence updates, and configure the presence auto-connect behaviour.
+
+/// @defgroup Friends Friends
+/// @brief Friend list management — list, add, remove, and respond to friend requests.
+
+/// @defgroup Followers Followers
+/// @brief Follow and unfollow players; query follower/following counts.
+
+// ---------------------------------------------------------------------------
+// Top-level: Player
+// ---------------------------------------------------------------------------
+
+/// @defgroup Player Player
+/// @brief Core player profile operations.
+///
+/// Retrieve and update the player's public profile, name, and info.
+
+/// @defgroup PlayerFiles Player Files
+/// @brief Per-player cloud-stored binary or JSON files.
+///
+/// Upload, download, list, and delete files associated with a player's
+/// account — useful for save games, inventories, or any player-specific blob.
+
+/// @defgroup PlayerProgressions Player Progressions
+/// @brief Track player XP and level advancement through progression tiers.
+///
+/// Get a player's progression state, award XP, and query tiers and rewards.
+/// See also @ref Progressions for the shared progression infrastructure.
+
+/// @defgroup PlayerStorage Player Storage
+/// @brief Simple key-value store scoped to the player.
+///
+/// Read, write, and delete named string values persisted server-side.
+
+// ---------------------------------------------------------------------------
+// Top-level: Heroes & Characters
+// ---------------------------------------------------------------------------
+
+/// @defgroup Hero Hero
+/// @brief Hero-based character selection and loadout management.
+///
+/// List available heroes, create hero instances for the player, and
+/// manage their equipped items.
+
+/// @defgroup CharacterProgressions Character Progressions
+/// @brief Progression tracking scoped to an individual character.
+
+// ---------------------------------------------------------------------------
+// Top-level: Economy
+// ---------------------------------------------------------------------------
+
+/// @defgroup Currency Currency
+/// @brief Define and query the in-game currency types configured in the LootLocker console.
+
+/// @defgroup Balances Balances
+/// @brief Read and update a player's currency balances.
+
+/// @defgroup Catalog Catalog
+/// @brief Browse item listings in the LootLocker storefront catalog.
+///
+/// List catalog items, filter by type, and retrieve pricing details.
+
+/// @defgroup Purchasing Purchasing
+/// @brief Initiate and validate item purchases (IAP and virtual currency).
+///
+/// Covers real-money IAP (Apple, Google, Steam) and virtual-currency
+/// purchases in a single unified interface.
+
+/// @defgroup Entitlements Entitlements
+/// @brief Query what a player has been granted — including IAP entitlements.
+
+/// @defgroup DropTables Drop Tables
+/// @brief Evaluate drop-table loot rolls and claim results for the player.
+
+// ---------------------------------------------------------------------------
+// Top-level: Assets & Inventory
+// ---------------------------------------------------------------------------
+
+/// @defgroup Assets Assets
+/// @brief Browse the asset catalogue defined in the LootLocker console.
+///
+/// List, filter, paginate, and retrieve detail for asset types.
+
+/// @defgroup AssetInstance Asset Instances
+/// @brief Operations on asset instances owned by the current player.
+///
+/// Retrieve a player's owned instances, update key-value storage attached
+/// to an instance, and manage rental states.
+
+/// @defgroup AssetInstanceProgressions Asset Instance Progressions
+/// @brief Progression tracking scoped to a specific asset instance.
+
+/// @defgroup UserGeneratedContent User-Generated Content (UGC)
+/// @brief Create, edit, and publish player-authored assets.
+
+/// @defgroup Collectables Collectables
+/// @brief Collectable items — groups, items, and player collection state.
+
+// ---------------------------------------------------------------------------
+// Top-level: Progression & Competition
+// ---------------------------------------------------------------------------
+
+/// @defgroup Progressions Progressions
+/// @brief Shared progression infrastructure (tiers, rewards, reset).
+///
+/// Complementary to @ref PlayerProgressions and @ref CharacterProgressions;
+/// this group covers the underlying progression management endpoints.
+
+/// @defgroup Leaderboard Leaderboards
+/// @brief Submit scores and read ranked results.
+///
+/// Write scores (with optional metadata), retrieve all-player rankings,
+/// page through results, and look up a specific player's rank.
+
+/// @defgroup Missions Missions
+/// @brief Time-limited challenges with completion tracking.
+
+/// @defgroup Maps Maps
+/// @brief Retrieve map configurations and node data.
+
+/// @defgroup Triggers Triggers
+/// @brief Fire named trigger events that award items or currency server-side.
+
+// ---------------------------------------------------------------------------
+// Top-level: Metadata & Messaging
+// ---------------------------------------------------------------------------
+
+/// @defgroup Metadata Metadata
+/// @brief Attach and retrieve arbitrary key-value metadata on any entity.
+///
+/// Supports per-asset, per-player, per-character, per-progression, and
+/// per-leaderboard metadata in a unified interface.
+
+/// @defgroup Messages Messages
+/// @brief Read player inbox messages from the LootLocker console.
+
+/// @defgroup Notifications Notifications
+/// @brief Receive and dismiss push/persistent notifications for the player.
+
+/// @defgroup Broadcasts Broadcasts
+/// @brief Read game-wide broadcast messages configured in the console.
+
+// ---------------------------------------------------------------------------
+// Top-level: Moderation
+// ---------------------------------------------------------------------------
+
+/// @defgroup Reports Reports
+/// @brief Submit player-generated moderation reports to LootLocker.
+
+/// @defgroup Feedback Feedback
+/// @brief Submit structured feedback (feature requests, bug reports, general).
+
+// ---------------------------------------------------------------------------
+// Top-level: Utilities
+// ---------------------------------------------------------------------------
+
+/// @defgroup Misc Miscellaneous Utilities
+/// @brief Helpers that don't fit neatly into a feature group.
+
+/// @defgroup EventSystem Event System
+/// @brief Subscribe to SDK lifecycle events (session start/end, token refresh).
+///
+/// The event system is the preferred way to react to authentication state
+/// changes without polling \c CheckInitialized().
