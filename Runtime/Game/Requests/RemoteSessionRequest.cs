@@ -287,7 +287,8 @@ namespace LootLocker
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
                 float timeOutAfterMinutes = 5.0f,
-                string forPlayerWithUlid = null)
+                string forPlayerWithUlid = null,
+                LootLockerAccountProvider provider = LootLockerAccountProvider.guest)
             {
                 var instance = GetInstance();
                 if (instance == null)
@@ -302,7 +303,14 @@ namespace LootLocker
                 }
                 return instance._StartRemoteSessionWithContinualPolling(leaseIntent, remoteSessionLeaseInformation,
                     remoteSessionLeaseStatusUpdateCallback, remoteSessionCompleted, pollingIntervalSeconds,
-                    timeOutAfterMinutes, forPlayerWithUlid);
+                    timeOutAfterMinutes, forPlayerWithUlid, provider);
+            }
+
+            private static string GetProviderUrlParam(LootLockerAccountProvider provider)
+            {
+                if (provider == LootLockerAccountProvider.guest)
+                    return string.Empty;
+                return provider.ToString();
             }
 
             public static void CancelRemoteSessionProcess(Guid processGuid)
@@ -327,6 +335,7 @@ namespace LootLocker
                 public bool ShouldCancel;
                 public LootLockerRemoteSessionLeaseIntent Intent;
                 public string forPlayerWithUlid;
+                public string ProviderUrlParam; // empty string means no provider
                 public Action<LootLockerRemoteSessionStatusPollingResponse> UpdateCallbackAction;
                 public Action<LootLockerStartRemoteSessionResponse> ProcessCompletedCallbackAction;
             }
@@ -453,7 +462,8 @@ namespace LootLocker
                 Action<LootLockerStartRemoteSessionResponse> remoteSessionCompleted,
                 float pollingIntervalSeconds = 1.0f,
                 float timeOutAfterMinutes = 5.0f,
-                string forPlayerWithUlid = null)
+                string forPlayerWithUlid = null,
+                LootLockerAccountProvider provider = LootLockerAccountProvider.guest)
             {
                 if (_remoteSessionsProcesses.Count > 0)
                 {
@@ -464,6 +474,7 @@ namespace LootLocker
                 }
 
                 Guid processGuid = Guid.NewGuid();
+                string capturedProviderUrlParam = GetProviderUrlParam(provider);
                 LootLockerRemoteSessionProcess lootLockerRemoteSessionProcess = new LootLockerRemoteSessionProcess()
                 {
                     LastUpdatedAt = DateTime.UtcNow,
@@ -472,7 +483,8 @@ namespace LootLocker
                     UpdateCallbackAction = remoteSessionLeaseStatusUpdateCallback,
                     ProcessCompletedCallbackAction = remoteSessionCompleted,
                     Intent = leaseIntent,
-                    forPlayerWithUlid = forPlayerWithUlid
+                    forPlayerWithUlid = forPlayerWithUlid,
+                    ProviderUrlParam = capturedProviderUrlParam
                 };
                 _remoteSessionsProcesses.Add(processGuid, lootLockerRemoteSessionProcess);
 
@@ -516,7 +528,7 @@ namespace LootLocker
                         process.LastUpdatedStatus = leaseRemoteSessionResponse.status;
                         process.LastUpdatedAt = DateTime.UtcNow;
                         StartCoroutine(ContinualPollingAction(processGuid));
-                    });
+                    }, capturedProviderUrlParam);
                 });
                 return processGuid;
             }
@@ -534,7 +546,8 @@ namespace LootLocker
                 string titleId,
                 string environmentId,
                 string forPlayerWithUlid,
-                Action<LootLockerLeaseRemoteSessionResponse> onComplete)
+                Action<LootLockerLeaseRemoteSessionResponse> onComplete,
+                string providerUrlParam = null)
             {
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
                     new LootLockerLeaseRemoteSessionRequest(titleId, environmentId);
@@ -544,8 +557,15 @@ namespace LootLocker
                     endPoint.httpMethod,
                     LootLockerJson.SerializeObject(leaseRemoteSessionRequest),
                     (serverResponse) =>
-                        onComplete?.Invoke(
-                            LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse)),
+                    {
+                        var response = LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse);
+                        if (!string.IsNullOrEmpty(providerUrlParam) && response != null && response.redirect_url != null)
+                        {
+                            string separator = response.redirect_url.Contains("?") ? "&" : "?";
+                            response.redirect_url = response.redirect_url + separator + "provider=" + providerUrlParam;
+                        }
+                        onComplete?.Invoke(response);
+                    },
                     leaseIntent == LootLockerRemoteSessionLeaseIntent.link);
             }
             private void StartRemoteSession(string leaseCode, string nonce, Action<LootLockerStartRemoteSessionResponse> onComplete)
