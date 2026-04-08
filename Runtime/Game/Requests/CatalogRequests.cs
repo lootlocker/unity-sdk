@@ -23,6 +23,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// A LootLocker catalog listing, containing entries with prices and entity details.
     /// </summary>
     public class LootLockerCatalog
     {
@@ -49,6 +50,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A price entry for a catalog item, specifying the currency amount and display value.
     /// </summary>
     public class LootLockerCatalogEntryPrice
     {
@@ -79,6 +81,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Apple App Store listing information for a catalog entry.
     /// </summary>
     public class LootLockerCatalogAppleAppStoreListing
     {
@@ -89,6 +92,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Google Play Store listing information for a catalog entry.
     /// </summary>
     public class LootLockerCatalogGooglePlayStoreListing
     {
@@ -99,6 +103,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A Steam Store price entry specifying currency code and amount for a catalog listing.
     /// </summary>
     public class LootLockerCatalogSteamStoreListingPrice
     {
@@ -113,6 +118,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Steam Store listing information for a catalog entry.
     /// </summary>
     public class LootLockerCatalogSteamStoreListing
     {
@@ -127,6 +133,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Stripe Store listing information for a catalog entry.
     /// </summary>
     public class LootLockerCatalogStripeStoreListing
     {
@@ -157,6 +164,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// All store-specific listing information for a catalog entry across supported platforms.
     /// </summary>
     public class LootLockerCatalogEntryListings
     {
@@ -271,6 +279,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A single entry in a LootLocker catalog, combining entity metadata with prices and store listings.
     /// </summary>
     public class LootLockerCatalogEntry
     {
@@ -318,6 +327,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about an asset entity referenced by a catalog entry.
     /// </summary>
     public class LootLockerAssetDetails
     {
@@ -373,6 +383,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about a progression points entity referenced by a catalog entry.
     /// </summary>
     public class LootLockerProgressionPointDetails
     {
@@ -407,6 +418,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about a progression reset entity referenced by a catalog entry.
     /// </summary>
     public class LootLockerProgressionResetDetails
     {
@@ -437,6 +449,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Details about a currency entity referenced by a catalog entry.
     /// </summary>
     public class LootLockerCurrencyDetails
     {
@@ -568,6 +581,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing a list of all catalogs available for the game.
     /// </summary>
     public class LootLockerListCatalogsResponse : LootLockerResponse
     {
@@ -578,6 +592,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing a catalog's entries and all associated entity detail lookup maps.
     /// </summary>
     public class LootLockerListCatalogPricesResponse : LootLockerResponse
     {
@@ -778,6 +793,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// A catalog entry with all relevant entity details inlined for convenient access without separate lookup maps.
         /// </summary>
         public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
         {
@@ -951,6 +967,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response (v2) containing a catalog's entries and all associated entity detail lookup maps.
     /// </summary>
     public class LootLockerListCatalogPricesV2Response : LootLockerResponse
     {
@@ -1155,6 +1172,7 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// A catalog entry with all relevant entity details inlined for convenient access without separate lookup maps.
         /// </summary>
         public class LootLockerInlinedCatalogEntry : LootLockerCatalogEntry
         {

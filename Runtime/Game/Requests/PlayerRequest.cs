@@ -12,43 +12,76 @@ namespace LootLocker.Requests
     // Data Definitions
     //==================================================
 
+    /// <summary>
+    /// First-party platform identifiers (Steam, Xbox, PSN) linked to a player's account.
+    /// </summary>
     public class PlatformIDs
     {
+        /// <summary>The player's Steam id, or null if not linked.</summary>
         public ulong? steam_id { get; set; }
+        /// <summary>The player's Xbox id, or null if not linked.</summary>
         public string xbox_id { get; set; }
+        /// <summary>The player's PSN id, or null if not linked.</summary>
         public ulong? psn_id { get; set; }
     }
 
+    /// <summary>
+    /// Player information combined with all linked first-party platform identifiers.
+    /// </summary>
     public class PlayerWith1stPartyPlatformIDs
     {
+        /// <summary>The legacy integer id of the player.</summary>
         public uint player_id { get; set; }
+        /// <summary>The public UID of the player.</summary>
         public string player_public_uid { get; set; }
+        /// <summary>The display name of the player.</summary>
         public string name { get; set; }
+        /// <summary>The platform the player was last active on.</summary>
         public string last_active_platform { get; set; }
+        /// <summary>The first-party platform identifiers linked to this player.</summary>
         public PlatformIDs platform_ids { get; set; }
     }
 
+    /// <summary>
+    /// Player name and various identifier forms used for player lookup operations.
+    /// </summary>
     public class PlayerNameWithIDs
     {
+        /// <summary>The legacy integer id of the player.</summary>
         public uint player_id { get; set; }
+        /// <summary>The public UID of the player.</summary>
         public string player_public_uid { get; set; }
+        /// <summary>The ULID of the player.</summary>
         public string ulid { get; set; }
+        /// <summary>The display name of the player.</summary>
         public string name { get; set; }
+        /// <summary>The platform the player was last active on.</summary>
         public string last_active_platform { get; set; }
+        /// <summary>The platform-specific player identifier on the last active platform.</summary>
         public string platform_player_id { get; set; }
     }
 
+    /// <summary>
+    /// A deactivated asset and its replacement, used to notify the player that an asset they own has been retired.
+    /// </summary>
     [Serializable]
     public class LootLockerDeactivatedObjects
     {
+        /// <summary>The id of the asset that was deactivated.</summary>
         public int deactivated_asset_id { get; set; }
+        /// <summary>The id of the replacement asset, if one is available.</summary>
         public int replacement_asset_id { get; set; }
+        /// <summary>The reason the asset was deactivated.</summary>
         public string reason { get; set; }
     }
 
+    /// <summary>
+    /// A helper class used internally to represent an asset class name.
+    /// </summary>
     [Serializable]
     public class LootLockerAssetClass
     {
+        /// <summary>The asset class name.</summary>
         public string Asset { get; set; }
     }
 
@@ -91,11 +124,18 @@ namespace LootLocker.Requests
         public LootLockerMetadataEntry[] metadata { get; set; }
     }
 
+    /// <summary>
+    /// A reward object linking an inventory instance to the underlying asset details.
+    /// </summary>
     public class LootLockerRewardObject
     {
+        /// <summary>The inventory instance id of the reward item.</summary>
         public int instance_id { get; set; }
+        /// <summary>The variation id of the reward item, or null for the default variation.</summary>
         public int? variation_id { get; set; }
+        /// <summary>The source through which this reward was acquired.</summary>
         public string acquisition_source { get; set; }
+        /// <summary>Full asset details for the reward item.</summary>
         public LootLockerCommonAsset asset { get; set; }
     }
 
@@ -133,12 +173,19 @@ namespace LootLocker.Requests
     //==================================================
     // Request Definitions
     //==================================================
+    /// <summary>
+    /// Request to set or update the name of the current player.
+    /// </summary>
     [Serializable]
     public class PlayerNameRequest
     {
+        /// <summary>The new name to assign to the player.</summary>
         public string name { get; set; }
     }
 
+    /// <summary>
+    /// Request to look up the first-party platform ids for multiple players identified by their legacy ids or public UIDs.
+    /// </summary>
     public class LookupPlayer1stPartyPlatformIDsRequest
     {
         public ulong[] player_ids { get; set; }
@@ -152,6 +199,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to look up basic info for multiple players identified by their ULID, legacy id, or public UID.
     /// </summary>
     public class LootLockerListPlayerInfoRequest
     {
@@ -228,44 +276,71 @@ namespace LootLocker.Requests
     //==================================================
     // Response Definitions
     //==================================================
+    /// <summary>
+    /// A base response type for operations that return no payload beyond success or error state.
+    /// </summary>
     [Serializable]
     public class LootLockerStandardResponse : LootLockerResponse
     {
     }
     
+    /// <summary>
+    /// Response containing a list of players and their linked first-party platform identifiers.
+    /// </summary>
     [Serializable]
     public class Player1stPartyPlatformIDsLookupResponse : LootLockerResponse
     {
+        /// <summary>The list of players with their first-party platform ids.</summary>
         public PlayerWith1stPartyPlatformIDs[] players { get; set; }
     }
 
+    /// <summary>
+    /// Response containing a list of players with their names and various identifier forms.
+    /// </summary>
     [Serializable]
     public class PlayerNameLookupResponse : LootLockerResponse
     {
+        /// <summary>The list of matched players with their names and identifiers.</summary>
         public PlayerNameWithIDs[] players { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the current player's display name.
+    /// </summary>
     [Serializable]
     public class PlayerNameResponse : LootLockerResponse
     {
+        /// <summary>The current display name of the player.</summary>
         public string name { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the list of DLC package identifiers owned by the current player.
+    /// </summary>
     [Serializable]
     public class LootLockerDlcResponse : LootLockerResponse
     {
+        /// <summary>The list of DLC identifiers owned by the player.</summary>
         public string[] dlcs { get; set; }
     }
 
+    /// <summary>
+    /// Response containing assets that have been deactivated and their replacements, if any.
+    /// </summary>
     [Serializable]
     public class LootLockerDeactivatedAssetsResponse : LootLockerResponse
     {
+        /// <summary>The list of deactivated asset entries.</summary>
         public LootLockerDeactivatedObjects[] objects { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the current player's currency balance.
+    /// </summary>
     [Serializable]
     public class LootLockerBalanceResponse : LootLockerResponse
     {
+        /// <summary>The player's current currency balance, or null if unavailable.</summary>
         public int? balance { get; set; }
     }
 
@@ -285,17 +360,29 @@ namespace LootLocker.Requests
         public LootLockerExtendedPagination pagination { get; set; }
     }
     
+    /// <summary>
+    /// Response containing a list of files attached to the player's account.
+    /// </summary>
     public class LootLockerPlayerFilesResponse : LootLockerResponse
     {
+        /// <summary>The list of player files.</summary>
         public LootLockerPlayerFile[] items { get; set; }
     }
 
+    /// <summary>
+    /// A file stored on a player's account, with download URL, metadata, and expiration information.
+    /// </summary>
     public class LootLockerPlayerFile : LootLockerResponse
     {
+        /// <summary>The unique identifier of this player file.</summary>
         public int id { get; set; }
+        /// <summary>The revision id for this file version.</summary>
         public string revision_id { get; set; }
+        /// <summary>The file name.</summary>
         public string name { get; set; }
+        /// <summary>The file size in bytes.</summary>
         public int size { get; set; }
+        /// <summary>The purpose or category tag for this file.</summary>
         public string purpose { get; set; }
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -303,18 +390,27 @@ namespace LootLocker.Requests
 #else
         [Json(Name = "public")]
 #endif
+        /// <summary>Whether this file is publicly accessible.</summary>
         public bool is_public { get; set; }
+        /// <summary>The signed URL to download this file.</summary>
         public string url { get; set; }
+        /// <summary>When the signed URL expires.</summary>
         public DateTime url_expires_at { get; set; }
+        /// <summary>When this file was created.</summary>
         public DateTime created_at { get; set; }
     }
 
+    /// <summary>
+    /// Response containing asset reward notifications for the current player.
+    /// </summary>
     public class LootLockerPlayerAssetNotificationsResponse : LootLockerResponse
     {
+        /// <summary>The list of asset reward objects the player has been notified about.</summary>
         public LootLockerRewardObject[] objects { get; set; }
     }
 
     /// <summary>
+    /// Response containing key information about the currently logged-in player.
     /// </summary>
     public class LootLockerGetCurrentPlayerInfoResponse : LootLockerResponse
     {
@@ -325,6 +421,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing key information about one or more looked-up players.
     /// </summary>
     public class LootLockerListPlayerInfoResponse : LootLockerResponse
     {

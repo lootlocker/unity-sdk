@@ -19,6 +19,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// The current balance of a specific currency held by a wallet.
     /// </summary>
     public class LootLockerBalance
     {
@@ -41,6 +42,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// A currency modifier applied to a wallet that adjusts the effective value of a currency.
     /// </summary>
     public class LootLockerBalanceModifiers
     {
@@ -75,6 +77,7 @@ namespace LootLocker.Requests
     //==================================================
     
     /// <summary>
+    /// Request to create a new wallet for a player or character.
     /// </summary>
     public class LootLockerCreateWalletRequest
     {
@@ -93,6 +96,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Request to credit (add) an amount of currency to a wallet.
     /// </summary>
     public class LootLockerCreditRequest
     {
@@ -110,6 +114,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Request to debit (remove) an amount of currency from a wallet.
     /// </summary>
     public class LootLockerDebitRequest
     {
@@ -131,6 +136,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing all currency balances in a wallet.
     /// </summary>
     public class LootLockerListBalancesForWalletResponse : LootLockerResponse
     {
@@ -141,6 +147,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response containing the details of a player or character wallet.
     /// </summary>
     public class LootLockerGetWalletResponse : LootLockerResponse
     {
@@ -163,6 +170,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response returned after crediting an amount to a wallet, showing the resulting balance.
     /// </summary>
     public class LootLockerCreditWalletResponse : LootLockerResponse
     {
@@ -185,6 +193,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response returned after debiting an amount from a wallet, showing the resulting balance.
     /// </summary>
     public class LootLockerDebitWalletResponse : LootLockerResponse
     {
@@ -207,6 +216,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response returned after successfully creating a new wallet.
     /// </summary>
     public class LootLockerCreateWalletResponse : LootLockerResponse
     {

@@ -21,6 +21,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// A trigger key that was successfully invoked.
     /// </summary>
     public class LootLockerSuccessfulKey
     {
@@ -31,6 +32,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// A trigger key that failed to invoke, including the reason for failure.
     /// </summary>
     public class LootLockerFailedKey
     {
@@ -49,6 +51,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Request to invoke one or more triggers by their keys.
     /// </summary>
     public class LootLockerInvokeTriggersByKeyRequest
     {

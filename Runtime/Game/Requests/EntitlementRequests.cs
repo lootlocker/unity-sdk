@@ -48,6 +48,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// An individual item within an entitlement listing, referencing a catalog item.
     /// </summary>
     public class LootLockerEntitlementHistoryItem
     {
@@ -84,6 +85,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A metadata key-value pair attached to an entitlement listing, carrying additional context about the entitlement.
     /// </summary>
     public class LootLockerEntitlementHistoryMetadata
     {
@@ -100,6 +102,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A reward (such as a leaderboard or progression reward) included in an entitlement listing.
     /// </summary>
     public class LootLockerEntitlementHistoryReward
     {
@@ -121,6 +124,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A complete entitlement listing, grouping items, rewards, and metadata for a single entitlement event.
     /// </summary>
     public class LootLockerEntitlementListing
     {
@@ -172,6 +176,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response containing a paginated history of entitlement listings for the current player.
     /// </summary>
     public class LootLockerEntitlementHistoryResponse : LootLockerResponse
     {
