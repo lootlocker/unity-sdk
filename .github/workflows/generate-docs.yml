@@ -1,0 +1,56 @@
+name: Generate Docs
+run-name: "Generate Docs on ${{ github.ref_name }}"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - dev
+    types:
+      - opened
+      - synchronize
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+jobs:
+  generate-docs:
+    name: Generate SDK reference docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # required for gh release upload
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen graphviz
+
+      - name: Sync navigation table
+        run: bash .doxygen/sync-nav.sh
+
+      - name: Generate docs
+        run: doxygen .doxygen/Doxyfile
+
+      - name: Upload docs artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-docs-${{ github.sha }}
+          path: docs/html/
+          retention-days: 30
+
+      - name: Package docs for release
+        if: github.event_name == 'release'
+        run: zip -r docs-${{ github.ref_name }}.zip docs/html/
+
+      - name: Attach docs to GitHub release
+        if: github.event_name == 'release'
+        run: gh release upload ${{ github.ref_name }} docs-${{ github.ref_name }}.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
