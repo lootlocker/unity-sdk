@@ -17,8 +17,8 @@
 ///
 /// Call \c LootLockerSDKManager.Init()
 /// once at game startup, or rely on the LootLocker Settings asset configured in
-/// **Edit → Project Settings → LootLocker SDK**.
-
+/// **Edit → Project Settings → LootLocker SDK**.///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/the-basics/unity-quick-start).
 /// @defgroup SDKCustomization SDK Customization
 /// @brief Override SDK internals for testing or advanced integration scenarios.
 ///
@@ -40,12 +40,16 @@
 /// Covers Guest, White Label, Google, Apple, Nintendo, Xbox, Epic Games,
 /// Android (Google Play), Amazon Luna, PlayStation, and Steam login flows,
 /// as well as session verification and token refresh.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/authentication).
 
 /// @defgroup WhiteLabel White Label Login
 /// @brief Email/password authentication using LootLocker's built-in identity system.
 ///
 /// Create accounts, log in, verify email, request password resets, and end
 /// White Label sessions.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/white-label-login).
 
 /// @defgroup RemoteSessions Remote Sessions
 /// @brief QR-code / deep-link secondary-device login flow.
@@ -58,6 +62,8 @@
 ///
 /// Lets players connect multiple providers (e.g., Steam + Apple) to a single
 /// LootLocker player identity.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/unified-player-accounts).
 
 // ---------------------------------------------------------------------------
 // Top-level: Presence & Social
@@ -68,12 +74,18 @@
 ///
 /// Read and update the current player's presence, subscribe to friend
 /// presence updates, and configure the presence auto-connect behaviour.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/presence).
 
 /// @defgroup Friends Friends
 /// @brief Friend list management — list, add, remove, and respond to friend requests.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/friends-and-followers).
 
 /// @defgroup Followers Followers
 /// @brief Follow and unfollow players; query follower/following counts.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/friends-and-followers).
 
 // ---------------------------------------------------------------------------
 // Top-level: Player
@@ -83,18 +95,24 @@
 /// @brief Core player profile operations.
 ///
 /// Retrieve and update the player's public profile, name, and info.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/overview).
 
 /// @defgroup PlayerFiles Player Files
 /// @brief Per-player cloud-stored binary or JSON files.
 ///
 /// Upload, download, list, and delete files associated with a player's
 /// account — useful for save games, inventories, or any player-specific blob.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/files).
 
 /// @defgroup PlayerProgressions Player Progressions
 /// @brief Track player XP and level advancement through progression tiers.
 ///
 /// Get a player's progression state, award XP, and query tiers and rewards.
 /// See also @ref Progressions for the shared progression infrastructure.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/progressions).
 
 /// @defgroup PlayerStorage Player Storage
 /// @brief Simple key-value store scoped to the player.
@@ -110,9 +128,13 @@
 ///
 /// List available heroes, create hero instances for the player, and
 /// manage their equipped items.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/classes-and-heroes).
 
 /// @defgroup CharacterProgressions Character Progressions
 /// @brief Progression tracking scoped to an individual character.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/classes-and-heroes).
 
 // ---------------------------------------------------------------------------
 // Top-level: Economy
@@ -120,26 +142,39 @@
 
 /// @defgroup Currency Currency
 /// @brief Define and query the in-game currency types configured in the LootLocker console.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/currencies).
 
 /// @defgroup Balances Balances
 /// @brief Read and update a player's currency balances.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/wallets).
 
 /// @defgroup Catalog Catalog
 /// @brief Browse item listings in the LootLocker storefront catalog.
 ///
 /// List catalog items, filter by type, and retrieve pricing details.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/catalogs).
 
 /// @defgroup Purchasing Purchasing
 /// @brief Initiate and validate item purchases (IAP and virtual currency).
 ///
 /// Covers real-money IAP (Apple, Google, Steam) and virtual-currency
 /// purchases in a single unified interface.
+///
+/// See the [LootLocker documentation — Real-Money Purchases](https://docs.lootlocker.com/commerce/real-money-purchases)
+/// and [Virtual Purchases](https://docs.lootlocker.com/commerce/virtual-purchases).
 
 /// @defgroup Entitlements Entitlements
 /// @brief Query what a player has been granted — including IAP entitlements.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/entitlements).
 
 /// @defgroup DropTables Drop Tables
 /// @brief Evaluate drop-table loot rolls and claim results for the player.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/content/working-with-assets/how-to/create-a-drop-table).
 
 // ---------------------------------------------------------------------------
 // Top-level: Assets & Inventory
@@ -149,18 +184,24 @@
 /// @brief Browse the asset catalogue defined in the LootLocker console.
 ///
 /// List, filter, paginate, and retrieve detail for asset types.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/content/working-with-assets).
 
 /// @defgroup AssetInstance Asset Instances
 /// @brief Operations on asset instances owned by the current player.
 ///
 /// Retrieve a player's owned instances, update key-value storage attached
 /// to an instance, and manage rental states.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/inventory).
 
 /// @defgroup AssetInstanceProgressions Asset Instance Progressions
 /// @brief Progression tracking scoped to a specific asset instance.
 
 /// @defgroup UserGeneratedContent User-Generated Content (UGC)
 /// @brief Create, edit, and publish player-authored assets.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/content/ugc-overview).
 
 /// @defgroup Collectables Collectables
 /// @brief Collectable items — groups, items, and player collection state.
@@ -174,12 +215,16 @@
 ///
 /// Complementary to @ref PlayerProgressions and @ref CharacterProgressions;
 /// this group covers the underlying progression management endpoints.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/progressions).
 
 /// @defgroup Leaderboard Leaderboards
 /// @brief Submit scores and read ranked results.
 ///
 /// Write scores (with optional metadata), retrieve all-player rankings,
 /// page through results, and look up a specific player's rank.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/leaderboards).
 
 /// @defgroup Missions Missions
 /// @brief Time-limited challenges with completion tracking.
@@ -189,6 +234,8 @@
 
 /// @defgroup Triggers Triggers
 /// @brief Fire named trigger events that award items or currency server-side.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/triggers).
 
 // ---------------------------------------------------------------------------
 // Top-level: Metadata & Messaging
@@ -199,15 +246,21 @@
 ///
 /// Supports per-asset, per-player, per-character, per-progression, and
 /// per-leaderboard metadata in a unified interface.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/shared-systems/metadata).
 
 /// @defgroup Messages Messages
 /// @brief Read player inbox messages from the LootLocker console.
 
 /// @defgroup Notifications Notifications
 /// @brief Receive and dismiss push/persistent notifications for the player.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/shared-systems/notifications).
 
 /// @defgroup Broadcasts Broadcasts
 /// @brief Read game-wide broadcast messages configured in the console.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/broadcasts).
 
 // ---------------------------------------------------------------------------
 // Top-level: Moderation
@@ -218,6 +271,8 @@
 
 /// @defgroup Feedback Feedback
 /// @brief Submit structured feedback (feature requests, bug reports, general).
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/feedback).
 
 // ---------------------------------------------------------------------------
 // Top-level: Utilities
