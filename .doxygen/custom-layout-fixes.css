@@ -225,3 +225,10 @@ div.contents {
     border-right: 1px solid var(--separator-color) !important;
     z-index: -1 !important; /* Behind sidebar content */
 }
+/* Group pages: suppress the auto-generated "Detailed Description" h2 heading.
+   title="" in DoxygenLayout.xml should suppress it but some Doxygen versions
+   still emit <h2 class="groupheader"><a id="details"></a>Detailed Description</h2>.
+   Target it via the anchor Doxygen always inserts inside it. */
+h2.groupheader:has(#details) {
+    display: none !important;
+}
