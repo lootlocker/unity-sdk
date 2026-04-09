@@ -25,10 +25,13 @@
 /// Includes state-writer injection, reset, and lifecycle introspection helpers.
 
 /// @defgroup MultiUserManagement Multi-User Management
-/// @brief Manage concurrent player sessions on a single device.
+/// @brief Manage multiple simultaneous player sessions on a single device.
 ///
-/// Switch the active player, query all cached players, clear per-player or
-/// global state, and control which player receives subsequent API calls.
+/// Ideal for local multiplayer, hot seat, and couch co-op games.
+/// All SDK methods accept an optional player-ULID parameter to target a
+/// specific session. Players move through three states: *active* (authenticated
+/// this session), *inactive-cached* (session data survives a restart), and
+/// *cached* (device-local data, no current session).
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/multi-user).
 
@@ -37,35 +40,50 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Authentication Authentication
-/// @brief Start and end player sessions across all supported identity providers.
+/// @brief Start and end player sessions via Guest, Platform, or White Label login.
 ///
-/// Covers Guest, White Label, Google, Apple, Nintendo, Xbox, Epic Games,
-/// Android (Google Play), Amazon Luna, PlayStation, and Steam login flows,
-/// as well as session verification and token refresh.
+/// Three login families are supported:
+/// - **Guest Login** — assigns each player a unique device-local ID; no
+///   account required. Ideal for fast entry on mobile or web.
+/// - **Platform Login** — delegates to a first-party platform (Steam,
+///   PlayStation, Xbox, Nintendo Switch, Epic Games, Google Play,
+///   Apple Game Center, Meta/Oculus, Amazon Luna, Discord).
+/// - **White Label Login** — custom email/password accounts for your game.
+///
+/// See also @ref WhiteLabel and @ref ConnectedAccounts.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/authentication).
 
 /// @defgroup WhiteLabel White Label Login
-/// @brief Email/password authentication using LootLocker's built-in identity system.
+/// @brief Custom email/password account system built into your game.
 ///
-/// Create accounts, log in, verify email, request password resets, and end
-/// White Label sessions.
+/// Players sign in with an email address and password unique to your game.
+/// Includes customizable reset-password and confirm-account pages that match
+/// your game's branding. Integrates with @ref ConnectedAccounts so that guest
+/// players can 'upgrade' to a fully registered account at any time, preserving
+/// their existing progress.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/white-label-login).
 
 /// @defgroup RemoteSessions Remote Sessions
-/// @brief QR-code / deep-link secondary-device login flow.
+/// @brief Log in to a different platform than the one you are currently playing on.
 ///
-/// Start a remote-session lease, poll or subscribe for approval, and cancel
-/// the flow from the primary device.
+/// Part of Unified Player Accounts (UPA). A player on one platform (e.g.,
+/// Nintendo Switch) can authenticate as their account on another platform
+/// (e.g., Steam) without needing the target platform's native app. The flow
+/// uses an 8-digit code verified through https://auth.game.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/unified-player-accounts#remote-login).
 
 /// @defgroup ConnectedAccounts Connected Accounts
-/// @brief Link or unlink third-party identity providers to an existing session.
+/// @brief Link multiple platform accounts together under a single LootLocker player identity.
 ///
-/// Lets players connect multiple providers (e.g., Steam + Apple) to a single
-/// LootLocker player identity.
+/// Once linked, the same player profile loads regardless of which platform
+/// the game is started on, enabling cross-platform progression and cross-saves.
+/// Linking can be done via **External Linking** (redirects to the LootLocker
+/// `auth.game` website; recommended for most cases) or **Direct Linking** (used
+/// when the player is already on the target platform). Also supports
+/// transitioning a Guest Login to any other provider.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/unified-player-accounts).
 
@@ -74,20 +92,33 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Presence Presence
-/// @brief Real-time online/offline visibility and status for players.
+/// @brief Track when and how players are active across all platforms in real time.
 ///
-/// Read and update the current player's presence, subscribe to friend
-/// presence updates, and configure the presence auto-connect behaviour.
+/// Basic Presence records session start/end times, automatically computing
+/// CCU (concurrent users) and session length. **Rich Presence** (available to
+/// select customers) extends this with developer-defined per-session player
+/// statuses (e.g., `Main Menu`, `Level 3`) that produce a detailed activity
+/// timeline per session — useful for analytics, live-ops, and player support.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/presence).
 
 /// @defgroup Friends Friends
-/// @brief Friend list management — list, add, remove, and respond to friend requests.
+/// @brief Cross-platform friend list — send, accept, and manage friend requests.
+///
+/// Players can add each other using any supported identifier (player ID,
+/// ULID, public UID, display name, or first-party IDs such as Steam/PSN)
+/// regardless of platform. Friend requests require mutual acceptance. Players
+/// can also block others. The Friends and @ref Followers systems are
+/// independent and can be used separately.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/friends-and-followers).
 
 /// @defgroup Followers Followers
-/// @brief Follow and unfollow players; query follower/following counts.
+/// @brief One-way player subscriptions — follow without requiring approval.
+///
+/// Unlike @ref Friends, following does not require the other player to accept.
+/// Query a player's follower and following counts and enumerate their lists.
+/// Can be used alongside or entirely independently of the Friends system.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/friends-and-followers).
 
@@ -96,25 +127,34 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Player Player
-/// @brief Core player profile operations.
+/// @brief Retrieve and manage the current player's profile, name, and identifiers.
 ///
-/// Retrieve and update the player's public profile, name, and info.
+/// Covers public profile data, display-name assignment, and account info
+/// lookups. For inventory see @ref AssetInstance; for XP/levels see
+/// @ref PlayerProgressions; for currency balances see @ref Balances; for
+/// cloud file storage see @ref PlayerFiles.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/overview).
 
 /// @defgroup PlayerFiles Player Files
-/// @brief Per-player cloud-stored binary or JSON files.
+/// @brief CDN-backed file storage scoped to a player's profile.
 ///
-/// Upload, download, list, and delete files associated with a player's
-/// account — useful for save games, inventories, or any player-specific blob.
+/// Best suited for large files such as screenshots, cloud saves, or profile
+/// pictures that benefit from CDN delivery. For small key-value data prefer
+/// @ref Metadata. Each file upload requires a declared purpose; files can be
+/// marked private to restrict visibility. Up to five revisions per file are
+/// retained, with revert capability in the Web Console.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/files).
 
 /// @defgroup PlayerProgressions Player Progressions
-/// @brief Track player XP and level advancement through progression tiers.
+/// @brief Award points and read tier state for a player's progressions.
 ///
-/// Get a player's progression state, award XP, and query tiers and rewards.
-/// See also @ref Progressions for the shared progression infrastructure.
+/// Progressions are points-threshold systems where reaching each tier unlocks
+/// configured rewards (assets, currency, other progression points). This group
+/// covers player-scoped operations: query current state, award points, and
+/// retrieve earned rewards. See @ref Progressions for the shared infrastructure
+/// (tier definitions, metadata, reset).
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/progressions).
 
@@ -128,15 +168,22 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Hero Hero
-/// @brief Hero-based character selection and loadout management.
+/// @brief Create and manage hero instances for the current player.
 ///
-/// List available heroes, create hero instances for the player, and
-/// manage their equipped items.
+/// Heroes are player-owned instances of a Hero Class, which in turn extends a
+/// Base Class. Hero Classes inherit the default loadout and equippable asset
+/// rules of their Base Class but may override them with exceptions. This group
+/// covers listing available heroes, creating player hero instances, and managing
+/// equipped item loadouts.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/classes-and-heroes).
 
 /// @defgroup CharacterProgressions Character Progressions
-/// @brief Progression tracking scoped to an individual character.
+/// @brief Award points and read tier state for a character's progressions.
+///
+/// Mirrors the @ref PlayerProgressions interface but targets a specific
+/// character's progression slot rather than the player directly. Useful for
+/// per-class XP, mastery systems, and per-hero level tracks.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/classes-and-heroes).
 
@@ -145,38 +192,71 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Currency Currency
-/// @brief Define and query the in-game currency types configured in the LootLocker console.
+/// @brief Define and query the virtual currency types in your game's economy.
+///
+/// Currencies drive virtual and (indirectly) real-money purchases via the
+/// Catalog system. Each currency has a name, shorthand identifier, minor-unit
+/// name, and denomination chain (e.g., 1 Gold = 100 Silver = 1,000 Copper).
+/// They can be granted by rewards from Progressions, Leaderboards, and
+/// Triggers, or exchanged for other currencies. See @ref Balances to read
+/// player wallets.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/currencies).
 
 /// @defgroup Balances Balances
-/// @brief Read and update a player's currency balances.
+/// @brief Read and adjust a player's wallet balances for each currency.
+///
+/// Each player (and optionally each character or hero) holds a Wallet with
+/// a unique ID. Balances update automatically when currency is granted via
+/// rewards or spent via Catalog purchases, and can also be credited or debited
+/// directly through the API or Web Console. See @ref Currency for currency
+/// type definitions.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/wallets).
 
 /// @defgroup Catalog Catalog
-/// @brief Browse item listings in the LootLocker storefront catalog.
+/// @brief Browse item listings and prices in the LootLocker storefront catalog.
 ///
-/// List catalog items, filter by type, and retrieve pricing details.
+/// Catalogs are the pricing layer of LootLocker's economy — they assign
+/// virtual or real-money prices to Assets, Currencies, Progressions, and
+/// Progression Resets. A game can have multiple catalogs (e.g., one per store
+/// section). Listings support single items or bundles with custom Metadata
+/// and integrate with platform payment systems (App Store, Google Play, Steam).
+/// See @ref Purchasing to initiate a transaction.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/catalogs).
 
 /// @defgroup Purchasing Purchasing
-/// @brief Initiate and validate item purchases (IAP and virtual currency).
+/// @brief Initiate and validate purchases — both real-money (IAP) and virtual-currency.
 ///
-/// Covers real-money IAP (Apple, Google, Steam) and virtual-currency
-/// purchases in a single unified interface.
+/// **Real-money purchases** integrate with first-party payment systems
+/// (Apple App Store, Google Play, Steam) to process and server-side validate
+/// IAP receipts. **Virtual purchases** debit a player's Wallet and grant the
+/// catalog item. Both flows produce an entitlement inspectable via
+/// @ref Entitlements.
 ///
 /// See the [LootLocker documentation — Real-Money Purchases](https://docs.lootlocker.com/commerce/real-money-purchases)
 /// and [Virtual Purchases](https://docs.lootlocker.com/commerce/virtual-purchases).
 
 /// @defgroup Entitlements Entitlements
-/// @brief Query what a player has been granted — including IAP entitlements.
+/// @brief Inspect a player's purchase history and individual transaction statuses.
+///
+/// An entitlement records that a player has *access rights* to an item rather
+/// than outright ownership. Use this group to list all purchases, check the
+/// status of in-flight transactions, and display a transaction history — a
+/// requirement imposed by some First Party platforms.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/entitlements).
 
 /// @defgroup DropTables Drop Tables
-/// @brief Evaluate drop-table loot rolls and claim results for the player.
+/// @brief Evaluate weighted loot rolls from a Drop Table asset and claim the results.
+///
+/// Drop Tables are a special Asset Complexity configured in the console.
+/// Each table is divided into *drop groups* with a weighting (or guaranteed
+/// Force Select), a min/max drop count, and a list of tagged assets. Evaluate
+/// the table to receive a proposed drop list, then pick/claim them to grant
+/// them to the player's inventory. Tags allow loot to vary by player context
+/// (e.g., faction or class).
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/content/working-with-assets/how-to/create-a-drop-table).
 
@@ -185,17 +265,26 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Assets Assets
-/// @brief Browse the asset catalogue defined in the LootLocker console.
+/// @brief Browse and filter the asset catalogue defined in the LootLocker console.
 ///
-/// List, filter, paginate, and retrieve detail for asset types.
+/// Assets are anything a player can earn, purchase, possess, or equip —
+/// cosmetics, weapons, game configs, loot boxes, drop tables, or rental items.
+/// Each asset is assigned a Context (category) and a Complexity (Generic,
+/// Loot Box, Rental, or Drop Table) that adds behaviour. This group covers
+/// listing reference assets and their metadata; for player-owned instances
+/// see @ref AssetInstance.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/content/working-with-assets).
 
 /// @defgroup AssetInstance Asset Instances
-/// @brief Operations on asset instances owned by the current player.
+/// @brief Access and manage asset instances in the current player's inventory.
 ///
-/// Retrieve a player's owned instances, update key-value storage attached
-/// to an instance, and manage rental states.
+/// When an asset is granted, a unique Asset Instance is created that extends
+/// the reference asset with a player-specific Instance ID and mutable state.
+/// Instances enter inventory via leaderboard/progression/trigger rewards,
+/// Catalog purchases, or default class loadouts. This group covers listing,
+/// updating key-value storage per instance, and managing rental states. For
+/// the reference catalogue see @ref Assets.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/inventory).
 
@@ -215,18 +304,27 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Progressions Progressions
-/// @brief Shared progression infrastructure (tiers, rewards, reset).
+/// @brief Configure and query the shared progression infrastructure.
 ///
-/// Complementary to @ref PlayerProgressions and @ref CharacterProgressions;
-/// this group covers the underlying progression management endpoints.
+/// Progressions are points-based levelling systems with configurable tiers
+/// and configurable per-tier rewards (assets, currency, progression points).
+/// The same progression can be applied to players (@ref PlayerProgressions),
+/// characters (@ref CharacterProgressions), or asset instances
+/// (@ref AssetInstanceProgressions). This group covers cross-cutting endpoints:
+/// reading tier and reward definitions, awarding generic points, and resetting
+/// a progression. Progressions also support custom Metadata.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/progressions).
 
 /// @defgroup Leaderboard Leaderboards
-/// @brief Submit scores and read ranked results.
+/// @brief Rank players or any custom key by score, with optional resets and rewards.
 ///
-/// Write scores (with optional metadata), retrieve all-player rankings,
-/// page through results, and look up a specific player's rank.
+/// Two leaderboard types are supported: **Player Type** (scores tied to player
+/// IDs — traditional rankings) and **Generic Type** (scores tied to custom
+/// string keys — rank UGC, teams, or any entity). Metadata can be stored
+/// alongside each score for contextual enrichment. Periodic **resets** can be
+/// configured in the console to clear rankings on a schedule and automatically
+/// distribute rewards to top-placed players.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/leaderboards).
 
@@ -237,7 +335,14 @@
 /// @brief Retrieve map configurations and node data.
 
 /// @defgroup Triggers Triggers
-/// @brief Fire named trigger events that award items or currency server-side.
+/// @brief Invoke named trigger events that grant server-configured rewards.
+///
+/// Triggers are created in the console and linked to reward payloads (assets,
+/// currency, progression points). **Limited Triggers** may be invoked at most
+/// N times per player — ideal for one-time milestones, achievements, or
+/// first-launch gifts. **Unlimited Triggers** can be invoked repeatedly for
+/// recurring rewards such as per-kill drops or ad-watch grants. Rewards are
+/// automatically granted to the player's inventory and wallets.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/triggers).
 
@@ -246,10 +351,14 @@
 // ---------------------------------------------------------------------------
 
 /// @defgroup Metadata Metadata
-/// @brief Attach and retrieve arbitrary key-value metadata on any entity.
+/// @brief Attach and retrieve typed key-value metadata on any LootLocker entity.
 ///
-/// Supports per-asset, per-player, per-character, per-progression, and
-/// per-leaderboard metadata in a unified interface.
+/// Metadata can be attached to Progressions, Leaderboards, Catalogs,
+/// Currencies, Assets, and more. Values are strongly typed: String, Boolean,
+/// Number, JSON, or Base64-encoded binary. Entries support optional **Tags**
+/// for filtering (e.g., seasonal, featured) and a **Game Read** flag that
+/// restricts visibility to the Server API only — useful for keeping sensitive
+/// data out of the game client.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/shared-systems/metadata).
 
@@ -257,12 +366,25 @@
 /// @brief Read player inbox messages from the LootLocker console.
 
 /// @defgroup Notifications Notifications
-/// @brief Receive and dismiss push/persistent notifications for the player.
+/// @brief Poll and acknowledge queued event notifications generated by other SDK systems.
+///
+/// Notifications are generated automatically by Rewards, Leaderboard resets,
+/// Catalog purchases, Progressions, and Triggers when significant events occur.
+/// They accumulate in a server-side queue until the game marks them as read,
+/// guaranteeing delivery even while a player is offline.
+/// **Note:** these are delivery-queue notifications polled from the game client,
+/// not mobile push notifications.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/shared-systems/notifications).
 
 /// @defgroup Broadcasts Broadcasts
-/// @brief Read game-wide broadcast messages configured in the console.
+/// @brief Fetch scheduled, localizable messages published from the LootLocker console.
+///
+/// Broadcasts can target all players or specific segments filtered by
+/// platform, activity, or playtime. Each message supports text, images,
+/// actions, and custom key-value pairs, with full localization and flexible
+/// publish schedules across timezones. Typical uses: patch notes, event
+/// announcements, maintenance notices, and catalog promotions.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/broadcasts).
 
@@ -274,7 +396,14 @@
 /// @brief Submit player-generated moderation reports to LootLocker.
 
 /// @defgroup Feedback Feedback
-/// @brief Submit structured feedback (feature requests, bug reports, general).
+/// @brief Submit player, UGC, or game-level reports to LootLocker's moderation system.
+///
+/// Three report targets are supported: **Player Feedback** — report another
+/// player for inappropriate behaviour or cheating; **UGC Feedback** — flag
+/// player-created content that violates community standards; **Game Feedback**
+/// — submit bug reports, performance issues, or general suggestions. Each
+/// target supports configurable categories. All reports are viewable and
+/// manageable in the LootLocker web console.
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/feedback).
 
