@@ -8287,7 +8287,7 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerResponse>(failedResponse?.requestContext?.player_ulid));
                 return;
             }
-            if (!CheckInitialized(false))
+            if (!CheckInitialized(false, failedResponse.requestContext.player_ulid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(failedResponse?.requestContext?.player_ulid));
                 return;
