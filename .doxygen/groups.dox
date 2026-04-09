@@ -29,6 +29,8 @@
 ///
 /// Switch the active player, query all cached players, clear per-player or
 /// global state, and control which player receives subsequent API calls.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/multi-user).
 
 // ---------------------------------------------------------------------------
 // Top-level: Sessions
@@ -56,6 +58,8 @@
 ///
 /// Start a remote-session lease, poll or subscribe for approval, and cancel
 /// the flow from the primary device.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/unified-player-accounts#remote-login).
 
 /// @defgroup ConnectedAccounts Connected Accounts
 /// @brief Link or unlink third-party identity providers to an existing session.
