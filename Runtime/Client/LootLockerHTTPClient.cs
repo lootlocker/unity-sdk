@@ -295,9 +295,12 @@ namespace LootLocker
         {
             CurrentlyOngoingRequests?.Clear();
             HTTPExecutionQueue?.Clear();
-            for (int i = 0; i < FailedRequestHistory?.Count; i++)
+            if (FailedRequestHistory != null)
             {
-                FailedRequestHistory[i] = null;
+                for (int i = 0; i < FailedRequestHistory.Count; i++)
+                {
+                    FailedRequestHistory[i] = null;
+                }
             }
             CompletedRequestIDs?.Clear();
             ExecutionItemsNeedingRefresh?.Clear();
@@ -1037,6 +1040,7 @@ namespace LootLocker
                     {
                         LootLockerLogger.Log($"Failed to retrieve feedback categories for error report. Status code: {feedbackCategoriesResponse.statusCode} and message: {feedbackCategoriesResponse.errorData.message}", LootLockerLogger.LogLevel.Debug);
                         LootLockerFailureFeedbackCategory = null;
+                        value?.Invoke(false);
                         return;
                     }
                     foreach(var cat in feedbackCategoriesResponse.categories)
@@ -1164,7 +1168,11 @@ namespace LootLocker
 
             DateTime lowestTimeStamp = DateTime.MaxValue;
             int lowestTimeStampIndex = -1;
-            for (int i = 0; i < FailedRequestHistory?.Count; i++)
+            if (FailedRequestHistory == null)
+            {
+                return;
+            }
+            for (int i = 0; i < FailedRequestHistory.Count; i++)
             {
                 if (FailedRequestHistory[i] == null)
                 {
