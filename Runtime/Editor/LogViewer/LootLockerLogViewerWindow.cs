@@ -40,10 +40,18 @@ namespace LootLocker.Extension
             }
             if (visualTree == null)
             {
-                // Find by asset name in the AssetDatabase — works for any install location
+                // Find by exact filename in the AssetDatabase — works for any install location
                 string[] guids = AssetDatabase.FindAssets("LootLockerLogViewerWindow t:VisualTreeAsset");
-                if (guids.Length > 0)
-                    visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(guids[0]));
+                foreach (string guid in guids)
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (assetPath.EndsWith("/LootLockerLogViewerWindow.uxml", StringComparison.Ordinal))
+                    {
+                        visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+                        if (visualTree != null)
+                            break;
+                    }
+                }
             }
             if (visualTree == null)
             {

@@ -28,6 +28,7 @@ namespace LootLocker
         // Locates the SDK root by finding this script in the AssetDatabase and walking up four
         // directory levels: LootLockerConfig.cs -> Resources/ -> Game/ -> Runtime/ -> SDK root.
         // This works regardless of install location (Assets/, Packages/, or any custom path).
+        // But it only works in the editor
         private static string GetSdkRootAssetsPath(bool requireWritable = false)
         {
             if (_cachedSdkRootPath == null)
@@ -185,7 +186,9 @@ namespace LootLocker
                     foreach (string guid in guids)
                     {
                         string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                        if (Path.GetFileNameWithoutExtension(assetPath).Equals(ConfigFileName, StringComparison.OrdinalIgnoreCase))
+                        // Match exact filename including extension to avoid false positives from
+                        // other TextAssets (e.g. .json/.txt) that share the same base name
+                        if (assetPath.EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase))
                         {
                             TextAsset foundAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
                             if (foundAsset != null)
@@ -414,7 +417,8 @@ namespace LootLocker
         {
             if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A")) 
                 || ListInstalledPackagesRequest != null
-                || AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset").Length > 0 /*Configured through config file, read sdk version there*/)
+                || Array.Exists(AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset"),
+                    g => AssetDatabase.GUIDToAssetPath(g).EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase)) /*Configured through config file, read sdk version there*/)
             {
                 return;
             }
