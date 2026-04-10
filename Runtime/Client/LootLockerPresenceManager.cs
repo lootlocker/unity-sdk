@@ -607,7 +607,7 @@ namespace LootLocker
 
             if (!instance._isEnabled)
             {
-                    string errorMessage = "Presence is disabled. Enable it in Project Settings > LootLocker SDK > Presence Settings or use _SetPresenceEnabled(true).";
+                    string errorMessage = "Presence is disabled. Enable it in the SDK settings or use _SetPresenceEnabled(true).";
                 LootLockerLogger.Log(errorMessage, LootLockerLogger.LogLevel.Debug);
                 onComplete?.Invoke(false, errorMessage);
                 return;
