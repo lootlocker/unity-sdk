@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Synchronizes the mainpage navigation table with groups.dox definitions.
-# Run from the repo root: bash .doxygen/sync-nav.sh
+# generate-doxygen-docs.sh — LootLocker Unity SDK
+# 1. Syncs the mainpage navigation table from groups.dox
+# 2. Reads the SDK version from package.json
+# 3. Runs Doxygen
+# Run from the repo root:  bash .doxygen/generate-doxygen-docs.sh
 set -euo pipefail
 
 GROUPS_FILE="${1:-.doxygen/groups.dox}"
 MAINPAGE_FILE="${2:-.doxygen/mainpage.md}"
 
+# ── 1. Sync navigation table ──────────────────────────────────────────
 python3 - "$GROUPS_FILE" "$MAINPAGE_FILE" << 'EOF'
 import re, sys
 
@@ -15,7 +19,6 @@ mainpage_file = sys.argv[2]
 with open(groups_file) as f:
     content = f.read()
 
-# Match @defgroup lines and optionally the following @brief line
 pattern = r'/// @defgroup\s+(\w+)\s+([^\r\n]+)(?:\r?\n/// @brief\s+([^\r\n]+))?'
 matches = re.findall(pattern, content)
 
@@ -40,3 +43,11 @@ with open(mainpage_file, 'w') as f:
 
 print(f"sync-nav: updated {mainpage_file} with {len(matches)} groups")
 EOF
+
+# ── 2. Extract version ────────────────────────────────────────────────
+export LL_SDK_VERSION
+LL_SDK_VERSION="$(jq -r '.version' package.json)"
+echo "generate-doxygen-docs: version=${LL_SDK_VERSION}"
+
+# ── 3. Run Doxygen ────────────────────────────────────────────────────
+doxygen .doxygen/Doxyfile

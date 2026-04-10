@@ -7,6 +7,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "LootLocker Unity SDK"
 PROJECT_BRIEF          = "Game backend SDK for Unity"
+PROJECT_NUMBER         = $(LL_SDK_VERSION)
 PROJECT_LOGO           = .doxygen/images/lootlocker-logo.png
 OUTPUT_DIRECTORY       = docs
 

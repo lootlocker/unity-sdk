@@ -2,13 +2,9 @@ name: Generate Docs
 run-name: "Generate Docs on ${{ github.ref_name }}"
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
-      - dev
     types:
       - opened
       - synchronize
@@ -39,17 +35,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
 
-      - name: Sync navigation table
-        run: bash .doxygen/sync-nav.sh
-
       - name: Generate docs
-        run: doxygen .doxygen/Doxyfile
+        run: bash .doxygen/generate-doxygen-docs.sh
 
       - name: Upload docs artifact
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: sdk-docs-${{ steps.sdk-version.outputs.version }}
+          name: unity-sdk-docs-${{ steps.sdk-version.outputs.version }}
           path: docs/html/
           retention-days: 30
 
@@ -65,7 +57,7 @@ jobs:
       - name: Download docs artifact
         uses: actions/download-artifact@v4
         with:
-          name: sdk-docs-${{ needs.generate-docs.outputs.sdk-version }}
+          name: unity-sdk-docs-${{ needs.generate-docs.outputs.sdk-version }}
           path: docs/html/
 
       - name: Package docs for release
