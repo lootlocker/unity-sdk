@@ -18,12 +18,58 @@ namespace LootLocker
         private static readonly string SettingsName = $"{PackageName}Config";
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
-        private static readonly string ConfigAssetsPath = $"Assets/{ConfigFolderName}/Resources/Config/{ConfigAssetName}";
-        private static string ConfigResourceFolder => $"{Application.dataPath}/{ConfigFolderName}/Resources/Config";
         private static readonly string ConfigFileIdentifier = ""; // Optional extra package id if you want to be able to switch between multiple configurations
         private static readonly string ConfigFileExtension = ".bytes";
         private static readonly string ConfigFileName = $"{SettingsName}" + (string.IsNullOrEmpty(ConfigFileIdentifier) ? "" : $"-{ConfigFileIdentifier}");
-        private static readonly string ConfigFilePath = $"Assets/{ConfigFolderName}/Resources/Config/{ConfigFileName}{ConfigFileExtension}";
+
+#if UNITY_EDITOR
+        private static string _cachedSdkRootPath = null;
+
+        // Locates the SDK root by finding this script in the AssetDatabase and walking up four
+        // directory levels: LootLockerConfig.cs -> Resources/ -> Game/ -> Runtime/ -> SDK root.
+        // This works regardless of install location (Assets/, Packages/, or any custom path).
+        private static string GetSdkRootAssetsPath(bool requireWritable = false)
+        {
+            if (_cachedSdkRootPath == null)
+            {
+                string[] guids = AssetDatabase.FindAssets($"{nameof(LootLockerConfig)} t:MonoScript");
+                foreach (string guid in guids)
+                {
+                    string scriptPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (scriptPath.EndsWith($"/{nameof(LootLockerConfig)}.cs", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Walk up 4 levels: Resources/ -> Game/ -> Runtime/ -> SDK root
+                        string dir = Path.GetDirectoryName(scriptPath); // .../Resources
+                        dir = Path.GetDirectoryName(dir);               // .../Game
+                        dir = Path.GetDirectoryName(dir);               // .../Runtime
+                        dir = Path.GetDirectoryName(dir);               // SDK root
+                        if (!string.IsNullOrEmpty(dir))
+                        {
+                            _cachedSdkRootPath = dir.Replace('\\', '/');
+                            break;
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(_cachedSdkRootPath))
+                    _cachedSdkRootPath = $"Assets/{ConfigFolderName}";
+            }
+            // Packages/ is read-only — writable content (e.g. asset creation) must go under Assets/
+            if (requireWritable && _cachedSdkRootPath.StartsWith("Packages/", StringComparison.OrdinalIgnoreCase))
+                return $"Assets/{ConfigFolderName}";
+            return _cachedSdkRootPath;
+        }
+
+        private static string ConfigAssetsPath => $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/Config/{ConfigAssetName}";
+        private static string ConfigResourceFolder
+        {
+            get
+            {
+                string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+                return Path.Combine(projectRoot, GetSdkRootAssetsPath(requireWritable: true), "Resources", "Config");
+            }
+        }
+        private static string ConfigFilePath => $"{GetSdkRootAssetsPath()}/Resources/Config/{ConfigFileName}{ConfigFileExtension}";
+#endif
 
 
 #region User Config Variables
@@ -118,32 +164,59 @@ namespace LootLocker
         private static ExternalFileConfig CheckForFileConfig()
         {
             ExternalFileConfig fileConfig = null;
-            try {
-                if(!File.Exists(ConfigFilePath))
-                {
-                    return fileConfig;
-                }
-#if UNITY_EDITOR
-                AssetDatabase.ImportAsset(ConfigFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
-                AssetDatabase.Refresh();
-                TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(ConfigFilePath);
-#else
-                TextAsset configTextAsset = null;
-#endif
-                
-                // Fallback: if Unity asset system isn't ready, read file directly from disk
+            try
+            {
                 string configText = null;
-                if(configTextAsset != null)
+
+                // 1. Primary: Resources.Load — works in any install location in both editor and builds.
+                //    The .bytes file must be inside a Resources/ folder for this to work.
+                TextAsset resourcesTextAsset = Resources.Load<TextAsset>($"Config/{ConfigFileName}");
+                if (resourcesTextAsset != null)
                 {
-                    configText = configTextAsset.text;
+                    configText = resourcesTextAsset.text;
                 }
-                else
+
+#if UNITY_EDITOR
+                // 2. Editor fallback A: search AssetDatabase by name — finds the file regardless of
+                //    where it lives in the project (handles race where Resources DB is not yet warmed up)
+                if (configText == null)
                 {
-                    // Direct file read as fallback
-                    configText = File.ReadAllText(ConfigFilePath);
+                    string[] guids = AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset");
+                    foreach (string guid in guids)
+                    {
+                        string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                        if (Path.GetFileNameWithoutExtension(assetPath).Equals(ConfigFileName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            TextAsset foundAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
+                            if (foundAsset != null)
+                            {
+                                configText = foundAsset.text;
+                                break;
+                            }
+                        }
+                    }
                 }
-                
-                if(!string.IsNullOrEmpty(configText))
+
+                // 3. Editor fallback B: SDK-root-relative path with forced re-import; also reads
+                //    the file directly from disk if the asset database still hasn't picked it up
+                if (configText == null && File.Exists(ConfigFilePath))
+                {
+                    AssetDatabase.ImportAsset(ConfigFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                    AssetDatabase.Refresh();
+                    TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(ConfigFilePath);
+                    if (configTextAsset != null)
+                    {
+                        configText = configTextAsset.text;
+                    }
+                    else
+                    {
+                        // Direct file read as last resort when the asset database is still not ready
+                        configText = File.ReadAllText(ConfigFilePath);
+                    }
+                }
+#endif
+
+                if (!string.IsNullOrEmpty(configText))
                 {
                     var encryptedBase64 = configText;
                     if (!LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(encryptedBase64))
@@ -162,16 +235,13 @@ namespace LootLocker
                         return fileConfig;
                     }
                 }
-                else
-                {
-                }
             }
             catch (Exception ex)
             {
                 LootLockerLogger.Log("Error while checking for file config: " + ex.Message, LootLockerLogger.LogLevel.Error);
                 return fileConfig;
             }
-            return fileConfig;            
+            return fileConfig;
         }
 
 #if UNITY_EDITOR
@@ -344,7 +414,7 @@ namespace LootLocker
         {
             if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A")) 
                 || ListInstalledPackagesRequest != null
-                || File.Exists(ConfigFilePath) /*Configured through config file, read sdk version there*/)
+                || AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset").Length > 0 /*Configured through config file, read sdk version there*/)
             {
                 return;
             }
@@ -374,9 +444,10 @@ namespace LootLocker
                     }
                 }
 
-                if (File.Exists("Assets/LootLockerSDK/package.json"))
+                string sdkPackageJsonPath = $"{GetSdkRootAssetsPath()}/package.json";
+                if (File.Exists(sdkPackageJsonPath))
                 {
-                    LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText("Assets/LootLockerSDK/package.json")).version;
+                    LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(sdkPackageJsonPath)).version;
                     LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                     return;
                 }
@@ -575,6 +646,7 @@ namespace LootLocker
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
             _current = null;
+            _cachedSdkRootPath = null;
         }
 #endif
 #endregion
