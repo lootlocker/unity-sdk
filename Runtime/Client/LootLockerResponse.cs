@@ -207,7 +207,7 @@ namespace LootLocker
         /// </summary>
         public static T SDKNotInitializedError<T>(string forPlayerWithUlid, DateTime? requestTime = null, string requestId = null) where T : LootLockerResponse, new()
         {
-            return ClientError<T>("The LootLocker SDK has not been initialized, please start a session to call this method", forPlayerWithUlid, requestTime, requestId);
+            return ClientError<T>("The game client has not been initialized, please start a session to call this method", forPlayerWithUlid, requestTime, requestId);
         }
 
         /// <summary>
