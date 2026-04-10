@@ -45,7 +45,7 @@ namespace LootLocker.Extension
                 foreach (string guid in guids)
                 {
                     string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                    if (assetPath.EndsWith("/LootLockerLogViewerWindow.uxml", StringComparison.Ordinal))
+                    if (assetPath.EndsWith("/LootLockerLogViewerWindow.uxml", System.StringComparison.Ordinal))
                     {
                         visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
                         if (visualTree != null)
