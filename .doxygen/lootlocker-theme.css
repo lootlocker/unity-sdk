@@ -160,10 +160,38 @@ html.dark-mode {
 #ll-topnav-product {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ll-nav-fg);
+  color: var(--ll-nav-fg) !important;
+  text-decoration: none !important;
   flex-shrink: 0;
   white-space: nowrap;
   margin-right: 4px;
+}
+
+/* ── Version badge ── */
+#ll-topnav-version {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ll-nav-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+/* ── GitHub icon link ── */
+#ll-topnav-github {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--ll-nav-muted) !important;
+  text-decoration: none !important;
+  opacity: 0.8;
+  margin-left: 6px;
+  transition: color 0.15s, opacity 0.15s;
+}
+
+#ll-topnav-github:hover {
+  color: var(--ll-nav-fg) !important;
+  opacity: 1;
 }
 
 /* ── Left group: logo + divider + product + tabs ── */
