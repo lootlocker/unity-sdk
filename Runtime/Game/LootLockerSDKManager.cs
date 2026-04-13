@@ -2481,7 +2481,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
-        /// <param name="provider">Optional: If provided (any value other than guest), the provider name will be appended as a URL query parameter to the redirect_url in the lease response</param>
+        /// <param name="provider">Optional: Preloads the connection flow with which provider to use for sign-in, so the user does not have to select it manually. When set to any value other than guest, the provider is embedded in the redirect_url returned with the lease information.</param>
         public static Guid StartRemoteSession(
             Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
             Action<LootLockerRemoteSessionStatusPollingResponse> remoteSessionLeaseStatusUpdate,
@@ -2520,7 +2520,7 @@ namespace LootLocker.Requests
         /// <param name="onComplete">Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</param>
         /// <param name="pollingIntervalSeconds">Optional: How often to poll the status of the remote session process</param>
         /// <param name="timeOutAfterMinutes">Optional: How long to allow the process to take in its entirety</param>
-        /// <param name="provider">Optional: If provided (any value other than guest), the provider name will be appended as a URL query parameter to the redirect_url in the lease response</param>
+        /// <param name="provider">Optional: Preloads the connection flow with which provider to use for linking, so the user does not have to select it manually. When set to any value other than guest, the provider is embedded in the redirect_url returned with the lease information.</param>
         public static Guid StartRemoteSessionForLinking(
             string forPlayerWithUlid,
             Action<LootLockerLeaseRemoteSessionResponse> remoteSessionLeaseInformation,
