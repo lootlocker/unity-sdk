@@ -8183,11 +8183,6 @@ namespace LootLocker.Requests
                 onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Failed to send error report because HTTP client was not available", failedResponse?.requestContext?.player_ulid));
                 return;
             }
-            if(!httpClient.IsFailureReportingEnabled())
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Failed to send error report because failure reporting is not enabled", failedResponse?.requestContext?.player_ulid));
-                return;
-            }
             
             if(!httpClient.TryGetFailedRequestReportForRequestId(failedResponse.requestContext.request_id, out var report))
             {
@@ -8196,27 +8191,34 @@ namespace LootLocker.Requests
             }
 
             report.UserDescription = userDescription;
-            string reportAsJson = LootLockerJson.SerializeObject(report);
-            reportAsJson = LootLockerObfuscator.ObfuscateJsonStringForLogging(reportAsJson);
-            reportAsJson = LootLockerJson.PrettifyJsonString(reportAsJson);
 
-            string failureFeedbackCategoryId = httpClient.GetFailureFeedbackCategoryId();
-            if(failureFeedbackCategoryId.Equals("Not Initialized"))
+            var body = new LootLockerErrorReportBody
             {
-                httpClient.RefreshFailureFeedbackCategoryId((bool success) =>
-                {
-                    if(!success)
-                    {
-                        onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerResponse>("Failed to send error report because failure feedback category id could not be retrieved from the server", failedResponse?.requestContext?.player_ulid));
-                        return;
-                    }
-                    SendGameFeedback(reportAsJson, httpClient.GetFailureFeedbackCategoryId(), onComplete, failedResponse.requestContext.player_ulid);
-                });
-                return;
-            }
-            SendGameFeedback(reportAsJson, httpClient.GetFailureFeedbackCategoryId(), onComplete, failedResponse.requestContext.player_ulid);
-        }
+                user_description = report.UserDescription,
+                client_request_id = report.ClientRequestId,
+                server_request_id = report.ServerRequestId,
+                trace_id = report.TraceId,
+                status_code = report.StatusCode,
+                message = report.Message,
+                endpoint = report.Endpoint,
+                http_method = report.http_method,
+                response_body = report.ResponseJsonBody,
+                response_headers = report.ResponseHeaders,
+                request_body = report.RequestBody,
+                request_headers = report.RequestHeaders,
+                retry_attempts = report.RetryAttempts,
+                request_duration_seconds = report.RequestDurationSeconds,
+                server_timestamp = report.ServerTimestamp,
+                client_timestamp = report.ClientTimestamp,
+                player_ulid = report.PlayerUlid,
+                sdk_version = report.SdkVersion
+            };
+            string reportAsJson = LootLockerJson.SerializeObject(body);
 
+            EndPointClass endPoint = LootLockerEndPoints.createErrorReport;
+            LootLockerServerRequest.CallAPI(failedResponse.requestContext.player_ulid, endPoint.endPoint, endPoint.httpMethod, reportAsJson, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
         {

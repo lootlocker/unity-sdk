@@ -282,6 +282,10 @@ namespace LootLocker
         public static EndPointClass listFeedbackCategories = new EndPointClass("feedback/category/entity/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass createFeedbackEntry = new EndPointClass("feedback", LootLockerHTTPMethod.POST);
 
+        // Error Reports
+        [Header("Error Reports")]
+        public static EndPointClass createErrorReport = new EndPointClass("error-report", LootLockerHTTPMethod.POST);
+
         // Friends
         [Header("Friends")]
         public static EndPointClass listFriends = new EndPointClass("player/friends", LootLockerHTTPMethod.GET);
