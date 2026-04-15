@@ -171,13 +171,6 @@ namespace LootLocker
                 IsInitialized = true;
                 _instance = this;
 
-                if (!string.IsNullOrEmpty(LootLockerStateData.GetDefaultPlayerULID()))
-                {
-                    if(LootLockerFailureFeedbackCategory.Equals("Not Initialized"))
-                    {
-                        RefreshFailureFeedbackCategoryId((_ignored) => {});                  
-                    }
-                }
             }
             LootLockerLogger.Log("HTTPClient initialized", LootLockerLogger.LogLevel.Verbose);
         }
@@ -1011,56 +1004,10 @@ namespace LootLocker
             /// The ULID of the player for whom the request was made. This can be useful information for debugging and error analysis, as it can help determine if the failure was specific to a particular player or if it was a more widespread issue. It can also be useful for analyzing patterns of failures across different players.
             /// </summary>
             public string PlayerUlid { get; set; }
-        }
-
-        private static string LootLockerFailureFeedbackCategory = "Not Initialized";
-
-        public bool IsFailureReportingEnabled()
-        {
-            return !string.IsNullOrEmpty(LootLockerFailureFeedbackCategory);
-        }
-
-        public string GetFailureFeedbackCategoryId()
-        {
-            return LootLockerFailureFeedbackCategory;
-        }
-
-        public void RefreshFailureFeedbackCategoryId(Action<bool> value)
-        {
-            if(string.IsNullOrEmpty(LootLockerFailureFeedbackCategory))
-            {
-                value?.Invoke(false);
-                return;
-            }
-            if(LootLockerFailureFeedbackCategory.Equals("Not Initialized"))
-            {
-                LootLockerSDKManager.ListGameFeedbackCategories((feedbackCategoriesResponse) => 
-                {
-                    if(!feedbackCategoriesResponse.success)
-                    {
-                        LootLockerLogger.Log($"Failed to retrieve feedback categories for error report. Status code: {feedbackCategoriesResponse.statusCode} and message: {feedbackCategoriesResponse.errorData.message}", LootLockerLogger.LogLevel.Debug);
-                        LootLockerFailureFeedbackCategory = null;
-                        value?.Invoke(false);
-                        return;
-                    }
-                    foreach(var cat in feedbackCategoriesResponse.categories)
-                    {
-                        if(cat?.name == "lootlocker_request_failure")
-                        {
-                            LootLockerFailureFeedbackCategory = cat.id;
-                            value?.Invoke(true);
-                            return;
-                        }
-                    }
-                    LootLockerFailureFeedbackCategory = null;
-                    LootLockerLogger.Log($"Failed to find appropriate category to send error report under. Feedback categories retrieved successfully but no category with name 'lootlocker_request_failure' was found. LootLocker Error reporting turned off", LootLockerLogger.LogLevel.Debug);
-                    value?.Invoke(false);
-                }, LootLockerStateData.GetDefaultPlayerULID());
-            }
-            else {
-                // Category is already initialized, just return true
-                value?.Invoke(true);
-            }
+            /// <summary>
+            /// The version of the LootLocker SDK that sent the request.
+            /// </summary>
+            public string SdkVersion { get; set; }
         }
 
         public bool TryGetFailedRequestReportForRequestId(string requestId, out LootLockerFailedRequestReport report)
@@ -1083,11 +1030,6 @@ namespace LootLocker
 
         private void StoreFailedRequestReport(LootLockerResponse failedResponse, LootLockerHTTPExecutionQueueItem executionItem)
         {
-            if(string.IsNullOrEmpty(LootLockerFailureFeedbackCategory))
-            {
-                // Auto reporting is disabled, do not store error report
-                return;
-            }
             if(failedResponse == null || failedResponse.errorData == null)
             {
                 LootLockerLogger.Log($"Failed response or error data was null, cannot construct valid error report. Player ULID: {executionItem.RequestData.ForPlayerWithUlid}", LootLockerLogger.LogLevel.Debug);
@@ -1134,7 +1076,8 @@ namespace LootLocker
                 RequestDurationSeconds = Time.time - executionItem.RequestStartTime,
                 ServerTimestamp = "", // We resolve this below
                 ClientTimestamp = (DateTime.Now - TimeSpan.FromSeconds(Time.time - executionItem.RequestStartTime)).ToString("o"), // ISO 8601 format
-                PlayerUlid = failedResponsePlayerUlid
+                PlayerUlid = failedResponsePlayerUlid,
+                SdkVersion = LootLockerConfig.current?.sdk_version
             };
             
             var requestHeaders = executionItem.RequestData.ExtraHeaders;
