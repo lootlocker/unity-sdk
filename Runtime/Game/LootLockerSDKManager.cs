@@ -8317,7 +8317,7 @@ namespace LootLocker.Requests
 
             report.UserDescription = userDescription;
 
-            static string[] RedactSensitiveHeaders(string[] headers)
+            string[] RedactSensitiveHeaders(string[] headers)
             {
                 if (headers == null) return null;
                 return headers.Select(h =>
