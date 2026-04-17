@@ -8192,6 +8192,20 @@ namespace LootLocker.Requests
 
             report.UserDescription = userDescription;
 
+            static string[] RedactSensitiveHeaders(string[] headers)
+            {
+                if (headers == null) return null;
+                return headers.Select(h =>
+                {
+                    int sep = h.IndexOf(':');
+                    if (sep <= 0) return h;
+                    string name = h.Substring(0, sep).ToLowerInvariant();
+                    if (name.Contains("token") || name.Contains("authorization") || name.Contains("cookie"))
+                        return h.Substring(0, sep + 1) + " [REDACTED]";
+                    return h;
+                }).ToArray();
+            }
+
             var body = new LootLockerErrorReportBody
             {
                 user_description = report.UserDescription,
@@ -8203,9 +8217,9 @@ namespace LootLocker.Requests
                 endpoint = report.Endpoint,
                 http_method = report.http_method,
                 response_body = report.ResponseJsonBody,
-                response_headers = report.ResponseHeaders,
+                response_headers = RedactSensitiveHeaders(report.ResponseHeaders),
                 request_body = report.RequestBody,
-                request_headers = report.RequestHeaders,
+                request_headers = RedactSensitiveHeaders(report.RequestHeaders),
                 retry_attempts = report.RetryAttempts,
                 request_duration_seconds = report.RequestDurationSeconds,
                 server_timestamp = report.ServerTimestamp,

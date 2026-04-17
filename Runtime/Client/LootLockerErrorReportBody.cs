@@ -1,6 +1,3 @@
-using System;
-using LootLocker.Requests;
-
 namespace LootLocker.Requests
 {
     /// <summary>
