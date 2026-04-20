@@ -5,7 +5,6 @@ using UnityEngine;
 using System.Text;
 using LootLocker.LootLockerEnums;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEngine.Networking;
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
@@ -6613,99 +6612,6 @@ namespace LootLocker.Requests
 
         #endregion
 
-        #region Missions
-
-        /// @ingroup Missions
-        /// <summary>
-        /// Get all available missions for the current game. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingAllMissionsResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetAllMissions(Action<LootLockerGetAllMissionsResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetAllMissionsResponse>(forPlayerWithUlid));
-                return;
-            }
-            LootLockerAPIManager.GetAllMissions(forPlayerWithUlid, onComplete);
-        }
-
-        /// @ingroup Missions
-        /// <summary>
-        /// Get information about a single mission. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
-        /// </summary>
-        /// <param name="missionId">The ID of the mission to get information about</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingASingleMissionResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetMission(int missionId, Action<LootLockerGetMissionResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetMissionResponse>(forPlayerWithUlid));
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.GetMission(forPlayerWithUlid, data, onComplete);
-        }
-
-        /// @ingroup Missions
-        /// <summary>
-        /// Start a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
-        /// </summary>
-        /// <param name="missionId">The ID of the mission to start</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStartingAMissionResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void StartMission(int missionId, Action<LootLockerStartMissionResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerStartMissionResponse>(forPlayerWithUlid));
-                return;
-            }
-            LootLockerGetRequest data = new LootLockerGetRequest();
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.StartMission(forPlayerWithUlid, data, onComplete);
-        }
-
-        /// @ingroup Missions
-        /// <summary>
-        /// Finish a mission for the current player. Missions are created with the Admin API https://ref.lootlocker.com/admin-api/#introduction together with data from your game. You can read more about Missions here; https://docs.lootlocker.com/background/game-systems#missions
-        /// </summary>
-        /// <param name="missionId">The ID of the mission to start</param>
-        /// <param name="startingMissionSignature">Mission signature is received when starting a mission</param>
-        /// <param name="playerId">ID of the current player</param>
-        /// <param name="finishingPayload">A LootLockerFinishingPayload with variables for how the mission was completed</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerFinishingAMissionResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void FinishMission(int missionId, string startingMissionSignature, string playerId,
-            LootLockerFinishingPayload finishingPayload, Action<LootLockerFinishMissionResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerFinishMissionResponse>(forPlayerWithUlid));
-                return;
-            }
-            string source = LootLockerJson.SerializeObject(finishingPayload) + startingMissionSignature + playerId;
-            string hash;
-            using (SHA1 sha1Hash = SHA1.Create())
-            {
-                byte[] sourceBytes = Encoding.UTF8.GetBytes(source);
-                byte[] hashBytes = sha1Hash.ComputeHash(sourceBytes);
-                hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
-            }
-
-            LootLockerFinishMissionRequest data = new LootLockerFinishMissionRequest()
-            {
-                signature = hash,
-                payload = finishingPayload
-            };
-            data.getRequests.Add(missionId.ToString());
-            LootLockerAPIManager.FinishMission(forPlayerWithUlid, data, onComplete);
-        }
-        #endregion
-
         #region Maps
         /// @ingroup Maps
         /// <summary>
@@ -7476,44 +7382,6 @@ namespace LootLocker.Requests
         }
 
 #endregion
-
-        #region Collectables
-        /// @ingroup Collectables
-        /// <summary>
-        /// Get all collectables for the game.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGettingCollectablesResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetCollectables(Action<LootLockerGetCollectablesResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetCollectablesResponse>(forPlayerWithUlid));
-                return;
-            }
-            LootLockerAPIManager.GetCollectables(forPlayerWithUlid, onComplete);
-        }
-
-        /// @ingroup Collectables
-        /// <summary>
-        /// Collect a collectable item. This will grant the collectable to the player.
-        /// </summary>
-        /// <param name="slug">A string representing what was collected, example; Carsdriven.Bugs.Dune</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCollectingAnItemResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void CollectItem(string slug, Action<LootLockerCollectItemResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCollectItemResponse>(forPlayerWithUlid));
-                return;
-            }
-            LootLockerCollectingAnItemRequest data = new LootLockerCollectingAnItemRequest();
-            data.slug = slug;
-            LootLockerAPIManager.CollectItem(forPlayerWithUlid, data, onComplete);
-        }
-
-        #endregion
 
         #region Messages
 
