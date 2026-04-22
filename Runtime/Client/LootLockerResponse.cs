@@ -46,6 +46,7 @@ namespace LootLocker
         /// </summary>
         public string EventId { get; set; } = Guid.NewGuid().ToString();
 
+#if LOOTLOCKER_BETA_ENABLE_ERROR_REPORTING
         /// <summary>
         /// Sends a report about a failed request to be viewable in the LootLocker dashboard.
         /// This is intended to be used in the case where a request fails and you want to send the details of that failure to LootLocker for debugging and tracking purposes. 
@@ -59,6 +60,7 @@ namespace LootLocker
         {
             LootLocker.Requests.LootLockerSDKManager.SendLootLockerErrorReport(userDescription, this, onComplete);
         }
+#endif
 
         public static void Deserialize<T>(Action<T> onComplete, LootLockerResponse serverResponse,
 #if LOOTLOCKER_USE_NEWTONSOFTJSON

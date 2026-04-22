@@ -747,10 +747,12 @@ namespace LootLocker
             
             response.requestContext = new LootLockerRequestContext(executionItem.RequestData.ForPlayerWithUlid, executionItem.RequestData.RequestStartTime, executionItem.RequestData.RequestId);
             
+#if LOOTLOCKER_BETA_ENABLE_ERROR_REPORTING
             if (response != null && !response.success)
             {
                 StoreFailedRequestReport(response, executionItem);
             }
+#endif
 
             CurrentlyOngoingRequests.Remove(executionItem.RequestData.RequestId);
             executionItem.IsWaitingForSessionRefresh = false;
