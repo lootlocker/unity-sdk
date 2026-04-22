@@ -559,10 +559,18 @@ namespace LootLocker
                     (serverResponse) =>
                     {
                         var response = LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse);
-                        if (!string.IsNullOrEmpty(providerUrlParam) && response != null && response.redirect_url != null)
+                        if (!string.IsNullOrEmpty(providerUrlParam) && response != null)
                         {
-                            string separator = response.redirect_url.Contains("?") ? "&" : "?";
-                            response.redirect_url = response.redirect_url + separator + "provider=" + providerUrlParam;
+                            if (response.redirect_url != null)
+                            {
+                                string separator = response.redirect_url.Contains("?") ? "&" : "?";
+                                response.redirect_url = response.redirect_url + separator + "provider=" + providerUrlParam;
+                            }
+                            if (response.display_url != null)
+                            {
+                                string separator = response.display_url.Contains("?") ? "&" : "?";
+                                response.display_url = response.display_url + separator + "provider=" + providerUrlParam;
+                            }
                         }
                         onComplete?.Invoke(response);
                     },
