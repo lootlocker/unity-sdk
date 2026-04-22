@@ -8250,6 +8250,7 @@ namespace LootLocker.Requests
             SendFeedback(LootLockerFeedbackTypes.ugc, ulid, description, category_id, onComplete, forPlayerWithUlid);
         }
 
+#if LOOTLOCKER_BETA_ENABLE_ERROR_REPORTING
         /// <summary>
         /// Sends a report about a failed request to be viewable in the LootLocker dashboard.
         /// This is intended to be used in the case where a request fails and you want to send the details of that failure to LootLocker for debugging and tracking purposes. 
@@ -8357,6 +8358,7 @@ namespace LootLocker.Requests
             EndPointClass endPoint = LootLockerEndPoints.createErrorReport;
             LootLockerServerRequest.CallAPI(failedResponse.requestContext.player_ulid, endPoint.endPoint, endPoint.httpMethod, reportAsJson, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
+#endif
         
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         private static void SendFeedback(LootLockerFeedbackTypes type, string ulid, string description, string category_id, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
