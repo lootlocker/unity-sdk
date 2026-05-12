@@ -2,9 +2,6 @@ name: Generate Docs
 run-name: "Generate Docs on ${{ github.ref_name }}"
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -75,8 +72,8 @@ jobs:
     name: Deploy docs to GitHub Pages
     runs-on: ubuntu-latest
     needs: generate-docs
-    # Deploy on push to main, on release, or on manual dispatch — not on PRs
-    if: github.event_name != 'pull_request'
+    # Deploy on release or manual dispatch only
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
 
@@ -98,10 +95,15 @@ jobs:
         id: targets
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
-            echo "version_dir=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "deploy_version=true" >> "$GITHUB_OUTPUT"
+            echo "target_dir=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "deploy_latest=true" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
           else
-            echo "deploy_version=false" >> "$GITHUB_OUTPUT"
+            BRANCH="${{ github.ref_name }}"
+            SAFE_BRANCH="branch-$(echo "$BRANCH" | tr '/' '-')"
+            echo "target_dir=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
+            echo "deploy_latest=false" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build versions.json
@@ -115,25 +117,31 @@ jobs:
               with open(existing_path) as f:
                   versions = json.load(f)
 
-          new_version = os.environ.get("NEW_VERSION", "")
-          deploy_version = os.environ.get("DEPLOY_VERSION", "false") == "true"
+          target_dir = os.environ.get("TARGET_DIR", "")
+          is_release = os.environ.get("IS_RELEASE", "false") == "true"
 
-          # Add versioned entry if this is a release deploy
-          if deploy_version and new_version:
-              paths = {v["path"] for v in versions}
-              if new_version + "/" not in paths:
-                  versions.append({"version": new_version, "path": new_version + "/"})
+          # Update or add the new entry
+          paths = {v["path"] for v in versions}
+          if target_dir and target_dir + "/" not in paths:
+              versions.append({"version": target_dir, "path": target_dir + "/"})
 
-          # Ensure "latest" entry always exists at the front
-          versions = [v for v in versions if v["version"] != "latest"]
-
-          # Sort release versions descending by semver (best-effort)
           def semver_key(v):
               m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", v["version"])
               return tuple(int(x) for x in m.groups()) if m else (0, 0, 0)
 
-          versions.sort(key=semver_key, reverse=True)
-          versions.insert(0, {"version": "latest", "path": "latest/"})
+          if is_release:
+              # latest always first, release versions desc, branch previews last
+              release_vs = [v for v in versions if v["version"] != "latest" and not v["version"].startswith("branch-")]
+              branch_vs  = [v for v in versions if v["version"].startswith("branch-")]
+              release_vs.sort(key=semver_key, reverse=True)
+              versions = [{"version": "latest", "path": "latest/"}] + release_vs + branch_vs
+          else:
+              # Dispatch: preserve existing latest entry; branch previews at end
+              latest_entry = next((v for v in versions if v["version"] == "latest"), None)
+              release_vs = [v for v in versions if v["version"] != "latest" and not v["version"].startswith("branch-")]
+              branch_vs  = [v for v in versions if v["version"].startswith("branch-")]
+              release_vs.sort(key=semver_key, reverse=True)
+              versions = (([latest_entry] if latest_entry else []) + release_vs + branch_vs)
 
           os.makedirs("site-root", exist_ok=True)
           with open("site-root/versions.json", "w") as f:
@@ -141,8 +149,8 @@ jobs:
           print("versions.json:", json.dumps(versions, indent=2))
           PYEOF
         env:
-          NEW_VERSION: ${{ github.ref_name }}
-          DEPLOY_VERSION: ${{ steps.targets.outputs.deploy_version }}
+          TARGET_DIR: ${{ steps.targets.outputs.target_dir }}
+          IS_RELEASE: ${{ steps.targets.outputs.is_release }}
 
       - name: Build root redirect page
         run: |
@@ -160,21 +168,21 @@ jobs:
           </html>
           EOF
 
-      - name: Deploy latest to GitHub Pages
+      - name: Deploy to target directory
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: ${{ steps.targets.outputs.target_dir }}
+          keep_files: true
+
+      - name: Deploy to latest (release only)
+        if: steps.targets.outputs.deploy_latest == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           destination_dir: latest
-          keep_files: true
-
-      - name: Deploy versioned docs to GitHub Pages
-        if: steps.targets.outputs.deploy_version == 'true'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-          destination_dir: ${{ github.ref_name }}
           keep_files: true
 
       - name: Deploy site root (versions.json + index.html)
