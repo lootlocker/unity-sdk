@@ -59,11 +59,19 @@ jobs:
           if [ -d /tmp/sdk-staging/Samples~ ]; then
             mv /tmp/sdk-staging/Samples~ /tmp/sdk-staging/Samples
           fi
+          # Keep package metadata aligned with the staged folder layout
+          tmp_package_json="/tmp/sdk-staging/package.json.tmp"
+          jq 'if .samples then .samples |= map(if .path then .path |= sub("^Samples~/"; "Samples/") else . end) else . end' \
+            /tmp/sdk-staging/package.json > "$tmp_package_json"
+          mv "$tmp_package_json" /tmp/sdk-staging/package.json
 
       - name: Install Unity UPM CLI
         run: |
+          # Pin to a specific version for reproducibility and supply-chain safety.
+          # To upgrade, check https://cdn.packages.unity.com/upm-cli/latest.txt and update the version below.
+          UPM_CLI_VERSION="v9.27.0"
           curl -fsSL https://cdn.packages.unity.com/upm-cli/install.sh -o install.sh
-          bash install.sh
+          bash install.sh "$UPM_CLI_VERSION"
           echo "$HOME/.upm/bin" >> "$GITHUB_PATH"
 
       - name: Verify Unity UPM CLI
