@@ -167,14 +167,44 @@ html.dark-mode {
   margin-right: 4px;
 }
 
-/* ── Version badge ── */
-#ll-topnav-version {
+/* ── Version badge + version picker ── */
+#ll-topnav-version,
+#ll-version-picker {
   font-size: 11px;
   font-weight: 500;
   color: var(--ll-nav-muted);
   white-space: nowrap;
   flex-shrink: 0;
   margin-right: 2px;
+}
+
+#ll-version-picker {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ll-nav-muted) 40%, transparent);
+  border-radius: 4px;
+  padding: 1px 18px 1px 6px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 8px 5px;
+}
+
+#ll-version-picker:hover {
+  border-color: var(--ll-nav-muted);
+  color: var(--ll-nav-fg);
+}
+
+#ll-version-picker:focus {
+  outline: 2px solid var(--ll-accent, #7c5cbf);
+  outline-offset: 1px;
+}
+
+#ll-version-picker option {
+  background: var(--ll-nav-bg, #1e1e2e);
+  color: var(--ll-nav-fg, #e0e0e0);
 }
 
 /* ── GitHub icon link ── */

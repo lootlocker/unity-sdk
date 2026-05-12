@@ -56,7 +56,8 @@ HTML_EXTRA_STYLESHEET  = .doxygen/doxygen-awesome/doxygen-awesome.css \
                          .doxygen/custom-layout-fixes.css \
                          .doxygen/lootlocker-theme.css
 HTML_EXTRA_FILES       = .doxygen/images/lootlocker-logo.png \
-                         .doxygen/nav-customization.js
+                         .doxygen/nav-customization.js \
+                         .doxygen/version-picker.js
 
 #---------------------------------------------------------------------------
 # Disable unused outputs
