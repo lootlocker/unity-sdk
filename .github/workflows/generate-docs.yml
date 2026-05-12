@@ -100,8 +100,12 @@ jobs:
             echo "is_release=true" >> "$GITHUB_OUTPUT"
           else
             BRANCH="${{ github.ref_name }}"
-            SAFE_BRANCH="branch-$(echo "$BRANCH" | tr '/' '-')"
-            echo "target_dir=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
+            if [ "$BRANCH" = "main" ]; then
+              echo "target_dir=latest" >> "$GITHUB_OUTPUT"
+            else
+              SAFE_BRANCH="branch-$(echo "$BRANCH" | tr '/' '-')"
+              echo "target_dir=$SAFE_BRANCH" >> "$GITHUB_OUTPUT"
+            fi
             echo "deploy_latest=false" >> "$GITHUB_OUTPUT"
             echo "is_release=false" >> "$GITHUB_OUTPUT"
           fi
@@ -136,12 +140,12 @@ jobs:
               release_vs.sort(key=semver_key, reverse=True)
               versions = [{"version": "latest", "path": "latest/"}] + release_vs + branch_vs
           else:
-              # Dispatch: preserve existing latest entry; branch previews at end
-              latest_entry = next((v for v in versions if v["version"] == "latest"), None)
+              # Dispatch: always include latest entry; branch previews at end
+              latest_entry = next((v for v in versions if v["version"] == "latest"), {"version": "latest", "path": "latest/"})
               release_vs = [v for v in versions if v["version"] != "latest" and not v["version"].startswith("branch-")]
               branch_vs  = [v for v in versions if v["version"].startswith("branch-")]
               release_vs.sort(key=semver_key, reverse=True)
-              versions = (([latest_entry] if latest_entry else []) + release_vs + branch_vs)
+              versions = [latest_entry] + release_vs + branch_vs
 
           os.makedirs("site-root", exist_ok=True)
           with open("site-root/versions.json", "w") as f:
