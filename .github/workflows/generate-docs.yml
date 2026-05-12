@@ -2,6 +2,9 @@ name: Generate Docs
 run-name: "Generate Docs on ${{ github.ref_name }}"
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -67,3 +70,117 @@ jobs:
         run: gh release upload --clobber ${{ github.ref_name }} docs-${{ github.ref_name }}.zip
         env:
           GH_TOKEN: ${{ github.token }}
+
+  deploy-pages:
+    name: Deploy docs to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: generate-docs
+    # Deploy on push to main, on release, or on manual dispatch — not on PRs
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: unity-sdk-docs-${{ needs.generate-docs.outputs.sdk-version }}
+          path: site/
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-branch
+        continue-on-error: true  # first run — branch may not exist yet
+
+      - name: Determine deploy target(s)
+        id: targets
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "version_dir=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "deploy_version=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy_version=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build versions.json
+        run: |
+          python3 - << 'PYEOF'
+          import json, os, re
+
+          existing_path = "gh-pages-branch/versions.json"
+          versions = []
+          if os.path.exists(existing_path):
+              with open(existing_path) as f:
+                  versions = json.load(f)
+
+          new_version = os.environ.get("NEW_VERSION", "")
+          deploy_version = os.environ.get("DEPLOY_VERSION", "false") == "true"
+
+          # Add versioned entry if this is a release deploy
+          if deploy_version and new_version:
+              paths = {v["path"] for v in versions}
+              if new_version + "/" not in paths:
+                  versions.append({"version": new_version, "path": new_version + "/"})
+
+          # Ensure "latest" entry always exists at the front
+          versions = [v for v in versions if v["version"] != "latest"]
+
+          # Sort release versions descending by semver (best-effort)
+          def semver_key(v):
+              m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", v["version"])
+              return tuple(int(x) for x in m.groups()) if m else (0, 0, 0)
+
+          versions.sort(key=semver_key, reverse=True)
+          versions.insert(0, {"version": "latest", "path": "latest/"})
+
+          os.makedirs("site-root", exist_ok=True)
+          with open("site-root/versions.json", "w") as f:
+              json.dump(versions, f, indent=2)
+          print("versions.json:", json.dumps(versions, indent=2))
+          PYEOF
+        env:
+          NEW_VERSION: ${{ github.ref_name }}
+          DEPLOY_VERSION: ${{ steps.targets.outputs.deploy_version }}
+
+      - name: Build root redirect page
+        run: |
+          cat > site-root/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8"/>
+            <meta http-equiv="refresh" content="0;url=latest/"/>
+            <title>LootLocker Unity SDK — Reference Docs</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="latest/">latest documentation</a>…</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy latest to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: latest
+          keep_files: true
+
+      - name: Deploy versioned docs to GitHub Pages
+        if: steps.targets.outputs.deploy_version == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: ${{ github.ref_name }}
+          keep_files: true
+
+      - name: Deploy site root (versions.json + index.html)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site-root
+          destination_dir: .
+          keep_files: true
