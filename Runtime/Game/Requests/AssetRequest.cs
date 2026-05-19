@@ -152,8 +152,10 @@ namespace LootLocker.Requests
     {
         ///<summary>If set to true, response will include only UGC assets.</summary>
         public bool ugc_only { get; set; } = false;
-        ///<summary>If provided, only the requested ids will be returned. No pagination will be attempted or respected, maximum 100 assets.</summary>
+        ///<summary>If provided only the requested ids will be returned (max 100, server enforced). When this is set, pagination is ignored.</summary>
         public List<int> asset_ids { get; set; } = new List<int>();
+        ///<summary>If provided only assets from the specified contexts will be returned.</summary>
+        public List<int> context_ids { get; set; } = new List<int>();
         /// <summary>Filters to apply to the asset listing.</summary>
         public List<LootLockerSimpleAssetFilter> asset_filters { get; set; } = new List<LootLockerSimpleAssetFilter>();
     }
