@@ -316,6 +316,10 @@ namespace LootLocker.Requests
         /// </summary>
         public bool purchasable { get; set; }
         /// <summary>
+        /// Whether this entry is refundable. If false, purchases of this entry cannot be refunded.
+        /// </summary>
+        public bool non_refundable { get; set; }
+        /// <summary>
         /// Function to help identify details simpler
         /// </summary>
         /// <returns>The identifier for looking up details</returns>
