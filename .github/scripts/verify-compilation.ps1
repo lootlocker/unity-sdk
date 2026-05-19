@@ -64,7 +64,7 @@ function Initialize-TempProject {
 
     $SdkRef = $RepoRoot -replace '\\', '/'
     $nl = [char]10
-    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  }' + $nl + '}'
+    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.unity.test-framework": "1.1.33",' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  }' + $nl + '}'
     [IO.File]::WriteAllText((Join-Path $TempProject 'Packages\manifest.json'), $manifestContent)
 
     $psContent = '%YAML 1.1' + $nl + '%TAG !u! tag:unity3d.com,2011:' + $nl + '--- !u!129 &1' + $nl + 'PlayerSettings:' + $nl + '  companyName: LootLockerSDKVerification' + $nl + '  productName: LootLockerSDKVerification'
