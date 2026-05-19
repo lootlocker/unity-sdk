@@ -52,6 +52,7 @@ init_temp_project() {
   cat > "$TEMP_PROJECT/Packages/manifest.json" <<EOF
 {
   "dependencies": {
+    "com.unity.test-framework": "1.1.33",
     "com.lootlocker.lootlockersdk": "file:${REPO_ROOT}"
   }
 }

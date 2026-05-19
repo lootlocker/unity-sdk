@@ -110,7 +110,7 @@ function Initialize-TestProject {
     $SdkRef = $RepoRoot -replace '\\', '/'
     $nl = [char]10
     # Include "testables" so Unity imports the SDK's test assemblies (UNITY_INCLUDE_TESTS)
-    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  },' + $nl + '  "testables": [' + $nl + '    "com.lootlocker.lootlockersdk"' + $nl + '  ]' + $nl + '}'
+    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.unity.test-framework": "1.1.33",' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  },' + $nl + '  "testables": [' + $nl + '    "com.lootlocker.lootlockersdk"' + $nl + '  ]' + $nl + '}'
     [IO.File]::WriteAllText((Join-Path $TempProject 'Packages\manifest.json'), $manifestContent)
 
     $psContent = '%YAML 1.1' + $nl + '%TAG !u! tag:unity3d.com,2011:' + $nl + '--- !u!129 &1' + $nl + 'PlayerSettings:' + $nl + '  companyName: LootLockerSDKVerification' + $nl + '  productName: LootLockerSDKVerification'
