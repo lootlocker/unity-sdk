@@ -61,6 +61,7 @@ jobs:
           cat > TestProject/Packages/manifest.json <<'EOF'
           {
             "dependencies": {
+              "com.unity.test-framework": "1.1.33",
               "com.lootlocker.lootlockersdk": "file:../../sdk"
             },
             "testables": [

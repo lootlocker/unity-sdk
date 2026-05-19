@@ -14,24 +14,29 @@ namespace LootLockerTests.PlayMode
 {
     public class AssetTests
     {
-        // Setup and teardown similar to LeaderboardTest
-        private LootLockerTestGame gameUnderTest = null;
+        // Game and assets are created once for all tests in this class to avoid re-running ~90 sequential
+        // API calls per test. TearDown deletes the game on the last test (or on setup failure).
+        // LootLockerTestGame.CreateGame/DeleteGame automatically register/unregister with
+        // LootLockerOrphanedTestGameRegistry; LootLockerTestRunCallback provides a safety-net
+        // deletion for partial runs (e.g. CIFast).
+        private static LootLockerTestGame gameUnderTest = null;
         private LootLockerConfig configCopy = null;
         private static int TestCounter = 0;
+        private static bool SharedSetupFailed = false;
         private bool SetupFailed = false;
-        private int numberOfAssetsToCreate = 5;
-        private int numberOfAssetDataEntitiesToAdd = 7;
-        private int numberOfAssetMetadataToAdd = 8;
-        private int numberOfAssetStorageKeysToAdd = 4;
-        private List<int> createdAssetIds = new List<int>();
-        private List<string> createdAssetUlids = new List<string>();
+        private const int TotalTestCount = 16;
+        private const int numberOfAssetsToCreate = 5;
+        private const int numberOfAssetDataEntitiesToAdd = 7;
+        private const int numberOfAssetMetadataToAdd = 8;
+        private const int numberOfAssetStorageKeysToAdd = 4;
+        private static readonly List<int> createdAssetIds = new List<int>();
+        private static readonly List<string> createdAssetUlids = new List<string>();
 
         [UnitySetUp]
         public IEnumerator Setup()
         {
             TestCounter++;
-            createdAssetIds.Clear();
-            createdAssetUlids.Clear();
+            SetupFailed = SharedSetupFailed;
             configCopy = LootLockerConfig.current;
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
@@ -40,160 +45,175 @@ namespace LootLockerTests.PlayMode
                 Debug.LogError("Could not clear LootLocker config");
             }
 
-            // Create game
-            bool gameCreationCallCompleted = false;
-            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            if (gameUnderTest == null)
             {
-                if (!success)
+                // One-time shared setup: create game and assets once for all tests in this class
+                SharedSetupFailed = false;
+                SetupFailed = false;
+
+                // Create game
+                bool gameCreationCallCompleted = false;
+                LootLockerTestGame.CreateGame(testName: this.GetType().Name + " ", onComplete: (success, errorMessage, game) =>
                 {
+                    if (!success)
+                    {
+                        gameCreationCallCompleted = true;
+                        Debug.LogError(errorMessage);
+                        SharedSetupFailed = true;
+                    }
+                    gameUnderTest = game;
                     gameCreationCallCompleted = true;
-                    Debug.LogError(errorMessage);
-                    SetupFailed = true;
-                }
-                gameUnderTest = game;
-                gameCreationCallCompleted = true;
-            });
-            yield return new WaitUntil(() => gameCreationCallCompleted);
-            if (SetupFailed)
-            {
-                yield break;
-            }
-            gameUnderTest?.SwitchToStageEnvironment();
-
-            // Enable guest platform
-            bool enableGuestLoginCallCompleted = false;
-            gameUnderTest?.EnableGuestLogin((success, errorMessage) =>
-            {
-                if (!success)
-                {
-                    Debug.LogError(errorMessage);
-                    SetupFailed = true;
-                }
-                enableGuestLoginCallCompleted = true;
-            });
-            yield return new WaitUntil(() => enableGuestLoginCallCompleted);
-            if (SetupFailed)
-            {
-                yield break;
-            }
-            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
-
-            bool getAssetContextsCallCompleted = false;
-            int contextId = 0;
-            LootLockerTestAssets.GetAssetContexts((success, errorMessage, contextResponse) =>
-            {
-                if (!success)
-                {
-                    Debug.LogError(errorMessage);
-                    SetupFailed = true;
-                }
-                contextId = contextResponse?.contexts?[0].id ?? 0;
-                getAssetContextsCallCompleted = true;
-            });
-
-            yield return new WaitUntil(() => getAssetContextsCallCompleted);
-            if (SetupFailed)
-            {
-                yield break;
-            }
-
-            for (int i = 0; i < numberOfAssetsToCreate; i++)
-            {
-                bool assetCreationCallCompleted = false;
-                LootLockerTestAssets.CreateAsset(contextId, (assetResponse) =>
-                {
-                    if (assetResponse == null || !assetResponse.success)
-                    {
-                        Debug.LogError("Failed to create asset: " + assetResponse?.errorData?.message);
-                        SetupFailed = true;
-                        assetCreationCallCompleted = true;
-                    }
-                    else
-                    {
-                        createdAssetIds.Add(assetResponse.asset.id);
-                        createdAssetUlids.Add(assetResponse.asset.ulid);
-                        LootLockerTestAssets.ActivateAsset(assetResponse.asset.id, (activateResponse) =>
-                        {
-                            if (activateResponse == null || !activateResponse.success)
-                            {
-                                Debug.LogError("Failed to activate asset: " + activateResponse?.errorData?.message);
-                                SetupFailed = true;
-                            }
-
-                            string stringAsset = assetResponse.text;
-                            stringAsset = stringAsset.Replace("{\"success\":true,\"asset\":", "");
-                            stringAsset = stringAsset.Remove(stringAsset.Length - 1);
-                            string storageArrayString = "\"storage\": [";
-                            for (int j = 0; j < numberOfAssetStorageKeysToAdd; j++)
-                            {
-                                if (j > 0)
-                                {
-                                    storageArrayString += ",";
-                                }
-                                storageArrayString += "{\"key\":\"storage_key_" + j + "\",\"value\":\"storage_value_" + j + "\"}";
-                            }
-                            storageArrayString += "]";
-
-                            stringAsset = stringAsset.Replace("\"storage\":[]", storageArrayString);
-                            LootLockerTestAssets.UpdateAsset(stringAsset, assetResponse.asset.id, (updateResponse) =>
-                            {
-                                if (updateResponse == null || !updateResponse.success)
-                                {
-                                    Debug.LogError("Failed to update asset: " + updateResponse?.errorData?.message);
-                                    SetupFailed = true;
-                                }
-                                assetCreationCallCompleted = true;
-                            });
-                        });
-                    }
                 });
-                yield return new WaitUntil(() => assetCreationCallCompleted);
-                if (SetupFailed)
+                yield return new WaitUntil(() => gameCreationCallCompleted);
+                if (SharedSetupFailed)
                 {
                     yield break;
                 }
+                gameUnderTest?.SwitchToStageEnvironment();
+
+                // Enable guest platform
+                bool enableGuestLoginCallCompleted = false;
+                gameUnderTest?.EnableGuestLogin((success, errorMessage) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogError(errorMessage);
+                        SharedSetupFailed = true;
+                    }
+                    enableGuestLoginCallCompleted = true;
+                });
+                yield return new WaitUntil(() => enableGuestLoginCallCompleted);
+                if (SharedSetupFailed)
+                {
+                    yield break;
+                }
+
+                bool getAssetContextsCallCompleted = false;
+                int contextId = 0;
+                LootLockerTestAssets.GetAssetContexts((success, errorMessage, contextResponse) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogError(errorMessage);
+                        SharedSetupFailed = true;
+                    }
+                    contextId = contextResponse?.contexts?[0].id ?? 0;
+                    getAssetContextsCallCompleted = true;
+                });
+                yield return new WaitUntil(() => getAssetContextsCallCompleted);
+                if (SharedSetupFailed)
+                {
+                    yield break;
+                }
+
+                createdAssetIds.Clear();
+                createdAssetUlids.Clear();
+                for (int i = 0; i < numberOfAssetsToCreate; i++)
+                {
+                    bool assetCreationCallCompleted = false;
+                    LootLockerTestAssets.CreateAsset(contextId, (assetResponse) =>
+                    {
+                        if (assetResponse == null || !assetResponse.success)
+                        {
+                            Debug.LogError("Failed to create asset: " + assetResponse?.errorData?.message);
+                            SharedSetupFailed = true;
+                            assetCreationCallCompleted = true;
+                        }
+                        else
+                        {
+                            createdAssetIds.Add(assetResponse.asset.id);
+                            createdAssetUlids.Add(assetResponse.asset.ulid);
+                            LootLockerTestAssets.ActivateAsset(assetResponse.asset.id, (activateResponse) =>
+                            {
+                                if (activateResponse == null || !activateResponse.success)
+                                {
+                                    Debug.LogError("Failed to activate asset: " + activateResponse?.errorData?.message);
+                                    SharedSetupFailed = true;
+                                }
+
+                                string stringAsset = assetResponse.text;
+                                stringAsset = stringAsset.Replace("{\"success\":true,\"asset\":", "");
+                                stringAsset = stringAsset.Remove(stringAsset.Length - 1);
+                                string storageArrayString = "\"storage\": [";
+                                for (int j = 0; j < numberOfAssetStorageKeysToAdd; j++)
+                                {
+                                    if (j > 0)
+                                    {
+                                        storageArrayString += ",";
+                                    }
+                                    storageArrayString += "{\"key\":\"storage_key_" + j + "\",\"value\":\"storage_value_" + j + "\"}";
+                                }
+                                storageArrayString += "]";
+
+                                stringAsset = stringAsset.Replace("\"storage\":[]", storageArrayString);
+                                LootLockerTestAssets.UpdateAsset(stringAsset, assetResponse.asset.id, (updateResponse) =>
+                                {
+                                    if (updateResponse == null || !updateResponse.success)
+                                    {
+                                        Debug.LogError("Failed to update asset: " + updateResponse?.errorData?.message);
+                                        SharedSetupFailed = true;
+                                    }
+                                    assetCreationCallCompleted = true;
+                                });
+                            });
+                        }
+                    });
+                    yield return new WaitUntil(() => assetCreationCallCompleted);
+                    if (SharedSetupFailed)
+                    {
+                        yield break;
+                    }
+                }
+
+                for (int i = 0; i < createdAssetIds.Count; i++)
+                {
+                    for (int j = 0; j < numberOfAssetDataEntitiesToAdd; j++)
+                    {
+                        bool addDataEntityCallCompleted = false;
+                        LootLockerTestAssets.AddDataEntityToAsset(createdAssetIds[i], "data_entity_" + j, "data_value_" + j, (response) =>
+                        {
+                            if (response == null || !response.success)
+                            {
+                                Debug.LogError("Failed to add data entity to asset: " + response?.errorData?.message);
+                                SharedSetupFailed = true;
+                            }
+                            addDataEntityCallCompleted = true;
+                        });
+                        yield return new WaitUntil(() => addDataEntityCallCompleted);
+                        if (SharedSetupFailed)
+                        {
+                            yield break;
+                        }
+                    }
+
+                    for (int j = 0; j < numberOfAssetMetadataToAdd; j++)
+                    {
+                        bool addMetadataCallCompleted = false;
+                        LootLockerTestAssets.AddMetadataToAsset(createdAssetUlids[i], "metadata_key_" + j, "metadata_value_" + j, (response) =>
+                        {
+                            if (response == null || !response.success)
+                            {
+                                Debug.LogError("Failed to add metadata to asset: " + response?.errorData?.message);
+                                SharedSetupFailed = true;
+                            }
+                            addMetadataCallCompleted = true;
+                        });
+                        yield return new WaitUntil(() => addMetadataCallCompleted);
+                        if (SharedSetupFailed)
+                        {
+                            yield break;
+                        }
+                    }
+                }
+
             }
 
-            for (int i = 0; i < createdAssetIds.Count; i++)
+            if (SetupFailed)
             {
-                for (int j = 0; j < numberOfAssetDataEntitiesToAdd; j++)
-                {
-                    bool addDataEntityCallCompleted = false;
-                    LootLockerTestAssets.AddDataEntityToAsset(createdAssetIds[i], "data_entity_" + j, "data_value_" + j, (response) =>
-                    {
-                        if (response == null || !response.success)
-                        {
-                            Debug.LogError("Failed to add data entity to asset: " + response?.errorData?.message);
-                            SetupFailed = true;
-                        }
-                        addDataEntityCallCompleted = true;
-                    });
-                    yield return new WaitUntil(() => addDataEntityCallCompleted);
-                    if (SetupFailed)
-                    {
-                        yield break;
-                    }
-                }
-
-                for (int j = 0; j < numberOfAssetMetadataToAdd; j++)
-                {
-                    bool addMetadataCallCompleted = false;
-                    LootLockerTestAssets.AddMetadataToAsset(createdAssetUlids[i], "metadata_key_" + j, "metadata_value_" + j, (response) =>
-                    {
-                        if (response == null || !response.success)
-                        {
-                            Debug.LogError("Failed to add metadata to asset: " + response?.errorData?.message);
-                            SetupFailed = true;
-                        }
-                        addMetadataCallCompleted = true;
-                    });
-                    yield return new WaitUntil(() => addMetadataCallCompleted);
-                    if (SetupFailed)
-                    {
-                        yield break;
-                    }
-                }
+                yield break;
             }
+
+            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
 
             // Sign in client
             bool guestLoginCompleted = false;
@@ -211,29 +231,38 @@ namespace LootLockerTests.PlayMode
         public IEnumerator TearDown()
         {
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
-            if (gameUnderTest != null)
-            {
-                bool gameDeletionCallCompleted = false;
-                gameUnderTest.DeleteGame(((success, errorMessage) =>
-                {
-                    if (!success)
-                    {
-                        Debug.LogError(errorMessage);
-                    }
-
-                    gameUnderTest = null;
-                    gameDeletionCallCompleted = true;
-                }));
-                yield return new WaitUntil(() => gameDeletionCallCompleted);
-            }
 
             LootLockerStateData.ClearAllSavedStates();
 
+            if (TestCounter >= TotalTestCount || SharedSetupFailed)
+            {
+                if (gameUnderTest != null)
+                {
+                    bool gameDeletionCallCompleted = false;
+                    gameUnderTest.DeleteGame(((success, errorMessage) =>
+                    {
+                        if (!success)
+                        {
+                            Debug.LogError(errorMessage);
+                        }
+
+                        gameUnderTest = null;
+                        gameDeletionCallCompleted = true;
+                    }));
+                    yield return new WaitUntil(() => gameDeletionCallCompleted);
+                }
+                TestCounter = 0;
+                SharedSetupFailed = false;
+                createdAssetIds.Clear();
+                createdAssetUlids.Clear();
+            }
+
             LootLockerConfig.CreateNewSettings(configCopy);
+
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_DefaultParameters_ReturnsAssetsWithNullValuesForIncludables()
         {
@@ -268,7 +297,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeStorage_ReturnsAssetsWithStorageButNullOtherwise()
         {
@@ -310,7 +339,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeMetadata_ReturnsAssetsWithMetadataButNullOtherwise()
         {
@@ -352,7 +381,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_IncludeDataEntities_ReturnsAssetsWithDataEntitiesButNullOtherwise()
         {
@@ -441,7 +470,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithPaginationParameters_ReturnsExpectedAsset()
         {
@@ -476,7 +505,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(listResponse.assets[1].asset_ulid, paginatedListResponse.assets[0].asset_ulid, "The expected asset was not returned in the paginated response");
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithFilterAndAllIncludes_ReturnsExpectedAssetWithAllIncludes()
         {
@@ -525,7 +554,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByIdAscending_ReturnsAssetsInAscendingIdOrder()
         {
@@ -557,7 +586,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByIdDescending_ReturnsAssetsInDescendingIdOrder()
         {
@@ -589,7 +618,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByNameDescending_ReturnsAssetsInDescendingNameOrder()
         {
@@ -621,7 +650,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderByCreatedAtDescending_ReturnsAssetsInDescendingCreatedOrder()
         {
@@ -650,7 +679,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by created_at");
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderingWithPagination_ReturnsCorrectlyOrderedPaginatedResults()
         {
@@ -693,7 +722,7 @@ namespace LootLockerTests.PlayMode
             Assert.Less(firstPageResponse.assets[1].asset_id, secondPageResponse.assets[0].asset_id, "Assets should be ordered across pages");
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OrderingWithFiltersAndIncludes_ReturnsCorrectlyOrderedFilteredResults()
         {
@@ -748,7 +777,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_OnlyOrderByWithoutDirection_UsesDefaultDirectionSuccessfully()
         {
@@ -776,7 +805,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(numberOfAssetsToCreate, listResponse.assets.Length, "Should return all created assets when ordering by ID with default direction");
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithAssetFilters_ReturnsOnlyFilteredAssets()
         {
@@ -882,7 +911,7 @@ namespace LootLockerTests.PlayMode
             }
         }
 
-        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
         public IEnumerator ListAssets_WithMultipleAssetFilterValues_ReturnsAssetsMatchingAnyValue()
         {
