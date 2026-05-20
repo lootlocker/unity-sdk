@@ -431,6 +431,17 @@ namespace LootLocker
                 return false;
             }
 
+            var mode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.Hotseat;
+
+            if (mode == LootLockerMultiUserSessionMode.SingleSession)
+            {
+                // Wipe all existing player state before saving the new player.
+                // There should only ever be one player in the system.
+                _ClearAllSavedStates();
+            }
+
+            // Save the player data into the active cache and persistent storage.
+            // Note: after _ClearAllSavedStates(), ActiveMetaData is a fresh empty object — this is intentional.
             ActivePlayerData[updatedPlayerData.ULID] = updatedPlayerData;
             _SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
             ActiveMetaData.SavedPlayerStateULIDs.AddUnique(updatedPlayerData.ULID);
@@ -438,10 +449,27 @@ namespace LootLocker
             {
                 ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[updatedPlayerData.WhiteLabelEmail] = updatedPlayerData.ULID;
             }
-            if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
+
+            if (mode == LootLockerMultiUserSessionMode.ProfileSwitching)
             {
+                // Deactivate all other players (keep in cold cache) and set the new player as the sole active default.
+                _SetAllPlayersToInactiveExceptForPlayer(updatedPlayerData.ULID);
+            }
+            else if (mode == LootLockerMultiUserSessionMode.SingleSession)
+            {
+                // Only one player ever exists — always make them the default.
                 _SetDefaultPlayerULID(updatedPlayerData.ULID);
             }
+            else
+            {
+                // Hotseat (and NotSet, which resolves to Hotseat at runtime): the first authenticated
+                // player in the session is the default; subsequent authentications do not change it.
+                if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
+                {
+                    _SetDefaultPlayerULID(updatedPlayerData.ULID);
+                }
+            }
+
             _SaveMetaDataToPlayerPrefs();
 
             return true;
