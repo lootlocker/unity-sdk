@@ -10,6 +10,46 @@ using UnityEngine;
 
 namespace LootLocker
 {
+    /// <summary>
+    /// Controls how the SDK handles multiple player sessions when a new authentication succeeds.
+    /// This determines which player is the "default" for API calls that do not explicitly specify a player ULID.
+    /// </summary>
+    public enum LootLockerMultiUserSessionMode
+    {
+        /// <summary>
+        /// [Not yet configured] The SDK automatically sets this to <see cref="SingleSession"/> on new installs
+        /// or <see cref="Hotseat"/> on existing installs the first time the Unity Editor loads this project.
+        /// This value should never be set manually — it exists solely for pre-migration compatibility.
+        /// </summary>
+        NotSet = 0,
+
+        /// <summary>
+        /// Multiple active sessions are allowed simultaneously.
+        /// The first player to authenticate in a game session becomes the default player.
+        /// Subsequent authentications are additive: they join the active pool but do not change the default.
+        /// All player data is retained in persistent cache between sessions.
+        /// Best for: local multiplayer, couch co-op, or any game where multiple players share a device at the same time.
+        /// </summary>
+        Hotseat = 1,
+
+        /// <summary>
+        /// Only one player session exists at any given time.
+        /// Each new authentication completely wipes all previous session data before saving the new player as the sole active default.
+        /// There is always exactly one player in the system; no historical data is kept.
+        /// Best for: standard single-player games where only one account should ever exist on the device.
+        /// </summary>
+        SingleSession = 2,
+
+        /// <summary>
+        /// Only one player is active at a time, but historical player sessions are retained in a cold cache.
+        /// Each new authentication makes that player the sole active and default player while all previously active
+        /// players are deactivated — but their session data remains on-device.
+        /// Developers can switch back to a previously-authenticated player without re-authenticating.
+        /// Best for: games with an account selection screen, or games where players switch between accounts.
+        /// </summary>
+        ProfileSwitching = 3,
+    }
+
     [Serializable]
     public class LootLockerConfig : ScriptableObject
     {
@@ -103,6 +143,13 @@ namespace LootLocker
         
         [Tooltip("Enable presence functionality while in the Unity Editor. Disable this if you don't want development to affect presence data.")]
         public bool enablePresenceInEditor = true;
+
+        [Tooltip(
+            "Controls how the SDK handles multiple player sessions when a new authentication succeeds.\n\n" +
+            "Hotseat: Multiple active sessions are allowed simultaneously. The first authentication in a game session is set as the default player. Subsequent authentications are additive — they join the active pool but do not change the default. Best for local multiplayer / couch co-op.\n\n" +
+            "Single Session: Only one player session exists at any time. New authentications wipe all previous session data before saving the new player as the sole active default. Best for standard single-player games.\n\n" +
+            "Profile Switching: Only one player is active at a time, but historical players are retained in cold cache. Each new authentication deactivates all others and becomes the sole active default. Developers can switch back to a cached player without re-authenticating. Best for games with account selection screens.")]
+        public LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet;
 
 #endregion
 
@@ -406,6 +453,20 @@ namespace LootLocker
                 // Create config file instantly when SDK has been installed
                 Get();
                 EditorPrefs.SetBool(configFileEditorPref, true);
+            }
+
+            // Pre-migration: if multiUserSessionMode has never been set (NotSet), determine the correct
+            // default based on whether this is a new install (no API key) or an existing project.
+            // New installs default to SingleSession; existing projects default to Hotseat for
+            // backwards compatibility with the previous behaviour.
+            LootLockerConfig config = Get();
+            if (config != null && config.multiUserSessionMode == LootLockerMultiUserSessionMode.NotSet)
+            {
+                config.multiUserSessionMode = string.IsNullOrEmpty(config.apiKey)
+                    ? LootLockerMultiUserSessionMode.SingleSession
+                    : LootLockerMultiUserSessionMode.Hotseat;
+                EditorUtility.SetDirty(config);
+                EditorApplication.delayCall += AssetDatabase.SaveAssets;
             }
 
             StoreSDKVersion();
