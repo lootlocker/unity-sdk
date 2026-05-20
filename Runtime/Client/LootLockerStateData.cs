@@ -431,7 +431,14 @@ namespace LootLocker
                 return false;
             }
 
-            var mode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.Hotseat;
+            var mode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.NotSet;
+            // Resolve NotSet the same way migration does: no API key → SingleSession, otherwise Hotseat.
+            if (mode == LootLockerMultiUserSessionMode.NotSet)
+            {
+                mode = string.IsNullOrEmpty(LootLockerConfig.current?.apiKey)
+                    ? LootLockerMultiUserSessionMode.SingleSession
+                    : LootLockerMultiUserSessionMode.Hotseat;
+            }
 
             // Save the player data into the active cache and persistent storage first.
             // (For SingleSession we wipe others after the save so that an IO failure cannot
@@ -463,8 +470,8 @@ namespace LootLocker
             }
             else
             {
-                // Hotseat (and NotSet, which resolves to Hotseat at runtime): the first authenticated
-                // player in the session is the default; subsequent authentications do not change it.
+                // Hotseat: the first authenticated player in the session is the default; subsequent authentications do not change it.
+                // (NotSet is resolved to either SingleSession or Hotseat above, so it never reaches this branch as NotSet.)
                 if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
                 {
                     _SetDefaultPlayerULID(updatedPlayerData.ULID);
