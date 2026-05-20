@@ -19,5 +19,6 @@ public class ExternalFileConfig
     public bool prettify_json { get; set; }
     public bool obfuscate_logs { get; set; }
     public bool allow_token_refresh { get; set; }
+    public LootLockerMultiUserSessionMode multi_user_session_mode { get; set; }
 }
 }

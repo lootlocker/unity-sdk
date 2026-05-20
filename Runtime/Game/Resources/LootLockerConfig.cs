@@ -197,6 +197,10 @@ namespace LootLocker
                 _current.allowTokenRefresh = fileConfig.allow_token_refresh;
                 _current.prettifyJson = fileConfig.prettify_json;
                 _current.obfuscateLogs = fileConfig.obfuscate_logs;
+                if (fileConfig.multi_user_session_mode != LootLockerMultiUserSessionMode.NotSet)
+                {
+                    _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
+                }
 #if UNITY_EDITOR
                 _current.adminToken = null;
 #endif
@@ -426,6 +430,14 @@ namespace LootLocker
                     if (bool.TryParse(args[i + 1], out bool enablePresenceAutoDisconnectOnFocusChange))
                     {
                         this.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
+                    }
+                }
+                else if (args[i] == "-multiusersessionmode")
+                {
+                    if (System.Enum.TryParse<LootLockerMultiUserSessionMode>(args[i + 1], true, out LootLockerMultiUserSessionMode multiUserSessionMode)
+                        && multiUserSessionMode != LootLockerMultiUserSessionMode.NotSet)
+                    {
+                        this.multiUserSessionMode = multiUserSessionMode;
                     }
                 }
             }
