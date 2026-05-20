@@ -433,17 +433,18 @@ namespace LootLocker
 
             var mode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.Hotseat;
 
-            if (mode == LootLockerMultiUserSessionMode.SingleSession)
-            {
-                // Wipe all existing player state before saving the new player.
-                // There should only ever be one player in the system.
-                _ClearAllSavedStates();
-            }
-
-            // Save the player data into the active cache and persistent storage.
-            // Note: after _ClearAllSavedStates(), ActiveMetaData is a fresh empty object — this is intentional.
+            // Save the player data into the active cache and persistent storage first.
+            // (For SingleSession we wipe others after the save so that an IO failure cannot
+            //  leave the SDK with zero saved players.)
             ActivePlayerData[updatedPlayerData.ULID] = updatedPlayerData;
             _SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
+
+            if (mode == LootLockerMultiUserSessionMode.SingleSession)
+            {
+                // Remove all saved state except for the newly-saved player.
+                // Because the save already succeeded above this is safe even if clearing other slots fails.
+                _ClearAllSavedStatesExceptForPlayer(updatedPlayerData.ULID);
+            }
             ActiveMetaData.SavedPlayerStateULIDs.AddUnique(updatedPlayerData.ULID);
             if (!string.IsNullOrEmpty(updatedPlayerData.WhiteLabelEmail))
             {
