@@ -981,5 +981,167 @@ namespace LootLockerTests.PlayMode
 
             yield return null;
         }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator MultiUser_SingleSessionMode_AuthenticatingSecondPlayer_ClearsFirstPlayer()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.SingleSession;
+
+            string player1Ulid = null;
+            bool session1Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                player1Ulid = response.player_ulid;
+                session1Completed = true;
+            });
+            yield return new WaitUntil(() => session1Completed);
+            Assert.IsNotNull(player1Ulid, "First guest session did not return a ULID");
+
+            // When
+            string player2Ulid = null;
+            bool session2Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                player2Ulid = response.player_ulid;
+                session2Completed = true;
+            });
+            yield return new WaitUntil(() => session2Completed);
+            Assert.IsNotNull(player2Ulid, "Second guest session did not return a ULID");
+
+            // Then
+            var cachedUlids = LootLockerStateData.GetCachedPlayerULIDs();
+            var activeUlids = LootLockerStateData.GetActivePlayerULIDs();
+            var defaultUlid = LootLockerStateData.GetDefaultPlayerULID();
+
+            Assert.AreEqual(1, cachedUlids.Count, "SingleSession should retain only 1 cached player");
+            Assert.AreEqual(1, activeUlids.Count, "SingleSession should retain only 1 active player");
+            Assert.IsFalse(cachedUlids.Contains(player1Ulid), "First player should have been cleared from cache");
+            Assert.IsTrue(cachedUlids.Contains(player2Ulid), "Second player should remain in cache");
+            Assert.AreEqual(player2Ulid, defaultUlid, "Second player should be the default");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator MultiUser_SingleSessionMode_ReauthenticatingSamePlayer_PreservesPlayerData()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.SingleSession;
+
+            string identifier = Guid.NewGuid().ToString();
+            string player1Ulid = null;
+            bool session1Completed = false;
+            LootLockerSDKManager.StartGuestSession(identifier, response =>
+            {
+                player1Ulid = response.player_ulid;
+                session1Completed = true;
+            });
+            yield return new WaitUntil(() => session1Completed);
+            Assert.IsNotNull(player1Ulid, "First guest session did not return a ULID");
+
+            // When — re-authenticate using the same identifier
+            string reauthUlid = null;
+            bool reauthCompleted = false;
+            LootLockerSDKManager.StartGuestSession(identifier, response =>
+            {
+                reauthUlid = response.player_ulid;
+                reauthCompleted = true;
+            });
+            yield return new WaitUntil(() => reauthCompleted);
+            Assert.IsNotNull(reauthUlid, "Re-auth guest session did not return a ULID");
+
+            // Then
+            var cachedUlids = LootLockerStateData.GetCachedPlayerULIDs();
+            var activeUlids = LootLockerStateData.GetActivePlayerULIDs();
+
+            Assert.AreEqual(player1Ulid, reauthUlid, "Re-authenticating the same identifier should return the same ULID");
+            Assert.AreEqual(1, cachedUlids.Count, "SingleSession should retain only 1 cached player after re-auth");
+            Assert.AreEqual(1, activeUlids.Count, "SingleSession should retain only 1 active player after re-auth");
+            Assert.IsTrue(cachedUlids.Contains(player1Ulid), "Re-authenticated player should still be cached");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator MultiUser_ProfileSwitchingMode_AuthenticatingSecondPlayer_DeactivatesFirstButKeepsBothCached()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.ProfileSwitching;
+
+            string player1Ulid = null;
+            bool session1Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                player1Ulid = response.player_ulid;
+                session1Completed = true;
+            });
+            yield return new WaitUntil(() => session1Completed);
+            Assert.IsNotNull(player1Ulid, "First guest session did not return a ULID");
+
+            // When
+            string player2Ulid = null;
+            bool session2Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                player2Ulid = response.player_ulid;
+                session2Completed = true;
+            });
+            yield return new WaitUntil(() => session2Completed);
+            Assert.IsNotNull(player2Ulid, "Second guest session did not return a ULID");
+
+            // Then
+            var cachedUlids = LootLockerStateData.GetCachedPlayerULIDs();
+            var activeUlids = LootLockerStateData.GetActivePlayerULIDs();
+            var defaultUlid = LootLockerStateData.GetDefaultPlayerULID();
+
+            Assert.AreEqual(2, cachedUlids.Count, "ProfileSwitching should retain both players in cache");
+            Assert.AreEqual(1, activeUlids.Count, "ProfileSwitching should deactivate old player, leaving 1 active");
+            Assert.IsTrue(cachedUlids.Contains(player1Ulid), "First player should still be in cache");
+            Assert.IsTrue(cachedUlids.Contains(player2Ulid), "Second player should be in cache");
+            Assert.IsFalse(activeUlids.Contains(player1Ulid), "First player should be inactive");
+            Assert.IsTrue(activeUlids.Contains(player2Ulid), "Second player should be active");
+            Assert.AreEqual(player2Ulid, defaultUlid, "Second player should be the default");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator MultiUser_HotseatMode_ExplicitlySet_AuthenticatingMultiplePlayers_AllRemainActive()
+        {
+            Assert.IsFalse(SetupFailed, "Setup did not succeed");
+
+            // Given
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.Hotseat;
+
+            string player1Ulid = null;
+            bool session1Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
+            {
+                player1Ulid = response.player_ulid;
+                session1Completed = true;
+            });
+            yield return new WaitUntil(() => session1Completed);
+            Assert.IsNotNull(player1Ulid, "First guest session did not return a ULID");
+
+            // When — start two more sessions
+            bool session2Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response => { session2Completed = true; });
+            yield return new WaitUntil(() => session2Completed);
+
+            bool session3Completed = false;
+            LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response => { session3Completed = true; });
+            yield return new WaitUntil(() => session3Completed);
+
+            // Then
+            var cachedUlids = LootLockerStateData.GetCachedPlayerULIDs();
+            var activeUlids = LootLockerStateData.GetActivePlayerULIDs();
+            var defaultUlid = LootLockerStateData.GetDefaultPlayerULID();
+
+            Assert.AreEqual(3, cachedUlids.Count, "Hotseat should retain all 3 players in cache");
+            Assert.AreEqual(3, activeUlids.Count, "Hotseat should keep all 3 players active");
+            Assert.IsTrue(cachedUlids.Contains(player1Ulid), "First player should be in cache");
+            Assert.AreEqual(player1Ulid, defaultUlid, "First player should remain the default in Hotseat mode");
+        }
     }
 }
