@@ -431,6 +431,20 @@ namespace LootLocker
                 return false;
             }
 
+            // Save the player data into the active cache and persistent storage first.
+            // (For SingleSession we wipe others after the save so that an IO failure cannot
+            //  leave the SDK with zero saved players.)
+            ActivePlayerData[updatedPlayerData.ULID] = updatedPlayerData;
+            _SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
+
+            // Register ULID and WhiteLabel mapping unconditionally, then persist.
+            ActiveMetaData.SavedPlayerStateULIDs.AddUnique(updatedPlayerData.ULID);
+            if (!string.IsNullOrEmpty(updatedPlayerData.WhiteLabelEmail))
+            {
+                ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[updatedPlayerData.WhiteLabelEmail] = updatedPlayerData.ULID;
+            }
+            _SaveMetaDataToPlayerPrefs();
+
             var mode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.NotSet;
             // Resolve NotSet the same way migration does: no API key → SingleSession, otherwise Hotseat.
             if (mode == LootLockerMultiUserSessionMode.NotSet)
@@ -440,45 +454,30 @@ namespace LootLocker
                     : LootLockerMultiUserSessionMode.Hotseat;
             }
 
-            // Save the player data into the active cache and persistent storage first.
-            // (For SingleSession we wipe others after the save so that an IO failure cannot
-            //  leave the SDK with zero saved players.)
-            ActivePlayerData[updatedPlayerData.ULID] = updatedPlayerData;
-            _SavePlayerDataToPlayerPrefs(updatedPlayerData.ULID);
-
-            if (mode == LootLockerMultiUserSessionMode.SingleSession)
+            // Apply mode-specific behaviour — each path handles its own default + persistence internally.
+            switch (mode)
             {
-                // Remove all saved state except for the newly-saved player.
-                // Because the save already succeeded above this is safe even if clearing other slots fails.
-                _ClearAllSavedStatesExceptForPlayer(updatedPlayerData.ULID);
+                case LootLockerMultiUserSessionMode.SingleSession:
+                    // Remove all saved state except for the newly-saved player.
+                    // Because the save already succeeded above this is safe even if clearing other slots fails.
+                    // This also sets the new player as the default and persists meta state.
+                    _ClearAllSavedStatesExceptForPlayer(updatedPlayerData.ULID);
+                    break;
+                case LootLockerMultiUserSessionMode.ProfileSwitching:
+                    // Deactivate all other players (keep in cold cache) and set the new player as the sole active default.
+                    // This also sets the new player as the default and persists meta state.
+                    _SetAllPlayersToInactiveExceptForPlayer(updatedPlayerData.ULID);
+                    break;
+                case LootLockerMultiUserSessionMode.Hotseat:
+                case LootLockerMultiUserSessionMode.NotSet:
+                default: // Hotseat — first authenticated player becomes the default; stays the default thereafter.
+                    // (NotSet is resolved to either SingleSession or Hotseat above, so it never reaches this branch as NotSet.)
+                    if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
+                    {
+                        _SetDefaultPlayerULID(updatedPlayerData.ULID);
+                    }
+                    break;
             }
-            ActiveMetaData.SavedPlayerStateULIDs.AddUnique(updatedPlayerData.ULID);
-            if (!string.IsNullOrEmpty(updatedPlayerData.WhiteLabelEmail))
-            {
-                ActiveMetaData.WhiteLabelEmailToPlayerUlidMap[updatedPlayerData.WhiteLabelEmail] = updatedPlayerData.ULID;
-            }
-
-            if (mode == LootLockerMultiUserSessionMode.ProfileSwitching)
-            {
-                // Deactivate all other players (keep in cold cache) and set the new player as the sole active default.
-                _SetAllPlayersToInactiveExceptForPlayer(updatedPlayerData.ULID);
-            }
-            else if (mode == LootLockerMultiUserSessionMode.SingleSession)
-            {
-                // Only one player ever exists — always make them the default.
-                _SetDefaultPlayerULID(updatedPlayerData.ULID);
-            }
-            else
-            {
-                // Hotseat: the first authenticated player in the session is the default; subsequent authentications do not change it.
-                // (NotSet is resolved to either SingleSession or Hotseat above, so it never reaches this branch as NotSet.)
-                if (string.IsNullOrEmpty(ActiveMetaData.DefaultPlayer) || !ActivePlayerData.ContainsKey(ActiveMetaData.DefaultPlayer))
-                {
-                    _SetDefaultPlayerULID(updatedPlayerData.ULID);
-                }
-            }
-
-            _SaveMetaDataToPlayerPrefs();
 
             return true;
         }
