@@ -551,7 +551,8 @@ namespace LootLocker
 
         public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, 
             bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false, bool obfuscateLogs = true, 
-            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true)
+            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true,
+            LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet)
         {
             _current = Get();
 
@@ -568,6 +569,10 @@ namespace LootLocker
             _current.enablePresenceAutoConnect = enablePresenceAutoConnect;
             _current.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
             _current.enablePresenceInEditor = enablePresenceInEditor;
+            if (multiUserSessionMode != LootLockerMultiUserSessionMode.NotSet)
+            {
+                _current.multiUserSessionMode = multiUserSessionMode;
+            }
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
