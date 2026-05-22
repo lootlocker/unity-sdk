@@ -109,6 +109,7 @@ namespace LootLockerTests.PlayMode
             }
 
             gameUnderTest?.InitializeLootLockerSDK();
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.Hotseat;
 
             float setupTimeout = Time.time + 10f;
 
