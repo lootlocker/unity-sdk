@@ -56,16 +56,19 @@ namespace LootLocker.Requests
         /// <param name="enablePresenceAutoConnect">If true, presence will auto-connect.</param>
         /// <param name="enablePresenceAutoDisconnectOnFocusChange">If true, presence will auto-disconnect on focus change.</param>
         /// <param name="enablePresenceInEditor">If true, presence will be enabled in the editor.</param>
+        /// <param name="multiUserSessionMode">Optional : Controls how the SDK handles multiple player sessions when a new authentication succeeds. If not supplied (or set to NotSet), the mode already stored in the config is preserved.</param>
         /// 
         /// <returns>True if initialized successfully, false otherwise</returns>
         public static bool Init(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, 
             bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = true, bool prettifyJson = false, bool obfuscateLogs = true, 
-            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true)
+            bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true,
+            LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet)
         {
             // Create new settings first
             bool configResult = LootLockerConfig.CreateNewSettings(apiKey, gameVersion, domainKey, 
                 logLevel, logInBuilds, errorsAsWarnings, allowTokenRefresh, prettifyJson, obfuscateLogs, 
-                enablePresence, enablePresenceAutoConnect, enablePresenceAutoDisconnectOnFocusChange, enablePresenceInEditor);
+                enablePresence, enablePresenceAutoConnect, enablePresenceAutoDisconnectOnFocusChange, enablePresenceInEditor,
+                multiUserSessionMode);
             if (!configResult)
             {
                 return false;

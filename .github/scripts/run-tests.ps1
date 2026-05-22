@@ -29,6 +29,11 @@
 .PARAMETER Force
     If specified, always recreates the temporary test project even if it already exists.
 
+.PARAMETER UseLocalEnv
+    If specified, routes all SDK HTTP traffic to the local devenv (http://localhost:8080) by
+    enabling the LOOTLOCKER_COMMANDLINE_SETTINGS scripting define and passing
+    -lootlockerurl localhost:8080 to Unity.
+
 .EXAMPLE
     # Fast subset (good default before a commit)
     .github\scripts\run-tests.ps1 -TestCategory LootLockerCIFast
@@ -48,7 +53,8 @@ param(
     [string] $TestFilter   = "",
     [ValidateSet("PlayMode", "EditMode")]
     [string] $TestMode     = "PlayMode",
-    [switch] $Force
+    [switch] $Force,
+    [switch] $UseLocalEnv
 )
 
 $ErrorActionPreference = 'Stop'
@@ -113,7 +119,11 @@ function Initialize-TestProject {
     $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.unity.test-framework": "1.1.33",' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  },' + $nl + '  "testables": [' + $nl + '    "com.lootlocker.lootlockersdk"' + $nl + '  ]' + $nl + '}'
     [IO.File]::WriteAllText((Join-Path $TempProject 'Packages\manifest.json'), $manifestContent)
 
+    $scriptingDefines = if ($UseLocalEnv) { 'LOOTLOCKER_COMMANDLINE_SETTINGS' } else { '' }
     $psContent = '%YAML 1.1' + $nl + '%TAG !u! tag:unity3d.com,2011:' + $nl + '--- !u!129 &1' + $nl + 'PlayerSettings:' + $nl + '  companyName: LootLockerSDKVerification' + $nl + '  productName: LootLockerSDKVerification'
+    if (-not [string]::IsNullOrEmpty($scriptingDefines)) {
+        $psContent += $nl + '  scriptingDefineSymbols:' + $nl + '    1: ' + $scriptingDefines
+    }
     [IO.File]::WriteAllText((Join-Path $TempProject 'ProjectSettings\ProjectSettings.asset'), $psContent)
 }
 
@@ -162,6 +172,10 @@ if (-not [string]::IsNullOrWhiteSpace($AdminEmail) -and -not [string]::IsNullOrW
     $UnityArgs += @("-adminemail", $AdminEmail, "-adminpassword", $AdminPassword)
 }
 
+if ($UseLocalEnv) {
+    $UnityArgs += @("-lootlockerurl", "localhost:8080")
+}
+
 # ---------------------------------------------------------------------------
 # 4. Run Unity test runner
 # ---------------------------------------------------------------------------
@@ -171,6 +185,7 @@ Write-Step "Project:  $ProjectPath"
 Write-Step "Mode:     $TestMode"
 if (-not [string]::IsNullOrWhiteSpace($TestCategory)) { Write-Step "Category: $TestCategory" }
 if (-not [string]::IsNullOrWhiteSpace($TestFilter))   { Write-Step "Filter:   $TestFilter" }
+if ($UseLocalEnv) { Write-Warn "LocalEnv: http://localhost:8080" }
 Write-Step "Results:  $ResultsFile"
 Write-Step ""
 
