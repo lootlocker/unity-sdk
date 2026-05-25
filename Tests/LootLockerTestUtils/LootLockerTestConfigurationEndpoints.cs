@@ -132,6 +132,10 @@ namespace LootLockerTestConfigurationUtils
 
         [Header("LootLocker Admin API Game Config")]
         public static EndPointClass setGameConfig = new EndPointClass("game/#GAMEID#/config/{0}", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Player Ban Operations")]
+        public static EndPointClass banPlayer = new EndPointClass("game/#GAMEID#/player/{0}/bans", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass unbanPlayer = new EndPointClass("game/#GAMEID#/player/{0}/bans", LootLockerHTTPMethod.DELETE, LootLockerCallerRole.Admin);
     }
     #endregion
 }
