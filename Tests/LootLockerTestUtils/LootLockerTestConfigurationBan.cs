@@ -14,7 +14,7 @@ namespace LootLockerTestConfigurationUtils
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                onComplete?.Invoke(null);
+                onComplete?.Invoke(new LootLockerResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
                 return;
             }
 
@@ -36,7 +36,7 @@ namespace LootLockerTestConfigurationUtils
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                onComplete?.Invoke(null);
+                onComplete?.Invoke(new LootLockerResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
                 return;
             }
 
