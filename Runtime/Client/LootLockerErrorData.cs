@@ -46,6 +46,12 @@
         public int? retry_after_seconds { get; set; } = null;
 
         /// <summary>
+        /// When the error code is <c>player_banned</c>, contains sanitized details about the active ban.
+        /// Null for all other error codes.
+        /// </summary>
+        public LootLockerBanInfo ban { get; set; }
+
+        /// <summary>
         /// An easy way of debugging LootLockerErrorData class, example: Debug.Log(onComplete.errorData);
         /// </summary>
         /// <returns>string used to debug errors</returns>

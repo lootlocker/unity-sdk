@@ -2057,6 +2057,36 @@ namespace LootLocker.Requests
         {
             ClearCacheForPlayer(forPlayerWithUlid);
         }
+
+        /// @ingroup Authentication
+        /// <summary>
+        /// Get the ban status for a player. Use this when a session start fails with error code <c>player_banned</c>
+        /// to retrieve the ban reason and duration and surface it to the player.
+        /// This endpoint does not require an active player session.
+        /// </summary>
+        /// <param name="playerUlid">The ULID of the player to query.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerBanStatusResponse</param>
+        public static void GetPlayerBanStatus(string playerUlid, Action<LootLockerBanStatusResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerBanStatusResponse>(null));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerBanStatusResponse>("playerUlid must not be null or empty", null));
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(null,
+                LootLockerEndPoints.banStatusRequest.endPoint, LootLockerEndPoints.banStatusRequest.httpMethod,
+                LootLockerJson.SerializeObject(new LootLockerBanStatusRequest { player_id = playerUlid }),
+                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); },
+                useAuthToken: false
+            );
+        }
         #endregion
 
         #region Event System
