@@ -1,0 +1,10 @@
+[
+  {
+    "version": "latest",
+    "path": "latest/"
+  },
+  {
+    "version": "v8.0.0",
+    "path": "v8.0.0/"
+  }
+]
