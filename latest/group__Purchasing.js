@@ -1,0 +1,26 @@
+var group__Purchasing =
+[
+    [ "LootLocker.Requests.LootLockerSDKManager.ActivateRentalAsset", "group__Purchasing.html#gac72cc74388cb4afde54fd0479da0bdc2", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemption", "group__Purchasing.html#ga35cfd08f703cb35c596e17e9f3ca9ecd", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemptionForClass", "group__Purchasing.html#ga675c0e20d5cf35cea8513923750d1fb3", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.CancelAsyncPurchasePolling", "group__Purchasing.html#ga5f1969f52cfa11777068db3ea11f7ae1", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.CreateStripeCheckoutSession", "group__Purchasing.html#ga319d6fd86f9b181bedec02995ee5d1eb", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.FinalizeSteamPurchaseRedemption", "group__Purchasing.html#gaddc93c3dc01bd401a95caf1cdd4ca72e", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.GetAsyncPurchaseStatus", "group__Purchasing.html#ga528516ebe34cc550f2e303168add7ca3", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseCatalogItems", "group__Purchasing.html#ga56dbd772fce1773c1e936ce0a9d89393", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem", "group__Purchasing.html#gae7a44d631045579597773650d2cf28d4", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseCatalogItems", "group__Purchasing.html#ga1680a3ad280f7babb6e8b2296d553a9c", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseSingleCatalogItem", "group__Purchasing.html#gaf0e712fdf5c5fdcad821310172d23343", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseCatalogItems", "group__Purchasing.html#gaab642b3b4009c757785e3fecb8b434de", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseSingleCatalogItem", "group__Purchasing.html#gad6ec254532f37a0d259177d2135d52fb", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.PollOrderStatus", "group__Purchasing.html#ga4b7d3d5194a0cdefa9f34b3aede28ca7", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.QuerySteamPurchaseRedemption", "group__Purchasing.html#ga001e009e840f7c0c1107e3f761a95c3e", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForClass", "group__Purchasing.html#gad394c087418d226fdddbf200e8ab9bb3", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForPlayer", "group__Purchasing.html#ga451582e6b324e699116f337f8146b28c", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForClass", "group__Purchasing.html#gabbfbc520ebd5dc771969f78e79b88df8", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForPlayer", "group__Purchasing.html#gaab86bc92cf1b91df160e5ed9b87c9763", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForClass", "group__Purchasing.html#gaf8b3af44a0b5ef79aca0b792e5e7cb38", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForPlayer", "group__Purchasing.html#ga5499de3863077320c184df2ec5ce7720", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RefundByEntitlementIds", "group__Purchasing.html#ga887de25053f766d8c021406cfa74d27c", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RetryAsyncPurchase", "group__Purchasing.html#gadb083637bd437ac8e52c087b7213639b", null ]
+];

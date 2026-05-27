@@ -1,0 +1,2034 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Player</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.0.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Player.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Player</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Retrieve and manage the current player's profile, name, and identifiers. </p>
+<p>Covers public profile data, display-name assignment, and account info lookups. For inventory see <a class="el" href="group__AssetInstance.html">Asset Instances</a>; for XP/levels see <a class="el" href="group__PlayerProgressions.html">Player Progressions</a>; for currency balances see <a class="el" href="group__Balances.html">Balances</a>; for cloud file storage see <a class="el" href="group__PlayerFiles.html">Player Files</a>.</p>
+<p>See the <a href="https://docs.lootlocker.com/players/overview">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga973ec828fd87841c4fb01b2ed53cd3f6" name="ga973ec828fd87841c4fb01b2ed53cd3f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga973ec828fd87841c4fb01b2ed53cd3f6">&#9670;&#160;</a></span>DeletePlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeletePlayer </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Mark the logged in player for deletion. </p>
+<p>After 30 days the player will be deleted from the system.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse&gt;</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4735767123bab5946e2a17f4c6dd0c19" name="ga4735767123bab5946e2a17f4c6dd0c19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4735767123bab5946e2a17f4c6dd0c19">&#9670;&#160;</a></span>GetAssetNotification()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetNotification </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerAssetNotificationsResponse.html">LootLockerPlayerAssetNotificationsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get assets that have been given to the currently logged in player since the last time this endpoint was called. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerAssetNotificationsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga536b3950f4c78015d5658eaf4715f3b5" name="ga536b3950f4c78015d5658eaf4715f3b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga536b3950f4c78015d5658eaf4715f3b5">&#9670;&#160;</a></span>GetBalance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetBalance </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBalanceResponse.html">LootLockerBalanceResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the amount of credits/currency that the player has. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerBalanceResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga65350c83e0c4dce02c014acf4981783d" name="ga65350c83e0c4dce02c014acf4981783d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga65350c83e0c4dce02c014acf4981783d">&#9670;&#160;</a></span>GetCurrentPlayerInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetCurrentPlayerInfo </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetCurrentPlayerInfoResponse.html">LootLockerGetCurrentPlayerInfoResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get information about the currently logged in player such as name and different ids to use for subsequent calls to <a class="el" href="namespaceLootLocker.html">LootLocker</a> methods. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga28e95a77da5f8d29ec67d4ebf1dcb41a" name="ga28e95a77da5f8d29ec67d4ebf1dcb41a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga28e95a77da5f8d29ec67d4ebf1dcb41a">&#9670;&#160;</a></span>GetDeactivatedAssetNotification()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetDeactivatedAssetNotification </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDeactivatedAssetsResponse.html">LootLockerDeactivatedAssetsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get asset deactivations for the currently logged in player since the last time this endpoint was called. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerDeactivatedAssetsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga944c5fc8df863995b7dbf496a2298e13" name="ga944c5fc8df863995b7dbf496a2298e13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga944c5fc8df863995b7dbf496a2298e13">&#9670;&#160;</a></span>GetDLCMigrated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetDLCMigrated </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDlcResponse.html">LootLockerDlcResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a list of DLC's migrated for the player. </p>
+<p>This response will only list the asset-ID's of the migrated DLC, if you want more information about the assets, use GetAssetNotification(Action&lt;LootLockerPlayerAssetNotificationsResponse&gt; onComplete) instead.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerDlcResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8b1c4926df7e6b689a9da20a4f13ee69" name="ga8b1c4926df7e6b689a9da20a4f13ee69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8b1c4926df7e6b689a9da20a4f13ee69">&#9670;&#160;</a></span>GetInventory() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetInventory </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the players inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerInventoryResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga778cb611505e46117c652a75c7e50d48" name="ga778cb611505e46117c652a75c7e50d48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga778cb611505e46117c652a75c7e50d48">&#9670;&#160;</a></span>GetInventory() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetInventory </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the players inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Amount of assets to retrieve</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerInventoryResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac05ad313a99a0c2707331a842ebfbd0e" name="gac05ad313a99a0c2707331a842ebfbd0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac05ad313a99a0c2707331a842ebfbd0e">&#9670;&#160;</a></span>GetInventory() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetInventory </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the players inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Amount of assets to retrieve</td></tr>
+    <tr><td class="paramname">after</td><td>The instance ID the list should start from</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerInventoryResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaebd140fc67ee04f44f4309b7a26355ae" name="gaebd140fc67ee04f44f4309b7a26355ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaebd140fc67ee04f44f4309b7a26355ae">&#9670;&#160;</a></span>GetPlayerName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerName </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html">PlayerNameResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the logged in players name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga28df9e98b9f1b99c35686f446bf83b94" name="ga28df9e98b9f1b99c35686f446bf83b94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga28df9e98b9f1b99c35686f446bf83b94">&#9670;&#160;</a></span>InitiateDLCMigration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.InitiateDLCMigration </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDlcResponse.html">LootLockerDlcResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initiate DLC Migration for the player: <a href="https://docs.lootlocker.com/background/live-ops-tools#dlc-migration">https://docs.lootlocker.com/background/live-ops-tools#dlc-migration</a> 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any. </p>
+<p>If you only want the ID's of the assets you can also use GetDLCMigrated(Action&lt;LootLockerDlcResponse&gt; onComplete).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerDlcResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf966493b7e6fe13c9da233a3cc519e8f" name="gaf966493b7e6fe13c9da233a3cc519e8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf966493b7e6fe13c9da233a3cc519e8f">&#9670;&#160;</a></span>ListCharacterInventory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListCharacterInventory </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryRequest.html">LootLockerListSimplifiedInventoryRequest</a>&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>characterId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>perPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List character inventory with minimal response data. </p>
+<p>Due to looking up less data, this endpoint is significantly faster than GetInventory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">request</td><td>Request object containing filters and optional metadata includes. To include metadata in the response, assign <code>request.includes.metadata</code> to a <code>LootLockerListSimplifiedInventoryMetadataIncludes</code> instance: <ul>
+<li>
+To fetch all metadata keys: <code>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes()</code> (empty <code>keys</code> array sets <code>all</code> to <code>true</code> automatically) </li>
+<li>
+To fetch specific metadata keys: <code>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes { keys = new[] { "key1", "key2" } }</code> (non-empty <code>keys</code> sets <code>all</code> to <code>false</code> automatically) </li>
+</ul>
+</td></tr>
+    <tr><td class="paramname">characterId</td><td>Optional : Filter inventory by character ID.</td></tr>
+    <tr><td class="paramname">perPage</td><td>Optional : Number of items per page.</td></tr>
+    <tr><td class="paramname">page</td><td>Optional : Page number to retrieve.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga88dd42f7725971d39d9aae8e6263a8b0" name="ga88dd42f7725971d39d9aae8e6263a8b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga88dd42f7725971d39d9aae8e6263a8b0">&#9670;&#160;</a></span>ListCharacterInventoryWithDefaultParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListCharacterInventoryWithDefaultParameters </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List character inventory with default parameters (no filters, first page, default page size). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gabfccc4d9b6eedede8b640ee9a3a5043c" name="gabfccc4d9b6eedede8b640ee9a3a5043c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabfccc4d9b6eedede8b640ee9a3a5043c">&#9670;&#160;</a></span>ListPlayerInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListPlayerInfo </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerIdsToLookUp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int[]&#160;</td>
+          <td class="paramname"><em>playerLegacyIdsToLookUp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerPublicUidsToLookUp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListPlayerInfoResponse.html">LootLockerListPlayerInfoResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List information for one or more other players. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerIdsToLookUp</td><td>A list of ULID ids of players to look up. These ids are in the form of ULIDs and are sometimes called player_ulid or similar</td></tr>
+    <tr><td class="paramname">playerLegacyIdsToLookUp</td><td>A list of legacy ids of players to look up. These ids are in the form of integers and are sometimes called simply player_id or id</td></tr>
+    <tr><td class="paramname">playerPublicUidsToLookUp</td><td>A list of public uids to look up. These ids are in the form of UIDs.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5e58fea5e2827d35c25acc99badcb23d" name="ga5e58fea5e2827d35c25acc99badcb23d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5e58fea5e2827d35c25acc99badcb23d">&#9670;&#160;</a></span>ListPlayerInventory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListPlayerInventory </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryRequest.html">LootLockerListSimplifiedInventoryRequest</a>&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>perPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List player inventory with minimal response data. </p>
+<p>Due to looking up less data, this endpoint is significantly faster than GetInventory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">request</td><td>Request object containing filters and optional metadata includes. To include metadata in the response, assign <code>request.includes.metadata</code> to a <code>LootLockerListSimplifiedInventoryMetadataIncludes</code> instance: <ul>
+<li>
+To fetch all metadata keys: <code>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes()</code> (empty <code>keys</code> array sets <code>all</code> to <code>true</code> automatically) </li>
+<li>
+To fetch specific metadata keys: <code>request.includes.metadata = new LootLockerListSimplifiedInventoryMetadataIncludes { keys = new[] { "key1", "key2" } }</code> (non-empty <code>keys</code> sets <code>all</code> to <code>false</code> automatically) </li>
+</ul>
+</td></tr>
+    <tr><td class="paramname">perPage</td><td>Optional : Number of items per page.</td></tr>
+    <tr><td class="paramname">page</td><td>Optional : Page number to retrieve.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gacd1aa6c0fe1977daa84a22a58be37f4e" name="gacd1aa6c0fe1977daa84a22a58be37f4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacd1aa6c0fe1977daa84a22a58be37f4e">&#9670;&#160;</a></span>ListPlayerInventoryWithDefaultParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListPlayerInventoryWithDefaultParameters </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List player inventory with default parameters (no filters, first page, default page size). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab6d91828a2a9d5e4f09ad081e09df5e2" name="gab6d91828a2a9d5e4f09ad081e09df5e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab6d91828a2a9d5e4f09ad081e09df5e2">&#9670;&#160;</a></span>LookupPlayer1stPartyPlatformIds() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayer1stPartyPlatformIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerPublicUIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1Player1stPartyPlatformIDsLookupResponse.html">Player1stPartyPlatformIDsLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get players 1st party platform ID's from the provided list of playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerPublicUIds</td><td>A list of multiple player public UID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0e116b5f6cf98e1354d0d8acb0ea29e0" name="ga0e116b5f6cf98e1354d0d8acb0ea29e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0e116b5f6cf98e1354d0d8acb0ea29e0">&#9670;&#160;</a></span>LookupPlayer1stPartyPlatformIds() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayer1stPartyPlatformIds </td>
+          <td>(</td>
+          <td class="paramtype">ulong[]&#160;</td>
+          <td class="paramname"><em>playerIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1Player1stPartyPlatformIDsLookupResponse.html">Player1stPartyPlatformIDsLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get players 1st party platform ID's from the provided list of playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerIds</td><td>A list of multiple player ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type Player1stPartyPlatformIDsLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga24e7c6d0bc512c11fe1276f48c4cc0c2" name="ga24e7c6d0bc512c11fe1276f48c4cc0c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga24e7c6d0bc512c11fe1276f48c4cc0c2">&#9670;&#160;</a></span>LookupPlayerNamesByEpicGamesIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByEpicGamesIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>epicGamesIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by Epic Games ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">epicGamesIds</td><td>A list of multiple player Epic Games ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga91448f11abb128b587304622cadd73e3" name="ga91448f11abb128b587304622cadd73e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga91448f11abb128b587304622cadd73e3">&#9670;&#160;</a></span>LookupPlayerNamesByGooglePlayGamesIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByGooglePlayGamesIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>googlePlayGamesIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by Google Play Games ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">googlePlayGamesIds</td><td>A list of multiple player Google Play Games ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga710cf5f95c0157996df30d954ae116dc" name="ga710cf5f95c0157996df30d954ae116dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga710cf5f95c0157996df30d954ae116dc">&#9670;&#160;</a></span>LookupPlayerNamesByGuestLoginIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByGuestLoginIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>guestLoginIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by public playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">guestLoginIds</td><td>A list of guest login ids</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaed864ee685ebc74c818120e0ff087599" name="gaed864ee685ebc74c818120e0ff087599"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaed864ee685ebc74c818120e0ff087599">&#9670;&#160;</a></span>LookupPlayerNamesByPlayerIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerIds </td>
+          <td>(</td>
+          <td class="paramtype">ulong[]&#160;</td>
+          <td class="paramname"><em>playerIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerIds</td><td>A list of multiple player ID's&lt;</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga56ae07627cd821627527a36c8ba56838" name="ga56ae07627cd821627527a36c8ba56838"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga56ae07627cd821627527a36c8ba56838">&#9670;&#160;</a></span>LookupPlayerNamesByPlayerNames()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerNames </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerNames</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by public playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerNames</td><td>A list of player names</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga2e3bcd8acfea5a295e35d34600334cd2" name="ga2e3bcd8acfea5a295e35d34600334cd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2e3bcd8acfea5a295e35d34600334cd2">&#9670;&#160;</a></span>LookupPlayerNamesByPlayerPublicUIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerPublicUIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerPublicUIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by public playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerPublicUIds</td><td>A list of multiple player public UID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac257e61fbfa3149e642a8c7b1f4fa8ef" name="gac257e61fbfa3149e642a8c7b1f4fa8ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac257e61fbfa3149e642a8c7b1f4fa8ef">&#9670;&#160;</a></span>LookupPlayerNamesByPlayerUlids()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerUlids </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>playerUlids</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by public playerID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlids</td><td>A list of player ulids</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4445e0e7b06303a35712a1b3bafdf6d8" name="ga4445e0e7b06303a35712a1b3bafdf6d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4445e0e7b06303a35712a1b3bafdf6d8">&#9670;&#160;</a></span>LookupPlayerNamesByPSNIds() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPSNIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>psnIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by PSN ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">psnIds</td><td>A list of multiple player PSN ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga222e5bc4ad954dc53d8c840cbf11245d" name="ga222e5bc4ad954dc53d8c840cbf11245d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga222e5bc4ad954dc53d8c840cbf11245d">&#9670;&#160;</a></span>LookupPlayerNamesByPSNIds() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPSNIds </td>
+          <td>(</td>
+          <td class="paramtype">ulong[]&#160;</td>
+          <td class="paramname"><em>psnIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by PSN ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">psnIds</td><td>A list of multiple player PSN ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaed57f4ac64eab00a3b6c9748dd48e430" name="gaed57f4ac64eab00a3b6c9748dd48e430"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaed57f4ac64eab00a3b6c9748dd48e430">&#9670;&#160;</a></span>LookupPlayerNamesBySteamIds() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesBySteamIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>steamIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by Steam ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">steamIds</td><td>A list of multiple player Steam ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa71eaee6aae82d1f8a82d98eb7943717" name="gaa71eaee6aae82d1f8a82d98eb7943717"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa71eaee6aae82d1f8a82d98eb7943717">&#9670;&#160;</a></span>LookupPlayerNamesBySteamIds() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesBySteamIds </td>
+          <td>(</td>
+          <td class="paramtype">ulong[]&#160;</td>
+          <td class="paramname"><em>steamIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by steam ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">steamIds</td><td>A list of multiple player Steam ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga26476c4608ad2af36be31fd4de378a71" name="ga26476c4608ad2af36be31fd4de378a71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga26476c4608ad2af36be31fd4de378a71">&#9670;&#160;</a></span>LookupPlayerNamesByXboxIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByXboxIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>xboxIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get player names and important ids of a set of players from their last active platform by Xbox ID's. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xboxIds</td><td>A list of multiple player XBOX ID's</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameLookupResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf527e71608f69c7f28261fc06a331d99" name="gaf527e71608f69c7f28261fc06a331d99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf527e71608f69c7f28261fc06a331d99">&#9670;&#160;</a></span>SetPlayerName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SetPlayerName </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html">PlayerNameResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the logged in players name. </p>
+<p>Max length of a name is 255 characters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name to set to the currently logged in player</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type PlayerNameResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga44c2a04042c9890db358c015632d6d4e" name="ga44c2a04042c9890db358c015632d6d4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga44c2a04042c9890db358c015632d6d4e">&#9670;&#160;</a></span>SetProfilePrivate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SetProfilePrivate </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStandardResponse.html">LootLockerStandardResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the players profile to be private. </p>
+<p>This means that their inventory will not be displayed publicly on Steam and other places.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerStandardResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf774bf72b6afd06cf025766316a66843" name="gaf774bf72b6afd06cf025766316a66843"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf774bf72b6afd06cf025766316a66843">&#9670;&#160;</a></span>SetProfilePublic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SetProfilePublic </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStandardResponse.html">LootLockerStandardResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the players profile to public. </p>
+<p>This means that their inventory will be displayed publicly on Steam and other places.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerStandardResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga65350c83e0c4dce02c014acf4981783d" id="r_ga65350c83e0c4dce02c014acf4981783d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga65350c83e0c4dce02c014acf4981783d">LootLocker.Requests.LootLockerSDKManager.GetCurrentPlayerInfo</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetCurrentPlayerInfoResponse.html">LootLockerGetCurrentPlayerInfoResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga65350c83e0c4dce02c014acf4981783d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get information about the currently logged in player such as name and different ids to use for subsequent calls to <a class="el" href="namespaceLootLocker.html">LootLocker</a> methods.  <br /></td></tr>
+<tr class="separator:ga65350c83e0c4dce02c014acf4981783d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabfccc4d9b6eedede8b640ee9a3a5043c" id="r_gabfccc4d9b6eedede8b640ee9a3a5043c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gabfccc4d9b6eedede8b640ee9a3a5043c">LootLocker.Requests.LootLockerSDKManager.ListPlayerInfo</a> (string[] playerIdsToLookUp, int[] playerLegacyIdsToLookUp, string[] playerPublicUidsToLookUp, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListPlayerInfoResponse.html">LootLockerListPlayerInfoResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gabfccc4d9b6eedede8b640ee9a3a5043c"><td class="mdescLeft">&#160;</td><td class="mdescRight">List information for one or more other players.  <br /></td></tr>
+<tr class="separator:gabfccc4d9b6eedede8b640ee9a3a5043c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac05ad313a99a0c2707331a842ebfbd0e" id="r_gac05ad313a99a0c2707331a842ebfbd0e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gac05ad313a99a0c2707331a842ebfbd0e">LootLocker.Requests.LootLockerSDKManager.GetInventory</a> (int count, int after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac05ad313a99a0c2707331a842ebfbd0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the players inventory.  <br /></td></tr>
+<tr class="separator:gac05ad313a99a0c2707331a842ebfbd0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8b1c4926df7e6b689a9da20a4f13ee69" id="r_ga8b1c4926df7e6b689a9da20a4f13ee69"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga8b1c4926df7e6b689a9da20a4f13ee69">LootLocker.Requests.LootLockerSDKManager.GetInventory</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga8b1c4926df7e6b689a9da20a4f13ee69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the players inventory.  <br /></td></tr>
+<tr class="separator:ga8b1c4926df7e6b689a9da20a4f13ee69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga778cb611505e46117c652a75c7e50d48" id="r_ga778cb611505e46117c652a75c7e50d48"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga778cb611505e46117c652a75c7e50d48">LootLocker.Requests.LootLockerSDKManager.GetInventory</a> (int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html">LootLockerInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga778cb611505e46117c652a75c7e50d48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the players inventory.  <br /></td></tr>
+<tr class="separator:ga778cb611505e46117c652a75c7e50d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacd1aa6c0fe1977daa84a22a58be37f4e" id="r_gacd1aa6c0fe1977daa84a22a58be37f4e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gacd1aa6c0fe1977daa84a22a58be37f4e">LootLocker.Requests.LootLockerSDKManager.ListPlayerInventoryWithDefaultParameters</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gacd1aa6c0fe1977daa84a22a58be37f4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">List player inventory with default parameters (no filters, first page, default page size).  <br /></td></tr>
+<tr class="separator:gacd1aa6c0fe1977daa84a22a58be37f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5e58fea5e2827d35c25acc99badcb23d" id="r_ga5e58fea5e2827d35c25acc99badcb23d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga5e58fea5e2827d35c25acc99badcb23d">LootLocker.Requests.LootLockerSDKManager.ListPlayerInventory</a> (<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryRequest.html">LootLockerListSimplifiedInventoryRequest</a> request, int perPage, int page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5e58fea5e2827d35c25acc99badcb23d"><td class="mdescLeft">&#160;</td><td class="mdescRight">List player inventory with minimal response data.  <br /></td></tr>
+<tr class="separator:ga5e58fea5e2827d35c25acc99badcb23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga88dd42f7725971d39d9aae8e6263a8b0" id="r_ga88dd42f7725971d39d9aae8e6263a8b0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga88dd42f7725971d39d9aae8e6263a8b0">LootLocker.Requests.LootLockerSDKManager.ListCharacterInventoryWithDefaultParameters</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga88dd42f7725971d39d9aae8e6263a8b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">List character inventory with default parameters (no filters, first page, default page size).  <br /></td></tr>
+<tr class="separator:ga88dd42f7725971d39d9aae8e6263a8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf966493b7e6fe13c9da233a3cc519e8f" id="r_gaf966493b7e6fe13c9da233a3cc519e8f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaf966493b7e6fe13c9da233a3cc519e8f">LootLocker.Requests.LootLockerSDKManager.ListCharacterInventory</a> (<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryRequest.html">LootLockerListSimplifiedInventoryRequest</a> request, int characterId, int perPage, int page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html">LootLockerSimpleInventoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf966493b7e6fe13c9da233a3cc519e8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">List character inventory with minimal response data.  <br /></td></tr>
+<tr class="separator:gaf966493b7e6fe13c9da233a3cc519e8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga536b3950f4c78015d5658eaf4715f3b5" id="r_ga536b3950f4c78015d5658eaf4715f3b5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga536b3950f4c78015d5658eaf4715f3b5">LootLocker.Requests.LootLockerSDKManager.GetBalance</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBalanceResponse.html">LootLockerBalanceResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga536b3950f4c78015d5658eaf4715f3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the amount of credits/currency that the player has.  <br /></td></tr>
+<tr class="separator:ga536b3950f4c78015d5658eaf4715f3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4735767123bab5946e2a17f4c6dd0c19" id="r_ga4735767123bab5946e2a17f4c6dd0c19"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga4735767123bab5946e2a17f4c6dd0c19">LootLocker.Requests.LootLockerSDKManager.GetAssetNotification</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerAssetNotificationsResponse.html">LootLockerPlayerAssetNotificationsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4735767123bab5946e2a17f4c6dd0c19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get assets that have been given to the currently logged in player since the last time this endpoint was called.  <br /></td></tr>
+<tr class="separator:ga4735767123bab5946e2a17f4c6dd0c19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga28e95a77da5f8d29ec67d4ebf1dcb41a" id="r_ga28e95a77da5f8d29ec67d4ebf1dcb41a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga28e95a77da5f8d29ec67d4ebf1dcb41a">LootLocker.Requests.LootLockerSDKManager.GetDeactivatedAssetNotification</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDeactivatedAssetsResponse.html">LootLockerDeactivatedAssetsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga28e95a77da5f8d29ec67d4ebf1dcb41a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get asset deactivations for the currently logged in player since the last time this endpoint was called.  <br /></td></tr>
+<tr class="separator:ga28e95a77da5f8d29ec67d4ebf1dcb41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga28df9e98b9f1b99c35686f446bf83b94" id="r_ga28df9e98b9f1b99c35686f446bf83b94"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga28df9e98b9f1b99c35686f446bf83b94">LootLocker.Requests.LootLockerSDKManager.InitiateDLCMigration</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDlcResponse.html">LootLockerDlcResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga28df9e98b9f1b99c35686f446bf83b94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiate DLC Migration for the player: <a href="https://docs.lootlocker.com/background/live-ops-tools#dlc-migration">https://docs.lootlocker.com/background/live-ops-tools#dlc-migration</a> 5 minutes after calling this endpoint you should issue a call to the Player Asset Notifications call to get the results of the migrated DLC, if any.  <br /></td></tr>
+<tr class="separator:ga28df9e98b9f1b99c35686f446bf83b94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga944c5fc8df863995b7dbf496a2298e13" id="r_ga944c5fc8df863995b7dbf496a2298e13"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga944c5fc8df863995b7dbf496a2298e13">LootLocker.Requests.LootLockerSDKManager.GetDLCMigrated</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDlcResponse.html">LootLockerDlcResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga944c5fc8df863995b7dbf496a2298e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a list of DLC's migrated for the player.  <br /></td></tr>
+<tr class="separator:ga944c5fc8df863995b7dbf496a2298e13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga44c2a04042c9890db358c015632d6d4e" id="r_ga44c2a04042c9890db358c015632d6d4e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga44c2a04042c9890db358c015632d6d4e">LootLocker.Requests.LootLockerSDKManager.SetProfilePrivate</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStandardResponse.html">LootLockerStandardResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga44c2a04042c9890db358c015632d6d4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the players profile to be private.  <br /></td></tr>
+<tr class="separator:ga44c2a04042c9890db358c015632d6d4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf774bf72b6afd06cf025766316a66843" id="r_gaf774bf72b6afd06cf025766316a66843"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaf774bf72b6afd06cf025766316a66843">LootLocker.Requests.LootLockerSDKManager.SetProfilePublic</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStandardResponse.html">LootLockerStandardResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf774bf72b6afd06cf025766316a66843"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the players profile to public.  <br /></td></tr>
+<tr class="separator:gaf774bf72b6afd06cf025766316a66843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaebd140fc67ee04f44f4309b7a26355ae" id="r_gaebd140fc67ee04f44f4309b7a26355ae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaebd140fc67ee04f44f4309b7a26355ae">LootLocker.Requests.LootLockerSDKManager.GetPlayerName</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html">PlayerNameResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaebd140fc67ee04f44f4309b7a26355ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the logged in players name.  <br /></td></tr>
+<tr class="separator:gaebd140fc67ee04f44f4309b7a26355ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf527e71608f69c7f28261fc06a331d99" id="r_gaf527e71608f69c7f28261fc06a331d99"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaf527e71608f69c7f28261fc06a331d99">LootLocker.Requests.LootLockerSDKManager.SetPlayerName</a> (string name, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html">PlayerNameResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf527e71608f69c7f28261fc06a331d99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the logged in players name.  <br /></td></tr>
+<tr class="separator:gaf527e71608f69c7f28261fc06a331d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0e116b5f6cf98e1354d0d8acb0ea29e0" id="r_ga0e116b5f6cf98e1354d0d8acb0ea29e0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga0e116b5f6cf98e1354d0d8acb0ea29e0">LootLocker.Requests.LootLockerSDKManager.LookupPlayer1stPartyPlatformIds</a> (ulong[] playerIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1Player1stPartyPlatformIDsLookupResponse.html">Player1stPartyPlatformIDsLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga0e116b5f6cf98e1354d0d8acb0ea29e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get players 1st party platform ID's from the provided list of playerID's.  <br /></td></tr>
+<tr class="separator:ga0e116b5f6cf98e1354d0d8acb0ea29e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab6d91828a2a9d5e4f09ad081e09df5e2" id="r_gab6d91828a2a9d5e4f09ad081e09df5e2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gab6d91828a2a9d5e4f09ad081e09df5e2">LootLocker.Requests.LootLockerSDKManager.LookupPlayer1stPartyPlatformIds</a> (string[] playerPublicUIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1Player1stPartyPlatformIDsLookupResponse.html">Player1stPartyPlatformIDsLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gab6d91828a2a9d5e4f09ad081e09df5e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get players 1st party platform ID's from the provided list of playerID's.  <br /></td></tr>
+<tr class="separator:gab6d91828a2a9d5e4f09ad081e09df5e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaed864ee685ebc74c818120e0ff087599" id="r_gaed864ee685ebc74c818120e0ff087599"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaed864ee685ebc74c818120e0ff087599">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerIds</a> (ulong[] playerIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaed864ee685ebc74c818120e0ff087599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by playerID's.  <br /></td></tr>
+<tr class="separator:gaed864ee685ebc74c818120e0ff087599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2e3bcd8acfea5a295e35d34600334cd2" id="r_ga2e3bcd8acfea5a295e35d34600334cd2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga2e3bcd8acfea5a295e35d34600334cd2">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerPublicUIds</a> (string[] playerPublicUIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga2e3bcd8acfea5a295e35d34600334cd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by public playerID's.  <br /></td></tr>
+<tr class="separator:ga2e3bcd8acfea5a295e35d34600334cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac257e61fbfa3149e642a8c7b1f4fa8ef" id="r_gac257e61fbfa3149e642a8c7b1f4fa8ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gac257e61fbfa3149e642a8c7b1f4fa8ef">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerUlids</a> (string[] playerUlids, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac257e61fbfa3149e642a8c7b1f4fa8ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by public playerID's.  <br /></td></tr>
+<tr class="separator:gac257e61fbfa3149e642a8c7b1f4fa8ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga710cf5f95c0157996df30d954ae116dc" id="r_ga710cf5f95c0157996df30d954ae116dc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga710cf5f95c0157996df30d954ae116dc">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByGuestLoginIds</a> (string[] guestLoginIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga710cf5f95c0157996df30d954ae116dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by public playerID's.  <br /></td></tr>
+<tr class="separator:ga710cf5f95c0157996df30d954ae116dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56ae07627cd821627527a36c8ba56838" id="r_ga56ae07627cd821627527a36c8ba56838"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga56ae07627cd821627527a36c8ba56838">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPlayerNames</a> (string[] playerNames, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga56ae07627cd821627527a36c8ba56838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by public playerID's.  <br /></td></tr>
+<tr class="separator:ga56ae07627cd821627527a36c8ba56838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa71eaee6aae82d1f8a82d98eb7943717" id="r_gaa71eaee6aae82d1f8a82d98eb7943717"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaa71eaee6aae82d1f8a82d98eb7943717">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesBySteamIds</a> (ulong[] steamIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa71eaee6aae82d1f8a82d98eb7943717"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by steam ID's.  <br /></td></tr>
+<tr class="separator:gaa71eaee6aae82d1f8a82d98eb7943717"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaed57f4ac64eab00a3b6c9748dd48e430" id="r_gaed57f4ac64eab00a3b6c9748dd48e430"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#gaed57f4ac64eab00a3b6c9748dd48e430">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesBySteamIds</a> (string[] steamIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaed57f4ac64eab00a3b6c9748dd48e430"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by Steam ID's.  <br /></td></tr>
+<tr class="separator:gaed57f4ac64eab00a3b6c9748dd48e430"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga222e5bc4ad954dc53d8c840cbf11245d" id="r_ga222e5bc4ad954dc53d8c840cbf11245d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga222e5bc4ad954dc53d8c840cbf11245d">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPSNIds</a> (ulong[] psnIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga222e5bc4ad954dc53d8c840cbf11245d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by PSN ID's.  <br /></td></tr>
+<tr class="separator:ga222e5bc4ad954dc53d8c840cbf11245d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4445e0e7b06303a35712a1b3bafdf6d8" id="r_ga4445e0e7b06303a35712a1b3bafdf6d8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga4445e0e7b06303a35712a1b3bafdf6d8">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByPSNIds</a> (string[] psnIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4445e0e7b06303a35712a1b3bafdf6d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by PSN ID's.  <br /></td></tr>
+<tr class="separator:ga4445e0e7b06303a35712a1b3bafdf6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga26476c4608ad2af36be31fd4de378a71" id="r_ga26476c4608ad2af36be31fd4de378a71"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga26476c4608ad2af36be31fd4de378a71">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByXboxIds</a> (string[] xboxIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga26476c4608ad2af36be31fd4de378a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by Xbox ID's.  <br /></td></tr>
+<tr class="separator:ga26476c4608ad2af36be31fd4de378a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga24e7c6d0bc512c11fe1276f48c4cc0c2" id="r_ga24e7c6d0bc512c11fe1276f48c4cc0c2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga24e7c6d0bc512c11fe1276f48c4cc0c2">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByEpicGamesIds</a> (string[] epicGamesIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga24e7c6d0bc512c11fe1276f48c4cc0c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by Epic Games ID's.  <br /></td></tr>
+<tr class="separator:ga24e7c6d0bc512c11fe1276f48c4cc0c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga91448f11abb128b587304622cadd73e3" id="r_ga91448f11abb128b587304622cadd73e3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga91448f11abb128b587304622cadd73e3">LootLocker.Requests.LootLockerSDKManager.LookupPlayerNamesByGooglePlayGamesIds</a> (string[] googlePlayGamesIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html">PlayerNameLookupResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga91448f11abb128b587304622cadd73e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get player names and important ids of a set of players from their last active platform by Google Play Games ID's.  <br /></td></tr>
+<tr class="separator:ga91448f11abb128b587304622cadd73e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga973ec828fd87841c4fb01b2ed53cd3f6" id="r_ga973ec828fd87841c4fb01b2ed53cd3f6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Player.html#ga973ec828fd87841c4fb01b2ed53cd3f6">LootLocker.Requests.LootLockerSDKManager.DeletePlayer</a> (Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga973ec828fd87841c4fb01b2ed53cd3f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the logged in player for deletion.  <br /></td></tr>
+<tr class="separator:ga973ec828fd87841c4fb01b2ed53cd3f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+/* =============================================================================
+   LootLocker Theme for Doxygen
+   Matches the visual identity of ref.lootlocker.com
+   Colors sampled from the ApiDog-hosted LootLocker API reference.
+   ============================================================================= */
+
+/* ── Color tokens & doxygen-awesome overrides — light mode ─────────── */
+:root {
+  /* Top nav geometry */
+  --ll-nav-height: 48px;
+
+  /* LootLocker green palette (sourced from ref.lootlocker.com) */
+  --ll-green:         #029e74;
+  --ll-green-hover:   #017a59;
+  --ll-green-darker:  #01392a;
+  --ll-green-light:   #68ba99;
+  --ll-green-faint:   #e6f4ed;
+  --ll-green-faintest:#f7fbf9;
+
+  /* Top nav chrome */
+  --ll-nav-bg:        #ffffff;
+  --ll-nav-border:    #e6ebe8;
+  --ll-nav-fg:        #1a1922;
+  --ll-nav-muted:     #667085;
+
+  /* ── doxygen-awesome variable overrides ── */
+  --primary-color:                      var(--ll-green);
+  --primary-dark-color:                 var(--ll-green-darker);
+  --primary-light-color:                var(--ll-green-light);
+  --on-primary-color:                   #ffffff;
+
+  --page-background-color:              #ffffff;
+  --page-foreground-color:              #1a1922;
+  --page-secondary-foreground-color:    #667085;
+  --separator-color:                    #e6ebe8;
+  --blockquote-foreground:              #636568;
+
+  --side-nav-background:                var(--ll-green-faintest);
+  --searchbar-background:               #ffffff;
+  --code-background:                    #f3f8f6;
+  --code-foreground:                    var(--page-foreground-color);
+  --fragment-foreground:                #1a1922;
+}
+
+/* ── Dark mode — OS preference ─────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode) {
+    --ll-green:         #3dbf8f;
+    --ll-green-hover:   #29a87a;
+    --ll-green-darker:  #1d6b50;
+    --ll-green-light:   #55b28e;
+    --ll-green-faint:   #16382b;
+    --ll-green-faintest:#131d1b;
+
+    --ll-nav-bg:        #1c1e25;
+    --ll-nav-border:    #2a3830;
+    --ll-nav-fg:        #d2dbde;
+    --ll-nav-muted:     #859399;
+
+    --primary-color:                      var(--ll-green);
+    --primary-dark-color:                 var(--ll-green-darker);
+    --primary-light-color:                var(--ll-green-light);
+
+    --page-background-color:              #1a1922;
+    --page-foreground-color:              #d2dbde;
+    --page-secondary-foreground-color:    #859399;
+    --separator-color:                    #2a3830;
+    --blockquote-foreground:              #7e8c92;
+
+    --side-nav-background:                #1c1e25;
+    --searchbar-background:               #252628;
+    --code-background:                    #1e272b;
+    --code-foreground:                    #dbe4eb;
+    --fragment-foreground:                #dbe4eb;
+  }
+}
+
+/* ── Dark mode — explicit user toggle ──────────────────────────────── */
+html.dark-mode {
+  --ll-green:         #3dbf8f;
+  --ll-green-hover:   #29a87a;
+  --ll-green-darker:  #1d6b50;
+  --ll-green-light:   #55b28e;
+  --ll-green-faint:   #16382b;
+  --ll-green-faintest:#131d1b;
+
+  --ll-nav-bg:        #1c1e25;
+  --ll-nav-border:    #2a3830;
+  --ll-nav-fg:        #d2dbde;
+  --ll-nav-muted:     #859399;
+
+  --primary-color:                      var(--ll-green);
+  --primary-dark-color:                 var(--ll-green-darker);
+  --primary-light-color:                var(--ll-green-light);
+
+  --page-background-color:              #1a1922;
+  --page-foreground-color:              #d2dbde;
+  --page-secondary-foreground-color:    #859399;
+  --separator-color:                    #2a3830;
+  --blockquote-foreground:              #7e8c92;
+
+  --side-nav-background:                #1c1e25;
+  --searchbar-background:               #252628;
+  --code-background:                    #1e272b;
+  --code-foreground:                    #dbe4eb;
+  --fragment-foreground:                #dbe4eb;
+}
+
+/* =============================================================================
+   TOP NAVIGATION BAR
+   ============================================================================= */
+
+#ll-topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--ll-nav-height);
+  background: var(--ll-nav-bg);
+  border-bottom: 1px solid var(--ll-nav-border);
+  z-index: 9999;
+  box-sizing: border-box;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+#ll-topnav-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px;
+  gap: 0;
+}
+
+/* ── Logo ── */
+#ll-topnav-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none !important;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+#ll-topnav-logo-img {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+
+/* ── Vertical divider between logo and product label ── */
+#ll-topnav-divider {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: var(--ll-nav-border);
+  margin: 0 10px;
+  flex-shrink: 0;
+}
+
+/* ── Product name ── */
+#ll-topnav-product {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ll-nav-fg) !important;
+  text-decoration: none !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+/* ── Version badge + version picker ── */
+#ll-topnav-version,
+#ll-version-picker {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ll-nav-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+#ll-version-picker {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ll-nav-muted) 40%, transparent);
+  border-radius: 4px;
+  padding: 1px 18px 1px 6px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 8px 5px;
+}
+
+#ll-version-picker:hover {
+  border-color: var(--ll-nav-muted);
+  color: var(--ll-nav-fg);
+}
+
+#ll-version-picker:focus {
+  outline: 2px solid var(--ll-accent, #7c5cbf);
+  outline-offset: 1px;
+}
+
+#ll-version-picker option {
+  background: var(--ll-nav-bg, #1e1e2e);
+  color: var(--ll-nav-fg, #e0e0e0);
+}
+
+/* ── GitHub icon link ── */
+#ll-topnav-github {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--ll-nav-muted) !important;
+  text-decoration: none !important;
+  opacity: 0.8;
+  margin-left: 6px;
+  transition: color 0.15s, opacity 0.15s;
+}
+
+#ll-topnav-github:hover {
+  color: var(--ll-nav-fg) !important;
+  opacity: 1;
+}
+
+/* ── Left group: logo + divider + product + tabs ── */
+#ll-topnav-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Tab link group ── */
+#ll-topnav-links {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin-left: 6px;
+}
+
+.ll-topnav-tab {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ll-nav-muted) !important;
+  text-decoration: none !important;
+  border-bottom: 2px solid transparent;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.ll-topnav-tab:hover {
+  color: var(--ll-nav-fg) !important;
+  text-decoration: none !important;
+}
+
+.ll-topnav-tab.ll-active {
+  color: var(--ll-green) !important;
+  border-bottom-color: var(--ll-green);
+  font-weight: 600;
+}
+
+/* ── Right: CTA + toggle ── */
+#ll-topnav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Sign-up pill button */
+.ll-topnav-signup {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 16px;
+  background: var(--ll-green);
+  color: #ffffff !important;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.ll-topnav-signup:hover {
+  background: var(--ll-green-hover);
+}
+
+/* Dark/light mode toggle icon button */
+#ll-dark-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ll-nav-muted);
+  transition: color 0.15s, background 0.15s;
+}
+
+#ll-dark-toggle:hover {
+  color: var(--ll-nav-fg);
+  background: var(--ll-green-faint);
+}
+
+/* Icon visibility — light mode: show moon (click → go dark) */
+#ll-icon-sun  { display: none;  }
+#ll-icon-moon { display: block; }
+
+/* Icon visibility — dark mode: show sun (click → go light) */
+html.dark-mode #ll-icon-sun  { display: block; }
+html.dark-mode #ll-icon-moon { display: none;  }
+
+/* Icon visibility — when OS is dark and no explicit class is set */
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode):not(.dark-mode) #ll-icon-sun  { display: block; }
+  html:not(.light-mode):not(.dark-mode) #ll-icon-moon { display: none;  }
+}
+
+/* =============================================================================
+   LAYOUT: Offset everything below the fixed top nav
+   ============================================================================= */
+
+/* Push body content down so page top sits below the top nav */
+body {
+  padding-top: var(--ll-nav-height) !important;
+}
+
+/* Sidebar: full-height strip, starts below the top nav */
+#side-nav {
+  top: var(--ll-nav-height) !important;
+  height: calc(100vh - var(--ll-nav-height)) !important;
+  min-height: calc(100vh - var(--ll-nav-height)) !important;
+}
+
+/* Nav tree shares the same height budget */
+#nav-tree {
+  height: calc(100vh - var(--ll-nav-height)) !important;
+  min-height: calc(100vh - var(--ll-nav-height)) !important;
+}
+
+/* =============================================================================
+   SIDEBAR REFINEMENTS
+   ============================================================================= */
+
+/* Hide the project logo from the sidebar — it lives in the top nav now */
+#projectlogo {
+  display: none !important;
+}
+
+/* Make the project name smaller — it's a sidebar label, not a hero headline */
+#projectname {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* Tighten the titlearea padding */
+#titlearea {
+  padding: 10px 0 6px 0 !important;
+}
+
+/* Active nav item: green text instead of blue */
+#nav-tree .selected > a {
+  color: var(--ll-green) !important;
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+/* Style the Doxygen footer as a minimal attribution line */
+.footer, address.footer {
+  font-size: 11px !important;
+  color: var(--page-secondary-foreground-color) !important;
+  opacity: 0.7;
+}
+
+/* Hide the Doxygen logo image in the footer */
+img.footer {
+  display: none !important;
+}

@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerLeaseRemoteSessionResponse" name="LootLocker.Requests.LootLockerLeaseRemoteSessionResponse">
+<area shape="rect" id="Node000001" title="Response containing the lease code and redirect URL for a newly created remote session lease." alt="" coords="5,79,272,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="61,5,216,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,44,141,79,136,79,136,44"/>
+</map>

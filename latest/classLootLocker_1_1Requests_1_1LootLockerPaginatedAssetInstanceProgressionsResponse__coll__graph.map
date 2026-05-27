@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerPaginatedAssetInstanceProgressionsResponse" name="LootLocker.Requests.LootLockerPaginatedAssetInstanceProgressionsResponse">
+<area shape="rect" id="Node000001" title="Response containing a paginated list of an asset instance&#39;s progression statuses across multiple prog..." alt="" coords="5,79,224,133"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="37,5,192,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,44,117,79,112,79,112,44"/>
+</map>

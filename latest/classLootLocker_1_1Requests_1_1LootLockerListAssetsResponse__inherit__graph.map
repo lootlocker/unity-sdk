@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerListAssetsResponse" name="LootLocker.Requests.LootLockerListAssetsResponse">
+<area shape="rect" id="Node000001" title="Response object for listing assets from the simple asset endpoint." alt="" coords="5,79,199,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="25,5,179,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,44,105,79,99,79,99,44"/>
+</map>

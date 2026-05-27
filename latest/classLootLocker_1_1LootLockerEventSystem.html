@@ -1,0 +1,437 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker.LootLockerEventSystem Class Reference</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.0.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classLootLocker_1_1LootLockerEventSystem.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#properties">Properties</a> &#124;
+<a href="classLootLocker_1_1LootLockerEventSystem-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">LootLocker.LootLockerEventSystem Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Centralized event system for the <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK Manages event subscriptions, event firing, and event data.  
+ <a href="classLootLocker_1_1LootLockerEventSystem.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for LootLocker.LootLockerEventSystem:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1LootLockerEventSystem__inherit__graph.png" border="0" usemap="#aLootLocker_8LootLockerEventSystem_inherit__map" alt="Inheritance graph"/></div>
+<map name="aLootLocker_8LootLockerEventSystem_inherit__map" id="aLootLocker_8LootLockerEventSystem_inherit__map">
+<area shape="rect" title="Centralized event system for the LootLocker SDK Manages event subscriptions, event firing,..." alt="" coords="5,79,208,119"/>
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="35,5,179,31"/>
+<area shape="poly" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for LootLocker.LootLockerEventSystem:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1LootLockerEventSystem__coll__graph.png" border="0" usemap="#aLootLocker_8LootLockerEventSystem_coll__map" alt="Collaboration graph"/></div>
+<map name="aLootLocker_8LootLockerEventSystem_coll__map" id="aLootLocker_8LootLockerEventSystem_coll__map">
+<area shape="rect" title="Centralized event system for the LootLocker SDK Manages event subscriptions, event firing,..." alt="" coords="5,79,208,119"/>
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="35,5,179,31"/>
+<area shape="poly" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:af9e2fac6fb28c5a047da0eba37047779" id="r_af9e2fac6fb28c5a047da0eba37047779"><td class="memItemLeft" align="right" valign="top"><a id="af9e2fac6fb28c5a047da0eba37047779" name="af9e2fac6fb28c5a047da0eba37047779"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SubscribeInstance&lt; T &gt;</b> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType, LootLockerEventHandler&lt; T &gt; handler)</td></tr>
+<tr class="memdesc:af9e2fac6fb28c5a047da0eba37047779"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance method to subscribe to events without triggering circular dependency through GetInstance() Used during initialization when we already have the EventSystem instance. <br /></td></tr>
+<tr class="separator:af9e2fac6fb28c5a047da0eba37047779"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a519b03bdc329c1d1c9ba5f24226a2311" id="r_a519b03bdc329c1d1c9ba5f24226a2311"><td class="memItemLeft" align="right" valign="top"><a id="a519b03bdc329c1d1c9ba5f24226a2311" name="a519b03bdc329c1d1c9ba5f24226a2311"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>UnsubscribeInstance&lt; T &gt;</b> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType, LootLockerEventHandler&lt; T &gt; handler)</td></tr>
+<tr class="memdesc:a519b03bdc329c1d1c9ba5f24226a2311"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsubscribe from a specific event type with typed handler using this instance. <br /></td></tr>
+<tr class="separator:a519b03bdc329c1d1c9ba5f24226a2311"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a883e10449bf2f1f521acc1581906c65d" id="r_a883e10449bf2f1f521acc1581906c65d"><td class="memItemLeft" align="right" valign="top"><a id="a883e10449bf2f1f521acc1581906c65d" name="a883e10449bf2f1f521acc1581906c65d"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>Subscribe&lt; T &gt;</b> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType, LootLockerEventHandler&lt; T &gt; handler)</td></tr>
+<tr class="memdesc:a883e10449bf2f1f521acc1581906c65d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribe to a specific event type with typed event data. <br /></td></tr>
+<tr class="separator:a883e10449bf2f1f521acc1581906c65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e637a7688c40368e15abef3c16a281b" id="r_a7e637a7688c40368e15abef3c16a281b"><td class="memItemLeft" align="right" valign="top"><a id="a7e637a7688c40368e15abef3c16a281b" name="a7e637a7688c40368e15abef3c16a281b"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>Unsubscribe&lt; T &gt;</b> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType, LootLockerEventHandler&lt; T &gt; handler)</td></tr>
+<tr class="memdesc:a7e637a7688c40368e15abef3c16a281b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsubscribe from a specific event type with typed handler. <br /></td></tr>
+<tr class="separator:a7e637a7688c40368e15abef3c16a281b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c19f5952b0b7cb5535ac3cbd354265f" id="r_a9c19f5952b0b7cb5535ac3cbd354265f"><td class="memItemLeft" align="right" valign="top"><a id="a9c19f5952b0b7cb5535ac3cbd354265f" name="a9c19f5952b0b7cb5535ac3cbd354265f"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerEvent&lt; T &gt;</b> (T eventData)</td></tr>
+<tr class="memdesc:a9c19f5952b0b7cb5535ac3cbd354265f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fire an event with specific event data. <br /></td></tr>
+<tr class="separator:a9c19f5952b0b7cb5535ac3cbd354265f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e6d66812769dc6583d9115fba77aadf" id="r_a0e6d66812769dc6583d9115fba77aadf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventSystem.html#a0e6d66812769dc6583d9115fba77aadf">ClearSubscribers</a> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType)</td></tr>
+<tr class="memdesc:a0e6d66812769dc6583d9115fba77aadf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all subscribers for a specific event type WARNING: This is for internal SDK use only.  <br /></td></tr>
+<tr class="separator:a0e6d66812769dc6583d9115fba77aadf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90a9817ad4da52b5de1f70ae7727f0b" id="r_aa90a9817ad4da52b5de1f70ae7727f0b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventSystem.html#aa90a9817ad4da52b5de1f70ae7727f0b">ClearAllSubscribers</a> ()</td></tr>
+<tr class="memdesc:aa90a9817ad4da52b5de1f70ae7727f0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all event subscribers WARNING: This is for internal SDK use only.  <br /></td></tr>
+<tr class="separator:aa90a9817ad4da52b5de1f70ae7727f0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a152402822063e4df74a6417840e20002" id="r_a152402822063e4df74a6417840e20002"><td class="memItemLeft" align="right" valign="top"><a id="a152402822063e4df74a6417840e20002" name="a152402822063e4df74a6417840e20002"></a>
+static int&#160;</td><td class="memItemRight" valign="bottom"><b>GetSubscriberCount</b> (<a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> eventType)</td></tr>
+<tr class="memdesc:a152402822063e4df74a6417840e20002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of subscribers for a specific event type. <br /></td></tr>
+<tr class="separator:a152402822063e4df74a6417840e20002"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f2b759b10990447e8ffc6e3127a02ea" id="r_a7f2b759b10990447e8ffc6e3127a02ea"><td class="memItemLeft" align="right" valign="top"><a id="a7f2b759b10990447e8ffc6e3127a02ea" name="a7f2b759b10990447e8ffc6e3127a02ea"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerSessionStarted</b> (LootLockerPlayerData playerData)</td></tr>
+<tr class="memdesc:a7f2b759b10990447e8ffc6e3127a02ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger session started event. <br /></td></tr>
+<tr class="separator:a7f2b759b10990447e8ffc6e3127a02ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1744520aaa4f23c7d5fbff3387e00ae0" id="r_a1744520aaa4f23c7d5fbff3387e00ae0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventSystem.html#a1744520aaa4f23c7d5fbff3387e00ae0">TriggerSessionEnded</a> (string playerUlid, bool clearLocalState=false)</td></tr>
+<tr class="memdesc:a1744520aaa4f23c7d5fbff3387e00ae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger session ended event.  <br /></td></tr>
+<tr class="separator:a1744520aaa4f23c7d5fbff3387e00ae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a273db686cdee02d00f1bc98320a1e752" id="r_a273db686cdee02d00f1bc98320a1e752"><td class="memItemLeft" align="right" valign="top"><a id="a273db686cdee02d00f1bc98320a1e752" name="a273db686cdee02d00f1bc98320a1e752"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerSessionRefreshed</b> (LootLockerPlayerData playerData)</td></tr>
+<tr class="memdesc:a273db686cdee02d00f1bc98320a1e752"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger session refreshed event. <br /></td></tr>
+<tr class="separator:a273db686cdee02d00f1bc98320a1e752"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1de96c5ff7a01067df930435c892caae" id="r_a1de96c5ff7a01067df930435c892caae"><td class="memItemLeft" align="right" valign="top"><a id="a1de96c5ff7a01067df930435c892caae" name="a1de96c5ff7a01067df930435c892caae"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerSessionExpired</b> (string playerUlid)</td></tr>
+<tr class="memdesc:a1de96c5ff7a01067df930435c892caae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger session expired event. <br /></td></tr>
+<tr class="separator:a1de96c5ff7a01067df930435c892caae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08dc1fc63f87a6fc4ef31b2879822892" id="r_a08dc1fc63f87a6fc4ef31b2879822892"><td class="memItemLeft" align="right" valign="top"><a id="a08dc1fc63f87a6fc4ef31b2879822892" name="a08dc1fc63f87a6fc4ef31b2879822892"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerLocalSessionDeactivated</b> (string playerUlid)</td></tr>
+<tr class="memdesc:a08dc1fc63f87a6fc4ef31b2879822892"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger local session cleared event for a specific player. <br /></td></tr>
+<tr class="separator:a08dc1fc63f87a6fc4ef31b2879822892"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74fb3f70cf68b712a92d73af32dee0e3" id="r_a74fb3f70cf68b712a92d73af32dee0e3"><td class="memItemLeft" align="right" valign="top"><a id="a74fb3f70cf68b712a92d73af32dee0e3" name="a74fb3f70cf68b712a92d73af32dee0e3"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerLocalSessionActivated</b> (LootLockerPlayerData playerData)</td></tr>
+<tr class="memdesc:a74fb3f70cf68b712a92d73af32dee0e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger session activated event. <br /></td></tr>
+<tr class="separator:a74fb3f70cf68b712a92d73af32dee0e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2565fe70e9ee14a15965473d91fa9756" id="r_a2565fe70e9ee14a15965473d91fa9756"><td class="memItemLeft" align="right" valign="top"><a id="a2565fe70e9ee14a15965473d91fa9756" name="a2565fe70e9ee14a15965473d91fa9756"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>TriggerPresenceConnectionStateChanged</b> (string playerUlid, <a class="el" href="namespaceLootLocker.html#a7e68587eb85188bc45ee7b7cdacf1862">LootLockerPresenceConnectionState</a> previousState, <a class="el" href="namespaceLootLocker.html#a7e68587eb85188bc45ee7b7cdacf1862">LootLockerPresenceConnectionState</a> newState, string errorMessage=null)</td></tr>
+<tr class="memdesc:a2565fe70e9ee14a15965473d91fa9756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to trigger presence connection state changed event. <br /></td></tr>
+<tr class="separator:a2565fe70e9ee14a15965473d91fa9756"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:a90ac2a079149b3f3cd9a7775c9736ec4" id="r_a90ac2a079149b3f3cd9a7775c9736ec4"><td class="memItemLeft" align="right" valign="top"><a id="a90ac2a079149b3f3cd9a7775c9736ec4" name="a90ac2a079149b3f3cd9a7775c9736ec4"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsInitialized</b> = false<code> [get]</code></td></tr>
+<tr class="memdesc:a90ac2a079149b3f3cd9a7775c9736ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the service has been initialized. <br /></td></tr>
+<tr class="separator:a90ac2a079149b3f3cd9a7775c9736ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9331249832ee6589b4bdb69449709175" id="r_a9331249832ee6589b4bdb69449709175"><td class="memItemLeft" align="right" valign="top"><a id="a9331249832ee6589b4bdb69449709175" name="a9331249832ee6589b4bdb69449709175"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>ServiceName</b><code> [get]</code></td></tr>
+<tr class="memdesc:a9331249832ee6589b4bdb69449709175"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service name for logging and identification. <br /></td></tr>
+<tr class="separator:a9331249832ee6589b4bdb69449709175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a939fead97dd877a9518300c0a765919c" id="r_a939fead97dd877a9518300c0a765919c"><td class="memItemLeft" align="right" valign="top"><a id="a939fead97dd877a9518300c0a765919c" name="a939fead97dd877a9518300c0a765919c"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>LogEvents</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a939fead97dd877a9518300c0a765919c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to log events to the console for debugging. <br /></td></tr>
+<tr class="separator:a939fead97dd877a9518300c0a765919c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header properties_interfaceLootLocker_1_1ILootLockerService"><td colspan="2" onclick="javascript:toggleInherit('properties_interfaceLootLocker_1_1ILootLockerService')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="interfaceLootLocker_1_1ILootLockerService.html">LootLocker.ILootLockerService</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Centralized event system for the <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK Manages event subscriptions, event firing, and event data. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa90a9817ad4da52b5de1f70ae7727f0b" name="aa90a9817ad4da52b5de1f70ae7727f0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa90a9817ad4da52b5de1f70ae7727f0b">&#9670;&#160;</a></span>ClearAllSubscribers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.LootLockerEventSystem.ClearAllSubscribers </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear all event subscribers WARNING: This is for internal SDK use only. </p>
+<p>It will clear ALL subscribers including internal SDK subscriptions. External code should use explicit Unsubscribe() calls instead. </p>
+
+</div>
+</div>
+<a id="a0e6d66812769dc6583d9115fba77aadf" name="a0e6d66812769dc6583d9115fba77aadf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e6d66812769dc6583d9115fba77aadf">&#9670;&#160;</a></span>ClearSubscribers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.LootLockerEventSystem.ClearSubscribers </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker.html#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a>&#160;</td>
+          <td class="paramname"><em>eventType</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear all subscribers for a specific event type WARNING: This is for internal SDK use only. </p>
+<p>It will clear ALL subscribers including internal SDK subscriptions. External code should use explicit Unsubscribe() calls instead. </p>
+
+</div>
+</div>
+<a id="a1744520aaa4f23c7d5fbff3387e00ae0" name="a1744520aaa4f23c7d5fbff3387e00ae0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1744520aaa4f23c7d5fbff3387e00ae0">&#9670;&#160;</a></span>TriggerSessionEnded()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.LootLockerEventSystem.TriggerSessionEnded </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>clearLocalState</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Helper method to trigger session ended event. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The player whose session ended</td></tr>
+    <tr><td class="paramname">clearLocalState</td><td>Whether to clear local state for this player</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceLootLocker.html">LootLocker</a></li><li class="navelem"><a class="el" href="classLootLocker_1_1LootLockerEventSystem.html">LootLockerEventSystem</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>
