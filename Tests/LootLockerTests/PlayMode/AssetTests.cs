@@ -40,16 +40,15 @@ namespace LootLockerTests.PlayMode
             configCopy = LootLockerConfig.current;
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
-            if (!LootLockerConfig.ClearSettings())
-            {
-                Debug.LogError("Could not clear LootLocker config");
-            }
-
             if (gameUnderTest == null)
             {
                 // One-time shared setup: create game and assets once for all tests in this class
                 SharedSetupFailed = false;
                 SetupFailed = false;
+                if (!LootLockerConfig.ClearSettings())
+                {
+                    Debug.LogError("Could not clear LootLocker config");
+                }
 
                 // Create game
                 bool gameCreationCallCompleted = false;
@@ -255,9 +254,12 @@ namespace LootLockerTests.PlayMode
                 SharedSetupFailed = false;
                 createdAssetIds.Clear();
                 createdAssetUlids.Clear();
+                LootLockerConfig.current.adminToken = null;
             }
 
+            string adminToken = LootLockerConfig.current.adminToken;
             LootLockerConfig.CreateNewSettings(configCopy);
+            LootLockerConfig.current.adminToken = adminToken;
 
             Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
         }
