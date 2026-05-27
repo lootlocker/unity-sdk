@@ -493,6 +493,9 @@ jobs:
         run: |
           mkdir TestProject/ProjectSettings
           echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Disable domain reload between tests to speed up play mode test execution
+        run: |
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!159 &1\nEditorSettings:\n  m_ObjectHideFlags: 0\n  serializedVersion: 11\n  m_EnterPlayModeOptionsEnabled: 1\n  m_EnterPlayModeOptions: 1' >> TestProject/ProjectSettings/EditorSettings.asset
       - name: Enable beta features
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;${{ VARS.CURRENT_BETA_FEATURES }}/g' TestProject/ProjectSettings/ProjectSettings.asset
