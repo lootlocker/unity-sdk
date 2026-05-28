@@ -327,6 +327,36 @@ namespace LootLocker.Requests
         #region Authentication
         /// @ingroup Authentication
         /// <summary>
+        /// Add a player state manually from externally sourced data (e.g. after a server token exchange) without performing an authentication call.
+        ///
+        /// At minimum, <paramref name="playerData"/> must have a non-empty <c>SessionToken</c> and <c>ULID</c>. All other fields are optional but recommended for full SDK functionality.
+        /// </summary>
+        /// <param name="playerData">Player state to cache and use for future requests</param>
+        /// <returns>True if the state was saved successfully; false if <paramref name="playerData"/> was null or missing required fields.</returns>
+        public static bool StartSessionManual(LootLockerPlayerData playerData)
+        {
+            if (playerData == null)
+            {
+                LootLockerLogger.Log("StartSessionManual called with null playerData", LootLockerLogger.LogLevel.Warning);
+                return false;
+            }
+            if (string.IsNullOrEmpty(playerData.SessionToken))
+            {
+                LootLockerLogger.Log("StartSessionManual called with empty SessionToken", LootLockerLogger.LogLevel.Warning);
+                return false;
+            }
+            if (string.IsNullOrEmpty(playerData.ULID))
+            {
+                LootLockerLogger.Log("StartSessionManual called with empty ULID", LootLockerLogger.LogLevel.Warning);
+                return false;
+            }
+
+            LootLockerEventSystem.TriggerSessionStarted(playerData);
+            return true;
+        }
+
+        /// @ingroup Authentication
+        /// <summary>
         /// Verify the player's identity with the server and selected platform.
         /// </summary>
         /// <param name="deviceId"></param>
