@@ -238,6 +238,8 @@ public class NotificationTests
                 {
                     Assert.IsNotEmpty(rewardBody.Asset.Asset_ulid, "No ulid parsed for asset");
                     Assert.IsNotEmpty(rewardBody.Asset.Details.Name, "No name was parsed for asset");
+                    Assert.IsNotNull(rewardBody.Asset.Asset_instance_ids, "Asset_instance_ids was null");
+                    Assert.IsNotEmpty(rewardBody.Asset.Asset_instance_ids, "Asset_instance_ids was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key], "Notification trigger key was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Id], "Notification trigger id was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Limit], "Notification trigger limit was empty");
