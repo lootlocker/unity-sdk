@@ -172,6 +172,15 @@ public class NotificationTests
             yield break;
         }
 
+        // Step 2b: Activate Asset
+        bool assetActivated = false;
+        LootLockerTestAssets.ActivateAsset(assetResponse.asset.id, response =>
+        {
+            assetActivated = true;
+            if (!response.success) errorMessage = "Failed to activate asset: " + response.errorData?.message;
+        });
+        yield return new WaitUntil(() => assetActivated);
+
         bool rewardCreated = false;
         string rewardId = null;
 
@@ -238,6 +247,7 @@ public class NotificationTests
                 {
                     Assert.IsNotEmpty(rewardBody.Asset.Asset_ulid, "No ulid parsed for asset");
                     Assert.IsNotEmpty(rewardBody.Asset.Details.Name, "No name was parsed for asset");
+                    Assert.IsNotNull(rewardBody.Asset.Asset_instance_id, "No asset instance id parsed for asset");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Key], "Notification trigger key was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Id], "Notification trigger id was empty");
                     Assert.IsNotEmpty(notification.Content.ContextAsDictionary[LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers.Limit], "Notification trigger limit was empty");
