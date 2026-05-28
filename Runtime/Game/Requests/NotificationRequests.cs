@@ -355,12 +355,6 @@ namespace LootLocker.Requests
         /// The ULID of the Asset.
         /// </summary>
         public string Asset_ulid { get; set; }
-        /// <summary>
-        /// The IDs of the Asset Instances that were granted. Will be null or empty if the reward did not result in any asset instance grants (for example in group rewards where no assets were granted, or for non-asset reward types).
-        /// For multi-quantity purchases (e.g. buying 3 of the same item) all granted instance IDs are listed here.
-        /// For group rewards each nested asset entry carries its own Asset_instance_ids.
-        /// </summary>
-        public int[] Asset_instance_ids { get; set; }
     }
 
     /// <summary>
