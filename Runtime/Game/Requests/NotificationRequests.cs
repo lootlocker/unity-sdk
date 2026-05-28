@@ -355,6 +355,10 @@ namespace LootLocker.Requests
         /// The ULID of the Asset.
         /// </summary>
         public string Asset_ulid { get; set; }
+        /// <summary>
+        /// The ID of the Asset Instance that was granted. Will be null if the reward did not result in an asset instance grant (for example in group rewards).
+        /// </summary>
+        public int? Asset_instance_id { get; set; }
     }
 
     /// <summary>
