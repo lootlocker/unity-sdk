@@ -2497,6 +2497,10 @@ namespace LootLocker.Requests
         /// - You can not move an identity provider that the source player does not have
         /// - You can not move an identity provider to a player that already has an account from said identity provider associated with their account.
         /// - You can not move an identity provider which isn't active in your game settings.
+        /// 
+        /// NOTE: This method requires <see cref="LootLockerMultiUserSessionMode.Hotseat"/> to be configured (via <see cref="LootLockerConfig.multiUserSessionMode"/>),
+        /// because it needs two simultaneously active local sessions. It will return an error if the current mode is
+        /// <see cref="LootLockerMultiUserSessionMode.SingleSession"/> or <see cref="LootLockerMultiUserSessionMode.ProfileSwitching"/>.
         /// </summary>
         /// <param name="FromPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers FROM</param>
         /// <param name="ToPlayerWithUlid">The ULID of an authenticated player that you wish to move identity providers TO</param>
@@ -2507,6 +2511,13 @@ namespace LootLocker.Requests
             if (!CheckInitialized(false, FromPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListConnectedAccountsResponse>(FromPlayerWithUlid));
+                return;
+            }
+
+            var currentMode = LootLockerConfig.current?.multiUserSessionMode ?? LootLockerMultiUserSessionMode.NotSet;
+            if (currentMode == LootLockerMultiUserSessionMode.SingleSession || currentMode == LootLockerMultiUserSessionMode.ProfileSwitching)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListConnectedAccountsResponse>($"TransferIdentityProvidersBetweenAccounts requires Hotseat multi-user session mode because it needs two simultaneously active local sessions. Current mode: {currentMode}", FromPlayerWithUlid));
                 return;
             }
 
