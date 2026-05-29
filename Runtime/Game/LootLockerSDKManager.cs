@@ -332,9 +332,15 @@ namespace LootLocker.Requests
         /// At minimum, <paramref name="playerData"/> must have a non-empty <c>SessionToken</c> and <c>ULID</c>. All other fields are optional but recommended for full SDK functionality.
         /// </summary>
         /// <param name="playerData">Player state to cache and use for future requests</param>
-        /// <returns>True if the state was saved successfully; false if <paramref name="playerData"/> was null or missing required fields.</returns>
+        /// <returns>True if the state was saved successfully; false if <paramref name="playerData"/> was null or missing required fields, or if the SDK is not initialized.</returns>
         public static bool StartSessionManual(LootLockerPlayerData playerData)
         {
+            if (!CheckInitialized(true))
+            {
+                LootLockerLogger.Log("StartSessionManual called before the SDK was initialized", LootLockerLogger.LogLevel.Warning);
+                return false;
+            }
+
             if (playerData == null)
             {
                 LootLockerLogger.Log("StartSessionManual called with null playerData", LootLockerLogger.LogLevel.Warning);
