@@ -43,10 +43,6 @@ namespace LootLocker.Requests
         /// </summary>
         public bool has_metadata { get; set; }
         /// <summary>
-        /// Whether this leaderboard allows manual resets to be requested via the server API.
-        /// </summary>
-        public bool allow_manual_resets { get; set; }
-        /// <summary>
         /// Schedule of the Leaderboard.
         /// </summary>
         public LootLockerLeaderboardSchedule schedule { get; set; }
@@ -56,7 +52,6 @@ namespace LootLocker.Requests
         public LootLockerLeaderboardReward[] rewards { get; set; }
         /// <summary>
         /// Pending manual resets that have been requested but not yet processed, ordered by scheduled_for ascending.
-        /// Only populated when allow_manual_resets is true.
         /// </summary>
         public LootLockerLeaderboardUpcomingReset[] upcoming_resets { get; set; }
         /// <summary>
