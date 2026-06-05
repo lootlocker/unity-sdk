@@ -43,6 +43,10 @@ namespace LootLocker.Requests
         /// </summary>
         public bool has_metadata { get; set; }
         /// <summary>
+        /// Whether this leaderboard allows manual resets to be requested via the server API.
+        /// </summary>
+        public bool allow_manual_resets { get; set; }
+        /// <summary>
         /// Schedule of the Leaderboard.
         /// </summary>
         public LootLockerLeaderboardSchedule schedule { get; set; }
@@ -51,9 +55,33 @@ namespace LootLocker.Requests
         /// </summary>
         public LootLockerLeaderboardReward[] rewards { get; set; }
         /// <summary>
+        /// Pending manual resets that have been requested but not yet processed, ordered by scheduled_for ascending.
+        /// Only populated when allow_manual_resets is true.
+        /// </summary>
+        public LootLockerLeaderboardUpcomingReset[] upcoming_resets { get; set; }
+        /// <summary>
         /// The ulid for this leaderboard
         /// </summary>
         public string ulid { get; set; }
+    }
+
+    /// <summary>
+    /// A pending manual reset for a leaderboard that has been requested but not yet processed.
+    /// </summary>
+    public class LootLockerLeaderboardUpcomingReset
+    {
+        /// <summary>
+        /// The unique ID of this manual reset request.
+        /// </summary>
+        public int id { get; set; }
+        /// <summary>
+        /// An optional human-readable name for this reset.
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The UTC time at which this reset is scheduled to be processed (ISO 8601).
+        /// </summary>
+        public string scheduled_for { get; set; }
     }
 
     /// <summary>
