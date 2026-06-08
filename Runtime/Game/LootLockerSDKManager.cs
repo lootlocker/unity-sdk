@@ -9666,6 +9666,70 @@ namespace LootLocker.Requests
 
         /// @ingroup Misc
         /// <summary>
+        /// Check the current connection and session state for a player.
+        ///
+        /// Performs a lightweight ping to the LootLocker servers and returns one of the following states:
+        /// <list type="bullet">
+        ///   <item><see cref="LootLockerConnectionState.NotInitialized"/> – the SDK has not been initialized.</item>
+        ///   <item><see cref="LootLockerConnectionState.NotSignedIn"/> – no session exists for the player.</item>
+        ///   <item><see cref="LootLockerConnectionState.NoConnection"/> – the device has no internet or the server did not respond.</item>
+        ///   <item><see cref="LootLockerConnectionState.SignedInAndConnected"/> – the session is valid and the server is reachable.</item>
+        ///   <item><see cref="LootLockerConnectionState.SessionExpired"/> – a session exists but the token has expired (401) or another non-ban 403 was returned.</item>
+        ///   <item><see cref="LootLockerConnectionState.Banned"/> – the player is currently banned. <see cref="LootLockerConnectionStateResponse.BanDetails"/> is populated.</item>
+        ///   <item><see cref="LootLockerConnectionState.ServerError"/> – the server returned a 5xx error.</item>
+        /// </list>
+        ///
+        /// Note: This method does not attempt to refresh the session token. Use the appropriate session refresh method
+        /// if you want to recover from an expired token.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerConnectionStateResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CheckConnectionStatus(Action<LootLockerConnectionStateResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!LootLockerLifecycleManager.IsReady)
+            {
+                onComplete?.Invoke(new LootLockerConnectionStateResponse
+                {
+                    success = false,
+                    State = LootLockerConnectionState.NotInitialized,
+                    statusCode = 0,
+                });
+                return;
+            }
+
+            if (string.IsNullOrEmpty(forPlayerWithUlid))
+            {
+                forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
+
+            var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
+            if (string.IsNullOrEmpty(playerData?.SessionToken))
+            {
+                onComplete?.Invoke(new LootLockerConnectionStateResponse
+                {
+                    success = false,
+                    State = LootLockerConnectionState.NotSignedIn,
+                    statusCode = 0,
+                });
+                return;
+            }
+
+            if (UnityEngine.Application.internetReachability == UnityEngine.NetworkReachability.NotReachable)
+            {
+                onComplete?.Invoke(new LootLockerConnectionStateResponse
+                {
+                    success = false,
+                    State = LootLockerConnectionState.NoConnection,
+                    statusCode = 0,
+                });
+                return;
+            }
+
+            LootLockerAPIManager.CheckConnectionStatus(forPlayerWithUlid, onComplete);
+        }
+
+        /// @ingroup Misc
+        /// <summary>
         ///  Get meta information about the game
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response</param>
