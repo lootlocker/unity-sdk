@@ -79,6 +79,14 @@ namespace LootLocker.Admin
                 EditorGUILayout.Space();
             }
 
+            if (LootLockerConfig.IsFileConfigActive)
+            {
+                EditorGUILayout.HelpBox("Settings are controlled by the external config file and cannot be edited here. Edit the config file to change these values.", MessageType.Warning);
+                EditorGUILayout.Space();
+            }
+
+            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
+
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("apiKey"));
             if (EditorGUI.EndChangeCheck())
@@ -184,6 +192,8 @@ namespace LootLocker.Admin
             EditorGUILayout.Space();
 
             DrawPresenceSettings();
+
+            EditorGUI.EndDisabledGroup();
         }
 
         private static bool IsSemverString(string str)
