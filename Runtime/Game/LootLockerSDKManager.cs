@@ -9679,8 +9679,9 @@ namespace LootLocker.Requests
         ///   <item><see cref="LootLockerConnectionState.ServerError"/> – the server returned a 5xx error.</item>
         /// </list>
         ///
-        /// Note: This method does not attempt to refresh the session token. Use the appropriate session refresh method
-        /// if you want to recover from an expired token.
+        /// Note: If <see cref="LootLockerConfig.allowTokenRefresh"/> is enabled, the underlying HTTP client may automatically attempt
+        /// a session refresh when the ping returns 401 or 403. This method does not explicitly request a refresh;
+        /// it reports the resulting state after any such automatic refresh behavior.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerConnectionStateResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>

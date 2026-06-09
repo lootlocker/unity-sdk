@@ -1,6 +1,5 @@
 using System;
 using LootLocker.Requests;
-using UnityEngine;
 
 namespace LootLocker.Requests
 {
@@ -56,7 +55,7 @@ namespace LootLocker.Requests
         Banned,
         /// <summary>The server could not be reached (no network, timeout, or status code 0).</summary>
         NoConnection,
-        /// <summary>The server returned a 5xx error.</summary>
+        /// <summary>The server returned a 5xx error, or an unexpected non-success status code.</summary>
         ServerError,
     }
 
@@ -205,11 +204,12 @@ namespace LootLocker
                     return;
                 }
 
-                // Any other failure (unlikely from ping, but handled conservatively)
+                // Any other failure (e.g., 400, 404, 429 — unexpected for a ping, but handled conservatively).
+                // Map to ServerError rather than SessionExpired so State is consistent with statusCode.
                 onComplete?.Invoke(new LootLockerConnectionStateResponse
                 {
                     success = false,
-                    State = LootLockerConnectionState.SessionExpired,
+                    State = LootLockerConnectionState.ServerError,
                     statusCode = statusCode,
                     text = pingResponse.text,
                     errorData = pingResponse.errorData,
