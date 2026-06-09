@@ -9672,6 +9672,7 @@ namespace LootLocker.Requests
         /// <list type="bullet">
         ///   <item><see cref="LootLockerConnectionState.NotInitialized"/> – the SDK has not been initialized.</item>
         ///   <item><see cref="LootLockerConnectionState.NotSignedIn"/> – no session exists for the player.</item>
+        ///   <item><see cref="LootLockerConnectionState.SavedButInactive"/> – the player has saved credentials but is not currently active in the multi-player session. Call the appropriate session start method or MakePlayerActive to activate them first.</item>
         ///   <item><see cref="LootLockerConnectionState.NoConnection"/> – the device has no internet or the server did not respond.</item>
         ///   <item><see cref="LootLockerConnectionState.SignedInAndConnected"/> – the session is valid and the server is reachable.</item>
         ///   <item><see cref="LootLockerConnectionState.SessionExpired"/> – a session exists but the token has expired (401) or another non-ban 403 was returned.</item>
@@ -9701,6 +9702,25 @@ namespace LootLocker.Requests
             if (string.IsNullOrEmpty(forPlayerWithUlid))
             {
                 forPlayerWithUlid = GetDefaultPlayerUlid();
+            }
+
+            // Only proceed if the player is currently active in the multi-player session.
+            // Using an inactive player's credentials would risk activating them as a side
+            // effect of a successful ping or an automatic token refresh.
+            bool isActive = !string.IsNullOrEmpty(forPlayerWithUlid) &&
+                            LootLockerStateData.GetActivePlayerULIDs().Any(u => string.Equals(u, forPlayerWithUlid, System.StringComparison.OrdinalIgnoreCase));
+            if (!isActive)
+            {
+                LootLockerConnectionState state = (!string.IsNullOrEmpty(forPlayerWithUlid) && LootLockerStateData.SaveStateExistsForPlayer(forPlayerWithUlid))
+                    ? LootLockerConnectionState.SavedButInactive
+                    : LootLockerConnectionState.NotSignedIn;
+                onComplete?.Invoke(new LootLockerConnectionStateResponse
+                {
+                    success = false,
+                    State = state,
+                    statusCode = 0,
+                });
+                return;
             }
 
             var playerData = LootLockerStateData.GetPlayerDataForPlayerWithUlidWithoutChangingState(forPlayerWithUlid);
