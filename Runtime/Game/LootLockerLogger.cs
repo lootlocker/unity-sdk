@@ -132,7 +132,7 @@ namespace LootLocker
             _instance.logListeners.Add(identifier, listener);
             if(!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && LootLockerConfig.current.sdk_version != "N/A")
             {
-                listener.Log(LootLockerLogger.LogLevel.Verbose, $"LootLocker Version v{LootLockerConfig.current.sdk_version}");
+                listener.Log(LootLockerLogger.LogLevel.Verbose, $"{LootLockerConfig.PackageName} Version v{LootLockerConfig.current.sdk_version}");
             }
 
             _instance.ReplayLogRecord(listener);

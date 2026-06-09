@@ -12,11 +12,11 @@ namespace LootLocker.Extension
         private VisualTreeAsset m_VisualTreeAsset;
         private LogViewerUI logViewerUI;
 
-        [MenuItem("Window/LootLocker/Log Viewer")]
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Log Viewer")]
         public static void ShowWindow()
         {
             var wnd = GetWindow<LootLockerLogViewerWindow>();
-            wnd.titleContent = new GUIContent("LootLocker Log Viewer");
+            wnd.titleContent = new GUIContent(LootLockerConfig.PackageName + " Log Viewer");
             wnd.Show();
         }
 
