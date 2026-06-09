@@ -161,6 +161,8 @@ namespace LootLocker
         {
             if (_current != null)
             {
+                if (_activeFileConfig != null)
+                    ApplyFileConfig(_activeFileConfig);
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
                 _current.CheckForSettingOverrides();
 #endif
@@ -186,28 +188,8 @@ namespace LootLocker
             var fileConfig = CheckForFileConfig();
             if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
             {
-                _current.sdk_version = fileConfig.sdk_version;
-                _current.apiKey = fileConfig.api_key;
-                _current.game_version = fileConfig.game_version;
-                _current.domainKey = fileConfig.domain_key;
-                _current.enablePresence = fileConfig.enable_presence;
-                _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
-                _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
-                _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
-                _current.logLevel = fileConfig.log_level;
-                _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
-                _current.logInBuilds = fileConfig.log_in_builds;
-                _current.allowTokenRefresh = fileConfig.allow_token_refresh;
-                _current.prettifyJson = fileConfig.prettify_json;
-                _current.obfuscateLogs = fileConfig.obfuscate_logs;
-                if (fileConfig.multi_user_session_mode != LootLockerMultiUserSessionMode.NotSet)
-                {
-                    _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
-                }
-                _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
-#if UNITY_EDITOR
-                _current.adminToken = null;
-#endif
+                _activeFileConfig = fileConfig;
+                ApplyFileConfig(fileConfig);
             }
 
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
@@ -721,6 +703,39 @@ namespace LootLocker
         }
 
         private static LootLockerConfig _current;
+        private static ExternalFileConfig _activeFileConfig;
+
+        /// <summary>
+        /// True when an external config file is present and governing settings.
+        /// All fields controlled by the file config are read-only while this is true.
+        /// </summary>
+        public static bool IsFileConfigActive => _activeFileConfig != null;
+
+        private static void ApplyFileConfig(ExternalFileConfig fileConfig)
+        {
+            _current.sdk_version = fileConfig.sdk_version;
+            _current.apiKey = fileConfig.api_key;
+            _current.game_version = fileConfig.game_version;
+            _current.domainKey = fileConfig.domain_key;
+            _current.enablePresence = fileConfig.enable_presence;
+            _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
+            _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
+            _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
+            _current.logLevel = fileConfig.log_level;
+            _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
+            _current.logInBuilds = fileConfig.log_in_builds;
+            _current.allowTokenRefresh = fileConfig.allow_token_refresh;
+            _current.prettifyJson = fileConfig.prettify_json;
+            _current.obfuscateLogs = fileConfig.obfuscate_logs;
+            if (fileConfig.multi_user_session_mode != LootLockerMultiUserSessionMode.NotSet)
+            {
+                _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
+            }
+            _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
+#if UNITY_EDITOR
+            _current.adminToken = null;
+#endif
+        }
 
         public static LootLockerConfig current
         {
@@ -773,6 +788,7 @@ namespace LootLocker
         {
             _current = null;
             _cachedSdkRootPath = null;
+            _activeFileConfig = null;
         }
 #endif
 #endregion
