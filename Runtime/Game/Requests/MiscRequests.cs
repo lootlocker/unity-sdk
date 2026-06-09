@@ -46,8 +46,10 @@ namespace LootLocker.Requests
         /// <summary>The SDK has not been initialized.</summary>
         NotInitialized,
         /// <summary>No session token exists for the specified player – they have not signed in.</summary>
-        NotSignedIn,
-        /// <summary>The session token is valid and the server is reachable.</summary>
+        NotSignedIn,        /// <summary>The player has saved credentials in local storage but is not currently active in the
+        /// multi-player session. Call the appropriate session start method or MakePlayerActive to activate
+        /// them before calling CheckConnectionStatus again.</summary>
+        SavedButInactive,        /// <summary>The session token is valid and the server is reachable.</summary>
         SignedInAndConnected,
         /// <summary>A session token exists but the server returned 401 – the token has expired.</summary>
         SessionExpired,
