@@ -93,7 +93,10 @@ namespace LootLocker.Extension
         #endregion
 
         #region SDK Tools
-        [MenuItem("Window/LootLocker/Tools/Clear Local Player Data", false, 101)]
+        public static bool ValidateClearLocalPlayerData()
+        {
+            return LootLockerConfig.current.enableEditorAdminExtension;
+        }
         public static void ClearLocalPlayerData()
         {
             if (!EditorUtility.DisplayDialog("Clear Local Player Data", "Are you sure you want to clear all local player data? This action cannot be undone.", "Yes", "No"))
@@ -105,7 +108,10 @@ namespace LootLocker.Extension
         #endregion
 
         #region Window Management
-        [MenuItem("Window/LootLocker/Manage", false, 100)]
+        public static bool ValidateRun()
+        {
+            return LootLockerConfig.current.enableEditorAdminExtension;
+        }
         public static void Run()
         {
             LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();

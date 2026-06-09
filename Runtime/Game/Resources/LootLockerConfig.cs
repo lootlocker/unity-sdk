@@ -54,7 +54,7 @@ namespace LootLocker
     public class LootLockerConfig : ScriptableObject
     {
         public static readonly string PackageShortName = "LL"; // Standard is LL
-        private static readonly string PackageName = "LootLocker"; // Standard is LootLocker
+        public const string PackageName = "Pantaloon"; // Standard is LootLocker
         private static readonly string SettingsName = $"{PackageName}Config";
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
@@ -151,6 +151,9 @@ namespace LootLocker
             "Profile Switching: Only one player is active at a time, but historical players are retained in cold cache. Each new authentication deactivates all others and becomes the sole active default. Developers can switch back to a cached player without re-authenticating. Best for games with account selection screens.")]
         public LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet;
 
+        [Tooltip("Enable the LootLocker admin extension in the Unity Editor. Disable this if you do not want the editor admin tools to be available.")]
+        public bool enableEditorAdminExtension = true;
+
 #endregion
 
 #region Internal logic and configuration
@@ -201,6 +204,7 @@ namespace LootLocker
                 {
                     _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
                 }
+                _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
 #if UNITY_EDITOR
                 _current.adminToken = null;
 #endif
@@ -440,6 +444,13 @@ namespace LootLocker
                         this.multiUserSessionMode = multiUserSessionMode;
                     }
                 }
+                else if (args[i] == "-enableeditoradminextension")
+                {
+                    if (bool.TryParse(args[i + 1], out bool enableEditorAdminExtension))
+                    {
+                        this.enableEditorAdminExtension = enableEditorAdminExtension;
+                    }
+                }
             }
 #endif
         }
@@ -582,7 +593,7 @@ namespace LootLocker
         public static bool CreateNewSettings(string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info, 
             bool logInBuilds = false, bool errorsAsWarnings = false, bool allowTokenRefresh = false, bool prettifyJson = false, bool obfuscateLogs = true, 
             bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true,
-            LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet)
+            LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet, bool enableEditorAdminExtension = true)
         {
             _current = Get();
 
@@ -603,6 +614,7 @@ namespace LootLocker
             {
                 _current.multiUserSessionMode = multiUserSessionMode;
             }
+            _current.enableEditorAdminExtension = enableEditorAdminExtension;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
@@ -638,6 +650,7 @@ namespace LootLocker
             _current.enablePresenceAutoConnect = newConfig.enablePresenceAutoConnect;
             _current.enablePresenceAutoDisconnectOnFocusChange = newConfig.enablePresenceAutoDisconnectOnFocusChange;
             _current.enablePresenceInEditor = newConfig.enablePresenceInEditor;
+            _current.enableEditorAdminExtension = newConfig.enableEditorAdminExtension;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
@@ -683,6 +696,7 @@ namespace LootLocker
             _current.enablePresenceAutoConnect = true;
             _current.enablePresenceAutoDisconnectOnFocusChange = false;
             _current.enablePresenceInEditor = true;
+            _current.enableEditorAdminExtension = true;
 #if UNITY_EDITOR
             _current.adminToken = null;
 #endif //UNITY_EDITOR
