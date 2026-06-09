@@ -54,7 +54,7 @@ namespace LootLocker
     public class LootLockerConfig : ScriptableObject
     {
         public static readonly string PackageShortName = "LL"; // Standard is LL
-        public const string PackageName = "Pantaloon"; // Standard is LootLocker
+        public const string PackageName = "LootLocker"; // Standard is LootLocker
         private static readonly string SettingsName = $"{PackageName}Config";
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";

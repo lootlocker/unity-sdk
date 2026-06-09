@@ -93,10 +93,13 @@ namespace LootLocker.Extension
         #endregion
 
         #region SDK Tools
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Tools/Clear Local Player Data", true, 101)]
         public static bool ValidateClearLocalPlayerData()
         {
             return LootLockerConfig.current.enableEditorAdminExtension;
         }
+
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Tools/Clear Local Player Data", false, 101)]
         public static void ClearLocalPlayerData()
         {
             if (!EditorUtility.DisplayDialog("Clear Local Player Data", "Are you sure you want to clear all local player data? This action cannot be undone.", "Yes", "No"))
@@ -108,14 +111,17 @@ namespace LootLocker.Extension
         #endregion
 
         #region Window Management
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Manage", true, 100)]
         public static bool ValidateRun()
         {
             return LootLockerConfig.current.enableEditorAdminExtension;
         }
+
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Manage", false, 100)]
         public static void Run()
         {
             LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
-            wnd.titleContent = new GUIContent("LootLocker");
+            wnd.titleContent = new GUIContent(LootLockerConfig.PackageName);
 
             if (!string.IsNullOrEmpty(LootLockerEditorData.GetAdminToken()))
             {
@@ -145,7 +151,7 @@ namespace LootLocker.Extension
                     (EditorApplication.CallbackFunction)delegate
                     {
                         LootLockerAdminExtension wnd = GetWindow<LootLockerAdminExtension>();
-                        wnd.titleContent = new GUIContent("LootLocker");
+                        wnd.titleContent = new GUIContent(LootLockerConfig.PackageName);
                         wnd.ShowUtility();
                     });
             }

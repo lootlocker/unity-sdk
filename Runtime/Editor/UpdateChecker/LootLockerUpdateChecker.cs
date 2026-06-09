@@ -76,7 +76,7 @@ namespace LootLocker.Extension
             FetchLatestRelease(isManualCheck: false);
         }
 
-        [MenuItem("Window/LootLocker/Check for Updates", false, 102)]
+        [MenuItem("Window/" + LootLockerConfig.PackageName + "/Check for Updates", false, 102)]
         public static void ManualCheck()
         {
             FetchLatestRelease(isManualCheck: true);
@@ -91,7 +91,7 @@ namespace LootLocker.Extension
             {
                 if (isManualCheck)
                     EditorUtility.DisplayDialog(
-                        "LootLocker Update Check",
+                        LootLockerConfig.PackageName + " Update Check",
                         "This SDK is managed by the Unity Package Manager registry. Use the Package Manager window (Window \u2192 Package Manager) to check for and apply updates.",
                         "OK");
                 return;
@@ -138,7 +138,7 @@ namespace LootLocker.Extension
             {
                 if (_isManualCheck)
                     EditorUtility.DisplayDialog(
-                        "LootLocker Update Check",
+                        LootLockerConfig.PackageName + " Update Check",
                         "Could not reach GitHub to check for updates. Please try again later.",
                         "OK");
                 // Don't stamp last-checked on network failure so the next editor open retries.
@@ -152,8 +152,9 @@ namespace LootLocker.Extension
             {
                 if (_isManualCheck)
                     EditorUtility.DisplayDialog(
-                        "LootLocker Update Check",
-                        "Could not parse release information. Visit https://github.com/lootlocker/unity-sdk/releases to check manually.",
+                        LootLockerConfig.PackageName + " Update Check",
+                        "Could not parse release information. Visit https://github.com/lootlocker/unity-sdk/releases to check manually."
+                        + (LootLockerConfig.PackageName != "LootLocker" ? "\n\n" + LootLockerConfig.PackageName + " SDK is powered by LootLocker — release notes are on the LootLocker GitHub page." : ""),
                         "OK");
                 // Don't stamp last-checked on parse failure so the next editor open retries.
                 return;
@@ -173,7 +174,7 @@ namespace LootLocker.Extension
                 {
                     string displayCurrent = string.IsNullOrEmpty(currentVersion) ? "unknown" : $"v{currentVersion}";
                     EditorUtility.DisplayDialog(
-                        "LootLocker Update Check",
+                        LootLockerConfig.PackageName + " Update Check",
                         $"You are on the latest version ({displayCurrent}).",
                         "OK");
                 }
@@ -261,19 +262,19 @@ namespace LootLocker.Extension
 
         internal static void Show(string currentVersion, string latestVersion, string releaseUrl)
         {
-            var window = GetWindow<LootLockerUpdateNotificationWindow>(true, "LootLocker Update Available", true);
+            var window = GetWindow<LootLockerUpdateNotificationWindow>(true, LootLockerConfig.PackageName + " Update Available", true);
             window._currentVersion = currentVersion;
             window._latestVersion  = latestVersion;
             window._releaseUrl     = releaseUrl;
-            window.minSize = new Vector2(480, 170);
-            window.maxSize = new Vector2(480, 170);
+            window.minSize = new Vector2(480, LootLockerConfig.PackageName == "LootLocker" ? 170 : 190);
+            window.maxSize = new Vector2(480, LootLockerConfig.PackageName == "LootLocker" ? 170 : 190);
             window.ShowUtility();
         }
 
         private void OnGUI()
         {
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("LootLocker Unity SDK update available!", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(LootLockerConfig.PackageName + " Unity SDK update available!", EditorStyles.boldLabel);
             EditorGUILayout.Space(4);
             string installed = string.IsNullOrEmpty(_currentVersion) ? "unknown" : $"v{_currentVersion}";
             string latest    = string.IsNullOrEmpty(_latestVersion)  ? "unknown" : $"v{_latestVersion}";
@@ -282,6 +283,13 @@ namespace LootLocker.Extension
 
             if (GUILayout.Button("See What's New \u2197"))
                 Application.OpenURL(_releaseUrl);
+
+            if (LootLockerConfig.PackageName != "LootLocker")
+            {
+                EditorGUILayout.Space(4);
+                var noticeStyle = new GUIStyle(EditorStyles.miniLabel) { fontStyle = FontStyle.Italic };
+                EditorGUILayout.LabelField(LootLockerConfig.PackageName + " SDK is powered by LootLocker \u2014 release notes are on the LootLocker GitHub page.", noticeStyle);
+            }
 
             EditorGUILayout.Space(8);
             EditorGUILayout.BeginHorizontal();
