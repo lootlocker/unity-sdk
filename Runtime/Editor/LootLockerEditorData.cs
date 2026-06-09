@@ -58,6 +58,8 @@ namespace LootLocker.Extension
 
         public static bool ShouldAutoShowWindow()
         {
+            if (!LootLockerConfig.current.enableEditorAdminExtension)
+                return false;
             var result = EditorPrefs.GetBool(firstTimeWelcome, true);
             EditorPrefs.SetBool(firstTimeWelcome, false);
             return result;
