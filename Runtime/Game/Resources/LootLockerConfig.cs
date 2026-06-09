@@ -513,15 +513,10 @@ namespace LootLocker
                 }
                 return;
             }
-            // If we already have a cached version, fire the event immediately for
-            // responsiveness so subscribers don't have to wait for Client.List().
-            // Then fall through to re-query — this keeps sdk_version current after
-            // SDK updates on disk (fixes stale version on upgrade).
-            if (!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A"))
-            {
-                SdkVersionDetermined = true;
-                OnSdkVersionDetermined?.Invoke();
-            }
+            // If we already have a cached version, still re-query to keep sdk_version
+            // current after SDK updates on disk (fixes stale version on upgrade).
+            // We only raise OnSdkVersionDetermined once the authoritative value has
+            // been resolved by Client.List(), so subscribers never act on stale data.
             ListInstalledPackagesRequest = Client.List();
             EditorApplication.update += ListInstalledPackagesRequestProgress;
         }
