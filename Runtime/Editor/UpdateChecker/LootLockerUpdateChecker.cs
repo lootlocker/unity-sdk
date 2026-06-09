@@ -11,10 +11,10 @@ namespace LootLocker.Extension
     internal static class LootLockerUpdateChecker
     {
         // EditorPrefs keys — global per machine, not per project
-        private const string PrefNeverNotify    = "com.lootlocker.sdk.updatecheck.nevernotify";
-        private const string PrefSkippedVersion = "com.lootlocker.sdk.updatecheck.skippedversion";
-        private const string PrefRemindAfter    = "com.lootlocker.sdk.updatecheck.remindafter";
-        private const string PrefLastChecked    = "com.lootlocker.sdk.updatecheck.lastchecked";
+        internal const string PrefNeverNotify    = "com.lootlocker.sdk.updatecheck.nevernotify";
+        internal const string PrefSkippedVersion = "com.lootlocker.sdk.updatecheck.skippedversion";
+        internal const string PrefRemindAfter    = "com.lootlocker.sdk.updatecheck.remindafter";
+        internal const string PrefLastChecked    = "com.lootlocker.sdk.updatecheck.lastchecked";
 
         private const string GitHubReleasesUrl  = "https://api.github.com/repos/lootlocker/unity-sdk/releases/latest";
         private const double CheckIntervalHours = 24.0;
@@ -99,6 +99,7 @@ namespace LootLocker.Extension
 
             _isManualCheck = isManualCheck;
             _activeRequest = UnityWebRequest.Get(GitHubReleasesUrl);
+            _activeRequest.timeout = 15;
             _activeRequest.SetRequestHeader("User-Agent", "LootLocker Unity SDK Update Checker");
             _activeRequest.SendWebRequest();
             EditorApplication.update += PollRequest;
@@ -242,7 +243,12 @@ namespace LootLocker.Extension
             string[] parts = version.Split('.');
             int[] result = new int[parts.Length];
             for (int i = 0; i < parts.Length; i++)
-                int.TryParse(parts[i], out result[i]);
+            {
+                string part = parts[i];
+                int cut = part.IndexOfAny(new[] { '-', '+' });
+                if (cut >= 0) part = part.Substring(0, cut);
+                int.TryParse(part, out result[i]);
+            }
             return result;
         }
     }
@@ -269,7 +275,9 @@ namespace LootLocker.Extension
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("LootLocker Unity SDK update available!", EditorStyles.boldLabel);
             EditorGUILayout.Space(4);
-            EditorGUILayout.LabelField($"Installed: v{_currentVersion}   \u2022   Latest: v{_latestVersion}");
+            string installed = string.IsNullOrEmpty(_currentVersion) ? "unknown" : $"v{_currentVersion}";
+            string latest    = string.IsNullOrEmpty(_latestVersion)  ? "unknown" : $"v{_latestVersion}";
+            EditorGUILayout.LabelField($"Installed: {installed}   \u2022   Latest: {latest}");
             EditorGUILayout.Space(6);
 
             if (GUILayout.Button("See What's New \u2197"))
@@ -286,19 +294,19 @@ namespace LootLocker.Extension
 
             if (GUILayout.Button("Skip This Version"))
             {
-                EditorPrefs.SetString("com.lootlocker.sdk.updatecheck.skippedversion", _latestVersion);
+                EditorPrefs.SetString(LootLockerUpdateChecker.PrefSkippedVersion, _latestVersion);
                 Close();
             }
 
             if (GUILayout.Button("Remind in 7 Days"))
             {
-                EditorPrefs.SetString("com.lootlocker.sdk.updatecheck.remindafter", DateTime.UtcNow.AddDays(7).Ticks.ToString());
+                EditorPrefs.SetString(LootLockerUpdateChecker.PrefRemindAfter, DateTime.UtcNow.AddDays(7).Ticks.ToString());
                 Close();
             }
 
             if (GUILayout.Button("Never Notify"))
             {
-                EditorPrefs.SetBool("com.lootlocker.sdk.updatecheck.nevernotify", true);
+                EditorPrefs.SetBool(LootLockerUpdateChecker.PrefNeverNotify, true);
                 Close();
             }
 
