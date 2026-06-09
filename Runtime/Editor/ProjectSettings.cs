@@ -73,6 +73,12 @@ namespace LootLocker.Admin
 
         private void DrawGameSettings()
         {
+            if (LootLockerConfig.PackageName != "LootLocker")
+            {
+                EditorGUILayout.HelpBox(LootLockerConfig.PackageName + " SDK is powered by LootLocker. Settings here configure the underlying LootLocker integration.", MessageType.Info);
+                EditorGUILayout.Space();
+            }
+
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("apiKey"));
             if (EditorGUI.EndChangeCheck())
@@ -245,9 +251,9 @@ namespace LootLocker.Admin
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
         {
-            return new ProjectSettings("Project/LootLocker SDK", SettingsScope.Project)
+            return new ProjectSettings("Project/" + LootLockerConfig.PackageName + " SDK", SettingsScope.Project)
             {
-                label = "LootLocker SDK"
+                label = LootLockerConfig.PackageName + " SDK"
             };
         }
     }
