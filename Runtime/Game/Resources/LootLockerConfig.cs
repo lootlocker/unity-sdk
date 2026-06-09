@@ -486,14 +486,41 @@ namespace LootLocker
 
         protected static ListRequest ListInstalledPackagesRequest;
 
+        // Raised once after the SDK version string has been resolved (either synchronously or
+        // after the async Client.List() call completes). Editor-only subscribers should
+        // unsubscribe inside their handler to avoid duplicate calls across domain reloads.
+        public static event Action OnSdkVersionDetermined;
+
+        // True once the SDK version has been resolved this editor session.
+        // Check this in [InitializeOnLoad] static constructors to handle the case where the
+        // event already fired before the subscriber registered (e.g. after a domain reload).
+        public static bool SdkVersionDetermined { get; private set; }
+
         static void StoreSDKVersion()
         {
-            if ((!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A")) 
-                || ListInstalledPackagesRequest != null
-                || Array.Exists(AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset"),
-                    g => AssetDatabase.GUIDToAssetPath(g).EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase)) /*Configured through config file, read sdk version there*/)
-            {
+            // Don't re-queue if a request is already in flight.
+            if (ListInstalledPackagesRequest != null)
                 return;
+            // Version provided by an external config file — treat as authoritative and
+            // don't overwrite it from the package manifest.
+            if (Array.Exists(AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset"),
+                g => AssetDatabase.GUIDToAssetPath(g).EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (!SdkVersionDetermined)
+                {
+                    SdkVersionDetermined = true;
+                    OnSdkVersionDetermined?.Invoke();
+                }
+                return;
+            }
+            // If we already have a cached version, fire the event immediately for
+            // responsiveness so subscribers don't have to wait for Client.List().
+            // Then fall through to re-query — this keeps sdk_version current after
+            // SDK updates on disk (fixes stale version on upgrade).
+            if (!string.IsNullOrEmpty(LootLockerConfig.current.sdk_version) && !LootLockerConfig.current.sdk_version.Equals("N/A"))
+            {
+                SdkVersionDetermined = true;
+                OnSdkVersionDetermined?.Invoke();
             }
             ListInstalledPackagesRequest = Client.List();
             EditorApplication.update += ListInstalledPackagesRequestProgress;
@@ -517,6 +544,8 @@ namespace LootLocker
                     {
                         LootLockerConfig.current.sdk_version = package.version;
                         LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                        SdkVersionDetermined = true;
+                        OnSdkVersionDetermined?.Invoke();
                         return;
                     }
                 }
@@ -526,6 +555,8 @@ namespace LootLocker
                 {
                     LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(sdkPackageJsonPath)).version;
                     LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                    SdkVersionDetermined = true;
+                    OnSdkVersionDetermined?.Invoke();
                     return;
                 }
 
@@ -539,12 +570,16 @@ namespace LootLocker
                         {
                             LootLockerConfig.current.sdk_version = packageDescription.version;
                             LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                            SdkVersionDetermined = true;
+                            OnSdkVersionDetermined?.Invoke();
                             return;
                         }
                     }
                 }
 
                 LootLockerConfig.current.sdk_version = "N/A";
+                SdkVersionDetermined = true;
+                OnSdkVersionDetermined?.Invoke();
             }
         }
 #endif
