@@ -161,8 +161,8 @@ namespace LootLocker
         {
             if (_current != null)
             {
-                if (_activeFileConfig != null)
-                    ApplyFileConfig(_activeFileConfig);
+                // File config is applied once on cold load — reapplying on every
+                // read is unnecessary since settings are UI-locked while active.
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
                 _current.CheckForSettingOverrides();
 #endif
