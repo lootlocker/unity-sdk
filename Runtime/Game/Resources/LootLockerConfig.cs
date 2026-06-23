@@ -577,12 +577,12 @@ namespace LootLocker
             bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true,
             LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet, bool enableEditorAdminExtension = true)
         {
+            _current = Get();
+
             if (IsFileConfigActive)
             {
                 return false;
             }
-
-            _current = Get();
 
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
@@ -614,6 +614,8 @@ namespace LootLocker
 
         public static bool CreateNewSettings(LootLockerConfig newConfig)
         {
+            _current = Get();
+
             if (IsFileConfigActive)
             {
                 return false;
@@ -675,6 +677,11 @@ namespace LootLocker
 
         public static bool ClearSettings()
         {
+            if (IsFileConfigActive)
+            {
+                return false;
+            }
+
             _current.apiKey = null;
             _current.game_version = null;
             _current.logLevel = LootLockerLogger.LogLevel.Info;
