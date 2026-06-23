@@ -420,7 +420,7 @@ namespace LootLocker
                 }
                 else if (args[i] == "-multiusersessionmode")
                 {
-                    if (System.Enum.TryParse<LootLockerMultiUserSessionMode>(args[i + 1], true, out LootLockerMultiUserSessionMode multiUserSessionMode)
+                    if (i + 1 < args.Length && System.Enum.TryParse<LootLockerMultiUserSessionMode>(args[i + 1], true, out LootLockerMultiUserSessionMode multiUserSessionMode)
                         && multiUserSessionMode != LootLockerMultiUserSessionMode.NotSet)
                     {
                         this.multiUserSessionMode = multiUserSessionMode;
@@ -428,7 +428,7 @@ namespace LootLocker
                 }
                 else if (args[i] == "-enableeditoradminextension")
                 {
-                    if (bool.TryParse(args[i + 1], out bool enableEditorAdminExtension))
+                    if (i + 1 < args.Length && bool.TryParse(args[i + 1], out bool enableEditorAdminExtension))
                     {
                         this.enableEditorAdminExtension = enableEditorAdminExtension;
                     }
@@ -577,6 +577,11 @@ namespace LootLocker
             bool enablePresence = false, bool enablePresenceAutoConnect = true, bool enablePresenceAutoDisconnectOnFocusChange = false, bool enablePresenceInEditor = true,
             LootLockerMultiUserSessionMode multiUserSessionMode = LootLockerMultiUserSessionMode.NotSet, bool enableEditorAdminExtension = true)
         {
+            if (IsFileConfigActive)
+            {
+                return false;
+            }
+
             _current = Get();
 
             _current.apiKey = apiKey;
@@ -609,6 +614,11 @@ namespace LootLocker
 
         public static bool CreateNewSettings(LootLockerConfig newConfig)
         {
+            if (IsFileConfigActive)
+            {
+                return false;
+            }
+
             if(newConfig == null)
             {
                 return false;
