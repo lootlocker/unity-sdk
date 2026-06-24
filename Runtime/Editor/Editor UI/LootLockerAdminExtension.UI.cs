@@ -36,7 +36,22 @@ namespace LootLocker.Extension
             }
             if (visualTree == null)
             {
-                Debug.LogError("LootLockerAdminExtension: LootLocker not found in `Assets/LootLocker` or in Packages. Non standard install locations not supported.");
+                // Find by exact filename in the AssetDatabase — works for any install location
+                string[] guids = AssetDatabase.FindAssets("LootLockerAdminExtension t:VisualTreeAsset");
+                foreach (string guid in guids)
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (assetPath.EndsWith("/LootLockerAdminExtension.uxml", System.StringComparison.Ordinal))
+                    {
+                        visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+                        if (visualTree != null)
+                            break;
+                    }
+                }
+            }
+            if (visualTree == null)
+            {
+                Debug.LogError("LootLockerAdminExtension: Could not find LootLockerAdminExtension.uxml in the AssetDatabase.");
                 return;
             }
 

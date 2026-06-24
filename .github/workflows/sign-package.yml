@@ -1,0 +1,119 @@
+name: Sign and release package
+run-name: "Sign and release package for ${{ github.ref_name }}"
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sign:
+    name: Sign UPM package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+      UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
+      UPM_ORG_ID: ${{ secrets.UNITY_ORG_ID }}
+      DIST_DIR: /tmp/signed-upm-dist
+
+    steps:
+      - name: Check required secrets
+        run: |
+          missing=""
+          [ -z "$UPM_SERVICE_ACCOUNT_KEY_ID" ]  && missing="$missing UPM_SERVICE_ACCOUNT_KEY_ID"
+          [ -z "$UPM_SERVICE_ACCOUNT_KEY_SECRET" ] && missing="$missing UPM_SERVICE_ACCOUNT_KEY_SECRET"
+          [ -z "$UPM_ORG_ID" ] && missing="$missing UNITY_ORG_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required secrets:$missing"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read package metadata
+        run: |
+          package_name="$(jq -r '.name' package.json)"
+          package_version="$(jq -r '.version' package.json)"
+          echo "PACKAGE_NAME=$package_name" >> "$GITHUB_ENV"
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+          printf 'Package name: %s\nPackage version: %s\n' "$package_name" "$package_version"
+
+      - name: Prepare package folder
+        run: |
+          # Copy checkout to a clean staging dir so we don't mutate the workspace
+          cp -r . /tmp/sdk-staging
+
+          # Strip internal-only items that should not be distributed
+          rm -rf /tmp/sdk-staging/.github
+          rm -rf /tmp/sdk-staging/.git
+          rm -f  /tmp/sdk-staging/.gitignore
+          rm -rf /tmp/sdk-staging/Tests
+          rm -f  /tmp/sdk-staging/Tests.meta
+
+          # upm pack requires Samples (not Samples~) to include sample content
+          if [ -d /tmp/sdk-staging/Samples~ ]; then
+            mv /tmp/sdk-staging/Samples~ /tmp/sdk-staging/Samples
+          fi
+          # Keep package metadata aligned with the staged folder layout
+          tmp_package_json="/tmp/sdk-staging/package.json.tmp"
+          jq 'if .samples then .samples |= map(if .path then .path |= sub("^Samples~/"; "Samples/") else . end) else . end' \
+            /tmp/sdk-staging/package.json > "$tmp_package_json"
+          mv "$tmp_package_json" /tmp/sdk-staging/package.json
+
+      - name: Install Unity UPM CLI
+        run: |
+          # Pin to a specific version for reproducibility and supply-chain safety.
+          # To upgrade, check https://cdn.packages.unity.com/upm-cli/latest.txt and update the version below.
+          UPM_CLI_VERSION="v9.27.0"
+          curl -fsSL https://cdn.packages.unity.com/upm-cli/install.sh -o install.sh
+          bash install.sh "$UPM_CLI_VERSION"
+          echo "$HOME/.upm/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Unity UPM CLI
+        run: upm --version
+
+      - name: Sign package
+        run: |
+          mkdir -p "$DIST_DIR"
+          upm pack /tmp/sdk-staging --organization-id "$UPM_ORG_ID" --destination "$DIST_DIR"
+
+      - name: Verify and rename signed tarball
+        run: |
+          shopt -s nullglob
+          archives=("$DIST_DIR"/*.tgz "$DIST_DIR"/*.tar.gz)
+          if [ "${#archives[@]}" -ne 1 ]; then
+            printf 'Expected exactly one signed archive, found %s\n' "${#archives[@]}" >&2
+            exit 1
+          fi
+          archive="${archives[0]}"
+
+          # Verify the tarball contains the required entries
+          tar -tzf "$archive" | grep -qx 'package/package.json' \
+            || { echo "::error::package/package.json not found in signed tarball"; exit 1; }
+          tar -tzf "$archive" | grep -qx 'package/.attestation.p7m' \
+            || { echo "::error::package/.attestation.p7m not found — signing may have failed"; exit 1; }
+
+          # Rename to canonical name so OpenUPM prefix matching works reliably
+          canonical="$DIST_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz"
+          mv "$archive" "$canonical"
+          echo "PACKAGE_ARCHIVE=$canonical" >> "$GITHUB_ENV"
+          printf 'Signed archive: %s\n' "$(basename "$canonical")"
+          tar -xOzf "$canonical" package/package.json | jq '{name, version}'
+
+      - name: Upload signed package as workflow artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LootLockerSDK-Signed-${{ env.PACKAGE_VERSION }}
+          path: /tmp/signed-upm-dist/*.tgz
+
+      - name: Upload signed package to GitHub Release
+        if: github.event_name == 'release'
+        run: gh release upload --clobber "${{ github.ref_name }}" "$PACKAGE_ARCHIVE"
+        env:
+          GH_TOKEN: ${{ github.token }}

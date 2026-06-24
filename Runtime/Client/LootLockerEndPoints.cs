@@ -184,13 +184,6 @@ namespace LootLocker
         public static EndPointClass addingFilesToAssetCandidates = new EndPointClass("v1/player/assets/candidates/{0}/file", LootLockerHTTPMethod.UPLOAD_FILE);
         public static EndPointClass removingFilesFromAssetCandidates = new EndPointClass("v1/player/assets/candidates/{0}/file/{1}", LootLockerHTTPMethod.DELETE);
 
-        // Missions
-        [Header("Missions")]
-        public static EndPointClass gettingAllMissions = new EndPointClass("v1/missions", LootLockerHTTPMethod.GET);
-        public static EndPointClass gettingASingleMission = new EndPointClass("v1/mission/{0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass startingMission = new EndPointClass("v1/mission/{0}/start", LootLockerHTTPMethod.POST);
-        public static EndPointClass finishingMission = new EndPointClass("v1/mission/{0}/end", LootLockerHTTPMethod.POST);
-
         // Maps
         [Header("Maps")]
         public static EndPointClass gettingAllMaps = new EndPointClass("v1/maps", LootLockerHTTPMethod.GET);
@@ -220,11 +213,6 @@ namespace LootLocker
 
         // Triggers
         public static EndPointClass InvokeTriggers = new EndPointClass("triggers/cozy-crusader/v1", LootLockerHTTPMethod.POST);
-
-        // Maps
-        [Header("Collectables")]
-        public static EndPointClass gettingCollectables = new EndPointClass("v1/collectable", LootLockerHTTPMethod.GET);
-        public static EndPointClass collectingAnItem = new EndPointClass("v1/collectable", LootLockerHTTPMethod.POST);
 
         // Messages
         [Header("Messages")]
@@ -293,6 +281,10 @@ namespace LootLocker
         [Header("Feedback")]
         public static EndPointClass listFeedbackCategories = new EndPointClass("feedback/category/entity/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass createFeedbackEntry = new EndPointClass("feedback", LootLockerHTTPMethod.POST);
+
+        // Error Reports
+        [Header("Error Reports")]
+        public static EndPointClass createErrorReport = new EndPointClass("error-report", LootLockerHTTPMethod.POST);
 
         // Friends
         [Header("Friends")]

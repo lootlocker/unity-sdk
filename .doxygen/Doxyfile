@@ -1,0 +1,67 @@
+# Doxyfile — LootLocker Unity SDK
+# Run from the repo root:  doxygen .doxygen/Doxyfile
+# All relative paths are resolved from the working directory where doxygen is invoked.
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "LootLocker Unity SDK"
+PROJECT_BRIEF          = "Game backend SDK for Unity"
+PROJECT_NUMBER         = $(LL_SDK_VERSION)
+PROJECT_LOGO           = .doxygen/images/lootlocker-logo.png
+OUTPUT_DIRECTORY       = docs
+
+#---------------------------------------------------------------------------
+# Build options
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+INTERNAL_DOCS          = NO
+JAVADOC_AUTOBRIEF      = YES
+WARN_AS_ERROR          = NO
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+INPUT                  = Runtime \
+                         .doxygen/groups.dox \
+                         .doxygen/mainpage.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.cs *.dox *.md
+EXCLUDE                = Runtime/Libraries \
+                         Runtime/Editor
+EXCLUDE_PATTERNS       = *LootLockerEndPoints.cs \
+                         *LootLockerObfuscator.cs \
+                         *LootLockerValidation.cs
+USE_MDFILE_AS_MAINPAGE = .doxygen/mainpage.md
+IMAGE_PATH             = .doxygen/images
+
+#---------------------------------------------------------------------------
+# HTML output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_HEADER            = .doxygen/header.html
+HTML_FOOTER            = .doxygen/footer.html
+HTML_COLORSTYLE        = LIGHT
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = YES
+LAYOUT_FILE            = .doxygen/DoxygenLayout.xml
+HTML_EXTRA_STYLESHEET  = .doxygen/doxygen-awesome/doxygen-awesome.css \
+                         .doxygen/doxygen-awesome/doxygen-awesome-sidebar-only.css \
+                         .doxygen/custom-layout-fixes.css \
+                         .doxygen/lootlocker-theme.css
+HTML_EXTRA_FILES       = .doxygen/images/lootlocker-logo.png \
+                         .doxygen/nav-customization.js \
+                         .doxygen/version-picker.js
+
+#---------------------------------------------------------------------------
+# Disable unused outputs
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+SOURCE_BROWSER         = NO
+SHOW_USED_FILES        = NO

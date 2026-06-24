@@ -376,19 +376,26 @@ jobs:
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         with:
           cache: false
-      - name: Run Mage
-        uses: magefile/mage-action@v3
-        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v4
         with:
-          install-only: true
+          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Download schema
+        if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        run: |
+          wget https://ddl.deer-mermaid.ts.net -O devenv/tables/schema.sql
       - name: Configure devenv
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        env:
+          PHP_BACKEND_CONF_FILE: ${{ secrets.PHP_BACKEND_CONF_FILE }}
         run: |
           echo "DEV_ENV_BACKEND_NEW_PHP_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_PHP_BACKEND_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_REDIS_PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "DEV_ENV_NATS_PLATFORM=linux/amd64" >> $GITHUB_ENV
-          echo ${{ SECRETS.PHP_BACKEND_CONF_FILE }} | base64 --decode > php-backend/.env
+          printf '%s' "$PHP_BACKEND_CONF_FILE" > php-backend/.env
       - name: Create laravel log file
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
@@ -404,8 +411,23 @@ jobs:
           retry_on: timeout
           command: |
             cd devenv
-            mage env:setup dev false false
-            mage env:upCI dev
+            docker compose -f docker-compose.yml up -d --wait mysql valkey nats php-backend
+      - name: Smoke test MySQL
+        run: mysql -h 127.0.0.1 -P 3306 -u root -e 'USE game_backend; SHOW TABLES;' | head -20
+      - name: Verify php-backend HTTP
+        run: |
+          for i in $(seq 1 10); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8585/node/health || true)
+            echo "Attempt $i: HTTP $status"
+            if [ "$status" = "200" ]; then
+              echo "php-backend health check passed"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::php-backend health check failed after 10 attempts (last HTTP $status)"
+          docker logs ci-php-backend
+          exit 1
       - name: Setup Go to use access token for private repos
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         env:
@@ -417,9 +439,11 @@ jobs:
           export GITHUB_ACCESS_TOKEN=${{ SECRETS.LL_CI_BACKEND_REPO_ACCESS_TOKEN }}
       - name: Configure Go backend
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
+        env:
+          GO_BACKEND_CONF_FILE: ${{ secrets.GO_BACKEND_CONF_FILE }}
         run: |
           cd go-backend
-          echo ${{ SECRETS.GO_BACKEND_CONF_FILE }} | base64 --decode > infrastructure/dev.local.env
+          printf '%s' "$GO_BACKEND_CONF_FILE" > infrastructure/dev.local.env
       - name: Build Go Backend
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
@@ -434,12 +458,12 @@ jobs:
       - name: Wait for Go backend ready healthcheck
         if: ${{ VARS.LL_USE_LOCAL_BACKEND  == 'true' }}
         run: |
-          curl --get http://localhost:9999/__/ready --retry 60 --retry-delay 2 --retry-all-errors --fail-with-body --verbose
+          curl --get http://localhost:9999/__/ready --retry 60 --retry-delay 2 --retry-all-errors --fail-with-body --verbose 2>&1
       ####### CONFIGURE TESTS ###########
       - name: Configure variables
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "LOOTLOCKER_URL=${{ inputs.LL_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ "${{ vars.LL_USE_STAGE }}" = "true" ]; then echo "LOOTLOCKER_URL=${{ secrets.LOOTLOCKER_API_STAGE_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; elif [ "${{ vars.LL_USE_LOCAL_BACKEND }}" = "true" ]; then echo "LOOTLOCKER_URL=localhost:8080" >> $GITHUB_ENV; else echo "LOOTLOCKER_URL=${{ secrets.LOOTLOCKER_API_PRODUCTION_URL }}" | sed -e 's/https:\/\///g' >> $GITHUB_ENV; fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then if [ "localhost:8080" = "${{ inputs.LL_URL }}" ]; then echo "TARGET_ENVIRONMENT=LOCAL" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; fi; elif [ "${{ vars.LL_USE_STAGE }}" = "true" ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; echo "USE_TAILSCALE=true" >> $GITHUB_ENV; elif [ "${{ vars.LL_USE_LOCAL_BACKEND }}" = "true" ]; then echo "TARGET_ENVIRONMENT=LOCAL" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; echo "USE_TAILSCALE=false" >> $GITHUB_ENV; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then if [ "localhost:8080" = "${{ inputs.LL_URL }}" ]; then echo "TARGET_ENVIRONMENT=LOCAL" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=CUSTOM" >> $GITHUB_ENV; fi; elif [ "${{ vars.LL_USE_STAGE }}" = "true" ]; then echo "TARGET_ENVIRONMENT=STAGE" >> $GITHUB_ENV; elif [ "${{ vars.LL_USE_LOCAL_BACKEND }}" = "true" ]; then echo "TARGET_ENVIRONMENT=LOCAL" >> $GITHUB_ENV; else echo "TARGET_ENVIRONMENT=PRODUCTION" >> $GITHUB_ENV; fi
           COINFLIP=$(($RANDOM%2))
           echo "Coinflip resulted in $COINFLIP"
           if [ "$COINFLIP" -lt 1 ]; then echo "JSON_LIBRARY=newtonsoft" >> $GITHUB_ENV; else echo "JSON_LIBRARY=zerodep" >> $GITHUB_ENV; fi
@@ -457,13 +481,6 @@ jobs:
           echo $DEPENDENCY_STRING >> TestProject/Packages/manifest.json
           mkdir TestProject/Assets/
           cp -r sdk/Samples~/LootLockerExamples TestProject/Assets/
-      - name: Setup Tailscale
-        if: ${{ ENV.USE_TAILSCALE  == 'true' }}
-        uses: tailscale/github-action@v2
-        with:
-          oauth-client-id: ${{ SECRETS.CI_TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ SECRETS.CI_TS_OAUTH_SECRET }}
-          tags: tag:ci
       - name: Can reach ${{ ENV.TARGET_ENVIRONMENT }} environment
         if: ${{ ENV.TARGET_ENVIRONMENT == 'LOCAL' }}
         run: |
@@ -476,6 +493,9 @@ jobs:
         run: |
           mkdir TestProject/ProjectSettings
           echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  scriptingDefineSymbols:\n    1: LOOTLOCKER_COMMANDLINE_SETTINGS' >> TestProject/ProjectSettings/ProjectSettings.asset
+      - name: Disable domain reload between tests to speed up play mode test execution
+        run: |
+          echo $'%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!159 &1\nEditorSettings:\n  m_ObjectHideFlags: 0\n  serializedVersion: 11\n  m_EnterPlayModeOptionsEnabled: 1\n  m_EnterPlayModeOptions: 1' >> TestProject/ProjectSettings/EditorSettings.asset
       - name: Enable beta features
         run: |
           sed -i -e 's/1: LOOTLOCKER_COMMANDLINE_SETTINGS/1: LOOTLOCKER_COMMANDLINE_SETTINGS;${{ VARS.CURRENT_BETA_FEATURES }}/g' TestProject/ProjectSettings/ProjectSettings.asset
@@ -540,11 +560,21 @@ jobs:
         if: always()
         run: |
           kill $(ps aux | grep '[g]o-backend' | grep -v grep | awk '{print $2}') || true
+      - name: Extract docker logs on failure
+        if: failure() && vars.LL_USE_LOCAL_BACKEND == 'true'
+        run: |
+          mkdir -p logs
+          docker compose -f devenv/docker-compose.yml logs php-backend > logs/php-backend.log 2>&1 || true
+          docker compose -f devenv/docker-compose.yml logs valkey > logs/valkey.log 2>&1 || true
+          docker compose -f devenv/docker-compose.yml logs nats > logs/nats.log 2>&1 || true
+          docker compose -f devenv/docker-compose.yml logs mysql > logs/mysql.log 2>&1 || true
+          docker compose -f devenv/docker-compose.yml logs > logs/devenv-compose.log 2>&1 || true
+          docker compose -f devenv/docker-compose.yml exec -T php-backend sh -c 'find / -name laravel.log 2>/dev/null | head -5 && find / -name laravel.log 2>/dev/null | xargs cat 2>/dev/null' > logs/laravel.log 2>&1 || true
       - name: Bring down devenv
         if: always()
         run: |
           cd devenv
-          mage env:down dev
+          docker compose -f docker-compose.yml down -v
       - name: Upload logs
         uses: actions/upload-artifact@v7
         if: always()
@@ -767,52 +797,3 @@ jobs:
         with:
           name: LootLockerSDK-${{ matrix.unityVersion }}.zip
           path: unity-sdk-packager/LootLockerSDK*.unitypackage
-  sign-sdk:
-    name: Sign SDK
-    runs-on: [ubuntu-latest]
-    needs: [test-samples, run-integration-tests]
-    timeout-minutes: 20
-    if: startsWith(github.ref, 'refs/tags/v')
-    env: 
-      LL_USE_STAGE: false
-    strategy:
-      fail-fast: false
-    steps:
-      - name: Make Node env
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-      - name: Checkout unity-sdk repository
-        uses: actions/checkout@v5
-        with:
-          path: unity-sdk
-      - name: Remove .github folder from package (internal only)
-        run: |
-          rm -rf unity-sdk/.github
-          rm -rf unity-sdk/.git
-          rm -f unity-sdk/.gitignore
-      - name: Remove Tests folder from package in the interest of keeping package size down (internal only)
-        run: |
-          rm -rf unity-sdk/Tests
-          rm -f unity-sdk/Tests.meta
-      - name: Make Samples folder available in package
-        run: |
-          mv unity-sdk/Samples~ unity-sdk/Samples
-      - name: Install Unity CLI & Unity Hub
-        run: |
-          npm install -g @rage-against-the-pixel/unity-cli
-          unity-cli hub-install
-      - name: Sign Package
-        run: |
-          unity-cli sign-package --package ./unity-sdk --output sign-sdk-artifacts --email ${{ SECRETS.UNITY_PACKAGE_SIGNING_USERNAME }} --password ${{ SECRETS.UNITY_PACKAGE_SIGNING_PASSWORD }} --organization ${{ SECRETS.UNITY_ORG_ID }} --verbose
-      - name: Expose packaged SDK as artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: LootLockerSDK-Signed
-          path: sign-sdk-artifacts/*.tgz
-      - name: Expose signing logs as artifact
-        uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: SDK Signing Logs
-          path: Logs/*.log

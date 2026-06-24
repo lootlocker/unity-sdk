@@ -40,7 +40,22 @@ namespace LootLocker.Extension
             }
             if (visualTree == null)
             {
-                Debug.LogError("LootLockerLogViewerWindow: LootLocker not found in `Assets/LootLocker` or in Packages. Non standard install locations not supported.");
+                // Find by exact filename in the AssetDatabase — works for any install location
+                string[] guids = AssetDatabase.FindAssets("LootLockerLogViewerWindow t:VisualTreeAsset");
+                foreach (string guid in guids)
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (assetPath.EndsWith("/LootLockerLogViewerWindow.uxml", System.StringComparison.Ordinal))
+                    {
+                        visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+                        if (visualTree != null)
+                            break;
+                    }
+                }
+            }
+            if (visualTree == null)
+            {
+                Debug.LogError("LootLockerLogViewerWindow: Could not find LootLockerLogViewerWindow.uxml in the AssetDatabase.");
                 return;
             }
             var root = rootVisualElement;

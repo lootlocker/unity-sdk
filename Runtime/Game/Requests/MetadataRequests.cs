@@ -213,6 +213,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A source identifier paired with a list of metadata keys, used to specify which keys to retrieve from a given source.
     /// </summary>
     public class LootLockerMetadataSourceAndKeys
     {
@@ -231,6 +232,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A source identifier paired with its retrieved metadata entries.
     /// </summary>
     public class LootLockerMetadataSourceAndEntries
     {
@@ -261,6 +263,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// An error that occurred while performing a metadata operation, identifying the action, entry, and reason for failure.
     /// </summary>
     public class LootLockerMetadataOperationError
     {
@@ -279,6 +282,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A metadata entry combined with the action to perform on it (create, update, delete).
     /// </summary>
     public class LootLockerMetadataOperation : LootLockerMetadataEntry
     {
@@ -289,6 +293,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// An internal representation of a metadata operation with string-typed enum fields, used for serializing requests.
     /// </summary>
     public class LootLockerInternalMetadataOperationWithStringEnums : LootLockerMetadataOperation
     {
@@ -313,6 +318,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Request to retrieve metadata from multiple sources at once.
     /// </summary>
     public class LootLockerGetMultisourceMetadataRequest
     {
@@ -323,6 +329,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Internal request object for a batch of metadata operations on a specific source.
     /// </summary>
     public class LootLockerInternalMetadataOperationRequest
     {
@@ -348,6 +355,7 @@ namespace LootLocker.Requests
     // Response Definitions
     //==================================================
     /// <summary>
+    /// Response containing a paginated list of metadata entries for a source.
     /// </summary>
     public class LootLockerListMetadataResponse : LootLockerResponse
     {
@@ -362,6 +370,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response containing a single metadata entry retrieved by key.
     /// </summary>
     public class LootLockerGetMetadataResponse : LootLockerResponse
     {
@@ -372,6 +381,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response containing metadata entries for multiple sources, grouped by source.
     /// </summary>
     public class LootLockerGetMultisourceMetadataResponse : LootLockerResponse
     {
@@ -382,6 +392,7 @@ namespace LootLocker.Requests
     };
 
     /// <summary>
+    /// Response from a metadata operations request, indicating the source and any errors that occurred.
     /// </summary>
     public class LootLockerMetadataOperationsResponse : LootLockerResponse
     {

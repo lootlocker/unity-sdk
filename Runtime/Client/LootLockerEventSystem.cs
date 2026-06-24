@@ -180,7 +180,7 @@ namespace LootLocker
     [Serializable]
     public class LootLockerEventSystemResetEventData : LootLockerEventData
     {
-        string message { get; set; } = "The LootLocker Event System has been reset and all subscribers have been cleared. If you were subscribed to events, you will need to re-subscribe.";
+        string message { get; set; } = "The event system has been reset and all subscribers have been cleared. If you were subscribed to events, you will need to re-subscribe.";
         public LootLockerEventSystemResetEventData() 
             : base(LootLockerEventType.EventSystemReset)
         {

@@ -23,6 +23,7 @@ namespace LootLockerTestConfigurationUtils
         public int DevelopmentGameId { get; set; }
         public string DevelopmentGameApiKey { get; set; }
         public string GameVersion { get; set; } = "0.0.1.0";
+        public string AdminToken { get; private set; }
         public int OrganisationId { get; set; }
         public int UserId { get; set; }
         public LootLockerTestUser User { get; set; }
@@ -106,6 +107,8 @@ namespace LootLockerTestConfigurationUtils
 
                                 createdGame.DevelopmentGameApiKey = stageKeyResponse.api_key;
 
+                                createdGame.AdminToken = LootLockerConfig.current.adminToken;
+                                LootLockerOrphanedTestGameRegistry.Register(createdGame.GameId, createdGame.AdminToken, LootLockerConfig.current.adminUrl);
                                 onComplete?.Invoke(true, "", createdGame);
                             });
                         });
@@ -118,11 +121,15 @@ namespace LootLockerTestConfigurationUtils
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                // Not signed in
-                onComplete?.Invoke(false, "Not logged in");
-                return;
+                if (string.IsNullOrEmpty(AdminToken))
+                {
+                    onComplete?.Invoke(false, "Not logged in");
+                    return;
+                }
+                LootLockerConfig.current.adminToken = AdminToken;
             }
 
+            LootLockerOrphanedTestGameRegistry.Unregister(GameId);
             SwitchToProdEnvironment();
             EndPointClass endPoint = LootLockerTestConfigurationEndpoints.DeleteGame;
             LootLockerAdminRequest.Send(endPoint.endPoint, endPoint.httpMethod, null, (stageGameDelete) =>

@@ -1,5 +1,9 @@
 ﻿namespace LootLocker
 {
+    /// <summary>
+    /// Error information returned when a LootLocker API call fails.
+    /// Contains error codes, messages, and debugging information for troubleshooting.
+    /// </summary>
     public class LootLockerErrorData
     {
         public LootLockerErrorData(int httpStatusCode, string errorMessage)
@@ -50,17 +54,17 @@
             // Empty error, make sure we print something
             if (string.IsNullOrEmpty(message) && string.IsNullOrEmpty(trace_id) && string.IsNullOrEmpty(request_id))
             {
-                return $"An unexpected LootLocker error without error data occurred. Please try again later.\n If the issue persists, please contact LootLocker support.";
+                return $"An unexpected error occurred. Please try again later. If the issue persists, please contact support.";
             }
 
             //Print the most important info first
-            string prettyError = $"LootLocker Error: \"{message ?? ""}\"";
+            string prettyError = $"Error: \"{message ?? ""}\"";
 
             // Look for intermittent, non user errors
             if (!string.IsNullOrEmpty(code) && code.StartsWith("HTTP5"))
             {
                 prettyError +=
-                    $"\nTry again later. If the issue persists, please contact LootLocker support and provide the following error details:\n trace ID - \"{trace_id ?? ""}\",\n request ID - \"{request_id ?? ""}\",\n message - \"{message ?? ""}\".";
+                    $"\nTry again later. If the issue persists, please contact support and provide the following error details:\n trace ID - \"{trace_id ?? ""}\",\n request ID - \"{request_id ?? ""}\",\n message - \"{message ?? ""}\".";
                 if (!string.IsNullOrEmpty(doc_url))
                 {
                     prettyError += $"\nFor more information, see {doc_url} (error code was \"{code}\").";
@@ -77,7 +81,7 @@
                 }
 
                 prettyError +=
-                    $"\nIf you are unable to fix the issue, contact LootLocker support and provide the following error details:";
+                    $"\nIf you are unable to fix the issue, contact support and provide the following error details:";
                 if (!string.IsNullOrEmpty(trace_id ?? ""))
                 {
                     prettyError += $"\n     trace ID - \"{trace_id}\"";

@@ -36,6 +36,7 @@ namespace LootLocker.Requests
     //==================================================
     
     /// <summary>
+    /// An account provider linked to the current player's LootLocker account.
     /// </summary>
     public class LootLockerConnectedAccountProvider
     {
@@ -54,6 +55,7 @@ namespace LootLocker.Requests
     //==================================================
     
     /// <summary>
+    /// Request to link a Google account to the current player's LootLocker account using an id token.
     /// </summary>
     public class LootLockerConnectGoogleProviderToAccountRequest
     {
@@ -64,6 +66,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to link a Google account to the current player's LootLocker account, specifying the OAuth2 client platform.
     /// </summary>
     public class LootLockerConnectGoogleProviderToAccountWithPlatformRequest
     {
@@ -78,6 +81,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to link a remote session to the current player's LootLocker account using a lease code and nonce.
     /// </summary>
     public class LootLockerConnectRemoteSessionToAccountRequest
     {
@@ -92,6 +96,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to transfer connected account providers from one LootLocker player account to another.
     /// </summary>
     public class LootLockerTransferProvidersBetweenAccountsRequest
     {
@@ -110,6 +115,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Request to link an Apple account to the current player's LootLocker account using an authorization code.
     /// </summary>
     public class LootLockerConnectAppleRestProviderToAccountRequest
     {
@@ -120,6 +126,7 @@ namespace LootLocker.Requests
     }
     
     /// <summary>
+    /// Request to link an Epic Games account to the current player's LootLocker account.
     /// </summary>
     public class LootLockerConnectEpicProviderToAccountRequest
     {
@@ -130,6 +137,7 @@ namespace LootLocker.Requests
     }
     
     /// <summary>
+    /// Request to link a PlayStation account to the current player's LootLocker account.
     /// </summary>
     public class LootLockerConnectPlaystationProviderToAccountRequest
     {
@@ -144,6 +152,7 @@ namespace LootLocker.Requests
     }
     
     /// <summary>
+    /// Request to link a Discord account to the current player's LootLocker account.
     /// </summary>
     public class LootLockerConnectDiscordProviderToAccountRequest
     {
@@ -154,6 +163,7 @@ namespace LootLocker.Requests
     }
     
     /// <summary>
+    /// Request to link a Twitch account to the current player's LootLocker account using an authorization code.
     /// </summary>
     public class LootLockerConnectTwitchProviderToAccountRequest
     {
@@ -168,6 +178,7 @@ namespace LootLocker.Requests
     //==================================================
 
     /// <summary>
+    /// Response returned after successfully connecting an account provider to the current player's LootLocker account.
     /// </summary>
     public class LootLockerAccountConnectedResponse : LootLockerResponse
     {
@@ -178,6 +189,7 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response containing all account providers connected to the current player's LootLocker account.
     /// </summary>
     public class LootLockerListConnectedAccountsResponse : LootLockerResponse
     {

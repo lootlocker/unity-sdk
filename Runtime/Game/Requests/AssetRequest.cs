@@ -5,6 +5,9 @@ using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
+    /// <summary>
+    /// Filter criteria for listing assets based on purchasability, rentability, or popularity.
+    /// </summary>
     public enum AssetFilter
     {
         purchasable,
@@ -16,27 +19,33 @@ namespace LootLocker.LootLockerEnums
         none
     }
 
+    /// <summary>
+    /// The field by which to order an asset list response.
+    /// </summary>
     public enum OrderAssetListBy
     {
-        // Unordered
+        /// <summary>Do not apply a specific ordering.</summary>
         none,
-        // Order by asset ID
+        /// <summary>Order by asset ID.</summary>
         id,
-        // Order by asset name
+        /// <summary>Order by asset name.</summary>
         name,
-        // Order by when the asset was created
+        /// <summary>Order by when the asset was created.</summary>
         created_at,
-        // Order by when the asset was last updated
+        /// <summary>Order by when the asset was last updated.</summary>
         updated_at,
     }
 
+    /// <summary>
+    /// The direction in which to order an asset list response.
+    /// </summary>
     public enum OrderAssetListDirection
     {
-        // Unordered
+        /// <summary>Do not apply a specific direction.</summary>
         none,
-        // Ascending order
+        /// <summary>Order ascending (lowest to highest).</summary>
         asc,
-        // Descending order
+        /// <summary>Order descending (highest to lowest).</summary>
         desc
     }
 }
@@ -44,26 +53,44 @@ namespace LootLocker.LootLockerEnums
 namespace LootLocker.Requests
 {
 
+    /// <summary>
+    /// Indicates whether an asset is part of the default loadout configuration.
+    /// </summary>
     public class LootLockerDefault_Loadouts_Info
     {
+        /// <summary>Whether this entry represents a default loadout asset.</summary>
         public bool Default { get; set; }
     }
 
+    /// <summary>
+    /// Variation information for a legacy asset, containing the id, name, colors, and links.
+    /// </summary>
     public class LootLockerVariation_Info
     {
+        /// <summary>The unique identifier of the variation.</summary>
         public int id { get; set; }
+        /// <summary>The display name of the variation.</summary>
         public string name { get; set; }
+        /// <summary>The primary color of the variation, or null if not set.</summary>
         public object primary_color { get; set; }
+        /// <summary>The secondary color of the variation, or null if not set.</summary>
         public object secondary_color { get; set; }
+        /// <summary>Links associated with the variation.</summary>
         public object links { get; set; }
     }
 
+    /// <summary>
+    /// Request object used internally to track pagination state for legacy asset list calls.
+    /// </summary>
     [Serializable]
     public class LootLockerAssetRequest : LootLockerResponse
     {
+        /// <summary>The number of assets to fetch per page.</summary>
         public int count { get; set; }
+        /// <summary>The id of the last asset retrieved, used for cursor-based pagination.</summary>
         public static int lastId { get; set; }
 
+        /// <summary>Resets the pagination cursor to the beginning of the asset list.</summary>
         public static void ResetAssetCalls()
         {
             lastId = 0;
@@ -112,9 +139,9 @@ namespace LootLocker.Requests
     /// </summary>
     public class LootLockerSimpleAssetFilter
     {
-        // The key for which to look for the filtered values
+        /// <summary>The key for which to look for the filtered values.</summary>
         public string key { get; set; }
-        // A list of values to filter by. If the asset has any of these values for the given key, it will be included in the results.
+        /// <summary>A list of values to filter by. If the asset has any of these values for the given key, it will be included in the results.</summary>
         public string[] values { get; set; }
     }
 
@@ -125,8 +152,10 @@ namespace LootLocker.Requests
     {
         ///<summary>If set to true, response will include only UGC assets.</summary>
         public bool ugc_only { get; set; } = false;
-        ///<summary>If provided, only the requested ids will be returned. No pagination will be attempted or respected, maximum 100 assets.</summary>
+        ///<summary>If provided only the requested ids will be returned (max 100, server enforced). When this is set, pagination is ignored.</summary>
         public List<int> asset_ids { get; set; } = new List<int>();
+        ///<summary>If provided only assets from the specified contexts will be returned.</summary>
+        public List<int> context_ids { get; set; } = new List<int>();
         /// <summary>Filters to apply to the asset listing.</summary>
         public List<LootLockerSimpleAssetFilter> asset_filters { get; set; } = new List<LootLockerSimpleAssetFilter>();
     }
@@ -144,119 +173,216 @@ namespace LootLocker.Requests
         public LootLockerExtendedPagination pagination { get; set; }
     }
 
+    /// <summary>
+    /// Request to grant an asset to the current player's inventory.
+    /// </summary>
     public class LootLockerGrantAssetRequest
     {
+        /// <summary>The id of the asset to grant.</summary>
         public int asset_id { get; set; }
+        /// <summary>The variation id to grant, or null for the default variation.</summary>
         public int? asset_variation_id { get; set; }
+        /// <summary>The rental option id to use, or null if the asset is not rented.</summary>
         public int? asset_rental_option_id { get; set; }
     }
 
+    /// <summary>
+    /// Response containing a list of assets returned by a legacy asset request.
+    /// </summary>
     public class LootLockerAssetResponse : LootLockerResponse
     {
+        /// <summary>The list of assets returned by the endpoint.</summary>
         public LootLockerCommonAsset[] assets { get; set; }
     }
 
+    /// <summary>
+    /// Response containing a single asset.
+    /// </summary>
     public class LootLockerSingleAssetResponse : LootLockerResponse
     {
+        /// <summary>The requested asset.</summary>
         public LootLockerCommonAsset asset { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the full details of an asset, returned by the legacy common asset endpoint.
+    /// </summary>
     [Serializable]
     public class LootLockerCommonAssetResponse : LootLockerResponse
     {
+        /// <summary>The legacy integer id of the asset.</summary>
         public int id { get; set; }
+        /// <summary>The UUID of the asset.</summary>
         public string uuid { get; set; }
+        /// <summary>The ULID of the asset.</summary>
         public string ulid { get; set; }
+        /// <summary>The display name of the asset.</summary>
         public string name { get; set; }
+        /// <summary>Whether the asset is currently active.</summary>
         public bool active { get; set; }
+        /// <summary>Whether the asset can be purchased.</summary>
         public bool purchasable { get; set; }
+        /// <summary>The type category of the asset.</summary>
         public string type { get; set; }
+        /// <summary>The regular price of the asset.</summary>
         public int price { get; set; }
+        /// <summary>The sale price of the asset, or null if not on sale.</summary>
         public int? sales_price { get; set; }
+        /// <summary>A formatted string representation of the price for display purposes.</summary>
         public string display_price { get; set; }
+        /// <summary>The context (category) the asset belongs to.</summary>
         public string context { get; set; }
+        /// <summary>The context unlocked by equipping this asset.</summary>
         public string unlocks_context { get; set; }
+        /// <summary>Whether this asset can be removed from an equip slot after being equipped.</summary>
         public bool detachable { get; set; }
+        /// <summary>When the asset was last updated, as a date string.</summary>
         public string updated { get; set; }
+        /// <summary>When the asset was marked as new, as a date string.</summary>
         public string marked_new { get; set; }
+        /// <summary>The id of the variation that is selected by default.</summary>
         public int default_variation_id { get; set; }
+        /// <summary>The description of the asset.</summary>
         public string description { get; set; }
+        /// <summary>Named links (e.g. image URLs) associated with this asset.</summary>
         public LootLockerLinks links { get; set; }
+        /// <summary>Key-value storage entries attached to this asset.</summary>
         public LootLockerStorage[] storage { get; set; }
+        /// <summary>Rarity information for this asset.</summary>
         public LootLockerRarity rarity { get; set; }
+        /// <summary>Whether this asset is popular.</summary>
         public bool popular { get; set; }
+        /// <summary>A numeric score used to rank asset popularity.</summary>
         public int popularity_score { get; set; }
+        /// <summary>Whether each grant of this asset creates a unique inventory instance.</summary>
         public bool unique_instance { get; set; }
+        /// <summary>Available rental options for this asset.</summary>
         public LootLockerRental_Options[] rental_options { get; set; }
+        /// <summary>Filters (tags) applied to this asset for categorisation.</summary>
         public LootLockerFilter[] filters { get; set; }
+        /// <summary>Variations available for this asset.</summary>
         public LootLockerVariation[] variations { get; set; }
+        /// <summary>Whether this asset is featured.</summary>
         public bool featured { get; set; }
+        /// <summary>Whether this asset is locked to its context.</summary>
         public bool context_locked { get; set; }
+        /// <summary>Whether this asset can be purchased initially.</summary>
         public bool initially_purchasable { get; set; }
+        /// <summary>Files associated with this asset.</summary>
         public LootLockerFile[] files { get; set; }
+        /// <summary>Information about the UGC creator of this asset, if applicable.</summary>
         public LootLockerAssetCandidate asset_candidate { get; set; }
+        /// <summary>Data entities attached to this asset.</summary>
         public string[] data_entities { get; set; }
     }
 
     /// <summary>
-    /// A simplified asset object to improve performance
+    /// A simplified asset object to improve performance by including only the fields most commonly needed.
     /// </summary>
     [Serializable]
     public class LootLockerSimpleAsset
     {
+        /// <summary>The legacy integer id of the asset.</summary>
         public int asset_id { get; set; }
+        /// <summary>The UUID of the asset.</summary>
         public string asset_uuid { get; set; }
+        /// <summary>The ULID of the asset.</summary>
         public string asset_ulid { get; set; }
+        /// <summary>The display name of the asset.</summary>
         public string asset_name { get; set; }
+        /// <summary>The id of the context this asset belongs to.</summary>
         public int context_id { get; set; }
+        /// <summary>The name of the context this asset belongs to.</summary>
         public string context_name { get; set; }
+        /// <summary>The player who authored this asset, if it is user-generated content.</summary>
         public LootLockerSimpleAssetAuthor author { get; set; }
+        /// <summary>Key-value storage entries attached to this asset, if requested.</summary>
         public LootLockerStorage[] storage { get; set; }
+        /// <summary>Files associated with this asset, if requested.</summary>
         public LootLockerSimpleAssetFile[] files { get; set; }
+        /// <summary>Data entities attached to this asset, if requested.</summary>
         public LootLockerSimpleAssetDataEntity[] data_entities { get; set; }
+        /// <summary>Metadata entries associated with this asset, if requested.</summary>
         public LootLockerMetadataEntry[] metadata { get; set; }
     }
 
+    /// <summary>
+    /// Authorship information for a user-generated content (UGC) asset.
+    /// </summary>
     public class LootLockerSimpleAssetAuthor
     {
+        /// <summary>The legacy integer id of the player who authored the asset.</summary>
         public int player_id { get; set; }
+        /// <summary>The ULID of the player who authored the asset.</summary>
         public string player_ulid { get; set; }
+        /// <summary>The public UID of the player who authored the asset.</summary>
         public string public_uid { get; set; }
+        /// <summary>The current display name of the player who authored the asset.</summary>
         public string active_name { get; set; }
     }
 
+    /// <summary>
+    /// A file associated with a simplified asset, providing the size, name, URL, and optional tags.
+    /// </summary>
     public class LootLockerSimpleAssetFile
     {
+        /// <summary>The file size in bytes.</summary>
         public int size { get; set; }
+        /// <summary>The file name.</summary>
         public string name { get; set; }
+        /// <summary>The URL from which the file can be downloaded.</summary>
         public string url { get; set; }
+        /// <summary>Tags categorising or labelling the file.</summary>
         public string[] tags { get; set; }
     }
 
+    /// <summary>
+    /// A named data entity attached to a simplified asset.
+    /// </summary>
     public class LootLockerSimpleAssetDataEntity
     {
+        /// <summary>The name of this data entity.</summary>
         public string name { get; set; }
+        /// <summary>The data payload of this entity, as a JSON string or raw value.</summary>
         public string data { get; set; }
     }
 
+    /// <summary>
+    /// Indicates whether a legacy asset entry is part of the player's default loadout.
+    /// </summary>
     public class LootLockerDefault_Loadouts
     {
+        /// <summary>Whether this asset is in the default loadout.</summary>
         public bool Default { get; set; }
     }
 
+    /// <summary>
+    /// Response containing the list of asset ids that the current player has marked as favourites.
+    /// </summary>
     public class LootLockerFavouritesListResponse : LootLockerResponse
     {
+        /// <summary>The list of asset ids marked as favourites by the current player.</summary>
         public int[] favourites { get; set; }
     }
 
+    /// <summary>
+    /// Response returned after granting an asset to the current player's inventory.
+    /// </summary>
     public class LootLockerGrantAssetResponse : LootLockerResponse
     {
+        /// <summary>The inventory instance id of the granted item.</summary>
         public int id { get; set; }
+        /// <summary>The id of the asset that was granted.</summary>
         public int asset_id { get; set; }
+        /// <summary>The ULID of the asset that was granted.</summary>
         public string asset_ulid { get; set; }
+        /// <summary>The variation id of the granted item, or null for the default variation.</summary>
         public int? asset_variation_id { get; set; }
+        /// <summary>The rental option id of the granted item, or null if not rented.</summary>
         public int? asset_rental_option_id { get; set; }
+        /// <summary>The source through which this item was acquired.</summary>
         public string acquisition_source { get; set; }
+        /// <summary>The date and time when this item was acquired, as a string.</summary>
         public string acquisition_date { get; set; }
     }
 }
