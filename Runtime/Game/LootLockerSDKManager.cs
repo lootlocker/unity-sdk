@@ -9216,6 +9216,18 @@ namespace LootLocker.Requests
                 return;
             }
 
+            if (catalogListingIds == null || catalogListingIds.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListCatalogItemsByIdResponse>("catalogListingIds must not be null or empty", forPlayerWithUlid));
+                return;
+            }
+
+            if (catalogListingIds.Length > 100)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerListCatalogItemsByIdResponse>("catalogListingIds must not exceed 100 items", forPlayerWithUlid));
+                return;
+            }
+
             var request = new LootLockerListCatalogItemsByIdRequest { ids = catalogListingIds };
 
             if (includeMetadata)

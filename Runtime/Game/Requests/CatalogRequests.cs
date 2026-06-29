@@ -670,7 +670,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Metadata entries. Populated when includes.metadata is set.
         /// </summary>
-        public List<object> metadata { get; set; }
+        public LootLockerMetadataEntry[] metadata { get; set; }
     }
 
     /// <summary>

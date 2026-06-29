@@ -476,6 +476,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(result.success, $"API call should succeed: {result.errorData?.message}");
             Assert.NotNull(result.errors, "errors should not be null when items are not found");
             Assert.AreEqual(1, result.errors.Length, "Expected 1 error for unknown catalog item");
+            Assert.NotNull(result.items, "items should not be null");
             Assert.AreEqual(0, result.items.Length, "Expected 0 items returned for unknown catalog item");
             Assert.AreEqual("01ARZ3NDEKTSV4RRFFQ69G5FAV", result.errors[0].id, "Expected matching error id");
         }
@@ -733,20 +734,26 @@ namespace LootLockerTests.PlayMode
             // ----- Test: Call with non-existent catalog key -----
             // Ensure logging is enabled so the expected error log is emitted
             var prevLogLevel = LootLockerConfig.current.logLevel;
-            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
-            LogAssert.Expect(LogType.Error, new Regex("nonexistent_catalog_key_12345.*catalog not found"));
-            LootLockerListCatalogPricesV2Response result = null;
-            bool apiCallDone = false;
-            LootLockerSDKManager.ListCatalogItems("nonexistent_catalog_key_12345", 10, 1, response =>
+            try
             {
-                result = response;
-                apiCallDone = true;
-            });
-            yield return new WaitUntil(() => apiCallDone);
+                LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Info;
+                LogAssert.Expect(LogType.Error, new Regex("nonexistent_catalog_key_12345.*catalog not found"));
+                LootLockerListCatalogPricesV2Response result = null;
+                bool apiCallDone = false;
+                LootLockerSDKManager.ListCatalogItems("nonexistent_catalog_key_12345", 10, 1, response =>
+                {
+                    result = response;
+                    apiCallDone = true;
+                });
+                yield return new WaitUntil(() => apiCallDone);
 
-            Assert.IsFalse(result.success, "Expected API call to fail with invalid key");
-            Assert.NotNull(result.errorData, "errorData should not be null");
-            LootLockerConfig.current.logLevel = prevLogLevel;
+                Assert.IsFalse(result.success, "Expected API call to fail with invalid key");
+                Assert.NotNull(result.errorData, "errorData should not be null");
+            }
+            finally
+            {
+                LootLockerConfig.current.logLevel = prevLogLevel;
+            }
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]

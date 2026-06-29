@@ -13,7 +13,7 @@ namespace LootLockerTestConfigurationUtils
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                onComplete?.Invoke(null);
+                onComplete?.Invoke(new LootLockerRewardResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
                 return;
             }
 
