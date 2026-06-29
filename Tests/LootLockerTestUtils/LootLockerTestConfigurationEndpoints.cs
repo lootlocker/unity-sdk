@@ -97,6 +97,7 @@ namespace LootLockerTestConfigurationUtils
         public static EndPointClass addDataEntityToAsset = new EndPointClass("/v1/game/#GAMEID#/data", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
         public static EndPointClass updateAssetFilters = new EndPointClass("/v1/game/#GAMEID#/assets/filters/bulk", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
         public static EndPointClass createReward = new EndPointClass("game/#GAMEID#/reward", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass createGroupReward = new EndPointClass("game/#GAMEID#/reward/group", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
         public static EndPointClass bulkEditAssetFilters = new EndPointClass("v1/game/#GAMEID#/assets/filters/bulk", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
 
         [Header("LootLocker Admin API Trigger Operations")]
