@@ -9197,6 +9197,42 @@ namespace LootLocker.Requests
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.listCatalogItemsByKey.httpMethod, onComplete: (serverResponse) => { onComplete?.Invoke(new LootLockerListCatalogPricesV2Response(serverResponse)); });
         }
+
+        /// @ingroup Catalog
+        /// <summary>
+        /// List catalog items by their catalog_listing_ids.
+        /// Returns entries with entity details and optionally metadata inlined directly.
+        /// </summary>
+        /// <param name="catalogListingIds">Array of catalog_listing_id strings (max 100)</param>
+        /// <param name="includeMetadata">If true, metadata is included for each entry, filtered by "metadataKeys" if provided.</param>
+        /// <param name="metadataKeys">Optional: Specific metadata keys to include. Only applicable if includeMetadata is true. If null/empty, all metadata is returned.</param>
+        /// <param name="onComplete">Callback with inlined catalog entries</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player.</param>
+        public static void ListCatalogItemsById(string[] catalogListingIds, bool includeMetadata, string[] metadataKeys, Action<LootLockerListCatalogItemsByIdResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListCatalogItemsByIdResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var request = new LootLockerListCatalogItemsByIdRequest { ids = catalogListingIds };
+
+            if (includeMetadata)
+            {
+                request.includes = new LootLockerCatalogItemsIncludes
+                {
+                    metadata = new LootLockerMetadataInclude
+                    {
+                        all = (metadataKeys == null || metadataKeys.Length == 0),
+                        keys = metadataKeys
+                    }
+                };
+            }
+
+            string json = LootLockerJson.SerializeObject(request);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listCatalogItemsById.endPoint, LootLockerEndPoints.listCatalogItemsById.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
         #endregion
 
         #region Entitlements

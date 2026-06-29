@@ -1,4 +1,4 @@
-﻿using LootLocker.LootLockerEnums;
+using LootLocker.LootLockerEnums;
 using System.Collections.Generic;
 
 namespace LootLocker.LootLockerEnums
@@ -580,9 +580,189 @@ namespace LootLocker.Requests
 
     }
 
+    /// <summary>
+    /// Optional includes configuration for catalog items lookup.
+    /// </summary>
+    public class LootLockerCatalogItemsIncludes
+    {
+        /// <summary>
+        /// Metadata include configuration. If null, metadata is not included.
+        /// </summary>
+        public LootLockerMetadataInclude metadata { get; set; }
+    }
+
+    /// <summary>
+    /// Metadata include configuration. Specify all: true or specific keys.
+    /// </summary>
+    public class LootLockerMetadataInclude
+    {
+        /// <summary>
+        /// If true, all metadata entries for the item are returned.
+        /// </summary>
+        public bool all { get; set; }
+
+        /// <summary>
+        /// Specific metadata key names to filter by. Only used when all is false.
+        /// </summary>
+        public string[] keys { get; set; }
+    }
+
+    /// <summary>
+    /// A group association with the entity detail inlined directly.
+    /// </summary>
+    public class LootLockerInlinedGroupAssociation
+    {
+        /// <summary>
+        /// The entity kind of this association (asset, currency, progression_points, progression_reset)
+        /// </summary>
+        public LootLockerCatalogEntryEntityKind kind { get; set; }
+        /// <summary>
+        /// The unique id of the entity
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The catalog listing id for this association
+        /// </summary>
+        public string catalog_listing_id { get; set; }
+        /// <summary>
+        /// Asset details inlined, populated when kind is asset
+        /// </summary>
+        public LootLockerAssetDetails asset_detail { get; set; }
+        /// <summary>
+        /// Currency details inlined, populated when kind is currency
+        /// </summary>
+        public LootLockerCurrencyDetails currency_detail { get; set; }
+        /// <summary>
+        /// Progression point details inlined, populated when kind is progression_points
+        /// </summary>
+        public LootLockerProgressionPointDetails progression_point_detail { get; set; }
+        /// <summary>
+        /// Progression reset details inlined, populated when kind is progression_reset
+        /// </summary>
+        public LootLockerProgressionResetDetails progression_reset_detail { get; set; }
+    }
+
+    /// <summary>
+    /// A catalog entry with entity details inlined directly. Used by the GetCatalogItemsByID endpoint.
+    /// </summary>
+    public class LootLockerListCatalogItemsByIdEntry : LootLockerCatalogEntry
+    {
+        /// <summary>
+        /// Asset details inlined, non-null when entity_kind is asset
+        /// </summary>
+        public LootLockerAssetDetails asset_detail { get; set; }
+        /// <summary>
+        /// Currency details inlined, non-null when entity_kind is currency
+        /// </summary>
+        public LootLockerCurrencyDetails currency_detail { get; set; }
+        /// <summary>
+        /// Progression point details inlined, non-null when entity_kind is progression_points
+        /// </summary>
+        public LootLockerProgressionPointDetails progression_point_detail { get; set; }
+        /// <summary>
+        /// Progression reset details inlined, non-null when entity_kind is progression_reset
+        /// </summary>
+        public LootLockerProgressionResetDetails progression_reset_detail { get; set; }
+        /// <summary>
+        /// Group details inlined, non-null when entity_kind is group
+        /// </summary>
+        public LootLockerInlinedGroupDetails group_detail { get; set; }
+        /// <summary>
+        /// Metadata entries. Populated when includes.metadata is set.
+        /// </summary>
+        public List<object> metadata { get; set; }
+    }
+
+    /// <summary>
+    /// Describes why a specific catalog_listing_id could not be resolved.
+    /// </summary>
+    public class LootLockerListCatalogItemsByIdError
+    {
+        /// <summary>
+        /// The catalog_listing_id that failed
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// The reason: "not_found"
+        /// </summary>
+        public string reason { get; set; }
+    }
+
+    /// <summary>
+    /// Group detail used by the ListCatalogItemsById endpoint, where association details are
+    /// inlined directly into each association entry by the backend.
+    /// </summary>
+    public class LootLockerInlinedGroupDetailsWithAssociations
+    {
+        /// <summary>
+        /// The name of the Group.
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// The description of the Group.
+        /// </summary>
+        public string description { get; set; }
+        /// <summary>
+        /// The metadata for the Group reward.
+        /// </summary>
+        public LootLockerGroupMetadata[] metadata { get; set; }
+        /// <summary>
+        /// The ID of the reward.
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The catalog listing id for this group detail.
+        /// </summary>
+        public string catalog_listing_id { get; set; }
+        /// <summary>
+        /// Associations with entity details inlined directly. Each association's detail
+        /// field (asset_detail, currency_detail, etc.) is populated based on its kind.
+        /// </summary>
+        public LootLockerInlinedGroupAssociation[] inlined_associations { get; set; }
+    }
+
+    //==================================================
+    // Request Definitions
+    //==================================================
+
+    /// <summary>
+    /// Request body for looking up catalog items by their catalog_listing_ids. Cross-catalog supported.
+    /// </summary>
+    public class LootLockerListCatalogItemsByIdRequest
+    {
+        /// <summary>
+        /// Array of catalog_listing_id strings to look up (max 100)
+        /// </summary>
+        public string[] ids { get; set; }
+
+        /// <summary>
+        /// Optional includes configuration to control what additional data is returned
+        /// </summary>
+        public LootLockerCatalogItemsIncludes includes { get; set; }
+    }
+
     //==================================================
     // Response Definitions
     //==================================================
+
+    /// <summary>
+    /// Response for the GetCatalogItemsByID endpoint.
+    /// Contains catalog entries with entity details and metadata inlined directly.
+    /// On partial success, errors describes which IDs could not be resolved and why.
+    /// </summary>
+    public class LootLockerListCatalogItemsByIdResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// Array of inlined catalog entries matching the successfully resolved IDs
+        /// </summary>
+        public LootLockerListCatalogItemsByIdEntry[] items { get; set; }
+
+        /// <summary>
+        /// Errors for IDs that could not be resolved. Omitted when all IDs succeeded.
+        /// </summary>
+        public LootLockerListCatalogItemsByIdError[] errors { get; set; }
+    }
 
     /// <summary>
     /// Response containing a list of all catalogs available for the game.

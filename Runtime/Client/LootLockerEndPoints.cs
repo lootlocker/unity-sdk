@@ -265,6 +265,7 @@ namespace LootLocker
         public static EndPointClass listCatalogs = new EndPointClass("catalogs", LootLockerHTTPMethod.GET);
         public static EndPointClass deprecatedListCatalogItemsByKey = new EndPointClass("catalog/key/{0}/prices", LootLockerHTTPMethod.GET);
         public static EndPointClass listCatalogItemsByKey = new EndPointClass("catalogs/inspired-ibex/v1/catalog/key/{0}/list", LootLockerHTTPMethod.GET);
+        public static EndPointClass listCatalogItemsById = new EndPointClass("catalogs/inspired-ibex/v1/catalog/items", LootLockerHTTPMethod.POST);
 
         // Misc
         [Header("Misc")]
