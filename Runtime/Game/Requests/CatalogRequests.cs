@@ -666,7 +666,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// Group details inlined, non-null when entity_kind is group
         /// </summary>
-        public LootLockerInlinedGroupDetails group_detail { get; set; }
+        public LootLockerInlinedGroupDetailsWithAssociations group_detail { get; set; }
         /// <summary>
         /// Metadata entries. Populated when includes.metadata is set.
         /// </summary>
@@ -719,7 +719,7 @@ namespace LootLocker.Requests
         /// Associations with entity details inlined directly. Each association's detail
         /// field (asset_detail, currency_detail, etc.) is populated based on its kind.
         /// </summary>
-        public LootLockerInlinedGroupAssociation[] inlined_associations { get; set; }
+        public LootLockerInlinedGroupAssociation[] associations { get; set; }
     }
 
     //==================================================
