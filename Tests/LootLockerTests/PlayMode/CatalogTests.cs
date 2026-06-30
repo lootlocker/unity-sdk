@@ -182,6 +182,32 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => done);
         }
 
+        private IEnumerator AddMetadataToCatalogItem(string catalogItemId, string key, string value)
+        {
+            bool done = false;
+            LootLockerTestMetadata.PerformMetadataOperations(LootLockerTestMetadata.LootLockerTestMetadataSources.catalog_item, catalogItemId, new System.Collections.Generic.List<LootLockerTestMetadata.LootLockerTestMetadataOperation>
+            {
+                new LootLockerTestMetadata.LootLockerTestMetadataOperation
+                {
+                    action = LootLockerTestMetadata.LootLockerTestMetadataActions.upsert,
+                    key = key,
+                    value = value,
+                    type = LootLockerTestMetadata.LootLockerTestMetadataTypes.String,
+                    tags = new[] { "test" },
+                    access = new [] {"game_api.read"},
+                }
+            }, response =>
+            {
+                if (response == null || !response.success)
+                {
+                    Debug.LogError($"Failed to add metadata to catalog item: {response?.errorData?.message}");
+                    SetupFailed = true;
+                }
+                done = true;
+            });
+            yield return new WaitUntil(() => done);
+        }
+
         private IEnumerator StartGuestSession()
         {
             bool done = false;
@@ -450,6 +476,55 @@ namespace LootLockerTests.PlayMode
             Assert.NotNull(currencyAssociation, "Expected a currency association");
             Assert.NotNull(currencyAssociation.currency_detail, "currency_detail should not be null on association");
             Assert.AreEqual(_currentCurrencyId, currencyAssociation.currency_detail.id, "Expected matching currency ID");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator ListCatalogItemsById_WithMetadataInclude_PopulatesEntryMetadata()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // ----- Setup: create an asset catalog item with metadata on the catalog item -----
+            yield return LoadAssetContext();
+            if (SetupFailed) { yield break; }
+
+            yield return CreateAndActivateAsset();
+            if (SetupFailed) { yield break; }
+
+            yield return CreateCatalog("Asset Meta Catalog", CatalogKey + "_asset_meta");
+            if (SetupFailed) { yield break; }
+
+            yield return AddCatalogItemAndToggle(_currentAssetUlid, "asset");
+            if (SetupFailed) { yield break; }
+
+            // Add metadata directly to the catalog item
+            yield return AddMetadataToCatalogItem(_currentCatalogItemId, "test_key", "test_value");
+            if (SetupFailed) { yield break; }
+
+            yield return PublishCurrentCatalog();
+
+            yield return StartGuestSession();
+            if (SetupFailed) { yield break; }
+
+            // ----- Test: List with metadata include -----
+            LootLockerListCatalogItemsByIdResponse result = null;
+            bool apiCallDone = false;
+            LootLockerSDKManager.ListCatalogItemsById(new[] { _currentCatalogItemId }, true, null, response =>
+            {
+                result = response;
+                apiCallDone = true;
+            });
+            yield return new WaitUntil(() => apiCallDone);
+
+            Assert.IsTrue(result.success, $"API call failed: {result.errorData?.message}");
+            Assert.NotNull(result.items, "items should not be null");
+            Assert.AreEqual(1, result.items.Length, "Expected 1 item");
+            Assert.AreEqual("asset", result.items[0].entity_kind.ToString(), "Expected asset entity kind");
+
+            // Entry-level metadata should be populated when includes.metadata is set
+            Assert.NotNull(result.items[0].metadata, "Entry-level metadata should not be null when includes.metadata is set");
+            Assert.Greater(result.items[0].metadata.Length, 0, "Expected at least one metadata entry");
+            var testKeyEntry = System.Array.Find(result.items[0].metadata, e => e.key == "test_key");
+            Assert.NotNull(testKeyEntry, "Expected to find 'test_key' in metadata entries");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
