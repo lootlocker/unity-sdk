@@ -552,6 +552,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// The metadata for the Group reward.
         /// </summary>
+        [System.Obsolete("Deprecated: This field was never used and will be removed")] // Deprecation date 2026-06-30
         public LootLockerGroupMetadata[] metadata { get; set; }
 
         /// <summary>
@@ -703,10 +704,6 @@ namespace LootLocker.Requests
         /// The description of the Group.
         /// </summary>
         public string description { get; set; }
-        /// <summary>
-        /// The metadata for the Group reward.
-        /// </summary>
-        public LootLockerGroupMetadata[] metadata { get; set; }
         /// <summary>
         /// The ID of the reward.
         /// </summary>
