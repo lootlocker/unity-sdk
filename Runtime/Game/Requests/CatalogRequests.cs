@@ -164,6 +164,17 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Xbox Store listing information for a catalog entry.
+    /// </summary>
+    public class LootLockerCatalogXboxStoreListing
+    {
+        /// <summary>
+        /// The id of the product in Xbox Store that can be purchased and then used to redeem this catalog entry
+        /// </summary>
+        public string product_id { get; set; }
+    }
+
+    /// <summary>
     /// All store-specific listing information for a catalog entry across supported platforms.
     /// </summary>
     public class LootLockerCatalogEntryListings
@@ -192,6 +203,10 @@ namespace LootLocker.Requests
         /// The listing information (if configured) for Playstation Store
         /// </summary>
         public LootLockerCatalogPlaystationStoreListing playstation_store { get; set; }
+        /// <summary>
+        /// The listing information (if configured) for Xbox Store
+        /// </summary>
+        public LootLockerCatalogXboxStoreListing xbox_store { get; set; }
     }
 
     /// <summary>

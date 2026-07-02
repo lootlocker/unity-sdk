@@ -215,6 +215,56 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// Response from a request to get an Xbox service ticket
+    /// </summary>
+    public class LootLockerXboxServiceTicketResponse : LootLockerResponse
+    {
+        /// <summary>
+        /// The service ticket to use for Xbox store purchase redemption
+        /// </summary>
+        public string service_ticket { get; set; }
+        /// <summary>
+        /// How many seconds until the ticket expires
+        /// </summary>
+        public int expires_in { get; set; }
+        /// <summary>
+        /// The date and time when the ticket expires
+        /// </summary>
+        public string expires_at { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemXboxStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The Xbox user collections ID (JWT) that identifies the user making the purchase
+        /// </summary>
+        public string user_collections_id { get; set; }
+        /// <summary>
+        /// The id of the Xbox Store product to redeem
+        /// </summary>
+        public string product_id { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LootLockerRedeemXboxStorePurchaseForClassRequest : LootLockerRedeemXboxStorePurchaseForPlayerRequest
+    {
+        /// <summary>
+        /// The id of the class to redeem this purchase for
+        /// </summary>
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonProperty("character_id")]
+#else
+        [Json(Name = "character_id")]
+#endif
+        public int class_id { get; set; }
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     public class LootLockerBeginSteamPurchaseRedemptionRequest
@@ -839,6 +889,23 @@ namespace LootLocker
                 catalog_item_id = catalogItemId
             });
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.createStripeCheckoutSession.endPoint, LootLockerEndPoints.createStripeCheckoutSession.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: true);
+        }
+
+        public static void GetXboxServiceTicket(string forPlayerWithUlid, Action<LootLockerXboxServiceTicketResponse> onComplete)
+        {
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.xboxServiceTicket.endPoint, LootLockerEndPoints.xboxServiceTicket.httpMethod, "", (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void RedeemXboxStorePurchaseForPlayer(string forPlayerWithUlid, LootLockerRedeemXboxStorePurchaseForPlayerRequest purchaseRequest, Action<LootLockerResponse> onComplete)
+        {
+            var body = LootLockerJson.SerializeObject(purchaseRequest);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemXboxStorePurchase.endPoint, LootLockerEndPoints.redeemXboxStorePurchase.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void RedeemXboxStorePurchaseForClass(string forPlayerWithUlid, LootLockerRedeemXboxStorePurchaseForClassRequest purchaseRequest, Action<LootLockerResponse> onComplete)
+        {
+            var body = LootLockerJson.SerializeObject(purchaseRequest);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.redeemXboxStorePurchase.endPoint, LootLockerEndPoints.redeemXboxStorePurchase.httpMethod, body, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }

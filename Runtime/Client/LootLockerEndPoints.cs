@@ -199,6 +199,8 @@ namespace LootLocker
         public static EndPointClass redeemGooglePlayStorePurchase = new EndPointClass("store/google/redeem", LootLockerHTTPMethod.POST);
         public static EndPointClass redeemEpicStorePurchase = new EndPointClass("store/epic/redeem", LootLockerHTTPMethod.POST);
         public static EndPointClass redeemPlayStationStorePurchase = new EndPointClass("store/playstation/redeem", LootLockerHTTPMethod.POST);
+        public static EndPointClass xboxServiceTicket = new EndPointClass("store/xbox/ticket", LootLockerHTTPMethod.POST);
+        public static EndPointClass redeemXboxStorePurchase = new EndPointClass("store/xbox/redeem", LootLockerHTTPMethod.POST);
 
         public static EndPointClass beginSteamPurchaseRedemption = new EndPointClass("store/steam/redeem/begin", LootLockerHTTPMethod.POST);
         public static EndPointClass querySteamPurchaseRedemptionStatus = new EndPointClass("store/steam/redeem/query", LootLockerHTTPMethod.POST);
