@@ -262,6 +262,8 @@ namespace LootLocker.Requests
                     List<string> localizationKeys = new List<string>();
                     for (int k = 0; k < (internalLang.localizations?.Length ?? 0); k++)
                     {
+                        localizationKeys.Add(internalLang.localizations[k].key);
+                        lang.localizations[internalLang.localizations[k].key] = internalLang.localizations[k].value;
                         switch (internalLang.localizations[k].key)
                         {
                             case "ll.headline":
@@ -280,8 +282,6 @@ namespace LootLocker.Requests
                                 lang.action_name = internalLang.localizations[k].value;
                                 break;
                             default:
-                                localizationKeys.Add(internalLang.localizations[k].key);
-                                lang.localizations[internalLang.localizations[k].key] = internalLang.localizations[k].value;
                                 break;
                         }
                     }
