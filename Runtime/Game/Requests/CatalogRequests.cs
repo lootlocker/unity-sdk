@@ -1068,7 +1068,6 @@ namespace LootLocker.Requests
 
                         inlinedGroupDetails.name = catalogLevelGroup.name;
                         inlinedGroupDetails.description = catalogLevelGroup.description;
-                        inlinedGroupDetails.metadata = catalogLevelGroup.metadata;
                         inlinedGroupDetails.id = catalogLevelGroup.id;
                         inlinedGroupDetails.associations = catalogLevelGroup.associations;
 
@@ -1447,7 +1446,6 @@ namespace LootLocker.Requests
 
                         inlinedGroupDetails.name = catalogLevelGroup.name;
                         inlinedGroupDetails.description = catalogLevelGroup.description;
-                        inlinedGroupDetails.metadata = catalogLevelGroup.metadata;
                         inlinedGroupDetails.id = catalogLevelGroup.id;
                         inlinedGroupDetails.associations = catalogLevelGroup.associations;
 
