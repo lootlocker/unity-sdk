@@ -6908,6 +6908,68 @@ namespace LootLocker.Requests
 
         /// @ingroup Purchasing
         /// <summary>
+        /// Get an Xbox service ticket that can be used to redeem an Xbox Store purchase
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetXboxServiceTicket(Action<LootLockerXboxServiceTicketResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerXboxServiceTicketResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.GetXboxServiceTicket(forPlayerWithUlid, onComplete);
+        }
+
+        /// @ingroup Purchasing
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Xbox Store for the current player
+        /// </summary>
+        /// <param name="userCollectionsId">The Xbox user collections ID (JWT) that identifies the user making the purchase</param>
+        /// <param name="productId">The id of the Xbox Store product to redeem</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemXboxStorePurchaseForPlayer(string userCollectionsId, string productId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.RedeemXboxStorePurchaseForPlayer(forPlayerWithUlid, new LootLockerRedeemXboxStorePurchaseForPlayerRequest()
+            {
+                user_collections_id = userCollectionsId,
+                product_id = productId
+            }, onComplete);
+        }
+
+        /// @ingroup Purchasing
+        /// <summary>
+        /// Redeem a purchase that was made successfully towards the Xbox Store for a class that the current player owns
+        /// </summary>
+        /// <param name="classId">The id of the class to redeem this purchase for</param>
+        /// <param name="userCollectionsId">The Xbox user collections ID (JWT) that identifies the user making the purchase</param>
+        /// <param name="productId">The id of the Xbox Store product to redeem</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void RedeemXboxStorePurchaseForClass(int classId, string userCollectionsId, string productId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+            LootLockerAPIManager.RedeemXboxStorePurchaseForClass(forPlayerWithUlid, new LootLockerRedeemXboxStorePurchaseForClassRequest()
+            {
+                user_collections_id = userCollectionsId,
+                product_id = productId,
+                class_id = classId
+            }, onComplete);
+        }
+
+        /// @ingroup Purchasing
+        /// <summary>
         /// Redeem a purchase that was made successfully towards the Epic Store for the current player
         /// </summary>
         /// <param name="accountId">The Epic account id of the account that this purchase was made for</param>
