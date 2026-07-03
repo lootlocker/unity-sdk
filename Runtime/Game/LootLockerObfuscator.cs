@@ -39,7 +39,26 @@ namespace LootLocker
             new ObfuscationDetails("password", '*', 0, 0),
             new ObfuscationDetails("domain_key"),
             new ObfuscationDetails("session_token"),
-            new ObfuscationDetails("token")
+            new ObfuscationDetails("token"),
+            // Auth & session credentials
+            new ObfuscationDetails("steam_ticket"),
+            new ObfuscationDetails("id_token"),
+            new ObfuscationDetails("auth_code"),
+            new ObfuscationDetails("apple_authorization_code"),
+            new ObfuscationDetails("xbox_user_token"),
+            new ObfuscationDetails("nsa_id_token"),
+            new ObfuscationDetails("access_token"),
+            new ObfuscationDetails("refresh_token"),
+            new ObfuscationDetails("nonce"),
+            new ObfuscationDetails("signature"),
+            new ObfuscationDetails("salt"),
+            new ObfuscationDetails("source_token"),
+            new ObfuscationDetails("target_token"),
+            // Purchase / IAP credentials
+            new ObfuscationDetails("purchase_token"),
+            new ObfuscationDetails("bearer_token"),
+            new ObfuscationDetails("user_collections_id"),
+            new ObfuscationDetails("service_ticket"),
         };
 
         public static string ObfuscateJsonStringForLogging(string json)
