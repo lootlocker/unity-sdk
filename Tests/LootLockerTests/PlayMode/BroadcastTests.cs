@@ -47,14 +47,14 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(enLang.action, "window.open(\"/some/page\")");
             Assert.AreEqual(enLang.action_name, "Play Now");
             Assert.AreEqual(enLang.body, "Broadcast content");
-            Assert.AreEqual(3, enLang.localizations.Count);
-            Assert.AreEqual(3, enLang.localization_keys.Length);
+            Assert.AreEqual(8, enLang.localizations.Count);
+            Assert.AreEqual(8, enLang.localization_keys.Length);
             
-            Assert.AreEqual("extra-key", enLang.localization_keys[0]);
+            Assert.AreEqual("extra-key", enLang.localization_keys[5]);
             Assert.AreEqual("extra-value", enLang.localizations["extra-key"]);
-            Assert.AreEqual("final-toll", enLang.localization_keys[1]);
+            Assert.AreEqual("final-toll", enLang.localization_keys[6]);
             Assert.AreEqual("troll toll", enLang.localizations["final-toll"]);
-            Assert.AreEqual("what are the requirements here?", enLang.localization_keys[2]);
+            Assert.AreEqual("what are the requirements here?", enLang.localization_keys[7]);
             Assert.AreEqual("{ \"i-dont-know\": true }", enLang.localizations["what are the requirements here?"]);
 
             Assert.AreEqual("sv", broadcastResponse.broadcasts[0].language_codes[1]);
@@ -68,10 +68,10 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(sweLang.action, "window.open(\"/some/page\")");
             Assert.AreEqual(sweLang.action_name, "Spela nu");
             Assert.AreEqual(sweLang.body, "Lite innehåll");
-            Assert.AreEqual(1, sweLang.localizations.Count);
-            Assert.AreEqual(1, sweLang.localization_keys.Length);
+            Assert.AreEqual(6, sweLang.localizations.Count);
+            Assert.AreEqual(6, sweLang.localization_keys.Length);
             
-            Assert.AreEqual("🤩🤩 Hello 🤩🤩", sweLang.localization_keys[0]);
+            Assert.AreEqual("🤩🤩 Hello 🤩🤩", sweLang.localization_keys[5]);
             Assert.AreEqual("kjhasdkjah", sweLang.localizations["🤩🤩 Hello 🤩🤩"]);
         }
     }
