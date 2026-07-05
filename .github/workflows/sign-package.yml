@@ -93,14 +93,16 @@ jobs:
           archive="${archives[0]}"
 
           # Verify the tarball contains the required entries
-          tar -tzf "$archive" | grep -qx 'package/package.json' \
+          tar -tzf "$archive" 2>/dev/null | grep -qx 'package/package.json' \
             || { echo "::error::package/package.json not found in signed tarball"; exit 1; }
-          tar -tzf "$archive" | grep -qx 'package/.attestation.p7m' \
+          tar -tzf "$archive" 2>/dev/null | grep -qx 'package/.attestation.p7m' \
             || { echo "::error::package/.attestation.p7m not found — signing may have failed"; exit 1; }
 
           # Rename to canonical name so OpenUPM prefix matching works reliably
           canonical="$DIST_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz"
-          mv "$archive" "$canonical"
+          if [ "$archive" != "$canonical" ]; then
+            mv "$archive" "$canonical"
+          fi
           echo "PACKAGE_ARCHIVE=$canonical" >> "$GITHUB_ENV"
           printf 'Signed archive: %s\n' "$(basename "$canonical")"
           tar -xOzf "$canonical" package/package.json | jq '{name, version}'
