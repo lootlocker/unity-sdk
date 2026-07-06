@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.0.0</span>
+      <span id="ll-topnav-version">v8.1.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -257,8 +257,8 @@ $(document).ready(function(){initNavTree('group__Init.html',''); initResizable()
 
 </div>
 </div>
-<a id="gabeefb856bb769327b035278279f84de0" name="gabeefb856bb769327b035278279f84de0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gabeefb856bb769327b035278279f84de0">&#9670;&#160;</a></span>Init()</h2>
+<a id="ga016cecad69a23770db6d5dc936159b6e" name="ga016cecad69a23770db6d5dc936159b6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga016cecad69a23770db6d5dc936159b6e">&#9670;&#160;</a></span>Init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -342,7 +342,13 @@ $(document).ready(function(){initNavTree('group__Init.html',''); initResizable()
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>enablePresenceInEditor</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>enablePresenceInEditor</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204">LootLockerMultiUserSessionMode</a>&#160;</td>
+          <td class="paramname"><em>multiUserSessionMode</em> = <code><a class="el" href="namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204afaf396cbd83927b72a84d2616fac76ff">LootLockerMultiUserSessionMode::NotSet</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -373,6 +379,7 @@ $(document).ready(function(){initNavTree('group__Init.html',''); initResizable()
     <tr><td class="paramname">enablePresenceAutoConnect</td><td>If true, presence will auto-connect.</td></tr>
     <tr><td class="paramname">enablePresenceAutoDisconnectOnFocusChange</td><td>If true, presence will auto-disconnect on focus change.</td></tr>
     <tr><td class="paramname">enablePresenceInEditor</td><td>If true, presence will be enabled in the editor.</td></tr>
+    <tr><td class="paramname">multiUserSessionMode</td><td>Optional : Controls how the SDK handles multiple player sessions when a new authentication succeeds. If not supplied (or set to NotSet), the mode already stored in the config is preserved.</td></tr>
   </table>
   </dd>
 </dl>
@@ -383,9 +390,9 @@ $(document).ready(function(){initNavTree('group__Init.html',''); initResizable()
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gabeefb856bb769327b035278279f84de0" id="r_gabeefb856bb769327b035278279f84de0"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Init.html#gabeefb856bb769327b035278279f84de0">LootLocker.Requests.LootLockerSDKManager.Init</a> (string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel=LootLockerLogger.LogLevel.Info, bool logInBuilds=false, bool errorsAsWarnings=false, bool allowTokenRefresh=true, bool prettifyJson=false, bool obfuscateLogs=true, bool enablePresence=false, bool enablePresenceAutoConnect=true, bool enablePresenceAutoDisconnectOnFocusChange=false, bool enablePresenceInEditor=true)</td></tr>
-<tr class="memdesc:gabeefb856bb769327b035278279f84de0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manually initialize the SDK.  <br /></td></tr>
-<tr class="separator:gabeefb856bb769327b035278279f84de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga016cecad69a23770db6d5dc936159b6e" id="r_ga016cecad69a23770db6d5dc936159b6e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Init.html#ga016cecad69a23770db6d5dc936159b6e">LootLocker.Requests.LootLockerSDKManager.Init</a> (string apiKey, string gameVersion, string domainKey, LootLockerLogger.LogLevel logLevel=LootLockerLogger.LogLevel.Info, bool logInBuilds=false, bool errorsAsWarnings=false, bool allowTokenRefresh=true, bool prettifyJson=false, bool obfuscateLogs=true, bool enablePresence=false, bool enablePresenceAutoConnect=true, bool enablePresenceAutoDisconnectOnFocusChange=false, bool enablePresenceInEditor=true, <a class="el" href="namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204">LootLockerMultiUserSessionMode</a> multiUserSessionMode=<a class="el" href="namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204afaf396cbd83927b72a84d2616fac76ff">LootLockerMultiUserSessionMode.NotSet</a>)</td></tr>
+<tr class="memdesc:ga016cecad69a23770db6d5dc936159b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manually initialize the SDK.  <br /></td></tr>
+<tr class="separator:ga016cecad69a23770db6d5dc936159b6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga211499c537773acbbb918dbec6df1a5e" id="r_ga211499c537773acbbb918dbec6df1a5e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Init.html#ga211499c537773acbbb918dbec6df1a5e">LootLocker.Requests.LootLockerSDKManager.CheckInitialized</a> (bool skipSessionCheck=false, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:ga211499c537773acbbb918dbec6df1a5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility function to check if the sdk has been initialized.  <br /></td></tr>
 <tr class="separator:ga211499c537773acbbb918dbec6df1a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>

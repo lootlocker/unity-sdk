@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.0.0</span>
+      <span id="ll-topnav-version">v8.1.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -344,6 +344,73 @@ $(document).ready(function(){initNavTree('group__Catalog.html',''); initResizabl
 
 </div>
 </div>
+<a id="ga1259cb202a570850e5c6afa5d5696d53" name="ga1259cb202a570850e5c6afa5d5696d53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1259cb202a570850e5c6afa5d5696d53">&#9670;&#160;</a></span>ListCatalogItemsById()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListCatalogItemsById </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>catalogListingIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>includeMetadata</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>metadataKeys</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdResponse.html">LootLockerListCatalogItemsByIdResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List catalog items by their catalog_listing_ids. </p>
+<p>Returns entries with entity details and optionally metadata inlined directly.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">catalogListingIds</td><td>Array of catalog_listing_id strings (max 100)</td></tr>
+    <tr><td class="paramname">includeMetadata</td><td>If true, metadata is included for each entry, filtered by "metadataKeys" if provided.</td></tr>
+    <tr><td class="paramname">metadataKeys</td><td>Optional: Specific metadata keys to include. Only applicable if includeMetadata is true. If null/empty, all metadata is returned.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Callback with inlined catalog entries</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ga8caa325347271759883860d0a634c952" name="ga8caa325347271759883860d0a634c952"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8caa325347271759883860d0a634c952">&#9670;&#160;</a></span>ListCatalogs()</h2>
 
@@ -401,6 +468,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga697edebfbc6cdb521d2730236201a0ad" id="r_ga697edebfbc6cdb521d2730236201a0ad"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Catalog.html#ga697edebfbc6cdb521d2730236201a0ad">LootLocker.Requests.LootLockerSDKManager.ListCatalogItems</a> (string catalogKey, int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesV2Response.html">LootLockerListCatalogPricesV2Response</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:ga697edebfbc6cdb521d2730236201a0ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the items available in a specific catalog.  <br /></td></tr>
 <tr class="separator:ga697edebfbc6cdb521d2730236201a0ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1259cb202a570850e5c6afa5d5696d53" id="r_ga1259cb202a570850e5c6afa5d5696d53"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Catalog.html#ga1259cb202a570850e5c6afa5d5696d53">LootLocker.Requests.LootLockerSDKManager.ListCatalogItemsById</a> (string[] catalogListingIds, bool includeMetadata, string[] metadataKeys, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdResponse.html">LootLockerListCatalogItemsByIdResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga1259cb202a570850e5c6afa5d5696d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">List catalog items by their catalog_listing_ids.  <br /></td></tr>
+<tr class="separator:ga1259cb202a570850e5c6afa5d5696d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

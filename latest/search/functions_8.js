@@ -1,7 +1,7 @@
 var searchData=
 [
   ['incrementscore_0',['IncrementScore',['../group__Leaderboard.html#ga24950f9d0e08cf561ca957f6d8c566fb',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['init_1',['Init',['../group__Init.html#gabeefb856bb769327b035278279f84de0',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['init_1',['Init',['../group__Init.html#ga016cecad69a23770db6d5dc936159b6e',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['initialize_2',['initialize',['../interfaceLootLocker_1_1ILootLockerService.html#a1539b7c19447a5b342691c627fe5381a',1,'LootLocker.ILootLockerService.Initialize()'],['../classLootLocker_1_1RateLimiter.html#a125729bf8a6cbb80272d85563dae8a99',1,'LootLocker.RateLimiter.Initialize()']]],
   ['initiateandpollasyncpurchasecatalogitems_3',['InitiateAndPollAsyncPurchaseCatalogItems',['../group__Purchasing.html#ga56dbd772fce1773c1e936ce0a9d89393',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['initiateandpollasyncpurchasesinglecatalogitem_4',['InitiateAndPollAsyncPurchaseSingleCatalogItem',['../group__Purchasing.html#gae7a44d631045579597773650d2cf28d4',1,'LootLocker::Requests::LootLockerSDKManager']]],

@@ -1,19 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classLootLocker_1_1LootLockerEventData.html" title="Base class for all LootLocker event data." alt="" coords="5,237,239,262"/>
-<area shape="rect" id="Node000001" href="$classLootLocker_1_1LootLockerEventSystemResetEventData.html" title="Event data for event system reset events." alt="" coords="313,5,515,45"/>
-<area shape="poly" id="edge5_Node000000_Node000001" title=" " alt="" coords="135,223,159,185,193,140,236,94,285,55,311,42,314,47,288,60,239,98,197,143,164,188,140,226"/>
-<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerLocalSessionActivatedEventData.html" title="Event data for local session activated events." alt="" coords="313,69,515,109"/>
-<area shape="poly" id="edge6_Node000000_Node000002" title=" " alt="" coords="144,225,205,172,244,143,285,119,315,107,317,112,288,124,247,148,208,176,147,229"/>
-<area shape="rect" id="Node000003" href="$classLootLocker_1_1LootLockerLocalSessionDeactivatedEventData.html" title="Event data for local session deactivated events." alt="" coords="305,133,523,173"/>
-<area shape="poly" id="edge7_Node000000_Node000003" title=" " alt="" coords="164,229,286,183,327,171,328,176,288,188,166,234"/>
-<area shape="rect" id="Node000004" href="$classLootLocker_1_1LootLockerPresenceConnectionStateChangedEventData.html" title="Event data for presence connection state changed events." alt="" coords="287,197,541,237"/>
-<area shape="poly" id="edge8_Node000000_Node000004" title=" " alt="" coords="251,232,286,229,287,234,252,238"/>
-<area shape="rect" id="Node000005" href="$classLootLocker_1_1LootLockerSessionEndedEventData.html" title="Event data for session ended events." alt="" coords="307,261,521,301"/>
-<area shape="poly" id="edge9_Node000000_Node000005" title=" " alt="" coords="252,261,307,267,306,272,251,266"/>
-<area shape="rect" id="Node000006" href="$classLootLocker_1_1LootLockerSessionExpiredEventData.html" title="Event data for session expired events." alt="" coords="307,325,521,365"/>
-<area shape="poly" id="edge10_Node000000_Node000006" title=" " alt="" coords="166,265,288,311,328,323,327,328,286,316,164,270"/>
-<area shape="rect" id="Node000007" href="$classLootLocker_1_1LootLockerSessionRefreshedEventData.html" title="Event data for session refreshed events." alt="" coords="307,389,521,429"/>
-<area shape="poly" id="edge11_Node000000_Node000007" title=" " alt="" coords="147,270,208,323,247,351,288,375,317,387,315,392,285,380,244,356,205,327,144,274"/>
-<area shape="rect" id="Node000008" href="$classLootLocker_1_1LootLockerSessionStartedEventData.html" title="Event data for session started events." alt="" coords="307,453,521,493"/>
-<area shape="poly" id="edge12_Node000000_Node000008" title=" " alt="" coords="140,273,164,310,197,355,239,401,288,439,311,451,309,455,285,444,236,405,193,359,159,313,135,276"/>
+<area shape="rect" id="Node000000" href="$classLootLocker_1_1LootLockerErrorData.html" title="Error information returned when a LootLocker API call fails." alt="" coords="5,5,232,31"/>
 </map>

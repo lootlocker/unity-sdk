@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classLootLocker_1_1Requests_1_1LootLockerCatalogEntryListings.html" title="All store&#45;specific listing information for a catalog entry across supported platforms." alt="" coords="5,5,204,45"/>
+<area shape="rect" id="Node000000" href="$classLootLocker_1_1Requests_1_1LootLockerCatalogEntry.html" title="A single entry in a LootLocker catalog, combining entity metadata with prices and store listings." alt="" coords="5,77,192,117"/>
+<area shape="rect" id="Node000001" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdEntry.html" title="A catalog entry with entity details inlined directly." alt="" coords="251,5,489,45"/>
+<area shape="poly" id="edge107_Node000000_Node000001" title=" " alt="" coords="181,71,239,55,286,43,287,48,241,60,182,76"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesResponse_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="249,70,491,125"/>
+<area shape="poly" id="edge108_Node000000_Node000002" title=" " alt="" coords="206,95,248,95,248,100,206,100"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesV2Response_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="240,149,500,203"/>
+<area shape="poly" id="edge109_Node000000_Node000003" title=" " alt="" coords="182,119,276,146,274,151,181,124"/>
 </map>

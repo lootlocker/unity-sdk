@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['uninitialized_0',['Uninitialized',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81af704f57ea420275ad51bf55b7dec2c96',1,'LootLocker']]],
-  ['updated_5fat_1',['updated_at',['../namespaceLootLocker_1_1LootLockerEnums.html#aff5a9a64fba273b693b5e21f838d5fdfaafd1a1a8e69e4b32a11a645da8280f8a',1,'LootLocker::LootLockerEnums']]]
+  ['ready_0',['Ready',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81ae7d31fc0602fb2ede144d18cdffd816b',1,'LootLocker']]],
+  ['refund_5ffailed_1',['refund_failed',['../namespaceLootLocker_1_1LootLockerEnums.html#a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114',1,'LootLocker::LootLockerEnums']]],
+  ['removed_2',['removed',['../namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711',1,'LootLocker::LootLockerEnums']]],
+  ['resetting_3',['Resetting',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81a84ba6b6de6447541f9cdfa184d1d2792',1,'LootLocker']]]
 ];

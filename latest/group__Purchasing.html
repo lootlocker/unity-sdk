@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.0.0</span>
+      <span id="ll-topnav-version">v8.1.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -605,6 +605,51 @@ $(document).ready(function(){initNavTree('group__Purchasing.html',''); initResiz
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">entitlementId</td><td>The entitlement id returned when initiating the async purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga241759df377fc2fa162abbd12c70ed51" name="ga241759df377fc2fa162abbd12c70ed51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga241759df377fc2fa162abbd12c70ed51">&#9670;&#160;</a></span>GetXboxServiceTicket()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetXboxServiceTicket </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerXboxServiceTicketResponse.html">LootLockerXboxServiceTicketResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an Xbox service ticket that can be used to redeem an Xbox Store purchase. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
     <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
   </table>
@@ -1545,6 +1590,131 @@ $(document).ready(function(){initNavTree('group__Purchasing.html',''); initResiz
 
 </div>
 </div>
+<a id="gad7e922ebb42dd81a2e7473d036f6d5df" name="gad7e922ebb42dd81a2e7473d036f6d5df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad7e922ebb42dd81a2e7473d036f6d5df">&#9670;&#160;</a></span>RedeemXboxStorePurchaseForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForClass </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>userCollectionsId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Xbox Store for a class that the current player owns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">classId</td><td>The id of the class to redeem this purchase for</td></tr>
+    <tr><td class="paramname">userCollectionsId</td><td>The Xbox user collections ID (JWT) that identifies the user making the purchase</td></tr>
+    <tr><td class="paramname">productId</td><td>The id of the Xbox Store product to redeem</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5bc713045a4a6c57d03e49bb52614012" name="ga5bc713045a4a6c57d03e49bb52614012"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5bc713045a4a6c57d03e49bb52614012">&#9670;&#160;</a></span>RedeemXboxStorePurchaseForPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>userCollectionsId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Xbox Store for the current player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">userCollectionsId</td><td>The Xbox user collections ID (JWT) that identifies the user making the purchase</td></tr>
+    <tr><td class="paramname">productId</td><td>The id of the Xbox Store product to redeem</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ga887de25053f766d8c021406cfa74d27c" name="ga887de25053f766d8c021406cfa74d27c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga887de25053f766d8c021406cfa74d27c">&#9670;&#160;</a></span>RefundByEntitlementIds()</h2>
 
@@ -1691,6 +1861,15 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf8b3af44a0b5ef79aca0b792e5e7cb38" id="r_gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaf8b3af44a0b5ef79aca0b792e5e7cb38">LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForClass</a> (string productId, string purchaseToken, int classId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Google Play Store for a class that the current player owns.  <br /></td></tr>
 <tr class="separator:gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga241759df377fc2fa162abbd12c70ed51" id="r_ga241759df377fc2fa162abbd12c70ed51"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga241759df377fc2fa162abbd12c70ed51">LootLocker.Requests.LootLockerSDKManager.GetXboxServiceTicket</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerXboxServiceTicketResponse.html">LootLockerXboxServiceTicketResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga241759df377fc2fa162abbd12c70ed51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an Xbox service ticket that can be used to redeem an Xbox Store purchase.  <br /></td></tr>
+<tr class="separator:ga241759df377fc2fa162abbd12c70ed51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bc713045a4a6c57d03e49bb52614012" id="r_ga5bc713045a4a6c57d03e49bb52614012"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga5bc713045a4a6c57d03e49bb52614012">LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForPlayer</a> (string userCollectionsId, string productId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5bc713045a4a6c57d03e49bb52614012"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Xbox Store for the current player.  <br /></td></tr>
+<tr class="separator:ga5bc713045a4a6c57d03e49bb52614012"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad7e922ebb42dd81a2e7473d036f6d5df" id="r_gad7e922ebb42dd81a2e7473d036f6d5df"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gad7e922ebb42dd81a2e7473d036f6d5df">LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForClass</a> (int classId, string userCollectionsId, string productId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad7e922ebb42dd81a2e7473d036f6d5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Xbox Store for a class that the current player owns.  <br /></td></tr>
+<tr class="separator:gad7e922ebb42dd81a2e7473d036f6d5df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaab86bc92cf1b91df160e5ed9b87c9763" id="r_gaab86bc92cf1b91df160e5ed9b87c9763"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaab86bc92cf1b91df160e5ed9b87c9763">LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForPlayer</a> (string accountId, string bearerToken, List&lt; string &gt; entitlementIds, string sandboxId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gaab86bc92cf1b91df160e5ed9b87c9763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Epic Store for the current player.  <br /></td></tr>
 <tr class="separator:gaab86bc92cf1b91df160e5ed9b87c9763"><td class="memSeparator" colspan="2">&#160;</td></tr>

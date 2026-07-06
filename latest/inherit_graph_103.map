@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classLootLocker_1_1Requests_1_1LootLockerInternalMetadataOperationRequest.html" title="Internal request object for a batch of metadata operations on a specific source." alt="" coords="5,5,245,60"/>
+<area shape="rect" id="Node000000" href="$classLootLocker_1_1Requests_1_1LootLockerGetRequests.html" title="Pagination parameters for requesting a range of leaderboard entries." alt="" coords="5,37,192,77"/>
+<area shape="rect" id="Node000001" href="$classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksRequest.html" title="Request to retrieve leaderboard ranks for all leaderboards a specific member appears on." alt="" coords="240,5,491,45"/>
+<area shape="poly" id="edge111_Node000000_Node000001" title=" " alt="" coords="205,42,239,38,240,43,206,47"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerGetScoreListRequest.html" title="Request to retrieve a paginated score list for a specific leaderboard, with cursor&#45;based pagination s..." alt="" coords="266,69,465,109"/>
+<area shape="poly" id="edge112_Node000000_Node000002" title=" " alt="" coords="206,68,266,75,266,80,206,73"/>
 </map>

@@ -10,5 +10,6 @@ var classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse =
     [ "schedule", "classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#af8f005d55271171f08bbf7ea5194c352", null ],
     [ "type", "classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#a12642729229e1ca641fd5c9076f918bc", null ],
     [ "ulid", "classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#a1df884736e3d1beceee61edc396c469a", null ],
+    [ "upcoming_resets", "classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#ab9721ab3de1bb5c8406283625895a70d", null ],
     [ "updated_at", "classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#ae864d3ef630a4072d60b723221f5c327", null ]
 ];

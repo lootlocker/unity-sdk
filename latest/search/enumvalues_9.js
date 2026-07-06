@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['skipped_0',['skipped',['../namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a',1,'LootLocker::LootLockerEnums']]]
+  ['quitting_0',['Quitting',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81a9ccfee4c47009600237ea2b0145db1ec',1,'LootLocker']]]
 ];

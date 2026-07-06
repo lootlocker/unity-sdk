@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.0.0</span>
+      <span id="ll-topnav-version">v8.1.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -298,6 +298,52 @@ $(document).ready(function(){initNavTree('group__Authentication.html',''); initR
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSessionResponse</td></tr>
     <tr><td class="paramname">clearLocalState</td><td>If set to true all local data about the player will be removed from the device if the session is successfully ended</td></tr>
     <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga87f5cd2a88029c76654a7e3a0aae5cd9" name="ga87f5cd2a88029c76654a7e3a0aae5cd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga87f5cd2a88029c76654a7e3a0aae5cd9">&#9670;&#160;</a></span>GetPlayerBanStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerBanStatus </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBanStatusResponse.html">LootLockerBanStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the ban status for a player. </p>
+<p>Use this when a session start fails with error code <code>player_banned</code> to retrieve the ban reason and duration and surface it to the player. This endpoint does not require an active player session.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The ULID of the player to query.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerBanStatusResponse</td></tr>
   </table>
   </dd>
 </dl>
@@ -1839,6 +1885,43 @@ $(document).ready(function(){initNavTree('group__Authentication.html',''); initR
 
 </div>
 </div>
+<a id="gaf291d6008da153a93ca93463a007d3c5" name="gaf291d6008da153a93ca93463a007d3c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf291d6008da153a93ca93463a007d3c5">&#9670;&#160;</a></span>StartSessionManual()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool LootLocker.Requests.LootLockerSDKManager.StartSessionManual </td>
+          <td>(</td>
+          <td class="paramtype">LootLockerPlayerData&#160;</td>
+          <td class="paramname"><em>playerData</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a player state manually from externally sourced data (e.g. </p>
+<p>after a server token exchange) without performing an authentication call.</p>
+<p>At minimum, <em>playerData</em>  must have a non-empty <code>SessionToken</code> and <code>ULID</code>. All other fields are optional but recommended for full SDK functionality.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerData</td><td>Player state to cache and use for future requests</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the state was saved successfully; false if <em>playerData</em>  was null or missing required fields, or if the SDK is not initialized.</dd></dl>
+
+</div>
+</div>
 <a id="ga5b4dc11c26c29eb48eb8d857c6e2b8c8" name="ga5b4dc11c26c29eb48eb8d857c6e2b8c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga5b4dc11c26c29eb48eb8d857c6e2b8c8">&#9670;&#160;</a></span>StartXboxOneSession()</h2>
 
@@ -2202,6 +2285,9 @@ $(document).ready(function(){initNavTree('group__Authentication.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:gaf291d6008da153a93ca93463a007d3c5" id="r_gaf291d6008da153a93ca93463a007d3c5"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Authentication.html#gaf291d6008da153a93ca93463a007d3c5">LootLocker.Requests.LootLockerSDKManager.StartSessionManual</a> (LootLockerPlayerData playerData)</td></tr>
+<tr class="memdesc:gaf291d6008da153a93ca93463a007d3c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a player state manually from externally sourced data (e.g.  <br /></td></tr>
+<tr class="separator:gaf291d6008da153a93ca93463a007d3c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad6a58f7a4babcc8d605b819e2443aa15" id="r_gad6a58f7a4babcc8d605b819e2443aa15"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Authentication.html#gad6a58f7a4babcc8d605b819e2443aa15">LootLocker.Requests.LootLockerSDKManager.VerifyID</a> (string deviceId, Action&lt; LootLockerVerifyResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gad6a58f7a4babcc8d605b819e2443aa15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the player's identity with the server and selected platform.  <br /></td></tr>
 <tr class="separator:gad6a58f7a4babcc8d605b819e2443aa15"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2310,6 +2396,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga236860079960249cc4beace861a000a4" id="r_ga236860079960249cc4beace861a000a4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Authentication.html#ga236860079960249cc4beace861a000a4">LootLocker.Requests.LootLockerSDKManager.ClearLocalSession</a> (string forPlayerWithUlid)</td></tr>
 <tr class="memdesc:ga236860079960249cc4beace861a000a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears client session data.  <br /></td></tr>
 <tr class="separator:ga236860079960249cc4beace861a000a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87f5cd2a88029c76654a7e3a0aae5cd9" id="r_ga87f5cd2a88029c76654a7e3a0aae5cd9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Authentication.html#ga87f5cd2a88029c76654a7e3a0aae5cd9">LootLocker.Requests.LootLockerSDKManager.GetPlayerBanStatus</a> (string playerUlid, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBanStatusResponse.html">LootLockerBanStatusResponse</a> &gt; onComplete)</td></tr>
+<tr class="memdesc:ga87f5cd2a88029c76654a7e3a0aae5cd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ban status for a player.  <br /></td></tr>
+<tr class="separator:ga87f5cd2a88029c76654a7e3a0aae5cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

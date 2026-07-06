@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.0.0</span>
+      <span id="ll-topnav-version">v8.1.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.0.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -246,10 +246,39 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>Reward_id</b><code>
 string&#160;</td><td class="memItemRight" valign="bottom"><b>Asset_ulid</b><code> [get, set]</code></td></tr>
 <tr class="memdesc:a72cdd6f57a5ecd3c042544db3a911f74"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ULID of the Asset. <br /></td></tr>
 <tr class="separator:a72cdd6f57a5ecd3c042544db3a911f74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9289c247569c791df4219b0e1710841e" id="r_a9289c247569c791df4219b0e1710841e"><td class="memItemLeft" align="right" valign="top">int[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardAsset.html#a9289c247569c791df4219b0e1710841e">Asset_instance_ids</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9289c247569c791df4219b0e1710841e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The IDs of the Asset Instances that were granted.  <br /></td></tr>
+<tr class="separator:a9289c247569c791df4219b0e1710841e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An asset reward attached to a notification. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Property Documentation</h2>
+<a id="a9289c247569c791df4219b0e1710841e" name="a9289c247569c791df4219b0e1710841e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9289c247569c791df4219b0e1710841e">&#9670;&#160;</a></span>Asset_instance_ids</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int [] LootLocker.Requests.LootLockerNotificationRewardAsset.Asset_instance_ids</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The IDs of the Asset Instances that were granted. </p>
+<p>Will be null or empty if the reward did not result in any asset instance grants (for example in group rewards where no assets were granted, or for non-asset reward types). For multi-quantity purchases (e.g. buying 3 of the same item) all granted instance IDs are listed here. For group rewards each nested asset entry carries its own Asset_instance_ids. </p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.9.8-->
 <!-- start footer part -->

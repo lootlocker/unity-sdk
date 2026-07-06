@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['created_5fat_0',['created_at',['../namespaceLootLocker_1_1LootLockerEnums.html#aff5a9a64fba273b693b5e21f838d5fdfafde81f1177b1541755b672c9dc97315a',1,'LootLocker::LootLockerEnums']]]
+  ['banned_0',['Banned',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830aa6f2b2df29609876b609c318bdbdf9a1',1,'LootLocker::Requests']]]
 ];

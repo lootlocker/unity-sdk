@@ -2,6 +2,7 @@ var group__Authentication =
 [
     [ "LootLocker.Requests.LootLockerSDKManager.ClearLocalSession", "group__Authentication.html#ga236860079960249cc4beace861a000a4", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.EndSession", "group__Authentication.html#ga81d1a75aa04db4f5de4bd0fe60e9d62e", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.GetPlayerBanStatus", "group__Authentication.html#ga87f5cd2a88029c76654a7e3a0aae5cd9", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RefreshAppleGameCenterSession", "group__Authentication.html#ga25d4773ad66c786dbe73a4320dec3945", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RefreshAppleSession", "group__Authentication.html#ga4613a1eae3f44df70750c348ca22fa63", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RefreshAppleSession", "group__Authentication.html#gad10b8a5a6c3e494809ed04058805810d", null ],
@@ -30,6 +31,7 @@ var group__Authentication =
     [ "LootLocker.Requests.LootLockerSDKManager.StartMetaSession", "group__Authentication.html#ga0b57a09cddf726375707270f62f7b689", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.StartNintendoSwitchSession", "group__Authentication.html#ga169d6c501bc2974e1a0889b674fc3f1a", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.StartPlaystationNetworkSession", "group__Authentication.html#gae1e4e54ba5b812f1aadc8df62ad58ad5", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.StartSessionManual", "group__Authentication.html#gaf291d6008da153a93ca93463a007d3c5", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.StartXboxOneSession", "group__Authentication.html#ga5b4dc11c26c29eb48eb8d857c6e2b8c8", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.VerifyID", "group__Authentication.html#gad6a58f7a4babcc8d605b819e2443aa15", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.VerifyPlayerAndStartPlaystationNetworkSession", "group__Authentication.html#ga686c273b40aff2b41fb11a123be3bc34", null ],

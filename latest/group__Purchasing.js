@@ -7,6 +7,7 @@ var group__Purchasing =
     [ "LootLocker.Requests.LootLockerSDKManager.CreateStripeCheckoutSession", "group__Purchasing.html#ga319d6fd86f9b181bedec02995ee5d1eb", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.FinalizeSteamPurchaseRedemption", "group__Purchasing.html#gaddc93c3dc01bd401a95caf1cdd4ca72e", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.GetAsyncPurchaseStatus", "group__Purchasing.html#ga528516ebe34cc550f2e303168add7ca3", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.GetXboxServiceTicket", "group__Purchasing.html#ga241759df377fc2fa162abbd12c70ed51", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseCatalogItems", "group__Purchasing.html#ga56dbd772fce1773c1e936ce0a9d89393", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem", "group__Purchasing.html#gae7a44d631045579597773650d2cf28d4", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseCatalogItems", "group__Purchasing.html#ga1680a3ad280f7babb6e8b2296d553a9c", null ],
@@ -21,6 +22,8 @@ var group__Purchasing =
     [ "LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForPlayer", "group__Purchasing.html#gaab86bc92cf1b91df160e5ed9b87c9763", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForClass", "group__Purchasing.html#gaf8b3af44a0b5ef79aca0b792e5e7cb38", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForPlayer", "group__Purchasing.html#ga5499de3863077320c184df2ec5ce7720", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForClass", "group__Purchasing.html#gad7e922ebb42dd81a2e7473d036f6d5df", null ],
+    [ "LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForPlayer", "group__Purchasing.html#ga5bc713045a4a6c57d03e49bb52614012", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RefundByEntitlementIds", "group__Purchasing.html#ga887de25053f766d8c021406cfa74d27c", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.RetryAsyncPurchase", "group__Purchasing.html#gadb083637bd437ac8e52c087b7213639b", null ]
 ];
