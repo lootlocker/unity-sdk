@@ -1,0 +1,760 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Metadata</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Metadata.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Metadata</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Attach and retrieve typed key-value metadata on any <a class="el" href="namespaceLootLocker.html">LootLocker</a> entity. </p>
+<p>Metadata can be attached to Progressions, Leaderboards, Catalogs, Currencies, Assets, and more. Values are strongly typed: String, Boolean, Number, JSON, or Base64-encoded binary. Entries support optional <b>Tags</b> for filtering (e.g., seasonal, featured) and a <b>Game Read</b> flag that restricts visibility to the Server API only — useful for keeping sensitive data out of the game client.</p>
+<p>See the <a href="https://docs.lootlocker.com/shared-systems/metadata">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gacbbafe2c959333eefe24d7eb2dab9140" name="gacbbafe2c959333eefe24d7eb2dab9140"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacbbafe2c959333eefe24d7eb2dab9140">&#9670;&#160;</a></span>GetMetadata()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetMetadata </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMetadataResponse.html">LootLockerGetMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get Metadata for the specified source with the given key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type for which to request metadata</td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to request metadata, note that if the source is self then this too should be set to "self"</td></tr>
+    <tr><td class="paramname">Key</td><td>The key of the metadata to fetch, use this to fetch metadata for a specific key for the specified source.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad676e6d3453ad5b1760bd2feab30f269" name="gad676e6d3453ad5b1760bd2feab30f269"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad676e6d3453ad5b1760bd2feab30f269">&#9670;&#160;</a></span>GetMultisourceMetadata()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetMultisourceMetadata </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataSourceAndKeys.html">LootLockerMetadataSourceAndKeys</a>[]&#160;</td>
+          <td class="paramname"><em>SourcesAndKeysToGet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMultisourceMetadataResponse.html">LootLockerGetMultisourceMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">SourcesAndKeysToGet</td><td>The combination of sources to get keys for, and the keys to get for those sources </td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Optional: Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga49da8982ff53a0ef9866ceaebd0fbff0" name="ga49da8982ff53a0ef9866ceaebd0fbff0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga49da8982ff53a0ef9866ceaebd0fbff0">&#9670;&#160;</a></span>ListMetadata() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListMetadata </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List Metadata for the specified source with default pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type for which to request metadata</td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to request metadata</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf69b241938bd8a935e4fa83fb894f2de" name="gaf69b241938bd8a935e4fa83fb894f2de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf69b241938bd8a935e4fa83fb894f2de">&#9670;&#160;</a></span>ListMetadata() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListMetadata </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the requested page of Metadata for the specified source with the specified pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type for which to request metadata</td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to request metadata</td></tr>
+    <tr><td class="paramname">Page</td><td>Used together with PerPage to apply pagination to this request. Page designates which "page" of items to fetch</td></tr>
+    <tr><td class="paramname">PerPage</td><td>Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga616cdeed53ae5c9c40b9492a84b63a8c" name="ga616cdeed53ae5c9c40b9492a84b63a8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga616cdeed53ae5c9c40b9492a84b63a8c">&#9670;&#160;</a></span>ListMetadataWithTags() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListMetadataWithTags </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>Tags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List Metadata for the specified source that has all of the provided tags, use default pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type for which to request metadata</td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to request metadata</td></tr>
+    <tr><td class="paramname">Tags</td><td>The tags that the requested metadata should have, only metadata matching <em>all of</em> the given tags will be returned </td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga174a5c83f1f3205017d9a48423e5eab8" name="ga174a5c83f1f3205017d9a48423e5eab8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga174a5c83f1f3205017d9a48423e5eab8">&#9670;&#160;</a></span>ListMetadataWithTags() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListMetadataWithTags </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>Tags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>IgnoreFiles</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type for which to request metadata</td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to request metadata</td></tr>
+    <tr><td class="paramname">Tags</td><td>The tags that the requested metadata should have, only metadata matching <em>all of</em> the given tags will be returned </td></tr>
+    <tr><td class="paramname">Page</td><td>Used together with PerPage to apply pagination to this request.Page designates which "page" of items to fetch</td></tr>
+    <tr><td class="paramname">PerPage</td><td>Used together with Page to apply pagination to this request.PerPage designates how many items are considered a "page"</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">IgnoreFiles</td><td>Base64 values will be set to content_type "application/x-redacted" and the content will be an empty String. Use this to avoid accidentally fetching large data files.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga15b3ba52c126c4b747125944f716763d" name="ga15b3ba52c126c4b747125944f716763d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga15b3ba52c126c4b747125944f716763d">&#9670;&#160;</a></span>PerformMetadataOperations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.PerformMetadataOperations </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a>&#160;</td>
+          <td class="paramname"><em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>SourceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperation.html">LootLockerMetadataOperation</a> &gt;&#160;</td>
+          <td class="paramname"><em>OperationsToPerform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperationsResponse.html">LootLockerMetadataOperationsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform the specified metadata operations for the specified source Note that a subset of the specified operations can fail without the full request failing. </p>
+<p>Make sure to check the errors array in the response.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Source</td><td>The source type that the source id refers to </td></tr>
+    <tr><td class="paramname">SourceID</td><td>The specific source id for which to set metadata, note that if the source is self then this too should be set to "self" </td></tr>
+    <tr><td class="paramname">OperationsToPerform</td><td>List of operations to perform for the given source </td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga49da8982ff53a0ef9866ceaebd0fbff0" id="r_ga49da8982ff53a0ef9866ceaebd0fbff0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#ga49da8982ff53a0ef9866ceaebd0fbff0">LootLocker.Requests.LootLockerSDKManager.ListMetadata</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga49da8982ff53a0ef9866ceaebd0fbff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">List Metadata for the specified source with default pagination.  <br /></td></tr>
+<tr class="separator:ga49da8982ff53a0ef9866ceaebd0fbff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf69b241938bd8a935e4fa83fb894f2de" id="r_gaf69b241938bd8a935e4fa83fb894f2de"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#gaf69b241938bd8a935e4fa83fb894f2de">LootLocker.Requests.LootLockerSDKManager.ListMetadata</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, int Page, int PerPage, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf69b241938bd8a935e4fa83fb894f2de"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the requested page of Metadata for the specified source with the specified pagination.  <br /></td></tr>
+<tr class="separator:gaf69b241938bd8a935e4fa83fb894f2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga616cdeed53ae5c9c40b9492a84b63a8c" id="r_ga616cdeed53ae5c9c40b9492a84b63a8c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#ga616cdeed53ae5c9c40b9492a84b63a8c">LootLocker.Requests.LootLockerSDKManager.ListMetadataWithTags</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, string[] Tags, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga616cdeed53ae5c9c40b9492a84b63a8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">List Metadata for the specified source that has all of the provided tags, use default pagination.  <br /></td></tr>
+<tr class="separator:ga616cdeed53ae5c9c40b9492a84b63a8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga174a5c83f1f3205017d9a48423e5eab8" id="r_ga174a5c83f1f3205017d9a48423e5eab8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#ga174a5c83f1f3205017d9a48423e5eab8">LootLocker.Requests.LootLockerSDKManager.ListMetadataWithTags</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, string[] Tags, int Page, int PerPage, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html">LootLockerListMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga174a5c83f1f3205017d9a48423e5eab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings.  <br /></td></tr>
+<tr class="separator:ga174a5c83f1f3205017d9a48423e5eab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacbbafe2c959333eefe24d7eb2dab9140" id="r_gacbbafe2c959333eefe24d7eb2dab9140"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#gacbbafe2c959333eefe24d7eb2dab9140">LootLocker.Requests.LootLockerSDKManager.GetMetadata</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, string Key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMetadataResponse.html">LootLockerGetMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gacbbafe2c959333eefe24d7eb2dab9140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get Metadata for the specified source with the given key.  <br /></td></tr>
+<tr class="separator:gacbbafe2c959333eefe24d7eb2dab9140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad676e6d3453ad5b1760bd2feab30f269" id="r_gad676e6d3453ad5b1760bd2feab30f269"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#gad676e6d3453ad5b1760bd2feab30f269">LootLocker.Requests.LootLockerSDKManager.GetMultisourceMetadata</a> (<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataSourceAndKeys.html">LootLockerMetadataSourceAndKeys</a>[] SourcesAndKeysToGet, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMultisourceMetadataResponse.html">LootLockerGetMultisourceMetadataResponse</a> &gt; onComplete, bool IgnoreFiles=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad676e6d3453ad5b1760bd2feab30f269"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the requested page of Metadata for the specified source that has all of the provided tags and paginate according to the supplied pagination settings.  <br /></td></tr>
+<tr class="separator:gad676e6d3453ad5b1760bd2feab30f269"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga15b3ba52c126c4b747125944f716763d" id="r_ga15b3ba52c126c4b747125944f716763d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Metadata.html#ga15b3ba52c126c4b747125944f716763d">LootLocker.Requests.LootLockerSDKManager.PerformMetadataOperations</a> (<a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> Source, string SourceID, List&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperation.html">LootLockerMetadataOperation</a> &gt; OperationsToPerform, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperationsResponse.html">LootLockerMetadataOperationsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga15b3ba52c126c4b747125944f716763d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform the specified metadata operations for the specified source Note that a subset of the specified operations can fail without the full request failing.  <br /></td></tr>
+<tr class="separator:ga15b3ba52c126c4b747125944f716763d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

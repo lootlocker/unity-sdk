@@ -1,0 +1,1144 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Assets</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Assets.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Assets</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Browse and filter the asset catalogue defined in the <a class="el" href="namespaceLootLocker.html">LootLocker</a> console. </p>
+<p>Assets are anything a player can earn, purchase, possess, or equip — cosmetics, weapons, game configs, loot boxes, drop tables, or rental items. Each asset is assigned a Context (category) and a Complexity (Generic, Loot Box, Rental, or Drop Table) that adds behaviour. This group covers listing reference assets and their metadata; for player-owned instances see <a class="el" href="group__AssetInstance.html">Asset Instances</a>.</p>
+<p>See the <a href="https://docs.lootlocker.com/content/working-with-assets">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gaee6e17253048e9be1a0b21ba1ad7fd6b" name="gaee6e17253048e9be1a0b21ba1ad7fd6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaee6e17253048e9be1a0b21ba1ad7fd6b">&#9670;&#160;</a></span>AddFavouriteAsset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.AddFavouriteAsset </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>assetId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add an asset to the current players favorite assets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetId</td><td>The ID of the asset to add to favourites</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac0464d41847101aa4dd537fbe8b7be38" name="gac0464d41847101aa4dd537fbe8b7be38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac0464d41847101aa4dd537fbe8b7be38">&#9670;&#160;</a></span>GetAssetById()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetById </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSingleAssetResponse.html">LootLockerSingleAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get information about a specific asset. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetId</td><td>The ID of the asset that you want information about</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSingleAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8fc8cf923572101955a37c7a02e0fbc4" name="ga8fc8cf923572101955a37c7a02e0fbc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8fc8cf923572101955a37c7a02e0fbc4">&#9670;&#160;</a></span>GetAssetInformation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetInformation </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSingleAssetResponse.html">LootLockerSingleAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get information about a specific asset. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetId</td><td>The ID of the asset that you want information about</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSingleAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad5c67d7b98670463ce98a5bdf64b4442" name="gad5c67d7b98670463ce98a5bdf64b4442"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad5c67d7b98670463ce98a5bdf64b4442">&#9670;&#160;</a></span>GetAssetListWithCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetListWithCount </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker::LootLockerEnums::AssetFilter</a> &gt;&#160;</td>
+          <td class="paramname"><em>filter</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>includeUGC</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Dictionary&lt; string, string &gt;&#160;</td>
+          <td class="paramname"><em>assetFilters</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>UGCCreatorPlayerID</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>contextID</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the available assets for the game. </p>
+<p>Up to 200 at a time. Includes amount of assets in the response.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetCount</td><td>Amount of assets to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">filter</td><td>A list of <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f" title="Filter criteria for listing assets based on purchasability, rentability, or popularity.">LootLocker.LootLockerEnums.AssetFilter</a> to get just specific assets.</td></tr>
+    <tr><td class="paramname">includeUGC</td><td>Should User Generated Content be included in this response?</td></tr>
+    <tr><td class="paramname">assetFilters</td><td>A Dictionary&lt;string, string&gt; of custom filters to use when retrieving assets</td></tr>
+    <tr><td class="paramname">UGCCreatorPlayerID</td><td>Only get assets created by a specific player</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+    <tr><td class="paramname">contextID</td><td>Only get assets for a specific context</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac72479ae8ddb5a7f5fb83025c91dd5a8" name="gac72479ae8ddb5a7f5fb83025c91dd5a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac72479ae8ddb5a7f5fb83025c91dd5a8">&#9670;&#160;</a></span>GetAssetNextList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetNextList </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker::LootLockerEnums::AssetFilter</a> &gt;&#160;</td>
+          <td class="paramname"><em>filter</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>includeUGC</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Dictionary&lt; string, string &gt;&#160;</td>
+          <td class="paramname"><em>assetFilters</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>UGCCreatorPlayerID</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>contextID</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the next set of assets after a previous call to GetAssetsOriginal or GetAssetListWithCount. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetCount</td><td>Amount of assets to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">filter</td><td>A list of <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f" title="Filter criteria for listing assets based on purchasability, rentability, or popularity.">LootLocker.LootLockerEnums.AssetFilter</a> to get just specific assets.</td></tr>
+    <tr><td class="paramname">includeUGC</td><td>Should User Generated Content be included in this response?</td></tr>
+    <tr><td class="paramname">assetFilters</td><td>A Dictionary&lt;string, string&gt; of custom filters to use when retrieving assets</td></tr>
+    <tr><td class="paramname">UGCCreatorPlayerID</td><td>Only get assets created by a specific player</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+    <tr><td class="paramname">contextID</td><td>Only get assets for a specific context</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8ef91e7f3913d7e0ec38e3cea2d19f04" name="ga8ef91e7f3913d7e0ec38e3cea2d19f04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8ef91e7f3913d7e0ec38e3cea2d19f04">&#9670;&#160;</a></span>GetAssetsById()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetsById </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>assetIdsToRetrieve</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get multiple assets by their IDs. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetIdsToRetrieve</td><td>A list of multiple assets to retrieve</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf9151323b231d14c764790af4804e9ff" name="gaf9151323b231d14c764790af4804e9ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf9151323b231d14c764790af4804e9ff">&#9670;&#160;</a></span>GetAssetsOriginal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAssetsOriginal </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>idOfLastAsset</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker::LootLockerEnums::AssetFilter</a> &gt;&#160;</td>
+          <td class="paramname"><em>filter</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>includeUGC</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Dictionary&lt; string, string &gt;&#160;</td>
+          <td class="paramname"><em>assetFilters</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>UGCCreatorPlayerID</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>contextID</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the available assets for the game. </p>
+<p>Up to 200 at a time.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetCount</td><td>Amount of assets to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">idOfLastAsset</td><td>Set this to stop getting assets after a certain asset</td></tr>
+    <tr><td class="paramname">filter</td><td>A list of <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f" title="Filter criteria for listing assets based on purchasability, rentability, or popularity.">LootLocker.LootLockerEnums.AssetFilter</a> to get just specific assets.</td></tr>
+    <tr><td class="paramname">includeUGC</td><td>Should User Generated Content be included in this response?</td></tr>
+    <tr><td class="paramname">assetFilters</td><td>A Dictionary&lt;string, string&gt; of custom filters to use when retrieving assets</td></tr>
+    <tr><td class="paramname">UGCCreatorPlayerID</td><td>Only get assets created by a specific player</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+    <tr><td class="paramname">contextID</td><td>Only get assets for a specific context</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga29d6f35ee1e8e268fc8591b9087670f3" name="ga29d6f35ee1e8e268fc8591b9087670f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga29d6f35ee1e8e268fc8591b9087670f3">&#9670;&#160;</a></span>GetContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetContext </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerContextResponse.html">LootLockerContextResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the available contexts for the game. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerContextResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga9bd4e227c9d9fd58ff51c9633498a769" name="ga9bd4e227c9d9fd58ff51c9633498a769"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9bd4e227c9d9fd58ff51c9633498a769">&#9670;&#160;</a></span>GrantAssetToPlayerInventory() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GrantAssetToPlayerInventory </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetResponse.html">LootLockerGrantAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Grant an Asset to the Player's Inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetID</td><td>The Asset you want to create an Instance of and give to the current player</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGrantAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga17b3577f2840ccc062d7e09a33cd400f" name="ga17b3577f2840ccc062d7e09a33cd400f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga17b3577f2840ccc062d7e09a33cd400f">&#9670;&#160;</a></span>GrantAssetToPlayerInventory() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GrantAssetToPlayerInventory </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>assetVariationID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>assetRentalOptionID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetResponse.html">LootLockerGrantAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Grant an Asset Instance to the Player's Inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetID</td><td>The Asset you want to create an Instance of and give to the current player</td></tr>
+    <tr><td class="paramname">assetVariationID</td><td>The id of the Asset Variation you want to grant</td></tr>
+    <tr><td class="paramname">assetRentalOptionID</td><td>The rental option id you want to give the Asset Instance</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGrantAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga509668ac8a2d931c9133fcaaa703226d" name="ga509668ac8a2d931c9133fcaaa703226d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga509668ac8a2d931c9133fcaaa703226d">&#9670;&#160;</a></span>ListAssets()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListAssets </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsRequest.html">LootLockerListAssetsRequest</a>&#160;</td>
+          <td class="paramname"><em>Request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsResponse.html">LootLockerListAssetsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#aff5a9a64fba273b693b5e21f838d5fdf">OrderAssetListBy</a>&#160;</td>
+          <td class="paramname"><em>orderBy</em> = <code>OrderAssetListBy::none</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#ac531873ad450de5f89eaa1bcda167b06">OrderAssetListDirection</a>&#160;</td>
+          <td class="paramname"><em>orderDirection</em> = <code>OrderAssetListDirection::none</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List assets with configurable response data. </p>
+<p>Use this to limit the fields returned in the response and improve performance.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Request</td><td>Request object with settings on what fields to include, exclude, and what assets to filter</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">PerPage</td><td>(Optional) Used together with Page to apply pagination to this Request. PerPage designates how many notifications are considered a "page". Set to 0 to not use this filter.</td></tr>
+    <tr><td class="paramname">Page</td><td>(Optional) Used together with PerPage to apply pagination to this Request. Page designates which "page" of items to fetch. Set to 0 to not use this filter.</td></tr>
+    <tr><td class="paramname">orderBy</td><td>(Optional) Order the list by a specific field. Default is unordered.</td></tr>
+    <tr><td class="paramname">orderDirection</td><td>(Optional) Order the list in ascending or descending order. Default is unordered.</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional: Execute the Request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0a6aa4d2e9779f72667fb7591b6ce990" name="ga0a6aa4d2e9779f72667fb7591b6ce990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0a6aa4d2e9779f72667fb7591b6ce990">&#9670;&#160;</a></span>ListAssetsWithDefaultParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListAssetsWithDefaultParameters </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsResponse.html">LootLockerListAssetsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List assets with default parameters (no filters, first page, default page size). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>Delegate for handling the server response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional: Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga49ec633671e7c7f98aa865d03f100022" name="ga49ec633671e7c7f98aa865d03f100022"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga49ec633671e7c7f98aa865d03f100022">&#9670;&#160;</a></span>ListFavouriteAssets()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListFavouriteAssets </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFavouritesListResponse.html">LootLockerFavouritesListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the current players favorite assets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerFavouritesListResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf360b02c70b61825e617d76b262f7709" name="gaf360b02c70b61825e617d76b262f7709"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf360b02c70b61825e617d76b262f7709">&#9670;&#160;</a></span>RemoveFavouriteAsset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RemoveFavouriteAsset </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>assetId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Remove an asset from the current players favorite assets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetId</td><td>The ID of the asset to remove from favourites</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga29d6f35ee1e8e268fc8591b9087670f3" id="r_ga29d6f35ee1e8e268fc8591b9087670f3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga29d6f35ee1e8e268fc8591b9087670f3">LootLocker.Requests.LootLockerSDKManager.GetContext</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerContextResponse.html">LootLockerContextResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga29d6f35ee1e8e268fc8591b9087670f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the available contexts for the game.  <br /></td></tr>
+<tr class="separator:ga29d6f35ee1e8e268fc8591b9087670f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf9151323b231d14c764790af4804e9ff" id="r_gaf9151323b231d14c764790af4804e9ff"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gaf9151323b231d14c764790af4804e9ff">LootLocker.Requests.LootLockerSDKManager.GetAssetsOriginal</a> (int assetCount, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, int? idOfLastAsset=null, List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker.LootLockerEnums.AssetFilter</a> &gt; filter=null, bool includeUGC=false, Dictionary&lt; string, string &gt; assetFilters=null, int UGCCreatorPlayerID=0, string forPlayerWithUlid=null, int contextID=0)</td></tr>
+<tr class="memdesc:gaf9151323b231d14c764790af4804e9ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the available assets for the game.  <br /></td></tr>
+<tr class="separator:gaf9151323b231d14c764790af4804e9ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad5c67d7b98670463ce98a5bdf64b4442" id="r_gad5c67d7b98670463ce98a5bdf64b4442"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gad5c67d7b98670463ce98a5bdf64b4442">LootLocker.Requests.LootLockerSDKManager.GetAssetListWithCount</a> (int assetCount, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker.LootLockerEnums.AssetFilter</a> &gt; filter=null, bool includeUGC=false, Dictionary&lt; string, string &gt; assetFilters=null, int UGCCreatorPlayerID=0, string forPlayerWithUlid=null, int contextID=0)</td></tr>
+<tr class="memdesc:gad5c67d7b98670463ce98a5bdf64b4442"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the available assets for the game.  <br /></td></tr>
+<tr class="separator:gad5c67d7b98670463ce98a5bdf64b4442"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac72479ae8ddb5a7f5fb83025c91dd5a8" id="r_gac72479ae8ddb5a7f5fb83025c91dd5a8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gac72479ae8ddb5a7f5fb83025c91dd5a8">LootLocker.Requests.LootLockerSDKManager.GetAssetNextList</a> (int assetCount, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, List&lt; <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#af7f1a9c2c35cc16fec26bd0c4588ad6f">LootLocker.LootLockerEnums.AssetFilter</a> &gt; filter=null, bool includeUGC=false, Dictionary&lt; string, string &gt; assetFilters=null, int UGCCreatorPlayerID=0, string forPlayerWithUlid=null, int contextID=0)</td></tr>
+<tr class="memdesc:gac72479ae8ddb5a7f5fb83025c91dd5a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next set of assets after a previous call to GetAssetsOriginal or GetAssetListWithCount.  <br /></td></tr>
+<tr class="separator:gac72479ae8ddb5a7f5fb83025c91dd5a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga99c1d41aa0fdc0e067c347f77232bcad" id="r_ga99c1d41aa0fdc0e067c347f77232bcad"><td class="memItemLeft" align="right" valign="top"><a id="ga99c1d41aa0fdc0e067c347f77232bcad" name="ga99c1d41aa0fdc0e067c347f77232bcad"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>LootLocker.Requests.LootLockerSDKManager.ResetAssetCalls</b> ()</td></tr>
+<tr class="memdesc:ga99c1d41aa0fdc0e067c347f77232bcad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the last id used in GetAssetNextList(). <br /></td></tr>
+<tr class="separator:ga99c1d41aa0fdc0e067c347f77232bcad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8fc8cf923572101955a37c7a02e0fbc4" id="r_ga8fc8cf923572101955a37c7a02e0fbc4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga8fc8cf923572101955a37c7a02e0fbc4">LootLocker.Requests.LootLockerSDKManager.GetAssetInformation</a> (int assetId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSingleAssetResponse.html">LootLockerSingleAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga8fc8cf923572101955a37c7a02e0fbc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get information about a specific asset.  <br /></td></tr>
+<tr class="separator:ga8fc8cf923572101955a37c7a02e0fbc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac0464d41847101aa4dd537fbe8b7be38" id="r_gac0464d41847101aa4dd537fbe8b7be38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gac0464d41847101aa4dd537fbe8b7be38">LootLocker.Requests.LootLockerSDKManager.GetAssetById</a> (int assetId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSingleAssetResponse.html">LootLockerSingleAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac0464d41847101aa4dd537fbe8b7be38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get information about a specific asset.  <br /></td></tr>
+<tr class="separator:gac0464d41847101aa4dd537fbe8b7be38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga49ec633671e7c7f98aa865d03f100022" id="r_ga49ec633671e7c7f98aa865d03f100022"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga49ec633671e7c7f98aa865d03f100022">LootLocker.Requests.LootLockerSDKManager.ListFavouriteAssets</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFavouritesListResponse.html">LootLockerFavouritesListResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga49ec633671e7c7f98aa865d03f100022"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the current players favorite assets.  <br /></td></tr>
+<tr class="separator:ga49ec633671e7c7f98aa865d03f100022"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaee6e17253048e9be1a0b21ba1ad7fd6b" id="r_gaee6e17253048e9be1a0b21ba1ad7fd6b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gaee6e17253048e9be1a0b21ba1ad7fd6b">LootLocker.Requests.LootLockerSDKManager.AddFavouriteAsset</a> (string assetId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaee6e17253048e9be1a0b21ba1ad7fd6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an asset to the current players favorite assets.  <br /></td></tr>
+<tr class="separator:gaee6e17253048e9be1a0b21ba1ad7fd6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf360b02c70b61825e617d76b262f7709" id="r_gaf360b02c70b61825e617d76b262f7709"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#gaf360b02c70b61825e617d76b262f7709">LootLocker.Requests.LootLockerSDKManager.RemoveFavouriteAsset</a> (string assetId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf360b02c70b61825e617d76b262f7709"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove an asset from the current players favorite assets.  <br /></td></tr>
+<tr class="separator:gaf360b02c70b61825e617d76b262f7709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8ef91e7f3913d7e0ec38e3cea2d19f04" id="r_ga8ef91e7f3913d7e0ec38e3cea2d19f04"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga8ef91e7f3913d7e0ec38e3cea2d19f04">LootLocker.Requests.LootLockerSDKManager.GetAssetsById</a> (string[] assetIdsToRetrieve, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html">LootLockerAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga8ef91e7f3913d7e0ec38e3cea2d19f04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get multiple assets by their IDs.  <br /></td></tr>
+<tr class="separator:ga8ef91e7f3913d7e0ec38e3cea2d19f04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9bd4e227c9d9fd58ff51c9633498a769" id="r_ga9bd4e227c9d9fd58ff51c9633498a769"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga9bd4e227c9d9fd58ff51c9633498a769">LootLocker.Requests.LootLockerSDKManager.GrantAssetToPlayerInventory</a> (int assetID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetResponse.html">LootLockerGrantAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga9bd4e227c9d9fd58ff51c9633498a769"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grant an Asset to the Player's Inventory.  <br /></td></tr>
+<tr class="separator:ga9bd4e227c9d9fd58ff51c9633498a769"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga17b3577f2840ccc062d7e09a33cd400f" id="r_ga17b3577f2840ccc062d7e09a33cd400f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga17b3577f2840ccc062d7e09a33cd400f">LootLocker.Requests.LootLockerSDKManager.GrantAssetToPlayerInventory</a> (int assetID, int? assetVariationID, int? assetRentalOptionID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetResponse.html">LootLockerGrantAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga17b3577f2840ccc062d7e09a33cd400f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grant an Asset Instance to the Player's Inventory.  <br /></td></tr>
+<tr class="separator:ga17b3577f2840ccc062d7e09a33cd400f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0a6aa4d2e9779f72667fb7591b6ce990" id="r_ga0a6aa4d2e9779f72667fb7591b6ce990"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga0a6aa4d2e9779f72667fb7591b6ce990">LootLocker.Requests.LootLockerSDKManager.ListAssetsWithDefaultParameters</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsResponse.html">LootLockerListAssetsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga0a6aa4d2e9779f72667fb7591b6ce990"><td class="mdescLeft">&#160;</td><td class="mdescRight">List assets with default parameters (no filters, first page, default page size).  <br /></td></tr>
+<tr class="separator:ga0a6aa4d2e9779f72667fb7591b6ce990"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga509668ac8a2d931c9133fcaaa703226d" id="r_ga509668ac8a2d931c9133fcaaa703226d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Assets.html#ga509668ac8a2d931c9133fcaaa703226d">LootLocker.Requests.LootLockerSDKManager.ListAssets</a> (<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsRequest.html">LootLockerListAssetsRequest</a> Request, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsResponse.html">LootLockerListAssetsResponse</a> &gt; onComplete, int PerPage=0, int Page=0, <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#aff5a9a64fba273b693b5e21f838d5fdf">OrderAssetListBy</a> orderBy=OrderAssetListBy.none, <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#ac531873ad450de5f89eaa1bcda167b06">OrderAssetListDirection</a> orderDirection=OrderAssetListDirection.none, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga509668ac8a2d931c9133fcaaa703226d"><td class="mdescLeft">&#160;</td><td class="mdescRight">List assets with configurable response data.  <br /></td></tr>
+<tr class="separator:ga509668ac8a2d931c9133fcaaa703226d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

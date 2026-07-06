@@ -1,0 +1,369 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker Unity SDK — API Reference</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('index.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title"><a class="el" href="namespaceLootLocker.html">LootLocker</a> Unity SDK — API Reference </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><div class="image">
+<img src="lootlocker-logo.png" alt="" width="280px"/>
+</div>
+<p><a href="https://lootlocker.com">LootLocker</a> is a <b>game backend-as-a-service</b> that ships fully-managed, cross-platform systems so your team can focus on making the game instead of maintaining infrastructure. This reference covers every public method and type in the SDK.</p>
+<hr  />
+<h1><a class="anchor" id="mainpage_quickstart"></a>
+Quick Start</h1>
+<p><b>1. Install</b> (via Open UPM — recommended)</p>
+<div class="fragment"><div class="line">openupm add com.lootlocker.lootlockersdk</div>
+</div><!-- fragment --><p>Or from Git: <code>Window → Package Manager → Add package from git URL →</code> <br  />
+ <code><a href="https://github.com/LootLocker/unity-sdk.git">https://github.com/LootLocker/unity-sdk.git</a></code></p>
+<p><b>2. Configure</b></p>
+<p>Open <b>Edit → Project Settings → <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK</b> and paste your <b>Game API Key</b> from the <a href="https://console.lootlocker.com/settings/api-keys">LootLocker console</a>.</p>
+<p><b>3. Start a session</b></p>
+<div class="fragment"><div class="line">LootLockerSDKManager.StartGuestSession(response =&gt;</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordflow">if</span> (!response.success)</div>
+<div class="line">    {</div>
+<div class="line">        Debug.LogError(<span class="stringliteral">&quot;Session failed: &quot;</span> + response.errorData?.message);</div>
+<div class="line">        return;</div>
+<div class="line">    }</div>
+<div class="line">    Debug.Log(<span class="stringliteral">&quot;Session started for player: &quot;</span> + response.player_ulid);</div>
+<div class="line">});</div>
+</div><!-- fragment --><p>All SDK calls are <b>static methods on <code>LootLockerSDKManager</code></b> and return results asynchronously via a callback delegate whose first argument derives from <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a>. Check <code>response.success</code> before accessing the payload fields.</p>
+<hr  />
+<h1><a class="anchor" id="mainpage_navigation"></a>
+Navigating This Reference</h1>
+<p>The <b>Topics</b> tab (left sidebar or top nav) is the recommended entry point. Methods are grouped by feature — start there to find everything related to a particular system without needing to know which class or file it lives in.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Topic   </th><th class="markdownTableHeadNone">What it covers    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Init.html">Initialization</a>   </td><td class="markdownTableBodyNone">Set up and configure the SDK before starting a session.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__SDKCustomization.html">SDK Customization</a>   </td><td class="markdownTableBodyNone">Override SDK internals for testing or advanced integration scenarios.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__MultiUserManagement.html">Multi-User Management</a>   </td><td class="markdownTableBodyNone">Manage multiple simultaneous player sessions on a single device.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Authentication.html">Authentication</a>   </td><td class="markdownTableBodyNone">Start and end player sessions via Guest, Platform, or White Label login.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__WhiteLabel.html">White Label Login</a>   </td><td class="markdownTableBodyNone">Custom email/password account system built into your game.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__RemoteSessions.html">Remote Sessions</a>   </td><td class="markdownTableBodyNone">Log in to a different platform than the one you are currently playing on.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__ConnectedAccounts.html">Connected Accounts</a>   </td><td class="markdownTableBodyNone">Link multiple platform accounts together under a single <a class="el" href="namespaceLootLocker.html">LootLocker</a> player identity.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Presence.html">Presence</a>   </td><td class="markdownTableBodyNone">Track when and how players are active across all platforms in real time.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Friends.html">Friends</a>   </td><td class="markdownTableBodyNone">Cross-platform friend list — send, accept, and manage friend requests.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Followers.html">Followers</a>   </td><td class="markdownTableBodyNone">One-way player subscriptions — follow without requiring approval.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Player.html">Player</a>   </td><td class="markdownTableBodyNone">Retrieve and manage the current player's profile, name, and identifiers.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__PlayerFiles.html">Player Files</a>   </td><td class="markdownTableBodyNone">CDN-backed file storage scoped to a player's profile.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__PlayerProgressions.html">Player Progressions</a>   </td><td class="markdownTableBodyNone">Award points and read tier state for a player's progressions.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__PlayerStorage.html">Player Storage</a>   </td><td class="markdownTableBodyNone">Simple key-value store scoped to the player.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Hero.html">Hero</a>   </td><td class="markdownTableBodyNone">Create and manage hero instances for the current player.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__CharacterProgressions.html">Character Progressions</a>   </td><td class="markdownTableBodyNone">Award points and read tier state for a character's progressions.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Currency.html">Currency</a>   </td><td class="markdownTableBodyNone">Define and query the virtual currency types in your game's economy.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Balances.html">Balances</a>   </td><td class="markdownTableBodyNone">Read and adjust a player's wallet balances for each currency.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Catalog.html">Catalog</a>   </td><td class="markdownTableBodyNone">Browse item listings and prices in the <a class="el" href="namespaceLootLocker.html">LootLocker</a> storefront catalog.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Purchasing.html">Purchasing</a>   </td><td class="markdownTableBodyNone">Initiate and validate purchases — both real-money (IAP) and virtual-currency.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Entitlements.html">Entitlements</a>   </td><td class="markdownTableBodyNone">Inspect a player's purchase history and individual transaction statuses.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__DropTables.html">Drop Tables</a>   </td><td class="markdownTableBodyNone">Evaluate weighted loot rolls from a Drop Table asset and claim the results.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Assets.html">Assets</a>   </td><td class="markdownTableBodyNone">Browse and filter the asset catalogue defined in the <a class="el" href="namespaceLootLocker.html">LootLocker</a> console.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__AssetInstance.html">Asset Instances</a>   </td><td class="markdownTableBodyNone">Access and manage asset instances in the current player's inventory.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__AssetInstanceProgressions.html">Asset Instance Progressions</a>   </td><td class="markdownTableBodyNone">Progression tracking scoped to a specific asset instance.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__UserGeneratedContent.html">User-Generated Content (UGC)</a>   </td><td class="markdownTableBodyNone">Create, edit, and publish player-authored assets.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Collectables.html">Collectables</a>   </td><td class="markdownTableBodyNone">Collectable items — groups, items, and player collection state.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Progressions.html">Progressions</a>   </td><td class="markdownTableBodyNone">Configure and query the shared progression infrastructure.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Leaderboard.html">Leaderboards</a>   </td><td class="markdownTableBodyNone">Rank players or any custom key by score, with optional resets and rewards.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Missions.html">Missions</a>   </td><td class="markdownTableBodyNone">Time-limited challenges with completion tracking.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Maps.html">Maps</a>   </td><td class="markdownTableBodyNone">Retrieve map configurations and node data.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Triggers.html">Triggers</a>   </td><td class="markdownTableBodyNone">Invoke named trigger events that grant server-configured rewards.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Metadata.html">Metadata</a>   </td><td class="markdownTableBodyNone">Attach and retrieve typed key-value metadata on any <a class="el" href="namespaceLootLocker.html">LootLocker</a> entity.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Messages.html">Messages</a>   </td><td class="markdownTableBodyNone">Read player inbox messages from the <a class="el" href="namespaceLootLocker.html">LootLocker</a> console.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Notifications.html">Notifications</a>   </td><td class="markdownTableBodyNone">Poll and acknowledge queued event notifications generated by other SDK systems.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Broadcasts.html">Broadcasts</a>   </td><td class="markdownTableBodyNone">Fetch scheduled, localizable messages published from the <a class="el" href="namespaceLootLocker.html">LootLocker</a> console.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Reports.html">Reports</a>   </td><td class="markdownTableBodyNone">Submit player-generated moderation reports to <a class="el" href="namespaceLootLocker.html">LootLocker</a>.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__Feedback.html">Feedback</a>   </td><td class="markdownTableBodyNone">Submit player, UGC, or game-level reports to <a class="el" href="namespaceLootLocker.html">LootLocker</a>'s moderation system.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="group__Misc.html">Miscellaneous Utilities</a>   </td><td class="markdownTableBodyNone">Helpers that don't fit neatly into a feature group.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="group__EventSystem.html">Event System</a>   </td><td class="markdownTableBodyNone">Subscribe to SDK lifecycle events (session start/end, token refresh).   </td></tr>
+</table>
+<hr  />
+<h1><a class="anchor" id="mainpage_response"></a>
+Response Conventions</h1>
+<p>Every callback receives a response object deriving from <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a>:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Field   </th><th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>success</code>   </td><td class="markdownTableBodyNone"><code>bool</code>   </td><td class="markdownTableBodyNone"><code>true</code> if the call succeeded    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>statusCode</code>   </td><td class="markdownTableBodyNone"><code>int</code>   </td><td class="markdownTableBodyNone">HTTP status (200, 401, 422, …)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>errorData</code>   </td><td class="markdownTableBodyNone"><a class="el" href="classLootLocker_1_1LootLockerErrorData.html">LootLockerErrorData</a>   </td><td class="markdownTableBodyNone">Populated on failure    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>requestContext</code>   </td><td class="markdownTableBodyNone"><a class="el" href="classLootLocker_1_1LootLockerRequestContext.html">LootLockerRequestContext</a>   </td><td class="markdownTableBodyNone">Contains contextual information about the request such as who it was made for and the ID of the request    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>text</code>   </td><td class="markdownTableBodyNone"><code>string</code>   </td><td class="markdownTableBodyNone">Raw JSON body (useful for debugging)   </td></tr>
+</table>
+<p>Always check <code>response.success</code> first. Never access payload fields if <code>success</code> is <code>false</code>.</p>
+<hr  />
+<h1><a class="anchor" id="mainpage_multi_player"></a>
+Multi-Player Device Support</h1>
+<p>The SDK can maintain <b>independent sessions for up to N players</b> on the same device (local co-op or couch multiplayer). Each call accepts an optional <code>forPlayerWithUlid</code> overload parameter. Use <a class="el" href="group__MultiUserManagement.html">Multi-User Management</a> to enumerate cached players and switch the default player.</p>
+<hr  />
+<h1><a class="anchor" id="mainpage_links"></a>
+Useful Links</h1>
+<ul>
+<li><a href="https://docs.lootlocker.com/">Full developer documentation</a></li>
+<li><a href="https://console.lootlocker.com/">LootLocker console</a></li>
+<li><a href="https://github.com/lootlocker/unity-sdk">GitHub repository</a></li>
+<li><a href="https://discord.lootlocker.io/">Discord community</a></li>
+<li><a href="https://ref.lootlocker.com/">REST API reference</a> </li>
+</ul>
+</div></div><!-- PageDoc -->
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

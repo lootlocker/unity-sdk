@@ -1,0 +1,238 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Class Members</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('functions_n.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="contents">
+<div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
+
+<h3><a id="index_n" name="index_n"></a>- n -</h3><ul>
+<li>name&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1____LootLockerInternalBroadcast.html#a20419fbf1d5755a7893679afca21de2b">LootLocker.Requests.__LootLockerInternalBroadcast</a>, <a class="el" href="classLootLocker_1_1Requests_1_1GetLootLockerCurrencyDetailsResponse.html#a872f94cf61b3e6ce4551585aed955911">LootLocker.Requests.GetLootLockerCurrencyDetailsResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetDetails.html#ab842faa645528845dbbc23726227fb36">LootLocker.Requests.LootLockerAssetDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBlockedPlayer.html#a4715612da8362f3fcb102bbac7e13243">LootLocker.Requests.LootLockerBlockedPlayer</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBroadcast.html#ac3ebd2c34fcf6bfd124ac7a65a253d13">LootLocker.Requests.LootLockerBroadcast</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerBroadcastGame.html#aee570ce83a402a31b1921cf832dfc23f">LootLocker.Requests.LootLockerBroadcastGame</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCatalog.html#ae0a79aa33ee985b70459aeea3f0308b0">LootLocker.Requests.LootLockerCatalog</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerClass.html#a6c659685462292bd1be482713ae232d6">LootLocker.Requests.LootLockerClass</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerClassTypes.html#a87ce1b501e3baff07d59adf98fdc0bcd">LootLocker.Requests.LootLockerClassTypes</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCommonAsset.html#a7ae21de50c1da7343f890ad5f338a173">LootLocker.Requests.LootLockerCommonAsset</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse.html#a4ad756e0e7656709ac371e43d8a835b0">LootLocker.Requests.LootLockerCommonAssetResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerContext.html#ade7465ceb4bb383787785dc6b1bb4bc0">LootLocker.Requests.LootLockerContext</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCreateClassRequest.html#a61b7706aa6d4dfbdcb298f202163708c">LootLocker.Requests.LootLockerCreateClassRequest</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCurrency.html#acbbd534edb91994edf4cd11eb426bfb1">LootLocker.Requests.LootLockerCurrency</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCurrencyDetails.html#a22d1ed6dd7efe675e781d8b356b17c53">LootLocker.Requests.LootLockerCurrencyDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerDenomination.html#a03cb9e6d805e466671f25e49a0ca77b6">LootLocker.Requests.LootLockerDenomination</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFilter.html#ab6d40fdc7dce2f25067504b7542206e3">LootLocker.Requests.LootLockerFilter</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriend.html#a43a51c21f62a0c5f25d13738ebcfd1fe">LootLocker.Requests.LootLockerFriend</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetFriendResponse.html#a0ea806e8412ab36ba81c8efdd987642d">LootLocker.Requests.LootLockerGetFriendResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerInlinedGroupDetailsWithAssociations.html#aa08e2b5fde2dd76f1d124c7acfe56597">LootLocker.Requests.LootLockerInlinedGroupDetailsWithAssociations</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#a307b2337f3c78eaa46848426baede59c">LootLocker.Requests.LootLockerLeaderboardDetailResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetails.html#a2e171e8ea96781df2600e0cf99fafe67">LootLocker.Requests.LootLockerLeaderboardDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardAssetDetails.html#aa65b8377bd883a5dadec00579be207b8">LootLocker.Requests.LootLockerLeaderboardRewardAssetDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardCurrencyDetails.html#a5384faf1b79ac714b31aa08fc52137e1">LootLocker.Requests.LootLockerLeaderboardRewardCurrencyDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardGroup.html#a4b5c59908c357e24ae414a4a7a5d3d10">LootLocker.Requests.LootLockerLeaderboardRewardGroup</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgressionDetails.html#a81e794351de5b1fffac739911430df58">LootLocker.Requests.LootLockerLeaderboardRewardProgressionDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgressionResetDetails.html#a964c4da0bd92f0be68338c65a89723cb">LootLocker.Requests.LootLockerLeaderboardRewardProgressionResetDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardUpcomingReset.html#a48db44dddb81664c001bed637d68b760">LootLocker.Requests.LootLockerLeaderboardUpcomingReset</a></li>
+<li>Name&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardAssetDetails.html#a0177348169bf0cc0cf32120ff761f461">LootLocker.Requests.LootLockerNotificationRewardAssetDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardCurrencyDetails.html#ac243e2aea4afdf58f903b056f61ecf53">LootLocker.Requests.LootLockerNotificationRewardCurrencyDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardGroup.html#a69c22600932705c82f8466a1bd7fd4ba">LootLocker.Requests.LootLockerNotificationRewardGroup</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgressionDetails.html#a75a9478e9b511b186e496452278272c1">LootLocker.Requests.LootLockerNotificationRewardProgressionDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgressionResetDetails.html#a90f7c0497a19cf7a285bdb19831c7025">LootLocker.Requests.LootLockerNotificationRewardProgressionResetDetails</a></li>
+<li>name&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedProgressionsResponse_1_1LootLockerProgression.html#ae92e76da3a42782b232a7ba1fea0413e">LootLocker.Requests.LootLockerPaginatedProgressionsResponse.LootLockerProgression</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayer.html#a0df3c6a073c5b325a3620fabe9ade0eb">LootLocker.Requests.LootLockerPlayer</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#a822820986cebbe3e80a534758ef71b60">LootLocker.Requests.LootLockerPlayerFile</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerInfo.html#ac06956132ea54ccf1818eef72b39fc1f">LootLocker.Requests.LootLockerPlayerInfo</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerProgressionPointDetails.html#a088d5fd00cb469dd918dcaa3ad71115f">LootLocker.Requests.LootLockerProgressionPointDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerProgressionResetDetails.html#ab24e376bb4033dd8ddda38b8221f47fa">LootLocker.Requests.LootLockerProgressionResetDetails</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerProgressionResponse.html#aef1252f36b986707fee6ae55920b6614">LootLocker.Requests.LootLockerProgressionResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRarity.html#a323f25a3cca78ee835896179f784d9e9">LootLocker.Requests.LootLockerRarity</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefundNonReversibleReward.html#a445a12fa5794e879344066c5cfcb1b70">LootLocker.Requests.LootLockerRefundNonReversibleReward</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefundPlayerInventoryEvent.html#a9428e75dd87d9444ca9dee54619e3484">LootLocker.Requests.LootLockerRefundPlayerInventoryEvent</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRental__Options.html#a8fb0d5981a372dcf54bd9f6dda24deff">LootLocker.Requests.LootLockerRental_Options</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetDataEntity.html#ad124f56ca42672ad9d1d0ea58733c718">LootLocker.Requests.LootLockerSimpleAssetDataEntity</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetFile.html#ad14d458e0687dde5cbd2057e871c58ec">LootLocker.Requests.LootLockerSimpleAssetFile</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerUpdateClassRequest.html#a9ce81d8d92ad5a9c586dee21c6664cb3">LootLocker.Requests.LootLockerUpdateClassRequest</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerVariation.html#a411e4705999104c0f6db4b6bb815dcc8">LootLocker.Requests.LootLockerVariation</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerVariation__Info.html#a2883db790eb6377acdf1f1a2a622bd89">LootLocker.Requests.LootLockerVariation_Info</a>, <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameRequest.html#ad65a31372b7a3d843bac49c8abaf6957">LootLocker.Requests.PlayerNameRequest</a>, <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html#ada04c09eae4c4c407e02d07fcf48a675">LootLocker.Requests.PlayerNameResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1PlayerNameWithIDs.html#ad3e860027a59bb9dad1ece0055ebf6bb">LootLocker.Requests.PlayerNameWithIDs</a>, <a class="el" href="classLootLocker_1_1Requests_1_1PlayerWith1stPartyPlatformIDs.html#a7ca2328529c24b135c379c8ec5af6e22">LootLocker.Requests.PlayerWith1stPartyPlatformIDs</a></li>
+<li>NetworkError&lt; T &gt;()&#160;:&#160;<a class="el" href="classLootLocker_1_1LootLockerResponseFactory.html#a831f1473cb7289dae618e944b291e36e">LootLocker.LootLockerResponseFactory</a></li>
+<li>newState&#160;:&#160;<a class="el" href="classLootLocker_1_1LootLockerPresenceConnectionStateChangedEventData.html#ac7a0cb3d38eba314ff70ed08524a0f01">LootLocker.LootLockerPresenceConnectionStateChangedEventData</a></li>
+<li>next_cursor&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPagination.html#a15ad883c63ff8ad208b6d21935baf2b9">LootLocker.Requests.LootLockerPagination</a></li>
+<li>next_run&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardSchedule.html#af0efd5e23bdda8df7a0ee90c241c7114">LootLocker.Requests.LootLockerLeaderboardSchedule</a></li>
+<li>next_threshold&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetInstanceProgressionResponse.html#a866ae140d2b97976944edd4e8003f75f">LootLocker.Requests.LootLockerAssetInstanceProgressionResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCharacterProgressionResponse.html#a978fe4e94ff7b6cfbf9838084863a6bd">LootLocker.Requests.LootLockerCharacterProgressionResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a5b224503062382e2d484bd70c677f2f4">LootLocker.Requests.LootLockerPaginatedAssetInstanceProgressionsResponse.LootLockerAssetInstanceProgression</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedCharacterProgressionsResponse_1_1LootLockerCharacterProgression.html#a40f64038426574a5309d25f1c8bda128">LootLocker.Requests.LootLockerPaginatedCharacterProgressionsResponse.LootLockerCharacterProgression</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse_1_1LootLockerPlayerProgression.html#aa5bc530bfafe2afcf2b536f789c5068f">LootLocker.Requests.LootLockerPaginatedPlayerProgressionsResponse.LootLockerPlayerProgression</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html#a7eec9d5c3fe18df21959f3d178225932">LootLocker.Requests.LootLockerPlayerProgressionResponse</a></li>
+<li>nextCursor&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksRequest.html#aa914387792f1d2090b4a118fc50f2fd3">LootLocker.Requests.LootLockerGetAllMemberRanksRequest</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListRequest.html#a906dedba5346354aae3968897989663c">LootLocker.Requests.LootLockerGetScoreListRequest</a></li>
+<li>non_refundable&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCatalogEntry.html#a6077a12929dede68642c71830f9356c0">LootLocker.Requests.LootLockerCatalogEntry</a></li>
+<li>Nonce&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerConnectRemoteSessionToAccountRequest.html#a45009be4c179fe4edfae0ea79d6ff0e9">LootLocker.Requests.LootLockerConnectRemoteSessionToAccountRequest</a></li>
+<li>nonce&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html#aa06709dc73eb1a871db2118d0be5bcf4">LootLocker.Requests.LootLockerLeaseRemoteSessionResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionRequest.html#aaec487eeb6ce4325104eb0705de98f74">LootLocker.Requests.LootLockerStartRemoteSessionRequest</a></li>
+<li>Notification_type&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerNotification.html#aa60ff081f4465a1f5f0c387b805c7799">LootLocker.Requests.LootLockerNotification</a></li>
+<li>Notifications&#160;:&#160;<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListNotificationsResponse.html#ab171c4d69a8fbefc7577e1826839af09">LootLocker.Requests.LootLockerListNotificationsResponse</a>, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerReadNotificationsRequest.html#ae793d971df72544b49d96ded2a89b721">LootLocker.Requests.LootLockerReadNotificationsRequest</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

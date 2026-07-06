@@ -1,0 +1,992 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Player Progressions</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__PlayerProgressions.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Player Progressions</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Award points and read tier state for a player's progressions. </p>
+<p>Progressions are points-threshold systems where reaching each tier unlocks configured rewards (assets, currency, other progression points). This group covers player-scoped operations: query current state, award points, and retrieve earned rewards. See <a class="el" href="group__Progressions.html">Progressions</a> for the shared infrastructure (tier definitions, metadata, reset).</p>
+<p>See the <a href="https://docs.lootlocker.com/game-systems/progressions">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gadc0677e84e87878e0b26aee9291faf71" name="gadc0677e84e87878e0b26aee9291faf71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadc0677e84e87878e0b26aee9291faf71">&#9670;&#160;</a></span>AddPointsToPlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.AddPointsToPlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>amount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds points to a player progression. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">amount</td><td>Amount of points to be added</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga3da0f07d698cb7eaeda271af912452d6" name="ga3da0f07d698cb7eaeda271af912452d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3da0f07d698cb7eaeda271af912452d6">&#9670;&#160;</a></span>DeletePlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeletePlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deletes a player progression. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae86d097ba9148bc787d2da326127f1ef" name="gae86d097ba9148bc787d2da326127f1ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae86d097ba9148bc787d2da326127f1ef">&#9670;&#160;</a></span>GetOtherPlayersProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html">LootLockerPlayerProgressionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a single progression that the specified player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The ulid of the player you wish to look up</td></tr>
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgression</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad2fe9dbefa04c018621d1ef3edaec7bb" name="gad2fe9dbefa04c018621d1ef3edaec7bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad2fe9dbefa04c018621d1ef3edaec7bb">&#9670;&#160;</a></span>GetOtherPlayersProgressions() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions that the specified player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The ulid of the player you wish to look up</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga00fc095d8fde8c8ac896f3e4d89503ef" name="ga00fc095d8fde8c8ac896f3e4d89503ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga00fc095d8fde8c8ac896f3e4d89503ef">&#9670;&#160;</a></span>GetOtherPlayersProgressions() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions that the specified player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The ulid of the player you wish to look up</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5dea9314f602a82d079b934765811977" name="ga5dea9314f602a82d079b934765811977"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5dea9314f602a82d079b934765811977">&#9670;&#160;</a></span>GetOtherPlayersProgressions() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions that the specified player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>The ulid of the player you wish to look up</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">after</td><td>Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga1e378d98a7cbd7195b34f1353ef2d8a9" name="ga1e378d98a7cbd7195b34f1353ef2d8a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e378d98a7cbd7195b34f1353ef2d8a9">&#9670;&#160;</a></span>GetPlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html">LootLockerPlayerProgressionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a single progression the player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgression</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac27e2f1f0e0fbf889ecf0698319a3350" name="gac27e2f1f0e0fbf889ecf0698319a3350"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac27e2f1f0e0fbf889ecf0698319a3350">&#9670;&#160;</a></span>GetPlayerProgressions() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions the player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5a0ad48352bd4a56d65bfd95a644bb71" name="ga5a0ad48352bd4a56d65bfd95a644bb71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5a0ad48352bd4a56d65bfd95a644bb71">&#9670;&#160;</a></span>GetPlayerProgressions() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions the player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaaa9ef517bda85d3aea52227c0bc83bac" name="gaaa9ef517bda85d3aea52227c0bc83bac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaaa9ef517bda85d3aea52227c0bc83bac">&#9670;&#160;</a></span>GetPlayerProgressions() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns multiple progressions the player is currently on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">after</td><td>Used for pagination, id of the player progression from which the pagination starts from, use the next_cursor and previous_cursor values</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPaginatedPlayerProgressions</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5fdb2c015336c6f690fdd2fb53a0c17f" name="ga5fdb2c015336c6f690fdd2fb53a0c17f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5fdb2c015336c6f690fdd2fb53a0c17f">&#9670;&#160;</a></span>RegisterPlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RegisterPlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers a player progression if it doesn't exist. </p>
+<p>Same as adding 0 points to a progression.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf17c6c58c5c71f584277404f2d0b069a" name="gaf17c6c58c5c71f584277404f2d0b069a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf17c6c58c5c71f584277404f2d0b069a">&#9670;&#160;</a></span>ResetPlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ResetPlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resets a player progression. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga3003477f97288fb1c823fc3df13bfbe5" name="ga3003477f97288fb1c823fc3df13bfbe5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3003477f97288fb1c823fc3df13bfbe5">&#9670;&#160;</a></span>SubtractPointsFromPlayerProgression()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SubtractPointsFromPlayerProgression </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>progressionKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>amount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subtracts points from a player progression. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">progressionKey</td><td>Progression key</td></tr>
+    <tr><td class="paramname">amount</td><td>Amount of points to be subtracted</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerProgressionWithRewards</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:gaaa9ef517bda85d3aea52227c0bc83bac" id="r_gaaa9ef517bda85d3aea52227c0bc83bac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gaaa9ef517bda85d3aea52227c0bc83bac">LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions</a> (int count, string after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaaa9ef517bda85d3aea52227c0bc83bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions the player is currently on.  <br /></td></tr>
+<tr class="separator:gaaa9ef517bda85d3aea52227c0bc83bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5a0ad48352bd4a56d65bfd95a644bb71" id="r_ga5a0ad48352bd4a56d65bfd95a644bb71"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga5a0ad48352bd4a56d65bfd95a644bb71">LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions</a> (int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5a0ad48352bd4a56d65bfd95a644bb71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions the player is currently on.  <br /></td></tr>
+<tr class="separator:ga5a0ad48352bd4a56d65bfd95a644bb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac27e2f1f0e0fbf889ecf0698319a3350" id="r_gac27e2f1f0e0fbf889ecf0698319a3350"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gac27e2f1f0e0fbf889ecf0698319a3350">LootLocker.Requests.LootLockerSDKManager.GetPlayerProgressions</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac27e2f1f0e0fbf889ecf0698319a3350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions the player is currently on.  <br /></td></tr>
+<tr class="separator:gac27e2f1f0e0fbf889ecf0698319a3350"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e378d98a7cbd7195b34f1353ef2d8a9" id="r_ga1e378d98a7cbd7195b34f1353ef2d8a9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga1e378d98a7cbd7195b34f1353ef2d8a9">LootLocker.Requests.LootLockerSDKManager.GetPlayerProgression</a> (string progressionKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html">LootLockerPlayerProgressionResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga1e378d98a7cbd7195b34f1353ef2d8a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a single progression the player is currently on.  <br /></td></tr>
+<tr class="separator:ga1e378d98a7cbd7195b34f1353ef2d8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc0677e84e87878e0b26aee9291faf71" id="r_gadc0677e84e87878e0b26aee9291faf71"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gadc0677e84e87878e0b26aee9291faf71">LootLocker.Requests.LootLockerSDKManager.AddPointsToPlayerProgression</a> (string progressionKey, ulong amount, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gadc0677e84e87878e0b26aee9291faf71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds points to a player progression.  <br /></td></tr>
+<tr class="separator:gadc0677e84e87878e0b26aee9291faf71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3003477f97288fb1c823fc3df13bfbe5" id="r_ga3003477f97288fb1c823fc3df13bfbe5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga3003477f97288fb1c823fc3df13bfbe5">LootLocker.Requests.LootLockerSDKManager.SubtractPointsFromPlayerProgression</a> (string progressionKey, ulong amount, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga3003477f97288fb1c823fc3df13bfbe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtracts points from a player progression.  <br /></td></tr>
+<tr class="separator:ga3003477f97288fb1c823fc3df13bfbe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf17c6c58c5c71f584277404f2d0b069a" id="r_gaf17c6c58c5c71f584277404f2d0b069a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gaf17c6c58c5c71f584277404f2d0b069a">LootLocker.Requests.LootLockerSDKManager.ResetPlayerProgression</a> (string progressionKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf17c6c58c5c71f584277404f2d0b069a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets a player progression.  <br /></td></tr>
+<tr class="separator:gaf17c6c58c5c71f584277404f2d0b069a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3da0f07d698cb7eaeda271af912452d6" id="r_ga3da0f07d698cb7eaeda271af912452d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga3da0f07d698cb7eaeda271af912452d6">LootLocker.Requests.LootLockerSDKManager.DeletePlayerProgression</a> (string progressionKey, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga3da0f07d698cb7eaeda271af912452d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a player progression.  <br /></td></tr>
+<tr class="separator:ga3da0f07d698cb7eaeda271af912452d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5fdb2c015336c6f690fdd2fb53a0c17f" id="r_ga5fdb2c015336c6f690fdd2fb53a0c17f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga5fdb2c015336c6f690fdd2fb53a0c17f">LootLocker.Requests.LootLockerSDKManager.RegisterPlayerProgression</a> (string progressionKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html">LootLockerPlayerProgressionWithRewardsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5fdb2c015336c6f690fdd2fb53a0c17f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a player progression if it doesn't exist.  <br /></td></tr>
+<tr class="separator:ga5fdb2c015336c6f690fdd2fb53a0c17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5dea9314f602a82d079b934765811977" id="r_ga5dea9314f602a82d079b934765811977"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga5dea9314f602a82d079b934765811977">LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions</a> (string playerUlid, int count, string after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5dea9314f602a82d079b934765811977"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions that the specified player is currently on.  <br /></td></tr>
+<tr class="separator:ga5dea9314f602a82d079b934765811977"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga00fc095d8fde8c8ac896f3e4d89503ef" id="r_ga00fc095d8fde8c8ac896f3e4d89503ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#ga00fc095d8fde8c8ac896f3e4d89503ef">LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions</a> (string playerUlid, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga00fc095d8fde8c8ac896f3e4d89503ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions that the specified player is currently on.  <br /></td></tr>
+<tr class="separator:ga00fc095d8fde8c8ac896f3e4d89503ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad2fe9dbefa04c018621d1ef3edaec7bb" id="r_gad2fe9dbefa04c018621d1ef3edaec7bb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gad2fe9dbefa04c018621d1ef3edaec7bb">LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgressions</a> (string playerUlid, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html">LootLockerPaginatedPlayerProgressionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad2fe9dbefa04c018621d1ef3edaec7bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns multiple progressions that the specified player is currently on.  <br /></td></tr>
+<tr class="separator:gad2fe9dbefa04c018621d1ef3edaec7bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae86d097ba9148bc787d2da326127f1ef" id="r_gae86d097ba9148bc787d2da326127f1ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerProgressions.html#gae86d097ba9148bc787d2da326127f1ef">LootLocker.Requests.LootLockerSDKManager.GetOtherPlayersProgression</a> (string playerUlid, string progressionKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html">LootLockerPlayerProgressionResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae86d097ba9148bc787d2da326127f1ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a single progression that the specified player is currently on.  <br /></td></tr>
+<tr class="separator:gae86d097ba9148bc787d2da326127f1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

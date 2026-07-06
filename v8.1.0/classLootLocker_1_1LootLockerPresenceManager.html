@@ -1,0 +1,389 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker.LootLockerPresenceManager Class Reference</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classLootLocker_1_1LootLockerPresenceManager.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#properties">Properties</a> &#124;
+<a href="classLootLocker_1_1LootLockerPresenceManager-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">LootLocker.LootLockerPresenceManager Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Manager for all <a class="el" href="namespaceLootLocker.html">LootLocker</a> Presence functionality Automatically manages presence connections for all active sessions.  
+ <a href="classLootLocker_1_1LootLockerPresenceManager.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for LootLocker.LootLockerPresenceManager:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1LootLockerPresenceManager__inherit__graph.png" border="0" usemap="#aLootLocker_8LootLockerPresenceManager_inherit__map" alt="Inheritance graph"/></div>
+<map name="aLootLocker_8LootLockerPresenceManager_inherit__map" id="aLootLocker_8LootLockerPresenceManager_inherit__map">
+<area shape="rect" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ..." alt="" coords="5,79,229,119"/>
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="45,5,189,31"/>
+<area shape="poly" title=" " alt="" coords="120,44,120,79,115,79,115,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for LootLocker.LootLockerPresenceManager:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1LootLockerPresenceManager__coll__graph.png" border="0" usemap="#aLootLocker_8LootLockerPresenceManager_coll__map" alt="Collaboration graph"/></div>
+<map name="aLootLocker_8LootLockerPresenceManager_coll__map" id="aLootLocker_8LootLockerPresenceManager_coll__map">
+<area shape="rect" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ..." alt="" coords="5,79,229,119"/>
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="45,5,189,31"/>
+<area shape="poly" title=" " alt="" coords="120,44,120,79,115,79,115,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ac9739accc655f12d5c8b27c34e29d8a2" id="r_ac9739accc655f12d5c8b27c34e29d8a2"><td class="memItemLeft" align="right" valign="top"><a id="ac9739accc655f12d5c8b27c34e29d8a2" name="ac9739accc655f12d5c8b27c34e29d8a2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetEventSystem</b> (<a class="el" href="classLootLocker_1_1LootLockerEventSystem.html">LootLockerEventSystem</a> eventSystemInstance)</td></tr>
+<tr class="memdesc:ac9739accc655f12d5c8b27c34e29d8a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform deferred initialization after services are fully ready. <br /></td></tr>
+<tr class="separator:ac9739accc655f12d5c8b27c34e29d8a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ad1a533a646aaff0d4a4f88b29531067d" id="r_ad1a533a646aaff0d4a4f88b29531067d"><td class="memItemLeft" align="right" valign="top"><a id="ad1a533a646aaff0d4a4f88b29531067d" name="ad1a533a646aaff0d4a4f88b29531067d"></a>
+static <a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html">LootLockerPresenceManager</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Get</b> ()</td></tr>
+<tr class="memdesc:ad1a533a646aaff0d4a4f88b29531067d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the PresenceManager service instance Services are automatically registered and initialized on first access if needed. <br /></td></tr>
+<tr class="separator:ad1a533a646aaff0d4a4f88b29531067d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad37ccbb34e6cbadea13e2ab2d305299f" id="r_ad37ccbb34e6cbadea13e2ab2d305299f"><td class="memItemLeft" align="right" valign="top"><a id="ad37ccbb34e6cbadea13e2ab2d305299f" name="ad37ccbb34e6cbadea13e2ab2d305299f"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>ConnectPresence</b> (string playerUlid=null, <a class="el" href="namespaceLootLocker.html#a21e897e83c6ff935e2c77003a986d21b">LootLockerPresenceCallback</a> onComplete=null)</td></tr>
+<tr class="memdesc:ad37ccbb34e6cbadea13e2ab2d305299f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect presence for a specific player session. <br /></td></tr>
+<tr class="separator:ad37ccbb34e6cbadea13e2ab2d305299f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26a47a0521d372ab008e3e6a448801c6" id="r_a26a47a0521d372ab008e3e6a448801c6"><td class="memItemLeft" align="right" valign="top"><a id="a26a47a0521d372ab008e3e6a448801c6" name="a26a47a0521d372ab008e3e6a448801c6"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>DisconnectPresence</b> (string playerUlid=null, <a class="el" href="namespaceLootLocker.html#a21e897e83c6ff935e2c77003a986d21b">LootLockerPresenceCallback</a> onComplete=null)</td></tr>
+<tr class="memdesc:a26a47a0521d372ab008e3e6a448801c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect presence for a specific player session. <br /></td></tr>
+<tr class="separator:a26a47a0521d372ab008e3e6a448801c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00dfbf117bb89d4ce7b5f4d991488ef1" id="r_a00dfbf117bb89d4ce7b5f4d991488ef1"><td class="memItemLeft" align="right" valign="top"><a id="a00dfbf117bb89d4ce7b5f4d991488ef1" name="a00dfbf117bb89d4ce7b5f4d991488ef1"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>DisconnectAll</b> ()</td></tr>
+<tr class="memdesc:a00dfbf117bb89d4ce7b5f4d991488ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect all presence connections. <br /></td></tr>
+<tr class="separator:a00dfbf117bb89d4ce7b5f4d991488ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c23d29a6e18660323636c9d60da1485" id="r_a6c23d29a6e18660323636c9d60da1485"><td class="memItemLeft" align="right" valign="top"><a id="a6c23d29a6e18660323636c9d60da1485" name="a6c23d29a6e18660323636c9d60da1485"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdatePresenceStatus</b> (string status, Dictionary&lt; string, string &gt; metadata=null, string playerUlid=null, <a class="el" href="namespaceLootLocker.html#a21e897e83c6ff935e2c77003a986d21b">LootLockerPresenceCallback</a> onComplete=null)</td></tr>
+<tr class="memdesc:a6c23d29a6e18660323636c9d60da1485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update presence status for a specific player. <br /></td></tr>
+<tr class="separator:a6c23d29a6e18660323636c9d60da1485"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85952e4d6aae75f681d2eb5f788f8443" id="r_a85952e4d6aae75f681d2eb5f788f8443"><td class="memItemLeft" align="right" valign="top"><a id="a85952e4d6aae75f681d2eb5f788f8443" name="a85952e4d6aae75f681d2eb5f788f8443"></a>
+static <a class="el" href="namespaceLootLocker.html#a7e68587eb85188bc45ee7b7cdacf1862">LootLockerPresenceConnectionState</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetPresenceConnectionState</b> (string playerUlid=null)</td></tr>
+<tr class="memdesc:a85952e4d6aae75f681d2eb5f788f8443"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get presence connection state for a specific player. <br /></td></tr>
+<tr class="separator:a85952e4d6aae75f681d2eb5f788f8443"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90fe73b9344c8c91144ebc032b0219c" id="r_aa90fe73b9344c8c91144ebc032b0219c"><td class="memItemLeft" align="right" valign="top"><a id="aa90fe73b9344c8c91144ebc032b0219c" name="aa90fe73b9344c8c91144ebc032b0219c"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsPresenceConnected</b> (string playerUlid=null)</td></tr>
+<tr class="memdesc:aa90fe73b9344c8c91144ebc032b0219c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if presence is connected for a specific player. <br /></td></tr>
+<tr class="separator:aa90fe73b9344c8c91144ebc032b0219c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addddb8ed7166d6055a99f42510e2b20e" id="r_addddb8ed7166d6055a99f42510e2b20e"><td class="memItemLeft" align="right" valign="top"><a id="addddb8ed7166d6055a99f42510e2b20e" name="addddb8ed7166d6055a99f42510e2b20e"></a>
+static <a class="el" href="classLootLocker_1_1LootLockerPresenceConnectionStats.html">LootLockerPresenceConnectionStats</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetPresenceConnectionStats</b> (string playerUlid=null)</td></tr>
+<tr class="memdesc:addddb8ed7166d6055a99f42510e2b20e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get connection statistics including latency to <a class="el" href="namespaceLootLocker.html">LootLocker</a> for a specific player. <br /></td></tr>
+<tr class="separator:addddb8ed7166d6055a99f42510e2b20e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5720b692a92620962ebab00d0acc1f65" id="r_a5720b692a92620962ebab00d0acc1f65"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html#a5720b692a92620962ebab00d0acc1f65">GetLastSentStatus</a> (string playerUlid=null)</td></tr>
+<tr class="memdesc:a5720b692a92620962ebab00d0acc1f65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last status that was sent for a specific player.  <br /></td></tr>
+<tr class="separator:a5720b692a92620962ebab00d0acc1f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:a85a3db6990a23ae275f631b35bbc8227" id="r_a85a3db6990a23ae275f631b35bbc8227"><td class="memItemLeft" align="right" valign="top"><a id="a85a3db6990a23ae275f631b35bbc8227" name="a85a3db6990a23ae275f631b35bbc8227"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsEnabled</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a85a3db6990a23ae275f631b35bbc8227"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the presence system is enabled. <br /></td></tr>
+<tr class="separator:a85a3db6990a23ae275f631b35bbc8227"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5097bef64b9e0a1cb491afc0ee0a6be" id="r_ab5097bef64b9e0a1cb491afc0ee0a6be"><td class="memItemLeft" align="right" valign="top"><a id="ab5097bef64b9e0a1cb491afc0ee0a6be" name="ab5097bef64b9e0a1cb491afc0ee0a6be"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>AutoConnectEnabled</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ab5097bef64b9e0a1cb491afc0ee0a6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether presence should automatically connect when sessions are started. <br /></td></tr>
+<tr class="separator:ab5097bef64b9e0a1cb491afc0ee0a6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b57994d408302d3ef9221087cc092fb" id="r_a0b57994d408302d3ef9221087cc092fb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html#a0b57994d408302d3ef9221087cc092fb">AutoDisconnectOnFocusChange</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a0b57994d408302d3ef9221087cc092fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether presence should automatically disconnect when the application loses focus or is paused.  <br /></td></tr>
+<tr class="separator:a0b57994d408302d3ef9221087cc092fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a937de4409fdd2eecda921a331d965a95" id="r_a937de4409fdd2eecda921a331d965a95"><td class="memItemLeft" align="right" valign="top"><a id="a937de4409fdd2eecda921a331d965a95" name="a937de4409fdd2eecda921a331d965a95"></a>
+static IEnumerable&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ActiveClientUlids</b><code> [get]</code></td></tr>
+<tr class="memdesc:a937de4409fdd2eecda921a331d965a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all active presence client ULIDs. <br /></td></tr>
+<tr class="separator:a937de4409fdd2eecda921a331d965a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab95b564f2695188ed82209400a75a278" id="r_ab95b564f2695188ed82209400a75a278"><td class="memItemLeft" align="right" valign="top"><a id="ab95b564f2695188ed82209400a75a278" name="ab95b564f2695188ed82209400a75a278"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsInitialized</b> = false<code> [get]</code></td></tr>
+<tr class="memdesc:ab95b564f2695188ed82209400a75a278"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the service has been initialized. <br /></td></tr>
+<tr class="separator:ab95b564f2695188ed82209400a75a278"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9f9486e24a17ac7e15c1469f1fbf1c7" id="r_ab9f9486e24a17ac7e15c1469f1fbf1c7"><td class="memItemLeft" align="right" valign="top"><a id="ab9f9486e24a17ac7e15c1469f1fbf1c7" name="ab9f9486e24a17ac7e15c1469f1fbf1c7"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>ServiceName</b><code> [get]</code></td></tr>
+<tr class="memdesc:ab9f9486e24a17ac7e15c1469f1fbf1c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service name for logging and identification. <br /></td></tr>
+<tr class="separator:ab9f9486e24a17ac7e15c1469f1fbf1c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header properties_interfaceLootLocker_1_1ILootLockerService"><td colspan="2" onclick="javascript:toggleInherit('properties_interfaceLootLocker_1_1ILootLockerService')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="interfaceLootLocker_1_1ILootLockerService.html">LootLocker.ILootLockerService</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Manager for all <a class="el" href="namespaceLootLocker.html">LootLocker</a> Presence functionality Automatically manages presence connections for all active sessions. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5720b692a92620962ebab00d0acc1f65" name="a5720b692a92620962ebab00d0acc1f65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5720b692a92620962ebab00d0acc1f65">&#9670;&#160;</a></span>GetLastSentStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static string LootLocker.LootLockerPresenceManager.GetLastSentStatus </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerUlid</em> = <code>null</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the last status that was sent for a specific player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerUlid</td><td>Optional: The player's ULID. If not provided, uses the default player</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The last sent status string, or null if no client is found or no status has been sent</dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Property Documentation</h2>
+<a id="a0b57994d408302d3ef9221087cc092fb" name="a0b57994d408302d3ef9221087cc092fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b57994d408302d3ef9221087cc092fb">&#9670;&#160;</a></span>AutoDisconnectOnFocusChange</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool LootLocker.LootLockerPresenceManager.AutoDisconnectOnFocusChange</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether presence should automatically disconnect when the application loses focus or is paused. </p>
+<p>When enabled, presence will disconnect when the app goes to background and reconnect when it returns to foreground. Useful for saving battery on mobile or managing resources. </p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceLootLocker.html">LootLocker</a></li><li class="navelem"><a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html">LootLockerPresenceManager</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

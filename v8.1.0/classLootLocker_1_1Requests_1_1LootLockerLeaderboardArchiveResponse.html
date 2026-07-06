@@ -1,0 +1,285 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker.Requests.LootLockerLeaderboardArchiveResponse Class Reference</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#properties">Properties</a> &#124;
+<a href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">LootLocker.Requests.LootLockerLeaderboardArchiveResponse Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Response containing a list of archived (past) leaderboard snapshots.  
+ <a href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for LootLocker.Requests.LootLockerLeaderboardArchiveResponse:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse__inherit__graph.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_inherit__map" alt="Inheritance graph"/></div>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_inherit__map" id="aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_inherit__map">
+<area shape="rect" title="Response containing a list of archived (past) leaderboard snapshots." alt="" coords="5,79,263,119"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="57,5,211,31"/>
+<area shape="poly" title=" " alt="" coords="137,44,137,79,131,79,131,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for LootLocker.Requests.LootLockerLeaderboardArchiveResponse:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse__coll__graph.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_coll__map" alt="Collaboration graph"/></div>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_coll__map" id="aLootLocker_8Requests_8LootLockerLeaderboardArchiveResponse_coll__map">
+<area shape="rect" title="Response containing a list of archived (past) leaderboard snapshots." alt="" coords="5,79,263,119"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="57,5,211,31"/>
+<area shape="poly" title=" " alt="" coords="137,44,137,79,131,79,131,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:a76a59f3fa8657ac5925618690a9bff88" id="r_a76a59f3fa8657ac5925618690a9bff88"><td class="memItemLeft" align="right" valign="top"><a id="a76a59f3fa8657ac5925618690a9bff88" name="a76a59f3fa8657ac5925618690a9bff88"></a>
+LootLockerLeaderboardArchive[]&#160;</td><td class="memItemRight" valign="bottom"><b>archives</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a76a59f3fa8657ac5925618690a9bff88"><td class="mdescLeft">&#160;</td><td class="mdescRight">A List of past Leaderboards. <br /></td></tr>
+<tr class="separator:a76a59f3fa8657ac5925618690a9bff88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header properties_classLootLocker_1_1LootLockerResponse"><td colspan="2" onclick="javascript:toggleInherit('properties_classLootLocker_1_1LootLockerResponse')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLocker.LootLockerResponse</a></td></tr>
+<tr class="memitem:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_ab0e40597a3bcf58e25fa56e32deae172"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>statusCode</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">HTTP Status Code. <br /></td></tr>
+<tr class="separator:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a082a6753afb7cca1fcf89415a647e950"><td class="memItemLeft" align="right" valign="top">
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>success</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this request was a success. <br /></td></tr>
+<tr class="separator:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a9e0b526bcc6c79ebe8b9ddca0be4379f"><td class="memItemLeft" align="right" valign="top">
+string&#160;</td><td class="memItemRight" valign="bottom"><b>text</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw text/http body from the server response. <br /></td></tr>
+<tr class="separator:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_af650fdeb9f0c6ba9745cf21f3f78c626"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classLootLocker_1_1LootLockerRequestContext.html">LootLockerRequestContext</a>&#160;</td><td class="memItemRight" valign="bottom"><b>requestContext</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Context for the request. <br /></td></tr>
+<tr class="separator:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a7ab0f8f19e90c233f7a87d4d566f5577"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classLootLocker_1_1LootLockerErrorData.html">LootLockerErrorData</a>&#160;</td><td class="memItemRight" valign="bottom"><b>errorData</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this request was not a success, this structure holds all the information needed to identify the problem. <br /></td></tr>
+<tr class="separator:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_afc4f50259754838517102f75dcafde60"><td class="memItemLeft" align="right" valign="top">
+string&#160;</td><td class="memItemRight" valign="bottom"><b>EventId</b> = Guid.NewGuid().ToString()<code> [get, set]</code></td></tr>
+<tr class="memdesc:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events of the same type makes use unable to identify each one <br /></td></tr>
+<tr class="separator:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Response containing a list of archived (past) leaderboard snapshots. </p>
+</div></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceLootLocker.html">LootLocker</a></li><li class="navelem"><a class="el" href="namespaceLootLocker_1_1Requests.html">Requests</a></li><li class="navelem"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html">LootLockerLeaderboardArchiveResponse</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

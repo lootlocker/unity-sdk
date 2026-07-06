@@ -1,0 +1,5 @@
+<map id="LootLocker.LootLockerPresenceManager" name="LootLocker.LootLockerPresenceManager">
+<area shape="rect" id="Node000001" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ..." alt="" coords="5,79,229,119"/>
+<area shape="rect" id="Node000002" href="$interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="45,5,189,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,44,120,79,115,79,115,44"/>
+</map>
