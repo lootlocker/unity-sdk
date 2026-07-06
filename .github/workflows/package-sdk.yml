@@ -68,7 +68,8 @@ jobs:
       - name: Attach .unitypackage to release
         if: github.event_name == 'release'
         run: |
-          for f in unity-sdk-packager/LootLockerSDK*.unitypackage; do
+          cd unity-sdk
+          for f in ../unity-sdk-packager/LootLockerSDK*.unitypackage; do
             echo "Uploading $f"
             gh release upload --clobber "${{ github.ref_name }}" "$f"
           done
