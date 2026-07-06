@@ -1,0 +1,409 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker.Requests.LootLockerCommonAssetResponse Class Reference</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#properties">Properties</a> &#124;
+<a href="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">LootLocker.Requests.LootLockerCommonAssetResponse Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Response containing the full details of an asset, returned by the legacy common asset endpoint.  
+ <a href="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for LootLocker.Requests.LootLockerCommonAssetResponse:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse__inherit__graph.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCommonAssetResponse_inherit__map" alt="Inheritance graph"/></div>
+<map name="aLootLocker_8Requests_8LootLockerCommonAssetResponse_inherit__map" id="aLootLocker_8Requests_8LootLockerCommonAssetResponse_inherit__map">
+<area shape="rect" title="Response containing the full details of an asset, returned by the legacy common asset endpoint." alt="" coords="5,79,228,119"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="39,5,194,31"/>
+<area shape="poly" title=" " alt="" coords="119,44,119,79,114,79,114,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for LootLocker.Requests.LootLockerCommonAssetResponse:</div>
+<div class="dyncontent">
+<div class="center"><img src="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse__coll__graph.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCommonAssetResponse_coll__map" alt="Collaboration graph"/></div>
+<map name="aLootLocker_8Requests_8LootLockerCommonAssetResponse_coll__map" id="aLootLocker_8Requests_8LootLockerCommonAssetResponse_coll__map">
+<area shape="rect" title="Response containing the full details of an asset, returned by the legacy common asset endpoint." alt="" coords="5,79,228,119"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="39,5,194,31"/>
+<area shape="poly" title=" " alt="" coords="119,44,119,79,114,79,114,44"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:a65ffa8ec1dee93c6765d25dee645cad9" id="r_a65ffa8ec1dee93c6765d25dee645cad9"><td class="memItemLeft" align="right" valign="top"><a id="a65ffa8ec1dee93c6765d25dee645cad9" name="a65ffa8ec1dee93c6765d25dee645cad9"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>id</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a65ffa8ec1dee93c6765d25dee645cad9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The legacy integer id of the asset. <br /></td></tr>
+<tr class="separator:a65ffa8ec1dee93c6765d25dee645cad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f5da7e08e80151331be7ad9a166baec" id="r_a5f5da7e08e80151331be7ad9a166baec"><td class="memItemLeft" align="right" valign="top"><a id="a5f5da7e08e80151331be7ad9a166baec" name="a5f5da7e08e80151331be7ad9a166baec"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>uuid</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a5f5da7e08e80151331be7ad9a166baec"><td class="mdescLeft">&#160;</td><td class="mdescRight">The UUID of the asset. <br /></td></tr>
+<tr class="separator:a5f5da7e08e80151331be7ad9a166baec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ce95849ef61124891f70f1dc8132e52" id="r_a9ce95849ef61124891f70f1dc8132e52"><td class="memItemLeft" align="right" valign="top"><a id="a9ce95849ef61124891f70f1dc8132e52" name="a9ce95849ef61124891f70f1dc8132e52"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>ulid</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9ce95849ef61124891f70f1dc8132e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ULID of the asset. <br /></td></tr>
+<tr class="separator:a9ce95849ef61124891f70f1dc8132e52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ad756e0e7656709ac371e43d8a835b0" id="r_a4ad756e0e7656709ac371e43d8a835b0"><td class="memItemLeft" align="right" valign="top"><a id="a4ad756e0e7656709ac371e43d8a835b0" name="a4ad756e0e7656709ac371e43d8a835b0"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a4ad756e0e7656709ac371e43d8a835b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The display name of the asset. <br /></td></tr>
+<tr class="separator:a4ad756e0e7656709ac371e43d8a835b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78a8251c00d5e11ec10b7cead5bbb54a" id="r_a78a8251c00d5e11ec10b7cead5bbb54a"><td class="memItemLeft" align="right" valign="top"><a id="a78a8251c00d5e11ec10b7cead5bbb54a" name="a78a8251c00d5e11ec10b7cead5bbb54a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>active</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a78a8251c00d5e11ec10b7cead5bbb54a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the asset is currently active. <br /></td></tr>
+<tr class="separator:a78a8251c00d5e11ec10b7cead5bbb54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64a5f60d60e97d25091fffda967bf042" id="r_a64a5f60d60e97d25091fffda967bf042"><td class="memItemLeft" align="right" valign="top"><a id="a64a5f60d60e97d25091fffda967bf042" name="a64a5f60d60e97d25091fffda967bf042"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>purchasable</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a64a5f60d60e97d25091fffda967bf042"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the asset can be purchased. <br /></td></tr>
+<tr class="separator:a64a5f60d60e97d25091fffda967bf042"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94ff73212c281f81ff1411764ce0177f" id="r_a94ff73212c281f81ff1411764ce0177f"><td class="memItemLeft" align="right" valign="top"><a id="a94ff73212c281f81ff1411764ce0177f" name="a94ff73212c281f81ff1411764ce0177f"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>type</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a94ff73212c281f81ff1411764ce0177f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type category of the asset. <br /></td></tr>
+<tr class="separator:a94ff73212c281f81ff1411764ce0177f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeabef758ac2e966eb84ec4c26f9d26d3" id="r_aeabef758ac2e966eb84ec4c26f9d26d3"><td class="memItemLeft" align="right" valign="top"><a id="aeabef758ac2e966eb84ec4c26f9d26d3" name="aeabef758ac2e966eb84ec4c26f9d26d3"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>price</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:aeabef758ac2e966eb84ec4c26f9d26d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The regular price of the asset. <br /></td></tr>
+<tr class="separator:aeabef758ac2e966eb84ec4c26f9d26d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69c5db90aac10f4c2b60e4309f45bc6d" id="r_a69c5db90aac10f4c2b60e4309f45bc6d"><td class="memItemLeft" align="right" valign="top"><a id="a69c5db90aac10f4c2b60e4309f45bc6d" name="a69c5db90aac10f4c2b60e4309f45bc6d"></a>
+int?&#160;</td><td class="memItemRight" valign="bottom"><b>sales_price</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a69c5db90aac10f4c2b60e4309f45bc6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The sale price of the asset, or null if not on sale. <br /></td></tr>
+<tr class="separator:a69c5db90aac10f4c2b60e4309f45bc6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae87fe12cb80cec51d0e7fd5e631cd1fe" id="r_ae87fe12cb80cec51d0e7fd5e631cd1fe"><td class="memItemLeft" align="right" valign="top"><a id="ae87fe12cb80cec51d0e7fd5e631cd1fe" name="ae87fe12cb80cec51d0e7fd5e631cd1fe"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>display_price</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ae87fe12cb80cec51d0e7fd5e631cd1fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">A formatted string representation of the price for display purposes. <br /></td></tr>
+<tr class="separator:ae87fe12cb80cec51d0e7fd5e631cd1fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac049698659b9c393f3b35c6e4ace8965" id="r_ac049698659b9c393f3b35c6e4ace8965"><td class="memItemLeft" align="right" valign="top"><a id="ac049698659b9c393f3b35c6e4ace8965" name="ac049698659b9c393f3b35c6e4ace8965"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>context</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ac049698659b9c393f3b35c6e4ace8965"><td class="mdescLeft">&#160;</td><td class="mdescRight">The context (category) the asset belongs to. <br /></td></tr>
+<tr class="separator:ac049698659b9c393f3b35c6e4ace8965"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25e9754ad4dcba01271df87a1740eef7" id="r_a25e9754ad4dcba01271df87a1740eef7"><td class="memItemLeft" align="right" valign="top"><a id="a25e9754ad4dcba01271df87a1740eef7" name="a25e9754ad4dcba01271df87a1740eef7"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>unlocks_context</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a25e9754ad4dcba01271df87a1740eef7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The context unlocked by equipping this asset. <br /></td></tr>
+<tr class="separator:a25e9754ad4dcba01271df87a1740eef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f1350c228b96849551ffb5734965d0d" id="r_a3f1350c228b96849551ffb5734965d0d"><td class="memItemLeft" align="right" valign="top"><a id="a3f1350c228b96849551ffb5734965d0d" name="a3f1350c228b96849551ffb5734965d0d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>detachable</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a3f1350c228b96849551ffb5734965d0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this asset can be removed from an equip slot after being equipped. <br /></td></tr>
+<tr class="separator:a3f1350c228b96849551ffb5734965d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a775707cd8dff9643f721239764cb5a8f" id="r_a775707cd8dff9643f721239764cb5a8f"><td class="memItemLeft" align="right" valign="top"><a id="a775707cd8dff9643f721239764cb5a8f" name="a775707cd8dff9643f721239764cb5a8f"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>updated</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a775707cd8dff9643f721239764cb5a8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">When the asset was last updated, as a date string. <br /></td></tr>
+<tr class="separator:a775707cd8dff9643f721239764cb5a8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3bae04547492a4c094e3ba199302c8d" id="r_aa3bae04547492a4c094e3ba199302c8d"><td class="memItemLeft" align="right" valign="top"><a id="aa3bae04547492a4c094e3ba199302c8d" name="aa3bae04547492a4c094e3ba199302c8d"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>marked_new</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:aa3bae04547492a4c094e3ba199302c8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">When the asset was marked as new, as a date string. <br /></td></tr>
+<tr class="separator:aa3bae04547492a4c094e3ba199302c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9512cfb54a8709ab2a5d1bc0521866da" id="r_a9512cfb54a8709ab2a5d1bc0521866da"><td class="memItemLeft" align="right" valign="top"><a id="a9512cfb54a8709ab2a5d1bc0521866da" name="a9512cfb54a8709ab2a5d1bc0521866da"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>default_variation_id</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9512cfb54a8709ab2a5d1bc0521866da"><td class="mdescLeft">&#160;</td><td class="mdescRight">The id of the variation that is selected by default. <br /></td></tr>
+<tr class="separator:a9512cfb54a8709ab2a5d1bc0521866da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4be91ad21995b08dd4bfce007a9b189e" id="r_a4be91ad21995b08dd4bfce007a9b189e"><td class="memItemLeft" align="right" valign="top"><a id="a4be91ad21995b08dd4bfce007a9b189e" name="a4be91ad21995b08dd4bfce007a9b189e"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>description</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a4be91ad21995b08dd4bfce007a9b189e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The description of the asset. <br /></td></tr>
+<tr class="separator:a4be91ad21995b08dd4bfce007a9b189e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab65bf80c1e12c0d655c618361dec7226" id="r_ab65bf80c1e12c0d655c618361dec7226"><td class="memItemLeft" align="right" valign="top"><a id="ab65bf80c1e12c0d655c618361dec7226" name="ab65bf80c1e12c0d655c618361dec7226"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLinks.html">LootLockerLinks</a>&#160;</td><td class="memItemRight" valign="bottom"><b>links</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ab65bf80c1e12c0d655c618361dec7226"><td class="mdescLeft">&#160;</td><td class="mdescRight">Named links (e.g. image URLs) associated with this asset. <br /></td></tr>
+<tr class="separator:ab65bf80c1e12c0d655c618361dec7226"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af56d4c4c603a2dd07a859d7c98b5a32a" id="r_af56d4c4c603a2dd07a859d7c98b5a32a"><td class="memItemLeft" align="right" valign="top"><a id="af56d4c4c603a2dd07a859d7c98b5a32a" name="af56d4c4c603a2dd07a859d7c98b5a32a"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStorage.html">LootLockerStorage</a>[]&#160;</td><td class="memItemRight" valign="bottom"><b>storage</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:af56d4c4c603a2dd07a859d7c98b5a32a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Key-value storage entries attached to this asset. <br /></td></tr>
+<tr class="separator:af56d4c4c603a2dd07a859d7c98b5a32a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0606c18135f6e4213ae7e63019f4ea2" id="r_af0606c18135f6e4213ae7e63019f4ea2"><td class="memItemLeft" align="right" valign="top"><a id="af0606c18135f6e4213ae7e63019f4ea2" name="af0606c18135f6e4213ae7e63019f4ea2"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRarity.html">LootLockerRarity</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rarity</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:af0606c18135f6e4213ae7e63019f4ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rarity information for this asset. <br /></td></tr>
+<tr class="separator:af0606c18135f6e4213ae7e63019f4ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eb96fa076b7acb7433816471ed57e3e" id="r_a4eb96fa076b7acb7433816471ed57e3e"><td class="memItemLeft" align="right" valign="top"><a id="a4eb96fa076b7acb7433816471ed57e3e" name="a4eb96fa076b7acb7433816471ed57e3e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>popular</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a4eb96fa076b7acb7433816471ed57e3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this asset is popular. <br /></td></tr>
+<tr class="separator:a4eb96fa076b7acb7433816471ed57e3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f9a02e0444de2c645b5a98f53ef1439" id="r_a9f9a02e0444de2c645b5a98f53ef1439"><td class="memItemLeft" align="right" valign="top"><a id="a9f9a02e0444de2c645b5a98f53ef1439" name="a9f9a02e0444de2c645b5a98f53ef1439"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>popularity_score</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9f9a02e0444de2c645b5a98f53ef1439"><td class="mdescLeft">&#160;</td><td class="mdescRight">A numeric score used to rank asset popularity. <br /></td></tr>
+<tr class="separator:a9f9a02e0444de2c645b5a98f53ef1439"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a583ae37649383c8a7bb7c22af14edd4e" id="r_a583ae37649383c8a7bb7c22af14edd4e"><td class="memItemLeft" align="right" valign="top"><a id="a583ae37649383c8a7bb7c22af14edd4e" name="a583ae37649383c8a7bb7c22af14edd4e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>unique_instance</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a583ae37649383c8a7bb7c22af14edd4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether each grant of this asset creates a unique inventory instance. <br /></td></tr>
+<tr class="separator:a583ae37649383c8a7bb7c22af14edd4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0881a396fa3fc04a940f044ec4b06b49" id="r_a0881a396fa3fc04a940f044ec4b06b49"><td class="memItemLeft" align="right" valign="top"><a id="a0881a396fa3fc04a940f044ec4b06b49" name="a0881a396fa3fc04a940f044ec4b06b49"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRental__Options.html">LootLockerRental_Options</a>[]&#160;</td><td class="memItemRight" valign="bottom"><b>rental_options</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a0881a396fa3fc04a940f044ec4b06b49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Available rental options for this asset. <br /></td></tr>
+<tr class="separator:a0881a396fa3fc04a940f044ec4b06b49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d366858cc3de3e86d0d3d4184ff6f89" id="r_a8d366858cc3de3e86d0d3d4184ff6f89"><td class="memItemLeft" align="right" valign="top"><a id="a8d366858cc3de3e86d0d3d4184ff6f89" name="a8d366858cc3de3e86d0d3d4184ff6f89"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFilter.html">LootLockerFilter</a>[]&#160;</td><td class="memItemRight" valign="bottom"><b>filters</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a8d366858cc3de3e86d0d3d4184ff6f89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filters (tags) applied to this asset for categorisation. <br /></td></tr>
+<tr class="separator:a8d366858cc3de3e86d0d3d4184ff6f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47061d204af55ba346f997c07970fe71" id="r_a47061d204af55ba346f997c07970fe71"><td class="memItemLeft" align="right" valign="top"><a id="a47061d204af55ba346f997c07970fe71" name="a47061d204af55ba346f997c07970fe71"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerVariation.html">LootLockerVariation</a>[]&#160;</td><td class="memItemRight" valign="bottom"><b>variations</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a47061d204af55ba346f997c07970fe71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variations available for this asset. <br /></td></tr>
+<tr class="separator:a47061d204af55ba346f997c07970fe71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae253fee4192ca3ef446b2c118894e9fd" id="r_ae253fee4192ca3ef446b2c118894e9fd"><td class="memItemLeft" align="right" valign="top"><a id="ae253fee4192ca3ef446b2c118894e9fd" name="ae253fee4192ca3ef446b2c118894e9fd"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>featured</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ae253fee4192ca3ef446b2c118894e9fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this asset is featured. <br /></td></tr>
+<tr class="separator:ae253fee4192ca3ef446b2c118894e9fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accf86dda47ca806dc08510cf748793f1" id="r_accf86dda47ca806dc08510cf748793f1"><td class="memItemLeft" align="right" valign="top"><a id="accf86dda47ca806dc08510cf748793f1" name="accf86dda47ca806dc08510cf748793f1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>context_locked</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:accf86dda47ca806dc08510cf748793f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this asset is locked to its context. <br /></td></tr>
+<tr class="separator:accf86dda47ca806dc08510cf748793f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c112885b79faeec0f6e8612733e071f" id="r_a1c112885b79faeec0f6e8612733e071f"><td class="memItemLeft" align="right" valign="top"><a id="a1c112885b79faeec0f6e8612733e071f" name="a1c112885b79faeec0f6e8612733e071f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>initially_purchasable</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a1c112885b79faeec0f6e8612733e071f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this asset can be purchased initially. <br /></td></tr>
+<tr class="separator:a1c112885b79faeec0f6e8612733e071f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a383da9a48b596febe92d5bc22cd84b44" id="r_a383da9a48b596febe92d5bc22cd84b44"><td class="memItemLeft" align="right" valign="top"><a id="a383da9a48b596febe92d5bc22cd84b44" name="a383da9a48b596febe92d5bc22cd84b44"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFile.html">LootLockerFile</a>[]&#160;</td><td class="memItemRight" valign="bottom"><b>files</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a383da9a48b596febe92d5bc22cd84b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Files associated with this asset. <br /></td></tr>
+<tr class="separator:a383da9a48b596febe92d5bc22cd84b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8100fcd0d91d43635dae5308147b5f41" id="r_a8100fcd0d91d43635dae5308147b5f41"><td class="memItemLeft" align="right" valign="top"><a id="a8100fcd0d91d43635dae5308147b5f41" name="a8100fcd0d91d43635dae5308147b5f41"></a>
+<a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAssetCandidate.html">LootLockerAssetCandidate</a>&#160;</td><td class="memItemRight" valign="bottom"><b>asset_candidate</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a8100fcd0d91d43635dae5308147b5f41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Information about the UGC creator of this asset, if applicable. <br /></td></tr>
+<tr class="separator:a8100fcd0d91d43635dae5308147b5f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a354853b0b3784f3295df018f13025a05" id="r_a354853b0b3784f3295df018f13025a05"><td class="memItemLeft" align="right" valign="top"><a id="a354853b0b3784f3295df018f13025a05" name="a354853b0b3784f3295df018f13025a05"></a>
+string[]&#160;</td><td class="memItemRight" valign="bottom"><b>data_entities</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a354853b0b3784f3295df018f13025a05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data entities attached to this asset. <br /></td></tr>
+<tr class="separator:a354853b0b3784f3295df018f13025a05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header properties_classLootLocker_1_1LootLockerResponse"><td colspan="2" onclick="javascript:toggleInherit('properties_classLootLocker_1_1LootLockerResponse')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLocker.LootLockerResponse</a></td></tr>
+<tr class="memitem:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_ab0e40597a3bcf58e25fa56e32deae172"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>statusCode</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">HTTP Status Code. <br /></td></tr>
+<tr class="separator:ab0e40597a3bcf58e25fa56e32deae172 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a082a6753afb7cca1fcf89415a647e950"><td class="memItemLeft" align="right" valign="top">
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>success</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this request was a success. <br /></td></tr>
+<tr class="separator:a082a6753afb7cca1fcf89415a647e950 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a9e0b526bcc6c79ebe8b9ddca0be4379f"><td class="memItemLeft" align="right" valign="top">
+string&#160;</td><td class="memItemRight" valign="bottom"><b>text</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw text/http body from the server response. <br /></td></tr>
+<tr class="separator:a9e0b526bcc6c79ebe8b9ddca0be4379f inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_af650fdeb9f0c6ba9745cf21f3f78c626"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classLootLocker_1_1LootLockerRequestContext.html">LootLockerRequestContext</a>&#160;</td><td class="memItemRight" valign="bottom"><b>requestContext</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">Context for the request. <br /></td></tr>
+<tr class="separator:af650fdeb9f0c6ba9745cf21f3f78c626 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_a7ab0f8f19e90c233f7a87d4d566f5577"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classLootLocker_1_1LootLockerErrorData.html">LootLockerErrorData</a>&#160;</td><td class="memItemRight" valign="bottom"><b>errorData</b><code> [get, set]</code></td></tr>
+<tr class="memdesc:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this request was not a success, this structure holds all the information needed to identify the problem. <br /></td></tr>
+<tr class="separator:a7ab0f8f19e90c233f7a87d4d566f5577 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse" id="r_afc4f50259754838517102f75dcafde60"><td class="memItemLeft" align="right" valign="top">
+string&#160;</td><td class="memItemRight" valign="bottom"><b>EventId</b> = Guid.NewGuid().ToString()<code> [get, set]</code></td></tr>
+<tr class="memdesc:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="mdescLeft">&#160;</td><td class="mdescRight">inheritdoc added this because unity main thread executing style cut the calling stack and make the event orphan see also calling multiple events of the same type makes use unable to identify each one <br /></td></tr>
+<tr class="separator:afc4f50259754838517102f75dcafde60 inherit properties_classLootLocker_1_1LootLockerResponse"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Response containing the full details of an asset, returned by the legacy common asset endpoint. </p>
+</div></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceLootLocker.html">LootLocker</a></li><li class="navelem"><a class="el" href="namespaceLootLocker_1_1Requests.html">Requests</a></li><li class="navelem"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse.html">LootLockerCommonAssetResponse</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

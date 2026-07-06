@@ -1,0 +1,1934 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Purchasing</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Purchasing.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Purchasing</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Initiate and validate purchases — both real-money (IAP) and virtual-currency. </p>
+<p><b>Real-money purchases</b> integrate with first-party payment systems (Apple App Store, Google Play, Steam) to process and server-side validate IAP receipts. <b>Virtual purchases</b> debit a player's Wallet and grant the catalog item. Both flows produce an entitlement inspectable via <a class="el" href="group__Entitlements.html">Entitlements</a>.</p>
+<p>See the <a href="https://docs.lootlocker.com/commerce/real-money-purchases">LootLocker documentation — Real-Money Purchases</a> and <a href="https://docs.lootlocker.com/commerce/virtual-purchases">Virtual Purchases</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gac72cc74388cb4afde54fd0479da0bdc2" name="gac72cc74388cb4afde54fd0479da0bdc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac72cc74388cb4afde54fd0479da0bdc2">&#9670;&#160;</a></span>ActivateRentalAsset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ActivateRentalAsset </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerActivateRentalAssetResponse.html">LootLockerActivateRentalAssetResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Activate a rental asset. </p>
+<p>This will grant the asset to the player and start the rental timer on the server.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID of the asset to activate</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerActivateARentalAssetResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga35cfd08f703cb35c596e17e9f3ca9ecd" name="ga35cfd08f703cb35c596e17e9f3ca9ecd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga35cfd08f703cb35c596e17e9f3ca9ecd">&#9670;&#160;</a></span>BeginSteamPurchaseRedemption()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemption </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>steamId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>currency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>language</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>catalogItemId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerBeginSteamPurchaseRedemptionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item. </p>
+<p>Steam in-app purchases need to be configured for this to work Steam in-app purchases works slightly different from other platforms, you begin a purchase with this call which initiates it in Steams backend While your app is waiting for the user to finalize that purchase you can use QuerySteamPurchaseRedemptionStatus to get the status, when that tells you that the purchase is Approved you can finalize the purchase using FinalizeSteamPurchaseRedemption</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">steamId</td><td>Id of the Steam User that is making the purchase</td></tr>
+    <tr><td class="paramname">currency</td><td>The currency to use for the purchase</td></tr>
+    <tr><td class="paramname">language</td><td>The language to use for the purchase</td></tr>
+    <tr><td class="paramname">catalogItemId</td><td>The <a class="el" href="namespaceLootLocker.html">LootLocker</a> Catalog Item Id for the item you wish to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga675c0e20d5cf35cea8513923750d1fb3" name="ga675c0e20d5cf35cea8513923750d1fb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga675c0e20d5cf35cea8513923750d1fb3">&#9670;&#160;</a></span>BeginSteamPurchaseRedemptionForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemptionForClass </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>steamId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>currency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>language</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>catalogItemId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerBeginSteamPurchaseRedemptionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item for the specified class. </p>
+<p>Steam in-app purchases need to be configured for this to work Steam in-app purchases works slightly different from other platforms, you begin a purchase with this call which initiates it in Steams backend While your app is waiting for the user to finalize that purchase you can use QuerySteamPurchaseRedemptionStatus to get the status, when that tells you that the purchase is Approved you can finalize the purchase using FinalizeSteamPurchaseRedemption</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">classId</td><td>Id of the class to make the purchase for</td></tr>
+    <tr><td class="paramname">steamId</td><td>Id of the Steam User that is making the purchase</td></tr>
+    <tr><td class="paramname">currency</td><td>The currency to use for the purchase</td></tr>
+    <tr><td class="paramname">language</td><td>The language to use for the purchase</td></tr>
+    <tr><td class="paramname">catalogItemId</td><td>The <a class="el" href="namespaceLootLocker.html">LootLocker</a> Catalog Item Id for the item you wish to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5f1969f52cfa11777068db3ea11f7ae1" name="ga5f1969f52cfa11777068db3ea11f7ae1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5f1969f52cfa11777068db3ea11f7ae1">&#9670;&#160;</a></span>CancelAsyncPurchasePolling()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CancelAsyncPurchasePolling </td>
+          <td>(</td>
+          <td class="paramtype">Guid&#160;</td>
+          <td class="paramname"><em>processGuid</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cancel an ongoing async purchase polling process. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">processGuid</td><td>The Guid returned by InitiateAndPollAsyncPurchaseCatalogItems or InitiateAndPollAsyncPurchaseSingleCatalogItem</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga319d6fd86f9b181bedec02995ee5d1eb" name="ga319d6fd86f9b181bedec02995ee5d1eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga319d6fd86f9b181bedec02995ee5d1eb">&#9670;&#160;</a></span>CreateStripeCheckoutSession()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CreateStripeCheckoutSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>catalogItemId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCreateStripeCheckoutSessionResponse.html">LootLockerCreateStripeCheckoutSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a Stripe Checkout session for a catalog item. </p>
+<p>This initiates a Stripe-hosted checkout flow. The response contains a <code>checkout_link</code> — open it in a browser or webview so the player can complete the payment on Stripe's hosted checkout page. The response also contains an <code>entitlement_id</code> which can be used to track the purchase progress via the entitlements endpoint.</p>
+<p>Stripe in-app purchases must be configured in the <a class="el" href="namespaceLootLocker.html">LootLocker</a> dashboard for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">catalogItemId</td><td>The ULID of the catalog item to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaddc93c3dc01bd401a95caf1cdd4ca72e" name="gaddc93c3dc01bd401a95caf1cdd4ca72e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaddc93c3dc01bd401a95caf1cdd4ca72e">&#9670;&#160;</a></span>FinalizeSteamPurchaseRedemption()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.FinalizeSteamPurchaseRedemption </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>entitlementId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Finalize a started Steam Purchase and subsequently redeem the catalog items that the entitlement refers to. </p>
+<p>The steam purchase needs to be in status Approved for this call to work</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entitlementId</td><td>The id of the entitlement to finalize the purchase for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga528516ebe34cc550f2e303168add7ca3" name="ga528516ebe34cc550f2e303168add7ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga528516ebe34cc550f2e303168add7ca3">&#9670;&#160;</a></span>GetAsyncPurchaseStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAsyncPurchaseStatus </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>entitlementId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the status of an async purchase. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entitlementId</td><td>The entitlement id returned when initiating the async purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga241759df377fc2fa162abbd12c70ed51" name="ga241759df377fc2fa162abbd12c70ed51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga241759df377fc2fa162abbd12c70ed51">&#9670;&#160;</a></span>GetXboxServiceTicket()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetXboxServiceTicket </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerXboxServiceTicketResponse.html">LootLockerXboxServiceTicketResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an Xbox service ticket that can be used to redeem an Xbox Store purchase. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga56dbd772fce1773c1e936ce0a9d89393" name="ga56dbd772fce1773c1e936ce0a9d89393"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga56dbd772fce1773c1e936ce0a9d89393">&#9670;&#160;</a></span>InitiateAndPollAsyncPurchaseCatalogItems()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static Guid LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseCatalogItems </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LootLockerCatalogItemAndQuantityPair[]&#160;</td>
+          <td class="paramname"><em>items</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onStatusUpdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>pollingIntervalSeconds</em> = <code>1::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>timeoutAfterMinutes</em> = <code>5::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initiate an async purchase of one or more catalog items and automatically poll until it reaches a terminal state. </p>
+<p>While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">items</td><td>The catalog items with quantities to purchase</td></tr>
+    <tr><td class="paramname">onStatusUpdate</td><td>Optional: Called on each poll while the purchase is pending</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Called when the purchase reaches a terminal state</td></tr>
+    <tr><td class="paramname">pollingIntervalSeconds</td><td>Optional: How often to poll in seconds (minimum 1)</td></tr>
+    <tr><td class="paramname">timeoutAfterMinutes</td><td>Optional: How many minutes before the process times out</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Guid identifying this process. Pass it to CancelAsyncPurchasePolling to cancel early.</dd></dl>
+
+</div>
+</div>
+<a id="gae7a44d631045579597773650d2cf28d4" name="gae7a44d631045579597773650d2cf28d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae7a44d631045579597773650d2cf28d4">&#9670;&#160;</a></span>InitiateAndPollAsyncPurchaseSingleCatalogItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static Guid LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>itemId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>quantity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onStatusUpdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>pollingIntervalSeconds</em> = <code>1::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>timeoutAfterMinutes</em> = <code>5::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initiate an async purchase of a single catalog item and automatically poll until it reaches a terminal state. </p>
+<p>While pending, onStatusUpdate (if provided) is called each poll. When active, failed, timed out, or cancelled, onComplete is called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">itemId</td><td>The catalog listing id of the item to purchase</td></tr>
+    <tr><td class="paramname">quantity</td><td>The quantity of the item to purchase</td></tr>
+    <tr><td class="paramname">onStatusUpdate</td><td>Optional: Called on each poll while the purchase is pending</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Called when the purchase reaches a terminal state</td></tr>
+    <tr><td class="paramname">pollingIntervalSeconds</td><td>Optional: How often to poll in seconds (minimum 1)</td></tr>
+    <tr><td class="paramname">timeoutAfterMinutes</td><td>Optional: How many minutes before the process times out</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Guid identifying this process. Pass it to CancelAsyncPurchasePolling to cancel early.</dd></dl>
+
+</div>
+</div>
+<a id="ga1680a3ad280f7babb6e8b2296d553a9c" name="ga1680a3ad280f7babb6e8b2296d553a9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1680a3ad280f7babb6e8b2296d553a9c">&#9670;&#160;</a></span>InitiateAsyncPurchaseCatalogItems()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseCatalogItems </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LootLockerCatalogItemAndQuantityPair[]&#160;</td>
+          <td class="paramname"><em>items</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initiate an async purchase of one or more catalog items using a specified wallet. </p>
+<p>The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status. Use InitiateAndPollAsyncPurchaseCatalogItems for an automatic polling experience.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">items</td><td>The catalog items with quantities to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf0e712fdf5c5fdcad821310172d23343" name="gaf0e712fdf5c5fdcad821310172d23343"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf0e712fdf5c5fdcad821310172d23343">&#9670;&#160;</a></span>InitiateAsyncPurchaseSingleCatalogItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseSingleCatalogItem </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>itemId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>quantity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initiate an async purchase of a single catalog item using a specified wallet. </p>
+<p>The async purchase flow uses a dedicated endpoint and returns an entitlement_id to poll for status. Use InitiateAndPollAsyncPurchaseSingleCatalogItem for an automatic polling experience.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">itemId</td><td>The catalog listing id of the item to purchase</td></tr>
+    <tr><td class="paramname">quantity</td><td>The quantity of the item to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaab642b3b4009c757785e3fecb8b434de" name="gaab642b3b4009c757785e3fecb8b434de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaab642b3b4009c757785e3fecb8b434de">&#9670;&#160;</a></span>LootLockerPurchaseCatalogItems()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseCatalogItems </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LootLockerCatalogItemAndQuantityPair[]&#160;</td>
+          <td class="paramname"><em>itemsToPurchase</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerPurchaseCatalogItemResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Purchase one or more catalog items using a specified wallet. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">itemsToPurchase</td><td>A list of items to purchase along with the quantity of each item to purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad6ec254532f37a0d259177d2135d52fb" name="gad6ec254532f37a0d259177d2135d52fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad6ec254532f37a0d259177d2135d52fb">&#9670;&#160;</a></span>LootLockerPurchaseSingleCatalogItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseSingleCatalogItem </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>itemID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>quantity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerPurchaseCatalogItemResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Purchase one catalog item using a specified wallet. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">walletID</td><td>The id of the wallet to use for the purchase</td></tr>
+    <tr><td class="paramname">itemID</td><td>The id of the item that you want to purchase</td></tr>
+    <tr><td class="paramname">quantity</td><td>The amount that you want to purchase the item </td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4b7d3d5194a0cdefa9f34b3aede28ca7" name="ga4b7d3d5194a0cdefa9f34b3aede28ca7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4b7d3d5194a0cdefa9f34b3aede28ca7">&#9670;&#160;</a></span>PollOrderStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.PollOrderStatus </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerPurchaseOrderStatus &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This will give you the current status of a purchase. </p>
+<p>These statuses can be returned; open - The order is being processed closed - The order have been processed successfully refunded - The order has been refunded canceled - The order has been canceled failed - The order failed</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetId</td><td>The ID of the asset to check the status for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPurchaseOrderStatus</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga001e009e840f7c0c1107e3f761a95c3e" name="ga001e009e840f7c0c1107e3f761a95c3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga001e009e840f7c0c1107e3f761a95c3e">&#9670;&#160;</a></span>QuerySteamPurchaseRedemption()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.QuerySteamPurchaseRedemption </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>entitlementId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerQuerySteamPurchaseRedemptionStatusResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check the Steam Purchase status for a given entitlement. </p>
+<p>Use this to check the status of an ongoing purchase to know when it's ready to finalize or has been aborted or use this to get information for a completed purchase</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entitlementId</td><td>The id of the entitlement to check the status for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad394c087418d226fdddbf200e8ab9bb3" name="gad394c087418d226fdddbf200e8ab9bb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad394c087418d226fdddbf200e8ab9bb3">&#9670;&#160;</a></span>RedeemAppleAppStorePurchaseForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForClass </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>transactionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>sandboxed</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Apple App Store for a class that the current player owns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">transactionId</td><td>The id of the transaction successfully made towards the Apple App Store</td></tr>
+    <tr><td class="paramname">classId</td><td>The id of the class to redeem this transaction for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">sandboxed</td><td>Optional: Should this redemption be made towards sandbox App Store</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga451582e6b324e699116f337f8146b28c" name="ga451582e6b324e699116f337f8146b28c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga451582e6b324e699116f337f8146b28c">&#9670;&#160;</a></span>RedeemAppleAppStorePurchaseForPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>transactionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>sandboxed</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Apple App Store for the current player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">transactionId</td><td>The id of the transaction successfully made towards the Apple App Store</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">sandboxed</td><td>Optional: Should this redemption be made towards sandbox App Store</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gabbfbc520ebd5dc771969f78e79b88df8" name="gabbfbc520ebd5dc771969f78e79b88df8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabbfbc520ebd5dc771969f78e79b88df8">&#9670;&#160;</a></span>RedeemEpicStorePurchaseForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForClass </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>accountId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>bearerToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; string &gt;&#160;</td>
+          <td class="paramname"><em>entitlementIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>sandboxId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">accountId</td><td>The Epic account id of the account that this purchase was made for</td></tr>
+    <tr><td class="paramname">bearerToken</td><td>This is the token from epic used to allow the <a class="el" href="namespaceLootLocker.html">LootLocker</a> backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</td></tr>
+    <tr><td class="paramname">entitlementIds</td><td>The ids of the purchased entitlements that you wish to redeem</td></tr>
+    <tr><td class="paramname">sandboxId</td><td>The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</td></tr>
+    <tr><td class="paramname">classId</td><td>The id of the class to redeem this purchase for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional: Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaab86bc92cf1b91df160e5ed9b87c9763" name="gaab86bc92cf1b91df160e5ed9b87c9763"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaab86bc92cf1b91df160e5ed9b87c9763">&#9670;&#160;</a></span>RedeemEpicStorePurchaseForPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>accountId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>bearerToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; string &gt;&#160;</td>
+          <td class="paramname"><em>entitlementIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>sandboxId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Epic Store for the current player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">accountId</td><td>The Epic account id of the account that this purchase was made for</td></tr>
+    <tr><td class="paramname">bearerToken</td><td>This is the token from epic used to allow the <a class="el" href="namespaceLootLocker.html">LootLocker</a> backend to verify ownership of the specified entitlements. This is sometimes referred to as the Server Auth Ticket or Auth Token depending on your Epic integration.</td></tr>
+    <tr><td class="paramname">entitlementIds</td><td>The ids of the purchased entitlements that you wish to redeem</td></tr>
+    <tr><td class="paramname">sandboxId</td><td>The Sandbox Id configured for the game making the purchase (this is the sandbox id from your epic online service configuration)</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional: Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf8b3af44a0b5ef79aca0b792e5e7cb38" name="gaf8b3af44a0b5ef79aca0b792e5e7cb38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf8b3af44a0b5ef79aca0b792e5e7cb38">&#9670;&#160;</a></span>RedeemGooglePlayStorePurchaseForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForClass </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>purchaseToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Google Play Store for a class that the current player owns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">productId</td><td>The id of the product that this redemption refers to</td></tr>
+    <tr><td class="paramname">purchaseToken</td><td>The token from the purchase successfully made towards the Google Play Store</td></tr>
+    <tr><td class="paramname">classId</td><td>The id of the class to redeem this purchase for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5499de3863077320c184df2ec5ce7720" name="ga5499de3863077320c184df2ec5ce7720"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5499de3863077320c184df2ec5ce7720">&#9670;&#160;</a></span>RedeemGooglePlayStorePurchaseForPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>purchaseToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Google Play Store for the current player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">productId</td><td>The id of the product that this redemption refers to</td></tr>
+    <tr><td class="paramname">purchaseToken</td><td>The token from the purchase successfully made towards the Google Play Store</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad7e922ebb42dd81a2e7473d036f6d5df" name="gad7e922ebb42dd81a2e7473d036f6d5df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad7e922ebb42dd81a2e7473d036f6d5df">&#9670;&#160;</a></span>RedeemXboxStorePurchaseForClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForClass </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>classId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>userCollectionsId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Xbox Store for a class that the current player owns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">classId</td><td>The id of the class to redeem this purchase for</td></tr>
+    <tr><td class="paramname">userCollectionsId</td><td>The Xbox user collections ID (JWT) that identifies the user making the purchase</td></tr>
+    <tr><td class="paramname">productId</td><td>The id of the Xbox Store product to redeem</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5bc713045a4a6c57d03e49bb52614012" name="ga5bc713045a4a6c57d03e49bb52614012"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5bc713045a4a6c57d03e49bb52614012">&#9670;&#160;</a></span>RedeemXboxStorePurchaseForPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>userCollectionsId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>productId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Redeem a purchase that was made successfully towards the Xbox Store for the current player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">userCollectionsId</td><td>The Xbox user collections ID (JWT) that identifies the user making the purchase</td></tr>
+    <tr><td class="paramname">productId</td><td>The id of the Xbox Store product to redeem</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga887de25053f766d8c021406cfa74d27c" name="ga887de25053f766d8c021406cfa74d27c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga887de25053f766d8c021406cfa74d27c">&#9670;&#160;</a></span>RefundByEntitlementIds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RefundByEntitlementIds </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>entitlementIds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefundByEntitlementIdsResponse.html">LootLockerRefundByEntitlementIdsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Refund one or more entitlements by their IDs. </p>
+<p>Submits a refund request for the specified entitlement IDs. Assets associated with the entitlements will be removed from the player's inventory where possible, the original purchase currency will be credited back, and any currency rewards tied to the entitlement will be clawed back. The response includes details on what was reversed and any warnings for items that could not be fully reversed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entitlementIds</td><td>The IDs of the entitlements to refund </td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response </td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gadb083637bd437ac8e52c087b7213639b" name="gadb083637bd437ac8e52c087b7213639b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadb083637bd437ac8e52c087b7213639b">&#9670;&#160;</a></span>RetryAsyncPurchase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RetryAsyncPurchase </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>entitlementId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>walletId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LootLockerCatalogItemAndQuantityPair[]&#160;</td>
+          <td class="paramname"><em>items</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retry a failed async purchase. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entitlementId</td><td>The entitlement id of the failed purchase</td></tr>
+    <tr><td class="paramname">walletId</td><td>The id of the wallet to use for the retry</td></tr>
+    <tr><td class="paramname">items</td><td>The catalog items with quantities from the original purchase</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga4b7d3d5194a0cdefa9f34b3aede28ca7" id="r_ga4b7d3d5194a0cdefa9f34b3aede28ca7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga4b7d3d5194a0cdefa9f34b3aede28ca7">LootLocker.Requests.LootLockerSDKManager.PollOrderStatus</a> (int assetId, Action&lt; LootLockerPurchaseOrderStatus &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4b7d3d5194a0cdefa9f34b3aede28ca7"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will give you the current status of a purchase.  <br /></td></tr>
+<tr class="separator:ga4b7d3d5194a0cdefa9f34b3aede28ca7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac72cc74388cb4afde54fd0479da0bdc2" id="r_gac72cc74388cb4afde54fd0479da0bdc2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gac72cc74388cb4afde54fd0479da0bdc2">LootLocker.Requests.LootLockerSDKManager.ActivateRentalAsset</a> (int assetInstanceID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerActivateRentalAssetResponse.html">LootLockerActivateRentalAssetResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac72cc74388cb4afde54fd0479da0bdc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activate a rental asset.  <br /></td></tr>
+<tr class="separator:gac72cc74388cb4afde54fd0479da0bdc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad6ec254532f37a0d259177d2135d52fb" id="r_gad6ec254532f37a0d259177d2135d52fb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gad6ec254532f37a0d259177d2135d52fb">LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseSingleCatalogItem</a> (string walletID, string itemID, int quantity, Action&lt; LootLockerPurchaseCatalogItemResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad6ec254532f37a0d259177d2135d52fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purchase one catalog item using a specified wallet.  <br /></td></tr>
+<tr class="separator:gad6ec254532f37a0d259177d2135d52fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaab642b3b4009c757785e3fecb8b434de" id="r_gaab642b3b4009c757785e3fecb8b434de"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaab642b3b4009c757785e3fecb8b434de">LootLocker.Requests.LootLockerSDKManager.LootLockerPurchaseCatalogItems</a> (string walletId, LootLockerCatalogItemAndQuantityPair[] itemsToPurchase, Action&lt; LootLockerPurchaseCatalogItemResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaab642b3b4009c757785e3fecb8b434de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purchase one or more catalog items using a specified wallet.  <br /></td></tr>
+<tr class="separator:gaab642b3b4009c757785e3fecb8b434de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga451582e6b324e699116f337f8146b28c" id="r_ga451582e6b324e699116f337f8146b28c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga451582e6b324e699116f337f8146b28c">LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForPlayer</a> (string transactionId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, bool sandboxed=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga451582e6b324e699116f337f8146b28c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Apple App Store for the current player.  <br /></td></tr>
+<tr class="separator:ga451582e6b324e699116f337f8146b28c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad394c087418d226fdddbf200e8ab9bb3" id="r_gad394c087418d226fdddbf200e8ab9bb3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gad394c087418d226fdddbf200e8ab9bb3">LootLocker.Requests.LootLockerSDKManager.RedeemAppleAppStorePurchaseForClass</a> (string transactionId, int classId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, bool sandboxed=false, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad394c087418d226fdddbf200e8ab9bb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Apple App Store for a class that the current player owns.  <br /></td></tr>
+<tr class="separator:gad394c087418d226fdddbf200e8ab9bb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5499de3863077320c184df2ec5ce7720" id="r_ga5499de3863077320c184df2ec5ce7720"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga5499de3863077320c184df2ec5ce7720">LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForPlayer</a> (string productId, string purchaseToken, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5499de3863077320c184df2ec5ce7720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Google Play Store for the current player.  <br /></td></tr>
+<tr class="separator:ga5499de3863077320c184df2ec5ce7720"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf8b3af44a0b5ef79aca0b792e5e7cb38" id="r_gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaf8b3af44a0b5ef79aca0b792e5e7cb38">LootLocker.Requests.LootLockerSDKManager.RedeemGooglePlayStorePurchaseForClass</a> (string productId, string purchaseToken, int classId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Google Play Store for a class that the current player owns.  <br /></td></tr>
+<tr class="separator:gaf8b3af44a0b5ef79aca0b792e5e7cb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga241759df377fc2fa162abbd12c70ed51" id="r_ga241759df377fc2fa162abbd12c70ed51"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga241759df377fc2fa162abbd12c70ed51">LootLocker.Requests.LootLockerSDKManager.GetXboxServiceTicket</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerXboxServiceTicketResponse.html">LootLockerXboxServiceTicketResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga241759df377fc2fa162abbd12c70ed51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an Xbox service ticket that can be used to redeem an Xbox Store purchase.  <br /></td></tr>
+<tr class="separator:ga241759df377fc2fa162abbd12c70ed51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bc713045a4a6c57d03e49bb52614012" id="r_ga5bc713045a4a6c57d03e49bb52614012"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga5bc713045a4a6c57d03e49bb52614012">LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForPlayer</a> (string userCollectionsId, string productId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5bc713045a4a6c57d03e49bb52614012"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Xbox Store for the current player.  <br /></td></tr>
+<tr class="separator:ga5bc713045a4a6c57d03e49bb52614012"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad7e922ebb42dd81a2e7473d036f6d5df" id="r_gad7e922ebb42dd81a2e7473d036f6d5df"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gad7e922ebb42dd81a2e7473d036f6d5df">LootLocker.Requests.LootLockerSDKManager.RedeemXboxStorePurchaseForClass</a> (int classId, string userCollectionsId, string productId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad7e922ebb42dd81a2e7473d036f6d5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Xbox Store for a class that the current player owns.  <br /></td></tr>
+<tr class="separator:gad7e922ebb42dd81a2e7473d036f6d5df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaab86bc92cf1b91df160e5ed9b87c9763" id="r_gaab86bc92cf1b91df160e5ed9b87c9763"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaab86bc92cf1b91df160e5ed9b87c9763">LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForPlayer</a> (string accountId, string bearerToken, List&lt; string &gt; entitlementIds, string sandboxId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaab86bc92cf1b91df160e5ed9b87c9763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Epic Store for the current player.  <br /></td></tr>
+<tr class="separator:gaab86bc92cf1b91df160e5ed9b87c9763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabbfbc520ebd5dc771969f78e79b88df8" id="r_gabbfbc520ebd5dc771969f78e79b88df8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gabbfbc520ebd5dc771969f78e79b88df8">LootLocker.Requests.LootLockerSDKManager.RedeemEpicStorePurchaseForClass</a> (string accountId, string bearerToken, List&lt; string &gt; entitlementIds, string sandboxId, int classId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gabbfbc520ebd5dc771969f78e79b88df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redeem a purchase that was made successfully towards the Epic Store for a class that the current player owns.  <br /></td></tr>
+<tr class="separator:gabbfbc520ebd5dc771969f78e79b88df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga35cfd08f703cb35c596e17e9f3ca9ecd" id="r_ga35cfd08f703cb35c596e17e9f3ca9ecd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga35cfd08f703cb35c596e17e9f3ca9ecd">LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemption</a> (string steamId, string currency, string language, string catalogItemId, Action&lt; LootLockerBeginSteamPurchaseRedemptionResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga35cfd08f703cb35c596e17e9f3ca9ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item.  <br /></td></tr>
+<tr class="separator:ga35cfd08f703cb35c596e17e9f3ca9ecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga675c0e20d5cf35cea8513923750d1fb3" id="r_ga675c0e20d5cf35cea8513923750d1fb3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga675c0e20d5cf35cea8513923750d1fb3">LootLocker.Requests.LootLockerSDKManager.BeginSteamPurchaseRedemptionForClass</a> (int classId, string steamId, string currency, string language, string catalogItemId, Action&lt; LootLockerBeginSteamPurchaseRedemptionResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga675c0e20d5cf35cea8513923750d1fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin a Steam purchase with the given settings that when finalized will redeem the specified catalog item for the specified class.  <br /></td></tr>
+<tr class="separator:ga675c0e20d5cf35cea8513923750d1fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga001e009e840f7c0c1107e3f761a95c3e" id="r_ga001e009e840f7c0c1107e3f761a95c3e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga001e009e840f7c0c1107e3f761a95c3e">LootLocker.Requests.LootLockerSDKManager.QuerySteamPurchaseRedemption</a> (string entitlementId, Action&lt; LootLockerQuerySteamPurchaseRedemptionStatusResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga001e009e840f7c0c1107e3f761a95c3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the Steam Purchase status for a given entitlement.  <br /></td></tr>
+<tr class="separator:ga001e009e840f7c0c1107e3f761a95c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaddc93c3dc01bd401a95caf1cdd4ca72e" id="r_gaddc93c3dc01bd401a95caf1cdd4ca72e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaddc93c3dc01bd401a95caf1cdd4ca72e">LootLocker.Requests.LootLockerSDKManager.FinalizeSteamPurchaseRedemption</a> (string entitlementId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaddc93c3dc01bd401a95caf1cdd4ca72e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize a started Steam Purchase and subsequently redeem the catalog items that the entitlement refers to.  <br /></td></tr>
+<tr class="separator:gaddc93c3dc01bd401a95caf1cdd4ca72e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf0e712fdf5c5fdcad821310172d23343" id="r_gaf0e712fdf5c5fdcad821310172d23343"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gaf0e712fdf5c5fdcad821310172d23343">LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseSingleCatalogItem</a> (string walletId, string itemId, int quantity, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf0e712fdf5c5fdcad821310172d23343"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiate an async purchase of a single catalog item using a specified wallet.  <br /></td></tr>
+<tr class="separator:gaf0e712fdf5c5fdcad821310172d23343"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1680a3ad280f7babb6e8b2296d553a9c" id="r_ga1680a3ad280f7babb6e8b2296d553a9c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga1680a3ad280f7babb6e8b2296d553a9c">LootLocker.Requests.LootLockerSDKManager.InitiateAsyncPurchaseCatalogItems</a> (string walletId, LootLockerCatalogItemAndQuantityPair[] items, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga1680a3ad280f7babb6e8b2296d553a9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiate an async purchase of one or more catalog items using a specified wallet.  <br /></td></tr>
+<tr class="separator:ga1680a3ad280f7babb6e8b2296d553a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga528516ebe34cc550f2e303168add7ca3" id="r_ga528516ebe34cc550f2e303168add7ca3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga528516ebe34cc550f2e303168add7ca3">LootLocker.Requests.LootLockerSDKManager.GetAsyncPurchaseStatus</a> (string entitlementId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga528516ebe34cc550f2e303168add7ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the status of an async purchase.  <br /></td></tr>
+<tr class="separator:ga528516ebe34cc550f2e303168add7ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadb083637bd437ac8e52c087b7213639b" id="r_gadb083637bd437ac8e52c087b7213639b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gadb083637bd437ac8e52c087b7213639b">LootLocker.Requests.LootLockerSDKManager.RetryAsyncPurchase</a> (string entitlementId, string walletId, LootLockerCatalogItemAndQuantityPair[] items, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html">LootLockerAsyncPurchaseInitiatedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gadb083637bd437ac8e52c087b7213639b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retry a failed async purchase.  <br /></td></tr>
+<tr class="separator:gadb083637bd437ac8e52c087b7213639b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae7a44d631045579597773650d2cf28d4" id="r_gae7a44d631045579597773650d2cf28d4"><td class="memItemLeft" align="right" valign="top">static Guid&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#gae7a44d631045579597773650d2cf28d4">LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem</a> (string walletId, string itemId, int quantity, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt; onStatusUpdate, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt; onComplete, float pollingIntervalSeconds=1.0f, float timeoutAfterMinutes=5.0f, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae7a44d631045579597773650d2cf28d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiate an async purchase of a single catalog item and automatically poll until it reaches a terminal state.  <br /></td></tr>
+<tr class="separator:gae7a44d631045579597773650d2cf28d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56dbd772fce1773c1e936ce0a9d89393" id="r_ga56dbd772fce1773c1e936ce0a9d89393"><td class="memItemLeft" align="right" valign="top">static Guid&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga56dbd772fce1773c1e936ce0a9d89393">LootLocker.Requests.LootLockerSDKManager.InitiateAndPollAsyncPurchaseCatalogItems</a> (string walletId, LootLockerCatalogItemAndQuantityPair[] items, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt; onStatusUpdate, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html">LootLockerAsyncPurchaseStatusResponse</a> &gt; onComplete, float pollingIntervalSeconds=1.0f, float timeoutAfterMinutes=5.0f, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga56dbd772fce1773c1e936ce0a9d89393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiate an async purchase of one or more catalog items and automatically poll until it reaches a terminal state.  <br /></td></tr>
+<tr class="separator:ga56dbd772fce1773c1e936ce0a9d89393"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5f1969f52cfa11777068db3ea11f7ae1" id="r_ga5f1969f52cfa11777068db3ea11f7ae1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga5f1969f52cfa11777068db3ea11f7ae1">LootLocker.Requests.LootLockerSDKManager.CancelAsyncPurchasePolling</a> (Guid processGuid)</td></tr>
+<tr class="memdesc:ga5f1969f52cfa11777068db3ea11f7ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel an ongoing async purchase polling process.  <br /></td></tr>
+<tr class="separator:ga5f1969f52cfa11777068db3ea11f7ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga887de25053f766d8c021406cfa74d27c" id="r_ga887de25053f766d8c021406cfa74d27c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga887de25053f766d8c021406cfa74d27c">LootLocker.Requests.LootLockerSDKManager.RefundByEntitlementIds</a> (string[] entitlementIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefundByEntitlementIdsResponse.html">LootLockerRefundByEntitlementIdsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga887de25053f766d8c021406cfa74d27c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refund one or more entitlements by their IDs.  <br /></td></tr>
+<tr class="separator:ga887de25053f766d8c021406cfa74d27c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga319d6fd86f9b181bedec02995ee5d1eb" id="r_ga319d6fd86f9b181bedec02995ee5d1eb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Purchasing.html#ga319d6fd86f9b181bedec02995ee5d1eb">LootLocker.Requests.LootLockerSDKManager.CreateStripeCheckoutSession</a> (string catalogItemId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerCreateStripeCheckoutSessionResponse.html">LootLockerCreateStripeCheckoutSessionResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga319d6fd86f9b181bedec02995ee5d1eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a Stripe Checkout session for a catalog item.  <br /></td></tr>
+<tr class="separator:ga319d6fd86f9b181bedec02995ee5d1eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

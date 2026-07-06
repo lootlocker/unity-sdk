@@ -1,0 +1,904 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Asset Instances</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__AssetInstance.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Asset Instances</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Access and manage asset instances in the current player's inventory. </p>
+<p>When an asset is granted, a unique Asset Instance is created that extends the reference asset with a player-specific Instance ID and mutable state. Instances enter inventory via leaderboard/progression/trigger rewards, Catalog purchases, or default class loadouts. This group covers listing, updating key-value storage per instance, and managing rental states. For the reference catalogue see <a class="el" href="group__Assets.html">Assets</a>.</p>
+<p>See the <a href="https://docs.lootlocker.com/players/inventory">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gabab7d2c63ad5166d15d1dcdaf0f22c4d" name="gabab7d2c63ad5166d15d1dcdaf0f22c4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabab7d2c63ad5166d15d1dcdaf0f22c4d">&#9670;&#160;</a></span>CreateKeyValuePairForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CreateKeyValuePairForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a new key/value pair for a specific asset instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to create the key/value for</td></tr>
+    <tr><td class="paramname">key</td><td>Key(name)</td></tr>
+    <tr><td class="paramname">value</td><td>The value of the key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga3fe9e69c0c1223dd3cea3882f691b544" name="ga3fe9e69c0c1223dd3cea3882f691b544"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3fe9e69c0c1223dd3cea3882f691b544">&#9670;&#160;</a></span>DeleteAssetInstanceFromPlayerInventory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeleteAssetInstanceFromPlayerInventory </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Delete an Asset Instance from the current Player's Inventory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID of the asset instance you want to delete from the current Players Inventory</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf84a41fc88d67074860fac0aaeefbdb9" name="gaf84a41fc88d67074860fac0aaeefbdb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf84a41fc88d67074860fac0aaeefbdb9">&#9670;&#160;</a></span>DeleteKeyValuePairForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeleteKeyValuePairForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>keyValueID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Delete a specific key/value pair for a specific asset instance by key/value-id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to delete the key/value for</td></tr>
+    <tr><td class="paramname">keyValueID</td><td>ID of the key/value, can be obtained when creating the key or by using GetAllKeyValuePairsToAnInstance()</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga6255f9670c5b3fd9071565598f1fd313" name="ga6255f9670c5b3fd9071565598f1fd313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6255f9670c5b3fd9071565598f1fd313">&#9670;&#160;</a></span>GetAKeyValuePairByIdForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAKeyValuePairByIdForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>keyValueID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerGetSingleKeyValuePairsResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a specific key/value pair for a specific asset instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to get the key/value-pairs for</td></tr>
+    <tr><td class="paramname">keyValueID</td><td>The ID of the key-value to get. Can be obtained when creating a new key/value-pair or with GetAllKeyValuePairsToAnInstance()</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetSingleKeyValuePairsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga40df84494793bf3d1e3e94404e74459e" name="ga40df84494793bf3d1e3e94404e74459e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga40df84494793bf3d1e3e94404e74459e">&#9670;&#160;</a></span>GetAllKeyValuePairsForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllKeyValuePairsForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; LootLockerGetAllKeyValuePairsResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all key/value pairs for all asset instances. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllKeyValuePairsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae846b355b68a444199ce213b756eacef" name="gae846b355b68a444199ce213b756eacef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae846b355b68a444199ce213b756eacef">&#9670;&#160;</a></span>GetAllKeyValuePairsToAnInstance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllKeyValuePairsToAnInstance </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all key/value pairs for a specific asset instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to get the key/value-pairs for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga38e9b212bfe3bdee9a8a23738b0ec5c5" name="ga38e9b212bfe3bdee9a8a23738b0ec5c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga38e9b212bfe3bdee9a8a23738b0ec5c5">&#9670;&#160;</a></span>InspectALootBoxForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.InspectALootBoxForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerInspectALootBoxResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the drop rates for a loot box asset instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID of the loot box</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerInspectALootBoxResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8756f10d1430b04ae6853a1da1905a34" name="ga8756f10d1430b04ae6853a1da1905a34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8756f10d1430b04ae6853a1da1905a34">&#9670;&#160;</a></span>OpenALootBoxForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.OpenALootBoxForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerOpenLootBoxResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Open a loot box asset instance. </p>
+<p>The loot box will be consumed and the contents will be added to the player's inventory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID of the loot box</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerOpenLootBoxResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa9b2f07eab60fe05762afc5403d04644" name="gaa9b2f07eab60fe05762afc5403d04644"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa9b2f07eab60fe05762afc5403d04644">&#9670;&#160;</a></span>UpdateKeyValuePairByIdForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UpdateKeyValuePairByIdForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>keyValueID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update a specific key/value pair for a specific asset instance by key/value-id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to update the key/value for</td></tr>
+    <tr><td class="paramname">keyValueID</td><td>ID of the key/value, can be obtained when creating the key or by using GetAllKeyValuePairsToAnInstance()</td></tr>
+    <tr><td class="paramname">value</td><td>The new value of the key</td></tr>
+    <tr><td class="paramname">key</td><td>The new key(name) of the key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae1f364ca5123e3c450325e62e1b477dc" name="gae1f364ca5123e3c450325e62e1b477dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae1f364ca5123e3c450325e62e1b477dc">&#9670;&#160;</a></span>UpdateKeyValuePairForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UpdateKeyValuePairForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update a specific key/value pair for a specific asset instance by key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to update the key/value for</td></tr>
+    <tr><td class="paramname">key</td><td>Name of the key to update</td></tr>
+    <tr><td class="paramname">value</td><td>The new value of the key</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaba64a51de81041673bb4d706732c8dd6" name="gaba64a51de81041673bb4d706732c8dd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaba64a51de81041673bb4d706732c8dd6">&#9670;&#160;</a></span>UpdateOneOrMoreKeyValuePairForAssetInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UpdateOneOrMoreKeyValuePairForAssetInstances </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>assetInstanceID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Dictionary&lt; string, string &gt;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerAssetDefaultResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update a specific key/value pair for a specific asset instance. </p>
+<p>Data is provided as key/value pairs.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assetInstanceID</td><td>The asset instance ID to create the key/value for</td></tr>
+    <tr><td class="paramname">data</td><td>A Dictionary&lt;string, string&gt; for multiple key/values</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerAssetDefaultResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga40df84494793bf3d1e3e94404e74459e" id="r_ga40df84494793bf3d1e3e94404e74459e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#ga40df84494793bf3d1e3e94404e74459e">LootLocker.Requests.LootLockerSDKManager.GetAllKeyValuePairsForAssetInstances</a> (Action&lt; LootLockerGetAllKeyValuePairsResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga40df84494793bf3d1e3e94404e74459e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all key/value pairs for all asset instances.  <br /></td></tr>
+<tr class="separator:ga40df84494793bf3d1e3e94404e74459e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae846b355b68a444199ce213b756eacef" id="r_gae846b355b68a444199ce213b756eacef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gae846b355b68a444199ce213b756eacef">LootLocker.Requests.LootLockerSDKManager.GetAllKeyValuePairsToAnInstance</a> (int assetInstanceID, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae846b355b68a444199ce213b756eacef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all key/value pairs for a specific asset instance.  <br /></td></tr>
+<tr class="separator:gae846b355b68a444199ce213b756eacef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6255f9670c5b3fd9071565598f1fd313" id="r_ga6255f9670c5b3fd9071565598f1fd313"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#ga6255f9670c5b3fd9071565598f1fd313">LootLocker.Requests.LootLockerSDKManager.GetAKeyValuePairByIdForAssetInstances</a> (int assetInstanceID, int keyValueID, Action&lt; LootLockerGetSingleKeyValuePairsResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga6255f9670c5b3fd9071565598f1fd313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a specific key/value pair for a specific asset instance.  <br /></td></tr>
+<tr class="separator:ga6255f9670c5b3fd9071565598f1fd313"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabab7d2c63ad5166d15d1dcdaf0f22c4d" id="r_gabab7d2c63ad5166d15d1dcdaf0f22c4d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gabab7d2c63ad5166d15d1dcdaf0f22c4d">LootLocker.Requests.LootLockerSDKManager.CreateKeyValuePairForAssetInstances</a> (int assetInstanceID, string key, string value, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gabab7d2c63ad5166d15d1dcdaf0f22c4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new key/value pair for a specific asset instance.  <br /></td></tr>
+<tr class="separator:gabab7d2c63ad5166d15d1dcdaf0f22c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba64a51de81041673bb4d706732c8dd6" id="r_gaba64a51de81041673bb4d706732c8dd6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gaba64a51de81041673bb4d706732c8dd6">LootLocker.Requests.LootLockerSDKManager.UpdateOneOrMoreKeyValuePairForAssetInstances</a> (int assetInstanceID, Dictionary&lt; string, string &gt; data, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaba64a51de81041673bb4d706732c8dd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a specific key/value pair for a specific asset instance.  <br /></td></tr>
+<tr class="separator:gaba64a51de81041673bb4d706732c8dd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae1f364ca5123e3c450325e62e1b477dc" id="r_gae1f364ca5123e3c450325e62e1b477dc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gae1f364ca5123e3c450325e62e1b477dc">LootLocker.Requests.LootLockerSDKManager.UpdateKeyValuePairForAssetInstances</a> (int assetInstanceID, string key, string value, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae1f364ca5123e3c450325e62e1b477dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a specific key/value pair for a specific asset instance by key.  <br /></td></tr>
+<tr class="separator:gae1f364ca5123e3c450325e62e1b477dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa9b2f07eab60fe05762afc5403d04644" id="r_gaa9b2f07eab60fe05762afc5403d04644"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gaa9b2f07eab60fe05762afc5403d04644">LootLocker.Requests.LootLockerSDKManager.UpdateKeyValuePairByIdForAssetInstances</a> (int assetInstanceID, int keyValueID, string value, string key, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa9b2f07eab60fe05762afc5403d04644"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a specific key/value pair for a specific asset instance by key/value-id.  <br /></td></tr>
+<tr class="separator:gaa9b2f07eab60fe05762afc5403d04644"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf84a41fc88d67074860fac0aaeefbdb9" id="r_gaf84a41fc88d67074860fac0aaeefbdb9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#gaf84a41fc88d67074860fac0aaeefbdb9">LootLocker.Requests.LootLockerSDKManager.DeleteKeyValuePairForAssetInstances</a> (int assetInstanceID, int keyValueID, Action&lt; LootLockerAssetDefaultResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf84a41fc88d67074860fac0aaeefbdb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete a specific key/value pair for a specific asset instance by key/value-id.  <br /></td></tr>
+<tr class="separator:gaf84a41fc88d67074860fac0aaeefbdb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga38e9b212bfe3bdee9a8a23738b0ec5c5" id="r_ga38e9b212bfe3bdee9a8a23738b0ec5c5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#ga38e9b212bfe3bdee9a8a23738b0ec5c5">LootLocker.Requests.LootLockerSDKManager.InspectALootBoxForAssetInstances</a> (int assetInstanceID, Action&lt; LootLockerInspectALootBoxResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga38e9b212bfe3bdee9a8a23738b0ec5c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the drop rates for a loot box asset instance.  <br /></td></tr>
+<tr class="separator:ga38e9b212bfe3bdee9a8a23738b0ec5c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8756f10d1430b04ae6853a1da1905a34" id="r_ga8756f10d1430b04ae6853a1da1905a34"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#ga8756f10d1430b04ae6853a1da1905a34">LootLocker.Requests.LootLockerSDKManager.OpenALootBoxForAssetInstances</a> (int assetInstanceID, Action&lt; LootLockerOpenLootBoxResponse &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga8756f10d1430b04ae6853a1da1905a34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open a loot box asset instance.  <br /></td></tr>
+<tr class="separator:ga8756f10d1430b04ae6853a1da1905a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3fe9e69c0c1223dd3cea3882f691b544" id="r_ga3fe9e69c0c1223dd3cea3882f691b544"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__AssetInstance.html#ga3fe9e69c0c1223dd3cea3882f691b544">LootLocker.Requests.LootLockerSDKManager.DeleteAssetInstanceFromPlayerInventory</a> (int assetInstanceID, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga3fe9e69c0c1223dd3cea3882f691b544"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete an Asset Instance from the current Player's Inventory.  <br /></td></tr>
+<tr class="separator:ga3fe9e69c0c1223dd3cea3882f691b544"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

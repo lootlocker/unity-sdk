@@ -1,0 +1,932 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: White Label Login</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__WhiteLabel.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">White Label Login</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Custom email/password account system built into your game. </p>
+<p>Players sign in with an email address and password unique to your game. Includes customizable reset-password and confirm-account pages that match your game's branding. Integrates with <a class="el" href="group__ConnectedAccounts.html">Connected Accounts</a> so that guest players can 'upgrade' to a fully registered account at any time, preserving their existing progress.</p>
+<p>See the <a href="https://docs.lootlocker.com/players/white-label-login">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gad31365950ab3385b1e0eef1005ff374c" name="gad31365950ab3385b1e0eef1005ff374c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad31365950ab3385b1e0eef1005ff374c">&#9670;&#160;</a></span>CheckWhiteLabelSession() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; bool &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks for a stored session and if that session is valid. </p>
+<p>Depending on response of this method the developer can either start a session using the token, or show a login form. White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action bool that returns true if a White Label session exists </td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga565843d011fc8b84daaff2a7d6cc81b0" name="ga565843d011fc8b84daaff2a7d6cc81b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga565843d011fc8b84daaff2a7d6cc81b0">&#9670;&#160;</a></span>CheckWhiteLabelSession() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; bool &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks for a stored session and if that session is valid. </p>
+<p>Depending on response of this method the developer can either start a session using the token, or show a login form. White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>The email to check for a valid white label session</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action bool that returns true if a White Label session exists </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga63a680b726c6e1c1cba054e55008153b" name="ga63a680b726c6e1c1cba054e55008153b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga63a680b726c6e1c1cba054e55008153b">&#9670;&#160;</a></span>CheckWhiteLabelSession() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>token</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; bool &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the provided session token is valid for the provided White Label email. </p>
+<p>Depending on response of this method the developer can either start a session using the token, or show a login form. White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for the user</td></tr>
+    <tr><td class="paramname">token</td><td>The token is received when starting a White Label session.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action bool that returns true if a White Label session exists </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf7727f7c1ccfb33800c436e22d1893fb" name="gaf7727f7c1ccfb33800c436e22d1893fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf7727f7c1ccfb33800c436e22d1893fb">&#9670;&#160;</a></span>StartWhiteLabelSession() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; LootLockerSessionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html">LootLockerSessionOptionals</a>&#160;</td>
+          <td class="paramname"><em>Optionals</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the cached White Label token and email if any exist White Label platform must be enabled in the web console for this to work. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSessionResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+    <tr><td class="paramname">Optionals</td><td>Optional parameters for the session start request</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga9ccf20063ed260efabc0262171faf907" name="ga9ccf20063ed260efabc0262171faf907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9ccf20063ed260efabc0262171faf907">&#9670;&#160;</a></span>StartWhiteLabelSession() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">LootLockerWhiteLabelSessionRequest&#160;</td>
+          <td class="paramname"><em>sessionRequest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerSessionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the provided White Label request. </p>
+<p>White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sessionRequest</td><td>A White Label Session Request with inner values already set</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSessionResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaff79c2b03f229958ef74e383d6925f76" name="gaff79c2b03f229958ef74e383d6925f76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaff79c2b03f229958ef74e383d6925f76">&#9670;&#160;</a></span>StartWhiteLabelSession() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerSessionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html">LootLockerSessionOptionals</a>&#160;</td>
+          <td class="paramname"><em>Optionals</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the cached White Label token for the specified email if it exist White Label platform must be enabled in the web console for this to work. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>The email of the White Label user to start a WL session for</td></tr>
+    <tr><td class="paramname">Optionals</td><td>Optional parameters for the session start request</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSessionResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0bbd98a998fbff3e4ec3b40068e7f8cc" name="ga0bbd98a998fbff3e4ec3b40068e7f8cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0bbd98a998fbff3e4ec3b40068e7f8cc">&#9670;&#160;</a></span>WhiteLabelLogin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelLogin </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelLoginResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Log in a White Label user with the given email and password combination, verify user, and start a White Label Session. </p>
+<p>White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for an existing user</td></tr>
+    <tr><td class="paramname">password</td><td>Password for an existing user</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerWhiteLabelLoginResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga383e4079b0dae53f7a3bf8beafedfad1" name="ga383e4079b0dae53f7a3bf8beafedfad1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga383e4079b0dae53f7a3bf8beafedfad1">&#9670;&#160;</a></span>WhiteLabelLogin() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelLogin </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>remember</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelLoginResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Log in a White Label user with the given email and password combination, verify user, and start a White Label Session. </p>
+<p>Set remember=true to prolong the session lifetime White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for an existing user</td></tr>
+    <tr><td class="paramname">password</td><td>Password for an existing user</td></tr>
+    <tr><td class="paramname">remember</td><td>Set remember=true to prolong the session lifetime</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerWhiteLabelLoginResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4f12b199b7d439ea198baa8976380f86" name="ga4f12b199b7d439ea198baa8976380f86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4f12b199b7d439ea198baa8976380f86">&#9670;&#160;</a></span>WhiteLabelLoginAndStartSession()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelLoginAndStartSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>rememberMe</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelLoginAndStartSessionResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Log in a White Label user with the given email and password combination, verify user, and start a White Label Session. </p>
+<p>If that succeeds, then also start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session. The response is nested. The top properties will give the complete success condition and eventual error data. Nested inside the response you can also find the specific responses of the two composite calls using LoginResponse and SessionResponse respectively Set remember=true to prolong the session lifetime White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for an existing user</td></tr>
+    <tr><td class="paramname">password</td><td>Password for an existing user</td></tr>
+    <tr><td class="paramname">rememberMe</td><td>Set remember=true to prolong the session lifetime</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga1fa81cc7c0e01aacf410651f65ed1118" name="ga1fa81cc7c0e01aacf410651f65ed1118"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1fa81cc7c0e01aacf410651f65ed1118">&#9670;&#160;</a></span>WhiteLabelRequestPassword()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestPassword </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Request a password reset email for the given email address. </p>
+<p>White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for the user</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab522e3774670ed5e2c144868c7945773" name="gab522e3774670ed5e2c144868c7945773"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab522e3774670ed5e2c144868c7945773">&#9670;&#160;</a></span>WhiteLabelRequestVerification() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestVerification </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>userID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Request verify account email for the user. </p>
+<p>White Label platform must be enabled in the web console for this to work. Account verification must also be enabled.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">userID</td><td>ID of the player, will be retrieved when signing up/logging in.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga88d99470ebd41687d662d91ca5f94ec5" name="ga88d99470ebd41687d662d91ca5f94ec5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga88d99470ebd41687d662d91ca5f94ec5">&#9670;&#160;</a></span>WhiteLabelRequestVerification() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestVerification </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Request verify account email for the user. </p>
+<p>White Label platform must be enabled in the web console for this to work. Account verification must also be enabled.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>Email of the player</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac9e156a4f6037ac98e6af8d192c7d17d" name="gac9e156a4f6037ac98e6af8d192c7d17d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac9e156a4f6037ac98e6af8d192c7d17d">&#9670;&#160;</a></span>WhiteLabelSignUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelSignUp </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelSignupResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create new user using the White Label login system. </p>
+<p>White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for the new user</td></tr>
+    <tr><td class="paramname">password</td><td>Password for the new user</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerWhiteLabelSignupResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga0bbd98a998fbff3e4ec3b40068e7f8cc" id="r_ga0bbd98a998fbff3e4ec3b40068e7f8cc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga0bbd98a998fbff3e4ec3b40068e7f8cc">LootLocker.Requests.LootLockerSDKManager.WhiteLabelLogin</a> (string email, string password, Action&lt; LootLockerWhiteLabelLoginResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:ga0bbd98a998fbff3e4ec3b40068e7f8cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.  <br /></td></tr>
+<tr class="separator:ga0bbd98a998fbff3e4ec3b40068e7f8cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga383e4079b0dae53f7a3bf8beafedfad1" id="r_ga383e4079b0dae53f7a3bf8beafedfad1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga383e4079b0dae53f7a3bf8beafedfad1">LootLocker.Requests.LootLockerSDKManager.WhiteLabelLogin</a> (string email, string password, bool remember, Action&lt; LootLockerWhiteLabelLoginResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:ga383e4079b0dae53f7a3bf8beafedfad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.  <br /></td></tr>
+<tr class="separator:ga383e4079b0dae53f7a3bf8beafedfad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac9e156a4f6037ac98e6af8d192c7d17d" id="r_gac9e156a4f6037ac98e6af8d192c7d17d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gac9e156a4f6037ac98e6af8d192c7d17d">LootLocker.Requests.LootLockerSDKManager.WhiteLabelSignUp</a> (string email, string password, Action&lt; LootLockerWhiteLabelSignupResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:gac9e156a4f6037ac98e6af8d192c7d17d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create new user using the White Label login system.  <br /></td></tr>
+<tr class="separator:gac9e156a4f6037ac98e6af8d192c7d17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1fa81cc7c0e01aacf410651f65ed1118" id="r_ga1fa81cc7c0e01aacf410651f65ed1118"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga1fa81cc7c0e01aacf410651f65ed1118">LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestPassword</a> (string email, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete)</td></tr>
+<tr class="memdesc:ga1fa81cc7c0e01aacf410651f65ed1118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request a password reset email for the given email address.  <br /></td></tr>
+<tr class="separator:ga1fa81cc7c0e01aacf410651f65ed1118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab522e3774670ed5e2c144868c7945773" id="r_gab522e3774670ed5e2c144868c7945773"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gab522e3774670ed5e2c144868c7945773">LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestVerification</a> (int userID, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete)</td></tr>
+<tr class="memdesc:gab522e3774670ed5e2c144868c7945773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request verify account email for the user.  <br /></td></tr>
+<tr class="separator:gab522e3774670ed5e2c144868c7945773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga88d99470ebd41687d662d91ca5f94ec5" id="r_ga88d99470ebd41687d662d91ca5f94ec5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga88d99470ebd41687d662d91ca5f94ec5">LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestVerification</a> (string email, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete)</td></tr>
+<tr class="memdesc:ga88d99470ebd41687d662d91ca5f94ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request verify account email for the user.  <br /></td></tr>
+<tr class="separator:ga88d99470ebd41687d662d91ca5f94ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad31365950ab3385b1e0eef1005ff374c" id="r_gad31365950ab3385b1e0eef1005ff374c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gad31365950ab3385b1e0eef1005ff374c">LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession</a> (Action&lt; bool &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad31365950ab3385b1e0eef1005ff374c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks for a stored session and if that session is valid.  <br /></td></tr>
+<tr class="separator:gad31365950ab3385b1e0eef1005ff374c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga565843d011fc8b84daaff2a7d6cc81b0" id="r_ga565843d011fc8b84daaff2a7d6cc81b0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga565843d011fc8b84daaff2a7d6cc81b0">LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession</a> (string email, Action&lt; bool &gt; onComplete)</td></tr>
+<tr class="memdesc:ga565843d011fc8b84daaff2a7d6cc81b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks for a stored session and if that session is valid.  <br /></td></tr>
+<tr class="separator:ga565843d011fc8b84daaff2a7d6cc81b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga63a680b726c6e1c1cba054e55008153b" id="r_ga63a680b726c6e1c1cba054e55008153b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga63a680b726c6e1c1cba054e55008153b">LootLocker.Requests.LootLockerSDKManager.CheckWhiteLabelSession</a> (string email, string token, Action&lt; bool &gt; onComplete)</td></tr>
+<tr class="memdesc:ga63a680b726c6e1c1cba054e55008153b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the provided session token is valid for the provided White Label email.  <br /></td></tr>
+<tr class="separator:ga63a680b726c6e1c1cba054e55008153b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf7727f7c1ccfb33800c436e22d1893fb" id="r_gaf7727f7c1ccfb33800c436e22d1893fb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gaf7727f7c1ccfb33800c436e22d1893fb">LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession</a> (Action&lt; LootLockerSessionResponse &gt; onComplete, string forPlayerWithUlid=null, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html">LootLockerSessionOptionals</a> Optionals=null)</td></tr>
+<tr class="memdesc:gaf7727f7c1ccfb33800c436e22d1893fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the cached White Label token and email if any exist White Label platform must be enabled in the web console for this to work.  <br /></td></tr>
+<tr class="separator:gaf7727f7c1ccfb33800c436e22d1893fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaff79c2b03f229958ef74e383d6925f76" id="r_gaff79c2b03f229958ef74e383d6925f76"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gaff79c2b03f229958ef74e383d6925f76">LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession</a> (string email, Action&lt; LootLockerSessionResponse &gt; onComplete, <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html">LootLockerSessionOptionals</a> Optionals=null)</td></tr>
+<tr class="memdesc:gaff79c2b03f229958ef74e383d6925f76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the cached White Label token for the specified email if it exist White Label platform must be enabled in the web console for this to work.  <br /></td></tr>
+<tr class="separator:gaff79c2b03f229958ef74e383d6925f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9ccf20063ed260efabc0262171faf907" id="r_ga9ccf20063ed260efabc0262171faf907"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga9ccf20063ed260efabc0262171faf907">LootLocker.Requests.LootLockerSDKManager.StartWhiteLabelSession</a> (LootLockerWhiteLabelSessionRequest sessionRequest, Action&lt; LootLockerSessionResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:ga9ccf20063ed260efabc0262171faf907"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a <a class="el" href="namespaceLootLocker.html">LootLocker</a> Session using the provided White Label request.  <br /></td></tr>
+<tr class="separator:ga9ccf20063ed260efabc0262171faf907"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4f12b199b7d439ea198baa8976380f86" id="r_ga4f12b199b7d439ea198baa8976380f86"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga4f12b199b7d439ea198baa8976380f86">LootLocker.Requests.LootLockerSDKManager.WhiteLabelLoginAndStartSession</a> (string email, string password, bool rememberMe, Action&lt; LootLockerWhiteLabelLoginAndStartSessionResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:ga4f12b199b7d439ea198baa8976380f86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log in a White Label user with the given email and password combination, verify user, and start a White Label Session.  <br /></td></tr>
+<tr class="separator:ga4f12b199b7d439ea198baa8976380f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

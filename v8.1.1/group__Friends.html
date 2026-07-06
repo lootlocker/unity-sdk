@@ -1,0 +1,1183 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Friends</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Friends.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Friends</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Cross-platform friend list — send, accept, and manage friend requests. </p>
+<p>Players can add each other using any supported identifier (player ID, ULID, public UID, display name, or first-party IDs such as Steam/PSN) regardless of platform. Friend requests require mutual acceptance. Players can also block others. The Friends and <a class="el" href="group__Followers.html">Followers</a> systems are independent and can be used separately.</p>
+<p>See the <a href="https://docs.lootlocker.com/players/friends-and-followers">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga17fe4a7f0b5e3258f06444e89b0a2854" name="ga17fe4a7f0b5e3258f06444e89b0a2854"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga17fe4a7f0b5e3258f06444e89b0a2854">&#9670;&#160;</a></span>AcceptFriendRequest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.AcceptFriendRequest </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Accept the incoming friend request from the specified player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player that sent the friend request you wish to accept</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga314a5b3e7358cd6b990760e6e310c333" name="ga314a5b3e7358cd6b990760e6e310c333"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga314a5b3e7358cd6b990760e6e310c333">&#9670;&#160;</a></span>BlockPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.BlockPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Block the specified player (adding them to the currently logged in players block list and removing them the friend list) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player to block</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8274117e4243e0e84a03b1a422f0bd53" name="ga8274117e4243e0e84a03b1a422f0bd53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8274117e4243e0e84a03b1a422f0bd53">&#9670;&#160;</a></span>CancelFriendRequest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CancelFriendRequest </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cancel the outgoing friend request made to the specified player by the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player to cancel the friend request for</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaaeeea1d099e56f018d48cc29a8ebacd9" name="gaaeeea1d099e56f018d48cc29a8ebacd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaaeeea1d099e56f018d48cc29a8ebacd9">&#9670;&#160;</a></span>DeclineFriendRequest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeclineFriendRequest </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decline the incoming friend request from the specified player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player that sent the friend request you wish to decline</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaaf6dbbbf644516ee23f91508dbb3a3a7" name="gaaf6dbbbf644516ee23f91508dbb3a3a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaaf6dbbbf644516ee23f91508dbb3a3a7">&#9670;&#160;</a></span>DeleteFriend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeleteFriend </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Remove the specified player from the currently logged in player's friends list. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player to delete from the friends list</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0fd88f382403e1b45a8aa01f2a1b1975" name="ga0fd88f382403e1b45a8aa01f2a1b1975"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0fd88f382403e1b45a8aa01f2a1b1975">&#9670;&#160;</a></span>GetFriend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetFriend </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>friendPlayerULID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetFriendResponse.html">LootLockerGetFriendResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a specific friend of the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">friendPlayerULID</td><td>The ULID of the player for whom to get friend information</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional: Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab418852f2aa3e2e0ea99750246ad3df7" name="gab418852f2aa3e2e0ea99750246ad3df7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab418852f2aa3e2e0ea99750246ad3df7">&#9670;&#160;</a></span>ListBlockedPlayers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListBlockedPlayers </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListBlockedPlayersResponse.html">LootLockerListBlockedPlayersResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the players (if any) that are blocked by the currently logged in player with default pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa54524851b881dee188463ce59783ff9" name="gaa54524851b881dee188463ce59783ff9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa54524851b881dee188463ce59783ff9">&#9670;&#160;</a></span>ListBlockedPlayersPaginated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListBlockedPlayersPaginated </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListBlockedPlayersResponse.html">LootLockerListBlockedPlayersResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the players (if any) that are blocked by the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PerPage</td><td>The number of results to return per page</td></tr>
+    <tr><td class="paramname">Page</td><td>The page number to retrieve</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4f2eec735bfaef3ef1ff5c2bd364fdc9" name="ga4f2eec735bfaef3ef1ff5c2bd364fdc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4f2eec735bfaef3ef1ff5c2bd364fdc9">&#9670;&#160;</a></span>ListFriends()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListFriends </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List friends for the currently logged in player with default pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae35af294ed0db467f373b7169a0df49b" name="gae35af294ed0db467f373b7169a0df49b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae35af294ed0db467f373b7169a0df49b">&#9670;&#160;</a></span>ListFriendsByPlatform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListFriendsByPlatform </td>
+          <td>(</td>
+          <td class="paramtype">LL_AuthPlatforms&#160;</td>
+          <td class="paramname"><em>Platform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List friends that are on the specified platform for the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Platform</td><td>The platform to filter friends by (e.g., "Steam", "Xbox", "PlayStation")</td></tr>
+    <tr><td class="paramname">PerPage</td><td>The number of results to return per page</td></tr>
+    <tr><td class="paramname">Page</td><td>The page number to return</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga7fa93ec1951fb9822a070bff067d6556" name="ga7fa93ec1951fb9822a070bff067d6556"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7fa93ec1951fb9822a070bff067d6556">&#9670;&#160;</a></span>ListFriendsPaginated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListFriendsPaginated </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List friends for the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PerPage</td><td>The number of results to return per page</td></tr>
+    <tr><td class="paramname">Page</td><td>The page number to return</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga9a7e167e61186e626d0ee264d3bd5e9a" name="ga9a7e167e61186e626d0ee264d3bd5e9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9a7e167e61186e626d0ee264d3bd5e9a">&#9670;&#160;</a></span>ListIncomingFriendRequests()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListIncomingFriendRequests </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListIncomingFriendRequestsResponse.html">LootLockerListIncomingFriendRequestsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List incoming friend requests for the currently logged in player (friend requests made by others for this player) with default pagination. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga6dd16f4e1d7bb29827e4f4e8a74b7dea" name="ga6dd16f4e1d7bb29827e4f4e8a74b7dea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6dd16f4e1d7bb29827e4f4e8a74b7dea">&#9670;&#160;</a></span>ListIncomingFriendRequestsPaginated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListIncomingFriendRequestsPaginated </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListIncomingFriendRequestsResponse.html">LootLockerListIncomingFriendRequestsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List incoming friend requests for the currently logged in player with pagination (friend requests made by others for this player) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PerPage</td><td>The number of results to return per page</td></tr>
+    <tr><td class="paramname">Page</td><td>The page number to retrieve</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gac12df2634d31962a5aa54690efa575ff" name="gac12df2634d31962a5aa54690efa575ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac12df2634d31962a5aa54690efa575ff">&#9670;&#160;</a></span>ListOutgoingFriendRequests()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListOutgoingFriendRequests </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListOutgoingFriendRequestsResponse.html">LootLockerListOutgoingFriendRequestsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List outgoing friend requests for the currently logged in player (friend requests made by this player) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga089ac84173e07ddcb0d809bc014b2fa4" name="ga089ac84173e07ddcb0d809bc014b2fa4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga089ac84173e07ddcb0d809bc014b2fa4">&#9670;&#160;</a></span>ListOutGoingFriendRequestsPaginated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListOutGoingFriendRequestsPaginated </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>PerPage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListOutgoingFriendRequestsResponse.html">LootLockerListOutgoingFriendRequestsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List outgoing friend requests for the currently logged in player with pagination (friend requests made by this player) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PerPage</td><td>The number of results to return per page</td></tr>
+    <tr><td class="paramname">Page</td><td>The page number to retrieve</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga98c7d307b0750958e05518c7c74c6a2b" name="ga98c7d307b0750958e05518c7c74c6a2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga98c7d307b0750958e05518c7c74c6a2b">&#9670;&#160;</a></span>SendFriendRequest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SendFriendRequest </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Send a friend request to the specified player for the currently logged in player. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player to send the friend request to</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga320ee8e0f46729a3fe6d49d771c7cf04" name="ga320ee8e0f46729a3fe6d49d771c7cf04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga320ee8e0f46729a3fe6d49d771c7cf04">&#9670;&#160;</a></span>UnblockPlayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UnblockPlayer </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Unblock the specified player (remove from the currently logged in players block list) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">playerID</td><td>The id of the player to unblock</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga4f2eec735bfaef3ef1ff5c2bd364fdc9" id="r_ga4f2eec735bfaef3ef1ff5c2bd364fdc9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga4f2eec735bfaef3ef1ff5c2bd364fdc9">LootLocker.Requests.LootLockerSDKManager.ListFriends</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4f2eec735bfaef3ef1ff5c2bd364fdc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">List friends for the currently logged in player with default pagination.  <br /></td></tr>
+<tr class="separator:ga4f2eec735bfaef3ef1ff5c2bd364fdc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7fa93ec1951fb9822a070bff067d6556" id="r_ga7fa93ec1951fb9822a070bff067d6556"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga7fa93ec1951fb9822a070bff067d6556">LootLocker.Requests.LootLockerSDKManager.ListFriendsPaginated</a> (int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga7fa93ec1951fb9822a070bff067d6556"><td class="mdescLeft">&#160;</td><td class="mdescRight">List friends for the currently logged in player.  <br /></td></tr>
+<tr class="separator:ga7fa93ec1951fb9822a070bff067d6556"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae35af294ed0db467f373b7169a0df49b" id="r_gae35af294ed0db467f373b7169a0df49b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gae35af294ed0db467f373b7169a0df49b">LootLocker.Requests.LootLockerSDKManager.ListFriendsByPlatform</a> (LL_AuthPlatforms Platform, int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html">LootLockerListFriendsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae35af294ed0db467f373b7169a0df49b"><td class="mdescLeft">&#160;</td><td class="mdescRight">List friends that are on the specified platform for the currently logged in player.  <br /></td></tr>
+<tr class="separator:gae35af294ed0db467f373b7169a0df49b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0fd88f382403e1b45a8aa01f2a1b1975" id="r_ga0fd88f382403e1b45a8aa01f2a1b1975"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga0fd88f382403e1b45a8aa01f2a1b1975">LootLocker.Requests.LootLockerSDKManager.GetFriend</a> (string friendPlayerULID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetFriendResponse.html">LootLockerGetFriendResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga0fd88f382403e1b45a8aa01f2a1b1975"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a specific friend of the currently logged in player.  <br /></td></tr>
+<tr class="separator:ga0fd88f382403e1b45a8aa01f2a1b1975"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9a7e167e61186e626d0ee264d3bd5e9a" id="r_ga9a7e167e61186e626d0ee264d3bd5e9a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga9a7e167e61186e626d0ee264d3bd5e9a">LootLocker.Requests.LootLockerSDKManager.ListIncomingFriendRequests</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListIncomingFriendRequestsResponse.html">LootLockerListIncomingFriendRequestsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga9a7e167e61186e626d0ee264d3bd5e9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">List incoming friend requests for the currently logged in player (friend requests made by others for this player) with default pagination.  <br /></td></tr>
+<tr class="separator:ga9a7e167e61186e626d0ee264d3bd5e9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6dd16f4e1d7bb29827e4f4e8a74b7dea" id="r_ga6dd16f4e1d7bb29827e4f4e8a74b7dea"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga6dd16f4e1d7bb29827e4f4e8a74b7dea">LootLocker.Requests.LootLockerSDKManager.ListIncomingFriendRequestsPaginated</a> (int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListIncomingFriendRequestsResponse.html">LootLockerListIncomingFriendRequestsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga6dd16f4e1d7bb29827e4f4e8a74b7dea"><td class="mdescLeft">&#160;</td><td class="mdescRight">List incoming friend requests for the currently logged in player with pagination (friend requests made by others for this player)  <br /></td></tr>
+<tr class="separator:ga6dd16f4e1d7bb29827e4f4e8a74b7dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac12df2634d31962a5aa54690efa575ff" id="r_gac12df2634d31962a5aa54690efa575ff"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gac12df2634d31962a5aa54690efa575ff">LootLocker.Requests.LootLockerSDKManager.ListOutgoingFriendRequests</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListOutgoingFriendRequestsResponse.html">LootLockerListOutgoingFriendRequestsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gac12df2634d31962a5aa54690efa575ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">List outgoing friend requests for the currently logged in player (friend requests made by this player)  <br /></td></tr>
+<tr class="separator:gac12df2634d31962a5aa54690efa575ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga089ac84173e07ddcb0d809bc014b2fa4" id="r_ga089ac84173e07ddcb0d809bc014b2fa4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga089ac84173e07ddcb0d809bc014b2fa4">LootLocker.Requests.LootLockerSDKManager.ListOutGoingFriendRequestsPaginated</a> (int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListOutgoingFriendRequestsResponse.html">LootLockerListOutgoingFriendRequestsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga089ac84173e07ddcb0d809bc014b2fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">List outgoing friend requests for the currently logged in player with pagination (friend requests made by this player)  <br /></td></tr>
+<tr class="separator:ga089ac84173e07ddcb0d809bc014b2fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga98c7d307b0750958e05518c7c74c6a2b" id="r_ga98c7d307b0750958e05518c7c74c6a2b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga98c7d307b0750958e05518c7c74c6a2b">LootLocker.Requests.LootLockerSDKManager.SendFriendRequest</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga98c7d307b0750958e05518c7c74c6a2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a friend request to the specified player for the currently logged in player.  <br /></td></tr>
+<tr class="separator:ga98c7d307b0750958e05518c7c74c6a2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8274117e4243e0e84a03b1a422f0bd53" id="r_ga8274117e4243e0e84a03b1a422f0bd53"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga8274117e4243e0e84a03b1a422f0bd53">LootLocker.Requests.LootLockerSDKManager.CancelFriendRequest</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga8274117e4243e0e84a03b1a422f0bd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel the outgoing friend request made to the specified player by the currently logged in player.  <br /></td></tr>
+<tr class="separator:ga8274117e4243e0e84a03b1a422f0bd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga17fe4a7f0b5e3258f06444e89b0a2854" id="r_ga17fe4a7f0b5e3258f06444e89b0a2854"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga17fe4a7f0b5e3258f06444e89b0a2854">LootLocker.Requests.LootLockerSDKManager.AcceptFriendRequest</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga17fe4a7f0b5e3258f06444e89b0a2854"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accept the incoming friend request from the specified player.  <br /></td></tr>
+<tr class="separator:ga17fe4a7f0b5e3258f06444e89b0a2854"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaeeea1d099e56f018d48cc29a8ebacd9" id="r_gaaeeea1d099e56f018d48cc29a8ebacd9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gaaeeea1d099e56f018d48cc29a8ebacd9">LootLocker.Requests.LootLockerSDKManager.DeclineFriendRequest</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaaeeea1d099e56f018d48cc29a8ebacd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decline the incoming friend request from the specified player.  <br /></td></tr>
+<tr class="separator:gaaeeea1d099e56f018d48cc29a8ebacd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab418852f2aa3e2e0ea99750246ad3df7" id="r_gab418852f2aa3e2e0ea99750246ad3df7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gab418852f2aa3e2e0ea99750246ad3df7">LootLocker.Requests.LootLockerSDKManager.ListBlockedPlayers</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListBlockedPlayersResponse.html">LootLockerListBlockedPlayersResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gab418852f2aa3e2e0ea99750246ad3df7"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the players (if any) that are blocked by the currently logged in player with default pagination.  <br /></td></tr>
+<tr class="separator:gab418852f2aa3e2e0ea99750246ad3df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa54524851b881dee188463ce59783ff9" id="r_gaa54524851b881dee188463ce59783ff9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gaa54524851b881dee188463ce59783ff9">LootLocker.Requests.LootLockerSDKManager.ListBlockedPlayersPaginated</a> (int PerPage, int Page, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListBlockedPlayersResponse.html">LootLockerListBlockedPlayersResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa54524851b881dee188463ce59783ff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the players (if any) that are blocked by the currently logged in player.  <br /></td></tr>
+<tr class="separator:gaa54524851b881dee188463ce59783ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga314a5b3e7358cd6b990760e6e310c333" id="r_ga314a5b3e7358cd6b990760e6e310c333"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga314a5b3e7358cd6b990760e6e310c333">LootLocker.Requests.LootLockerSDKManager.BlockPlayer</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga314a5b3e7358cd6b990760e6e310c333"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block the specified player (adding them to the currently logged in players block list and removing them the friend list)  <br /></td></tr>
+<tr class="separator:ga314a5b3e7358cd6b990760e6e310c333"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga320ee8e0f46729a3fe6d49d771c7cf04" id="r_ga320ee8e0f46729a3fe6d49d771c7cf04"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#ga320ee8e0f46729a3fe6d49d771c7cf04">LootLocker.Requests.LootLockerSDKManager.UnblockPlayer</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga320ee8e0f46729a3fe6d49d771c7cf04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unblock the specified player (remove from the currently logged in players block list)  <br /></td></tr>
+<tr class="separator:ga320ee8e0f46729a3fe6d49d771c7cf04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaf6dbbbf644516ee23f91508dbb3a3a7" id="r_gaaf6dbbbf644516ee23f91508dbb3a3a7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Friends.html#gaaf6dbbbf644516ee23f91508dbb3a3a7">LootLocker.Requests.LootLockerSDKManager.DeleteFriend</a> (string playerID, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html">LootLockerFriendsOperationResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaaf6dbbbf644516ee23f91508dbb3a3a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the specified player from the currently logged in player's friends list.  <br /></td></tr>
+<tr class="separator:gaaf6dbbbf644516ee23f91508dbb3a3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

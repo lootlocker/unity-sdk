@@ -1,0 +1,1582 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Leaderboards</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__Leaderboard.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Leaderboards</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Rank players or any custom key by score, with optional resets and rewards. </p>
+<p>Two leaderboard types are supported: <b>Player Type</b> (scores tied to player IDs — traditional rankings) and <b>Generic Type</b> (scores tied to custom string keys — rank UGC, teams, or any entity). Metadata can be stored alongside each score for contextual enrichment. Periodic <b>resets</b> can be configured in the console to clear rankings on a schedule and automatically distribute rewards to top-placed players.</p>
+<p>See the <a href="https://docs.lootlocker.com/game-systems/leaderboards">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gaf8cc5f179f48691d045a7180dd9d30a9" name="gaf8cc5f179f48691d045a7180dd9d30a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf8cc5f179f48691d045a7180dd9d30a9">&#9670;&#160;</a></span>GetAllMemberRanks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanks </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current ranking for a member on all available leaderboards. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">member_id</td><td>The ID of the player to check</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gadd4242f42610d4ddddcafe158f980657" name="gadd4242f42610d4ddddcafe158f980657"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadd4242f42610d4ddddcafe158f980657">&#9670;&#160;</a></span>GetAllMemberRanksMain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksMain </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current ranking for a member on all available leaderboards. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">member_id</td><td>The ID of the player to check</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">after</td><td>How many extra rows after the returned position</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab1b5162117a932b239b70f3848b5e7e4" name="gab1b5162117a932b239b70f3848b5e7e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab1b5162117a932b239b70f3848b5e7e4">&#9670;&#160;</a></span>GetAllMemberRanksNext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksNext </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the next current rankings for a member on all available leaderboards. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">member_id</td><td>The ID of the player to check</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga60b0c91f94dbd9fe08e62a482a29f37e" name="ga60b0c91f94dbd9fe08e62a482a29f37e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga60b0c91f94dbd9fe08e62a482a29f37e">&#9670;&#160;</a></span>GetAllMemberRanksOriginal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksOriginal </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current ranking for a member on all available leaderboards. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">member_id</td><td>The ID of the player to check</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">after</td><td>How many extra rows after the players position</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf7a555f7f763966e2061c5b008d0d424" name="gaf7a555f7f763966e2061c5b008d0d424"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf7a555f7f763966e2061c5b008d0d424">&#9670;&#160;</a></span>GetAllMemberRanksPrev()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksPrev </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the previous ranking for a member on all available leaderboards. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">member_id</td><td>The ID of the player to check</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetAllMemberRanksResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa4dab1fc80ff47d2ac83f665ef2f1787" name="gaa4dab1fc80ff47d2ac83f665ef2f1787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa4dab1fc80ff47d2ac83f665ef2f1787">&#9670;&#160;</a></span>GetByListOfMembers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetByListOfMembers </td>
+          <td>(</td>
+          <td class="paramtype">string[]&#160;</td>
+          <td class="paramname"><em>members</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetByListOfMembersResponse.html">LootLockerGetByListOfMembersResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current ranking for several members on a specific leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">members</td><td>List of members to get as string</td></tr>
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard as a string</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetByListOfMembersResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga2c84dda06ee1d3cc14e63e5365de6976" name="ga2c84dda06ee1d3cc14e63e5365de6976"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2c84dda06ee1d3cc14e63e5365de6976">&#9670;&#160;</a></span>GetLeaderboardArchive() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the details of a Leaderboard Archive, containing past rewards, ranks, etc. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>Key of the json archive to read</td></tr>
+    <tr><td class="paramname">onComplete</td><td>&lt;onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf14f7409815834f7a9d953c91bdc5860" name="gaf14f7409815834f7a9d953c91bdc5860"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf14f7409815834f7a9d953c91bdc5860">&#9670;&#160;</a></span>GetLeaderboardArchive() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the details of a Leaderboard Archive, containing past rewards, ranks, etc. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>Key of the json archive to read</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to read </td></tr>
+    <tr><td class="paramname">onComplete</td><td>&lt;onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga6b6b23ac1c2a3a7afac81dbd89a5872d" name="ga6b6b23ac1c2a3a7afac81dbd89a5872d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6b6b23ac1c2a3a7afac81dbd89a5872d">&#9670;&#160;</a></span>GetLeaderboardArchive() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the details of a Leaderboard Archive, containing past rewards, ranks, etc. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>Key of the json archive to read</td></tr>
+    <tr><td class="paramname">count</td><td>Amount of entries to read </td></tr>
+    <tr><td class="paramname">after</td><td>Return after specified index </td></tr>
+    <tr><td class="paramname">onComplete</td><td>&lt;onComplete Action for handling the response of type LootLockerLeaderboardArchiveDetailsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa07479daefe6518683b4880434b5b86e" name="gaa07479daefe6518683b4880434b5b86e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa07479daefe6518683b4880434b5b86e">&#9670;&#160;</a></span>GetLeaderboardData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetLeaderboardData </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboard_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html">LootLockerLeaderboardDetailResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get data on a leaderboard, check rewards and when it will reset and the last reset time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboard_key</td><td>Key of the leaderboard to get data from</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerLeaderboardDetailResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga86d9e9ab5683390f7b150a321a6850d4" name="ga86d9e9ab5683390f7b150a321a6850d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga86d9e9ab5683390f7b150a321a6850d4">&#9670;&#160;</a></span>GetMemberRank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetMemberRank </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>member_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMemberRankResponse.html">LootLockerGetMemberRankResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current ranking for a specific player on a leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard as a string</td></tr>
+    <tr><td class="paramname">member_id</td><td>ID of the player as a string</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetMemberRankResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga6ec4c8b9159a89b1ed38b4913b11348b" name="ga6ec4c8b9159a89b1ed38b4913b11348b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6ec4c8b9159a89b1ed38b4913b11348b">&#9670;&#160;</a></span>GetNextScoreList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetNextScoreList </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the next entries for a specific leaderboard. </p>
+<p>Can be called after GetScoreList.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to get entries for</td></tr>
+    <tr><td class="paramname">count</td><td>How many entries to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetScoreListResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga23afd9eba37a7e6651a1b50454be860d" name="ga23afd9eba37a7e6651a1b50454be860d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga23afd9eba37a7e6651a1b50454be860d">&#9670;&#160;</a></span>GetPrevScoreList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPrevScoreList </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the previous entries for a specific leaderboard. </p>
+<p>Can be called after GetScoreList or GetNextScoreList.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to get entries for</td></tr>
+    <tr><td class="paramname">count</td><td>How many entries to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetScoreListResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaef95b912bc60e845a872abb088d33e63" name="gaef95b912bc60e845a872abb088d33e63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaef95b912bc60e845a872abb088d33e63">&#9670;&#160;</a></span>GetScoreList() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetScoreList </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the entries for a specific leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to get entries for</td></tr>
+    <tr><td class="paramname">count</td><td>How many entries to get</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetScoreListResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga437e87c795e144d267537d1272782067" name="ga437e87c795e144d267537d1272782067"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga437e87c795e144d267537d1272782067">&#9670;&#160;</a></span>GetScoreList() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetScoreList </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the entries for a specific leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to get entries for</td></tr>
+    <tr><td class="paramname">count</td><td>How many entries to get</td></tr>
+    <tr><td class="paramname">after</td><td>How many after the last entry to receive</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetScoreListResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga24950f9d0e08cf561ca957f6d8c566fb" name="ga24950f9d0e08cf561ca957f6d8c566fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga24950f9d0e08cf561ca957f6d8c566fb">&#9670;&#160;</a></span>IncrementScore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.IncrementScore </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>memberId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>amount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Increment an existing score on a leaderboard by the given amount. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">memberId</td><td>Can be left blank if it is a player leaderboard, otherwise this is the identifier you wish to use for this score</td></tr>
+    <tr><td class="paramname">amount</td><td>The amount with which to increment the current score on the given leaderboard (can be positive or negative)</td></tr>
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to submit score to</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSubmitScoreResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga45cbda782ea339bc4423ad83433d2bdf" name="ga45cbda782ea339bc4423ad83433d2bdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga45cbda782ea339bc4423ad83433d2bdf">&#9670;&#160;</a></span>ListLeaderboardArchive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListLeaderboardArchive </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboard_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html">LootLockerLeaderboardArchiveResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List the archived versions of a leaderboard, containing past rewards, ranks, etc. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">leaderboard_key</td><td>Key of the Leaderboard</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerLeaderboardArchiveResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4eaf15d575898a1af5c0193952048973" name="ga4eaf15d575898a1af5c0193952048973"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4eaf15d575898a1af5c0193952048973">&#9670;&#160;</a></span>ListLeaderboards()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ListLeaderboards </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>after</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListLeaderboardsResponse.html">LootLockerListLeaderboardsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List leaderboards with details on each leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>How many leaderboards to get in one request</td></tr>
+    <tr><td class="paramname">after</td><td>Return leaderboards after this specified index</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerGetMemberRankResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab93dae679e97bbb651bb1170b3d9a66f" name="gab93dae679e97bbb651bb1170b3d9a66f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab93dae679e97bbb651bb1170b3d9a66f">&#9670;&#160;</a></span>QueryScore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.QueryScore </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>score</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a leaderboard for which rank a specific score would achieve. </p>
+<p>Does not submit the score but returns the projected rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">score</td><td>The score to use for the query</td></tr>
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to submit score to</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSubmitScoreResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga31427a68dcd1556f98962eaa1c63bc3b" name="ga31427a68dcd1556f98962eaa1c63bc3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga31427a68dcd1556f98962eaa1c63bc3b">&#9670;&#160;</a></span>SubmitScore() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SubmitScore </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>memberId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>score</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Submit a score to a leaderboard. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">memberId</td><td>Can be left blank if it is a player leaderboard, otherwise an identifier for the player</td></tr>
+    <tr><td class="paramname">score</td><td>The score to upload</td></tr>
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to submit score to</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSubmitScoreResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga6878643c9caccce36549ca59cd47c4b0" name="ga6878643c9caccce36549ca59cd47c4b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6878643c9caccce36549ca59cd47c4b0">&#9670;&#160;</a></span>SubmitScore() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.SubmitScore </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>memberId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>score</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>leaderboardKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>metadata</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Submit a score to a leaderboard with additional metadata. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">memberId</td><td>Can be left blank if it is a player leaderboard, otherwise an identifier for the player</td></tr>
+    <tr><td class="paramname">score</td><td>The score to upload</td></tr>
+    <tr><td class="paramname">leaderboardKey</td><td>Key of the leaderboard to submit score to</td></tr>
+    <tr><td class="paramname">metadata</td><td>Additional metadata to add to the score</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerSubmitScoreResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga4eaf15d575898a1af5c0193952048973" id="r_ga4eaf15d575898a1af5c0193952048973"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga4eaf15d575898a1af5c0193952048973">LootLocker.Requests.LootLockerSDKManager.ListLeaderboards</a> (int count, int after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerListLeaderboardsResponse.html">LootLockerListLeaderboardsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4eaf15d575898a1af5c0193952048973"><td class="mdescLeft">&#160;</td><td class="mdescRight">List leaderboards with details on each leaderboard.  <br /></td></tr>
+<tr class="separator:ga4eaf15d575898a1af5c0193952048973"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga86d9e9ab5683390f7b150a321a6850d4" id="r_ga86d9e9ab5683390f7b150a321a6850d4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga86d9e9ab5683390f7b150a321a6850d4">LootLocker.Requests.LootLockerSDKManager.GetMemberRank</a> (string leaderboardKey, string member_id, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetMemberRankResponse.html">LootLockerGetMemberRankResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga86d9e9ab5683390f7b150a321a6850d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current ranking for a specific player on a leaderboard.  <br /></td></tr>
+<tr class="separator:ga86d9e9ab5683390f7b150a321a6850d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa4dab1fc80ff47d2ac83f665ef2f1787" id="r_gaa4dab1fc80ff47d2ac83f665ef2f1787"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaa4dab1fc80ff47d2ac83f665ef2f1787">LootLocker.Requests.LootLockerSDKManager.GetByListOfMembers</a> (string[] members, string leaderboardKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetByListOfMembersResponse.html">LootLockerGetByListOfMembersResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa4dab1fc80ff47d2ac83f665ef2f1787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current ranking for several members on a specific leaderboard.  <br /></td></tr>
+<tr class="separator:gaa4dab1fc80ff47d2ac83f665ef2f1787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadd4242f42610d4ddddcafe158f980657" id="r_gadd4242f42610d4ddddcafe158f980657"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gadd4242f42610d4ddddcafe158f980657">LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksMain</a> (int member_id, int count, int after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gadd4242f42610d4ddddcafe158f980657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current ranking for a member on all available leaderboards.  <br /></td></tr>
+<tr class="separator:gadd4242f42610d4ddddcafe158f980657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf8cc5f179f48691d045a7180dd9d30a9" id="r_gaf8cc5f179f48691d045a7180dd9d30a9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaf8cc5f179f48691d045a7180dd9d30a9">LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanks</a> (int member_id, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf8cc5f179f48691d045a7180dd9d30a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current ranking for a member on all available leaderboards.  <br /></td></tr>
+<tr class="separator:gaf8cc5f179f48691d045a7180dd9d30a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab1b5162117a932b239b70f3848b5e7e4" id="r_gab1b5162117a932b239b70f3848b5e7e4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gab1b5162117a932b239b70f3848b5e7e4">LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksNext</a> (int member_id, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gab1b5162117a932b239b70f3848b5e7e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next current rankings for a member on all available leaderboards.  <br /></td></tr>
+<tr class="separator:gab1b5162117a932b239b70f3848b5e7e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf7a555f7f763966e2061c5b008d0d424" id="r_gaf7a555f7f763966e2061c5b008d0d424"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaf7a555f7f763966e2061c5b008d0d424">LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksPrev</a> (int member_id, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf7a555f7f763966e2061c5b008d0d424"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous ranking for a member on all available leaderboards.  <br /></td></tr>
+<tr class="separator:gaf7a555f7f763966e2061c5b008d0d424"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga051fe4a2c8ab64cfc6b45f9fa1d794a1" id="r_ga051fe4a2c8ab64cfc6b45f9fa1d794a1"><td class="memItemLeft" align="right" valign="top"><a id="ga051fe4a2c8ab64cfc6b45f9fa1d794a1" name="ga051fe4a2c8ab64cfc6b45f9fa1d794a1"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>LootLocker.Requests.LootLockerSDKManager.ResetAllMemberRanksCalls</b> ()</td></tr>
+<tr class="memdesc:ga051fe4a2c8ab64cfc6b45f9fa1d794a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the calls for getting all member ranks. <br /></td></tr>
+<tr class="separator:ga051fe4a2c8ab64cfc6b45f9fa1d794a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga60b0c91f94dbd9fe08e62a482a29f37e" id="r_ga60b0c91f94dbd9fe08e62a482a29f37e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga60b0c91f94dbd9fe08e62a482a29f37e">LootLocker.Requests.LootLockerSDKManager.GetAllMemberRanksOriginal</a> (int member_id, int count, int after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html">LootLockerGetAllMemberRanksResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga60b0c91f94dbd9fe08e62a482a29f37e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current ranking for a member on all available leaderboards.  <br /></td></tr>
+<tr class="separator:ga60b0c91f94dbd9fe08e62a482a29f37e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga437e87c795e144d267537d1272782067" id="r_ga437e87c795e144d267537d1272782067"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga437e87c795e144d267537d1272782067">LootLocker.Requests.LootLockerSDKManager.GetScoreList</a> (string leaderboardKey, int count, int after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga437e87c795e144d267537d1272782067"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the entries for a specific leaderboard.  <br /></td></tr>
+<tr class="separator:ga437e87c795e144d267537d1272782067"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaef95b912bc60e845a872abb088d33e63" id="r_gaef95b912bc60e845a872abb088d33e63"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaef95b912bc60e845a872abb088d33e63">LootLocker.Requests.LootLockerSDKManager.GetScoreList</a> (string leaderboardKey, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaef95b912bc60e845a872abb088d33e63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the entries for a specific leaderboard.  <br /></td></tr>
+<tr class="separator:gaef95b912bc60e845a872abb088d33e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6ec4c8b9159a89b1ed38b4913b11348b" id="r_ga6ec4c8b9159a89b1ed38b4913b11348b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga6ec4c8b9159a89b1ed38b4913b11348b">LootLocker.Requests.LootLockerSDKManager.GetNextScoreList</a> (string leaderboardKey, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga6ec4c8b9159a89b1ed38b4913b11348b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next entries for a specific leaderboard.  <br /></td></tr>
+<tr class="separator:ga6ec4c8b9159a89b1ed38b4913b11348b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga23afd9eba37a7e6651a1b50454be860d" id="r_ga23afd9eba37a7e6651a1b50454be860d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga23afd9eba37a7e6651a1b50454be860d">LootLocker.Requests.LootLockerSDKManager.GetPrevScoreList</a> (string leaderboardKey, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html">LootLockerGetScoreListResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga23afd9eba37a7e6651a1b50454be860d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous entries for a specific leaderboard.  <br /></td></tr>
+<tr class="separator:ga23afd9eba37a7e6651a1b50454be860d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5e8de3d93d0e424b7fa933399bbb77a4" id="r_ga5e8de3d93d0e424b7fa933399bbb77a4"><td class="memItemLeft" align="right" valign="top"><a id="ga5e8de3d93d0e424b7fa933399bbb77a4" name="ga5e8de3d93d0e424b7fa933399bbb77a4"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>LootLocker.Requests.LootLockerSDKManager.ResetScoreCalls</b> ()</td></tr>
+<tr class="memdesc:ga5e8de3d93d0e424b7fa933399bbb77a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the next and previous cursors for the GetScoreList and GetNextScoreList methods. <br /></td></tr>
+<tr class="separator:ga5e8de3d93d0e424b7fa933399bbb77a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga31427a68dcd1556f98962eaa1c63bc3b" id="r_ga31427a68dcd1556f98962eaa1c63bc3b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga31427a68dcd1556f98962eaa1c63bc3b">LootLocker.Requests.LootLockerSDKManager.SubmitScore</a> (string memberId, int score, string leaderboardKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga31427a68dcd1556f98962eaa1c63bc3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Submit a score to a leaderboard.  <br /></td></tr>
+<tr class="separator:ga31427a68dcd1556f98962eaa1c63bc3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6878643c9caccce36549ca59cd47c4b0" id="r_ga6878643c9caccce36549ca59cd47c4b0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga6878643c9caccce36549ca59cd47c4b0">LootLocker.Requests.LootLockerSDKManager.SubmitScore</a> (string memberId, int score, string leaderboardKey, string metadata, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga6878643c9caccce36549ca59cd47c4b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Submit a score to a leaderboard with additional metadata.  <br /></td></tr>
+<tr class="separator:ga6878643c9caccce36549ca59cd47c4b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab93dae679e97bbb651bb1170b3d9a66f" id="r_gab93dae679e97bbb651bb1170b3d9a66f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gab93dae679e97bbb651bb1170b3d9a66f">LootLocker.Requests.LootLockerSDKManager.QueryScore</a> (int score, string leaderboardKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gab93dae679e97bbb651bb1170b3d9a66f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a leaderboard for which rank a specific score would achieve.  <br /></td></tr>
+<tr class="separator:gab93dae679e97bbb651bb1170b3d9a66f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga24950f9d0e08cf561ca957f6d8c566fb" id="r_ga24950f9d0e08cf561ca957f6d8c566fb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga24950f9d0e08cf561ca957f6d8c566fb">LootLocker.Requests.LootLockerSDKManager.IncrementScore</a> (string memberId, int amount, string leaderboardKey, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html">LootLockerSubmitScoreResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga24950f9d0e08cf561ca957f6d8c566fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment an existing score on a leaderboard by the given amount.  <br /></td></tr>
+<tr class="separator:ga24950f9d0e08cf561ca957f6d8c566fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga45cbda782ea339bc4423ad83433d2bdf" id="r_ga45cbda782ea339bc4423ad83433d2bdf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga45cbda782ea339bc4423ad83433d2bdf">LootLocker.Requests.LootLockerSDKManager.ListLeaderboardArchive</a> (string leaderboard_key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html">LootLockerLeaderboardArchiveResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga45cbda782ea339bc4423ad83433d2bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the archived versions of a leaderboard, containing past rewards, ranks, etc.  <br /></td></tr>
+<tr class="separator:ga45cbda782ea339bc4423ad83433d2bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2c84dda06ee1d3cc14e63e5365de6976" id="r_ga2c84dda06ee1d3cc14e63e5365de6976"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga2c84dda06ee1d3cc14e63e5365de6976">LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive</a> (string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga2c84dda06ee1d3cc14e63e5365de6976"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the details of a Leaderboard Archive, containing past rewards, ranks, etc.  <br /></td></tr>
+<tr class="separator:ga2c84dda06ee1d3cc14e63e5365de6976"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf14f7409815834f7a9d953c91bdc5860" id="r_gaf14f7409815834f7a9d953c91bdc5860"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaf14f7409815834f7a9d953c91bdc5860">LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive</a> (string key, int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf14f7409815834f7a9d953c91bdc5860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the details of a Leaderboard Archive, containing past rewards, ranks, etc.  <br /></td></tr>
+<tr class="separator:gaf14f7409815834f7a9d953c91bdc5860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6b6b23ac1c2a3a7afac81dbd89a5872d" id="r_ga6b6b23ac1c2a3a7afac81dbd89a5872d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#ga6b6b23ac1c2a3a7afac81dbd89a5872d">LootLocker.Requests.LootLockerSDKManager.GetLeaderboardArchive</a> (string key, int count, string after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html">LootLockerLeaderboardArchiveDetailsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga6b6b23ac1c2a3a7afac81dbd89a5872d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the details of a Leaderboard Archive, containing past rewards, ranks, etc.  <br /></td></tr>
+<tr class="separator:ga6b6b23ac1c2a3a7afac81dbd89a5872d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa07479daefe6518683b4880434b5b86e" id="r_gaa07479daefe6518683b4880434b5b86e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Leaderboard.html#gaa07479daefe6518683b4880434b5b86e">LootLocker.Requests.LootLockerSDKManager.GetLeaderboardData</a> (string leaderboard_key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html">LootLockerLeaderboardDetailResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa07479daefe6518683b4880434b5b86e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data on a leaderboard, check rewards and when it will reset and the last reset time.  <br /></td></tr>
+<tr class="separator:gaa07479daefe6518683b4880434b5b86e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

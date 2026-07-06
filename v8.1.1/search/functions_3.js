@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['debitbalancetowallet_0',['DebitBalanceToWallet',['../group__Balances.html#ga95cf488cdb53f881d4faba1222799512',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['declinefriendrequest_1',['DeclineFriendRequest',['../group__Friends.html#gaaeeea1d099e56f018d48cc29a8ebacd9',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteassetinstancefromplayerinventory_2',['DeleteAssetInstanceFromPlayerInventory',['../group__AssetInstance.html#ga3fe9e69c0c1223dd3cea3882f691b544',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteassetinstanceprogression_3',['DeleteAssetInstanceProgression',['../group__AssetInstanceProgressions.html#ga99615739287cc2a841e2380549017d25',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletecharacterprogression_4',['DeleteCharacterProgression',['../group__CharacterProgressions.html#ga9009c72a559d17630bc8a8f60013580a',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletefriend_5',['DeleteFriend',['../group__Friends.html#gaaf6dbbbf644516ee23f91508dbb3a3a7',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletehero_6',['DeleteHero',['../group__Hero.html#ga9e6db6547872090083d230d8d8f93003',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletekey_7',['DeleteKey',['../interfaceLootLocker_1_1ILootLockerStateWriter.html#ac2e1ce09e6542c8016b3ff9fb87537c6',1,'LootLocker::ILootLockerStateWriter']]],
+  ['deletekeyvalue_8',['DeleteKeyValue',['../group__PlayerStorage.html#ga12129fed0099714e3d4fac4a5449d77f',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletekeyvaluepairforassetinstances_9',['DeleteKeyValuePairForAssetInstances',['../group__AssetInstance.html#gaf84a41fc88d67074860fac0aaeefbdb9',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteplayer_10',['DeletePlayer',['../group__Player.html#ga973ec828fd87841c4fb01b2ed53cd3f6',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteplayerfile_11',['DeletePlayerFile',['../group__PlayerFiles.html#ga09fbbb0a732057ab40e4a40e2ccc2a40',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteplayerprogression_12',['DeletePlayerProgression',['../group__PlayerProgressions.html#ga3da0f07d698cb7eaeda271af912452d6',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletinganassetcandidate_13',['DeletingAnAssetCandidate',['../group__UserGeneratedContent.html#gab502b3231d9a711ad37f551dd7234331',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['disconnectaccount_14',['DisconnectAccount',['../group__ConnectedAccounts.html#ga34c0c8138ae068fec24414d2e4f42eed',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['disconnectall_15',['DisconnectAll',['../classLootLocker_1_1LootLockerPresenceManager.html#a00dfbf117bb89d4ce7b5f4d991488ef1',1,'LootLocker::LootLockerPresenceManager']]],
+  ['disconnectpresence_16',['DisconnectPresence',['../classLootLocker_1_1LootLockerPresenceManager.html#a26a47a0521d372ab008e3e6a448801c6',1,'LootLocker::LootLockerPresenceManager']]],
+  ['dispose_17',['Dispose',['../classLootLocker_1_1LootLockerPresenceClient.html#a74d9e3e137834fb86d711f0705458e01',1,'LootLocker::LootLockerPresenceClient']]]
+];

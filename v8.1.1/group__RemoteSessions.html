@@ -1,0 +1,537 @@
+<!-- HTML header for doxygen 1.9.8-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Remote Sessions</title>
+<!--BEGIN PROJECT_ICON-->
+<link rel="icon" href="$projecticon" type="image/x-icon" />
+<!--END PROJECT_ICON-->
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<!--BEGIN COPY_CLIPBOARD-->
+<script type="text/javascript" src="clipboard.js"></script>
+<!--END COPY_CLIPBOARD-->
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.1.1</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('group__RemoteSessions.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">Remote Sessions</div></div>
+</div><!--header-->
+<div class="contents">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Log in to a different platform than the one you are currently playing on. </p>
+<p>Part of Unified Player Accounts (UPA). A player on one platform (e.g., Nintendo Switch) can authenticate as their account on another platform (e.g., Steam) without needing the target platform's native app. The flow uses an 8-digit code verified through <a href="https://auth.game">https://auth.game</a>.</p>
+<p>See the <a href="https://docs.lootlocker.com/players/unified-player-accounts#remote-login">LootLocker documentation</a>. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga55e9e015374eb87fe68328358fb10cd2" name="ga55e9e015374eb87fe68328358fb10cd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga55e9e015374eb87fe68328358fb10cd2">&#9670;&#160;</a></span>CancelRemoteSessionProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.CancelRemoteSessionProcess </td>
+          <td>(</td>
+          <td class="paramtype">Guid&#160;</td>
+          <td class="paramname"><em>guid</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cancel an ongoing remote session process. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">guid</td><td>The guid of the remote session process that you want to cancel</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga9d1f258ab3d95d3285b5ee8fdcb7632a" name="ga9d1f258ab3d95d3285b5ee8fdcb7632a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9d1f258ab3d95d3285b5ee8fdcb7632a">&#9670;&#160;</a></span>RefreshRemoteSession() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RefreshRemoteSession </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefreshRemoteSessionResponse.html">LootLockerRefreshRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Refresh a previous session signed in remotely. </p>
+<p>A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae975baedec4e7703e2541a17557b8722" name="gae975baedec4e7703e2541a17557b8722"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae975baedec4e7703e2541a17557b8722">&#9670;&#160;</a></span>RefreshRemoteSession() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.RefreshRemoteSession </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>refreshToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefreshRemoteSessionResponse.html">LootLockerRefreshRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Refresh a previous session signed in remotely. </p>
+<p>If you do not want to manually handle the refresh token we recommend using the RefreshRemoteSession(Action&lt;LootLockerRemoteSessionResponse&gt; onComplete, string forPlayerWithUlid) method. A response code of 400 (Bad request) could mean that the refresh token has expired and you'll need to sign in again</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">refreshToken</td><td>Token received in response from StartRemoteSession request</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gadec76b1e662c1c9dcb7e2074bed9a0a4" name="gadec76b1e662c1c9dcb7e2074bed9a0a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadec76b1e662c1c9dcb7e2074bed9a0a4">&#9670;&#160;</a></span>StartRemoteSession()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static Guid LootLocker.Requests.LootLockerSDKManager.StartRemoteSession </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html">LootLockerLeaseRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>remoteSessionLeaseInformation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRemoteSessionStatusPollingResponse.html">LootLockerRemoteSessionStatusPollingResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>remoteSessionLeaseStatusUpdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionResponse.html">LootLockerStartRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>pollingIntervalSeconds</em> = <code>1::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>timeOutAfterMinutes</em> = <code>5::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a8c149e412d4b7c199da1853ade741672">LootLockerAccountProvider</a>&#160;</td>
+          <td class="paramname"><em>provider</em> = <code>LootLockerAccountProvider::guest</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a remote session If you want to let your local user sign in using another device then you use this method. </p>
+<p>First you will get the lease information needed to allow a secondary device to authenticate. While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process. When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">remoteSessionLeaseInformation</td><td>Will be invoked once to provide the lease information that the secondary device can use to authenticate</td></tr>
+    <tr><td class="paramname">remoteSessionLeaseStatusUpdate</td><td>Will be invoked intermittently to update the status lease process</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</td></tr>
+    <tr><td class="paramname">pollingIntervalSeconds</td><td>Optional: How often to poll the status of the remote session process</td></tr>
+    <tr><td class="paramname">timeOutAfterMinutes</td><td>Optional: How long to allow the process to take in its entirety</td></tr>
+    <tr><td class="paramname">provider</td><td>Optional: Preloads the connection flow with which provider to use for sign-in, so the user does not have to select it manually. When set to any value other than guest, the provider is embedded in the redirect_url returned with the lease information.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga90221767ede6fc358ccbb5f0a95f4de4" name="ga90221767ede6fc358ccbb5f0a95f4de4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga90221767ede6fc358ccbb5f0a95f4de4">&#9670;&#160;</a></span>StartRemoteSessionForLinking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static Guid LootLocker.Requests.LootLockerSDKManager.StartRemoteSessionForLinking </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html">LootLockerLeaseRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>remoteSessionLeaseInformation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRemoteSessionStatusPollingResponse.html">LootLockerRemoteSessionStatusPollingResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>remoteSessionLeaseStatusUpdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionResponse.html">LootLockerStartRemoteSessionResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>pollingIntervalSeconds</em> = <code>1::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>timeOutAfterMinutes</em> = <code>5::0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a8c149e412d4b7c199da1853ade741672">LootLockerAccountProvider</a>&#160;</td>
+          <td class="paramname"><em>provider</em> = <code>LootLockerAccountProvider::guest</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a remote session for linking If you want to let your local user sign in using another device then you use this method. </p>
+<p>First you will get the lease information needed to allow a secondary device to authenticate. While the process is ongoing, the remoteSessionLeaseStatusUpdate action (if one is provided) will be invoked intermittently (about once a second) to update you on the status of the process. When the process has come to an end (whether successfully or not), the onComplete action will be invoked with the updated information.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Execute the request for the specified player (the player that you intend to link the remote account into)</td></tr>
+    <tr><td class="paramname">remoteSessionLeaseInformation</td><td>Will be invoked once to provide the lease information that the secondary device can use to authenticate</td></tr>
+    <tr><td class="paramname">remoteSessionLeaseStatusUpdate</td><td>Will be invoked intermittently to update the status lease process</td></tr>
+    <tr><td class="paramname">onComplete</td><td>Invoked when the remote session process has run to completion containing either a valid session or information on why the process failed</td></tr>
+    <tr><td class="paramname">pollingIntervalSeconds</td><td>Optional: How often to poll the status of the remote session process</td></tr>
+    <tr><td class="paramname">timeOutAfterMinutes</td><td>Optional: How long to allow the process to take in its entirety</td></tr>
+    <tr><td class="paramname">provider</td><td>Optional: Preloads the connection flow with which provider to use for linking, so the user does not have to select it manually. When set to any value other than guest, the provider is embedded in the redirect_url returned with the lease information.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:gadec76b1e662c1c9dcb7e2074bed9a0a4" id="r_gadec76b1e662c1c9dcb7e2074bed9a0a4"><td class="memItemLeft" align="right" valign="top">static Guid&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RemoteSessions.html#gadec76b1e662c1c9dcb7e2074bed9a0a4">LootLocker.Requests.LootLockerSDKManager.StartRemoteSession</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html">LootLockerLeaseRemoteSessionResponse</a> &gt; remoteSessionLeaseInformation, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRemoteSessionStatusPollingResponse.html">LootLockerRemoteSessionStatusPollingResponse</a> &gt; remoteSessionLeaseStatusUpdate, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionResponse.html">LootLockerStartRemoteSessionResponse</a> &gt; onComplete, float pollingIntervalSeconds=1.0f, float timeOutAfterMinutes=5.0f, <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a8c149e412d4b7c199da1853ade741672">LootLockerAccountProvider</a> provider=LootLockerAccountProvider.guest)</td></tr>
+<tr class="memdesc:gadec76b1e662c1c9dcb7e2074bed9a0a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a remote session If you want to let your local user sign in using another device then you use this method.  <br /></td></tr>
+<tr class="separator:gadec76b1e662c1c9dcb7e2074bed9a0a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga90221767ede6fc358ccbb5f0a95f4de4" id="r_ga90221767ede6fc358ccbb5f0a95f4de4"><td class="memItemLeft" align="right" valign="top">static Guid&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RemoteSessions.html#ga90221767ede6fc358ccbb5f0a95f4de4">LootLocker.Requests.LootLockerSDKManager.StartRemoteSessionForLinking</a> (string forPlayerWithUlid, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html">LootLockerLeaseRemoteSessionResponse</a> &gt; remoteSessionLeaseInformation, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRemoteSessionStatusPollingResponse.html">LootLockerRemoteSessionStatusPollingResponse</a> &gt; remoteSessionLeaseStatusUpdate, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionResponse.html">LootLockerStartRemoteSessionResponse</a> &gt; onComplete, float pollingIntervalSeconds=1.0f, float timeOutAfterMinutes=5.0f, <a class="el" href="namespaceLootLocker_1_1LootLockerEnums.html#a8c149e412d4b7c199da1853ade741672">LootLockerAccountProvider</a> provider=LootLockerAccountProvider.guest)</td></tr>
+<tr class="memdesc:ga90221767ede6fc358ccbb5f0a95f4de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a remote session for linking If you want to let your local user sign in using another device then you use this method.  <br /></td></tr>
+<tr class="separator:ga90221767ede6fc358ccbb5f0a95f4de4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga55e9e015374eb87fe68328358fb10cd2" id="r_ga55e9e015374eb87fe68328358fb10cd2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RemoteSessions.html#ga55e9e015374eb87fe68328358fb10cd2">LootLocker.Requests.LootLockerSDKManager.CancelRemoteSessionProcess</a> (Guid guid)</td></tr>
+<tr class="memdesc:ga55e9e015374eb87fe68328358fb10cd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel an ongoing remote session process.  <br /></td></tr>
+<tr class="separator:ga55e9e015374eb87fe68328358fb10cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9d1f258ab3d95d3285b5ee8fdcb7632a" id="r_ga9d1f258ab3d95d3285b5ee8fdcb7632a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RemoteSessions.html#ga9d1f258ab3d95d3285b5ee8fdcb7632a">LootLocker.Requests.LootLockerSDKManager.RefreshRemoteSession</a> (Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefreshRemoteSessionResponse.html">LootLockerRefreshRemoteSessionResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga9d1f258ab3d95d3285b5ee8fdcb7632a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refresh a previous session signed in remotely.  <br /></td></tr>
+<tr class="separator:ga9d1f258ab3d95d3285b5ee8fdcb7632a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae975baedec4e7703e2541a17557b8722" id="r_gae975baedec4e7703e2541a17557b8722"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RemoteSessions.html#gae975baedec4e7703e2541a17557b8722">LootLocker.Requests.LootLockerSDKManager.RefreshRemoteSession</a> (string refreshToken, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerRefreshRemoteSessionResponse.html">LootLockerRefreshRemoteSessionResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gae975baedec4e7703e2541a17557b8722"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refresh a previous session signed in remotely.  <br /></td></tr>
+<tr class="separator:gae975baedec4e7703e2541a17557b8722"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.8-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.9.8
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

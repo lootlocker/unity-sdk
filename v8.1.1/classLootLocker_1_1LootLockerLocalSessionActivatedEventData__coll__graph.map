@@ -1,0 +1,5 @@
+<map id="LootLocker.LootLockerLocalSessionActivatedEventData" name="LootLocker.LootLockerLocalSessionActivatedEventData">
+<area shape="rect" id="Node000001" title="Event data for local session activated events." alt="" coords="5,79,208,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerEventData.html" title="Base class for all LootLocker event data." alt="" coords="27,5,187,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>

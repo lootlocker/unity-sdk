@@ -1,0 +1,15 @@
+var searchData=
+[
+  ['handleapplicationfocus_0',['handleapplicationfocus',['../classLootLocker_1_1RateLimiter.html#adb0ca4cecca6122ccf9f2023461997e1',1,'LootLocker.RateLimiter.HandleApplicationFocus()'],['../interfaceLootLocker_1_1ILootLockerService.html#a8857fcf3c766e93f2265336e0105d1f0',1,'LootLocker.ILootLockerService.HandleApplicationFocus(bool hasFocus)']]],
+  ['handleapplicationpause_1',['handleapplicationpause',['../interfaceLootLocker_1_1ILootLockerService.html#ac60762df72bc3687247497b0bf9bd0d2',1,'LootLocker.ILootLockerService.HandleApplicationPause()'],['../classLootLocker_1_1RateLimiter.html#a5268925dda4afee5bc7113d4a8b5e658',1,'LootLocker.RateLimiter.HandleApplicationPause()']]],
+  ['handleapplicationquit_2',['handleapplicationquit',['../interfaceLootLocker_1_1ILootLockerService.html#ad7b80c87dd0738076a7d37c8101f1715',1,'LootLocker.ILootLockerService.HandleApplicationQuit()'],['../classLootLocker_1_1RateLimiter.html#a61f0d3a420451e7f4b213d98c97a3ea8',1,'LootLocker.RateLimiter.HandleApplicationQuit()']]],
+  ['has_5fmetadata_3',['has_metadata',['../classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html#a98337b4cb0339e44a7e81e40518da1e5',1,'LootLocker.Requests.LootLockerLeaderboardDetailResponse.has_metadata'],['../classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetails.html#abf856307f1ffa6e68cfc01779ffa4b35',1,'LootLocker.Requests.LootLockerLeaderboardDetails.has_metadata']]],
+  ['haskey_4',['HasKey',['../interfaceLootLocker_1_1ILootLockerStateWriter.html#a7d7894b76b49cdb2e7ca19dd2de6a1fa',1,'LootLocker::ILootLockerStateWriter']]],
+  ['hasservice_3c_20t_20_3e_5',['HasService&lt; T &gt;',['../classLootLocker_1_1LootLockerLifecycleManager.html#ae20085167b235ec91587e35a5dde76f1',1,'LootLocker::LootLockerLifecycleManager']]],
+  ['headline_6',['headline',['../classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a6e5ccebe218e7562ff13ad96cc006003',1,'LootLocker::Requests::LootLockerBroadcastLanguage']]],
+  ['hero_7',['Hero',['../group__Hero.html',1,'']]],
+  ['holder_5fid_8',['holder_id',['../classLootLocker_1_1Requests_1_1LootLockerCreateWalletRequest.html#a5bce8a9d8cfef9f6b1e229731fa7853a',1,'LootLocker.Requests.LootLockerCreateWalletRequest.holder_id'],['../classLootLocker_1_1Requests_1_1LootLockerGetWalletResponse.html#abb893e294069e0a6d7c9cccc77597b6a',1,'LootLocker.Requests.LootLockerGetWalletResponse.holder_id']]],
+  ['holder_5ftype_9',['holder_type',['../classLootLocker_1_1Requests_1_1LootLockerCreateWalletRequest.html#a6f5550e367413d8312ef7f4bc937a3c1',1,'LootLocker::Requests::LootLockerCreateWalletRequest']]],
+  ['hotseat_10',['Hotseat',['../namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204aaca41c16b1e459f6897b49bc9e212d8e',1,'LootLocker']]],
+  ['http_5fmethod_11',['http_method',['../classLootLocker_1_1Requests_1_1LootLockerErrorReportBody.html#a04063bd92cc4e0de42707563d83ae5d5',1,'LootLocker.Requests.LootLockerErrorReportBody.http_method'],['../classLootLocker_1_1LootLockerHTTPClient_1_1LootLockerFailedRequestReport.html#afc2a466f18dbd699b3eccae50fa367f1',1,'LootLocker.LootLockerHTTPClient.LootLockerFailedRequestReport.http_method']]]
+];
