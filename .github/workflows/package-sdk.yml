@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  checks: write
 
 jobs:
   package-sdk:
@@ -35,6 +36,11 @@ jobs:
       - name: Add LootLockerSDK as asset folder
         run: |
           cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
+
+          # unity-sdk-packager requires Samples (not Samples~) for sample content
+          if [ -d unity-sdk-packager/Assets/LootLockerSDK/Samples~ ]; then
+            mv unity-sdk-packager/Assets/LootLockerSDK/Samples~ unity-sdk-packager/Assets/LootLockerSDK/Samples
+          fi
 
       - uses: actions/cache@v4
         with:
