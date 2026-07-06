@@ -1,0 +1,149 @@
+name: Enforce Release PR
+run-name: "Enforce release candidate PR requirements"
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  enforce:
+    name: Validate release candidate PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    if: contains(github.event.pull_request.labels.*.name, 'release candidate')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Validate PR body structure
+        id: check-body
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+
+          # Check 1: Non-empty
+          if [ -z "$(echo "$BODY" | tr -d '[:space:]')" ]; then
+            echo "::error::PR body is empty. Release notes are required."
+            echo "BODY_OK=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "BODY_OK=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Check 2: At least one ### section header
+          if echo "$BODY" | grep -q '^### '; then
+            echo "HAS_SECTIONS=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::PR body must have at least one section header (### Features, ### Fixes, etc.)."
+            echo "HAS_SECTIONS=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Check 3: Full Changelog link (warning only)
+          if echo "$BODY" | grep -qi 'Full Changelog:'; then
+            echo "HAS_CHANGELOG_LINK=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::PR body is missing a 'Full Changelog:' compare link."
+            echo "HAS_CHANGELOG_LINK=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Read version from package.json
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "::error::Could not read version from package.json"
+            exit 1
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Current version in branch: ${VERSION}"
+
+      - name: Get latest release tag
+        id: latest-tag
+        run: |
+          LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName // "v0.0.0"')
+          echo "TAG=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Latest release tag: ${LATEST_TAG}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Validate version bump
+        id: check-version
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.VERSION }}"
+          LATEST_TAG="${{ steps.latest-tag.outputs.TAG }}"
+          LATEST_VERSION=$(echo "$LATEST_TAG" | sed 's/^v//')
+
+          compare_versions() {
+            echo "$1" | awk -F. '{ printf "%d%03d%03d", $1, $2, $3 }'
+          }
+
+          OLD_CMP=$(compare_versions "$LATEST_VERSION")
+          NEW_CMP=$(compare_versions "$NEW_VERSION")
+
+          if [ "$OLD_CMP" -ge "$NEW_CMP" ]; then
+            echo "::error::Version ${NEW_VERSION} is not greater than latest release ${LATEST_VERSION}."
+            echo "VERSION_OK=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version bump OK: ${LATEST_VERSION} → ${NEW_VERSION}"
+            echo "VERSION_OK=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report and post status comment
+        if: always()
+        run: |
+          VERSION_OK="${{ steps.check-version.outputs.VERSION_OK }}"
+          BODY_OK="${{ steps.check-body.outputs.BODY_OK }}"
+          HAS_SECTIONS="${{ steps.check-body.outputs.HAS_SECTIONS }}"
+          HAS_CHANGELOG_LINK="${{ steps.check-body.outputs.HAS_CHANGELOG_LINK }}"
+          VERSION="${{ steps.version.outputs.VERSION }}"
+
+          issues=""
+          if [ "$VERSION_OK" != "true" ]; then
+            issues="${issues}\\n- ⚠️ **Version not bumped.** Latest release is ${{ steps.latest-tag.outputs.TAG }} but this PR has v${VERSION}."
+          fi
+          if [ "$BODY_OK" != "true" ]; then
+            issues="${issues}\\n- ⚠️ **PR body is empty.** Add release notes to the PR description."
+          fi
+          if [ "$HAS_SECTIONS" != "true" ]; then
+            issues="${issues}\\n- ⚠️ **No section headers found.** Add at least one \`###\` section (e.g. \`### Features\`, \`### Fixes\`)."
+          fi
+
+          warnings=""
+          if [ "$HAS_CHANGELOG_LINK" != "true" ]; then
+            warnings="${warnings}\\n- 💡 Missing \`Full Changelog:\` compare link — consider adding one."
+          fi
+
+          if [ -n "$issues" ]; then
+            printf "### ❌ Release PR Validation Failed\n${issues}${warnings}\n" > /tmp/status.md
+          else
+            printf "### ✅ Release PR Validation Passed\n\n- Version: **v${VERSION}** (bumped from ${{ steps.latest-tag.outputs.TAG }})\n- Release notes: present (section headers found)" > /tmp/status.md
+            if [ "$HAS_CHANGELOG_LINK" = "true" ]; then
+              printf ", changelog link present" >> /tmp/status.md
+            fi
+            printf "\n" >> /tmp/status.md
+          fi
+
+          # Find and update existing validation comments, or create a new one
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq '.[] | select(.body | startswith("### ✅ Release PR Validation") or startswith("### ❌ Release PR Validation")) | .id' \
+            | head -1)
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" \
+              --field body="$(cat /tmp/status.md)"
+          else
+            gh pr comment "$PR_NUMBER" --body "$(cat /tmp/status.md)"
+          fi
+
+          if [ -n "$issues" ]; then
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

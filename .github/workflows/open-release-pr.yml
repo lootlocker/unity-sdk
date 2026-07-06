@@ -1,0 +1,191 @@
+name: Open Release PR
+run-name: "Open release candidate PR for ${{ inputs.bump }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Type of version bump
+        required: true
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+        default: auto
+      custom_version:
+        description: Custom version override (e.g. 8.1.0). Leave empty to use semver bump.
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  open-pr:
+    name: Create release candidate PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Read current version
+        id: current
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Current version: ${VERSION}"
+
+      - name: Get previous release tag and commit log
+        id: prev-tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "TAG=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Previous tag: ${LATEST_TAG:-none}"
+
+          # Collect commits since last tag (or all commits if no tag yet)
+          REV_RANGE=""
+          if [ -n "$LATEST_TAG" ]; then
+            REV_RANGE="${LATEST_TAG}..HEAD"
+          else
+            REV_RANGE="HEAD"
+          fi
+
+          git log "$REV_RANGE" --format="%s" > /tmp/commits.log
+          COMMIT_COUNT=$(wc -l < /tmp/commits.log)
+          echo "Commits: ${COMMIT_COUNT}"
+          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate new version
+        id: new-version
+        run: |
+          CURRENT="${{ steps.current.outputs.VERSION }}"
+          CUSTOM="${{ inputs.custom_version }}"
+          BUMP="${{ inputs.bump }}"
+          ALREADY_CALCULATED=false
+
+          if [ -n "$CUSTOM" ]; then
+            NEW="$CUSTOM"
+            echo "Using custom version: ${NEW}"
+            ALREADY_CALCULATED=true
+          fi
+
+          if [ "$BUMP" = "auto" ] && [ "$ALREADY_CALCULATED" = "false" ]; then
+            echo "Auto-detecting version from OpenRouter..."
+            if [ -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then
+              echo "::error::OPENROUTER_API_KEY secret not set. Use manual bump or set secret."
+              exit 1
+            fi
+            COMMITS=$(head -100 /tmp/commits.log)
+            printf 'Based on these commit messages since the last release (v%s), determine the correct semver version for the next release. Analyze breaking changes, new features, and fixes. Respond with only the version number (e.g., 9.0.0).\n\n%s\n' "$CURRENT" "$COMMITS" > /tmp/version-prompt.txt
+            RESPONSE=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+              -H "Authorization: Bearer ${{ secrets.OPENROUTER_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --rawfile prompt /tmp/version-prompt.txt '{model:"deepseek/deepseek-v4-pro",messages:[{role:"user",content:$prompt}],reasoning:{effort:"low"},max_tokens:2000,temperature:0}')")
+            NEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ""' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+            if [ -z "$NEW" ]; then
+              echo "::warning::AI returned no parseable version, falling back to patch bump."
+              PATCH=$(echo "$CURRENT" | cut -d. -f3)
+              NEW="$(echo "$CURRENT" | cut -d. -f1).$(echo "$CURRENT" | cut -d. -f2).$((PATCH + 1))"
+            fi
+            echo "AI suggested version: ${NEW}"
+            ALREADY_CALCULATED=true
+          fi
+
+          if [ "$ALREADY_CALCULATED" = "false" ]; then
+            BUMP="${{ inputs.bump }}"
+            MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+            MINOR=$(echo "$CURRENT" | cut -d. -f2)
+            PATCH=$(echo "$CURRENT" | cut -d. -f3)
+            case "$BUMP" in
+              major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+              minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+              patch) PATCH=$((PATCH + 1)) ;;
+            esac
+            NEW="${MAJOR}.${MINOR}.${PATCH}"
+            echo "Bumped ${CURRENT} -> ${NEW} (${BUMP})"
+          fi
+
+          echo "TAG=v${NEW}" >> "$GITHUB_OUTPUT"
+          echo "VERSION=${NEW}" >> "$GITHUB_OUTPUT"
+
+
+      - name: Update version in package.json
+        run: |
+          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          echo "Updated package.json version to ${NEW_VERSION}"
+
+      - name: Create branch and commit
+        run: |
+          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          BRANCH="release/v${NEW_VERSION}"
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+          git checkout -b "$BRANCH"
+          git add package.json
+          git commit -m "Bump version to ${NEW_VERSION}"
+          git push origin "$BRANCH"
+
+          echo "BRANCH=${BRANCH}" >> "$GITHUB_ENV"
+
+      - name: Generate release notes
+        run: |
+          PREV="${{ steps.prev-tag.outputs.TAG }}"
+          NEW_TAG="${{ steps.new-version.outputs.TAG }}"
+          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          COMMITS=$(cat /tmp/commits.log)
+
+          echo "::group::Commits since ${PREV:-beginning}"
+          echo "$COMMITS"
+          echo "::endgroup::"
+
+          if [ -n "${{ secrets.OPENROUTER_API_KEY }}" ]; then
+            echo "Generating release notes via OpenRouter..."
+            printf 'You are writing release notes for LootLocker Unity SDK version %s.\n\nBelow are the commit messages since the last release. Write concise, user-facing release notes following this template exactly. Only include sections that have content. Keep the audience in mind: game developers using LootLocker in Unity.\n\nTemplate:\n### Features\n- Feature Title - Description of what the developer can now do.\n\n### Fixes\n- Fixed an issue where X would happen when Y.\n\n### Breaking Changes\n- Removed / changed API - explain migration.\n\nFull Changelog: [%s...%s](https://github.com/lootlocker/unity-sdk/compare/%s...%s)\n\nCommit messages:\n%s\n' "$NEW_VERSION" "$PREV" "$NEW_TAG" "$PREV" "$NEW_TAG" "$COMMITS" > /tmp/ai-prompt.txt
+            RESPONSE=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+              -H "Authorization: Bearer ${{ secrets.OPENROUTER_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --rawfile prompt /tmp/ai-prompt.txt '{model:"deepseek/deepseek-v4-pro",messages:[{role:"user",content:$prompt}],reasoning:{effort:"medium"},max_tokens:8000,temperature:0.3}')")
+            NOTES=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ""')
+            if [ -n "$NOTES" ] && [ "$NOTES" != "null" ]; then
+              echo "$NOTES" > /tmp/release-notes.md
+              echo "AI-generated release notes."
+            else
+              echo "::warning::OpenRouter returned empty response, falling back to template."
+              NOTES=""
+            fi
+          fi
+
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "Using static template."
+            printf '### Features\n\n- Feature Title - Description.\n\n### Fixes\n\n- Fixed ...\n\nFull Changelog: [%s...%s](https://github.com/lootlocker/unity-sdk/compare/%s...%s)\n' "$PREV" "$NEW_TAG" "$PREV" "$NEW_TAG" > /tmp/release-notes.md
+          fi
+
+          echo "Release notes generated."
+
+      - name: Create PR
+        run: |
+          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          TITLE="Release v${NEW_VERSION}"
+
+          gh pr create \
+            --title "$TITLE" \
+            --body "$(cat /tmp/release-notes.md)" \
+            --base main \
+            --head "$BRANCH" \
+            --label "release candidate" \
+            --reviewer "kirre-bylund"
+        env:
+          GH_TOKEN: ${{ github.token }}

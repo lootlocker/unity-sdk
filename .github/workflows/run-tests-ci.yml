@@ -1,5 +1,5 @@
-name: Run Tests and Package SDK
-run-name: Run Tests and Package SDK on ${{ github.ref_name }} because of ${{ github.event_name }} with commit ${{ github.sha }}
+name: Run Tests
+run-name: Run Tests on ${{ github.ref_name }} because of ${{ github.event_name }} with commit ${{ github.sha }}
 on:
   pull_request:
     branches: # Made towards the following
@@ -20,7 +20,7 @@ on:
         default: "localhost:8080"
 
 concurrency:
-  group: run-tests-and-package-${{ github.ref }}
+  group: run-tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -723,77 +723,4 @@ jobs:
           projectPath: unity-sdk-package-validator
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
-  package-sdk:
-    name: Package SDK
-    runs-on: [ubuntu-latest]
-    needs: [test-samples, run-integration-tests]
-    timeout-minutes: 5
-    if: (startsWith(github.ref, 'refs/pull') && endsWith(github.base_ref, 'main')) || (startsWith(github.ref, 'refs/heads') && endsWith(github.ref, 'main')) || startsWith(github.ref, 'refs/tags/v')
-    env: 
-      LL_USE_STAGE: false
-    strategy:
-      fail-fast: false
-      matrix:
-        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
-    steps:
-      - name: Setup commandline dependencies (if on self-hosted runner)
-        if: ${{ env.LL_USE_STAGE == 'true' }}
-        run: |
-          apt update
-          apt-get install -y git
-          git config --global --add safe.directory unity-sdk
-          git config --global --add safe.directory unity-sdk-packager
-          apt-get install -y jq
-          apt-get install -y sed
-          apt-get install -y docker
-          apt-get install -y curl
-          apt-get update
-          apt-get install ca-certificates curl gnupg
-          install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          chmod a+r /etc/apt/keyrings/docker.gpg
-          echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-            tee /etc/apt/sources.list.d/docker.list > /dev/null
-          apt-get update
-          apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-      - name: Checkout unity-sdk repository
-        uses: actions/checkout@v5
-        with:
-          path: unity-sdk
-      - name: Checkout unity-sdk-packager-project repository
-        uses: actions/checkout@v5
-        with:
-          repository: lootlocker/unity-sdk-packager
-          path: unity-sdk-packager
-          token: ${{ SECRETS.LL_PERSONAL_ACCESS_TOKEN }}
-      - name: Add LootLockerSDK as asset folder
-        run: |
-          cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
-      - uses: actions/cache@v4
-        with:
-          path: unity-sdk-packager/Library
-          key: ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
-          restore-keys: |
-            ${{ matrix.targetPlatform }}-Library-unity-sdk-packager
-            Library-
-      - name: Package SDK for ${{ matrix.unityVersion }}
-        id: package-sdk-gameci
-        uses: game-ci/unity-test-runner@v4.3.1
-        env:
-          UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
-        with:
-          testMode: editmode
-          checkName: SDK Packaging ${{ matrix.unityVersion }} Results
-          artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
-          projectPath: unity-sdk-packager
-          unityVersion: ${{ matrix.unityVersion }}
-          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
-      - name: Expose packaged SDK as artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: LootLockerSDK-${{ matrix.unityVersion }}.zip
-          path: unity-sdk-packager/LootLockerSDK*.unitypackage
+

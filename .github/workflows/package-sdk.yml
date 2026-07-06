@@ -1,0 +1,76 @@
+name: Package SDK
+run-name: "Package SDK for ${{ github.ref_name }}"
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  package-sdk:
+    name: Package and attach SDK
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
+
+    steps:
+      - name: Checkout unity-sdk repository
+        uses: actions/checkout@v5
+        with:
+          path: unity-sdk
+
+      - name: Checkout unity-sdk-packager-project repository
+        uses: actions/checkout@v5
+        with:
+          repository: lootlocker/unity-sdk-packager
+          path: unity-sdk-packager
+          token: ${{ SECRETS.LL_PERSONAL_ACCESS_TOKEN }}
+
+      - name: Add LootLockerSDK as asset folder
+        run: |
+          cp -r unity-sdk unity-sdk-packager/Assets/LootLockerSDK
+
+      - uses: actions/cache@v4
+        with:
+          path: unity-sdk-packager/Library
+          key: package-sdk-Library-${{ matrix.unityVersion }}
+          restore-keys: |
+            package-sdk-Library-
+            Library-
+
+      - name: Package SDK for ${{ matrix.unityVersion }}
+        id: package-sdk-gameci
+        uses: game-ci/unity-test-runner@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          checkName: SDK Packaging ${{ matrix.unityVersion }} Results
+          artifactsPath: package-sdk-${{ matrix.unityVersion }}-artifacts
+          projectPath: unity-sdk-packager
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
+
+      - name: Attach .unitypackage to release
+        run: |
+          for f in unity-sdk-packager/LootLockerSDK*.unitypackage; do
+            echo "Uploading $f"
+            gh release upload --clobber "${{ github.ref_name }}" "$f"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Upload package as workflow artifact (fallback)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: LootLockerSDK-${{ matrix.unityVersion }}
+          path: unity-sdk-packager/LootLockerSDK*.unitypackage
