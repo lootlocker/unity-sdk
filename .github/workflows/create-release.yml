@@ -154,6 +154,8 @@ jobs:
             --target main
 
           echo "Created release ${TAG}"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Post release notification on PR
         if: steps.find-pr.outputs.IS_RELEASE == 'true'
