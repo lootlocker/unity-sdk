@@ -60,6 +60,7 @@ jobs:
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
 
       - name: Attach .unitypackage to release
+        if: github.event_name == 'release'
         run: |
           for f in unity-sdk-packager/LootLockerSDK*.unitypackage; do
             echo "Uploading $f"

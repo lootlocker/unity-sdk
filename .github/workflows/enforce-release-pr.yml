@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 jobs:
   enforce:
@@ -26,7 +27,7 @@ jobs:
       - name: Validate PR body structure
         id: check-body
         run: |
-          BODY="${{ github.event.pull_request.body }}"
+          BODY=$(jq -r '.pull_request.body // ""' < "$GITHUB_EVENT_PATH")
 
           # Check 1: Non-empty
           if [ -z "$(echo "$BODY" | tr -d '[:space:]')" ]; then
