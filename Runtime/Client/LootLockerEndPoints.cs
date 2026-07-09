@@ -43,6 +43,7 @@ namespace LootLocker
         // White Label Login
         [Header("White Label Login")]
         public static EndPointClass whiteLabelSignUp = new EndPointClass("white-label-login/sign-up", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+        public static EndPointClass whiteLabelSignUpFields = new EndPointClass("white-label-login/sign-up/fields", LootLockerHTTPMethod.GET, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelLogin = new EndPointClass("white-label-login/login", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelVerifySession = new EndPointClass("white-label-login/verify-session", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelRequestPasswordReset = new EndPointClass("white-label-login/request-reset-password", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);

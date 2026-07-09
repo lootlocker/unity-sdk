@@ -2895,6 +2895,58 @@ namespace LootLocker.Requests
 
         /// @ingroup WhiteLabel
         /// <summary>
+        /// Create new user using the White Label login system, optionally including answers to custom sign-up fields.
+        /// Call <see cref="WhiteLabelGetSignUpFields"/> first to retrieve the fields configured for this game,
+        /// then pass the player's answers as <paramref name="customFields"/>.
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="email">E-mail for the new user</param>
+        /// <param name="password">Password for the new user</param>
+        /// <param name="customFields">
+        /// Answers to the custom sign-up fields configured in the web console.
+        /// Each entry must include the <c>metadata_key</c> matching a configured field and the value as a JSON string in <c>value_json</c>.
+        /// Pass null or an empty array if there are no custom fields.
+        /// </param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerWhiteLabelSignupResponse</param>
+        public static void WhiteLabelSignUp(string email, string password, LootLockerWhiteLabelCustomFieldValue[] customFields, Action<LootLockerWhiteLabelSignupResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignupResponse>(null));
+                return;
+            }
+
+            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
+            {
+                email = email,
+                password = password,
+                custom_fields = customFields
+            };
+
+            LootLockerAPIManager.WhiteLabelSignUp(input, onComplete);
+        }
+
+        /// @ingroup WhiteLabel
+        /// <summary>
+        /// Retrieve the list of custom sign-up fields configured for this game.
+        /// Use the returned fields to build a sign-up form, then pass the player's answers to
+        /// <see cref="WhiteLabelSignUp(string, string, LootLockerWhiteLabelCustomFieldValue[], Action{LootLockerWhiteLabelSignupResponse})"/>.
+        /// White Label platform must be enabled in the web console for this to work.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerWhiteLabelSignUpFieldsResponse</param>
+        public static void WhiteLabelGetSignUpFields(Action<LootLockerWhiteLabelSignUpFieldsResponse> onComplete)
+        {
+            if (!CheckInitialized(true))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerWhiteLabelSignUpFieldsResponse>(null));
+                return;
+            }
+
+            LootLockerAPIManager.WhiteLabelGetSignUpFields(onComplete);
+        }
+
+        /// @ingroup WhiteLabel
+        /// <summary>
         /// Request a password reset email for the given email address.
         /// White Label platform must be enabled in the web console for this to work.
         /// </summary>

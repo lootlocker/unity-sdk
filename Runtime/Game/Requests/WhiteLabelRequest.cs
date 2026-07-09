@@ -4,11 +4,29 @@ using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
+    public class LootLockerWhiteLabelCustomFieldValue
+    {
+        public string metadata_key { get; set; }
+        public string value_json { get; set; }
+    }
+
+    public class LootLockerWhiteLabelCustomField
+    {
+        public string question_text { get; set; }
+        public string metadata_key { get; set; }
+        public string field_type { get; set; }
+        public string @params { get; set; }
+        public bool required { get; set; }
+        public bool sensitive { get; set; }
+        public int sort_order { get; set; }
+    }
+
     public class LootLockerWhiteLabelUserRequest
     {
         public string email { get; set; }
         public string password { get; set; }
         public bool remember { get; set; }
+        public LootLockerWhiteLabelCustomFieldValue[] custom_fields { get; set; }
     }
 
     public class LootLockerWhiteLabelVerifySessionRequest
@@ -39,6 +57,12 @@ namespace LootLocker.Requests
     public class LootLockerWhiteLabelLoginResponse : LootLockerWhiteLabelSignupResponse
     {
         public string SessionToken { get; set; }
+    }
+
+    [Serializable]
+    public class LootLockerWhiteLabelSignUpFieldsResponse : LootLockerResponse
+    {
+        public LootLockerWhiteLabelCustomField[] fields { get; set; }
     }
 
     [Serializable]
@@ -189,6 +213,21 @@ namespace LootLocker
 
             var json = LootLockerJson.SerializeObject(new { email = email });
             LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, json, onComplete, useAuthToken: false, callerRole: endPoint.callerRole, additionalHeaders: GetDomainHeaders());
+        }
+
+        public static void WhiteLabelGetSignUpFields(Action<LootLockerWhiteLabelSignUpFieldsResponse> onComplete)
+        {
+            EndPointClass endPoint = LootLockerEndPoints.whiteLabelSignUpFields;
+
+            if (LootLockerConfig.current.domainKey.Length == 0)
+            {
+                LootLockerLogger.Log("Domain key must be set in settings", LootLockerLogger.LogLevel.Error);
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerWhiteLabelSignUpFieldsResponse>("Domain key must be set in settings", null));
+
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false, callerRole: endPoint.callerRole, additionalHeaders: GetDomainHeaders());
         }
 
         public static Dictionary<string, string> GetDomainHeaders()
