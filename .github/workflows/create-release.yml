@@ -59,7 +59,7 @@ jobs:
 
           PR_JSON=$(gh pr view "$PR_NUMBER" --json number,body,labels,title,state --jq '.')
           PR_TITLE=$(echo "$PR_JSON" | jq -r '.title')
-          HAS_RC_LABEL=$(echo "$PR_JSON" | jq -r '[.labels[].name] | index("release candidate") != null')
+          HAS_RC_LABEL=$(echo "$PR_JSON" | jq -r '.labels[].name' | tr '[:upper:]' '[:lower:]' | grep -q 'release candidate' && echo "true" || echo "false")
           PR_STATE=$(echo "$PR_JSON" | jq -r '.state')
 
           echo "Found PR #${PR_NUMBER}: ${PR_TITLE} (state: ${PR_STATE})"
