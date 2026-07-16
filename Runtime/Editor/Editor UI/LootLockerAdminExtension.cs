@@ -96,7 +96,7 @@ namespace LootLocker.Extension
         [MenuItem("Window/" + LootLockerConfig.PackageName + "/Tools/Clear Local Player Data", true, 101)]
         public static bool ValidateClearLocalPlayerData()
         {
-            return LootLockerConfig.current.enableEditorAdminExtension;
+            return true;
         }
 
         [MenuItem("Window/" + LootLockerConfig.PackageName + "/Tools/Clear Local Player Data", false, 101)]
