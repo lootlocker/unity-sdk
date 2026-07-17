@@ -9046,6 +9046,25 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Platform Keys
+        /// @ingroup PlatformKeys
+        /// <summary>
+        /// Get a list of the platform keys redeemed by the authenticated player
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlatformKeys(Action<LootLockerListPlatformKeysResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlatformKeysResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, LootLockerEndPoints.listPlatformKeys.endPoint, LootLockerEndPoints.listPlatformKeys.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+        #endregion
+
         #region Balances
         /// @ingroup Balances
         /// <summary>
