@@ -214,6 +214,15 @@
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/commerce/wallets).
 
+/// @defgroup PlatformKeys Platform Keys
+/// @brief List platform keys redeemed by the authenticated player.
+///
+/// Platform keys are keys distributed through LootLocker's Campaign system
+/// (e.g. Steam keys, Discord keys). This endpoint returns all keys redeemed
+/// by the currently authenticated player, grouped by campaign.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/campaigns/overview).
+
 /// @defgroup Catalog Catalog
 /// @brief Browse item listings and prices in the LootLocker storefront catalog.
 ///
