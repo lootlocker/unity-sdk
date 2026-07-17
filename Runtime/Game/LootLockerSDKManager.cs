@@ -2884,7 +2884,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
+            LootLockerWhiteLabelSignUpRequest input = new LootLockerWhiteLabelSignUpRequest
             {
                 email = email,
                 password = password
@@ -2916,7 +2916,7 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerWhiteLabelUserRequest input = new LootLockerWhiteLabelUserRequest
+            LootLockerWhiteLabelSignUpRequest input = new LootLockerWhiteLabelSignUpRequest
             {
                 email = email,
                 password = password,

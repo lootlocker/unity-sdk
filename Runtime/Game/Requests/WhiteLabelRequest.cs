@@ -26,6 +26,10 @@ namespace LootLocker.Requests
         public string email { get; set; }
         public string password { get; set; }
         public bool remember { get; set; }
+    }
+
+    public class LootLockerWhiteLabelSignUpRequest : LootLockerWhiteLabelUserRequest
+    {
         public LootLockerWhiteLabelCustomFieldValue[] custom_fields { get; set; }
     }
 
@@ -144,7 +148,7 @@ namespace LootLocker
             LootLockerServerRequest.CallAPI(null, endPoint.endPoint, endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); }, useAuthToken: false, callerRole: endPoint.callerRole, additionalHeaders: GetDomainHeaders());
         }
 
-        public static void WhiteLabelSignUp(LootLockerWhiteLabelUserRequest input, Action<LootLockerWhiteLabelSignupResponse> onComplete)
+        public static void WhiteLabelSignUp(LootLockerWhiteLabelSignUpRequest input, Action<LootLockerWhiteLabelSignupResponse> onComplete)
         {
             EndPointClass endPoint = LootLockerEndPoints.whiteLabelSignUp;
 

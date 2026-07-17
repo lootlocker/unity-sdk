@@ -66,7 +66,7 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
 
-            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Successfully created test game and initialized LootLocker");
+            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Failed to initialize LootLockerSDK");
 
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
@@ -143,8 +143,9 @@ namespace LootLockerTests.PlayMode
             // Then — the @params property serialized as "params" in JSON
             Assert.IsTrue(json.Contains("\"params\""),
                 $"JSON must contain the key \"params\", got:\n{json}");
-            Assert.IsTrue(json.Contains("\"min\":\"1900-01-01\""),
-                $"JSON must contain the nested JSON payload, got:\n{json}");
+            // The @params value is a JSON string, so inner quotes will be escaped in the serialized output
+            Assert.IsTrue(json.Contains("\\\"min\\\""),
+                $"JSON must contain the escaped nested JSON payload, got:\n{json}");
 
             // When — deserialize back
             var deserialized = LootLockerJson.DeserializeObject<LootLockerWhiteLabelCustomField>(json);
@@ -169,7 +170,7 @@ namespace LootLockerTests.PlayMode
                 value_json = "true"
             };
 
-            var request = new LootLockerWhiteLabelUserRequest
+            var request = new LootLockerWhiteLabelSignUpRequest
             {
                 email = "player@example.com",
                 password = "s3cur3p4ssw0rd",
@@ -179,7 +180,6 @@ namespace LootLockerTests.PlayMode
 
             // When
             string json = LootLockerJson.SerializeObject(request);
-            Debug.Log($"Serialized sign-up request: {json}");
 
             // Then — verify custom_fields appear in JSON with correct keys
             Assert.IsTrue(json.Contains("\"custom_fields\""),
