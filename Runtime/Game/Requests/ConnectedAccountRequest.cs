@@ -17,7 +17,8 @@ namespace LootLocker.LootLockerEnums
         xbox = 7,
         playstation = 8,
         twitch = 9,
-        discord = 10
+        discord = 10,
+        google_play_games = 11
     }
 
     /// <summary>
@@ -171,6 +172,50 @@ namespace LootLocker.Requests
         /// The Authorization Code from Twitch sign in
         /// </summary>
         public string authorization_code { get; set; }
+    }
+
+    /// <summary>
+    /// Request to link a Steam account to the current player's LootLocker account using a steam session ticket.
+    /// </summary>
+    public class LootLockerConnectSteamProviderToAccountRequest
+    {
+        /// <summary>
+        /// The Steam session ticket (hex-encoded)
+        /// </summary>
+        public string steam_ticket { get; set; }
+    }
+
+    /// <summary>
+    /// Request to link an Xbox account to the current player's LootLocker account using an Xbox user token.
+    /// </summary>
+    public class LootLockerConnectXboxProviderToAccountRequest
+    {
+        /// <summary>
+        /// The Xbox user token
+        /// </summary>
+        public string xbox_user_token { get; set; }
+    }
+
+    /// <summary>
+    /// Request to link a Nintendo Switch account to the current player's LootLocker account using an NSA ID token.
+    /// </summary>
+    public class LootLockerConnectNintendoProviderToAccountRequest
+    {
+        /// <summary>
+        /// The NSA ID token from Nintendo Switch sign in
+        /// </summary>
+        public string nsa_id_token { get; set; }
+    }
+
+    /// <summary>
+    /// Request to link a Google Play Games account to the current player's LootLocker account using an auth code.
+    /// </summary>
+    public class LootLockerConnectGooglePlayGamesProviderToAccountRequest
+    {
+        /// <summary>
+        /// The auth code from Google Play Games sign in
+        /// </summary>
+        public string auth_code { get; set; }
     }
 
     //==================================================
