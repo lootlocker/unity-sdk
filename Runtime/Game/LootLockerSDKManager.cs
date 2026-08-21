@@ -152,11 +152,26 @@ namespace LootLocker.Requests
         #region SDK Customization
         #if LOOTLOCKER_ENABLE_OVERRIDABLE_STATE_WRITER
         /// @ingroup SDKCustomization
+        /// <summary>
+        /// Override the default state writer used by the SDK. This allows you to customize how the SDK saves and loads player state data.
+        /// The default is the default Unity Player Prefs implementation, but you can provide your own implementation of ILootLockerStateWriter to save state data in a different way (e.g. to a file, to a database, etc.).
+        /// </summary>
+        /// <param name="stateWriter">The state writer to use for saving and loading player state data.</param>
         public static void SetStateWriter(ILootLockerStateWriter stateWriter)
         {
             LootLockerStateData.overrideStateWriter(stateWriter);
         }
         #endif
+
+        /// @ingroup SDKCustomization
+        /// <summary>
+        /// Get the current state writer used by the SDK. This allows you to access the current implementation of ILootLockerStateWriter used for saving and loading player state data.
+        /// </summary>
+        /// <returns>The current state writer used by the SDK.</returns>
+        public static ILootLockerStateWriter GetStateWriter()
+        {
+            return LootLockerStateData.GetStateWriter();
+        }
         
         /// @ingroup SDKCustomization
         /// <summary>
