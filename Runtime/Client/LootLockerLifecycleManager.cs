@@ -572,7 +572,7 @@ namespace LootLocker
             
             while (_serviceHealthMonitoringEnabled && Application.isPlaying)
             {
-                yield return new WaitForSeconds(healthCheckInterval);
+                yield return new WaitForSecondsRealtime(healthCheckInterval);
                 
                 if (_state != LifecycleManagerState.Ready)
                 {

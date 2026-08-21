@@ -748,7 +748,7 @@ namespace LootLocker
                 {
                     yield break;
                 }
-                yield return new WaitForSeconds(preProcess.PollingIntervalSeconds);
+                yield return new WaitForSecondsRealtime(preProcess.PollingIntervalSeconds);
 
                 while (_asyncPurchaseProcesses.TryGetValue(processGuid, out var process))
                 {
@@ -788,7 +788,7 @@ namespace LootLocker
                         if (statusResponse.statusCode >= 500 && statusResponse.statusCode <= 599 && processAfterPoll.Retries < _asyncPurchasePollingRetryLimit)
                         {
                             processAfterPoll.Retries++;
-                            yield return new WaitForSeconds(processAfterPoll.PollingIntervalSeconds);
+                            yield return new WaitForSecondsRealtime(processAfterPoll.PollingIntervalSeconds);
                             continue;
                         }
                         processAfterPoll.CompletedCallback?.Invoke(statusResponse);
@@ -807,7 +807,7 @@ namespace LootLocker
 
                     // Still pending — notify and wait
                     processAfterPoll.StatusUpdateCallback?.Invoke(statusResponse);
-                    yield return new WaitForSeconds(processAfterPoll.PollingIntervalSeconds);
+                    yield return new WaitForSecondsRealtime(processAfterPoll.PollingIntervalSeconds);
                 }
             }
 
