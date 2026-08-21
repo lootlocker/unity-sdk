@@ -19,6 +19,11 @@ namespace LootLocker.Requests
         /// The name of the player (same as set by SetPlayerName). If not supplied, will be left blank.
         /// </summary>
         public string player_name { get; set; } = null;
+        /// <summary>
+        /// Whether to automatically create a profile for the player if one does not exist. Defaults to true.
+        /// Set to false if you want to ensure that a profile is not created for the player if one does not exist. In this case, the session will fail with a 404 Player Not Found error if the player does not have a profile.
+        /// </summary>
+        public bool auto_create_profile { get; set; } = true;
     }
 
     public class LootLockerSteamSessionRequest
