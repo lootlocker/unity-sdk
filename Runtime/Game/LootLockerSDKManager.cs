@@ -2461,6 +2461,102 @@ namespace LootLocker.Requests
 
         /// @ingroup ConnectedAccounts
         /// <summary>
+        /// Connect a Steam account to the currently logged in LootLocker account using a raw Steam session ticket (byte array).
+        /// Internally converts the ticket to hex-encoded format before sending.
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Steam account is linked into
+        /// </summary>
+        /// <param name="ticket">The raw Steam session ticket byte array</param>
+        /// <param name="ticketSize">The size of the ticket</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectSteamAccount(ref byte[] ticket, uint ticketSize, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string hexTicket = _SteamSessionTicket(ref ticket, ticketSize);
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("steam");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectSteamProviderToAccountRequest() { steam_ticket = hexTicket });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// @ingroup ConnectedAccounts
+        /// <summary>
+        /// Connect an Xbox account to the currently logged in LootLocker account allowing that Xbox account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Xbox account is linked into
+        /// </summary>
+        /// <param name="xboxUserToken">The Xbox user token</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectXboxAccount(string xboxUserToken, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("xbox");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectXboxProviderToAccountRequest() { xbox_user_token = xboxUserToken });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// @ingroup ConnectedAccounts
+        /// <summary>
+        /// Connect a Nintendo Switch account to the currently logged in LootLocker account allowing that Nintendo Switch account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Nintendo Switch account is linked into
+        /// </summary>
+        /// <param name="nsaIdToken">The NSA ID token from Nintendo Switch sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectNintendoAccount(string nsaIdToken, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("nintendo");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectNintendoProviderToAccountRequest() { nsa_id_token = nsaIdToken });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// @ingroup ConnectedAccounts
+        /// <summary>
+        /// Connect a Google Play Games account to the currently logged in LootLocker account allowing that Google Play Games account to start sessions for this player
+        /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Google Play Games account is linked into
+        /// </summary>
+        /// <param name="authCode">The auth code from Google Play Games sign in</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConnectGooglePlayGamesAccount(string authCode, Action<LootLockerAccountConnectedResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAccountConnectedResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            string endpoint = LootLockerEndPoints.connectProviderToAccount.WithPathParameter("google-play-games");
+
+            string data = LootLockerJson.SerializeObject(new LootLockerConnectGooglePlayGamesProviderToAccountRequest() { auth_code = authCode });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerEndPoints.connectProviderToAccount.httpMethod, data, (response) => { LootLockerResponse.Deserialize(onComplete, response); });
+        }
+
+        /// @ingroup ConnectedAccounts
+        /// <summary>
         /// Connect an Epic Account to the currently logged in LootLocker account allowing that Epic account to start sessions for this player
         /// IMPORTANT: If you are using multiple users, be very sure to pass in the correct `forPlayerWithUlid` parameter as that will be the account that the Epic account is linked into
         /// </summary>
