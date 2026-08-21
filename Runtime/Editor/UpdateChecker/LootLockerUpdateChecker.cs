@@ -284,12 +284,14 @@ namespace LootLocker.Extension
             if (GUILayout.Button("See What's New \u2197"))
                 Application.OpenURL(_releaseUrl);
 
+#pragma warning disable 0162
             if (LootLockerConfig.PackageName != "LootLocker")
             {
                 EditorGUILayout.Space(4);
                 var noticeStyle = new GUIStyle(EditorStyles.miniLabel) { fontStyle = FontStyle.Italic };
                 EditorGUILayout.LabelField(LootLockerConfig.PackageName + " SDK is powered by LootLocker \u2014 release notes are on the LootLocker GitHub page.", noticeStyle);
             }
+#pragma warning restore 0162
 
             EditorGUILayout.Space(8);
             EditorGUILayout.BeginHorizontal();

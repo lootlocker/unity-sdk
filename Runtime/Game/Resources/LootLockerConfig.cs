@@ -21,6 +21,7 @@ namespace LootLocker
         /// or <see cref="Hotseat"/> on existing installs the first time the Unity Editor loads this project.
         /// This value should never be set manually — it exists solely for pre-migration compatibility.
         /// </summary>
+        [InspectorName(null)]
         NotSet = 0,
 
         /// <summary>

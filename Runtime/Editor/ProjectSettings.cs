@@ -14,6 +14,10 @@ namespace LootLocker.Admin
 
         public delegate void SendAttributionDelegate();
         public static event SendAttributionDelegate APIKeyEnteredEvent;
+
+        public static bool logSettingsFoldout = true;
+        public static bool presenceSettingsFoldout = true;
+
         internal static SerializedObject GetSerializedSettings()
         {
             if (gameSettings == null)
@@ -22,6 +26,7 @@ namespace LootLocker.Admin
             }
             return new SerializedObject(gameSettings);
         }
+        
         public ProjectSettings(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
         {
         }
@@ -73,11 +78,13 @@ namespace LootLocker.Admin
 
         private void DrawGameSettings()
         {
+#pragma warning disable 0162
             if (LootLockerConfig.PackageName != "LootLocker")
             {
                 EditorGUILayout.HelpBox(LootLockerConfig.PackageName + " SDK is powered by LootLocker. Settings here configure the underlying LootLocker integration.", MessageType.Info);
                 EditorGUILayout.Space();
             }
+#pragma warning restore 0162
 
             if (LootLockerConfig.IsFileConfigActive)
             {
@@ -147,6 +154,43 @@ namespace LootLocker.Admin
             }
 
             EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
+            }
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("multiUserSessionMode"));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.multiUserSessionMode = (LootLockerMultiUserSessionMode)m_CustomSettings.FindProperty("multiUserSessionMode").enumValueIndex;
+            }
+            EditorGUILayout.Space();
+
+            DrawLogSettings();
+
+            DrawPresenceSettings();
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private static bool IsSemverString(string str)
+        {
+            return Regex.IsMatch(str,
+                @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
+        }
+
+        private void DrawLogSettings()
+        {
+            logSettingsFoldout = EditorGUILayout.Foldout(logSettingsFoldout, "Log Settings", true, EditorStyles.foldoutHeader);
+            if (!logSettingsFoldout) return;
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logLevel"));
 
             if (EditorGUI.EndChangeCheck())
@@ -180,31 +224,14 @@ namespace LootLocker.Admin
             {
                 gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue;
             }
+
             EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
-            }
-            EditorGUILayout.Space();
-
-            DrawPresenceSettings();
-
-            EditorGUI.EndDisabledGroup();
-        }
-
-        private static bool IsSemverString(string str)
-        {
-            return Regex.IsMatch(str,
-                @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
 
         private void DrawPresenceSettings()
         {
-            EditorGUILayout.LabelField("Presence Settings", EditorStyles.boldLabel);
+            presenceSettingsFoldout = EditorGUILayout.Foldout(presenceSettingsFoldout, "Presence Settings", true, EditorStyles.foldoutHeader);
+            if (!presenceSettingsFoldout) return;
             EditorGUILayout.Space();
 
             if(gameSettings.enablePresence) 
@@ -220,39 +247,32 @@ namespace LootLocker.Admin
             {
                 gameSettings.enablePresence = m_CustomSettings.FindProperty("enablePresence").boolValue;
             }
-
-            // Only show sub-settings if presence is enabled
-            if (gameSettings.enablePresence)
+            EditorGUILayout.Space();
+            
+            // Auto-connect toggle
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect"));
+            if (EditorGUI.EndChangeCheck())
             {
-                EditorGUILayout.Space();
-                
-                // Auto-connect toggle
-                EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect"));
-                if (EditorGUI.EndChangeCheck())
-                {
-                    gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;
-                }
-                
-                // Auto-disconnect on focus change toggle
-                EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Pause Presence"));
-                if (EditorGUI.EndChangeCheck())
-                {
-                    gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
-                }
+                gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;
+            }
+            
+            // Auto-disconnect on focus change toggle
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), new GUIContent("Auto Pause Presence"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
+            }
 
-                EditorGUILayout.Space();
-                
-                // Enable presence in editor toggle
-                EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceInEditor"), new GUIContent("Enable Presence in Editor"));
-                if (EditorGUI.EndChangeCheck())
-                {
-                    gameSettings.enablePresenceInEditor = m_CustomSettings.FindProperty("enablePresenceInEditor").boolValue;
-                }
-
-                EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            
+            // Enable presence in editor toggle
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceInEditor"), new GUIContent("Enable Presence in Editor"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                gameSettings.enablePresenceInEditor = m_CustomSettings.FindProperty("enablePresenceInEditor").boolValue;
             }
 
             EditorGUILayout.Space();
