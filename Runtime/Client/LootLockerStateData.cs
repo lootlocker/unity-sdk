@@ -211,6 +211,11 @@ namespace LootLocker
             }
         }
 
+        public static ILootLockerStateWriter GetStateWriter()
+        {
+            return _stateWriter;
+        }
+
         //==================================================
         // Constants
         //==================================================
