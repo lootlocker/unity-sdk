@@ -56,12 +56,17 @@ namespace LootLocker.Requests
         /// The Game Version configured for the game
         /// </summary>
         public string game_version { get; set; }
+        /// <summary>
+        /// Optional list of identity providers to restrict the remote session to (e.g., "steam", "apple")
+        /// </summary>
+        public string[] providers { get; set; }
 
-        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId)
+        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId, string[] providers = null)
         {
             title_id = titleId;
             environment_id = environmentId;
             game_version = LootLockerConfig.current.game_version;
+            this.providers = providers;
         }
     }
 
@@ -379,7 +384,7 @@ namespace LootLocker
                 {
                     yield break;
                 }
-                yield return new WaitForSeconds(preProcess.PollingIntervalSeconds);
+                yield return new WaitForSecondsRealtime(preProcess.PollingIntervalSeconds);
                 while (_remoteSessionsProcesses.TryGetValue(processGuid, out var process))
                 {
                     // Check if we should continue the polling
@@ -418,13 +423,21 @@ namespace LootLocker
                         yield break;
                     }
 
+                    // If the process was cancelled while the HTTP poll was in-flight, skip
+                    // the status-update callback and let the next while-iteration handle it
+                    // via the ShouldCancel check at the top of the loop.
+                    if (processAfterStatusCheck.ShouldCancel)
+                    {
+                        continue;
+                    }
+
                     if (!startSessionResponse.success)
                     {
                         if (startSessionResponse.statusCode >= 500 && startSessionResponse.statusCode <= 599 && processAfterStatusCheck.Retries <= _leasingProcessPollingRetryLimit)
                         {
                             // Recoverable error
                             processAfterStatusCheck.Retries++;
-                            yield return new WaitForSeconds(processAfterStatusCheck.PollingIntervalSeconds);
+                            yield return new WaitForSecondsRealtime(processAfterStatusCheck.PollingIntervalSeconds);
                             continue;
                         }
 
@@ -451,7 +464,7 @@ namespace LootLocker
                     processAfterStatusCheck.LastUpdatedStatus = pollingResponse.lease_status;
 
                     // Sleep for a bit before checking again
-                    yield return new WaitForSeconds(processAfterStatusCheck.PollingIntervalSeconds);
+                    yield return new WaitForSecondsRealtime(processAfterStatusCheck.PollingIntervalSeconds);
                 }
             }
 
@@ -549,29 +562,18 @@ namespace LootLocker
                 Action<LootLockerLeaseRemoteSessionResponse> onComplete,
                 string providerUrlParam = null)
             {
+                string[] providers = string.IsNullOrEmpty(providerUrlParam) ? null : new[] { providerUrlParam };
                 LootLockerLeaseRemoteSessionRequest leaseRemoteSessionRequest =
-                    new LootLockerLeaseRemoteSessionRequest(titleId, environmentId);
+                    new LootLockerLeaseRemoteSessionRequest(titleId, environmentId, providers);
 
                 EndPointClass endPoint = leaseIntent == LootLockerRemoteSessionLeaseIntent.login ? LootLockerEndPoints.leaseRemoteSession : LootLockerEndPoints.leaseRemoteSessionForLinking;
+
                 LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint,
                     endPoint.httpMethod,
                     LootLockerJson.SerializeObject(leaseRemoteSessionRequest),
                     (serverResponse) =>
                     {
                         var response = LootLockerResponse.Deserialize<LootLockerLeaseRemoteSessionResponse>(serverResponse);
-                        if (!string.IsNullOrEmpty(providerUrlParam) && response != null)
-                        {
-                            if (response.redirect_url != null)
-                            {
-                                string separator = response.redirect_url.Contains("?") ? "&" : "?";
-                                response.redirect_url = response.redirect_url + separator + "provider=" + providerUrlParam;
-                            }
-                            if (response.display_url != null)
-                            {
-                                string separator = response.display_url.Contains("?") ? "&" : "?";
-                                response.display_url = response.display_url + separator + "provider=" + providerUrlParam;
-                            }
-                        }
                         onComplete?.Invoke(response);
                     },
                     leaseIntent == LootLockerRemoteSessionLeaseIntent.link);
