@@ -74,6 +74,14 @@ namespace LootLocker
         public static EndPointClass uploadPlayerFile = new EndPointClass("player/files", LootLockerHTTPMethod.UPLOAD_FILE);
         public static EndPointClass updatePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.UPDATE_FILE);
         public static EndPointClass deletePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass listPlayerFileRevisions = new EndPointClass("player/files/{0}/revisions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getPlayerFileRevision = new EndPointClass("player/files/{0}/revisions/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass promotePlayerFileRevision = new EndPointClass("player/files/{0}/revisions/{1}/current", LootLockerHTTPMethod.POST);
+        public static EndPointClass getPlayerFileByKey = new EndPointClass("player/files/key/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerFileRevisionsByKey = new EndPointClass("player/files/key/{0}/revisions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getPlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass promotePlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}/current", LootLockerHTTPMethod.POST);
+        public static EndPointClass deletePlayerFileByKey = new EndPointClass("player/files/key/{0}", LootLockerHTTPMethod.DELETE);
 
         // Player Progressions
         [Header("Player Progressions")]

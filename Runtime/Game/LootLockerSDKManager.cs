@@ -4080,8 +4080,9 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4095,6 +4096,10 @@ namespace LootLocker.Requests
                 { "public", isPublic.ToString().ToLower() }
             };
 
+            if (!string.IsNullOrEmpty(key))
+            {
+                body.Add("key", key);
+            }
 
             var fileBytes = new byte[] { };
             try
@@ -4125,7 +4130,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(pathToFile, filePurpose, false, onComplete, forPlayerWithUlid);
+            UploadPlayerFile(pathToFile, filePurpose, false, onComplete, null, forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
@@ -4136,8 +4141,9 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4150,6 +4156,11 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                body.Add("key", key);
+            }
 
             var fileBytes = new byte[fileStream.Length];
             try
@@ -4176,10 +4187,11 @@ namespace LootLocker.Requests
         /// <param name="fileStream">Filestream to upload</param>
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileStream, filePurpose, false, onComplete, forPlayerWithUlid);
+            UploadPlayerFile(fileStream, filePurpose, false, onComplete, key, forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
@@ -4191,8 +4203,9 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4205,6 +4218,11 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                body.Add("key", key);
+            }
 
             LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
@@ -4224,7 +4242,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete, forPlayerWithUlid);
+            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete, null, forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
@@ -4344,6 +4362,154 @@ namespace LootLocker.Requests
             var endpoint = LootLockerEndPoints.deletePlayerFile.WithPathParameter(fileId);
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// List all revisions for a player file.
+        /// </summary>
+        /// <param name="fileId">Id of the file.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFileRevisionsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFileRevisions(int fileId, Action<LootLockerPlayerFileRevisionsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFileRevisionsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListPlayerFileRevisions(forPlayerWithUlid, fileId, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Get a specific revision of a player file by its revision id.
+        /// </summary>
+        /// <param name="fileId">Id of the file.</param>
+        /// <param name="revisionId">The ULID of the revision to retrieve.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFileContent</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFileRevision(int fileId, string revisionId, Action<LootLockerPlayerFileContent> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFileContent>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetPlayerFileRevision(forPlayerWithUlid, fileId, revisionId, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Promote a specific revision to be the current (active) revision of a player file.
+        /// </summary>
+        /// <param name="fileId">Id of the file.</param>
+        /// <param name="revisionId">The ULID of the revision to promote.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void PromotePlayerFileRevision(int fileId, string revisionId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.PromotePlayerFileRevision(forPlayerWithUlid, fileId, revisionId, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Get a player file by its key.
+        /// </summary>
+        /// <param name="key">The key of the file.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFileByKey(string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetPlayerFileByKey(forPlayerWithUlid, key, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// List all revisions for a player file identified by its key.
+        /// </summary>
+        /// <param name="key">The key of the file.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFileRevisionsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFileRevisionsByKey(string key, Action<LootLockerPlayerFileRevisionsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFileRevisionsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListPlayerFileRevisionsByKey(forPlayerWithUlid, key, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Get a specific revision of a player file by its key and revision id.
+        /// </summary>
+        /// <param name="key">The key of the file.</param>
+        /// <param name="revisionId">The ULID of the revision to retrieve.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFileContent</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerFileRevisionByKey(string key, string revisionId, Action<LootLockerPlayerFileContent> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFileContent>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetPlayerFileRevisionByKey(forPlayerWithUlid, key, revisionId, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Promote a specific revision to be the current (active) revision of a player file identified by its key.
+        /// </summary>
+        /// <param name="key">The key of the file.</param>
+        /// <param name="revisionId">The ULID of the revision to promote.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void PromotePlayerFileRevisionByKey(string key, string revisionId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.PromotePlayerFileRevisionByKey(forPlayerWithUlid, key, revisionId, onComplete);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Delete a player file by its key.
+        /// </summary>
+        /// <param name="key">The key of the file to delete.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletePlayerFileByKey(string key, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.DeletePlayerFileByKey(forPlayerWithUlid, key, onComplete);
         }
         #endregion
 
