@@ -380,6 +380,8 @@ namespace LootLocker.Requests
         public string revision_id { get; set; }
         /// <summary>The file name.</summary>
         public string name { get; set; }
+        /// <summary>The optional key for upsert operations.</summary>
+        public string key { get; set; }
         /// <summary>The file size in bytes.</summary>
         public int size { get; set; }
         /// <summary>The purpose or category tag for this file.</summary>
@@ -398,6 +400,54 @@ namespace LootLocker.Requests
         public DateTime url_expires_at { get; set; }
         /// <summary>When this file was created.</summary>
         public DateTime created_at { get; set; }
+    }
+
+    /// <summary>
+    /// Response containing a list of revisions for a player file.
+    /// </summary>
+    public class LootLockerPlayerFileRevisionsResponse : LootLockerResponse
+    {
+        /// <summary>The list of revisions.</summary>
+        public LootLockerPlayerFileContent[] revisions { get; set; }
+        /// <summary>Metadata about the file.</summary>
+        public LootLockerPlayerFileMetadata file { get; set; }
+        /// <summary>The ULID of the current (active) revision.</summary>
+        public string current_revision_id { get; set; }
+    }
+
+    /// <summary>
+    /// Metadata about a player file, returned as part of the revisions response.
+    /// </summary>
+    public class LootLockerPlayerFileMetadata
+    {
+        /// <summary>When the file was created.</summary>
+        public DateTime created_at { get; set; }
+        /// <summary>The file name.</summary>
+        public string name { get; set; }
+        /// <summary>The optional key for upsert operations.</summary>
+        public string key { get; set; }
+        /// <summary>The purpose or category tag for this file.</summary>
+        public string purpose { get; set; }
+        /// <summary>The unique identifier of this player file.</summary>
+        public int id { get; set; }
+        /// <summary>Whether this file is publicly accessible.</summary>
+        public bool is_public { get; set; }
+    }
+
+    /// <summary>
+    /// A single file revision with download URL and metadata.
+    /// </summary>
+    public class LootLockerPlayerFileContent
+    {
+        /// <summary>The ULID of this revision.</summary>
+        public string id { get; set; }
+        /// <summary>The signed URL to download this revision.</summary>
+        public string url { get; set; }
+        /// <summary>The file size in bytes.</summary>
+        public int size { get; set; }
+        /// <summary>When this revision was created.</summary>
+        public DateTime created_at { get; set; }
+    }
     }
 
     /// <summary>
@@ -469,6 +519,54 @@ namespace LootLocker
             }
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void ListPlayerFileRevisions(string forPlayerWithUlid, int fileId, Action<LootLockerPlayerFileRevisionsResponse> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.listPlayerFileRevisions.WithPathParameter(fileId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void GetPlayerFileRevision(string forPlayerWithUlid, int fileId, string revisionId, Action<LootLockerPlayerFileContent> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.getPlayerFileRevision.WithPathParameters(fileId, revisionId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void PromotePlayerFileRevision(string forPlayerWithUlid, int fileId, string revisionId, Action<LootLockerResponse> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.promotePlayerFileRevision.WithPathParameters(fileId, revisionId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void GetPlayerFileByKey(string forPlayerWithUlid, string key, Action<LootLockerPlayerFile> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.getPlayerFileByKey.WithPathParameter(key);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void ListPlayerFileRevisionsByKey(string forPlayerWithUlid, string key, Action<LootLockerPlayerFileRevisionsResponse> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.listPlayerFileRevisionsByKey.WithPathParameter(key);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void GetPlayerFileRevisionByKey(string forPlayerWithUlid, string key, string revisionId, Action<LootLockerPlayerFileContent> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.getPlayerFileRevisionByKey.WithPathParameters(key, revisionId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.GET, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void PromotePlayerFileRevisionByKey(string forPlayerWithUlid, string key, string revisionId, Action<LootLockerResponse> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.promotePlayerFileRevisionByKey.WithPathParameters(key, revisionId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void DeletePlayerFileByKey(string forPlayerWithUlid, string key, Action<LootLockerResponse> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.deletePlayerFileByKey.WithPathParameter(key);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
