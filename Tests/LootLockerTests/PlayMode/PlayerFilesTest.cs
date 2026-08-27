@@ -158,11 +158,11 @@ namespace LootLockerTests.PlayMode
             // When
             LootLockerPlayerFile actualResponse = new LootLockerPlayerFile();
             bool completed = false;
-            LootLockerSDKManager.UploadPlayerFile(path, "test", true, fileResponse =>
+            LootLockerSDKManager.UploadPlayerFileByKey(path, "test", true, fileKey, fileResponse =>
             {
                 actualResponse = fileResponse;
                 completed = true;
-            }, key: fileKey);
+            });
 
             yield return new WaitUntil(() => completed);
 
@@ -184,22 +184,22 @@ namespace LootLockerTests.PlayMode
             // When — first upload
             LootLockerPlayerFile firstResponse = new LootLockerPlayerFile();
             bool firstDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, fileResponse =>
+            LootLockerSDKManager.UploadPlayerFileByKey(pathA, "test", true, fileKey, fileResponse =>
             {
                 firstResponse = fileResponse;
                 firstDone = true;
-            }, key: fileKey);
+            });
             yield return new WaitUntil(() => firstDone);
             Assert.IsTrue(firstResponse.success, "First upload failed");
 
             // When — second upload with same key
             LootLockerPlayerFile secondResponse = new LootLockerPlayerFile();
             bool secondDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, fileResponse =>
+            LootLockerSDKManager.UploadPlayerFileByKey(pathB, "test", true, fileKey, fileResponse =>
             {
                 secondResponse = fileResponse;
                 secondDone = true;
-            }, key: fileKey);
+            });
             yield return new WaitUntil(() => secondDone);
 
             // Then
@@ -267,11 +267,11 @@ namespace LootLockerTests.PlayMode
             string path = CreateTempFile("Lookup by key content");
             LootLockerPlayerFile uploadedFile = new LootLockerPlayerFile();
             bool uploadDone = false;
-            LootLockerSDKManager.UploadPlayerFile(path, "test", true, fileResponse =>
+            LootLockerSDKManager.UploadPlayerFileByKey(path, "test", true, fileKey, fileResponse =>
             {
                 uploadedFile = fileResponse;
                 uploadDone = true;
-            }, key: fileKey);
+            });
             yield return new WaitUntil(() => uploadDone);
             Assert.IsTrue(uploadedFile.success, "Upload for lookup test failed");
 
@@ -296,6 +296,8 @@ namespace LootLockerTests.PlayMode
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
             // When
+            bool preLogErrorsAsWarningsSetting = LootLockerConfig.current.logErrorsAsWarnings;
+            LootLockerConfig.current.logErrorsAsWarnings = true; // Suppress error logs for expected failure
             LootLockerPlayerFile fetchedFile = new LootLockerPlayerFile();
             bool fetchDone = false;
             LootLockerSDKManager.GetPlayerFileByKey("nonexistent-key-" + TestCounter, fileResponse =>
@@ -304,6 +306,7 @@ namespace LootLockerTests.PlayMode
                 fetchDone = true;
             });
             yield return new WaitUntil(() => fetchDone);
+            LootLockerConfig.current.logErrorsAsWarnings = preLogErrorsAsWarningsSetting;
 
             // Then
             Assert.IsFalse(fetchedFile.success, "GetPlayerFileByKey should fail for non-existent key");
@@ -318,11 +321,11 @@ namespace LootLockerTests.PlayMode
             string path = CreateTempFile("To be deleted by key");
             LootLockerPlayerFile uploadedFile = new LootLockerPlayerFile();
             bool uploadDone = false;
-            LootLockerSDKManager.UploadPlayerFile(path, "test", true, fileResponse =>
+            LootLockerSDKManager.UploadPlayerFileByKey(path, "test", true, fileKey, fileResponse =>
             {
                 uploadedFile = fileResponse;
                 uploadDone = true;
-            }, key: fileKey);
+            });
             yield return new WaitUntil(() => uploadDone);
             Assert.IsTrue(uploadedFile.success, "Upload for delete-by-key test failed");
 
@@ -339,15 +342,18 @@ namespace LootLockerTests.PlayMode
             // Then — verify deletion
             Assert.IsTrue(deleteResponse.success, "DeletePlayerFileByKey failed");
 
-            LootLockerPlayerFile fetchedFile = new LootLockerPlayerFile();
+            bool preLogErrorsAsWarningsSetting = LootLockerConfig.current.logErrorsAsWarnings;
+            LootLockerConfig.current.logErrorsAsWarnings = true; // Suppress error logs for expected failure
+            LootLockerPlayerFile fetchedFileResponse = new LootLockerPlayerFile();
             bool fetchDone = false;
             LootLockerSDKManager.GetPlayerFileByKey(fileKey, fileResponse =>
             {
-                fetchedFile = fileResponse;
+                fetchedFileResponse = fileResponse;
                 fetchDone = true;
             });
             yield return new WaitUntil(() => fetchDone);
-            Assert.IsFalse(fetchedFile.success, "File should no longer exist after deletion by key");
+            Assert.IsFalse(fetchedFileResponse.success, "File should no longer exist after deletion by key");
+            LootLockerConfig.current.logErrorsAsWarnings = preLogErrorsAsWarningsSetting;
         }
 
         // ================================================================
@@ -419,9 +425,15 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(uploadedFile.success, "Initial upload failed");
 
             // Update to create a second revision
+            LootLockerPlayerFile updateResponse = new LootLockerPlayerFile();
             bool updateDone = false;
-            LootLockerSDKManager.UpdatePlayerFile(uploadedFile.id, pathB, _ => { updateDone = true; });
+            LootLockerSDKManager.UpdatePlayerFile(uploadedFile.id, pathB, response =>
+            {
+                updateResponse = response;
+                updateDone = true;
+            });
             yield return new WaitUntil(() => updateDone);
+            Assert.IsTrue(updateResponse.success, "Update to create revision 2 failed");
 
             // Get revision list to find the first revision ID
             LootLockerPlayerFileRevisionsResponse revisionsResponse = new LootLockerPlayerFileRevisionsResponse();
@@ -472,9 +484,15 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(uploadedFile.success, "Initial upload failed");
 
             // Update to create revision 2
+            LootLockerPlayerFile updateResponse = new LootLockerPlayerFile();
             bool updateDone = false;
-            LootLockerSDKManager.UpdatePlayerFile(uploadedFile.id, pathB, _ => { updateDone = true; });
+            LootLockerSDKManager.UpdatePlayerFile(uploadedFile.id, pathB, response =>
+            {
+                updateResponse = response;
+                updateDone = true;
+            });
             yield return new WaitUntil(() => updateDone);
+            Assert.IsTrue(updateResponse.success, "Update to create revision 2 failed");
 
             // Get revision list to find the first revision ID
             LootLockerPlayerFileRevisionsResponse revisionsResponse = new LootLockerPlayerFileRevisionsResponse();
@@ -528,14 +546,26 @@ namespace LootLockerTests.PlayMode
             string pathB = CreateTempFile("Revision B by key");
 
             // Upload with key (creates revision 1)
+            LootLockerPlayerFile firstUpload = new LootLockerPlayerFile();
             bool firstDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, _ => { firstDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathA, "test", true, fileKey, response =>
+            {
+                firstUpload = response;
+                firstDone = true;
+            });
             yield return new WaitUntil(() => firstDone);
+            Assert.IsTrue(firstUpload.success, "First upload for revisions by key test failed");
 
             // Upsert with same key (creates revision 2)
+            LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, _ => { secondDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathB, "test", true, fileKey, response =>
+            {
+                secondUpload = response;
+                secondDone = true;
+            });
             yield return new WaitUntil(() => secondDone);
+            Assert.IsTrue(secondUpload.success, "Second upload for revisions by key test failed");
 
             // When
             LootLockerPlayerFileRevisionsResponse revisionsResponse = new LootLockerPlayerFileRevisionsResponse();
@@ -563,13 +593,25 @@ namespace LootLockerTests.PlayMode
             string pathA = CreateTempFile("First revision by key");
             string pathB = CreateTempFile("Second revision by key");
 
+            LootLockerPlayerFile firstUpload = new LootLockerPlayerFile();
             bool firstDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, _ => { firstDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathA, "test", true, fileKey, response =>
+            {
+                firstUpload = response;
+                firstDone = true;
+            });
             yield return new WaitUntil(() => firstDone);
+            Assert.IsTrue(firstUpload.success, "First upload for get revision by key test failed");
 
+            LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, _ => { secondDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathB, "test", true, fileKey, response =>
+            {
+                secondUpload = response;
+                secondDone = true;
+            });
             yield return new WaitUntil(() => secondDone);
+            Assert.IsTrue(secondUpload.success, "Second upload for get revision by key test failed");
 
             // Get revision list to find a revision ID
             LootLockerPlayerFileRevisionsResponse revisionsResponse = new LootLockerPlayerFileRevisionsResponse();
@@ -608,13 +650,25 @@ namespace LootLockerTests.PlayMode
             string pathA = CreateTempFile("First revision for promote by key");
             string pathB = CreateTempFile("Second revision for promote by key");
 
+            LootLockerPlayerFile firstUpload = new LootLockerPlayerFile();
             bool firstDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, _ => { firstDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathA, "test", true, fileKey, response =>
+            {
+                firstUpload = response;
+                firstDone = true;
+            });
             yield return new WaitUntil(() => firstDone);
+            Assert.IsTrue(firstUpload.success, "First upload for promote by key test failed");
 
+            LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, _ => { secondDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathB, "test", true, fileKey, response =>
+            {
+                secondUpload = response;
+                secondDone = true;
+            });
             yield return new WaitUntil(() => secondDone);
+            Assert.IsTrue(secondUpload.success, "Second upload for promote by key test failed");
 
             // Get revision list to find the first revision ID
             LootLockerPlayerFileRevisionsResponse revisionsResponse = new LootLockerPlayerFileRevisionsResponse();
@@ -699,13 +753,25 @@ namespace LootLockerTests.PlayMode
             string pathA = CreateTempFile("First list file");
             string pathB = CreateTempFile("Second list file");
 
+            LootLockerPlayerFile uploadA = new LootLockerPlayerFile();
             bool uploadADone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, _ => { uploadADone = true; });
+            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, response =>
+            {
+                uploadA = response;
+                uploadADone = true;
+            });
             yield return new WaitUntil(() => uploadADone);
+            Assert.IsTrue(uploadA.success, "First upload for list test failed");
 
+            LootLockerPlayerFile uploadB = new LootLockerPlayerFile();
             bool uploadBDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, _ => { uploadBDone = true; });
+            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, response =>
+            {
+                uploadB = response;
+                uploadBDone = true;
+            });
             yield return new WaitUntil(() => uploadBDone);
+            Assert.IsTrue(uploadB.success, "Second upload for list test failed");
 
             // When
             LootLockerPlayerFilesResponse listResponse = new LootLockerPlayerFilesResponse();
@@ -758,6 +824,8 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(deleteResponse.success, "DeletePlayerFile failed");
 
             // Verify deletion
+            bool preLogErrorsAsWarningsSetting = LootLockerConfig.current.logErrorsAsWarnings;
+            LootLockerConfig.current.logErrorsAsWarnings = true; // Suppress error logs for expected failure
             LootLockerPlayerFile fetchedFile = new LootLockerPlayerFile();
             bool fetchDone = false;
             LootLockerSDKManager.GetPlayerFile(uploadedFile.id, fileResponse =>
@@ -767,6 +835,7 @@ namespace LootLockerTests.PlayMode
             });
             yield return new WaitUntil(() => fetchDone);
             Assert.IsFalse(fetchedFile.success, "File should no longer exist after deletion");
+            LootLockerConfig.current.logErrorsAsWarnings = preLogErrorsAsWarningsSetting;
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
@@ -817,9 +886,15 @@ namespace LootLockerTests.PlayMode
             string fileKey = "list-key-" + TestCounter;
             string path = CreateTempFile("List response key check");
 
+            LootLockerPlayerFile uploadedFile = new LootLockerPlayerFile();
             bool uploadDone = false;
-            LootLockerSDKManager.UploadPlayerFile(path, "test", true, _ => { uploadDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(path, "test", true, fileKey, response =>
+            {
+                uploadedFile = response;
+                uploadDone = true;
+            });
             yield return new WaitUntil(() => uploadDone);
+            Assert.IsTrue(uploadedFile.success, "Upload for list response key test failed");
 
             // When
             LootLockerPlayerFilesResponse listResponse = new LootLockerPlayerFilesResponse();
@@ -854,13 +929,25 @@ namespace LootLockerTests.PlayMode
             string pathA = CreateTempFile("Metadata key revision A");
             string pathB = CreateTempFile("Metadata key revision B");
 
+            LootLockerPlayerFile firstUpload = new LootLockerPlayerFile();
             bool firstDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathA, "test", true, _ => { firstDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathA, "test", true, fileKey, response =>
+            {
+                firstUpload = response;
+                firstDone = true;
+            });
             yield return new WaitUntil(() => firstDone);
+            Assert.IsTrue(firstUpload.success, "First upload for metadata key test failed");
 
+            LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;
-            LootLockerSDKManager.UploadPlayerFile(pathB, "test", true, _ => { secondDone = true; }, key: fileKey);
+            LootLockerSDKManager.UploadPlayerFileByKey(pathB, "test", true, fileKey, response =>
+            {
+                secondUpload = response;
+                secondDone = true;
+            });
             yield return new WaitUntil(() => secondDone);
+            Assert.IsTrue(secondUpload.success, "Second upload for metadata key test failed");
 
             // Get file ID for the ID-based revisions call
             LootLockerPlayerFile fetchedFile = new LootLockerPlayerFile();
