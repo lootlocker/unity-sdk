@@ -66,6 +66,45 @@ namespace LootLockerTests.PlayMode
                 yield break;
             }
 
+            // Configure custom sign-up fields on the game
+            bool fieldsConfigured = false;
+            LootLockerTestConfigurationTitleConfig.SetCustomSignUpFields(
+                new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition[]
+                {
+                    new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition
+                    {
+                        question_text = "When were you born?",
+                        metadata_key = "birth_date",
+                        field_type = "date",
+                        required = true,
+                        sensitive = false,
+                        sort_order = 1
+                    },
+                    new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition
+                    {
+                        question_text = "Do you agree to the terms?",
+                        metadata_key = "tos_agree",
+                        field_type = "checkbox",
+                        required = true,
+                        sensitive = false,
+                        sort_order = 2
+                    }
+                },
+                (success, errorMessage) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogError($"Failed to configure custom sign-up fields: {errorMessage}");
+                        SetupFailed = true;
+                    }
+                    fieldsConfigured = true;
+                });
+            yield return new WaitUntil(() => fieldsConfigured);
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
             Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Failed to initialize LootLockerSDK");
 
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
@@ -114,8 +153,23 @@ namespace LootLockerTests.PlayMode
 
             // Then
             Assert.IsTrue(actualResponse.success, "GetSignUpFields returned unsuccessful: " + actualResponse.errorData?.message);
-            // Fields array should be present (empty if no custom fields configured on this game)
             Assert.IsNotNull(actualResponse.fields, "Fields array should not be null");
+            Assert.AreEqual(2, actualResponse.fields.Length, "Expected 2 custom sign-up fields to be configured");
+
+            // Verify the configured fields round-trip correctly (order-agnostic)
+            var fieldsByKey = new System.Collections.Generic.Dictionary<string, LootLockerWhiteLabelCustomField>();
+            foreach (var field in actualResponse.fields)
+            {
+                fieldsByKey[field.metadata_key] = field;
+            }
+
+            Assert.IsTrue(fieldsByKey.ContainsKey("birth_date"), "Expected birth_date field in response");
+            Assert.AreEqual("date", fieldsByKey["birth_date"].field_type, "birth_date field_type mismatch");
+            Assert.AreEqual("When were you born?", fieldsByKey["birth_date"].question_text, "birth_date question_text mismatch");
+
+            Assert.IsTrue(fieldsByKey.ContainsKey("tos_agree"), "Expected tos_agree field in response");
+            Assert.AreEqual("checkbox", fieldsByKey["tos_agree"].field_type, "tos_agree field_type mismatch");
+            Assert.AreEqual("Do you agree to the terms?", fieldsByKey["tos_agree"].question_text, "tos_agree question_text mismatch");
         }
 
         // Verifies serialization round-trip for the @params keyword-escaped property
