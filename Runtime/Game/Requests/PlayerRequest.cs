@@ -437,7 +437,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// A single file revision with download URL and metadata.
     /// </summary>
-    public class LootLockerPlayerFileContent
+    public class LootLockerPlayerFileContent : LootLockerResponse
     {
         /// <summary>The ULID of this revision.</summary>
         public string id { get; set; }
@@ -447,7 +447,6 @@ namespace LootLocker.Requests
         public int size { get; set; }
         /// <summary>When this revision was created.</summary>
         public DateTime created_at { get; set; }
-    }
     }
 
     /// <summary>

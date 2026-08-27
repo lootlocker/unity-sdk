@@ -4080,9 +4080,8 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(string pathToFile, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4095,11 +4094,6 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                body.Add("key", key);
-            }
 
             var fileBytes = new byte[] { };
             try
@@ -4130,7 +4124,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(string pathToFile, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(pathToFile, filePurpose, false, onComplete, null, forPlayerWithUlid);
+            UploadPlayerFile(pathToFile, filePurpose, false, onComplete, forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
@@ -4141,9 +4135,8 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4156,11 +4149,6 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                body.Add("key", key);
-            }
 
             var fileBytes = new byte[fileStream.Length];
             try
@@ -4187,11 +4175,10 @@ namespace LootLocker.Requests
         /// <param name="fileStream">Filestream to upload</param>
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(FileStream fileStream, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileStream, filePurpose, false, onComplete, key, forPlayerWithUlid);
+            UploadPlayerFile(fileStream, filePurpose, isPublic: false, onComplete, forPlayerWithUlid: forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
@@ -4203,9 +4190,8 @@ namespace LootLocker.Requests
         /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
         /// <param name="isPublic">Should this file be viewable by other players?</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
-        /// <param name="key">Optional key for upsert behavior. If a file with this key already exists, it will be updated.</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string key = null, string forPlayerWithUlid = null)
+        public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
@@ -4218,11 +4204,6 @@ namespace LootLocker.Requests
                 { "purpose", filePurpose },
                 { "public", isPublic.ToString().ToLower() }
             };
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                body.Add("key", key);
-            }
 
             LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
                 onComplete: (serverResponse) =>
@@ -4242,7 +4223,185 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void UploadPlayerFile(byte[] fileBytes, string fileName, string filePurpose, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
         {
-            UploadPlayerFile(fileBytes, fileName, filePurpose, false, onComplete, null, forPlayerWithUlid);
+            UploadPlayerFile(fileBytes, fileName, filePurpose, isPublic: false, onComplete, forPlayerWithUlid: forPlayerWithUlid);
+        }
+
+        /// @ingroup PlayerFiles
+        ///////////////////////////////////////////////////////////////////////////////
+
+        // ================================================================
+        // UploadPlayerFileByKey — dedicated overloads for upsert-by-key
+        // ================================================================
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file with the provided name and content, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// </summary>
+        /// <param name="pathToFile">Path to the file, example: Application.persistentDataPath + "/" + fileName;</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(string pathToFile, string filePurpose, bool isPublic, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() },
+                { "key", key }
+            };
+
+            var fileBytes = new byte[] { };
+            try
+            {
+                fileBytes = File.ReadAllBytes(pathToFile);
+            }
+            catch (Exception e)
+            {
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
+                return;
+            }
+
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(pathToFile), "multipart/form-data", body,
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Deserialize(onComplete, serverResponse);
+                });
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file with the provided name and content, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// The file will not be viewable by other players.
+        /// </summary>
+        /// <param name="pathToFile">Path to the file, example: Application.persistentDataPath + "/" + fileName;</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(string pathToFile, string filePurpose, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            UploadPlayerFileByKey(pathToFile, filePurpose, isPublic: false, key, onComplete, forPlayerWithUlid: forPlayerWithUlid);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file using a Filestream, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// </summary>
+        /// <param name="fileStream">Filestream to upload</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(FileStream fileStream, string filePurpose, bool isPublic, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() },
+                { "key", key }
+            };
+
+            var fileBytes = new byte[fileStream.Length];
+            try
+            {
+                fileStream.Read(fileBytes, 0, Convert.ToInt32(fileStream.Length));
+            }
+            catch (Exception e)
+            {
+                LootLockerLogger.Log($"File error: {e.Message}", LootLockerLogger.LogLevel.Error);
+                return;
+            }
+
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileStream.Name), "multipart/form-data", body,
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Deserialize(onComplete, serverResponse);
+                });
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file using a Filestream, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// The file will not be viewable by other players.
+        /// </summary>
+        /// <param name="fileStream">Filestream to upload</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(FileStream fileStream, string filePurpose, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            UploadPlayerFileByKey(fileStream, filePurpose, isPublic: false, key, onComplete, forPlayerWithUlid: forPlayerWithUlid);
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file using a byte array, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// </summary>
+        /// <param name="fileBytes">Byte array to upload</param>
+        /// <param name="fileName">Name of the file on LootLocker</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="isPublic">Should this file be viewable by other players?</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(byte[] fileBytes, string fileName, string filePurpose, bool isPublic, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
+                return;
+            }
+
+            var body = new Dictionary<string, string>()
+            {
+                { "purpose", filePurpose },
+                { "public", isPublic.ToString().ToLower() },
+                { "key", key }
+            };
+
+            LootLockerServerRequest.UploadFile(forPlayerWithUlid, LootLockerEndPoints.uploadPlayerFile, fileBytes, Path.GetFileName(fileName), "multipart/form-data", body,
+                onComplete: (serverResponse) =>
+                {
+                    LootLockerResponse.Deserialize(onComplete, serverResponse);
+                });
+        }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Upload a file using a byte array, using a key for upsert behavior.
+        /// If a file with the given key already exists for this player, it will be updated.
+        /// The file will not be viewable by other players.
+        /// </summary>
+        /// <param name="fileBytes">Byte array to upload</param>
+        /// <param name="fileName">Name of the file on LootLocker</param>
+        /// <param name="filePurpose">Purpose of the file, example: savefile/config</param>
+        /// <param name="key">Key for upsert behavior. If a file with this key already exists, it will be updated.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UploadPlayerFileByKey(byte[] fileBytes, string fileName, string filePurpose, string key, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            UploadPlayerFileByKey(fileBytes, fileName, filePurpose, isPublic: false, key, onComplete, forPlayerWithUlid: forPlayerWithUlid);
         }
 
         /// @ingroup PlayerFiles
