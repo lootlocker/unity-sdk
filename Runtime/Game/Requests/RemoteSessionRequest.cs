@@ -61,7 +61,12 @@ namespace LootLocker.Requests
         /// </summary>
         public string[] providers { get; set; }
 
-        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId, string[] providers = null)
+        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId)
+            : this(titleId, environmentId, null)
+        {
+        }
+
+        public LootLockerLeaseRemoteSessionRequest(string titleId, string environmentId, string[] providers)
         {
             title_id = titleId;
             environment_id = environmentId;

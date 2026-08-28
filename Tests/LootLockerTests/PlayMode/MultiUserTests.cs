@@ -15,12 +15,17 @@ namespace LootLockerTests.PlayMode
     public class InMemoryTestStateWriter : ILootLockerStateWriter
     {
         private Dictionary<string, string> _storage = new Dictionary<string, string>();
+        private Dictionary<string, int> _intStorage = new Dictionary<string, int>();
 
         public void DeleteKey(string key)
         {
             if (_storage.ContainsKey(key))
             {
                 _storage.Remove(key);
+            }
+            if (_intStorage.ContainsKey(key))
+            {
+                _intStorage.Remove(key);
             }
         }
 
@@ -33,14 +38,28 @@ namespace LootLockerTests.PlayMode
             return defaultValue;
         }
 
+        public int GetInt(string key, int defaultValue = 0)
+        {
+            if (_intStorage.ContainsKey(key))
+            {
+                return _intStorage[key];
+            }
+            return defaultValue;
+        }
+
         public void SetString(string key, string value)
         {
             _storage[key] = value;
         }
 
+        public void SetInt(string key, int value)
+        {
+            _intStorage[key] = value;
+        }
+
         public bool HasKey(string key)
         {
-            return _storage.ContainsKey(key);
+            return _storage.ContainsKey(key) || _intStorage.ContainsKey(key);
         }
     }
     

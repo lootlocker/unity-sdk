@@ -186,7 +186,11 @@ namespace LootLocker.Admin
 
         private void DrawLogSettings()
         {
+#if UNITY_2019_3_OR_NEWER
             logSettingsFoldout = EditorGUILayout.Foldout(logSettingsFoldout, "Log Settings", true, EditorStyles.foldoutHeader);
+#else
+            logSettingsFoldout = EditorGUILayout.Foldout(logSettingsFoldout, "Log Settings", true, EditorStyles.foldout);
+#endif
             if (!logSettingsFoldout) return;
             EditorGUILayout.Space();
 
@@ -230,7 +234,11 @@ namespace LootLocker.Admin
 
         private void DrawPresenceSettings()
         {
+#if UNITY_2019_3_OR_NEWER
             presenceSettingsFoldout = EditorGUILayout.Foldout(presenceSettingsFoldout, "Presence Settings", true, EditorStyles.foldoutHeader);
+#else
+            presenceSettingsFoldout = EditorGUILayout.Foldout(presenceSettingsFoldout, "Presence Settings", true, EditorStyles.foldout);
+#endif
             if (!presenceSettingsFoldout) return;
             EditorGUILayout.Space();
 
