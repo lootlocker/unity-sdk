@@ -221,7 +221,7 @@ namespace LootLockerTests.PlayMode
             var customFieldValue = new LootLockerWhiteLabelCustomFieldValue
             {
                 metadata_key = "tos_agree",
-                value_json = "true"
+                value_json = true
             };
 
             var request = new LootLockerWhiteLabelSignUpRequest
@@ -240,8 +240,9 @@ namespace LootLockerTests.PlayMode
                 $"JSON must contain \"custom_fields\", got:\n{json}");
             Assert.IsTrue(json.Contains("\"metadata_key\":\"tos_agree\""),
                 $"JSON must contain metadata_key, got:\n{json}");
-            Assert.IsTrue(json.Contains("\"value_json\":\"true\""),
-                $"JSON must contain value_json, got:\n{json}");
+            // value_json should serialize as a raw boolean, not a quoted string
+            Assert.IsTrue(json.Contains("\"value_json\":true"),
+                $"JSON must contain raw boolean value_json:true, got:\n{json}");
             // Verify existing fields still serialize
             Assert.IsTrue(json.Contains("\"email\":\"player@example.com\""),
                 $"JSON must contain email, got:\n{json}");
@@ -261,12 +262,12 @@ namespace LootLockerTests.PlayMode
                 new LootLockerWhiteLabelCustomFieldValue
                 {
                     metadata_key = "birth_date",
-                    value_json = "\"2000-01-15\""
+                    value_json = "2000-01-15"
                 },
                 new LootLockerWhiteLabelCustomFieldValue
                 {
                     metadata_key = "tos_agree",
-                    value_json = "true"
+                    value_json = true
                 }
             };
 
