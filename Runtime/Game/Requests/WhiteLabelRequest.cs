@@ -7,7 +7,15 @@ namespace LootLocker.Requests
     public class LootLockerWhiteLabelCustomFieldValue
     {
         public string metadata_key { get; set; }
-        public string value_json { get; set; }
+        /// <summary>
+        /// The value as a raw JSON primitive matching the field's configured type:
+        /// - text/select/date: a JSON string (e.g. "2000-01-15")
+        /// - number: a JSON number (e.g. 42)
+        /// - checkbox: a JSON boolean (e.g. true)
+        /// Pass the value as its native C# type (string, int, bool, etc.) —
+        /// the serializer will emit the correct JSON primitive automatically.
+        /// </summary>
+        public object value_json { get; set; }
     }
 
     public class LootLockerWhiteLabelCustomField
