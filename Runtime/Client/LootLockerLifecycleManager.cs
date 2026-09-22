@@ -46,7 +46,11 @@ namespace LootLocker
         #region Instance Handling
 
         private static LootLockerLifecycleManager _instance;
-        private static int _instanceId = 0;
+#if UNITY_6000_5_OR_NEWER
+        private static EntityId _instanceId = default;
+#else
+        private static int _instanceId = default;
+#endif
         private static GameObject _hostingGameObject = null;
         private static readonly object _instanceLock = new object();
 
@@ -70,7 +74,7 @@ namespace LootLocker
             {
                 Debug.LogWarning($"[LootLocker] LifecycleManager auto-initialization failed: {ex.Message}. Services will be initialized on first use.");
                 _instance = null;
-                _instanceId = 0;
+                _instanceId = default;
                 if (_hostingGameObject != null)
                 {
                     Destroy(_hostingGameObject);
@@ -115,7 +119,11 @@ namespace LootLocker
             {                
                 var gameObject = new GameObject("LootLockerLifecycleManager");
                 _instance = gameObject.AddComponent<LootLockerLifecycleManager>();
+#if UNITY_6000_5_OR_NEWER
+                _instanceId = _instance.GetEntityId();
+#else
                 _instanceId = _instance.GetInstanceID();
+#endif
                 _hostingGameObject = gameObject;
 
                 if (Application.isPlaying)
@@ -150,7 +158,7 @@ namespace LootLocker
 #endif
                     
                     _instance = null;
-                    _instanceId = 0;
+                    _instanceId = default;
                     _hostingGameObject = null;
                 }
                 
@@ -168,13 +176,22 @@ namespace LootLocker
 #endif
             foreach (LootLockerLifecycleManager manager in managers)
             {
-                if (manager != null && _instanceId != manager.GetInstanceID() && manager.gameObject != null && ((LootLockerLifecycleManager)manager)._isInitialized)
+                if (manager != null && manager.gameObject != null && ((LootLockerLifecycleManager)manager)._isInitialized)
                 {
-#if UNITY_EDITOR
-                    DestroyImmediate(manager.gameObject);
+                    bool isCurrentInstance;
+#if UNITY_6000_5_OR_NEWER
+                    isCurrentInstance = _instanceId == manager.GetEntityId();
 #else
-                    Destroy(manager.gameObject);
+                    isCurrentInstance = _instanceId == manager.GetInstanceID();
 #endif
+                    if (!isCurrentInstance)
+                    {
+#if UNITY_EDITOR
+                        DestroyImmediate(manager.gameObject);
+#else
+                        Destroy(manager.gameObject);
+#endif
+                    }
                 }
             }
             yield return null;
