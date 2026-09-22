@@ -478,7 +478,7 @@ namespace LootLocker
             int waitCount = 0;
             while(!IsConnectedAndAuthenticated && waitCount < maxWaitTimes)
             {
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSecondsRealtime(0.1f);
                 waitCount++;
             }
             
@@ -1122,7 +1122,7 @@ namespace LootLocker
             while (IsConnectedAndAuthenticated)
             {
                 SendPing();
-                yield return new WaitForSeconds(PING_INTERVAL);
+                yield return new WaitForSecondsRealtime(PING_INTERVAL);
             }
         }
 
@@ -1138,7 +1138,7 @@ namespace LootLocker
             LootLockerLogger.Log($"Scheduling Presence reconnect attempt {reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS} in {delayToUse} seconds", LootLockerLogger.LogLevel.Debug);
             ChangeConnectionState(LootLockerPresenceConnectionState.Reconnecting);
 
-            yield return new WaitForSeconds(delayToUse);
+            yield return new WaitForSecondsRealtime(delayToUse);
 
             if (shouldReconnect && connectionState == LootLockerPresenceConnectionState.Reconnecting)
             {

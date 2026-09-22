@@ -43,6 +43,7 @@ namespace LootLocker
         // White Label Login
         [Header("White Label Login")]
         public static EndPointClass whiteLabelSignUp = new EndPointClass("white-label-login/sign-up", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+        public static EndPointClass whiteLabelSignUpFields = new EndPointClass("white-label-login/sign-up/fields", LootLockerHTTPMethod.GET, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelLogin = new EndPointClass("white-label-login/login", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelVerifySession = new EndPointClass("white-label-login/verify-session", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
         public static EndPointClass whiteLabelRequestPasswordReset = new EndPointClass("white-label-login/request-reset-password", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
@@ -73,6 +74,14 @@ namespace LootLocker
         public static EndPointClass uploadPlayerFile = new EndPointClass("player/files", LootLockerHTTPMethod.UPLOAD_FILE);
         public static EndPointClass updatePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.UPDATE_FILE);
         public static EndPointClass deletePlayerFile = new EndPointClass("/player/files/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass listPlayerFileRevisions = new EndPointClass("player/files/{0}/revisions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getPlayerFileRevision = new EndPointClass("player/files/{0}/revisions/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass promotePlayerFileRevision = new EndPointClass("player/files/{0}/revisions/{1}/current", LootLockerHTTPMethod.POST);
+        public static EndPointClass getPlayerFileByKey = new EndPointClass("player/files/key/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass listPlayerFileRevisionsByKey = new EndPointClass("player/files/key/{0}/revisions", LootLockerHTTPMethod.GET);
+        public static EndPointClass getPlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass promotePlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}/current", LootLockerHTTPMethod.POST);
+        public static EndPointClass deletePlayerFileByKey = new EndPointClass("player/files/key/{0}", LootLockerHTTPMethod.DELETE);
 
         // Player Progressions
         [Header("Player Progressions")]
@@ -252,6 +261,10 @@ namespace LootLocker
         public static EndPointClass listCurrencies = new EndPointClass("currencies", LootLockerHTTPMethod.GET);
         public static EndPointClass getCurrencyDetails = new EndPointClass("currency/code/{0}", LootLockerHTTPMethod.GET);
         public static EndPointClass getCurrencyDenominationsByCode = new EndPointClass("currency/code/{0}/denominations", LootLockerHTTPMethod.GET);
+
+        // Platform Keys
+        [Header("Platform Keys")]
+        public static EndPointClass listPlatformKeys = new EndPointClass("platform-keys/v1", LootLockerHTTPMethod.GET);
 
         // Balances
         [Header("Balances")]

@@ -1,0 +1,289 @@
+using System.Collections;
+using LootLocker;
+using LootLocker.Requests;
+using LootLockerTestConfigurationUtils;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+namespace LootLockerTests.PlayMode
+{
+    public class WhiteLabelSignUpFieldsTest
+    {
+        private LootLockerTestGame gameUnderTest = null;
+        private LootLockerConfig configCopy = null;
+        private static int TestCounter = 0;
+        private bool SetupFailed = false;
+
+        [UnitySetUp]
+        public IEnumerator Setup()
+        {
+            TestCounter++;
+            configCopy = LootLockerConfig.current;
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
+
+            if (!LootLockerConfig.ClearSettings())
+            {
+                Debug.LogError("Could not clear LootLocker config");
+            }
+
+            LootLockerConfig.current.logLevel = LootLockerLogger.LogLevel.Debug;
+
+            // Create game
+            bool gameCreationCallCompleted = false;
+            LootLockerTestGame.CreateGame(testName: this.GetType().Name + TestCounter + " ", onComplete: (success, errorMessage, game) =>
+            {
+                if (!success)
+                {
+                    gameCreationCallCompleted = true;
+                    Debug.LogError(errorMessage);
+                    SetupFailed = true;
+                }
+                gameUnderTest = game;
+                gameCreationCallCompleted = true;
+            });
+            yield return new WaitUntil(() => gameCreationCallCompleted);
+            if (SetupFailed)
+            {
+                yield break;
+            }
+            gameUnderTest?.SwitchToStageEnvironment();
+
+            // Enable white label login
+            bool enableWLCompleted = false;
+            gameUnderTest?.EnableWhiteLabelLogin((success, errorMessage) =>
+            {
+                if (!success)
+                {
+                    Debug.LogError(errorMessage);
+                    SetupFailed = true;
+                }
+                enableWLCompleted = true;
+            });
+            yield return new WaitUntil(() => enableWLCompleted);
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
+            // Configure custom sign-up fields on the game
+            bool fieldsConfigured = false;
+            LootLockerTestConfigurationTitleConfig.SetCustomSignUpFields(
+                new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition[]
+                {
+                    new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition
+                    {
+                        question_text = "When were you born?",
+                        metadata_key = "birth_date",
+                        field_type = "date",
+                        required = true,
+                        sensitive = false,
+                        sort_order = 1
+                    },
+                    new LootLockerTestConfigurationTitleConfig.WhiteLabelCustomSignUpFieldDefinition
+                    {
+                        question_text = "Do you agree to the terms?",
+                        metadata_key = "tos_agree",
+                        field_type = "checkbox",
+                        required = true,
+                        sensitive = false,
+                        sort_order = 2
+                    }
+                },
+                (success, errorMessage) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogError($"Failed to configure custom sign-up fields: {errorMessage}");
+                        SetupFailed = true;
+                    }
+                    fieldsConfigured = true;
+                });
+            yield return new WaitUntil(() => fieldsConfigured);
+            if (SetupFailed)
+            {
+                yield break;
+            }
+
+            Assert.IsTrue(gameUnderTest?.InitializeLootLockerSDK(), "Failed to initialize LootLockerSDK");
+
+            Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
+        }
+
+        [UnityTearDown]
+        public IEnumerator TearDown()
+        {
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} test case #####");
+            if (gameUnderTest != null)
+            {
+                bool gameDeletionCallCompleted = false;
+                gameUnderTest.DeleteGame(((success, errorMessage) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogError(errorMessage);
+                    }
+
+                    gameUnderTest = null;
+                    gameDeletionCallCompleted = true;
+                }));
+                yield return new WaitUntil(() => gameDeletionCallCompleted);
+            }
+
+            LootLockerStateData.ClearAllSavedStates();
+
+            LootLockerConfig.CreateNewSettings(configCopy);
+            Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator GetSignUpFields_WithWhiteLabelEnabled_ReturnsFieldsResponse()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // When
+            LootLockerWhiteLabelSignUpFieldsResponse actualResponse = null;
+            bool getFieldsCallCompleted = false;
+            LootLockerSDKManager.WhiteLabelGetSignUpFields(response =>
+            {
+                actualResponse = response;
+                getFieldsCallCompleted = true;
+            });
+            yield return new WaitUntil(() => getFieldsCallCompleted);
+
+            // Then
+            Assert.IsTrue(actualResponse.success, "GetSignUpFields returned unsuccessful: " + actualResponse.errorData?.message);
+            Assert.IsNotNull(actualResponse.fields, "Fields array should not be null");
+            Assert.AreEqual(2, actualResponse.fields.Length, "Expected 2 custom sign-up fields to be configured");
+
+            // Verify the configured fields round-trip correctly (order-agnostic)
+            var fieldsByKey = new System.Collections.Generic.Dictionary<string, LootLockerWhiteLabelCustomField>();
+            foreach (var field in actualResponse.fields)
+            {
+                fieldsByKey[field.metadata_key] = field;
+            }
+
+            Assert.IsTrue(fieldsByKey.ContainsKey("birth_date"), "Expected birth_date field in response");
+            Assert.AreEqual("date", fieldsByKey["birth_date"].field_type, "birth_date field_type mismatch");
+            Assert.AreEqual("When were you born?", fieldsByKey["birth_date"].question_text, "birth_date question_text mismatch");
+
+            Assert.IsTrue(fieldsByKey.ContainsKey("tos_agree"), "Expected tos_agree field in response");
+            Assert.AreEqual("checkbox", fieldsByKey["tos_agree"].field_type, "tos_agree field_type mismatch");
+            Assert.AreEqual("Do you agree to the terms?", fieldsByKey["tos_agree"].question_text, "tos_agree question_text mismatch");
+        }
+
+        // Verifies serialization round-trip for the @params keyword-escaped property
+        [Test, Category("LootLocker"), Category("LootLockerCI")]
+        public void CustomField_SerializeDeserialize_HandlesParamsKeywordProperty()
+        {
+            // Given — a custom field with the @params property set
+            var original = new LootLockerWhiteLabelCustomField
+            {
+                question_text = "When were you born?",
+                metadata_key = "birth_date",
+                field_type = "date",
+                required = true,
+                sensitive = false,
+                sort_order = 1
+            };
+
+            // Assign via the @params property (C# verbatim identifier for the keyword 'params')
+            original.@params = "{\"min\":\"1900-01-01\",\"max\":\"2026-01-01\"}";
+
+            // When — serialize to JSON
+            string json = LootLockerJson.SerializeObject(original);
+            Debug.Log($"Serialized custom field: {json}");
+
+            // Then — the @params property serialized as "params" in JSON
+            Assert.IsTrue(json.Contains("\"params\""),
+                $"JSON must contain the key \"params\", got:\n{json}");
+            // The @params value is a JSON string, so inner quotes will be escaped in the serialized output
+            Assert.IsTrue(json.Contains("\\\"min\\\""),
+                $"JSON must contain the escaped nested JSON payload, got:\n{json}");
+
+            // When — deserialize back
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerWhiteLabelCustomField>(json);
+
+            // Then — the @params value round-trips
+            Assert.AreEqual(original.question_text, deserialized.question_text, "question_text should round-trip");
+            Assert.AreEqual(original.metadata_key, deserialized.metadata_key, "metadata_key should round-trip");
+            Assert.AreEqual(original.field_type, deserialized.field_type, "field_type should round-trip");
+            Assert.AreEqual(original.required, deserialized.required, "required should round-trip");
+            Assert.AreEqual(original.@params, deserialized.@params, "@params should round-trip through serialize/deserialize");
+            Assert.AreEqual(original.sort_order, deserialized.sort_order, "sort_order should round-trip");
+        }
+
+        // Verifies serialization of request body with custom_fields array
+        [Test, Category("LootLocker"), Category("LootLockerCI")]
+        public void UserRequest_SerializeDeserialize_IncludesCustomFields()
+        {
+            // Given
+            var customFieldValue = new LootLockerWhiteLabelCustomFieldValue
+            {
+                metadata_key = "tos_agree",
+                value_json = true
+            };
+
+            var request = new LootLockerWhiteLabelSignUpRequest
+            {
+                email = "player@example.com",
+                password = "s3cur3p4ssw0rd",
+                remember = false,
+                custom_fields = new[] { customFieldValue }
+            };
+
+            // When
+            string json = LootLockerJson.SerializeObject(request);
+
+            // Then — verify custom_fields appear in JSON with correct keys
+            Assert.IsTrue(json.Contains("\"custom_fields\""),
+                $"JSON must contain \"custom_fields\", got:\n{json}");
+            Assert.IsTrue(json.Contains("\"metadata_key\":\"tos_agree\""),
+                $"JSON must contain metadata_key, got:\n{json}");
+            // value_json should serialize as a raw boolean, not a quoted string
+            Assert.IsTrue(json.Contains("\"value_json\":true"),
+                $"JSON must contain raw boolean value_json:true, got:\n{json}");
+            // Verify existing fields still serialize
+            Assert.IsTrue(json.Contains("\"email\":\"player@example.com\""),
+                $"JSON must contain email, got:\n{json}");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator SignUp_WithCustomFields_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // Given — a unique email so we don't conflict with repeated test runs
+            string email = $"test-{TestCounter}-{System.Guid.NewGuid():N}@example.com";
+            string password = "TestPassword123!";
+
+            LootLockerWhiteLabelCustomFieldValue[] customFields = new LootLockerWhiteLabelCustomFieldValue[]
+            {
+                new LootLockerWhiteLabelCustomFieldValue
+                {
+                    metadata_key = "birth_date",
+                    value_json = "2000-01-15"
+                },
+                new LootLockerWhiteLabelCustomFieldValue
+                {
+                    metadata_key = "tos_agree",
+                    value_json = true
+                }
+            };
+
+            // When
+            LootLockerWhiteLabelSignupResponse actualResponse = null;
+            bool signUpCallCompleted = false;
+            LootLockerSDKManager.WhiteLabelSignUp(email, password, customFields, response =>
+            {
+                actualResponse = response;
+                signUpCallCompleted = true;
+            });
+            yield return new WaitUntil(() => signUpCallCompleted);
+
+            // Then
+            Assert.IsTrue(actualResponse.success, "WhiteLabelSignUp with custom fields failed: " + actualResponse.errorData?.message);
+            Assert.IsNotNull(actualResponse.Email, "Email should be present in response");
+        }
+    }
+}

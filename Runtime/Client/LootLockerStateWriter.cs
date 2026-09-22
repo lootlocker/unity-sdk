@@ -27,6 +27,19 @@ namespace LootLocker
         /// <param name="key">The key to set the value for.</param>
         /// <param name="value">The value to set.</param>
         void SetString(string key, string value);
+        /// <summary>
+        /// Get an int from persistent storage. If the key does not exist then return the provided default value.
+        /// </summary>
+        /// <param name="key">The key to retrieve the value for.</param>
+        /// <param name="defaultValue">The value to return if the key does not exist.</param>
+        /// <returns>The value associated with the key, or the default value if the key does not exist.</returns>
+        int GetInt(string key, int defaultValue = 0);
+        /// <summary>
+        /// Set an integer in persistent storage.
+        /// </summary>
+        /// <param name="key">The key to set the value for.</param>
+        /// <param name="value">The value to set.</param>
+        void SetInt(string key, int value);
 
         /// <summary>
         /// Delete a key from persistent storage.
@@ -65,6 +78,17 @@ namespace LootLocker
         }
 
         /// <summary>
+        /// Gets an int from PlayerPrefs.
+        /// </summary>
+        /// <param name="key">The key to retrieve the value for.</param>
+        /// <param name="defaultValue">The value to return if the key does not exist.</param>
+        /// <returns>The value associated with the key, or the default value if the key does not exist.</returns>
+        public int GetInt(string key, int defaultValue = 0)
+        {
+            return PlayerPrefs.GetInt(key, defaultValue);
+        }
+
+        /// <summary>
         /// Checks if a key exists in PlayerPrefs.
         /// </summary>
         /// <param name="key"></param>
@@ -72,6 +96,17 @@ namespace LootLocker
         public bool HasKey(string key)
         {
             return PlayerPrefs.HasKey(key);
+        }
+
+        /// <summary>
+        /// Sets an int in PlayerPrefs and saves the changes.
+        /// </summary>
+        /// <param name="key">The key to set the value for.</param>
+        /// <param name="value">The value to set.</param>
+        public void SetInt(string key, int value)
+        {
+            PlayerPrefs.SetInt(key, value);
+            PlayerPrefs.Save();
         }
 
         /// <summary>
@@ -98,12 +133,22 @@ namespace LootLocker
             return defaultValue;
         }
 
+        public int GetInt(string key, int defaultValue = 0)
+        {
+            return defaultValue;
+        }
+
         public bool HasKey(string key)
         {
             return false;
         }
 
         public void SetString(string key, string value)
+        {
+            // Do nothing
+        }
+
+        public void SetInt(string key, int value)
         {
             // Do nothing
         }

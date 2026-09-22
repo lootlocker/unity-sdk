@@ -1132,7 +1132,7 @@ namespace LootLocker
                     ConnectPresence(state.ULID);
                     
                     // Small delay between connections to avoid overwhelming the system
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSecondsRealtime(0.1f);
                 }
             }
         }

@@ -41,19 +41,21 @@ jobs:
         id: current
         run: |
           VERSION=$(jq -r '.version' package.json)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "::error::Could not read version from package.json"
+            exit 1
+          fi
           echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Current version: ${VERSION}"
 
       - name: Get previous release tag and commit log
         id: prev-tag
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "TAG=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
-          echo "Previous tag: ${LATEST_TAG:-none}"
-
-          # Collect commits since last tag (or all commits if no tag yet)
+          echo "Previous tag: ${LATEST_TAG}"
           REV_RANGE=""
-          if [ -n "$LATEST_TAG" ]; then
+          if [ -n "$LATEST_TAG" ] && [ "$LATEST_TAG" != "v0.0.0" ]; then
             REV_RANGE="${LATEST_TAG}..HEAD"
           else
             REV_RANGE="HEAD"
@@ -81,23 +83,24 @@ jobs:
           if [ "$BUMP" = "auto" ] && [ "$ALREADY_CALCULATED" = "false" ]; then
             echo "Auto-detecting version from OpenRouter..."
             if [ -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then
-              echo "::error::OPENROUTER_API_KEY secret not set. Use manual bump or set secret."
-              exit 1
+              echo "::warning::OPENROUTER_API_KEY not set. Falling back to patch bump."
+              BUMP="patch"
+            else
+              COMMITS=$(head -100 /tmp/commits.log)
+              printf 'The current version is v%s. Based on these commit messages since the last release, determine the correct semver version for the next release. Analyze breaking changes, new features, and fixes. Respond with only the version number (e.g., 9.0.0).\n\n%s\n' "$CURRENT" "$COMMITS" > /tmp/version-prompt.txt
+              RESPONSE=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+                -H "Authorization: Bearer ${{ secrets.OPENROUTER_API_KEY }}" \
+                -H "Content-Type: application/json" \
+                -d "$(jq -n --rawfile prompt /tmp/version-prompt.txt '{model:"deepseek/deepseek-v4-pro",messages:[{role:"user",content:$prompt}],reasoning:{effort:"low"},max_tokens:2000,temperature:0}')")
+              NEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ""' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+              if [ -z "$NEW" ]; then
+                echo "::warning::AI returned no parseable version. Falling back to patch bump."
+                BUMP="patch"
+              else
+                echo "AI suggested version: ${NEW}"
+                ALREADY_CALCULATED=true
+              fi
             fi
-            COMMITS=$(head -100 /tmp/commits.log)
-            printf 'Based on these commit messages since the last release (v%s), determine the correct semver version for the next release. Analyze breaking changes, new features, and fixes. Respond with only the version number (e.g., 9.0.0).\n\n%s\n' "$CURRENT" "$COMMITS" > /tmp/version-prompt.txt
-            RESPONSE=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
-              -H "Authorization: Bearer ${{ secrets.OPENROUTER_API_KEY }}" \
-              -H "Content-Type: application/json" \
-              -d "$(jq -n --rawfile prompt /tmp/version-prompt.txt '{model:"deepseek/deepseek-v4-pro",messages:[{role:"user",content:$prompt}],reasoning:{effort:"low"},max_tokens:2000,temperature:0}')")
-            NEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ""' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-            if [ -z "$NEW" ]; then
-              echo "::warning::AI returned no parseable version, falling back to patch bump."
-              PATCH=$(echo "$CURRENT" | cut -d. -f3)
-              NEW="$(echo "$CURRENT" | cut -d. -f1).$(echo "$CURRENT" | cut -d. -f2).$((PATCH + 1))"
-            fi
-            echo "AI suggested version: ${NEW}"
-            ALREADY_CALCULATED=true
           fi
 
           if [ "$ALREADY_CALCULATED" = "false" ]; then

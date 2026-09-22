@@ -16,7 +16,7 @@ jobs:
     name: Validate release candidate PR
     runs-on: ubuntu-latest
     timeout-minutes: 3
-    if: contains(github.event.pull_request.labels.*.name, 'release candidate')
+    if: contains(github.event.pull_request.labels.*.name, 'Release Candidate') || contains(github.event.pull_request.labels.*.name, 'release candidate')
 
     steps:
       - name: Checkout
