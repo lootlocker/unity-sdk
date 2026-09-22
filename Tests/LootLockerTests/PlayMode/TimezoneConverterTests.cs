@@ -10,28 +10,30 @@ namespace LootLockerTests.PlayMode
     /// </summary>
     public class TimezoneConverterTests
     {
-        [Test, Category("LootLocker"), Category("LootLockerCIFast")]
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void ConvertUTCOffsetToIana_UsesCorrectCasingAndSign()
         {
             // IANA sign convention is reversed: Etc/GMT+X means UTC-X
             Assert.AreEqual("Etc/GMT+5", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(-5));
             Assert.AreEqual("Etc/GMT-2", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(2));
             Assert.AreEqual("Etc/UTC", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(0));
-            // Out-of-range offsets are clamped
-            Assert.AreEqual("Etc/GMT+12", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(-999));
-            Assert.AreEqual("Etc/GMT-14", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(999));
-        }
+        #if UNITY_2021_1_OR_NEWER
+                    // Out-of-range offsets are clamped (the converter only clamps from UNITY_2021_1_OR_NEWER)
+                    Assert.AreEqual("Etc/GMT+12", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(-999));
+                    Assert.AreEqual("Etc/GMT-14", LootLockerTimezoneConverter.convertUTCOffsetToIanaTzString(999));
+        #endif
+                }
 
-        [Test, Category("LootLocker"), Category("LootLockerCIFast")]
-        public void ConvertGMTOffsetToIana_UsesCorrectCasingAndSign()
-        {
-            Assert.AreEqual("Etc/GMT-5", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(-5));
-            Assert.AreEqual("Etc/GMT+2", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(2));
-            Assert.AreEqual("Etc/UTC", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(0));
-        }
+                [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+                public void ConvertGMTOffsetToIana_UsesCorrectCasingAndSign()
+                {
+                    Assert.AreEqual("Etc/GMT-5", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(-5));
+                    Assert.AreEqual("Etc/GMT+2", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(2));
+                    Assert.AreEqual("Etc/UTC", LootLockerTimezoneConverter.convertGMTOffsetToIanaTzString(0));
+                }
 
-        [Test, Category("LootLocker"), Category("LootLockerCIFast")]
-        public void TryConvertStringToIana_HandlesOffsetsWindowsAndIanaInputs()
+                [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+                public void TryConvertStringToIana_HandlesOffsetsWindowsAndIanaInputs()
         {
             // Numeric offset string
             Assert.IsTrue(LootLockerTimezoneConverter.TryConvertStringToIanaTzString("2", out string fromOffset));
