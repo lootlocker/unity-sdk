@@ -1,4 +1,5 @@
-﻿using LootLocker;
+using LootLocker;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using System;
 using System.Collections;
@@ -315,6 +316,181 @@ namespace LootLockerTests.PlayMode
 #endif
         }
 
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_SerializingConsumeItemRequestWithoutCount_OmitsCount()
+        {
+            // Given
+            var request = new LootLockerConsumeItemRequest();
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(request);
+
+            // Then
+            Assert.IsNotNull(serializedJson, "Not serialized, is null");
+            Assert.IsFalse(serializedJson.Contains("count"),
+                "Not serialized correctly, contains count even though it was never set");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_SerializingConsumeItemRequestWithCount_IncludesCount()
+        {
+            // Given
+            var request = new LootLockerConsumeItemRequest { count = 3 };
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(request);
+
+            // Then
+            Assert.IsNotNull(serializedJson, "Not serialized, is null");
+            Assert.IsTrue(serializedJson.Contains("count"),
+                "Not serialized correctly, does not contain count");
+            Assert.IsTrue(serializedJson.Contains("3"),
+                "Not serialized correctly, does not contain the count value");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_SerializingSplitItemStackRequest_IncludesCount()
+        {
+            // Given
+            var request = new LootLockerSplitItemStackRequest { count = 5 };
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(request);
+
+            // Then
+            Assert.IsNotNull(serializedJson, "Not serialized, is null");
+            Assert.IsTrue(serializedJson.Contains("count"),
+                "Not serialized correctly, does not contain count");
+            Assert.IsTrue(serializedJson.Contains("5"),
+                "Not serialized correctly, does not contain the count value");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_SerializingMergeItemStacksRequest_IncludesBothInventoryIds()
+        {
+            // Given
+            var request = new LootLockerMergeItemStacksRequest
+            {
+                source_inventory_id = "01HZZZZZZZZZZZZZZZZZZZZZZZ",
+                target_inventory_id = "01HYYYYYYYYYYYYYYYYYYYYYYY"
+            };
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(request);
+
+            // Then
+            Assert.IsNotNull(serializedJson, "Not serialized, is null");
+            Assert.IsTrue(serializedJson.Contains("source_inventory_id"),
+                "Not serialized correctly, does not contain source_inventory_id");
+            Assert.IsTrue(serializedJson.Contains("target_inventory_id"),
+                "Not serialized correctly, does not contain target_inventory_id");
+            Assert.IsTrue(serializedJson.Contains("01HZZZZZZZZZZZZZZZZZZZZZZZ"),
+                "Not serialized correctly, does not contain the source inventory id value");
+            Assert.IsTrue(serializedJson.Contains("01HYYYYYYYYYYYYYYYYYYYYYYY"),
+                "Not serialized correctly, does not contain the target inventory id value");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingListPlayerItemsResponse_Succeeds()
+        {
+            // Given
+            const string listPlayerItemsResponse =
+                "{\"success\":true,\"items\":[{\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":3,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"stackable\",\"consumable\":true,\"count\":7,\"source\":\"grant\",\"name\":\"Health Potion\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\"}],\"pagination\":{\"total\":1,\"offset\":0,\"per_page\":25,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerListPlayerItemsResponse>(listPlayerItemsResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsNotNull(deserialized.items, "Not deserialized, items is null");
+            Assert.AreEqual(1, deserialized.items.Length, "Not deserialized, wrong number of items");
+            Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.items[0].id, "Wrong item id");
+            Assert.AreEqual(3, deserialized.items[0].player_id, "Wrong player id");
+            Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.items[0].item_template_id, "Wrong item template id");
+            Assert.AreEqual("stackable", deserialized.items[0].item_type, "Wrong item type");
+            Assert.IsTrue(deserialized.items[0].consumable, "Wrong consumable value");
+            Assert.AreEqual(7, deserialized.items[0].count, "Wrong count");
+            Assert.AreEqual("Health Potion", deserialized.items[0].name, "Wrong name");
+            Assert.IsTrue(deserialized.items[0].deletable, "Wrong deletable value");
+            Assert.IsNotNull(deserialized.pagination, "Not deserialized, pagination is null");
+            Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
+            Assert.AreEqual(25, deserialized.pagination.per_page, "Wrong pagination per_page");
+            Assert.IsNull(deserialized.pagination.next_page, "Wrong pagination next_page");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingGetPlayerItemResponseWithTemplateAndMetadata_Succeeds()
+        {
+            // Given
+            const string getPlayerItemResponse =
+                "{\"success\":true,\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":3,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"instanced\",\"consumable\":false,\"count\":1,\"source\":\"grant\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"template\":{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":0,\"item_type\":\"instanced\",\"consumable\":false,\"deletable\":true},\"metadata\":[{\"key\":\"damage\",\"value\":12,\"type\":\"number\",\"access\":[\"game_api.read\"],\"tags\":[\"combat\"]}]}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerGetPlayerItemResponse>(getPlayerItemResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.id, "Wrong item id");
+            Assert.AreEqual("instanced", deserialized.item_type, "Wrong item type");
+            Assert.IsTrue(deserialized.deletable, "Wrong deletable value");
+            Assert.IsNotNull(deserialized.template, "Not deserialized, template is null");
+            Assert.AreEqual("Sword", deserialized.template.name, "Wrong template name");
+            Assert.AreEqual(42, deserialized.template.game_id, "Wrong template game id");
+            Assert.IsNotNull(deserialized.metadata, "Not deserialized, metadata is null");
+            Assert.AreEqual(1, deserialized.metadata.Length, "Not deserialized, wrong number of metadata entries");
+            Assert.AreEqual("damage", deserialized.metadata[0].key, "Wrong metadata key");
+            Assert.AreEqual(LootLockerMetadataTypes.Number, deserialized.metadata[0].type, "Wrong metadata type");
+            Assert.IsNotNull(deserialized.metadata[0].access, "Not deserialized, metadata access is null");
+            Assert.AreEqual("game_api.read", deserialized.metadata[0].access[0], "Wrong metadata access");
+            Assert.IsNotNull(deserialized.metadata[0].tags, "Not deserialized, metadata tags is null");
+            Assert.AreEqual("combat", deserialized.metadata[0].tags[0], "Wrong metadata tag");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingConsumeItemResponseWithGrantedItems_Succeeds()
+        {
+            // Given
+            const string consumeItemResponse =
+                "{\"success\":true,\"consumed\":true,\"granted\":[{\"source_id\":\"01HBBBBBBBBBBBBBBBBBBBBBBB\",\"count\":2,\"type\":\"currency\",\"name\":\"Gold\",\"code\":\"gold\"}]}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerConsumeItemResponse>(consumeItemResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsTrue(deserialized.consumed, "Wrong consumed value");
+            Assert.IsNotNull(deserialized.granted, "Not deserialized, granted is null");
+            Assert.AreEqual(1, deserialized.granted.Length, "Not deserialized, wrong number of granted items");
+            Assert.AreEqual("01HBBBBBBBBBBBBBBBBBBBBBBB", deserialized.granted[0].source_id, "Wrong granted source id");
+            Assert.AreEqual(2, deserialized.granted[0].count, "Wrong granted count");
+            Assert.AreEqual("currency", deserialized.granted[0].type, "Wrong granted type");
+            Assert.AreEqual("Gold", deserialized.granted[0].name, "Wrong granted name");
+            Assert.AreEqual("gold", deserialized.granted[0].code, "Wrong granted code");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingListItemTemplatesResponse_Succeeds()
+        {
+            // Given
+            const string listItemTemplatesResponse =
+                "{\"success\":true,\"items\":[{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":10,\"item_type\":\"instanced\",\"consumable\":false,\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-01-02T00:00:00Z\"}],\"pagination\":{\"total\":1,\"offset\":0,\"per_page\":25,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerListItemTemplatesResponse>(listItemTemplatesResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsNotNull(deserialized.items, "Not deserialized, items is null");
+            Assert.AreEqual(1, deserialized.items.Length, "Not deserialized, wrong number of item templates");
+            Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.items[0].id, "Wrong item template id");
+            Assert.AreEqual("Sword", deserialized.items[0].name, "Wrong item template name");
+            Assert.AreEqual(42, deserialized.items[0].game_id, "Wrong item template game id");
+            Assert.AreEqual(10, deserialized.items[0].limited, "Wrong item template limited value");
+            Assert.IsTrue(deserialized.items[0].deletable, "Wrong item template deletable value");
+            Assert.IsNotNull(deserialized.pagination, "Not deserialized, pagination is null");
+            Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
+        }
+
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SimpleTypeSerialization_Succeeds()
@@ -450,6 +626,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotEmpty(deserialized.enumArray);
             Assert.AreNotEqual(defaultEnumValue, deserialized.enumArray[0]);
         }
+
     }
 
     class CustomOptions : JsonOptions

@@ -154,8 +154,18 @@ namespace LootLocker.Requests
     /// </summary>
     public class LootLockerConsumeItemRequest
     {
-        /// <summary>The number of items to consume. If omitted, the whole stack is consumed.</summary>
+        /// <summary>
+        /// The number of items to consume. Defaults to 1 when omitted. To consume an entire stack,
+        /// pass the item's current count.
+        /// </summary>
         public int? count { get; set; }
+
+        public bool ShouldSerializecount()
+        {
+            // Omit count entirely when unset so the backend applies its default of 1. This also keeps
+            // the Newtonsoft and ZeroDep JSON backends consistent, since only ZeroDep skips nulls.
+            return count.HasValue;
+        }
     }
 
     /// <summary>
