@@ -6626,7 +6626,142 @@ namespace LootLocker.Requests
             LootLockerAPIManager.DeleteAssetInstanceFromPlayerInventory(forPlayerWithUlid, data, onComplete);
         }
         #endregion
-        
+
+        #region Items
+
+        /// <summary>
+        /// Returns a paginated list of all visible item templates.
+        /// </summary>
+        /// <param name="page">The page of item templates to return. Defaults to 1.</param>
+        /// <param name="perPage">The number of item templates to return per page. Defaults to 25.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListItemTemplates(int page, int perPage, Action<LootLockerListItemTemplatesResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListItemTemplatesResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListItemTemplates(forPlayerWithUlid, page, perPage, onComplete);
+        }
+
+        /// <summary>
+        /// Returns a paginated list of the current player's inventory items, including their item templates.
+        /// </summary>
+        /// <param name="page">The page of items to return. Defaults to 1.</param>
+        /// <param name="perPage">The number of items to return per page. Defaults to 25.</param>
+        /// <param name="name">(Optional) Return only items whose template name starts with the specified value. Set to null to not use this filter.</param>
+        /// <param name="itemType">(Optional) Return only items of the specified type. Set to null to not use this filter.</param>
+        /// <param name="consumable">(Optional) Return only items that are (or are not) consumable. Set to null to not use this filter.</param>
+        /// <param name="sort">(Optional) The field by which to sort the items. Set to null to not use this filter.</param>
+        /// <param name="order">(Optional) The direction in which to sort the items. Set to null to not use this filter.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListPlayerItems(int page, int perPage, string name = null, LootLockerItemType? itemType = null, bool? consumable = null, LootLockerItemSortField? sort = null, LootLockerSortOrder? order = null, Action<LootLockerListPlayerItemsResponse> onComplete = null, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListPlayerItemsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListPlayerItems(forPlayerWithUlid, page, perPage, name, itemType?.ToString(), consumable, sort?.ToString(), order?.ToString(), onComplete);
+        }
+
+        /// <summary>
+        /// Returns a single inventory item for the current player, including its item template.
+        /// </summary>
+        /// <param name="inventoryId">The id of the inventory item to fetch.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlayerItem(string inventoryId, Action<LootLockerGetPlayerItemResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetPlayerItemResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetPlayerItem(forPlayerWithUlid, inventoryId, onComplete);
+        }
+
+        /// <summary>
+        /// Deletes an inventory item from the current player's inventory.
+        /// </summary>
+        /// <param name="inventoryId">The id of the inventory item to delete.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void DeletePlayerItem(string inventoryId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.DeletePlayerItem(forPlayerWithUlid, inventoryId, onComplete);
+        }
+
+        /// <summary>
+        /// Consumes one or more items from a stackable inventory item. If <paramref name="count"/> is null, the whole stack is consumed.
+        /// </summary>
+        /// <param name="inventoryId">The id of the stackable inventory item to consume.</param>
+        /// <param name="count">(Optional) The number of items to consume. If null, the whole stack is consumed.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConsumePlayerItem(string inventoryId, int? count, Action<LootLockerConsumeItemResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerConsumeItemResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerConsumeItemRequest data = new LootLockerConsumeItemRequest { count = count };
+            LootLockerAPIManager.ConsumePlayerItem(forPlayerWithUlid, inventoryId, data, onComplete);
+        }
+
+        /// <summary>
+        /// Splits a stackable inventory item into two stacks, moving <paramref name="count"/> items into a new stack.
+        /// </summary>
+        /// <param name="inventoryId">The id of the stackable inventory item to split.</param>
+        /// <param name="count">The number of items to move into the new stack.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SplitPlayerItemStack(string inventoryId, int count, Action<LootLockerSplitItemStackResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerSplitItemStackResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerSplitItemStackRequest data = new LootLockerSplitItemStackRequest { count = count };
+            LootLockerAPIManager.SplitPlayerItemStack(forPlayerWithUlid, inventoryId, data, onComplete);
+        }
+
+        /// <summary>
+        /// Merges two stacks of the same item into one.
+        /// </summary>
+        /// <param name="sourceInventoryId">The id of the inventory item to merge from.</param>
+        /// <param name="targetInventoryId">The id of the inventory item to merge into.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void MergePlayerItemStacks(string sourceInventoryId, string targetInventoryId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerMergeItemStacksRequest data = new LootLockerMergeItemStacksRequest { source_inventory_id = sourceInventoryId, target_inventory_id = targetInventoryId };
+            LootLockerAPIManager.MergePlayerItemStacks(forPlayerWithUlid, data, onComplete);
+        }
+        #endregion
+
         #region AssetInstance progressions
 
         /// @ingroup AssetInstanceProgressions
