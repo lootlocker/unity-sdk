@@ -6632,8 +6632,8 @@ namespace LootLocker.Requests
         /// <summary>
         /// Returns a paginated list of all visible item templates.
         /// </summary>
-        /// <param name="page">The page of item templates to return. Defaults to 1.</param>
-        /// <param name="perPage">The number of item templates to return per page. Defaults to 25.</param>
+        /// <param name="page">The page of item templates to return.</param>
+        /// <param name="perPage">The number of item templates to return per page.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListItemTemplates(int page, int perPage, Action<LootLockerListItemTemplatesResponse> onComplete, string forPlayerWithUlid = null)
@@ -6650,8 +6650,8 @@ namespace LootLocker.Requests
         /// <summary>
         /// Returns a paginated list of the current player's inventory items, including their item templates.
         /// </summary>
-        /// <param name="page">The page of items to return. Defaults to 1.</param>
-        /// <param name="perPage">The number of items to return per page. Defaults to 25.</param>
+        /// <param name="page">The page of items to return.</param>
+        /// <param name="perPage">The number of items to return per page.</param>
         /// <param name="name">(Optional) Return only items whose template name starts with the specified value. Set to null to not use this filter.</param>
         /// <param name="itemType">(Optional) Return only items of the specified type. Set to null to not use this filter.</param>
         /// <param name="consumable">(Optional) Return only items that are (or are not) consumable. Set to null to not use this filter.</param>
