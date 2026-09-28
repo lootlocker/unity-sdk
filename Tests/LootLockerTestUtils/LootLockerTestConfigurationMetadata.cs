@@ -49,6 +49,8 @@ namespace LootLockerTestConfigurationUtils
             self = 6,
             asset = 7,
             item = 8, // This is the source for asset instances (player inventory items), while the "asset" source is for the asset in general
+            inventory = 9, // This is the source for inventory items
+            item_template = 10, // This is the source for item templates
         };
 
         /// <summary>
