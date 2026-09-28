@@ -1,6 +1,6 @@
 ﻿using System;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
-using LootLocker.Utilities.HTTP;
 
 namespace LootLocker.LootLockerEnums
 {
@@ -23,7 +23,44 @@ namespace LootLocker.LootLockerEnums
         /// <summary>Order by when the item was created.</summary>
         created_at,
         /// <summary>Order by when the item was last updated.</summary>
-        updated_at
+        updated_at,
+        /// <summary>Order by the source that granted the item.</summary>
+        source
+    }
+
+    /// <summary>
+    /// The kind of reward that was granted as a result of a behaviour.
+    /// </summary>
+    public enum LootLockerRewardKind
+    {
+        /// <summary>The reward kind could not be determined.</summary>
+        unknown,
+        /// <summary>An asset.</summary>
+        asset,
+        /// <summary>Progression points.</summary>
+        progression_points,
+        /// <summary>A progression reset.</summary>
+        progression_reset,
+        /// <summary>A currency.</summary>
+        currency,
+        /// <summary>A group.</summary>
+        group,
+        /// <summary>A reward.</summary>
+        reward,
+        /// <summary>A platform key.</summary>
+        platform_key,
+        /// <summary>A publisher currency.</summary>
+        publisher_currency,
+        /// <summary>Publisher progression points.</summary>
+        publisher_progression_points,
+        /// <summary>Player metadata.</summary>
+        player_metadata,
+        /// <summary>A file.</summary>
+        file,
+        /// <summary>A Discord role.</summary>
+        discord_role,
+        /// <summary>An item template.</summary>
+        item_template
     }
 
     /// <summary>
@@ -55,14 +92,11 @@ namespace LootLocker.Requests
         /// <summary>The name of the item template.</summary>
         public string name { get; set; }
 
-        /// <summary>The id of the game this item template belongs to.</summary>
-        public int game_id { get; set; }
-
         /// <summary>Indicates whether this item template is limited in how many of it can exist.</summary>
         public int limited { get; set; }
 
         /// <summary>The type of the item (instanced or stackable).</summary>
-        public string item_type { get; set; }
+        public LootLockerItemType item_type { get; set; }
 
         /// <summary>True if the item can be consumed by the player.</summary>
         public bool consumable { get; set; }
@@ -71,10 +105,10 @@ namespace LootLocker.Requests
         public bool deletable { get; set; }
 
         /// <summary>The time that this item template was created.</summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
-        /// <summary>The time that this item template was last updated.</summary>
-        public string updated_at { get; set; }
+        /// <summary>The time that this item template was last updated, or null if it has never been updated.</summary>
+        public DateTime? updated_at { get; set; }
     }
 
     //==================================================
@@ -96,7 +130,7 @@ namespace LootLocker.Requests
         public string item_template_id { get; set; }
 
         /// <summary>The type of the item (instanced or stackable).</summary>
-        public string item_type { get; set; }
+        public LootLockerItemType item_type { get; set; }
 
         /// <summary>True if the item can be consumed by the player.</summary>
         public bool consumable { get; set; }
@@ -114,10 +148,10 @@ namespace LootLocker.Requests
         public string source { get; set; }
 
         /// <summary>The time that this inventory item was created.</summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
-        /// <summary>The time that this inventory item was last updated.</summary>
-        public string updated_at { get; set; }
+        /// <summary>The time that this inventory item was last updated, or null if it has never been updated.</summary>
+        public DateTime? updated_at { get; set; }
 
         /// <summary>Arbitrary metadata attached to this inventory item.</summary>
         public LootLockerMetadataEntry[] metadata { get; set; }
@@ -135,8 +169,8 @@ namespace LootLocker.Requests
         /// <summary>The number of items granted.</summary>
         public int count { get; set; }
 
-        /// <summary>The type of the granted entry ("item_template", "currency", or "publisher_currency").</summary>
-        public string type { get; set; }
+        /// <summary>The type of the granted entry.</summary>
+        public LootLockerRewardKind type { get; set; }
 
         /// <summary>The name of the granted entry, if applicable.</summary>
         public string name { get; set; }
@@ -232,7 +266,7 @@ namespace LootLocker.Requests
         public string item_template_id { get; set; }
 
         /// <summary>The type of the item (instanced or stackable).</summary>
-        public string item_type { get; set; }
+        public LootLockerItemType item_type { get; set; }
 
         /// <summary>True if the item can be consumed by the player.</summary>
         public bool consumable { get; set; }
@@ -247,10 +281,10 @@ namespace LootLocker.Requests
         public string source { get; set; }
 
         /// <summary>The time that this inventory item was created.</summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
-        /// <summary>The time that this inventory item was last updated.</summary>
-        public string updated_at { get; set; }
+        /// <summary>The time that this inventory item was last updated, or null if it has never been updated.</summary>
+        public DateTime? updated_at { get; set; }
 
         /// <summary>The item template this inventory item is based on.</summary>
         public LootLockerItemTemplate template { get; set; }
@@ -281,89 +315,3 @@ namespace LootLocker.Requests
     }
 }
 
-namespace LootLocker
-{
-    //==================================================
-    // API Class Definition
-    //==================================================
-
-    public partial class LootLockerAPIManager
-    {
-        public static void ListItemTemplates(string forPlayerWithUlid, int page, int perPage, Action<LootLockerListItemTemplatesResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.listItemTemplates;
-
-            var queryParams = new QueryParamaterBuilder();
-            queryParams.Add("page", page);
-            queryParams.Add("per_page", perPage);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void ListPlayerItems(string forPlayerWithUlid, int page, int perPage, string name, string itemType, bool? consumable, string sort, string order, Action<LootLockerListPlayerItemsResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.listPlayerItems;
-
-            var queryParams = new QueryParamaterBuilder();
-            queryParams.Add("page", page);
-            queryParams.Add("per_page", perPage);
-            queryParams.Add("name", name);
-            queryParams.Add("item_type", itemType);
-            if (consumable.HasValue)
-            {
-                queryParams.Add("consumable", consumable.Value.ToString().ToLower());
-            }
-            queryParams.Add("sort", sort);
-            queryParams.Add("order", order);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void GetPlayerItem(string forPlayerWithUlid, string inventoryId, Action<LootLockerGetPlayerItemResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.getPlayerItem;
-
-            string getVariable = endPoint.WithPathParameter(inventoryId);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void DeletePlayerItem(string forPlayerWithUlid, string inventoryId, Action<LootLockerResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.deletePlayerItem;
-
-            string getVariable = endPoint.WithPathParameter(inventoryId);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void ConsumePlayerItem(string forPlayerWithUlid, string inventoryId, LootLockerConsumeItemRequest data, Action<LootLockerConsumeItemResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.consumePlayerItem;
-
-            string getVariable = endPoint.WithPathParameter(inventoryId);
-            string json = LootLockerJson.SerializeObject(data);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void SplitPlayerItemStack(string forPlayerWithUlid, string inventoryId, LootLockerSplitItemStackRequest data, Action<LootLockerSplitItemStackResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.splitPlayerItemStack;
-
-            string getVariable = endPoint.WithPathParameter(inventoryId);
-            string json = LootLockerJson.SerializeObject(data);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void MergePlayerItemStacks(string forPlayerWithUlid, LootLockerMergeItemStacksRequest data, Action<LootLockerResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.mergePlayerItemStacks;
-
-            string json = LootLockerJson.SerializeObject(data);
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-    }
-}
