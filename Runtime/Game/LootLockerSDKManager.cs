@@ -6738,10 +6738,10 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
-        /// Consumes one or more items from a stackable inventory item. If <paramref name="count"/> is null, the whole stack is consumed.
+        /// Consumes one or more items from a stackable inventory item. If <paramref name="count"/> is null, a single item is consumed.
         /// </summary>
         /// <param name="inventoryId">The id of the stackable inventory item to consume.</param>
-        /// <param name="count">(Optional) The number of items to consume. If null, the whole stack is consumed.</param>
+        /// <param name="count">(Optional) The number of items to consume. If null, the backend consumes 1. To consume the whole stack, pass the item's current count.</param>
         /// <param name="onComplete">Delegate for handling the server response</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ConsumePlayerItem(string inventoryId, int? count, Action<LootLockerConsumeItemResponse> onComplete, string forPlayerWithUlid = null)
