@@ -109,6 +109,20 @@ namespace LootLockerTestConfigurationUtils
         [Header("LootLocker Admin API Inventory Operations")]
         public static EndPointClass adminGrantAssetToPlayerInventory = new EndPointClass("/game/#GAMEID#/player/{0}/inventory/grant", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
+        [Header("LootLocker Admin API Item Template Operations")]
+        public static EndPointClass createItemTemplate = new EndPointClass("game/#GAMEID#/templates/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass listItemTemplates = new EndPointClass("game/#GAMEID#/templates/v1", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+        public static EndPointClass getItemTemplate = new EndPointClass("game/#GAMEID#/templates/v1/{0}", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+        public static EndPointClass updateItemTemplate = new EndPointClass("game/#GAMEID#/templates/v1/{0}", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
+        public static EndPointClass deleteItemTemplate = new EndPointClass("game/#GAMEID#/templates/v1/{0}", LootLockerHTTPMethod.DELETE, LootLockerCallerRole.Admin);
+        public static EndPointClass grantItemTemplate = new EndPointClass("game/#GAMEID#/templates/v1/grant", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass setItemTemplateAudiences = new EndPointClass("game/#GAMEID#/templates/v1/{0}/audiences", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass adminListPlayerItems = new EndPointClass("game/#GAMEID#/templates/v1/players/{0}/inventory", LootLockerHTTPMethod.GET, LootLockerCallerRole.Admin);
+        public static EndPointClass adminConsumePlayerItem = new EndPointClass("game/#GAMEID#/templates/v1/players/{0}/inventory/{1}/consume", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass adminDeletePlayerItem = new EndPointClass("game/#GAMEID#/templates/v1/players/{0}/inventory/{1}", LootLockerHTTPMethod.DELETE, LootLockerCallerRole.Admin);
+        public static EndPointClass adminSplitPlayerItemStack = new EndPointClass("game/#GAMEID#/templates/v1/players/{0}/inventory/{1}/split", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass adminMergePlayerItemStacks = new EndPointClass("game/#GAMEID#/templates/v1/players/{0}/inventory/merge", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
         [Header("LootLocker Admin API Metadata Operations")]
         public static EndPointClass metadataOperations = new EndPointClass("game/#GAMEID#/metadata", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
 
