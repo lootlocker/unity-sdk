@@ -407,11 +407,13 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.items[0].id, "Wrong item id");
             Assert.AreEqual(3, deserialized.items[0].player_id, "Wrong player id");
             Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.items[0].item_template_id, "Wrong item template id");
-            Assert.AreEqual("stackable", deserialized.items[0].item_type, "Wrong item type");
+            Assert.AreEqual(LootLockerItemType.stackable, deserialized.items[0].item_type, "Wrong item type");
             Assert.IsTrue(deserialized.items[0].consumable, "Wrong consumable value");
             Assert.AreEqual(7, deserialized.items[0].count, "Wrong count");
             Assert.AreEqual("Health Potion", deserialized.items[0].name, "Wrong name");
             Assert.IsTrue(deserialized.items[0].deletable, "Wrong deletable value");
+            Assert.AreNotEqual(default(DateTime), deserialized.items[0].created_at, "Wrong created_at value");
+            Assert.IsNull(deserialized.items[0].updated_at, "Wrong updated_at value");
             Assert.IsNotNull(deserialized.pagination, "Not deserialized, pagination is null");
             Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
             Assert.AreEqual(25, deserialized.pagination.per_page, "Wrong pagination per_page");
@@ -431,11 +433,12 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsNotNull(deserialized, "Not deserialized, is null");
             Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.id, "Wrong item id");
-            Assert.AreEqual("instanced", deserialized.item_type, "Wrong item type");
+            Assert.AreEqual(LootLockerItemType.instanced, deserialized.item_type, "Wrong item type");
             Assert.IsTrue(deserialized.deletable, "Wrong deletable value");
+            Assert.AreNotEqual(default(DateTime), deserialized.created_at, "Wrong created_at value");
             Assert.IsNotNull(deserialized.template, "Not deserialized, template is null");
             Assert.AreEqual("Sword", deserialized.template.name, "Wrong template name");
-            Assert.AreEqual(42, deserialized.template.game_id, "Wrong template game id");
+            Assert.AreEqual(LootLockerItemType.instanced, deserialized.template.item_type, "Wrong template item type");
             Assert.IsNotNull(deserialized.metadata, "Not deserialized, metadata is null");
             Assert.AreEqual(1, deserialized.metadata.Length, "Not deserialized, wrong number of metadata entries");
             Assert.AreEqual("damage", deserialized.metadata[0].key, "Wrong metadata key");
@@ -463,7 +466,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, deserialized.granted.Length, "Not deserialized, wrong number of granted items");
             Assert.AreEqual("01HBBBBBBBBBBBBBBBBBBBBBBB", deserialized.granted[0].source_id, "Wrong granted source id");
             Assert.AreEqual(2, deserialized.granted[0].count, "Wrong granted count");
-            Assert.AreEqual("currency", deserialized.granted[0].type, "Wrong granted type");
+            Assert.AreEqual(LootLockerRewardKind.currency, deserialized.granted[0].type, "Wrong granted type");
             Assert.AreEqual("Gold", deserialized.granted[0].name, "Wrong granted name");
             Assert.AreEqual("gold", deserialized.granted[0].code, "Wrong granted code");
         }
@@ -484,9 +487,11 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, deserialized.items.Length, "Not deserialized, wrong number of item templates");
             Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.items[0].id, "Wrong item template id");
             Assert.AreEqual("Sword", deserialized.items[0].name, "Wrong item template name");
-            Assert.AreEqual(42, deserialized.items[0].game_id, "Wrong item template game id");
+            Assert.AreEqual(LootLockerItemType.instanced, deserialized.items[0].item_type, "Wrong item template item type");
             Assert.AreEqual(10, deserialized.items[0].limited, "Wrong item template limited value");
             Assert.IsTrue(deserialized.items[0].deletable, "Wrong item template deletable value");
+            Assert.AreNotEqual(default(DateTime), deserialized.items[0].created_at, "Wrong item template created_at value");
+            Assert.IsNotNull(deserialized.items[0].updated_at, "Wrong item template updated_at value");
             Assert.IsNotNull(deserialized.pagination, "Not deserialized, pagination is null");
             Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
         }

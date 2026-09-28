@@ -6644,7 +6644,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ListItemTemplates(forPlayerWithUlid, page, perPage, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.listItemTemplates;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (page > 0)
+                queryParams.Add("page", page);
+            if (perPage > 0)
+                queryParams.Add("per_page", perPage);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6667,7 +6675,24 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ListPlayerItems(forPlayerWithUlid, page, perPage, name, itemType?.ToString(), consumable, sort?.ToString(), order?.ToString(), onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.listPlayerItems;
+
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (page > 0)
+                queryParams.Add("page", page);
+            if (perPage > 0)
+                queryParams.Add("per_page", perPage);
+            queryParams.Add("name", name);
+            if (itemType.HasValue)
+                queryParams.Add("item_type", itemType.Value.ToString());
+            if (consumable.HasValue)
+                queryParams.Add("consumable", consumable.Value.ToString().ToLower());
+            if (sort.HasValue)
+                queryParams.Add("sort", sort.Value.ToString());
+            if (order.HasValue)
+                queryParams.Add("order", order.Value.ToString());
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6684,7 +6709,11 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetPlayerItem(forPlayerWithUlid, inventoryId, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.getPlayerItem;
+
+            string getVariable = endPoint.WithPathParameter(inventoryId);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6701,7 +6730,11 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.DeletePlayerItem(forPlayerWithUlid, inventoryId, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.deletePlayerItem;
+
+            string getVariable = endPoint.WithPathParameter(inventoryId);
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6719,8 +6752,12 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerConsumeItemRequest data = new LootLockerConsumeItemRequest { count = count };
-            LootLockerAPIManager.ConsumePlayerItem(forPlayerWithUlid, inventoryId, data, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.consumePlayerItem;
+
+            string getVariable = endPoint.WithPathParameter(inventoryId);
+            string json = LootLockerJson.SerializeObject(new LootLockerConsumeItemRequest { count = count });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6738,8 +6775,12 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerSplitItemStackRequest data = new LootLockerSplitItemStackRequest { count = count };
-            LootLockerAPIManager.SplitPlayerItemStack(forPlayerWithUlid, inventoryId, data, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.splitPlayerItemStack;
+
+            string getVariable = endPoint.WithPathParameter(inventoryId);
+            string json = LootLockerJson.SerializeObject(new LootLockerSplitItemStackRequest { count = count });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, getVariable, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// <summary>
@@ -6757,8 +6798,11 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerMergeItemStacksRequest data = new LootLockerMergeItemStacksRequest { source_inventory_id = sourceInventoryId, target_inventory_id = targetInventoryId };
-            LootLockerAPIManager.MergePlayerItemStacks(forPlayerWithUlid, data, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.mergePlayerItemStacks;
+
+            string json = LootLockerJson.SerializeObject(new LootLockerMergeItemStacksRequest { source_inventory_id = sourceInventoryId, target_inventory_id = targetInventoryId });
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         #endregion
 
