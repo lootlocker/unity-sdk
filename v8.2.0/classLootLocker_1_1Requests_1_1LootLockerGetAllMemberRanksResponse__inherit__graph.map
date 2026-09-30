@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerGetAllMemberRanksResponse" name="LootLocker.Requests.LootLockerGetAllMemberRanksResponse">
+<area shape="rect" id="Node000001" title="Response containing all leaderboard ranks for a specific member across all leaderboards." alt="" coords="5,79,267,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="59,5,213,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,44,139,79,133,79,133,44"/>
+</map>

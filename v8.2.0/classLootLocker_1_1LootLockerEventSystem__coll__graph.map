@@ -1,0 +1,5 @@
+<map id="LootLocker.LootLockerEventSystem" name="LootLocker.LootLockerEventSystem">
+<area shape="rect" id="Node000001" title="Centralized event system for the LootLocker SDK Manages event subscriptions, event firing,..." alt="" coords="5,79,208,119"/>
+<area shape="rect" id="Node000002" href="$interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="35,5,179,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>

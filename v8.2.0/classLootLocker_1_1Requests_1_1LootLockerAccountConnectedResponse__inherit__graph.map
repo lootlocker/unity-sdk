@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerAccountConnectedResponse" name="LootLocker.Requests.LootLockerAccountConnectedResponse">
+<area shape="rect" id="Node000001" title="Response returned after successfully connecting an account provider to the current player&#39;s LootLocke..." alt="" coords="5,79,253,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="52,5,207,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,44,132,79,127,79,127,44"/>
+</map>

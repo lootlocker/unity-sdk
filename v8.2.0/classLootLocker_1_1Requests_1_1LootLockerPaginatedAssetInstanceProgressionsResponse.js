@@ -1,0 +1,6 @@
+var classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse =
+[
+    [ "LootLockerAssetInstanceProgression", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression" ],
+    [ "items", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse.html#ab4587dbd3f8eaf8d9a735a83b5cc9fdd", null ],
+    [ "pagination", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse.html#a973652b9dc293fbda5341d2a30a89791", null ]
+];

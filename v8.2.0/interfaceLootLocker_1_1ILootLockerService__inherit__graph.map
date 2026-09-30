@@ -1,0 +1,11 @@
+<map id="LootLocker.ILootLockerService" name="LootLocker.ILootLockerService">
+<area shape="rect" id="Node000001" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="5,106,223,131"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerEventSystem.html" title="Centralized event system for the LootLocker SDK Manages event subscriptions, event firing,..." alt="" coords="285,5,487,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,98,270,55,308,43,310,48,272,60,158,103"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1LootLockerPresenceManager.html" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ..." alt="" coords="274,69,498,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,103,273,99,274,104,237,108"/>
+<area shape="rect" id="Node000004" href="$classLootLocker_1_1LootLockerStateData.html" title="Manages player state data persistence and session lifecycle." alt="" coords="271,134,501,159"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,129,271,132,270,137,236,134"/>
+<area shape="rect" id="Node000005" href="$classLootLocker_1_1RateLimiter.html" title="Rate limiter service for managing HTTP request rate limiting." alt="" coords="301,183,471,209"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="164,134,271,168,322,181,321,186,270,173,162,139"/>
+</map>

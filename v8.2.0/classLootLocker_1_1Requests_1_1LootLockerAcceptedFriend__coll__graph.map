@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerAcceptedFriend" name="LootLocker.Requests.LootLockerAcceptedFriend">
+<area shape="rect" id="Node000001" title="Represents an accepted friend with additional friend request metadata /summary&gt;" alt="" coords="5,79,192,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerFriend.html" title="Represents a friend in the friend list /summary&gt;" alt="" coords="33,5,165,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,44,101,79,96,79,96,44"/>
+</map>

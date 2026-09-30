@@ -1,0 +1,7 @@
+<map id="LootLocker.Requests.LootLockerMetadataEntry" name="LootLocker.Requests.LootLockerMetadataEntry">
+<area shape="rect" id="Node000001" title="/summary&gt;" alt="" coords="32,5,219,45"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerMetadataOperation.html" title="A metadata entry combined with the action to perform on it (create, update, delete)." alt="" coords="30,93,221,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,59,128,93,123,93,123,59"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1Requests_1_1LootLockerInternalMetadataOperationWithStringEnums.html" title="An internal representation of a metadata operation with string&#45;typed enum fields, used for serializin..." alt="" coords="5,181,245,236"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="128,147,128,181,123,181,123,147"/>
+</map>

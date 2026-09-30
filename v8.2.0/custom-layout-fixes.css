@@ -1,0 +1,234 @@
+/* Custom CSS fixes for LootLocker Unity SDK documentation layout issues */
+
+/* ─── Sidebar width: 50% wider than the doxygen-awesome default (335px) ─── */
+:root {
+    --side-nav-fixed-width: 500px !important;
+}
+/* Remove doxygen's built-in horizontal nav bar from the document flow.
+   It is replaced by our custom #ll-topnav. Its float was causing #container
+   to start at ~500px, then #doc-content's own margin-left added another
+   ~500px, creating a ~1000px double-offset of the main content. */
+#main-nav {
+    display: none !important;
+}
+/* Hide items and restore indent levels set by nav-customization.js */
+#nav-tree-contents .ll-nav-hidden {
+    display: none !important;
+}
+
+/* Fix for excessive top spacing in sidebar-only doxygen-awesome theme */
+html {
+    /* Remove top spacing for sidebar-only layout - no header needed */
+    --top-height: 0px !important;
+}
+
+/* Ensure body and html have proper height for sidebar extension */
+html, body {
+    height: 100% !important;
+    min-height: 100vh !important;
+}
+
+/* Ensure proper content positioning - REMOVE height constraints that were truncating content */
+#doc-content {
+    margin-top: 0 !important;
+    padding-top: var(--spacing-medium);
+    /* Remove any height constraints that prevent full content display */
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Fix main content area positioning */
+div.contents {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    /* Ensure content can expand to full height */
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Override doxygen-awesome sidebar-only theme hiding of title area */
+#top {
+    display: block !important;
+    margin-bottom: 0 !important; /* Override the negative margin that hides the logo */
+    height: auto !important; /* Let it size naturally */
+    max-width: 100% !important;
+    overflow: hidden !important; /* Keep content contained */
+    border-bottom: none !important;
+    padding: 8px !important; /* Add some padding */
+}
+
+/* Adjust title area to prevent excessive height */
+#titlearea {
+    min-height: auto !important;
+    padding: 8px 0 !important; /* Reduce padding to minimize space */
+    /* Ensure title area fits within sidebar width */
+    width: 100% !important;
+    max-width: 500px !important; /* Match new sidebar width */
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    /* Fix z-index to ensure title area appears above nav tree */
+    position: relative !important;
+    z-index: 10 !important;
+    background: var(--side-nav-background) !important;
+    border: none !important;
+    margin: 0 !important; /* Remove any margins */
+}
+
+/* Fix title area table layout to prevent overflow */
+#titlearea table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important; /* Use fixed layout for better control */
+    margin: 0 !important;
+    /* Ensure table is visible */
+    position: relative !important;
+    z-index: 12 !important;
+    border-collapse: collapse !important;
+}
+
+/* Constrain project info to fit within sidebar */
+#projectalign {
+    width: auto !important;
+    max-width: calc(100% - 90px) !important; /* Account for smaller logo width */
+    overflow: hidden !important;
+    vertical-align: top !important;
+    padding-left: 0 !important;
+}
+
+#projectname, #projectbrief {
+    width: auto !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    font-size: 0.9em !important; /* Slightly smaller text */
+    line-height: 1.2 !important;
+    margin: 2px 0 !important; /* Reduce margins */
+}
+
+/* Ensure logo and project info are properly aligned */
+#projectlogo {
+    width: 80px !important; /* Fixed small width for logo */
+    max-width: 80px !important;
+    padding: 0 8px 0 0 !important;
+    vertical-align: top !important;
+    position: relative !important;
+    z-index: 15 !important;
+}
+
+#projectlogo img {
+    max-height: 40px !important; /* Smaller logo */
+    width: auto !important;
+    max-width: 72px !important; /* Fit within container */
+    display: block !important;
+    position: relative !important;
+    z-index: 20 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix potential spacing issues with search box */
+#MSearchBox {
+    margin-top: 3px !important; /* Reduced from var(--spacing-small) */
+    margin-bottom: 3px !important; /* Reduced from var(--spacing-small) */
+    /* Ensure search box fits within sidebar */
+    width: calc(100% - 32px) !important;
+    max-width: calc(100% - 32px) !important;
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+}
+
+/* Fix search box positioning elements */
+.MSearchBoxInactive, .MSearchBoxActive {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Constrain search box internal elements */
+#MSearchField {
+    width: calc(100% - 40px) !important;
+    max-width: calc(100% - 40px) !important;
+}
+
+/* Fix right-aligned elements in search */
+#titlearea .right {
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Ensure consistent spacing in main content */
+@media screen and (min-width: 768px) {
+    #doc-content {
+        margin-left: 0;
+        padding-left: var(--spacing-medium);
+        /* Critical: ensure no height restrictions on larger screens */
+        height: auto !important;
+        overflow: visible !important;
+    }
+    
+    /* Extend sidebar to full document height */
+    #nav-tree, #side-nav {
+        min-height: 100vh !important; /* At least viewport height */
+        height: 100% !important; /* Full document height */
+        top: 0px !important;
+        background: var(--side-nav-background) !important;
+        border-right: 1px solid var(--separator-color) !important; /* Extend border full height */
+    }
+    
+    /* Ensure nav tree doesn't overlap title area */
+    #nav-tree {
+        margin-top: 10px !important; /* Minimal gap after search box */
+        min-height: calc(100vh - 10px) !important; /* At least viewport height minus margin */
+        height: calc(100% - 10px) !important; /* Full height minus margin */
+        z-index: 5 !important;
+        background: var(--side-nav-background) !important;
+    }
+    
+    /* Fix sidebar positioning and ensure it extends full height */
+    #side-nav {
+        min-height: 100vh !important; /* At least viewport height */
+        height: 100% !important; /* Match document height */
+        top: 0px !important;
+        position: fixed !important;
+        background: var(--side-nav-background) !important;
+        border-right: 1px solid var(--separator-color) !important;
+    }
+}
+
+/* Ensure sidebar extends on smaller screens too */
+@media screen and (max-width: 767px) {
+    #side-nav {
+        min-height: 100vh !important;
+        height: 100% !important;
+        background: var(--side-nav-background) !important;
+        border-right: 1px solid var(--separator-color) !important;
+    }
+}
+
+/* Ensure main document structure supports full-height sidebar */
+#MSearchSelectWindow, .SelectionMark {
+    z-index: 9999 !important; /* Ensure search results appear above sidebar */
+}
+
+/* Alternative approach: Use pseudo-element to extend sidebar background */
+#side-nav::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: -100vh !important; /* Extend well below viewport */
+    background: var(--side-nav-background) !important;
+    border-right: 1px solid var(--separator-color) !important;
+    z-index: -1 !important; /* Behind sidebar content */
+}
+/* Group pages: suppress the auto-generated "Detailed Description" h2 heading.
+   title="" in DoxygenLayout.xml should suppress it but some Doxygen versions
+   still emit <h2 class="groupheader"><a id="details"></a>Detailed Description</h2>.
+   Target it via the anchor Doxygen always inserts inside it. */
+h2.groupheader:has(#details) {
+    display: none !important;
+}

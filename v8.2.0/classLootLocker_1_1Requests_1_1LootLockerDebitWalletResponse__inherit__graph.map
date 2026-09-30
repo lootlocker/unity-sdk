@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerDebitWalletResponse" name="LootLocker.Requests.LootLockerDebitWalletResponse">
+<area shape="rect" id="Node000001" title="Response returned after debiting an amount from a wallet, showing the resulting balance." alt="" coords="5,79,208,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="29,5,184,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="LootLocker.Requests.LootLockerCatalogEntry" name="LootLocker.Requests.LootLockerCatalogEntry">
+<area shape="rect" id="Node000001" title="A single entry in a LootLocker catalog, combining entity metadata with prices and store listings." alt="" coords="5,77,192,117"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdEntry.html" title="A catalog entry with entity details inlined directly." alt="" coords="251,5,489,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,71,239,55,286,43,287,48,241,60,182,76"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesResponse_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="249,70,491,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,95,248,95,248,100,206,100"/>
+<area shape="rect" id="Node000004" href="$classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesV2Response_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="240,149,500,203"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="182,119,276,146,274,151,181,124"/>
+</map>

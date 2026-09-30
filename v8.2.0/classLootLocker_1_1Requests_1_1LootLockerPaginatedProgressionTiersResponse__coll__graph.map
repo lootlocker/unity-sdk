@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerPaginatedProgressionTiersResponse" name="LootLocker.Requests.LootLockerPaginatedProgressionTiersResponse">
+<area shape="rect" id="Node000001" title="Response containing a paginated list of tiers for a specific progression." alt="" coords="5,79,241,133"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="46,5,201,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,44,126,79,121,79,121,44"/>
+</map>
