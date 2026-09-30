@@ -124,6 +124,10 @@ function Initialize-TestProject {
     if (-not [string]::IsNullOrEmpty($scriptingDefines)) {
         $psContent += $nl + '  scriptingDefineSymbols:' + $nl + '    1: ' + $scriptingDefines
     }
+    if ($UseLocalEnv) {
+        # The local devenv is plain http; Unity blocks insecure connections unless this is set.
+        $psContent += $nl + '  insecureHttpOption: 2'
+    }
     [IO.File]::WriteAllText((Join-Path $TempProject 'ProjectSettings\ProjectSettings.asset'), $psContent)
 }
 
