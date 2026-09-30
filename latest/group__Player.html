@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -628,6 +628,7 @@ $(document).ready(function(){initNavTree('group__Player.html',''); initResizable
 </div><div class="memdoc">
 
 <p>Get the players inventory. </p>
+<p>Operates on <b>assets</b> and <b>asset instances</b>. For the item-based inventory, see ListPlayerInventoryItems and friends, which deal with <b>items</b> and <b>item templates</b> and are a separate system. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">count</td><td>Amount of assets to retrieve</td></tr>
@@ -992,6 +993,7 @@ To fetch specific metadata keys: <code>request.includes.metadata = new LootLocke
   </table>
   </dd>
 </dl>
+<p>Operates on <b>assets</b> and <b>asset instances</b>. For the item-based inventory, see ListPlayerInventoryItems and friends, which deal with <b>items</b> and <b>item templates</b> and are a separate system. </p>
 
 </div>
 </div>
@@ -1030,6 +1032,7 @@ To fetch specific metadata keys: <code>request.includes.metadata = new LootLocke
 </div><div class="memdoc">
 
 <p>List player inventory with default parameters (no filters, first page, default page size). </p>
+<p>Operates on <b>assets</b> and <b>asset instances</b>. For the item-based inventory, see ListPlayerInventoryItems and friends, which deal with <b>items</b> and <b>item templates</b> and are a separate system. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>

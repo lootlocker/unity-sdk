@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerConsumeInventoryItemResponse" name="LootLocker.Requests.LootLockerConsumeInventoryItemResponse">
+<area shape="rect" id="Node000001" title="Response containing the result of consuming an item, including any items granted as a result." alt="" coords="5,79,285,119"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="68,5,223,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,44,148,79,143,79,143,44"/>
+</map>

@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['savedbutinactive_0',['SavedButInactive',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830afc8e5ea09d47efb2edfa091d8f782a63',1,'LootLocker::Requests']]],
-  ['servererror_1',['ServerError',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830a7d65c64901711bc2cd2a33ff2641fbe9',1,'LootLocker::Requests']]],
-  ['sessionexpired_2',['SessionExpired',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830a6dce5c5e5103a68c8b614613db57b3a5',1,'LootLocker::Requests']]],
-  ['signedinandconnected_3',['SignedInAndConnected',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830ae20c79275fac9a3dca35cfdfef95a4ec',1,'LootLocker::Requests']]],
-  ['singlesession_4',['SingleSession',['../namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204a7f38d7b441417b213701c616f7641745',1,'LootLocker']]],
-  ['skipped_5',['skipped',['../namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a',1,'LootLocker::LootLockerEnums']]]
+  ['ready_0',['Ready',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81ae7d31fc0602fb2ede144d18cdffd816b',1,'LootLocker']]],
+  ['refund_5ffailed_1',['refund_failed',['../namespaceLootLocker_1_1LootLockerEnums.html#a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114',1,'LootLocker::LootLockerEnums']]],
+  ['removed_2',['removed',['../namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711',1,'LootLocker::LootLockerEnums']]],
+  ['resetting_3',['Resetting',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81a84ba6b6de6447541f9cdfa184d1d2792',1,'LootLocker']]],
+  ['reward_4',['reward',['../namespaceLootLocker_1_1LootLockerEnums.html#a19684afe5d90f9fcb3daa619efc0db75af9b11ed03ce21394fd0e5b19ae2d3873',1,'LootLocker::LootLockerEnums']]]
 ];

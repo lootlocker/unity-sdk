@@ -12,10 +12,11 @@ var searchData=
   ['deletekeyvaluepairforassetinstances_9',['DeleteKeyValuePairForAssetInstances',['../group__AssetInstance.html#gaf84a41fc88d67074860fac0aaeefbdb9',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['deleteplayer_10',['DeletePlayer',['../group__Player.html#ga973ec828fd87841c4fb01b2ed53cd3f6',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['deleteplayerfile_11',['DeletePlayerFile',['../group__PlayerFiles.html#ga09fbbb0a732057ab40e4a40e2ccc2a40',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['deleteplayerprogression_12',['DeletePlayerProgression',['../group__PlayerProgressions.html#ga3da0f07d698cb7eaeda271af912452d6',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['deletinganassetcandidate_13',['DeletingAnAssetCandidate',['../group__UserGeneratedContent.html#gab502b3231d9a711ad37f551dd7234331',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['disconnectaccount_14',['DisconnectAccount',['../group__ConnectedAccounts.html#ga34c0c8138ae068fec24414d2e4f42eed',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['disconnectall_15',['DisconnectAll',['../classLootLocker_1_1LootLockerPresenceManager.html#a00dfbf117bb89d4ce7b5f4d991488ef1',1,'LootLocker::LootLockerPresenceManager']]],
-  ['disconnectpresence_16',['DisconnectPresence',['../classLootLocker_1_1LootLockerPresenceManager.html#a26a47a0521d372ab008e3e6a448801c6',1,'LootLocker::LootLockerPresenceManager']]],
-  ['dispose_17',['Dispose',['../classLootLocker_1_1LootLockerPresenceClient.html#a74d9e3e137834fb86d711f0705458e01',1,'LootLocker::LootLockerPresenceClient']]]
+  ['deleteplayerfilebykey_12',['DeletePlayerFileByKey',['../group__PlayerFiles.html#ga5e01aa04238d42dad065b6b2efb0b6e0',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deleteplayerprogression_13',['DeletePlayerProgression',['../group__PlayerProgressions.html#ga3da0f07d698cb7eaeda271af912452d6',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['deletinganassetcandidate_14',['DeletingAnAssetCandidate',['../group__UserGeneratedContent.html#gab502b3231d9a711ad37f551dd7234331',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['disconnectaccount_15',['DisconnectAccount',['../group__ConnectedAccounts.html#ga34c0c8138ae068fec24414d2e4f42eed',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['disconnectall_16',['DisconnectAll',['../classLootLocker_1_1LootLockerPresenceManager.html#a00dfbf117bb89d4ce7b5f4d991488ef1',1,'LootLocker::LootLockerPresenceManager']]],
+  ['disconnectpresence_17',['DisconnectPresence',['../classLootLocker_1_1LootLockerPresenceManager.html#a26a47a0521d372ab008e3e6a448801c6',1,'LootLocker::LootLockerPresenceManager']]],
+  ['dispose_18',['Dispose',['../classLootLocker_1_1LootLockerPresenceClient.html#a74d9e3e137834fb86d711f0705458e01',1,'LootLocker::LootLockerPresenceClient']]]
 ];

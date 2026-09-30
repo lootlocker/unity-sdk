@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -211,6 +211,35 @@ $(document).ready(function(){initNavTree('group__SDKCustomization.html',''); ini
 <p>Override SDK internals for testing or advanced integration scenarios. </p>
 <p>Includes state-writer injection, reset, and lifecycle introspection helpers. </p>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="gab9c178447a1a1d8a1c4d6858fb246d8f" name="gab9c178447a1a1d8a1c4d6858fb246d8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab9c178447a1a1d8a1c4d6858fb246d8f">&#9670;&#160;</a></span>GetStateWriter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html">ILootLockerStateWriter</a> LootLocker.Requests.LootLockerSDKManager.GetStateWriter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current state writer used by the SDK. </p>
+<p>This allows you to access the current implementation of ILootLockerStateWriter used for saving and loading player state data.</p>
+<dl class="section return"><dt>Returns</dt><dd>The current state writer used by the SDK.</dd></dl>
+
+</div>
+</div>
 <a id="gac4b0c1dc1152b98b89013231e4356546" name="gac4b0c1dc1152b98b89013231e4356546"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac4b0c1dc1152b98b89013231e4356546">&#9670;&#160;</a></span>ResetSDK()</h2>
 
@@ -242,6 +271,9 @@ $(document).ready(function(){initNavTree('group__SDKCustomization.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:gab9c178447a1a1d8a1c4d6858fb246d8f" id="r_gab9c178447a1a1d8a1c4d6858fb246d8f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html">ILootLockerStateWriter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SDKCustomization.html#gab9c178447a1a1d8a1c4d6858fb246d8f">LootLocker.Requests.LootLockerSDKManager.GetStateWriter</a> ()</td></tr>
+<tr class="memdesc:gab9c178447a1a1d8a1c4d6858fb246d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current state writer used by the SDK.  <br /></td></tr>
+<tr class="separator:gab9c178447a1a1d8a1c4d6858fb246d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac4b0c1dc1152b98b89013231e4356546" id="r_gac4b0c1dc1152b98b89013231e4356546"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SDKCustomization.html#gac4b0c1dc1152b98b89013231e4356546">LootLocker.Requests.LootLockerSDKManager.ResetSDK</a> ()</td></tr>
 <tr class="memdesc:gac4b0c1dc1152b98b89013231e4356546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the entire <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK, clearing all services and state.  <br /></td></tr>
 <tr class="separator:gac4b0c1dc1152b98b89013231e4356546"><td class="memSeparator" colspan="2">&#160;</td></tr>

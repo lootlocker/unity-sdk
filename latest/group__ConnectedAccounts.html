@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -479,6 +479,110 @@ $(document).ready(function(){initNavTree('group__ConnectedAccounts.html',''); in
 
 </div>
 </div>
+<a id="gab7ceeefacd448995bdd2e6d9ec68c5ae" name="gab7ceeefacd448995bdd2e6d9ec68c5ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab7ceeefacd448995bdd2e6d9ec68c5ae">&#9670;&#160;</a></span>ConnectGooglePlayGamesAccount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ConnectGooglePlayGamesAccount </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>authCode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Connect a Google Play Games account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Google Play Games account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Google Play Games account is linked into. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">authCode</td><td>The auth code from Google Play Games sign in</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaaacbcef8fb0cb71592aad5e65a02a075" name="gaaacbcef8fb0cb71592aad5e65a02a075"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaaacbcef8fb0cb71592aad5e65a02a075">&#9670;&#160;</a></span>ConnectNintendoAccount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ConnectNintendoAccount </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>nsaIdToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Connect a Nintendo Switch account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Nintendo Switch account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Nintendo Switch account is linked into. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nsaIdToken</td><td>The NSA ID token from Nintendo Switch sign in</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ga0d27c038db53f549bcd2256f7c89e079" name="ga0d27c038db53f549bcd2256f7c89e079"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga0d27c038db53f549bcd2256f7c89e079">&#9670;&#160;</a></span>ConnectPlaystationAccount()</h2>
 
@@ -597,6 +701,66 @@ $(document).ready(function(){initNavTree('group__ConnectedAccounts.html',''); in
 
 </div>
 </div>
+<a id="gad6b69cd4effff7ce0eb075f80f5be1a2" name="gad6b69cd4effff7ce0eb075f80f5be1a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad6b69cd4effff7ce0eb075f80f5be1a2">&#9670;&#160;</a></span>ConnectSteamAccount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ConnectSteamAccount </td>
+          <td>(</td>
+          <td class="paramtype">ref byte[]&#160;</td>
+          <td class="paramname"><em>ticket</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>ticketSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Connect a Steam account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account using a raw Steam session ticket (byte array). </p>
+<p>Internally converts the ticket to hex-encoded format before sending. IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Steam account is linked into</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ticket</td><td>The raw Steam session ticket byte array</td></tr>
+    <tr><td class="paramname">ticketSize</td><td>The size of the ticket</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="gaf5fa492f7b4243267ec5c1a89cdd2205" name="gaf5fa492f7b4243267ec5c1a89cdd2205"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaf5fa492f7b4243267ec5c1a89cdd2205">&#9670;&#160;</a></span>ConnectTwitchAccount()</h2>
 
@@ -641,6 +805,58 @@ $(document).ready(function(){initNavTree('group__ConnectedAccounts.html',''); in
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">authorizationCode</td><td>The Authorization Code from Twitch sign in</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga56883527a1efa664288cfa3a547c2638" name="ga56883527a1efa664288cfa3a547c2638"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga56883527a1efa664288cfa3a547c2638">&#9670;&#160;</a></span>ConnectXboxAccount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.ConnectXboxAccount </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>xboxUserToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Connect an Xbox account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Xbox account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Xbox account is linked into. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xboxUserToken</td><td>The Xbox user token</td></tr>
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
     <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
   </table>
@@ -834,6 +1050,18 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf5fa492f7b4243267ec5c1a89cdd2205" id="r_gaf5fa492f7b4243267ec5c1a89cdd2205"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#gaf5fa492f7b4243267ec5c1a89cdd2205">LootLocker.Requests.LootLockerSDKManager.ConnectTwitchAccount</a> (string authorizationCode, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gaf5fa492f7b4243267ec5c1a89cdd2205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect a Twitch Account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Twitch account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Twitch account is linked into.  <br /></td></tr>
 <tr class="separator:gaf5fa492f7b4243267ec5c1a89cdd2205"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad6b69cd4effff7ce0eb075f80f5be1a2" id="r_gad6b69cd4effff7ce0eb075f80f5be1a2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#gad6b69cd4effff7ce0eb075f80f5be1a2">LootLocker.Requests.LootLockerSDKManager.ConnectSteamAccount</a> (ref byte[] ticket, uint ticketSize, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gad6b69cd4effff7ce0eb075f80f5be1a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect a Steam account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account using a raw Steam session ticket (byte array).  <br /></td></tr>
+<tr class="separator:gad6b69cd4effff7ce0eb075f80f5be1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56883527a1efa664288cfa3a547c2638" id="r_ga56883527a1efa664288cfa3a547c2638"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#ga56883527a1efa664288cfa3a547c2638">LootLocker.Requests.LootLockerSDKManager.ConnectXboxAccount</a> (string xboxUserToken, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga56883527a1efa664288cfa3a547c2638"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect an Xbox account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Xbox account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Xbox account is linked into.  <br /></td></tr>
+<tr class="separator:ga56883527a1efa664288cfa3a547c2638"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaacbcef8fb0cb71592aad5e65a02a075" id="r_gaaacbcef8fb0cb71592aad5e65a02a075"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#gaaacbcef8fb0cb71592aad5e65a02a075">LootLocker.Requests.LootLockerSDKManager.ConnectNintendoAccount</a> (string nsaIdToken, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaaacbcef8fb0cb71592aad5e65a02a075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect a Nintendo Switch account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Nintendo Switch account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Nintendo Switch account is linked into.  <br /></td></tr>
+<tr class="separator:gaaacbcef8fb0cb71592aad5e65a02a075"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab7ceeefacd448995bdd2e6d9ec68c5ae" id="r_gab7ceeefacd448995bdd2e6d9ec68c5ae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#gab7ceeefacd448995bdd2e6d9ec68c5ae">LootLocker.Requests.LootLockerSDKManager.ConnectGooglePlayGamesAccount</a> (string authCode, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gab7ceeefacd448995bdd2e6d9ec68c5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect a Google Play Games account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Google Play Games account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Google Play Games account is linked into.  <br /></td></tr>
+<tr class="separator:gab7ceeefacd448995bdd2e6d9ec68c5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae921277ab47fd9e484e60acd806db914" id="r_gae921277ab47fd9e484e60acd806db914"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ConnectedAccounts.html#gae921277ab47fd9e484e60acd806db914">LootLocker.Requests.LootLockerSDKManager.ConnectEpicAccount</a> (string Token, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html">LootLockerAccountConnectedResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gae921277ab47fd9e484e60acd806db914"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect an Epic Account to the currently logged in <a class="el" href="namespaceLootLocker.html">LootLocker</a> account allowing that Epic account to start sessions for this player IMPORTANT: If you are using multiple users, be very sure to pass in the correct <code>forPlayerWithUlid</code> parameter as that will be the account that the Epic account is linked into.  <br /></td></tr>
 <tr class="separator:gae921277ab47fd9e484e60acd806db914"><td class="memSeparator" colspan="2">&#160;</td></tr>

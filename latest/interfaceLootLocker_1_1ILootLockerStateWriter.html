@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -222,6 +222,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad78077117f9f84e19bb47c0ce9dfa553" id="r_ad78077117f9f84e19bb47c0ce9dfa553"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html#ad78077117f9f84e19bb47c0ce9dfa553">SetString</a> (string key, string value)</td></tr>
 <tr class="memdesc:ad78077117f9f84e19bb47c0ce9dfa553"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a string in persistent storage.  <br /></td></tr>
 <tr class="separator:ad78077117f9f84e19bb47c0ce9dfa553"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab27f1473c4d91fc9b271b909a52cbb89" id="r_ab27f1473c4d91fc9b271b909a52cbb89"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html#ab27f1473c4d91fc9b271b909a52cbb89">GetInt</a> (string key, int defaultValue=0)</td></tr>
+<tr class="memdesc:ab27f1473c4d91fc9b271b909a52cbb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an int from persistent storage.  <br /></td></tr>
+<tr class="separator:ab27f1473c4d91fc9b271b909a52cbb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2321ea94834612666e357d3bcb90b845" id="r_a2321ea94834612666e357d3bcb90b845"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html#a2321ea94834612666e357d3bcb90b845">SetInt</a> (string key, int value)</td></tr>
+<tr class="memdesc:a2321ea94834612666e357d3bcb90b845"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set an integer in persistent storage.  <br /></td></tr>
+<tr class="separator:a2321ea94834612666e357d3bcb90b845"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2e1ce09e6542c8016b3ff9fb87537c6" id="r_ac2e1ce09e6542c8016b3ff9fb87537c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html#ac2e1ce09e6542c8016b3ff9fb87537c6">DeleteKey</a> (string key)</td></tr>
 <tr class="memdesc:ac2e1ce09e6542c8016b3ff9fb87537c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete a key from persistent storage.  <br /></td></tr>
 <tr class="separator:ac2e1ce09e6542c8016b3ff9fb87537c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -261,6 +267,45 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="ab27f1473c4d91fc9b271b909a52cbb89" name="ab27f1473c4d91fc9b271b909a52cbb89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab27f1473c4d91fc9b271b909a52cbb89">&#9670;&#160;</a></span>GetInt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int LootLocker.ILootLockerStateWriter.GetInt </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>defaultValue</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get an int from persistent storage. </p>
+<p>If the key does not exist then return the provided default value.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key to retrieve the value for.</td></tr>
+    <tr><td class="paramname">defaultValue</td><td>The value to return if the key does not exist.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The value associated with the key, or the default value if the key does not exist.</dd></dl>
 
 </div>
 </div>
@@ -327,6 +372,43 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the key exists, false otherwise.</dd></dl>
+
+</div>
+</div>
+<a id="a2321ea94834612666e357d3bcb90b845" name="a2321ea94834612666e357d3bcb90b845"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2321ea94834612666e357d3bcb90b845">&#9670;&#160;</a></span>SetInt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LootLocker.ILootLockerStateWriter.SetInt </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set an integer in persistent storage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key to set the value for.</td></tr>
+    <tr><td class="paramname">value</td><td>The value to set.</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

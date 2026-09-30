@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -507,6 +507,41 @@ $(document).ready(function(){initNavTree('group__WhiteLabel.html',''); initResiz
 
 </div>
 </div>
+<a id="gac3bebff3d84fcf00e83a636e20250e35" name="gac3bebff3d84fcf00e83a636e20250e35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac3bebff3d84fcf00e83a636e20250e35">&#9670;&#160;</a></span>WhiteLabelGetSignUpFields()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelGetSignUpFields </td>
+          <td>(</td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelSignUpFieldsResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the list of custom sign-up fields configured for this game. </p>
+<p>Use the returned fields to build a sign-up form, then pass the player's answers to WhiteLabelSignUp(string, string, LootLockerWhiteLabelCustomFieldValue[], Action&lt;LootLockerWhiteLabelSignupResponse&gt;). White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerWhiteLabelSignUpFieldsResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ga0bbd98a998fbff3e4ec3b40068e7f8cc" name="ga0bbd98a998fbff3e4ec3b40068e7f8cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga0bbd98a998fbff3e4ec3b40068e7f8cc">&#9670;&#160;</a></span>WhiteLabelLogin() <span class="overload">[1/2]</span></h2>
 
@@ -819,7 +854,7 @@ $(document).ready(function(){initNavTree('group__WhiteLabel.html',''); initResiz
 </div>
 </div>
 <a id="gac9e156a4f6037ac98e6af8d192c7d17d" name="gac9e156a4f6037ac98e6af8d192c7d17d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac9e156a4f6037ac98e6af8d192c7d17d">&#9670;&#160;</a></span>WhiteLabelSignUp()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#gac9e156a4f6037ac98e6af8d192c7d17d">&#9670;&#160;</a></span>WhiteLabelSignUp() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -871,6 +906,66 @@ $(document).ready(function(){initNavTree('group__WhiteLabel.html',''); initResiz
 
 </div>
 </div>
+<a id="gae4abce02f72684e022c463e893087af5" name="gae4abce02f72684e022c463e893087af5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae4abce02f72684e022c463e893087af5">&#9670;&#160;</a></span>WhiteLabelSignUp() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.WhiteLabelSignUp </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>email</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LootLockerWhiteLabelCustomFieldValue[]&#160;</td>
+          <td class="paramname"><em>customFields</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; LootLockerWhiteLabelSignupResponse &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create new user using the White Label login system, optionally including answers to custom sign-up fields. </p>
+<p>Call WhiteLabelGetSignUpFields first to retrieve the fields configured for this game, then pass the player's answers as <em>customFields</em> . White Label platform must be enabled in the web console for this to work.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">email</td><td>E-mail for the new user</td></tr>
+    <tr><td class="paramname">password</td><td>Password for the new user</td></tr>
+    <tr><td class="paramname">customFields</td><td>Answers to the custom sign-up fields configured in the web console. Each entry must include the <code>metadata_key</code> matching a configured field and the value as a JSON string in <code>value_json</code>. Pass null or an empty array if there are no custom fields. </td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerWhiteLabelSignupResponse</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -883,6 +978,12 @@ Functions</h2></td></tr>
 <tr class="memitem:gac9e156a4f6037ac98e6af8d192c7d17d" id="r_gac9e156a4f6037ac98e6af8d192c7d17d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gac9e156a4f6037ac98e6af8d192c7d17d">LootLocker.Requests.LootLockerSDKManager.WhiteLabelSignUp</a> (string email, string password, Action&lt; LootLockerWhiteLabelSignupResponse &gt; onComplete)</td></tr>
 <tr class="memdesc:gac9e156a4f6037ac98e6af8d192c7d17d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create new user using the White Label login system.  <br /></td></tr>
 <tr class="separator:gac9e156a4f6037ac98e6af8d192c7d17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae4abce02f72684e022c463e893087af5" id="r_gae4abce02f72684e022c463e893087af5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gae4abce02f72684e022c463e893087af5">LootLocker.Requests.LootLockerSDKManager.WhiteLabelSignUp</a> (string email, string password, LootLockerWhiteLabelCustomFieldValue[] customFields, Action&lt; LootLockerWhiteLabelSignupResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:gae4abce02f72684e022c463e893087af5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create new user using the White Label login system, optionally including answers to custom sign-up fields.  <br /></td></tr>
+<tr class="separator:gae4abce02f72684e022c463e893087af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac3bebff3d84fcf00e83a636e20250e35" id="r_gac3bebff3d84fcf00e83a636e20250e35"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#gac3bebff3d84fcf00e83a636e20250e35">LootLocker.Requests.LootLockerSDKManager.WhiteLabelGetSignUpFields</a> (Action&lt; LootLockerWhiteLabelSignUpFieldsResponse &gt; onComplete)</td></tr>
+<tr class="memdesc:gac3bebff3d84fcf00e83a636e20250e35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the list of custom sign-up fields configured for this game.  <br /></td></tr>
+<tr class="separator:gac3bebff3d84fcf00e83a636e20250e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1fa81cc7c0e01aacf410651f65ed1118" id="r_ga1fa81cc7c0e01aacf410651f65ed1118"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__WhiteLabel.html#ga1fa81cc7c0e01aacf410651f65ed1118">LootLocker.Requests.LootLockerSDKManager.WhiteLabelRequestPassword</a> (string email, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete)</td></tr>
 <tr class="memdesc:ga1fa81cc7c0e01aacf410651f65ed1118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request a password reset email for the given email address.  <br /></td></tr>
 <tr class="separator:ga1fa81cc7c0e01aacf410651f65ed1118"><td class="memSeparator" colspan="2">&#160;</td></tr>

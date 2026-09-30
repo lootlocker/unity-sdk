@@ -18,6 +18,7 @@ var topics =
     [ "Character Progressions", "group__CharacterProgressions.html", "group__CharacterProgressions" ],
     [ "Currency", "group__Currency.html", "group__Currency" ],
     [ "Balances", "group__Balances.html", "group__Balances" ],
+    [ "Platform Keys", "group__PlatformKeys.html", "group__PlatformKeys" ],
     [ "Catalog", "group__Catalog.html", "group__Catalog" ],
     [ "Purchasing", "group__Purchasing.html", "group__Purchasing" ],
     [ "Entitlements", "group__Entitlements.html", "group__Entitlements" ],

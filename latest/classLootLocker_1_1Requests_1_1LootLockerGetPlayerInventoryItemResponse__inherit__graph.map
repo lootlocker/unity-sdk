@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerGetPlayerInventoryItemResponse" name="LootLocker.Requests.LootLockerGetPlayerInventoryItemResponse">
+<area shape="rect" id="Node000001" title="Response containing the player&#39;s inventory item, returned at the top level with its template and meta..." alt="" coords="5,79,225,133"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="38,5,193,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,44,118,79,113,79,113,44"/>
+</map>

@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -220,11 +220,39 @@ Properties</h2></td></tr>
 <tr class="memitem:af7973b0ba7d3a9f9fc5e7492bb332986" id="r_af7973b0ba7d3a9f9fc5e7492bb332986"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html#af7973b0ba7d3a9f9fc5e7492bb332986">player_name</a> = null<code> [get, set]</code></td></tr>
 <tr class="memdesc:af7973b0ba7d3a9f9fc5e7492bb332986"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of the player (same as set by SetPlayerName).  <br /></td></tr>
 <tr class="separator:af7973b0ba7d3a9f9fc5e7492bb332986"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a560b91d84911557f6a1416d8637b08b8" id="r_a560b91d84911557f6a1416d8637b08b8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html#a560b91d84911557f6a1416d8637b08b8">auto_create_profile</a> = true<code> [get, set]</code></td></tr>
+<tr class="memdesc:a560b91d84911557f6a1416d8637b08b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to automatically create a profile for the player if one does not exist.  <br /></td></tr>
+<tr class="separator:a560b91d84911557f6a1416d8637b08b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Optional parameters that can be sent when starting a session. </p>
 <p>These are a collection of configuration options relating to the player whom the session is being started for. </p>
 </div><h2 class="groupheader">Property Documentation</h2>
+<a id="a560b91d84911557f6a1416d8637b08b8" name="a560b91d84911557f6a1416d8637b08b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a560b91d84911557f6a1416d8637b08b8">&#9670;&#160;</a></span>auto_create_profile</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool LootLocker.Requests.LootLockerSessionOptionals.auto_create_profile = true</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether to automatically create a profile for the player if one does not exist. </p>
+<p>Defaults to true. Set to false if you want to ensure that a profile is not created for the player if one does not exist. In this case, the session will fail with a 404 Player Not Found error if the player does not have a profile. </p>
+
+</div>
+</div>
 <a id="af7973b0ba7d3a9f9fc5e7492bb332986" name="af7973b0ba7d3a9f9fc5e7492bb332986"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af7973b0ba7d3a9f9fc5e7492bb332986">&#9670;&#160;</a></span>player_name</h2>
 

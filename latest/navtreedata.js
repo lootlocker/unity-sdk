@@ -43,13 +43,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a6e5ccebe218e7562ff13ad96cc006003",
-"classLootLocker_1_1Requests_1_1LootLockerDefaultClassLoadout.html#a5080e852f9e7d3bba84ebdec97b661a2",
-"classLootLocker_1_1Requests_1_1LootLockerLeaderboardMember.html#a93f3767ff91545618df6b39d00da1f2c",
-"classLootLocker_1_1Requests_1_1LootLockerMetadataOperationError.html#aff74d7f9e5907f881d72e4f0f0fd1121",
-"classLootLocker_1_1Requests_1_1LootLockerRarity.html#a323f25a3cca78ee835896179f784d9e9",
-"group__AssetInstance.html#ga3fe9e69c0c1223dd3cea3882f691b544",
-"group__Player.html#ga28e95a77da5f8d29ec67d4ebf1dcb41a"
+"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a346ede868fb273207b758bcde2079059",
+"classLootLocker_1_1Requests_1_1LootLockerDeactivatedObjects.html",
+"classLootLocker_1_1Requests_1_1LootLockerItemTemplate.html#a251beb4f80507355bdc3b39b5feb2ca0",
+"classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html",
+"classLootLocker_1_1Requests_1_1LootLockerPlayer.html#a23e35ac97ca45a95129252331bdc7f75",
+"classLootLocker_1_1Requests_1_1LootLockerVariation__Info.html#a4ec272aa7cbc243b9a5155d8024435c0",
+"group__Friends.html#ga320ee8e0f46729a3fe6d49d771c7cf04",
+"group__UserGeneratedContent.html#ga85bb3366a3ee7c640e6efc6acab08fc6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

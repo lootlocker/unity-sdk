@@ -60,7 +60,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.1.1</span>
+      <span id="ll-topnav-version">v8.2.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"$logosize/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.1.1</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.2.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -257,6 +257,58 @@ $(document).ready(function(){initNavTree('group__PlayerFiles.html',''); initResi
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">fileId</td><td>Id of the file. You can get the ID of files when you upload a file, or with GetAllPlayerFiles()</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5e01aa04238d42dad065b6b2efb0b6e0" name="ga5e01aa04238d42dad065b6b2efb0b6e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5e01aa04238d42dad065b6b2efb0b6e0">&#9670;&#160;</a></span>DeletePlayerFileByKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.DeletePlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Delete a player file by its key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key of the file to delete.</td></tr>
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
     <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
   </table>
@@ -408,6 +460,398 @@ $(document).ready(function(){initNavTree('group__PlayerFiles.html',''); initResi
   <table class="params">
     <tr><td class="paramname">fileId</td><td>Id of the file, can be retrieved with GetAllPlayerFiles() or when the file is uploaded</td></tr>
     <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5d1eb43120a8af50456736a5ad47d37b" name="ga5d1eb43120a8af50456736a5ad47d37b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5d1eb43120a8af50456736a5ad47d37b">&#9670;&#160;</a></span>GetPlayerFileByKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a player file by its key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key of the file.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga940eb4207f19a367c78a34d2feb020e3" name="ga940eb4207f19a367c78a34d2feb020e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga940eb4207f19a367c78a34d2feb020e3">&#9670;&#160;</a></span>GetPlayerFileRevision()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevision </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fileId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>revisionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileContent.html">LootLockerPlayerFileContent</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a specific revision of a player file by its revision id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileId</td><td>Id of the file.</td></tr>
+    <tr><td class="paramname">revisionId</td><td>The ULID of the revision to retrieve.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFileContent</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gabff4f9dd6ddd418b72450415df0ab188" name="gabff4f9dd6ddd418b72450415df0ab188"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabff4f9dd6ddd418b72450415df0ab188">&#9670;&#160;</a></span>GetPlayerFileRevisionByKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisionByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>revisionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileContent.html">LootLockerPlayerFileContent</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a specific revision of a player file by its key and revision id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key of the file.</td></tr>
+    <tr><td class="paramname">revisionId</td><td>The ULID of the revision to retrieve.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFileContent</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga52816ac502b8e83b5c82511fd8435851" name="ga52816ac502b8e83b5c82511fd8435851"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga52816ac502b8e83b5c82511fd8435851">&#9670;&#160;</a></span>GetPlayerFileRevisions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisions </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fileId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileRevisionsResponse.html">LootLockerPlayerFileRevisionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List all revisions for a player file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileId</td><td>Id of the file.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFileRevisionsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaf5f91458ee7d1d6ddddc0414b5ebf2c2" name="gaf5f91458ee7d1d6ddddc0414b5ebf2c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf5f91458ee7d1d6ddddc0414b5ebf2c2">&#9670;&#160;</a></span>GetPlayerFileRevisionsByKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisionsByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileRevisionsResponse.html">LootLockerPlayerFileRevisionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List all revisions for a player file identified by its key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key of the file.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFileRevisionsResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga10407b71c8c9bd1b4390d6a7b91ed568" name="ga10407b71c8c9bd1b4390d6a7b91ed568"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga10407b71c8c9bd1b4390d6a7b91ed568">&#9670;&#160;</a></span>PromotePlayerFileRevision()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.PromotePlayerFileRevision </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fileId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>revisionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Promote a specific revision to be the current (active) revision of a player file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileId</td><td>Id of the file.</td></tr>
+    <tr><td class="paramname">revisionId</td><td>The ULID of the revision to promote.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa57c3916eab8aaa9b11a6ac6ddb4f273" name="gaa57c3916eab8aaa9b11a6ac6ddb4f273"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa57c3916eab8aaa9b11a6ac6ddb4f273">&#9670;&#160;</a></span>PromotePlayerFileRevisionByKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.PromotePlayerFileRevisionByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>revisionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Promote a specific revision to be the current (active) revision of a player file identified by its key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The key of the file.</td></tr>
+    <tr><td class="paramname">revisionId</td><td>The ULID of the revision to promote.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerResponse</td></tr>
     <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
   </table>
   </dd>
@@ -989,6 +1433,443 @@ $(document).ready(function(){initNavTree('group__PlayerFiles.html',''); initResi
 
 </div>
 </div>
+<a id="ga69658585a38a73e7662182ee34d9b034" name="ga69658585a38a73e7662182ee34d9b034"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga69658585a38a73e7662182ee34d9b034">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[1/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">byte[]&#160;</td>
+          <td class="paramname"><em>fileBytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>fileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isPublic</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file using a byte array, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileBytes</td><td>Byte array to upload</td></tr>
+    <tr><td class="paramname">fileName</td><td>Name of the file on <a class="el" href="namespaceLootLocker.html">LootLocker</a></td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">isPublic</td><td>Should this file be viewable by other players?</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4b82f78ef4f1a1f4348ea767e77d69d8" name="ga4b82f78ef4f1a1f4348ea767e77d69d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4b82f78ef4f1a1f4348ea767e77d69d8">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[2/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">byte[]&#160;</td>
+          <td class="paramname"><em>fileBytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>fileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file using a byte array, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated. The file will not be viewable by other players.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileBytes</td><td>Byte array to upload</td></tr>
+    <tr><td class="paramname">fileName</td><td>Name of the file on <a class="el" href="namespaceLootLocker.html">LootLocker</a></td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga9d0dee547bad669b041b635f54e2566a" name="ga9d0dee547bad669b041b635f54e2566a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9d0dee547bad669b041b635f54e2566a">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[3/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">FileStream&#160;</td>
+          <td class="paramname"><em>fileStream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isPublic</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file using a Filestream, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileStream</td><td>Filestream to upload</td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">isPublic</td><td>Should this file be viewable by other players?</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga71f729cb19796d50b0d32527bd911c84" name="ga71f729cb19796d50b0d32527bd911c84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga71f729cb19796d50b0d32527bd911c84">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[4/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">FileStream&#160;</td>
+          <td class="paramname"><em>fileStream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file using a Filestream, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated. The file will not be viewable by other players.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileStream</td><td>Filestream to upload</td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga25ed1ad5714e0ea442f28eb72a585c68" name="ga25ed1ad5714e0ea442f28eb72a585c68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga25ed1ad5714e0ea442f28eb72a585c68">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[5/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>pathToFile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isPublic</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file with the provided name and content, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pathToFile</td><td>Path to the file, example: Application.persistentDataPath + "/" + fileName;</td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">isPublic</td><td>Should this file be viewable by other players?</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga31578028742aa75b8838a7d0b07e9a98" name="ga31578028742aa75b8838a7d0b07e9a98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga31578028742aa75b8838a7d0b07e9a98">&#9670;&#160;</a></span>UploadPlayerFileByKey() <span class="overload">[6/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>pathToFile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>filePurpose</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt;&#160;</td>
+          <td class="paramname"><em>onComplete</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>forPlayerWithUlid</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Upload a file with the provided name and content, using a key for upsert behavior. </p>
+<p>If a file with the given key already exists for this player, it will be updated. The file will not be viewable by other players.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pathToFile</td><td>Path to the file, example: Application.persistentDataPath + "/" + fileName;</td></tr>
+    <tr><td class="paramname">filePurpose</td><td>Purpose of the file, example: savefile/config</td></tr>
+    <tr><td class="paramname">key</td><td>Key for upsert behavior. If a file with this key already exists, it will be updated.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response of type LootLockerPlayerFile</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -1019,6 +1900,24 @@ Functions</h2></td></tr>
 <tr class="memitem:gab2fa06c5be9e111d81be1e217174747a" id="r_gab2fa06c5be9e111d81be1e217174747a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#gab2fa06c5be9e111d81be1e217174747a">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFile</a> (byte[] fileBytes, string fileName, string filePurpose, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gab2fa06c5be9e111d81be1e217174747a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file using a byte array.  <br /></td></tr>
 <tr class="separator:gab2fa06c5be9e111d81be1e217174747a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga25ed1ad5714e0ea442f28eb72a585c68" id="r_ga25ed1ad5714e0ea442f28eb72a585c68"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga25ed1ad5714e0ea442f28eb72a585c68">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (string pathToFile, string filePurpose, bool isPublic, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga25ed1ad5714e0ea442f28eb72a585c68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file with the provided name and content, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga25ed1ad5714e0ea442f28eb72a585c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga31578028742aa75b8838a7d0b07e9a98" id="r_ga31578028742aa75b8838a7d0b07e9a98"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga31578028742aa75b8838a7d0b07e9a98">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (string pathToFile, string filePurpose, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga31578028742aa75b8838a7d0b07e9a98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file with the provided name and content, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga31578028742aa75b8838a7d0b07e9a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9d0dee547bad669b041b635f54e2566a" id="r_ga9d0dee547bad669b041b635f54e2566a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga9d0dee547bad669b041b635f54e2566a">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (FileStream fileStream, string filePurpose, bool isPublic, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga9d0dee547bad669b041b635f54e2566a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file using a Filestream, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga9d0dee547bad669b041b635f54e2566a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga71f729cb19796d50b0d32527bd911c84" id="r_ga71f729cb19796d50b0d32527bd911c84"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga71f729cb19796d50b0d32527bd911c84">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (FileStream fileStream, string filePurpose, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga71f729cb19796d50b0d32527bd911c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file using a Filestream, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga71f729cb19796d50b0d32527bd911c84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga69658585a38a73e7662182ee34d9b034" id="r_ga69658585a38a73e7662182ee34d9b034"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga69658585a38a73e7662182ee34d9b034">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (byte[] fileBytes, string fileName, string filePurpose, bool isPublic, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga69658585a38a73e7662182ee34d9b034"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file using a byte array, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga69658585a38a73e7662182ee34d9b034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4b82f78ef4f1a1f4348ea767e77d69d8" id="r_ga4b82f78ef4f1a1f4348ea767e77d69d8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga4b82f78ef4f1a1f4348ea767e77d69d8">LootLocker.Requests.LootLockerSDKManager.UploadPlayerFileByKey</a> (byte[] fileBytes, string fileName, string filePurpose, string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga4b82f78ef4f1a1f4348ea767e77d69d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a file using a byte array, using a key for upsert behavior.  <br /></td></tr>
+<tr class="separator:ga4b82f78ef4f1a1f4348ea767e77d69d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac45097d0fb826f93af4666d4f545ffb2" id="r_gac45097d0fb826f93af4666d4f545ffb2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#gac45097d0fb826f93af4666d4f545ffb2">LootLocker.Requests.LootLockerSDKManager.UpdatePlayerFile</a> (int fileId, string pathToFile, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gac45097d0fb826f93af4666d4f545ffb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update an existing player file with a new file.  <br /></td></tr>
 <tr class="separator:gac45097d0fb826f93af4666d4f545ffb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1031,6 +1930,30 @@ Functions</h2></td></tr>
 <tr class="memitem:ga09fbbb0a732057ab40e4a40e2ccc2a40" id="r_ga09fbbb0a732057ab40e4a40e2ccc2a40"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga09fbbb0a732057ab40e4a40e2ccc2a40">LootLocker.Requests.LootLockerSDKManager.DeletePlayerFile</a> (int fileId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:ga09fbbb0a732057ab40e4a40e2ccc2a40"><td class="mdescLeft">&#160;</td><td class="mdescRight">The file will be deleted immediately and the action can not be reversed.  <br /></td></tr>
 <tr class="separator:ga09fbbb0a732057ab40e4a40e2ccc2a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga52816ac502b8e83b5c82511fd8435851" id="r_ga52816ac502b8e83b5c82511fd8435851"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga52816ac502b8e83b5c82511fd8435851">LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisions</a> (int fileId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileRevisionsResponse.html">LootLockerPlayerFileRevisionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga52816ac502b8e83b5c82511fd8435851"><td class="mdescLeft">&#160;</td><td class="mdescRight">List all revisions for a player file.  <br /></td></tr>
+<tr class="separator:ga52816ac502b8e83b5c82511fd8435851"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga940eb4207f19a367c78a34d2feb020e3" id="r_ga940eb4207f19a367c78a34d2feb020e3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga940eb4207f19a367c78a34d2feb020e3">LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevision</a> (int fileId, string revisionId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileContent.html">LootLockerPlayerFileContent</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga940eb4207f19a367c78a34d2feb020e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a specific revision of a player file by its revision id.  <br /></td></tr>
+<tr class="separator:ga940eb4207f19a367c78a34d2feb020e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga10407b71c8c9bd1b4390d6a7b91ed568" id="r_ga10407b71c8c9bd1b4390d6a7b91ed568"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga10407b71c8c9bd1b4390d6a7b91ed568">LootLocker.Requests.LootLockerSDKManager.PromotePlayerFileRevision</a> (int fileId, string revisionId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga10407b71c8c9bd1b4390d6a7b91ed568"><td class="mdescLeft">&#160;</td><td class="mdescRight">Promote a specific revision to be the current (active) revision of a player file.  <br /></td></tr>
+<tr class="separator:ga10407b71c8c9bd1b4390d6a7b91ed568"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5d1eb43120a8af50456736a5ad47d37b" id="r_ga5d1eb43120a8af50456736a5ad47d37b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga5d1eb43120a8af50456736a5ad47d37b">LootLocker.Requests.LootLockerSDKManager.GetPlayerFileByKey</a> (string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html">LootLockerPlayerFile</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5d1eb43120a8af50456736a5ad47d37b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a player file by its key.  <br /></td></tr>
+<tr class="separator:ga5d1eb43120a8af50456736a5ad47d37b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf5f91458ee7d1d6ddddc0414b5ebf2c2" id="r_gaf5f91458ee7d1d6ddddc0414b5ebf2c2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#gaf5f91458ee7d1d6ddddc0414b5ebf2c2">LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisionsByKey</a> (string key, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileRevisionsResponse.html">LootLockerPlayerFileRevisionsResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf5f91458ee7d1d6ddddc0414b5ebf2c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">List all revisions for a player file identified by its key.  <br /></td></tr>
+<tr class="separator:gaf5f91458ee7d1d6ddddc0414b5ebf2c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabff4f9dd6ddd418b72450415df0ab188" id="r_gabff4f9dd6ddd418b72450415df0ab188"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#gabff4f9dd6ddd418b72450415df0ab188">LootLocker.Requests.LootLockerSDKManager.GetPlayerFileRevisionByKey</a> (string key, string revisionId, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileContent.html">LootLockerPlayerFileContent</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gabff4f9dd6ddd418b72450415df0ab188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a specific revision of a player file by its key and revision id.  <br /></td></tr>
+<tr class="separator:gabff4f9dd6ddd418b72450415df0ab188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa57c3916eab8aaa9b11a6ac6ddb4f273" id="r_gaa57c3916eab8aaa9b11a6ac6ddb4f273"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#gaa57c3916eab8aaa9b11a6ac6ddb4f273">LootLocker.Requests.LootLockerSDKManager.PromotePlayerFileRevisionByKey</a> (string key, string revisionId, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaa57c3916eab8aaa9b11a6ac6ddb4f273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Promote a specific revision to be the current (active) revision of a player file identified by its key.  <br /></td></tr>
+<tr class="separator:gaa57c3916eab8aaa9b11a6ac6ddb4f273"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5e01aa04238d42dad065b6b2efb0b6e0" id="r_ga5e01aa04238d42dad065b6b2efb0b6e0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PlayerFiles.html#ga5e01aa04238d42dad065b6b2efb0b6e0">LootLocker.Requests.LootLockerSDKManager.DeletePlayerFileByKey</a> (string key, Action&lt; <a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:ga5e01aa04238d42dad065b6b2efb0b6e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete a player file by its key.  <br /></td></tr>
+<tr class="separator:ga5e01aa04238d42dad065b6b2efb0b6e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

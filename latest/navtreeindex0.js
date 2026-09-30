@@ -101,12 +101,13 @@ var NAVTREEINDEX0 =
 "classLootLocker_1_1LootLockerRequestContext.html#a9b3fb913ce08b02d625be550be5e3b18":[1,0,0,20,1],
 "classLootLocker_1_1LootLockerRequestContext.html#ab882993920ed22c0520ab406c26f5015":[1,0,0,20,0],
 "classLootLocker_1_1LootLockerResponse.html":[1,0,0,21],
-"classLootLocker_1_1LootLockerResponse.html#a082a6753afb7cca1fcf89415a647e950":[1,0,0,21,4],
-"classLootLocker_1_1LootLockerResponse.html#a7ab0f8f19e90c233f7a87d4d566f5577":[1,0,0,21,0],
-"classLootLocker_1_1LootLockerResponse.html#a9e0b526bcc6c79ebe8b9ddca0be4379f":[1,0,0,21,5],
-"classLootLocker_1_1LootLockerResponse.html#ab0e40597a3bcf58e25fa56e32deae172":[1,0,0,21,3],
-"classLootLocker_1_1LootLockerResponse.html#af650fdeb9f0c6ba9745cf21f3f78c626":[1,0,0,21,2],
-"classLootLocker_1_1LootLockerResponse.html#afc4f50259754838517102f75dcafde60":[1,0,0,21,1],
+"classLootLocker_1_1LootLockerResponse.html#a082a6753afb7cca1fcf89415a647e950":[1,0,0,21,5],
+"classLootLocker_1_1LootLockerResponse.html#a7ab0f8f19e90c233f7a87d4d566f5577":[1,0,0,21,1],
+"classLootLocker_1_1LootLockerResponse.html#a9e0b526bcc6c79ebe8b9ddca0be4379f":[1,0,0,21,6],
+"classLootLocker_1_1LootLockerResponse.html#ab0e40597a3bcf58e25fa56e32deae172":[1,0,0,21,4],
+"classLootLocker_1_1LootLockerResponse.html#ac965ed89874abe323080c49a89f7c548":[1,0,0,21,0],
+"classLootLocker_1_1LootLockerResponse.html#af650fdeb9f0c6ba9745cf21f3f78c626":[1,0,0,21,3],
+"classLootLocker_1_1LootLockerResponse.html#afc4f50259754838517102f75dcafde60":[1,0,0,21,2],
 "classLootLocker_1_1LootLockerResponseFactory.html":[1,0,0,22],
 "classLootLocker_1_1LootLockerResponseFactory.html#a18e774f1a26e7ee68a93b610a4bb8dcc":[1,0,0,22,6],
 "classLootLocker_1_1LootLockerResponseFactory.html#a1b3f89939c3a87d0450c7f332edbeb5c":[1,0,0,22,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classLootLocker_1_1Requests_1_1LootLockerBroadcastGame.html#aee570ce83a402a31b1921cf832dfc23f":[1,0,0,1,30,1],
 "classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html":[1,0,0,1,31],
 "classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a198b39860eddb4d35bcd5cdfe71d1731":[1,0,0,1,31,0],
-"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a20d7ae6c9915834d728807642f77648e":[1,0,0,1,31,4],
-"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a346ede868fb273207b758bcde2079059":[1,0,0,1,31,2]
+"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a20d7ae6c9915834d728807642f77648e":[1,0,0,1,31,4]
 };
