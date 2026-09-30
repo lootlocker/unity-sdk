@@ -148,6 +148,46 @@ if (-not [string]::IsNullOrWhiteSpace($CustomProject) -and (Test-Path $CustomPro
     $ProjectPath = $TempProject
 }
 
+# Reused and custom projects need the same local settings as freshly initialized projects.
+if ($UseLocalEnv) {
+    $ProjectSettingsFile = Join-Path $ProjectPath "ProjectSettings\ProjectSettings.asset"
+    if (Test-Path $ProjectSettingsFile) {
+        $nl = [char]10
+        $settingsContent = [IO.File]::ReadAllText($ProjectSettingsFile)
+        if ($settingsContent -notmatch 'LOOTLOCKER_COMMANDLINE_SETTINGS') {
+            $defineProperty = [Regex]::Match($settingsContent, '(?m)^  scriptingDefineSymbols:[^\r\n]*(?:\r?\n|$)')
+            if ($defineProperty.Success) {
+                $groupOne = [Regex]::Match($settingsContent.Substring($defineProperty.Index + $defineProperty.Length), '\A(?:    [^\r\n]*\r?\n)*?    1:[ \t]*[^\r\n]*')
+                if ($groupOne.Success) {
+                    $start = $defineProperty.Index + $defineProperty.Length + $groupOne.Index
+                    $newGroup = if ($groupOne.Value -match '^    1:[ \t]*$') {
+                        '    1: LOOTLOCKER_COMMANDLINE_SETTINGS'
+                    } else {
+                        $groupOne.Value + ';LOOTLOCKER_COMMANDLINE_SETTINGS'
+                    }
+                    $settingsContent = $settingsContent.Remove($start, $groupOne.Length).Insert($start, $newGroup)
+                } else {
+                    $settingsContent = $settingsContent.Insert($defineProperty.Index + $defineProperty.Length, '    1: LOOTLOCKER_COMMANDLINE_SETTINGS' + $nl)
+                }
+            } else {
+                $settingsContent = $settingsContent.TrimEnd() + $nl + '  scriptingDefineSymbols:' + $nl + '    1: LOOTLOCKER_COMMANDLINE_SETTINGS' + $nl
+            }
+        }
+        if ($settingsContent -match '(?m)^[ \t]*insecureHttpOption:') {
+            $updatedContent = [Regex]::Replace($settingsContent, '(?m)^[ \t]*insecureHttpOption:.*$', '  insecureHttpOption: 2')
+        } else {
+            $updatedContent = $settingsContent.TrimEnd() + $nl + '  insecureHttpOption: 2' + $nl
+        }
+        if ($updatedContent -ne $settingsContent) {
+            [IO.File]::WriteAllText($ProjectSettingsFile, $updatedContent)
+            Write-Step "Enabled insecure http in $ProjectSettingsFile"
+        }
+    } else {
+        Write-Fail "ProjectSettings.asset not found at $ProjectSettingsFile; cannot enable local http."
+        exit 1
+    }
+}
+
 $ResultsFile = Join-Path $ProjectPath "TestResults.xml"
 $LogFile     = Join-Path $ProjectPath "test-run.log"
 
