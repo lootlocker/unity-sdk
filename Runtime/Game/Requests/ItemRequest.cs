@@ -118,7 +118,12 @@ namespace LootLocker.Requests
     /// <summary>
     /// An item instance held in a player's inventory.
     /// </summary>
-    public class LootLockerItem
+    /// <remarks>
+    /// This represents an <b>item</b> granted from an item template. It is unrelated to the
+    /// asset-based inventory API (<see cref="LootLockerInventory"/>, <c>GetInventory</c>,
+    /// <c>ListPlayerInventory</c>), which deals with <b>assets</b> and <b>asset instances</b>.
+    /// </remarks>
+    public class LootLockerInventoryItem
     {
         /// <summary>The unique id of this inventory item.</summary>
         public string id { get; set; }
@@ -186,7 +191,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Request to consume a stackable item from the player's inventory.
     /// </summary>
-    public class LootLockerConsumeItemRequest
+    public class LootLockerConsumeInventoryItemRequest
     {
         /// <summary>
         /// The number of items to consume. Defaults to 1 when omitted. To consume an entire stack,
@@ -205,7 +210,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Request to split a stackable item in the player's inventory into two stacks.
     /// </summary>
-    public class LootLockerSplitItemStackRequest
+    public class LootLockerSplitInventoryItemStackRequest
     {
         /// <summary>The number of items to move into the new stack.</summary>
         public int count { get; set; }
@@ -214,7 +219,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Request to merge two stacks of the same item into one.
     /// </summary>
-    public class LootLockerMergeItemStacksRequest
+    public class LootLockerMergeInventoryItemStacksRequest
     {
         /// <summary>The id of the source inventory item to merge from.</summary>
         public string source_inventory_id { get; set; }
@@ -242,10 +247,10 @@ namespace LootLocker.Requests
     /// <summary>
     /// Response containing a paginated list of the player's inventory items.
     /// </summary>
-    public class LootLockerListPlayerItemsResponse : LootLockerResponse
+    public class LootLockerListPlayerInventoryItemsResponse : LootLockerResponse
     {
         /// <summary>The list of the player's inventory items.</summary>
-        public LootLockerItem[] items { get; set; }
+        public LootLockerInventoryItem[] items { get; set; }
 
         /// <summary>Pagination details for the response.</summary>
         public LootLockerExtendedPagination pagination { get; set; }
@@ -254,7 +259,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Response containing the player's inventory item, returned at the top level with its template and metadata.
     /// </summary>
-    public class LootLockerGetPlayerItemResponse : LootLockerResponse
+    public class LootLockerGetPlayerInventoryItemResponse : LootLockerResponse
     {
         /// <summary>The unique id of this inventory item.</summary>
         public string id { get; set; }
@@ -296,7 +301,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Response containing the result of consuming an item, including any items granted as a result.
     /// </summary>
-    public class LootLockerConsumeItemResponse : LootLockerResponse
+    public class LootLockerConsumeInventoryItemResponse : LootLockerResponse
     {
         /// <summary>True if the item was consumed.</summary>
         public bool consumed { get; set; }
@@ -308,7 +313,7 @@ namespace LootLocker.Requests
     /// <summary>
     /// Response containing the id of the newly created stack after splitting an item.
     /// </summary>
-    public class LootLockerSplitItemStackResponse : LootLockerResponse
+    public class LootLockerSplitInventoryItemStackResponse : LootLockerResponse
     {
         /// <summary>The id of the newly created item stack.</summary>
         public string id { get; set; }

@@ -320,7 +320,7 @@ namespace LootLockerTests.PlayMode
         public void Json_SerializingConsumeItemRequestWithoutCount_OmitsCount()
         {
             // Given
-            var request = new LootLockerConsumeItemRequest();
+            var request = new LootLockerConsumeInventoryItemRequest();
 
             // When
             string serializedJson = LootLockerJson.SerializeObject(request);
@@ -335,7 +335,7 @@ namespace LootLockerTests.PlayMode
         public void Json_SerializingConsumeItemRequestWithCount_IncludesCount()
         {
             // Given
-            var request = new LootLockerConsumeItemRequest { count = 3 };
+            var request = new LootLockerConsumeInventoryItemRequest { count = 3 };
 
             // When
             string serializedJson = LootLockerJson.SerializeObject(request);
@@ -352,7 +352,7 @@ namespace LootLockerTests.PlayMode
         public void Json_SerializingSplitItemStackRequest_IncludesCount()
         {
             // Given
-            var request = new LootLockerSplitItemStackRequest { count = 5 };
+            var request = new LootLockerSplitInventoryItemStackRequest { count = 5 };
 
             // When
             string serializedJson = LootLockerJson.SerializeObject(request);
@@ -369,7 +369,7 @@ namespace LootLockerTests.PlayMode
         public void Json_SerializingMergeItemStacksRequest_IncludesBothInventoryIds()
         {
             // Given
-            var request = new LootLockerMergeItemStacksRequest
+            var request = new LootLockerMergeInventoryItemStacksRequest
             {
                 source_inventory_id = "01HZZZZZZZZZZZZZZZZZZZZZZZ",
                 target_inventory_id = "01HYYYYYYYYYYYYYYYYYYYYYYY"
@@ -391,14 +391,14 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Json_DeserializingListPlayerItemsResponse_Succeeds()
+        public void Json_DeserializingListPlayerInventoryItemsResponse_Succeeds()
         {
             // Given
             const string listPlayerItemsResponse =
                 "{\"success\":true,\"items\":[{\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":3,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"stackable\",\"consumable\":true,\"count\":7,\"source\":\"grant\",\"name\":\"Health Potion\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\"}],\"pagination\":{\"total\":1,\"offset\":0,\"per_page\":25,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
 
             // When
-            var deserialized = LootLockerJson.DeserializeObject<LootLockerListPlayerItemsResponse>(listPlayerItemsResponse);
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerListPlayerInventoryItemsResponse>(listPlayerItemsResponse);
 
             // Then
             Assert.IsNotNull(deserialized, "Not deserialized, is null");
@@ -421,14 +421,14 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Json_DeserializingGetPlayerItemResponseWithTemplateAndMetadata_Succeeds()
+        public void Json_DeserializingGetPlayerInventoryItemResponseWithTemplateAndMetadata_Succeeds()
         {
             // Given
             const string getPlayerItemResponse =
                 "{\"success\":true,\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":3,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"instanced\",\"consumable\":false,\"count\":1,\"source\":\"grant\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"template\":{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":0,\"item_type\":\"instanced\",\"consumable\":false,\"deletable\":true},\"metadata\":[{\"key\":\"damage\",\"value\":12,\"type\":\"number\",\"access\":[\"game_api.read\"],\"tags\":[\"combat\"]}]}";
 
             // When
-            var deserialized = LootLockerJson.DeserializeObject<LootLockerGetPlayerItemResponse>(getPlayerItemResponse);
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerGetPlayerInventoryItemResponse>(getPlayerItemResponse);
 
             // Then
             Assert.IsNotNull(deserialized, "Not deserialized, is null");
@@ -457,7 +457,7 @@ namespace LootLockerTests.PlayMode
                 "{\"success\":true,\"consumed\":true,\"granted\":[{\"source_id\":\"01HBBBBBBBBBBBBBBBBBBBBBBB\",\"count\":2,\"type\":\"currency\",\"name\":\"Gold\",\"code\":\"gold\"}]}";
 
             // When
-            var deserialized = LootLockerJson.DeserializeObject<LootLockerConsumeItemResponse>(consumeItemResponse);
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerConsumeInventoryItemResponse>(consumeItemResponse);
 
             // Then
             Assert.IsNotNull(deserialized, "Not deserialized, is null");

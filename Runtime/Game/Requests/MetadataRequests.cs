@@ -25,8 +25,8 @@ namespace LootLocker.LootLockerEnums
         player = 5,
         self = 6,
         asset = 7,
-        item = 8, // This is the source for legacy items, while the "inventory" source is for item instances
-        inventory = 9, // This is the source for item instances (player inventory items)
+        item = 8, // This is the source for legacy items, while the "inventory_item" source is for item instances
+        inventory_item = 9, // This is the source for item instances (player inventory items)
         item_template = 10, // This is the source for item templates
     };
 
