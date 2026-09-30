@@ -98,20 +98,20 @@ namespace LootLockerTestConfigurationUtils
             LootLockerAdminRequest.Send(formattedEndpoint, endpoint.httpMethod, json, onComplete, true);
         }
 
-        public static void ListPlayerItemsAdmin(int playerId, Action<LootLockerTestAdminListPlayerItemsResponse> onComplete)
+        public static void ListPlayerInventoryItemsAdmin(int playerId, Action<LootLockerTestAdminListPlayerInventoryItemsResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
-                onComplete?.Invoke(new LootLockerTestAdminListPlayerItemsResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
+                onComplete?.Invoke(new LootLockerTestAdminListPlayerInventoryItemsResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
                 return;
             }
 
-            var endpoint = LootLockerTestConfigurationEndpoints.adminListPlayerItems;
+            var endpoint = LootLockerTestConfigurationEndpoints.adminListPlayerInventoryItems;
             string formattedEndpoint = string.Format(endpoint.endPoint, playerId);
 
             LootLockerAdminRequest.Send(formattedEndpoint, endpoint.httpMethod, null, onComplete: (serverResponse) =>
             {
-                var response = LootLockerResponse.Deserialize<LootLockerTestAdminListPlayerItemsResponse>(serverResponse);
+                var response = LootLockerResponse.Deserialize<LootLockerTestAdminListPlayerInventoryItemsResponse>(serverResponse);
                 onComplete?.Invoke(response);
             }, true);
         }
@@ -120,7 +120,7 @@ namespace LootLockerTestConfigurationUtils
         /// Consume items through the admin API. The endpoint requires a body carrying the
         /// player id; <paramref name="count"/> of 0 lets the backend apply its default of 1.
         /// </summary>
-        public static void ConsumePlayerItemAdmin(int playerId, string inventoryId, int count, Action<LootLockerTestAdminConsumeItemResponse> onComplete)
+        public static void ConsumePlayerInventoryItemAdmin(int playerId, string inventoryId, int count, Action<LootLockerTestAdminConsumeItemResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
@@ -128,7 +128,7 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            var endpoint = LootLockerTestConfigurationEndpoints.adminConsumePlayerItem;
+            var endpoint = LootLockerTestConfigurationEndpoints.adminConsumePlayerInventoryItem;
             string formattedEndpoint = string.Format(endpoint.endPoint, playerId, inventoryId);
             string json = LootLockerJson.SerializeObject(new LootLockerTestAdminConsumeItemRequest { player_id = playerId, count = count });
 
@@ -139,7 +139,7 @@ namespace LootLockerTestConfigurationUtils
             }, true);
         }
 
-        public static void DeletePlayerItemAdmin(int playerId, string inventoryId, Action<LootLockerResponse> onComplete)
+        public static void DeletePlayerInventoryItemAdmin(int playerId, string inventoryId, Action<LootLockerResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
@@ -147,13 +147,13 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            var endpoint = LootLockerTestConfigurationEndpoints.adminDeletePlayerItem;
+            var endpoint = LootLockerTestConfigurationEndpoints.adminDeletePlayerInventoryItem;
             string formattedEndpoint = string.Format(endpoint.endPoint, playerId, inventoryId);
 
             LootLockerAdminRequest.Send(formattedEndpoint, endpoint.httpMethod, null, onComplete, true);
         }
 
-        public static void SplitPlayerItemStackAdmin(int playerId, string inventoryId, int count, Action<LootLockerTestSplitItemStackResponse> onComplete)
+        public static void SplitPlayerInventoryItemStackAdmin(int playerId, string inventoryId, int count, Action<LootLockerTestSplitItemStackResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
@@ -161,7 +161,7 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            var endpoint = LootLockerTestConfigurationEndpoints.adminSplitPlayerItemStack;
+            var endpoint = LootLockerTestConfigurationEndpoints.adminSplitPlayerInventoryItemStack;
             string formattedEndpoint = string.Format(endpoint.endPoint, playerId, inventoryId);
             string json = LootLockerJson.SerializeObject(new LootLockerTestSplitItemStackRequest { count = count });
 
@@ -172,7 +172,7 @@ namespace LootLockerTestConfigurationUtils
             }, true);
         }
 
-        public static void MergePlayerItemStacksAdmin(int playerId, string sourceInventoryId, string targetInventoryId, Action<LootLockerResponse> onComplete)
+        public static void MergePlayerInventoryItemStacksAdmin(int playerId, string sourceInventoryId, string targetInventoryId, Action<LootLockerResponse> onComplete)
         {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
@@ -180,7 +180,7 @@ namespace LootLockerTestConfigurationUtils
                 return;
             }
 
-            var endpoint = LootLockerTestConfigurationEndpoints.adminMergePlayerItemStacks;
+            var endpoint = LootLockerTestConfigurationEndpoints.adminMergePlayerInventoryItemStacks;
             string formattedEndpoint = string.Format(endpoint.endPoint, playerId);
             string json = LootLockerJson.SerializeObject(new LootLockerTestMergeItemStacksRequest
             {
@@ -250,7 +250,7 @@ namespace LootLockerTestConfigurationUtils
         public string target_inventory_id { get; set; }
     }
 
-    public class LootLockerTestAdminListPlayerItemsResponse : LootLockerResponse
+    public class LootLockerTestAdminListPlayerInventoryItemsResponse : LootLockerResponse
     {
         public LootLockerTestAdminPlayerItem[] items { get; set; }
     }
