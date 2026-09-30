@@ -353,12 +353,12 @@ namespace LootLocker
         // Items
         [Header("Items")]
         public static EndPointClass listItemTemplates = new EndPointClass("player/inventory/v1", LootLockerHTTPMethod.GET);
-        public static EndPointClass listPlayerItems = new EndPointClass("player/inventory/v1/my", LootLockerHTTPMethod.GET);
-        public static EndPointClass getPlayerItem = new EndPointClass("player/inventory/v1/{0}", LootLockerHTTPMethod.GET);
-        public static EndPointClass deletePlayerItem = new EndPointClass("player/inventory/v1/{0}", LootLockerHTTPMethod.DELETE);
-        public static EndPointClass consumePlayerItem = new EndPointClass("player/inventory/v1/{0}/consume", LootLockerHTTPMethod.POST);
-        public static EndPointClass splitPlayerItemStack = new EndPointClass("player/inventory/v1/{0}/split", LootLockerHTTPMethod.POST);
-        public static EndPointClass mergePlayerItemStacks = new EndPointClass("player/inventory/v1/merge", LootLockerHTTPMethod.POST);
+        public static EndPointClass listPlayerInventoryItems = new EndPointClass("player/inventory/v1/my", LootLockerHTTPMethod.GET);
+        public static EndPointClass getPlayerInventoryItem = new EndPointClass("player/inventory/v1/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass deletePlayerInventoryItem = new EndPointClass("player/inventory/v1/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass consumePlayerInventoryItem = new EndPointClass("player/inventory/v1/{0}/consume", LootLockerHTTPMethod.POST);
+        public static EndPointClass splitPlayerInventoryItemStack = new EndPointClass("player/inventory/v1/{0}/split", LootLockerHTTPMethod.POST);
+        public static EndPointClass mergePlayerInventoryItemStacks = new EndPointClass("player/inventory/v1/merge", LootLockerHTTPMethod.POST);
     }
 
     [Serializable]

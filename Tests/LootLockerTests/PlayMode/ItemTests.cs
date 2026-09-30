@@ -190,14 +190,14 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_ListPlayerItems_ReturnsGrantedItem()
+        public IEnumerator Items_ListPlayerInventoryItems_ReturnsGrantedItem()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse response = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, onComplete: (r) =>
+            LootLockerListPlayerInventoryItemsResponse response = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, onComplete: (r) =>
             {
                 response = r;
                 listCallCompleted = true;
@@ -205,7 +205,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => listCallCompleted);
 
             // Then
-            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "ListPlayerItems call failed");
+            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "ListPlayerInventoryItems call failed");
             Assert.IsNotNull(response.items, "Player items should not be null");
             Assert.IsTrue(response.items.Any(i => i.id == grantedInventoryId), "Expected the granted item to be listed");
 
@@ -220,14 +220,14 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_ListPlayerItems_WithFilters_ReturnsFilteredItems()
+        public IEnumerator Items_ListPlayerInventoryItems_WithFilters_ReturnsFilteredItems()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse response = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, name: createdTemplateName, itemType: LootLockerItemType.stackable,
+            LootLockerListPlayerInventoryItemsResponse response = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, name: createdTemplateName, itemType: LootLockerItemType.stackable,
                 consumable: true, sort: LootLockerItemSortField.created_at, order: LootLockerSortOrder.DESC, onComplete: (r) =>
                 {
                     response = r;
@@ -236,7 +236,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => listCallCompleted);
 
             // Then
-            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "Filtered ListPlayerItems call failed");
+            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "Filtered ListPlayerInventoryItems call failed");
             Assert.IsNotNull(response.items, "Player items should not be null");
             Assert.IsTrue(response.items.Any(i => i.id == grantedInventoryId), "Expected the granted item to match the filters");
             Assert.IsTrue(response.items.All(i => i.item_type == LootLockerItemType.stackable), "All returned items should be stackable");
@@ -245,14 +245,14 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_GetPlayerItem_ReturnsItemWithTemplate()
+        public IEnumerator Items_GetPlayerInventoryItem_ReturnsItemWithTemplate()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool getCallCompleted = false;
-            LootLockerGetPlayerItemResponse response = null;
-            LootLockerSDKManager.GetPlayerItem(grantedInventoryId, (r) =>
+            LootLockerGetPlayerInventoryItemResponse response = null;
+            LootLockerSDKManager.GetPlayerInventoryItem(grantedInventoryId, (r) =>
             {
                 response = r;
                 getCallCompleted = true;
@@ -260,7 +260,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => getCallCompleted);
 
             // Then
-            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "GetPlayerItem call failed");
+            Assert.IsTrue(response.success, response.errorData?.ToString() ?? "GetPlayerInventoryItem call failed");
             Assert.AreEqual(grantedInventoryId, response.id, "Returned item id should match the requested id");
             Assert.AreEqual(5, response.count, "Item count should be 5");
             Assert.AreEqual(LootLockerItemType.stackable, response.item_type, "Item should be stackable");
@@ -272,14 +272,14 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_ConsumePlayerItem_PartialStack_DecrementsCount()
+        public IEnumerator Items_ConsumePlayerInventoryItem_PartialStack_DecrementsCount()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool consumeCallCompleted = false;
-            LootLockerConsumeItemResponse consumeResponse = null;
-            LootLockerSDKManager.ConsumePlayerItem(grantedInventoryId, 2, (r) =>
+            LootLockerConsumeInventoryItemResponse consumeResponse = null;
+            LootLockerSDKManager.ConsumePlayerInventoryItem(grantedInventoryId, 2, (r) =>
             {
                 consumeResponse = r;
                 consumeCallCompleted = true;
@@ -287,32 +287,32 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => consumeCallCompleted);
 
             // Then
-            Assert.IsTrue(consumeResponse.success, consumeResponse.errorData?.ToString() ?? "ConsumePlayerItem call failed");
+            Assert.IsTrue(consumeResponse.success, consumeResponse.errorData?.ToString() ?? "ConsumePlayerInventoryItem call failed");
             Assert.IsTrue(consumeResponse.consumed, "Item should report as consumed");
 
             bool getCallCompleted = false;
-            LootLockerGetPlayerItemResponse getResponse = null;
-            LootLockerSDKManager.GetPlayerItem(grantedInventoryId, (r) =>
+            LootLockerGetPlayerInventoryItemResponse getResponse = null;
+            LootLockerSDKManager.GetPlayerInventoryItem(grantedInventoryId, (r) =>
             {
                 getResponse = r;
                 getCallCompleted = true;
             });
             yield return new WaitUntil(() => getCallCompleted);
 
-            Assert.IsTrue(getResponse.success, getResponse.errorData?.ToString() ?? "GetPlayerItem after consume failed");
+            Assert.IsTrue(getResponse.success, getResponse.errorData?.ToString() ?? "GetPlayerInventoryItem after consume failed");
             Assert.AreEqual(3, getResponse.count, "Consuming 2 of 5 should leave 3");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_ConsumePlayerItem_WholeStack_RemovesItem()
+        public IEnumerator Items_ConsumePlayerInventoryItem_WholeStack_RemovesItem()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When - passing the full count consumes the entire row
             bool consumeCallCompleted = false;
-            LootLockerConsumeItemResponse consumeResponse = null;
-            LootLockerSDKManager.ConsumePlayerItem(grantedInventoryId, 5, (r) =>
+            LootLockerConsumeInventoryItemResponse consumeResponse = null;
+            LootLockerSDKManager.ConsumePlayerInventoryItem(grantedInventoryId, 5, (r) =>
             {
                 consumeResponse = r;
                 consumeCallCompleted = true;
@@ -320,32 +320,32 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => consumeCallCompleted);
 
             // Then
-            Assert.IsTrue(consumeResponse.success, consumeResponse.errorData?.ToString() ?? "ConsumePlayerItem call failed");
+            Assert.IsTrue(consumeResponse.success, consumeResponse.errorData?.ToString() ?? "ConsumePlayerInventoryItem call failed");
             Assert.IsTrue(consumeResponse.consumed, "Item should report as consumed");
 
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse listResponse = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, onComplete: (r) =>
+            LootLockerListPlayerInventoryItemsResponse listResponse = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, onComplete: (r) =>
             {
                 listResponse = r;
                 listCallCompleted = true;
             });
             yield return new WaitUntil(() => listCallCompleted);
 
-            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerItems after consume failed");
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerInventoryItems after consume failed");
             Assert.IsFalse(listResponse.items.Any(i => i.id == grantedInventoryId), "Fully consumed item should no longer be listed");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_SplitPlayerItemStack_CreatesSecondStack()
+        public IEnumerator Items_SplitPlayerInventoryItemStack_CreatesSecondStack()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool splitCallCompleted = false;
-            LootLockerSplitItemStackResponse splitResponse = null;
-            LootLockerSDKManager.SplitPlayerItemStack(grantedInventoryId, 2, (r) =>
+            LootLockerSplitInventoryItemStackResponse splitResponse = null;
+            LootLockerSDKManager.SplitPlayerInventoryItemStack(grantedInventoryId, 2, (r) =>
             {
                 splitResponse = r;
                 splitCallCompleted = true;
@@ -353,20 +353,20 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => splitCallCompleted);
 
             // Then
-            Assert.IsTrue(splitResponse.success, splitResponse.errorData?.ToString() ?? "SplitPlayerItemStack call failed");
+            Assert.IsTrue(splitResponse.success, splitResponse.errorData?.ToString() ?? "SplitPlayerInventoryItemStack call failed");
             Assert.IsNotNull(splitResponse.id, "Split should return the id of the new stack");
             Assert.AreNotEqual(grantedInventoryId, splitResponse.id, "The new stack should have a different id");
 
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse listResponse = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, onComplete: (r) =>
+            LootLockerListPlayerInventoryItemsResponse listResponse = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, onComplete: (r) =>
             {
                 listResponse = r;
                 listCallCompleted = true;
             });
             yield return new WaitUntil(() => listCallCompleted);
 
-            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerItems after split failed");
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerInventoryItems after split failed");
             var original = listResponse.items.FirstOrDefault(i => i.id == grantedInventoryId);
             var split = listResponse.items.FirstOrDefault(i => i.id == splitResponse.id);
             Assert.IsNotNull(original, "Original stack should still be listed");
@@ -377,25 +377,25 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_MergePlayerItemStacks_CombinesCounts()
+        public IEnumerator Items_MergePlayerInventoryItemStacks_CombinesCounts()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // Given - split off a second stack to merge back
             bool splitCallCompleted = false;
-            LootLockerSplitItemStackResponse splitResponse = null;
-            LootLockerSDKManager.SplitPlayerItemStack(grantedInventoryId, 2, (r) =>
+            LootLockerSplitInventoryItemStackResponse splitResponse = null;
+            LootLockerSDKManager.SplitPlayerInventoryItemStack(grantedInventoryId, 2, (r) =>
             {
                 splitResponse = r;
                 splitCallCompleted = true;
             });
             yield return new WaitUntil(() => splitCallCompleted);
-            Assert.IsTrue(splitResponse.success, splitResponse.errorData?.ToString() ?? "SplitPlayerItemStack call failed");
+            Assert.IsTrue(splitResponse.success, splitResponse.errorData?.ToString() ?? "SplitPlayerInventoryItemStack call failed");
 
             // When - merge the new stack back into the original
             bool mergeCallCompleted = false;
             LootLockerResponse mergeResponse = null;
-            LootLockerSDKManager.MergePlayerItemStacks(splitResponse.id, grantedInventoryId, (r) =>
+            LootLockerSDKManager.MergePlayerInventoryItemStacks(splitResponse.id, grantedInventoryId, (r) =>
             {
                 mergeResponse = r;
                 mergeCallCompleted = true;
@@ -403,18 +403,18 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => mergeCallCompleted);
 
             // Then
-            Assert.IsTrue(mergeResponse.success, mergeResponse.errorData?.ToString() ?? "MergePlayerItemStacks call failed");
+            Assert.IsTrue(mergeResponse.success, mergeResponse.errorData?.ToString() ?? "MergePlayerInventoryItemStacks call failed");
 
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse listResponse = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, onComplete: (r) =>
+            LootLockerListPlayerInventoryItemsResponse listResponse = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, onComplete: (r) =>
             {
                 listResponse = r;
                 listCallCompleted = true;
             });
             yield return new WaitUntil(() => listCallCompleted);
 
-            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerItems after merge failed");
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerInventoryItems after merge failed");
             var target = listResponse.items.FirstOrDefault(i => i.id == grantedInventoryId);
             Assert.IsNotNull(target, "Target stack should still be listed");
             Assert.AreEqual(5, target.count, "Merged stack should hold the combined count of 5");
@@ -423,14 +423,14 @@ namespace LootLockerTests.PlayMode
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_DeletePlayerItem_RemovesItem()
+        public IEnumerator Items_DeletePlayerInventoryItem_RemovesItem()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
             // When
             bool deleteCallCompleted = false;
             LootLockerResponse deleteResponse = null;
-            LootLockerSDKManager.DeletePlayerItem(grantedInventoryId, (r) =>
+            LootLockerSDKManager.DeletePlayerInventoryItem(grantedInventoryId, (r) =>
             {
                 deleteResponse = r;
                 deleteCallCompleted = true;
@@ -438,24 +438,24 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => deleteCallCompleted);
 
             // Then
-            Assert.IsTrue(deleteResponse.success, deleteResponse.errorData?.ToString() ?? "DeletePlayerItem call failed");
+            Assert.IsTrue(deleteResponse.success, deleteResponse.errorData?.ToString() ?? "DeletePlayerInventoryItem call failed");
 
             bool listCallCompleted = false;
-            LootLockerListPlayerItemsResponse listResponse = null;
-            LootLockerSDKManager.ListPlayerItems(1, 100, onComplete: (r) =>
+            LootLockerListPlayerInventoryItemsResponse listResponse = null;
+            LootLockerSDKManager.ListPlayerInventoryItems(1, 100, onComplete: (r) =>
             {
                 listResponse = r;
                 listCallCompleted = true;
             });
             yield return new WaitUntil(() => listCallCompleted);
 
-            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerItems after delete failed");
+            Assert.IsTrue(listResponse.success, listResponse.errorData?.ToString() ?? "ListPlayerInventoryItems after delete failed");
             Assert.IsFalse(listResponse.items.Any(i => i.id == grantedInventoryId), "Deleted item should no longer be listed");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
         [Timeout(360_000)]
-        public IEnumerator Items_DeletePlayerItem_NotDeletable_ReturnsForbidden()
+        public IEnumerator Items_DeletePlayerInventoryItem_NotDeletable_ReturnsForbidden()
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
@@ -497,7 +497,7 @@ namespace LootLockerTests.PlayMode
             // When
             bool deleteCallCompleted = false;
             LootLockerResponse deleteResponse = null;
-            LootLockerSDKManager.DeletePlayerItem(nonDeletableInventoryId, (r) =>
+            LootLockerSDKManager.DeletePlayerInventoryItem(nonDeletableInventoryId, (r) =>
             {
                 deleteResponse = r;
                 deleteCallCompleted = true;
