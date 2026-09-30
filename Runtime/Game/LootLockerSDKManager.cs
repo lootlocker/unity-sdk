@@ -6799,6 +6799,21 @@ namespace LootLocker.Requests
         }
 
         /// <summary>
+        /// Consumes a single item from a stackable inventory item.
+        /// </summary>
+        /// <remarks>
+        /// Operates on <b>items</b> and <b>item templates</b>. This is unrelated to the asset-based
+        /// inventory API, which deals with <b>assets</b> and <b>asset instances</b>.
+        /// </remarks>
+        /// <param name="inventoryId">The id of the stackable inventory item to consume.</param>
+        /// <param name="onComplete">Delegate for handling the server response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ConsumePlayerInventoryItem(string inventoryId, Action<LootLockerConsumeInventoryItemResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            ConsumePlayerInventoryItem(inventoryId, null, onComplete, forPlayerWithUlid);
+        }
+
+        /// <summary>
         /// Splits a stackable inventory item into two stacks, moving <paramref name="count"/> items into a new stack.
         /// </summary>
         /// <remarks>
