@@ -13,6 +13,11 @@ namespace LootLocker
         public string ban_reason { get; set; }
 
         /// <summary>
+        /// A player-facing message describing the ban. Empty when no detail was provided.
+        /// </summary>
+        public string ban_detail { get; set; }
+
+        /// <summary>
         /// The time the ban was issued, as an ISO 8601 timestamp.
         /// </summary>
         public string banned_on { get; set; }
