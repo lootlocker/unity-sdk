@@ -188,12 +188,7 @@ namespace LootLocker
 #endif
             }
 
-            var fileConfig = CheckForFileConfig();
-            if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
-            {
-                _activeFileConfig = fileConfig;
-                ApplyFileConfig(fileConfig);
-            }
+            RefreshFileConfigState();
 
 #if LOOTLOCKER_COMMANDLINE_SETTINGS
             _current.CheckForSettingOverrides();
@@ -513,7 +508,18 @@ namespace LootLocker
             // current after SDK updates on disk (fixes stale version on upgrade).
             // We only raise OnSdkVersionDetermined once the authoritative value has
             // been resolved by Client.List(), so subscribers never act on stale data.
-            ListInstalledPackagesRequest = Client.List();
+            try
+            {
+                ListInstalledPackagesRequest = Client.List();
+            }
+            catch (Exception exception)
+            {
+                // No Package Manager backend in this editor instance — resolve from files instead.
+                LootLockerLogger.Log($"Could not list installed packages, falling back to file based SDK version detection: {exception.Message}", LootLockerLogger.LogLevel.Verbose);
+                ListInstalledPackagesRequest = null;
+                ResolveSdkVersionFromFiles();
+                return;
+            }
             EditorApplication.update += ListInstalledPackagesRequestProgress;
         }
 
@@ -526,12 +532,27 @@ namespace LootLocker
 
         static void ListInstalledPackagesRequestProgress()
         {
-            if (ListInstalledPackagesRequest.IsCompleted)
+            if (ListInstalledPackagesRequest == null)
             {
                 EditorApplication.update -= ListInstalledPackagesRequestProgress;
-                foreach (var package in ListInstalledPackagesRequest.Result)
+                return;
+            }
+
+            if (!ListInstalledPackagesRequest.IsCompleted)
+            {
+                return;
+            }
+
+            EditorApplication.update -= ListInstalledPackagesRequestProgress;
+
+            // The Package Manager backend is not available in every editor instance (for example
+            // Multiplayer Play Mode virtual players). In that case the request completes with a
+            // failure status and a null Result, so the package list must be treated as optional.
+            if (ListInstalledPackagesRequest.Status == StatusCode.Success && ListInstalledPackagesRequest.Result != null)
+            {
+                foreach (UnityEditor.PackageManager.PackageInfo package in ListInstalledPackagesRequest.Result)
                 {
-                    if (package.name.Equals("com.lootlocker.lootlockersdk"))
+                    if (package != null && package.name.Equals("com.lootlocker.lootlockersdk"))
                     {
                         LootLockerConfig.current.sdk_version = package.version;
                         LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
@@ -540,38 +561,48 @@ namespace LootLocker
                         return;
                     }
                 }
+            }
+            else
+            {
+                LootLockerLogger.Log($"Could not list installed packages, falling back to file based SDK version detection: {ListInstalledPackagesRequest.Error?.message}", LootLockerLogger.LogLevel.Verbose);
+            }
 
-                string sdkPackageJsonPath = $"{GetSdkRootAssetsPath()}/package.json";
-                if (File.Exists(sdkPackageJsonPath))
-                {
-                    LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(sdkPackageJsonPath)).version;
-                    LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
-                    SdkVersionDetermined = true;
-                    OnSdkVersionDetermined?.Invoke();
-                    return;
-                }
+            ResolveSdkVersionFromFiles();
+        }
 
-
-                foreach (var assetPath in AssetDatabase.GetAllAssetPaths())
-                {
-                    if (assetPath.EndsWith("package.json"))
-                    {
-                        var packageDescription = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(assetPath));
-                        if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
-                        {
-                            LootLockerConfig.current.sdk_version = packageDescription.version;
-                            LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
-                            SdkVersionDetermined = true;
-                            OnSdkVersionDetermined?.Invoke();
-                            return;
-                        }
-                    }
-                }
-
-                LootLockerConfig.current.sdk_version = "N/A";
+        // Resolves the SDK version without relying on the Package Manager backend by reading the
+        // package manifest from disk. Used as a fallback whenever the package list is unavailable.
+        static void ResolveSdkVersionFromFiles()
+        {
+            string sdkPackageJsonPath = $"{GetSdkRootAssetsPath()}/package.json";
+            if (File.Exists(sdkPackageJsonPath))
+            {
+                LootLockerConfig.current.sdk_version = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(sdkPackageJsonPath)).version;
+                LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
                 SdkVersionDetermined = true;
                 OnSdkVersionDetermined?.Invoke();
+                return;
             }
+
+            foreach (string assetPath in AssetDatabase.GetAllAssetPaths())
+            {
+                if (assetPath.EndsWith("package.json"))
+                {
+                    LLPackageDescription packageDescription = LootLockerJson.DeserializeObject<LLPackageDescription>(File.ReadAllText(assetPath));
+                    if (!string.IsNullOrEmpty(packageDescription.name) && packageDescription.name.Equals("com.lootlocker.lootlockersdk"))
+                    {
+                        LootLockerConfig.current.sdk_version = packageDescription.version;
+                        LootLockerLogger.Log($"SDK Version v{LootLockerConfig.current.sdk_version}", LootLockerLogger.LogLevel.Verbose);
+                        SdkVersionDetermined = true;
+                        OnSdkVersionDetermined?.Invoke();
+                        return;
+                    }
+                }
+            }
+
+            LootLockerConfig.current.sdk_version = "N/A";
+            SdkVersionDetermined = true;
+            OnSdkVersionDetermined?.Invoke();
         }
 #endif
 
@@ -727,23 +758,46 @@ namespace LootLocker
 
         /// <summary>
         /// True when an external config file is present and governing settings.
-        /// All fields controlled by the file config are read-only while this is true.
+        /// All fields applied by <see cref="ApplyFileConfig"/> are read-only while this is true.
+        /// Game version and the log level / log errors as warnings / log in builds settings are
+        /// intentionally not applied from the file config and stay editable in Project Settings.
         /// </summary>
         public static bool IsFileConfigActive => _activeFileConfig != null;
+
+        private static bool _fileConfigChecked;
+
+        /// <summary>
+        /// Probes the external config file and applies it when present. Safe to call repeatedly;
+        /// the probe only runs once per domain unless <paramref name="force"/> is true.
+        /// </summary>
+        public static void RefreshFileConfigState(bool force = false)
+        {
+            if (_current == null)
+            {
+                return;
+            }
+            if (_fileConfigChecked && !force)
+            {
+                return;
+            }
+            _fileConfigChecked = true;
+            ExternalFileConfig fileConfig = CheckForFileConfig();
+            if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
+            {
+                _activeFileConfig = fileConfig;
+                ApplyFileConfig(fileConfig);
+            }
+        }
 
         private static void ApplyFileConfig(ExternalFileConfig fileConfig)
         {
             _current.sdk_version = fileConfig.sdk_version;
             _current.apiKey = fileConfig.api_key;
-            _current.game_version = fileConfig.game_version;
             _current.domainKey = fileConfig.domain_key;
             _current.enablePresence = fileConfig.enable_presence;
             _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
             _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
             _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
-            _current.logLevel = fileConfig.log_level;
-            _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
-            _current.logInBuilds = fileConfig.log_in_builds;
             _current.allowTokenRefresh = fileConfig.allow_token_refresh;
             _current.prettifyJson = fileConfig.prettify_json;
             _current.obfuscateLogs = fileConfig.obfuscate_logs;
@@ -809,6 +863,7 @@ namespace LootLocker
             _current = null;
             _cachedSdkRootPath = null;
             _activeFileConfig = null;
+            _fileConfigChecked = false;
         }
 #endif
 #endregion
