@@ -259,7 +259,7 @@ namespace LootLocker.Admin
             
             // Auto-connect toggle
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect"));
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), new GUIContent("Auto Connect", "Automatically connect presence when sessions are started. Once connected (automatically or manually), presence is maintained until explicitly disconnected."));
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;

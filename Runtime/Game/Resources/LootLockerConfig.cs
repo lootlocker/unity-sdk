@@ -138,7 +138,7 @@ namespace LootLocker
         [Tooltip("Enable WebSocket presence system by default. Can be controlled at runtime via SetPresenceEnabled().")]
         public bool enablePresence = false;
         
-        [Tooltip("Automatically connect presence when sessions are started. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
+        [Tooltip("Automatically connect presence when sessions are started. This only controls whether connections are initiated automatically; once connected (automatically or manually), presence is maintained until explicitly disconnected. Can be controlled at runtime via SetPresenceAutoConnectEnabled().")]
         public bool enablePresenceAutoConnect = true;
         
         [Tooltip("Automatically disconnect presence when app loses focus or is paused (useful for battery saving). Can be controlled at runtime via SetPresenceAutoDisconnectOnFocusChangeEnabled().")]
