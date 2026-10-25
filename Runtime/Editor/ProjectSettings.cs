@@ -33,10 +33,9 @@ namespace LootLocker.Admin
 
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
-            if (gameSettings == null)
-            {
-                gameSettings = LootLockerConfig.Get();
-            }
+            gameSettings = LootLockerConfig.Get();
+            LootLockerConfig.RefreshFileConfigState(force: true);
+
             // This function is called when the user clicks on the MyCustom element in the Settings window.
             m_CustomSettings = GetSerializedSettings();
 
@@ -44,10 +43,9 @@ namespace LootLocker.Admin
 
         public override void OnGUI(string searchContext)
         {
-            if (gameSettings == null)
-            {
-                gameSettings = LootLockerConfig.Get();
-            }
+            gameSettings = LootLockerConfig.Get();
+            LootLockerConfig.RefreshFileConfigState();
+
             m_CustomSettings.Update();
 
             // For Unity Attribution
@@ -88,7 +86,7 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Settings are controlled by the external config file and cannot be edited here. Edit the config file to change these values.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Game version and log settings remain editable. Edit the config file to change the other values.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
 
@@ -137,6 +135,7 @@ namespace LootLocker.Admin
             domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(domainContent, false);
             EditorGUILayout.Space();
+            EditorGUI.EndDisabledGroup();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("game_version"));
@@ -152,6 +151,7 @@ namespace LootLocker.Admin
                     "Game version needs to follow a numeric Semantic Versioning pattern: X.Y.Z.B with the sections denoting MAJOR.MINOR.PATCH.BUILD and the last two being optional. Read more at https://docs.lootlocker.com/the-basics/core-concepts/glossary#game-version",
                     MessageType.Warning, false);
             }
+            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"));
@@ -170,8 +170,11 @@ namespace LootLocker.Admin
                 gameSettings.multiUserSessionMode = (LootLockerMultiUserSessionMode)m_CustomSettings.FindProperty("multiUserSessionMode").enumValueIndex;
             }
             EditorGUILayout.Space();
+            EditorGUI.EndDisabledGroup();
 
             DrawLogSettings();
+
+            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
             DrawPresenceSettings();
 
@@ -220,6 +223,7 @@ namespace LootLocker.Admin
                 gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue;
             }
             EditorGUILayout.Space();
+            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("prettifyJson"), new GUIContent("Log JSON Formatted"));
@@ -228,6 +232,8 @@ namespace LootLocker.Admin
             {
                 gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue;
             }
+
+            EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
         }
