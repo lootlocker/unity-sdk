@@ -42,6 +42,11 @@ namespace LootLocker.Requests
         /// @ingroup Init
         /// <summary>
         /// Manually initialize the SDK.
+        ///
+        /// Values passed here take precedence over every file-based configuration source,
+        /// including a selected file config and the local override file. They are applied for the
+        /// lifetime of the process only and are never written back to the config asset, so calling
+        /// this cannot change what other developers or builds use.
         /// </summary>
         /// <param name="apiKey">Find the Game API-key at https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>

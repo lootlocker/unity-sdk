@@ -865,11 +865,9 @@ namespace LootLocker
         {
             _current = Get();
 
-            if (IsFileConfigActive)
-            {
-                return false;
-            }
-
+            // An explicit Init(...) call is the most specific instruction the SDK can receive, so
+            // it wins over every file-based source. It is deliberately not persisted: it applies
+            // for the lifetime of the process and cannot rewrite the committed config asset.
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
             _current.domainKey = domainKey;
@@ -902,11 +900,6 @@ namespace LootLocker
         {
             _current = Get();
 
-            if (IsFileConfigActive)
-            {
-                return false;
-            }
-
             if(newConfig == null)
             {
                 return false;
@@ -917,6 +910,7 @@ namespace LootLocker
                 return false;
             }
 
+            // See the string overload: an explicit Init(...) call outranks every file-based source.
             _current.apiKey = newConfig.apiKey;
             _current.game_version = newConfig.game_version;
             _current.domainKey = newConfig.domainKey;
