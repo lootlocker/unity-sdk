@@ -19,7 +19,33 @@ namespace LootLockerTests.EditMode
         [SetUp]
         public void CaptureOriginalConfig()
         {
-            _original = LootLockerConfig.current;
+            // A copy, not the live object. LootLockerConfig.current is the asset instance itself,
+            // so holding a reference to it and copying it back in TearDown would copy the object
+            // onto itself and restore nothing - the values these tests set would leak into every
+            // later test in the session.
+            LootLockerConfig live = LootLockerConfig.current;
+            if (live == null)
+            {
+                return;
+            }
+
+            _original = ScriptableObject.CreateInstance<LootLockerConfig>();
+            _original.hideFlags = HideFlags.HideAndDontSave;
+            _original.apiKey = live.apiKey;
+            _original.domainKey = live.domainKey;
+            _original.game_version = live.game_version;
+            _original.logLevel = live.logLevel;
+            _original.logErrorsAsWarnings = live.logErrorsAsWarnings;
+            _original.logInBuilds = live.logInBuilds;
+            _original.enablePresence = live.enablePresence;
+            _original.enablePresenceAutoConnect = live.enablePresenceAutoConnect;
+            _original.enablePresenceAutoDisconnectOnFocusChange = live.enablePresenceAutoDisconnectOnFocusChange;
+            _original.enablePresenceInEditor = live.enablePresenceInEditor;
+            _original.allowTokenRefresh = live.allowTokenRefresh;
+            _original.prettifyJson = live.prettifyJson;
+            _original.obfuscateLogs = live.obfuscateLogs;
+            _original.multiUserSessionMode = live.multiUserSessionMode;
+            _original.enableEditorAdminExtension = live.enableEditorAdminExtension;
         }
 
         [TearDown]
@@ -28,6 +54,8 @@ namespace LootLockerTests.EditMode
             if (_original != null)
             {
                 LootLockerConfig.CreateNewSettings(_original);
+                Object.DestroyImmediate(_original);
+                _original = null;
             }
         }
 
@@ -64,19 +92,26 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void InitCall_DoesNotPersistToTheAsset()
+        public void InitCall_AppliesToTheLiveConfigOnly()
         {
-            // Given: a known asset value
-            LootLockerConfig.CreateNewSettings("asset_key", "1.0.0", "asset_domain");
-            string assetKeyBefore = LootLockerConfig.current.apiKey;
+            // Given: the authored values of the asset, captured before anything is applied
+            LootLockerConfig.RestoreAssetValues();
+            string authoredKey = LootLockerConfig.current.apiKey;
 
             // When: an explicit call overrides it at runtime
             LootLockerConfig.CreateNewSettings("runtime_key", "1.0.0", "runtime_domain");
 
-            // Then: the live value changed, but nothing was written to disk
+            // Then: the live value changed...
             Assert.AreEqual("runtime_key", LootLockerConfig.current.apiKey);
-            Assert.AreEqual(assetKeyBefore, "asset_key",
-                "The asset value must be untouched; Init is process-lifetime only");
+
+            // ...but the authored values are untouched, so restoring them discards the Init value.
+            // This is the property that matters: Init is process-lifetime only and must never
+            // become the value that gets saved back to the committed asset.
+            LootLockerConfig.RestoreAssetValues();
+            Assert.AreEqual(authoredKey, LootLockerConfig.current.apiKey,
+                "Init must not overwrite the authored asset values");
+            Assert.AreNotEqual("runtime_key", LootLockerConfig.current.apiKey,
+                "The Init value must not survive a restore of the authored values");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]

@@ -75,5 +75,46 @@ namespace LootLockerTests.EditMode
             // Then
             Assert.AreEqual("prod", resolved, "An explicit selection must beat the legacy file");
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void RestoreAssetValues_DiscardsAppliedFileConfigValues()
+        {
+            // Regression: ReloadConfigAsset used to call Resources.Load, which returns the already
+            // loaded instance - the very object that had been mutated. Restoring was therefore a
+            // no-op and switching configs left the previous config's values in place for every
+            // field the new one omitted.
+            LootLockerConfig config = LootLockerConfig.current;
+            if (config == null)
+            {
+                Assert.Ignore("No config asset available in this project");
+            }
+
+            LootLockerConfig.RestoreAssetValues();
+            string authoredKey = config.apiKey;
+            string authoredDomain = config.domainKey;
+
+            try
+            {
+                // Given: values applied from a file config
+                var fileConfig = new ExternalFileConfig
+                {
+                    api_key = "applied_key",
+                    domain_key = "applied_domain",
+                };
+                LootLockerConfig.ApplyFileConfig(fileConfig, null);
+                Assert.AreEqual("applied_key", config.apiKey, "Precondition: the value was applied");
+
+                // When
+                LootLockerConfig.RestoreAssetValues();
+
+                // Then: the authored values are back
+                Assert.AreEqual(authoredKey, config.apiKey, "Restoring must discard the applied api_key");
+                Assert.AreEqual(authoredDomain, config.domainKey, "Restoring must discard the applied domain_key");
+            }
+            finally
+            {
+                LootLockerConfig.RestoreAssetValues();
+            }
+        }
     }
 }

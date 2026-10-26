@@ -124,7 +124,11 @@ namespace LootLockerTests.EditMode
             // Given: a fresh domain with no override applied
             // Then: the marker source must be empty rather than null
             Assert.IsNotNull(LootLockerConfig.LocalOverrideFields);
-            Assert.IsFalse(LootLockerConfig.IsLocallyOverridden(LootLockerConfigFields.LogLevel));
+
+            // Only the null and empty-id guards are asserted here. Asserting that a specific field
+            // is not overridden would depend on whether the developer running the tests happens to
+            // have a LootLockerConfig.local.bytes with that field, which is not a property of the
+            // code under test.
             Assert.IsFalse(LootLockerConfig.IsLocallyOverridden(null));
             Assert.IsFalse(LootLockerConfig.IsLocallyOverridden(""));
         }

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using LootLocker;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace LootLockerTests.EditMode
 {
@@ -8,9 +10,53 @@ namespace LootLockerTests.EditMode
     ///
     /// Two rules are pinned here: the SDK version always comes from the installed package, and the
     /// log settings do come from the file (they are what makes a "debug config" possible).
+    ///
+    /// These assert against the real applier rather than a hand-maintained list, so re-adding a
+    /// field to <c>ApplyFileConfig</c> actually fails the test that forbids it.
     /// </summary>
     public class FileConfigFieldTests
     {
+        private LootLockerConfig _original;
+
+        [SetUp]
+        public void CaptureOriginalConfig()
+        {
+            LootLockerConfig live = LootLockerConfig.current;
+            if (live == null)
+            {
+                return;
+            }
+
+            _original = ScriptableObject.CreateInstance<LootLockerConfig>();
+            _original.hideFlags = HideFlags.HideAndDontSave;
+            _original.apiKey = live.apiKey;
+            _original.domainKey = live.domainKey;
+            _original.game_version = live.game_version;
+            _original.logLevel = live.logLevel;
+            _original.logErrorsAsWarnings = live.logErrorsAsWarnings;
+            _original.logInBuilds = live.logInBuilds;
+            _original.enablePresence = live.enablePresence;
+            _original.enablePresenceAutoConnect = live.enablePresenceAutoConnect;
+            _original.enablePresenceAutoDisconnectOnFocusChange = live.enablePresenceAutoDisconnectOnFocusChange;
+            _original.enablePresenceInEditor = live.enablePresenceInEditor;
+            _original.allowTokenRefresh = live.allowTokenRefresh;
+            _original.prettifyJson = live.prettifyJson;
+            _original.obfuscateLogs = live.obfuscateLogs;
+            _original.multiUserSessionMode = live.multiUserSessionMode;
+            _original.enableEditorAdminExtension = live.enableEditorAdminExtension;
+        }
+
+        [TearDown]
+        public void RestoreOriginalConfig()
+        {
+            if (_original != null)
+            {
+                LootLockerConfig.CreateNewSettings(_original);
+                Object.DestroyImmediate(_original);
+                _original = null;
+            }
+        }
+
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void SdkVersion_IsNotAppliedFromFileConfig()
         {
@@ -21,13 +67,15 @@ namespace LootLockerTests.EditMode
 }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out _, out var fields, out string error);
+            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out var fields, out string error);
 
             // Then: the field still parses (existing files must keep working) but is not applied
             Assert.IsTrue(parsed, error);
             Assert.IsTrue(fields.Contains(LootLockerConfigFields.SdkVersion),
                 "The field must still be recognised so old files parse");
-            Assert.IsFalse(IsAppliedByFileConfig(LootLockerConfigFields.SdkVersion),
+
+            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            Assert.IsFalse(applied.Contains(LootLockerConfigFields.SdkVersion),
                 "sdk_version must never be applied from a config file");
         }
 
@@ -51,9 +99,14 @@ namespace LootLockerTests.EditMode
             Assert.IsTrue(config.log_errors_as_warnings);
             Assert.IsTrue(config.log_in_builds);
 
-            Assert.IsTrue(IsAppliedByFileConfig(LootLockerConfigFields.LogLevel));
-            Assert.IsTrue(IsAppliedByFileConfig(LootLockerConfigFields.LogErrorsAsWarnings));
-            Assert.IsTrue(IsAppliedByFileConfig(LootLockerConfigFields.LogInBuilds));
+            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogLevel));
+            Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogErrorsAsWarnings));
+            Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogInBuilds));
+
+            // And the values really reached the live config, not just the returned set.
+            Assert.AreEqual(LootLockerLogger.LogLevel.Verbose, LootLockerConfig.current.logLevel);
+            Assert.IsTrue(LootLockerConfig.current.logInBuilds);
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -68,37 +121,13 @@ namespace LootLockerTests.EditMode
             // Then: the field parses, but game version stays a Project Settings concern
             Assert.IsTrue(parsed, error);
             Assert.AreEqual("9.9.9", config.game_version);
-            Assert.IsFalse(IsAppliedByFileConfig(LootLockerConfigFields.GameVersion),
-                "Game version must stay editable in Project Settings");
-        }
 
-        /// <summary>
-        /// Mirrors the field list in <c>ApplyFileConfig</c>. Kept as an explicit list rather than
-        /// reflecting over the method so that adding a field to the applier without deciding
-        /// whether it belongs there fails this test.
-        /// </summary>
-        private static bool IsAppliedByFileConfig(string fieldName)
-        {
-            switch (fieldName)
-            {
-                case LootLockerConfigFields.ApiKey:
-                case LootLockerConfigFields.DomainKey:
-                case LootLockerConfigFields.EnablePresence:
-                case LootLockerConfigFields.EnablePresenceAutoConnect:
-                case LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange:
-                case LootLockerConfigFields.EnablePresenceInEditor:
-                case LootLockerConfigFields.LogLevel:
-                case LootLockerConfigFields.LogErrorsAsWarnings:
-                case LootLockerConfigFields.LogInBuilds:
-                case LootLockerConfigFields.PrettifyJson:
-                case LootLockerConfigFields.ObfuscateLogs:
-                case LootLockerConfigFields.AllowTokenRefresh:
-                case LootLockerConfigFields.MultiUserSessionMode:
-                case LootLockerConfigFields.EnableEditorAdminExtension:
-                    return true;
-                default:
-                    return false;
-            }
+            string before = LootLockerConfig.current.game_version;
+            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            Assert.IsFalse(applied.Contains(LootLockerConfigFields.GameVersion),
+                "Game version must stay editable in Project Settings");
+            Assert.AreEqual(before, LootLockerConfig.current.game_version,
+                "Applying a file config must not change the game version");
         }
     }
 }
