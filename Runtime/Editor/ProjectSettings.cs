@@ -84,13 +84,15 @@ namespace LootLocker.Admin
             }
 #pragma warning restore 0162
 
-            DrawFileConfigRow();
+            DrawFileConfigSection();
 
             if (LootLockerConfig.IsFileConfigActive)
             {
                 EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Game version and log settings remain editable. Edit the config file to change the other values.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
+
+            DrawValidation();
 
             EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
@@ -188,38 +190,43 @@ namespace LootLocker.Admin
         private const string NoneOption = "(None — use Project Settings)";
 
         /// <summary>
-        /// Draws the config file selection, refresh and validate controls on a single row.
+        /// Draws the config file selection and refresh controls.
         ///
-        /// The dropdown is only interactive when there is something to choose between: with zero
-        /// or one config file the selection is unambiguous, so a plain label is shown instead.
+        /// Nothing is drawn when there are no config files: a project without file configs should
+        /// look exactly like one that never had any. With a single config the selection is
+        /// unambiguous, so a plain label is shown instead of a dropdown.
         /// </summary>
-        private void DrawFileConfigRow()
+        private void DrawFileConfigSection()
         {
             List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigsForEditor();
+            if (discovered.Count == 0)
+            {
+                return;
+            }
+
             string selectedId = gameSettings.selectedFileConfigId;
+
+            // A dropdown is only needed when there is a real choice to make. With one config that
+            // is already in effect there is nothing to choose.
+            bool needsChoice = discovered.Count > 1
+                || (discovered.Count == 1 && selectedId != null && selectedId != discovered[0].Id);
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField("Config File", GUILayout.Width(EditorGUIUtility.labelWidth));
 
-                if (discovered.Count == 0)
+                if (needsChoice)
                 {
-                    EditorGUILayout.LabelField("No file config in use — settings below apply.");
-                }
-                else if (discovered.Count == 1 && selectedId == null)
-                {
-                    EditorGUILayout.LabelField($"Using {DescribeId(discovered[0].Id)}");
-                }
-                else
-                {
-                    string currentLabel = DescribeSelection(selectedId, discovered);
-
                     // A Popup cannot disable individual entries, so use a menu: invalid configs
                     // are shown greyed out and unclickable rather than selectable-but-broken.
-                    if (EditorGUILayout.DropdownButton(new GUIContent(currentLabel), FocusType.Keyboard))
+                    if (EditorGUILayout.DropdownButton(new GUIContent(DescribeSelection(selectedId, discovered)), FocusType.Keyboard))
                     {
                         ShowFileConfigMenu(selectedId, discovered);
                     }
+                }
+                else
+                {
+                    EditorGUILayout.LabelField($"Using {DescribeId(discovered[0].Id)}");
                 }
 
                 if (GUILayout.Button("Refresh", GUILayout.Width(70)))
@@ -227,17 +234,7 @@ namespace LootLocker.Admin
                     ClearValidationResult();
                     LootLockerConfig.RefreshFileConfigState(force: true);
                 }
-
-                using (new EditorGUI.DisabledScope(validationInProgress || string.IsNullOrEmpty(gameSettings?.apiKey)))
-                {
-                    if (GUILayout.Button(validationInProgress ? "Validating..." : "Validate", GUILayout.Width(90)))
-                    {
-                        ValidateCurrentConfig();
-                    }
-                }
             }
-
-            DrawValidationResult();
 
             if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
             {
@@ -348,6 +345,32 @@ namespace LootLocker.Admin
         {
             validationResult = null;
             validationInProgress = false;
+        }
+
+        /// <summary>
+        /// Draws the "Validate" affordance, which proves the currently effective API key works and
+        /// shows which game it belongs to.
+        ///
+        /// This validates whatever is currently applied (LootLockerConfig.current.apiKey), not an
+        /// arbitrary unselected config, so it is independent of file config selection.
+        /// </summary>
+        private void DrawValidation()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("Connection", GUILayout.Width(EditorGUIUtility.labelWidth));
+
+                using (new EditorGUI.DisabledScope(validationInProgress || string.IsNullOrEmpty(gameSettings?.apiKey)))
+                {
+                    if (GUILayout.Button(validationInProgress ? "Validating..." : "Validate", GUILayout.Width(90)))
+                    {
+                        ValidateCurrentConfig();
+                    }
+                }
+            }
+
+            DrawValidationResult();
+            EditorGUILayout.Space();
         }
 
         /// <summary>
