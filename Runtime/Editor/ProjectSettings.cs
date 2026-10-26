@@ -36,6 +36,7 @@ namespace LootLocker.Admin
         {
             gameSettings = LootLockerConfig.Get();
             LootLockerConfig.RefreshFileConfigState(force: true);
+            InvalidateDiscoveredConfigs();
 
             // This function is called when the user clicks on the MyCustom element in the Settings window.
             m_CustomSettings = GetSerializedSettings();
@@ -89,8 +90,7 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Click the closed padlock next to a setting to override it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);
-                EditorGUILayout.Space();
+                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Click the closed padlock next to a setting to override it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);                EditorGUILayout.Space();
             }
 
             DrawValidation();
@@ -293,6 +293,7 @@ namespace LootLocker.Admin
             }
 
             ClearValidationResult();
+            InvalidateDiscoveredConfigs();
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
 
@@ -307,6 +308,7 @@ namespace LootLocker.Admin
             }
 
             ClearValidationResult();
+            InvalidateDiscoveredConfigs();
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
 
@@ -341,6 +343,32 @@ namespace LootLocker.Admin
         }
 
         /// <summary>
+        /// Cached result of the last discovery. Discovery lists folders, reads and parses every
+        /// config file, and may fall back to the AssetDatabase, so running it on every OnGUI
+        /// repaint is far too expensive. Invalidated explicitly whenever something could have
+        /// changed: activation, the Refresh button, a selection change, and override edits.
+        /// </summary>
+        private static List<LootLockerConfig.FileConfigDescriptor> _discoveredConfigs;
+
+        private static List<LootLockerConfig.FileConfigDescriptor> GetDiscoveredConfigs()
+        {
+            if (_discoveredConfigs == null)
+            {
+                _discoveredConfigs = LootLockerConfig.DiscoverFileConfigsForEditor();
+            }
+
+            return _discoveredConfigs;
+        }
+
+        /// <summary>
+        /// Drops the cached discovery so the next repaint re-reads the config folder.
+        /// </summary>
+        private static void InvalidateDiscoveredConfigs()
+        {
+            _discoveredConfigs = null;
+        }
+
+        /// <summary>
         /// Draws the config file selection and refresh controls.
         ///
         /// Nothing is drawn when there are no config files: a project without file configs should
@@ -350,7 +378,7 @@ namespace LootLocker.Admin
         /// </summary>
         private void DrawFileConfigSection()
         {
-            List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigsForEditor();
+            List<LootLockerConfig.FileConfigDescriptor> discovered = GetDiscoveredConfigs();
             if (discovered.Count == 0)
             {
                 return;
@@ -384,6 +412,7 @@ namespace LootLocker.Admin
                 if (GUILayout.Button("Refresh", GUILayout.Width(70)))
                 {
                     ClearValidationResult();
+                    InvalidateDiscoveredConfigs();
                     LootLockerConfig.RefreshFileConfigState(force: true);
                 }
             }
@@ -406,7 +435,10 @@ namespace LootLocker.Admin
         {
             var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent(NoneOption), string.IsNullOrEmpty(selectedId),
+            // null means auto-detect, "" means explicitly none. They are different states and must
+            // not share a checkmark: comparing both against "" made None look selected whenever
+            // Default was.
+            menu.AddItem(new GUIContent(NoneOption), selectedId == "",
                 () => ApplyFileConfigSelection(""));
 
             foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
@@ -483,12 +515,17 @@ namespace LootLocker.Admin
                 LootLockerConfig.DeleteLocalOverride();
             }
 
+            // Save only the selection. gameSettings is the live asset and already holds the values
+            // applied from the previous config, so marking it dirty here would write those values
+            // into the committed config. Restore the authored values first, then persist the id.
+            LootLockerConfig.RestoreAssetValues();
             gameSettings.selectedFileConfigId = id;
             EditorUtility.SetDirty(gameSettings);
             AssetDatabase.SaveAssets();
 
             // The previous validation result described a different key, so it is now meaningless.
             ClearValidationResult();
+            InvalidateDiscoveredConfigs();
 
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
@@ -507,6 +544,13 @@ namespace LootLocker.Admin
         private static bool validationInProgress;
 
         /// <summary>
+        /// Incremented whenever the effective configuration changes. A validation callback captures
+        /// the value it started with and discards its result if the generation has moved on, so a
+        /// slow request for the previous key cannot overwrite the result for the current one.
+        /// </summary>
+        private static int validationGeneration;
+
+        /// <summary>
         /// Discards the last validation result. Called whenever the effective configuration
         /// changes, because a result describing the previous key is misleading.
         /// </summary>
@@ -514,6 +558,7 @@ namespace LootLocker.Admin
         {
             validationResult = null;
             validationInProgress = false;
+            validationGeneration++;
         }
 
         /// <summary>
@@ -566,6 +611,9 @@ namespace LootLocker.Admin
                 case LootLockerConfigValidationOutcome.Unreachable:
                     text = $"! {result.Message}";
                     break;
+                case LootLockerConfigValidationOutcome.EmptyResponse:
+                    text = $"! {result.Message}";
+                    break;
                 default:
                     text = result.Message;
                     break;
@@ -590,8 +638,18 @@ namespace LootLocker.Admin
             validationInProgress = true;
             validationResult = null;
 
+            int generation = validationGeneration;
+
             LootLocker.Requests.LootLockerSDKManager.GetGameInfo(response =>
             {
+                // The user switched config or reset an override while this request was in flight.
+                // Writing the result now would show a verdict for a key that is no longer in
+                // effect, which is exactly what ClearValidationResult was meant to prevent.
+                if (generation != validationGeneration)
+                {
+                    return;
+                }
+
                 validationResult = LootLockerConfigValidation.Classify(response, apiKey);
                 validationInProgress = false;
             });

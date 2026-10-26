@@ -16,6 +16,8 @@ namespace LootLocker.Admin
         KeyRejected = 2,
         /// <summary>The server could not be reached, or the request failed for a non-auth reason.</summary>
         Unreachable = 3,
+        /// <summary>The server answered successfully but returned no game information.</summary>
+        EmptyResponse = 4,
     }
 
     /// <summary>
@@ -74,6 +76,18 @@ namespace LootLocker.Admin
                     TitleId = response.info.title_id,
                     EnvironmentId = response.info.environment_id,
                     Message = "API key accepted.",
+                };
+            }
+
+            // The server answered and accepted the request, but sent no game information. That is
+            // not a connectivity problem, and reporting it as one sends developers after the wrong
+            // issue.
+            if (response.success)
+            {
+                return new LootLockerConfigValidationResult
+                {
+                    Outcome = LootLockerConfigValidationOutcome.EmptyResponse,
+                    Message = "API key accepted, but the server returned no game information.",
                 };
             }
 
