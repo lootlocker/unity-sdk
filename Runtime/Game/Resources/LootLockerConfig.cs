@@ -235,20 +235,22 @@ namespace LootLocker
 
                 if (string.IsNullOrEmpty(configText))
                 {
-                    // A selected-but-missing config must be loud, never a silent fallback to the
-                    // asset: that is how the wrong backend gets shipped.
+                    // The selected config is gone (moved, deleted, not pulled). Degrade to the
+                    // asset values, exactly as if no file config had ever existed, rather than
+                    // failing. Warn once per id so a missing file does not spam the console on
+                    // every refresh.
                     if (!string.IsNullOrEmpty(id))
                     {
-                        LootLockerLogger.Log(
-                            $"File config '{id}' was selected but could not be found. Expected Resources/Config/{fileName}{ConfigFileExtension}.",
-                            LootLockerLogger.LogLevel.Error);
+                        WarnOnceForMissingConfig(id,
+                            $"File config '{id}' was selected but could not be found. Falling back to the settings stored in the config asset. Expected Resources/Config/{fileName}{ConfigFileExtension}.");
                     }
                     return null;
                 }
 
                 if (!TryParseFileConfig(configText, out ExternalFileConfig fileConfig, out string error))
                 {
-                    LootLockerLogger.Log($"File config '{fileName}' is not usable: {error}", LootLockerLogger.LogLevel.Error);
+                    WarnOnceForMissingConfig(id,
+                        $"File config '{fileName}' is not usable ({error}). Falling back to the settings stored in the config asset.");
                     return null;
                 }
 
@@ -259,6 +261,22 @@ namespace LootLocker
                 LootLockerLogger.Log("Error while checking for file config: " + ex.Message, LootLockerLogger.LogLevel.Error);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Ids already reported as unusable, so a missing or broken config warns once instead of on
+        /// every refresh.
+        /// </summary>
+        private static readonly HashSet<string> _warnedConfigIds = new HashSet<string>();
+
+        private static void WarnOnceForMissingConfig(string id, string message)
+        {
+            if (string.IsNullOrEmpty(id) || !_warnedConfigIds.Add(id))
+            {
+                return;
+            }
+
+            LootLockerLogger.Log(message, LootLockerLogger.LogLevel.Warning);
         }
 
         /// <summary>
@@ -1207,6 +1225,7 @@ namespace LootLocker
             if (force)
             {
                 ReloadConfigAsset();
+                _warnedConfigIds.Clear();
             }
 
             ExternalFileConfig fileConfig = CheckForFileConfig();
