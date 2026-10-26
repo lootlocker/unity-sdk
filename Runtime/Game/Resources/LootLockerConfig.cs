@@ -1055,7 +1055,7 @@ namespace LootLocker
         /// True when an external config file is present and governing settings.
         /// All fields applied by <see cref="ApplyFileConfig"/> are read-only while this is true.
         /// Game version is intentionally not applied from the file config and stays editable in
-        /// Project Settings; everything else, including the log settings, comes from the file.
+        /// Project Settings.
         /// </summary>
         public static bool IsFileConfigActive => _activeFileConfig != null;
 
@@ -1535,11 +1535,6 @@ namespace LootLocker
             {
                 _current.domainKey = fileConfig.domain_key;
                 applied.Add(LootLockerConfigFields.DomainKey);
-            }
-            if (Applies(LootLockerConfigFields.GameVersion))
-            {
-                _current.game_version = fileConfig.game_version;
-                applied.Add(LootLockerConfigFields.GameVersion);
             }
             if (Applies(LootLockerConfigFields.LogLevel))
             {
