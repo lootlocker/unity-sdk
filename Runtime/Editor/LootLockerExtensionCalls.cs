@@ -61,7 +61,7 @@ namespace LootLocker.Extension
                             // Only persist when the value came from the asset. When a file config or
                             // a local override is active the restored value came from a file, and
                             // marking the asset dirty would copy it into the committed config.
-                            if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists())
+                            if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists() && !LootLockerConfig.HasInitOverrides)
                             {
                                 UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
                             }
@@ -83,7 +83,7 @@ namespace LootLocker.Extension
 #if UNITY_EDITOR
                     // See the success path: never persist a value that came from a file config or
                     // a local override.
-                    if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists())
+                    if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists() && !LootLockerConfig.HasInitOverrides)
                     {
                         UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
                     }
