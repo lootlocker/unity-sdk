@@ -202,5 +202,22 @@ namespace LootLockerTests.EditMode
             // Then
             Assert.IsEmpty(found, "File names with illegal identifiers must not be listed");
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_ReaderReceivesTheSameNameThatWasListed()
+        {
+            // Regression: discovery lists real file names (with the .bytes extension) while the
+            // load path works with bare names. If the reader is handed a name it cannot resolve,
+            // every config shows up as "could not be read".
+            var listed = new List<string>();
+            var read = new List<string>();
+
+            LootLockerConfig.DiscoverFileConfigs(
+                () => { listed.Add("LootLockerConfig-prod.bytes"); return listed; },
+                name => { read.Add(name); return ValidJson; });
+
+            CollectionAssert.AreEqual(listed, read,
+                "The reader must be given exactly the names that were listed");
+        }
     }
 }
