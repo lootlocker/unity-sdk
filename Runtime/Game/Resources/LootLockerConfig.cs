@@ -62,9 +62,14 @@ namespace LootLocker
         private static readonly string SettingsName = $"{PackageName}Config";
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
-        private static readonly string ConfigFileIdentifier = ""; // Optional extra package id if you want to be able to switch between multiple configurations
         private static readonly string ConfigFileExtension = ".bytes";
-        private static readonly string ConfigFileName = $"{SettingsName}" + (string.IsNullOrEmpty(ConfigFileIdentifier) ? "" : $"-{ConfigFileIdentifier}");
+
+        /// <summary>
+        /// Name of the config file currently in effect, derived from
+        /// <see cref="selectedFileConfigId"/>. The empty identifier maps to the legacy unsuffixed
+        /// name, which is what keeps existing projects working unchanged.
+        /// </summary>
+        private static string ConfigFileName => GetConfigFileNameForId(_current != null ? _current.selectedFileConfigId : null);
 
 #if UNITY_EDITOR
         private static string _cachedSdkRootPath = null;
@@ -127,6 +132,17 @@ namespace LootLocker
         [HideInInspector] public string adminToken = null;
 #endif
         [HideInInspector] public string domainKey;
+
+        /// <summary>
+        /// Which file config profile to use.
+        /// <para>null - auto-detect. Uses Resources/Config/LootLockerConfig.bytes if present (legacy behaviour).</para>
+        /// <para>"" - none. Use the values stored in this asset only.</para>
+        /// <para>"id" - use Resources/Config/LootLockerConfig-{id}.bytes</para>
+        /// Assets created before this field existed deserialize as null, so existing projects keep
+        /// their current behaviour.
+        /// </summary>
+        [HideInInspector] public string selectedFileConfigId = null;
+
         public string game_version = "1.0.0.0";
         [HideInInspector] public string sdk_version = "";
         public LootLockerLogger.LogLevel logLevel = LootLockerLogger.LogLevel.Info;
@@ -200,88 +216,156 @@ namespace LootLocker
         
         private static ExternalFileConfig CheckForFileConfig()
         {
-            ExternalFileConfig fileConfig = null;
             try
             {
-                string configText = null;
+                string id = ResolveFileConfigId(
+                    _current != null ? _current.selectedFileConfigId : null,
+                    commandLineId: null,
+                    buildPointerId: null,
+                    legacyFilePresent: LegacyConfigFileExists(),
+                    availableIds: DiscoverAvailableIds());
 
-                // 1. Primary: Resources.Load — works in any install location in both editor and builds.
-                //    The .bytes file must be inside a Resources/ folder for this to work.
-                TextAsset resourcesTextAsset = Resources.Load<TextAsset>($"Config/{ConfigFileName}");
-                if (resourcesTextAsset != null)
+                if (id == null)
                 {
-                    configText = resourcesTextAsset.text;
+                    return null;
                 }
 
-#if UNITY_EDITOR
-                // 2. Editor fallback A: search AssetDatabase by name — finds the file regardless of
-                //    where it lives in the project (handles race where Resources DB is not yet warmed up)
-                if (configText == null)
+                string fileName = GetConfigFileNameForId(id);
+                string configText = ReadConfigFileText(fileName);
+
+                if (string.IsNullOrEmpty(configText))
                 {
-                    string[] guids = AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset");
-                    foreach (string guid in guids)
+                    // A selected-but-missing config must be loud, never a silent fallback to the
+                    // asset: that is how the wrong backend gets shipped.
+                    if (!string.IsNullOrEmpty(id))
                     {
-                        string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                        // Match exact filename including extension to avoid false positives from
-                        // other TextAssets (e.g. .json/.txt) that share the same base name
-                        if (assetPath.EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase))
-                        {
-                            TextAsset foundAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
-                            if (foundAsset != null)
-                            {
-                                configText = foundAsset.text;
-                                break;
-                            }
-                        }
+                        LootLockerLogger.Log(
+                            $"File config '{id}' was selected but could not be found. Expected Resources/Config/{fileName}{ConfigFileExtension}.",
+                            LootLockerLogger.LogLevel.Error);
                     }
+                    return null;
                 }
 
-                // 3. Editor fallback B: SDK-root-relative path with forced re-import; also reads
-                //    the file directly from disk if the asset database still hasn't picked it up
-                if (configText == null && File.Exists(ConfigFilePath))
+                if (!TryParseFileConfig(configText, out ExternalFileConfig fileConfig, out string error))
                 {
-                    AssetDatabase.ImportAsset(ConfigFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
-                    AssetDatabase.Refresh();
-                    TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(ConfigFilePath);
-                    if (configTextAsset != null)
-                    {
-                        configText = configTextAsset.text;
-                    }
-                    else
-                    {
-                        // Direct file read as last resort when the asset database is still not ready
-                        configText = File.ReadAllText(ConfigFilePath);
-                    }
+                    LootLockerLogger.Log($"File config '{fileName}' is not usable: {error}", LootLockerLogger.LogLevel.Error);
+                    return null;
                 }
-#endif
 
-                if (!string.IsNullOrEmpty(configText))
-                {
-                    var encryptedBase64 = configText;
-                    if (!LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(encryptedBase64))
-                    {
-                        fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(configText);
-                        if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
-                        {
-                            return fileConfig;
-                        }
-                        return null;
-                    }
-                    var decryptedConfigJson = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.SimpleDecryptFromBase64(encryptedBase64);
-                    fileConfig = LootLockerJson.DeserializeObject<LootLocker.ExternalFileConfig>(decryptedConfigJson);
-                    if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
-                    {
-                        return fileConfig;
-                    }
-                }
+                return fileConfig;
             }
             catch (Exception ex)
             {
                 LootLockerLogger.Log("Error while checking for file config: " + ex.Message, LootLockerLogger.LogLevel.Error);
-                return fileConfig;
+                return null;
             }
-            return fileConfig;
         }
+
+        /// <summary>
+        /// Reads a config file's text, trying Resources first and falling back to the AssetDatabase
+        /// and then a direct disk read in the editor.
+        /// </summary>
+        private static string ReadConfigFileText(string fileName)
+        {
+            // 1. Primary: Resources.Load — works in any install location in both editor and builds.
+            //    The .bytes file must be inside a Resources/ folder for this to work.
+            TextAsset resourcesTextAsset = Resources.Load<TextAsset>($"Config/{fileName}");
+            if (resourcesTextAsset != null)
+            {
+                return resourcesTextAsset.text;
+            }
+
+#if UNITY_EDITOR
+            // 2. Editor fallback A: search AssetDatabase by name — finds the file regardless of
+            //    where it lives in the project (handles race where Resources DB is not yet warmed up)
+            string[] guids = AssetDatabase.FindAssets($"{fileName} t:TextAsset");
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                // Match exact filename including extension to avoid false positives from
+                // other TextAssets (e.g. .json/.txt) that share the same base name
+                if (assetPath.EndsWith($"/{fileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase))
+                {
+                    TextAsset foundAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
+                    if (foundAsset != null)
+                    {
+                        return foundAsset.text;
+                    }
+                }
+            }
+
+            // 3. Editor fallback B: SDK-root-relative path with forced re-import; also reads
+            //    the file directly from disk if the asset database still hasn't picked it up
+            string configFilePath = $"{GetSdkRootAssetsPath()}/Resources/Config/{fileName}{ConfigFileExtension}";
+            if (File.Exists(configFilePath))
+            {
+                AssetDatabase.ImportAsset(configFilePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                AssetDatabase.Refresh();
+                TextAsset configTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(configFilePath);
+                if (configTextAsset != null)
+                {
+                    return configTextAsset.text;
+                }
+
+                // Direct file read as last resort when the asset database is still not ready
+                return File.ReadAllText(configFilePath);
+            }
+#endif
+
+            return null;
+        }
+
+        /// <summary>
+        /// Whether the legacy unsuffixed config file exists.
+        /// </summary>
+        private static bool LegacyConfigFileExists()
+        {
+            return ReadConfigFileText(SettingsName) != null;
+        }
+
+        /// <summary>
+        /// Identifiers of the config files currently available.
+        /// </summary>
+        private static List<string> DiscoverAvailableIds()
+        {
+            var ids = new List<string>();
+            foreach (FileConfigDescriptor descriptor in DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText))
+            {
+                ids.Add(descriptor.Id);
+            }
+            return ids;
+        }
+
+        /// <summary>
+        /// File names present in the config folder, used by discovery.
+        /// </summary>
+        private static IEnumerable<string> ListConfigFileNames()
+        {
+            var names = new List<string>();
+
+#if UNITY_EDITOR
+            string folder = $"{GetSdkRootAssetsPath()}/Resources/Config";
+            if (Directory.Exists(folder))
+            {
+                foreach (string path in Directory.GetFiles(folder))
+                {
+                    names.Add(Path.GetFileName(path));
+                }
+            }
+#endif
+
+            return names;
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Discovers the config files available in this project, for the Project Settings dropdown.
+        /// </summary>
+        internal static List<FileConfigDescriptor> DiscoverFileConfigsForEditor()
+        {
+            return DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText);
+        }
+#endif
 
 #if UNITY_EDITOR
         private static void CreateConfigFile()
@@ -1072,11 +1156,36 @@ namespace LootLocker
                 return;
             }
             _fileConfigChecked = true;
+
+            // Reset from the asset before applying, otherwise switching from one config to another
+            // leaves the previous config's values in place for every field the new one omits.
+            if (force)
+            {
+                ReloadConfigAsset();
+            }
+
             ExternalFileConfig fileConfig = CheckForFileConfig();
             if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
             {
                 _activeFileConfig = fileConfig;
                 ApplyFileConfig(fileConfig);
+            }
+            else
+            {
+                _activeFileConfig = null;
+            }
+        }
+
+        /// <summary>
+        /// Re-reads the config asset from Resources so that file config values applied earlier are
+        /// discarded. Without this, switching configs cannot revert fields the new config omits.
+        /// </summary>
+        private static void ReloadConfigAsset()
+        {
+            LootLockerConfig reloaded = Resources.Load<LootLockerConfig>($"Config/{SettingsName}");
+            if (reloaded != null)
+            {
+                _current = reloaded;
             }
         }
 
