@@ -299,18 +299,39 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void TryParseFileConfig_MissingCommaIsAcceptedByTheParser()
+        public void TryParseFileConfig_MissingCommaIsAcceptedAndAllValuesAreRead()
         {
-            // Documents a real property of the bundled parser: ReadDictionary treats ',' as a
-            // no-op, so a missing separator is tolerated. This is asserted rather than assumed so
-            // that a future parser change is noticed, and so nobody relies on "missing comma" as a
-            // way to produce an invalid config.
-            const string missingComma = "{\n  \"api_key\": \"key123\"\n  \"log_level\": \"Verbose\"\n}";
+            // Deliberate decision: the parser is not strict, and it does not need to be. A config
+            // file is a hand-editable artifact, and the only thing that matters is whether every
+            // value ends up where it belongs. Rejecting a file that parses unambiguously would
+            // turn a cosmetic typo into a broken build for no benefit.
+            //
+            // The bundled parser treats ',' as a no-op, so a missing separator is tolerated. This
+            // asserts that the tolerance is harmless - every field is still read correctly - rather
+            // than merely that no exception is thrown.
+            const string missingComma = "{\n  \"api_key\": \"key123\"\n  \"log_level\": \"Verbose\"\n  \"log_in_builds\": true\n}";
 
             bool ok = LootLockerConfig.TryParseFileConfig(missingComma, out ExternalFileConfig config, out string error);
 
             Assert.IsTrue(ok, $"The bundled parser tolerates a missing comma; got: {error}");
             Assert.AreEqual("key123", config.api_key);
+            Assert.AreEqual(LootLockerLogger.LogLevel.Verbose, config.log_level);
+            Assert.IsTrue(config.log_in_builds);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void TryParseFileConfig_LenientParsingStillRejectsAmbiguousInput()
+        {
+            // Leniency is not the same as accepting anything. Input that cannot be resolved to a
+            // set of values must still fail, otherwise a broken file would silently produce a
+            // half-configured SDK.
+            const string unterminatedString = "{\n  \"api_key\": \"key123\n}";
+
+            bool ok = LootLockerConfig.TryParseFileConfig(unterminatedString, out ExternalFileConfig config, out string error);
+
+            Assert.IsFalse(ok, "Input that cannot be resolved to values must still be rejected");
+            Assert.IsNull(config);
+            Assert.IsNotEmpty(error);
         }
 
         #endregion
