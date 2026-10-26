@@ -235,9 +235,9 @@ namespace LootLocker.Admin
                         ValidateCurrentConfig();
                     }
                 }
-
-                DrawValidationResult();
             }
+
+            DrawValidationResult();
 
             if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
             {
@@ -351,7 +351,8 @@ namespace LootLocker.Admin
         }
 
         /// <summary>
-        /// Draws the outcome of the last validation inline, next to the Validate button.
+        /// Draws the outcome of the last validation on its own line, indented to line up with the
+        /// controls above it.
         /// </summary>
         private static void DrawValidationResult()
         {
@@ -361,22 +362,27 @@ namespace LootLocker.Admin
             }
 
             LootLockerConfigValidationResult result = validationResult.Value;
+            string text;
             switch (result.Outcome)
             {
                 case LootLockerConfigValidationOutcome.Success:
-                    EditorGUILayout.LabelField(
-                        $"\u2713 {result.GameName} (title {result.TitleId}, env {result.EnvironmentId})",
-                        EditorStyles.miniLabel);
+                    text = $"\u2713 {result.GameName} (title {result.TitleId}, env {result.EnvironmentId})";
                     break;
                 case LootLockerConfigValidationOutcome.KeyRejected:
-                    EditorGUILayout.LabelField($"\u2717 {result.Message}", EditorStyles.miniLabel);
+                    text = $"\u2717 {result.Message}";
                     break;
                 case LootLockerConfigValidationOutcome.Unreachable:
-                    EditorGUILayout.LabelField($"! {result.Message}", EditorStyles.miniLabel);
+                    text = $"! {result.Message}";
                     break;
                 default:
-                    EditorGUILayout.LabelField(result.Message, EditorStyles.miniLabel);
+                    text = result.Message;
                     break;
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(EditorGUIUtility.labelWidth);
+                EditorGUILayout.LabelField(text, EditorStyles.miniLabel);
             }
         }
 
