@@ -51,12 +51,36 @@ namespace LootLockerTests.EditMode
         [TearDown]
         public void RestoreOriginalConfig()
         {
+            // Forget the recorded Init values first, otherwise CreateNewSettings just re-records
+            // the restore values as Init overrides and they leak into every later test.
+            LootLockerConfig.ClearInitValues();
+
             if (_original != null)
             {
                 LootLockerConfig.CreateNewSettings(_original);
+                LootLockerConfig.ClearInitValues();
                 Object.DestroyImmediate(_original);
                 _original = null;
             }
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void InitCall_SurvivesAForcedRefresh()
+        {
+            // Regression: Init wrote its values onto the same live object the file layers are
+            // applied to, so any forced refresh - opening Project Settings, changing an override,
+            // deleting the override file - restored the authored snapshot over them. Init is
+            // documented as the highest-precedence source, so it has to win after a refresh too.
+            LootLockerConfig.CreateNewSettings("init_key", "1.0.0", "init_domain");
+
+            // When
+            LootLockerConfig.RefreshFileConfigState(force: true);
+
+            // Then
+            Assert.AreEqual("init_key", LootLockerConfig.current.apiKey,
+                "A forced refresh must not discard the Init value");
+            Assert.AreEqual("init_domain", LootLockerConfig.current.domainKey,
+                "A forced refresh must not discard the Init value");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
