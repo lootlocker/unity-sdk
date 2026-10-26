@@ -81,5 +81,7 @@ docs/html/
 
 # Local, per-developer config overrides. Never commit these: they are how a developer
 # temporarily changes a setting (e.g. log level) without forking the shared config file.
+# Kept outside Resources/ so Unity never packs them into a build.
 LootLockerConfig.local.bytes
 LootLockerConfig.local.bytes.meta
+LocalOverrides/
