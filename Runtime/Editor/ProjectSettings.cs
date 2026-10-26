@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -85,34 +86,24 @@ namespace LootLocker.Admin
 #pragma warning restore 0162
 
             DrawFileConfigSection();
-            DrawLocalOverrideSection();
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Edit the config file to change them, or use Local Overrides to change one for this machine only.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Use Override on a setting to change it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
 
             DrawValidation();
 
-            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("apiKey"), Label("API Key", LootLockerConfigFields.ApiKey));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue;
-            }
+            DrawOverridableField("apiKey", "API Key", LootLockerConfigFields.ApiKey,
+                () => gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue);
 
             var content = new GUIContent();
             content.text = "API key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(content, false);
             EditorGUILayout.Space();
 
-            EditorGUI.BeginChangeCheck();
-            
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("domainKey"), Label("Domain Key", LootLockerConfigFields.DomainKey));
-            if (EditorGUI.EndChangeCheck())
+            DrawOverridableField("domainKey", "Domain Key", LootLockerConfigFields.DomainKey, () =>
             {
                 gameSettings.domainKey = m_CustomSettings.FindProperty("domainKey").stringValue;
 
@@ -134,16 +125,15 @@ namespace LootLocker.Admin
                     gameSettings.domainKey = domainkey;
                     m_CustomSettings.FindProperty("domainKey").stringValue = domainkey;
                 }
-
-            }
+            });
             var domainContent = new GUIContent();
             domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(domainContent, false);
             EditorGUILayout.Space();
-            EditorGUI.EndDisabledGroup();
 
+            // Game version is never governed by a file config, so it has no override affordance.
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("game_version"), Label("Game Version", LootLockerConfigFields.GameVersion));
+            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("game_version"), new GUIContent("Game Version"));
             if (EditorGUI.EndChangeCheck())
             {
                 gameSettings.game_version = m_CustomSettings.FindProperty("game_version").stringValue;
@@ -156,34 +146,18 @@ namespace LootLocker.Admin
                     "Game version needs to follow a numeric Semantic Versioning pattern: X.Y.Z.B with the sections denoting MAJOR.MINOR.PATCH.BUILD and the last two being optional. Read more at https://docs.lootlocker.com/the-basics/core-concepts/glossary#game-version",
                     MessageType.Warning, false);
             }
-            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("allowTokenRefresh"), Label("Allow Token Refresh", LootLockerConfigFields.AllowTokenRefresh));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue; 
-            }
+            DrawOverridableField("allowTokenRefresh", "Allow Token Refresh", LootLockerConfigFields.AllowTokenRefresh,
+                () => gameSettings.allowTokenRefresh = m_CustomSettings.FindProperty("allowTokenRefresh").boolValue);
             EditorGUILayout.Space();
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("multiUserSessionMode"), Label("Multi User Session Mode", LootLockerConfigFields.MultiUserSessionMode));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.multiUserSessionMode = (LootLockerMultiUserSessionMode)m_CustomSettings.FindProperty("multiUserSessionMode").enumValueIndex;
-            }
+            DrawOverridableField("multiUserSessionMode", "Multi User Session Mode", LootLockerConfigFields.MultiUserSessionMode,
+                () => gameSettings.multiUserSessionMode = (LootLockerMultiUserSessionMode)m_CustomSettings.FindProperty("multiUserSessionMode").enumValueIndex);
             EditorGUILayout.Space();
-            EditorGUI.EndDisabledGroup();
 
             DrawLogSettings();
 
-            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
-
             DrawPresenceSettings();
-
-            EditorGUI.EndDisabledGroup();
         }
 
         #region File config selection
@@ -205,60 +179,68 @@ namespace LootLocker.Admin
             }
 
             return new GUIContent($"{text} (local override)",
-                "This value comes from the gitignored local override file, not from the shared config. Use Reset Local Overrides to remove it.");
+                "This value comes from the gitignored local override file, not from the shared config. Use Reset to remove it.");
         }
 
         /// <summary>
-        /// Draws the local override status and its Create/Reset affordances.
+        /// Draws one setting together with its local override affordance.
         ///
-        /// Nothing is drawn when no local override file exists and no file config is in effect:
-        /// a project that does not use file configs should not be told about a feature it is not
-        /// using.
+        /// The control is editable when the value is not governed by a file config, or when the
+        /// developer has explicitly overridden it. Editing an overridden field writes straight
+        /// through to the local override file, so what is on screen is always what is in effect.
         /// </summary>
-        private void DrawLocalOverrideSection()
+        /// <param name="propertyName">Serialized property name on the config asset.</param>
+        /// <param name="label">Label text.</param>
+        /// <param name="fieldName">JSON field name, see <see cref="LootLockerConfigFields"/>.</param>
+        /// <param name="onChanged">Applies the edited value to the live config.</param>
+        private void DrawOverridableField(string propertyName, string label, string fieldName, Action onChanged)
         {
-            bool exists = LootLockerConfig.LocalOverrideExists();
-            if (!exists && !LootLockerConfig.IsFileConfigActive)
-            {
-                return;
-            }
+            bool overridden = LootLockerConfig.IsLocallyOverridden(fieldName);
+            bool locked = LootLockerConfig.IsFileConfigActive && !overridden;
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField("Local Overrides", GUILayout.Width(EditorGUIUtility.labelWidth));
-
-                if (exists)
+                using (new EditorGUI.DisabledScope(locked))
                 {
-                    if (GUILayout.Button("Reset", GUILayout.Width(70)))
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.PropertyField(m_CustomSettings.FindProperty(propertyName), Label(label, fieldName));
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        ResetLocalOverrides();
+                        onChanged?.Invoke();
+
+                        // An overridden field is written straight back to the override file, so the
+                        // value survives a domain reload and stays in effect for this machine only.
+                        if (overridden)
+                        {
+                            PersistLocalOverrideField(fieldName, m_CustomSettings.FindProperty(propertyName));
+                        }
                     }
                 }
-                else
+
+                if (overridden)
                 {
-                    if (GUILayout.Button("Create", GUILayout.Width(70)))
+                    if (GUILayout.Button("Reset", GUILayout.Width(56)))
                     {
-                        CreateLocalOverride();
+                        ResetLocalOverrideField(fieldName);
+                    }
+                }
+                else if (LootLockerConfig.IsFileConfigActive)
+                {
+                    if (GUILayout.Button("Override", GUILayout.Width(70)))
+                    {
+                        OverrideField(fieldName, m_CustomSettings.FindProperty(propertyName));
                     }
                 }
             }
-
-            if (exists)
-            {
-                EditorGUILayout.HelpBox(
-                    "Settings marked (local override) come from a gitignored file and apply only to this machine. They are not shared with the team and are not committed.",
-                    MessageType.Info);
-            }
-
-            EditorGUILayout.Space();
         }
 
-        private static void CreateLocalOverride()
+        /// <summary>
+        /// Writes the current value of a property into the local override file, making the field
+        /// editable and pinning it to the value the developer is looking at.
+        /// </summary>
+        private static void OverrideField(string fieldName, SerializedProperty property)
         {
-            // Seed with the one setting people actually reach for: a temporary log level bump.
-            // An empty file would be valid but would do nothing, which reads as a broken button.
-            string json = "{\n  \"log_level\": \"Verbose\"\n}\n";
-            if (!LootLockerConfig.WriteLocalOverride(json))
+            if (!LootLockerConfig.SetLocalOverrideField(fieldName, SerializePropertyValue(property)))
             {
                 return;
             }
@@ -267,22 +249,48 @@ namespace LootLocker.Admin
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
 
-        private static void ResetLocalOverrides()
+        /// <summary>
+        /// Removes one field from the local override file, restoring the shared value.
+        /// </summary>
+        private static void ResetLocalOverrideField(string fieldName)
         {
-            if (!EditorUtility.DisplayDialog(
-                    "Reset local overrides?",
-                    "This deletes the gitignored local override file and restores the values from the shared config.",
-                    "Reset", "Cancel"))
-            {
-                return;
-            }
-
-            if (!LootLockerConfig.DeleteLocalOverride())
+            if (!LootLockerConfig.RemoveLocalOverrideField(fieldName))
             {
                 return;
             }
 
             ClearValidationResult();
+            LootLockerConfig.RefreshFileConfigState(force: true);
+        }
+
+        /// <summary>
+        /// Persists an edited overridden field back to the override file.
+        /// </summary>
+        private static void PersistLocalOverrideField(string fieldName, SerializedProperty property)
+        {
+            LootLockerConfig.SetLocalOverrideField(fieldName, SerializePropertyValue(property));
+            LootLockerConfig.RefreshFileConfigState(force: true);
+        }
+
+        /// <summary>
+        /// Renders a serialized property as JSON text for the override file.
+        /// </summary>
+        private static string SerializePropertyValue(SerializedProperty property)
+        {
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Boolean:
+                    return property.boolValue ? "true" : "false";
+                case SerializedPropertyType.Enum:
+                    // Enums are written by name: the file is meant to be readable and hand-editable.
+                    return LootLockerJson.SerializeObject(property.enumNames[property.enumValueIndex]);
+                case SerializedPropertyType.Integer:
+                    return property.intValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                case SerializedPropertyType.Float:
+                    return property.floatValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                default:
+                    return LootLockerJson.SerializeObject(property.stringValue);
+            }
         }
 
         /// <summary>
@@ -554,46 +562,20 @@ namespace LootLocker.Admin
             if (!logSettingsFoldout) return;
             EditorGUILayout.Space();
 
-            // Log settings are applied from the file config, so they are read-only while one is
-            // active. Use the local override file to change them for one machine.
-            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logLevel"), Label("Log Level", LootLockerConfigFields.LogLevel));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.logLevel = (LootLockerLogger.LogLevel)m_CustomSettings.FindProperty("logLevel").enumValueIndex;
-            }
+            DrawOverridableField("logLevel", "Log Level", LootLockerConfigFields.LogLevel,
+                () => gameSettings.logLevel = (LootLockerLogger.LogLevel)m_CustomSettings.FindProperty("logLevel").enumValueIndex);
             EditorGUILayout.Space();
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logErrorsAsWarnings"), Label("Log Errors As Warnings", LootLockerConfigFields.LogErrorsAsWarnings));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.logErrorsAsWarnings = m_CustomSettings.FindProperty("logErrorsAsWarnings").boolValue;
-            }
+            DrawOverridableField("logErrorsAsWarnings", "Log Errors As Warnings", LootLockerConfigFields.LogErrorsAsWarnings,
+                () => gameSettings.logErrorsAsWarnings = m_CustomSettings.FindProperty("logErrorsAsWarnings").boolValue);
             EditorGUILayout.Space();
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logInBuilds"), Label("Log In Builds", LootLockerConfigFields.LogInBuilds));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue;
-            }
+            DrawOverridableField("logInBuilds", "Log In Builds", LootLockerConfigFields.LogInBuilds,
+                () => gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue);
             EditorGUILayout.Space();
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("prettifyJson"), Label("Log JSON Formatted", LootLockerConfigFields.PrettifyJson));
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue;
-            }
-
-            EditorGUI.EndDisabledGroup();
+            DrawOverridableField("prettifyJson", "Log JSON Formatted", LootLockerConfigFields.PrettifyJson,
+                () => gameSettings.prettifyJson = m_CustomSettings.FindProperty("prettifyJson").boolValue);
 
             EditorGUILayout.Space();
         }
@@ -615,39 +597,23 @@ namespace LootLocker.Admin
             }
 
             // Enable presence toggle
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresence"), Label("Enable Presence", LootLockerConfigFields.EnablePresence));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.enablePresence = m_CustomSettings.FindProperty("enablePresence").boolValue;
-            }
+            DrawOverridableField("enablePresence", "Enable Presence", LootLockerConfigFields.EnablePresence,
+                () => gameSettings.enablePresence = m_CustomSettings.FindProperty("enablePresence").boolValue);
             EditorGUILayout.Space();
-            
+
             // Auto-connect toggle
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoConnect"), Label("Auto Connect", LootLockerConfigFields.EnablePresenceAutoConnect));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue;
-            }
-            
+            DrawOverridableField("enablePresenceAutoConnect", "Auto Connect", LootLockerConfigFields.EnablePresenceAutoConnect,
+                () => gameSettings.enablePresenceAutoConnect = m_CustomSettings.FindProperty("enablePresenceAutoConnect").boolValue);
+
             // Auto-disconnect on focus change toggle
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange"), Label("Auto Pause Presence", LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue;
-            }
+            DrawOverridableField("enablePresenceAutoDisconnectOnFocusChange", "Auto Pause Presence", LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange,
+                () => gameSettings.enablePresenceAutoDisconnectOnFocusChange = m_CustomSettings.FindProperty("enablePresenceAutoDisconnectOnFocusChange").boolValue);
 
             EditorGUILayout.Space();
-            
+
             // Enable presence in editor toggle
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("enablePresenceInEditor"), Label("Enable Presence in Editor", LootLockerConfigFields.EnablePresenceInEditor));
-            if (EditorGUI.EndChangeCheck())
-            {
-                gameSettings.enablePresenceInEditor = m_CustomSettings.FindProperty("enablePresenceInEditor").boolValue;
-            }
+            DrawOverridableField("enablePresenceInEditor", "Enable Presence in Editor", LootLockerConfigFields.EnablePresenceInEditor,
+                () => gameSettings.enablePresenceInEditor = m_CustomSettings.FindProperty("enablePresenceInEditor").boolValue);
 
             EditorGUILayout.Space();
         }
