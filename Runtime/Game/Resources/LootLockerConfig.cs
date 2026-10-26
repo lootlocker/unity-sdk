@@ -1167,7 +1167,10 @@ namespace LootLocker
                 return false;
             }
 
-            // See the string overload: an explicit Init(...) call outranks every file-based source.
+            // See the string overload: an explicit Init(...) call outranks every file-based source,
+            // and is recorded so a later forced refresh does not discard it.
+            RecordInitValues(overrides => CopyConfigValues(newConfig, overrides));
+
             _current.apiKey = newConfig.apiKey;
             _current.game_version = newConfig.game_version;
             _current.domainKey = newConfig.domainKey;
@@ -2067,6 +2070,24 @@ namespace LootLocker
         /// stored in the asset and must not be saved back to it.
         /// </summary>
         internal static bool HasInitOverrides => _initOverrides != null;
+
+        /// <summary>
+        /// Forgets the recorded Init values, restoring file-based precedence.
+        ///
+        /// Needed because the recorder has no natural lifetime end: an editor session that calls
+        /// Init once - including a test - would otherwise keep re-applying those values over every
+        /// later config change.
+        /// </summary>
+        internal static void ClearInitValues()
+        {
+            if (_initOverrides == null)
+            {
+                return;
+            }
+
+            UnityEngine.Object.DestroyImmediate(_initOverrides);
+            _initOverrides = null;
+        }
 
         /// <summary>
         /// Copies every field a file config may govern from one config to another.
