@@ -744,18 +744,9 @@ namespace LootLocker
             // Don't re-queue if a request is already in flight.
             if (ListInstalledPackagesRequest != null)
                 return;
-            // Version provided by an external config file — treat as authoritative and
-            // don't overwrite it from the package manifest.
-            if (Array.Exists(AssetDatabase.FindAssets($"{ConfigFileName} t:TextAsset"),
-                g => AssetDatabase.GUIDToAssetPath(g).EndsWith($"/{ConfigFileName}{ConfigFileExtension}", StringComparison.OrdinalIgnoreCase)))
-            {
-                if (!SdkVersionDetermined)
-                {
-                    SdkVersionDetermined = true;
-                    OnSdkVersionDetermined?.Invoke();
-                }
-                return;
-            }
+            // The version always resolves from the installed package, never from a config file.
+            // A config file that pinned a version would go stale the moment the SDK was updated,
+            // and there is no reason for a config to know which SDK version is running.
             // If we already have a cached version, still re-query to keep sdk_version
             // current after SDK updates on disk (fixes stale version on upgrade).
             // We only raise OnSdkVersionDetermined once the authoritative value has
@@ -1006,8 +997,8 @@ namespace LootLocker
         /// <summary>
         /// True when an external config file is present and governing settings.
         /// All fields applied by <see cref="ApplyFileConfig"/> are read-only while this is true.
-        /// Game version and the log level / log errors as warnings / log in builds settings are
-        /// intentionally not applied from the file config and stay editable in Project Settings.
+        /// Game version is intentionally not applied from the file config and stays editable in
+        /// Project Settings; everything else, including the log settings, comes from the file.
         /// </summary>
         public static bool IsFileConfigActive => _activeFileConfig != null;
 
@@ -1478,11 +1469,6 @@ namespace LootLocker
                 return onlyFields == null || onlyFields.Contains(fieldName);
             }
 
-            if (Applies(LootLockerConfigFields.SdkVersion))
-            {
-                _current.sdk_version = fileConfig.sdk_version;
-                applied.Add(LootLockerConfigFields.SdkVersion);
-            }
             if (Applies(LootLockerConfigFields.ApiKey))
             {
                 _current.apiKey = fileConfig.api_key;
@@ -1492,6 +1478,26 @@ namespace LootLocker
             {
                 _current.domainKey = fileConfig.domain_key;
                 applied.Add(LootLockerConfigFields.DomainKey);
+            }
+            if (Applies(LootLockerConfigFields.GameVersion))
+            {
+                _current.game_version = fileConfig.game_version;
+                applied.Add(LootLockerConfigFields.GameVersion);
+            }
+            if (Applies(LootLockerConfigFields.LogLevel))
+            {
+                _current.logLevel = fileConfig.log_level;
+                applied.Add(LootLockerConfigFields.LogLevel);
+            }
+            if (Applies(LootLockerConfigFields.LogErrorsAsWarnings))
+            {
+                _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
+                applied.Add(LootLockerConfigFields.LogErrorsAsWarnings);
+            }
+            if (Applies(LootLockerConfigFields.LogInBuilds))
+            {
+                _current.logInBuilds = fileConfig.log_in_builds;
+                applied.Add(LootLockerConfigFields.LogInBuilds);
             }
             if (Applies(LootLockerConfigFields.EnablePresence))
             {
