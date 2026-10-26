@@ -193,8 +193,9 @@ namespace LootLocker.Admin
         /// Draws the config file selection and refresh controls.
         ///
         /// Nothing is drawn when there are no config files: a project without file configs should
-        /// look exactly like one that never had any. With a single config the selection is
-        /// unambiguous, so a plain label is shown instead of a dropdown.
+        /// look exactly like one that never had any. The same applies when there is exactly one
+        /// config and it is the one in effect - there is nothing to choose and nothing to report,
+        /// so the row would be pure noise.
         /// </summary>
         private void DrawFileConfigSection()
         {
@@ -205,28 +206,28 @@ namespace LootLocker.Admin
             }
 
             string selectedId = gameSettings.selectedFileConfigId;
+            bool selectionMissing = !string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId);
 
-            // A dropdown is only needed when there is a real choice to make. With one config that
-            // is already in effect there is nothing to choose.
-            bool needsChoice = discovered.Count > 1
-                || (discovered.Count == 1 && selectedId != null && selectedId != discovered[0].Id);
+            // A dropdown is only needed when there is a real choice to make. That is the case when
+            // several configs exist, when the selection is stale, or when the user explicitly
+            // opted out ("") while configs are available - otherwise they could never opt back in.
+            bool needsChoice = discovered.Count > 1 || selectionMissing || selectedId == "";
+
+            if (!needsChoice)
+            {
+                // Exactly one config, and it is the one in effect. Nothing to show.
+                return;
+            }
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField("Config File", GUILayout.Width(EditorGUIUtility.labelWidth));
 
-                if (needsChoice)
+                // A Popup cannot disable individual entries, so use a menu: invalid configs
+                // are shown greyed out and unclickable rather than selectable-but-broken.
+                if (EditorGUILayout.DropdownButton(new GUIContent(DescribeSelection(selectedId, discovered)), FocusType.Keyboard))
                 {
-                    // A Popup cannot disable individual entries, so use a menu: invalid configs
-                    // are shown greyed out and unclickable rather than selectable-but-broken.
-                    if (EditorGUILayout.DropdownButton(new GUIContent(DescribeSelection(selectedId, discovered)), FocusType.Keyboard))
-                    {
-                        ShowFileConfigMenu(selectedId, discovered);
-                    }
-                }
-                else
-                {
-                    EditorGUILayout.LabelField($"Using {DescribeId(discovered[0].Id)}");
+                    ShowFileConfigMenu(selectedId, discovered);
                 }
 
                 if (GUILayout.Button("Refresh", GUILayout.Width(70)))
@@ -236,7 +237,7 @@ namespace LootLocker.Admin
                 }
             }
 
-            if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
+            if (selectionMissing)
             {
                 EditorGUILayout.HelpBox(
                     $"The selected config '{selectedId}' is no longer available, so the settings stored in the config asset are being used. Select another config or (None) to clear this.",
