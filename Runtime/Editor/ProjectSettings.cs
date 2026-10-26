@@ -242,8 +242,8 @@ namespace LootLocker.Admin
             if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
             {
                 EditorGUILayout.HelpBox(
-                    $"The selected config '{selectedId}' was not found. Expected Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes.",
-                    MessageType.Error);
+                    $"The selected config '{selectedId}' is no longer available, so the settings stored in the config asset are being used. Select another config or (None) to clear this.",
+                    MessageType.Warning);
             }
 
             EditorGUILayout.Space();
