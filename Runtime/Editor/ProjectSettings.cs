@@ -90,6 +90,8 @@ namespace LootLocker.Admin
                 EditorGUILayout.Space();
             }
 
+            DrawValidation();
+
             EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
             EditorGUI.BeginChangeCheck();
@@ -186,6 +188,86 @@ namespace LootLocker.Admin
             return Regex.IsMatch(str,
                 @"^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:\.(0|[1-9]\d*))?$");
         }
+
+        #region Validation
+
+        private static LootLockerConfigValidationResult? validationResult;
+        private static bool validationInProgress;
+
+        /// <summary>
+        /// Draws the "Validate" affordance, which proves the currently effective API key works and
+        /// shows which game it belongs to.
+        ///
+        /// This validates whatever is currently applied (LootLockerConfig.current.apiKey), not an
+        /// arbitrary unselected config.
+        /// </summary>
+        private void DrawValidation()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("Connection", GUILayout.Width(EditorGUIUtility.labelWidth));
+
+                using (new EditorGUI.DisabledScope(validationInProgress || string.IsNullOrEmpty(gameSettings?.apiKey)))
+                {
+                    if (GUILayout.Button(validationInProgress ? "Validating..." : "Validate", GUILayout.Width(100)))
+                    {
+                        ValidateCurrentConfig();
+                    }
+                }
+
+                DrawValidationResult();
+            }
+
+            EditorGUILayout.Space();
+        }
+
+        private static void DrawValidationResult()
+        {
+            if (!validationResult.HasValue)
+            {
+                return;
+            }
+
+            LootLockerConfigValidationResult result = validationResult.Value;
+            switch (result.Outcome)
+            {
+                case LootLockerConfigValidationOutcome.Success:
+                    EditorGUILayout.LabelField(
+                        $"\u2713 {result.GameName} (title {result.TitleId}, env {result.EnvironmentId})",
+                        EditorStyles.miniLabel);
+                    break;
+                case LootLockerConfigValidationOutcome.KeyRejected:
+                    EditorGUILayout.LabelField($"\u2717 {result.Message}", EditorStyles.miniLabel);
+                    break;
+                case LootLockerConfigValidationOutcome.Unreachable:
+                    EditorGUILayout.LabelField($"! {result.Message}", EditorStyles.miniLabel);
+                    break;
+                default:
+                    EditorGUILayout.LabelField(result.Message, EditorStyles.miniLabel);
+                    break;
+            }
+        }
+
+        private static void ValidateCurrentConfig()
+        {
+            string apiKey = LootLockerConfig.current?.apiKey;
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                validationResult = LootLockerConfigValidation.Classify(null, apiKey);
+                return;
+            }
+
+            validationInProgress = true;
+            validationResult = null;
+
+            LootLocker.Requests.LootLockerSDKManager.GetGameInfo(response =>
+            {
+                validationResult = LootLockerConfigValidation.Classify(response, apiKey);
+                validationInProgress = false;
+            });
+        }
+
+        #endregion
 
         private void DrawLogSettings()
         {
