@@ -119,6 +119,21 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void LocalOverrideFile_IsOutsideResources()
+        {
+            // Regression: the override used to live under Resources/Config, so Unity packed it into
+            // every build made on that machine. Guarding the read path with UNITY_EDITOR stopped
+            // the SDK from using it, but the bytes - including a local api_key - still shipped in
+            // the build data. The file must not be inside any Resources folder at all.
+            string path = LootLockerConfig.LocalOverridePath.Replace('\\', '/');
+
+            Assert.IsFalse(path.Contains("/Resources/"),
+                $"The local override must not live under Resources, but was: {path}");
+            Assert.IsTrue(path.Contains("/LocalOverrides/"),
+                $"Expected the LocalOverrides folder, but was: {path}");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void LocalOverrideFields_AreEmptyWhenNothingIsOverridden()
         {
             // Given: a fresh domain with no override applied

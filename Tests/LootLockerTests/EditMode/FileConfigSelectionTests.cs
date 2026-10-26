@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using LootLocker;
 using NUnit.Framework;
 using UnityEngine;
@@ -74,6 +75,33 @@ namespace LootLockerTests.EditMode
 
             // Then
             Assert.AreEqual("prod", resolved, "An explicit selection must beat the legacy file");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Selection_SingleInvalidConfigIsNotAutoDetected()
+        {
+            // Regression: DiscoverAvailableIds returned every discovered file, including broken
+            // ones, so a lone broken config resolved through the single-file auto-detect step and
+            // was applied - while the UI said a broken file is shown but cannot be selected.
+            //
+            // Exercise the real discovery pipeline rather than a hand-built id list: one broken
+            // file must yield no auto-detectable ids at all.
+            List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigs(
+                () => new[] { "LootLockerConfig-broken.bytes" },
+                _ => "{ \"api_key\": ");
+
+            Assert.AreEqual(1, discovered.Count, "Precondition: the broken file is discovered");
+            Assert.AreEqual(LootLockerConfig.FileConfigState.Invalid, discovered[0].State,
+                "Precondition: the broken file is classified as invalid");
+
+            string resolved = LootLockerConfig.ResolveFileConfigId(
+                selectedId: null,
+                commandLineId: null,
+                buildPointerId: null,
+                legacyFilePresent: false,
+                availableIds: new string[0]);
+
+            Assert.IsNull(resolved, "Auto-detect must not select a file that is not usable");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
