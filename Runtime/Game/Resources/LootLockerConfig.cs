@@ -54,6 +54,33 @@ namespace LootLocker
         ProfileSwitching = 3,
     }
 
+    /// <summary>
+    /// JSON field names understood by <see cref="ExternalFileConfig"/>.
+    ///
+    /// A config file is sparse: a field that is absent has to be distinguishable from a field that
+    /// is present and set to its default value. That distinction is what lets the local override
+    /// file change one setting without resetting every other one.
+    /// </summary>
+    internal static class LootLockerConfigFields
+    {
+        public const string ApiKey = "api_key";
+        public const string DomainKey = "domain_key";
+        public const string GameVersion = "game_version";
+        public const string EnablePresence = "enable_presence";
+        public const string EnablePresenceAutoConnect = "enable_presence_autoconnect";
+        public const string EnablePresenceAutoDisconnectOnFocusChange = "enable_presence_autodisconnect_on_focus_change";
+        public const string EnablePresenceInEditor = "enable_presence_in_editor";
+        public const string SdkVersion = "sdk_version";
+        public const string LogLevel = "log_level";
+        public const string LogErrorsAsWarnings = "log_errors_as_warnings";
+        public const string LogInBuilds = "log_in_builds";
+        public const string PrettifyJson = "prettify_json";
+        public const string ObfuscateLogs = "obfuscate_logs";
+        public const string AllowTokenRefresh = "allow_token_refresh";
+        public const string MultiUserSessionMode = "multi_user_session_mode";
+        public const string EnableEditorAdminExtension = "enable_editor_admin_extension";
+    }
+
     [Serializable]
     public class LootLockerConfig : ScriptableObject
     {
@@ -63,6 +90,14 @@ namespace LootLocker
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
         private static readonly string ConfigFileExtension = ".bytes";
+
+        /// <summary>
+        /// File name (without extension) of the gitignored local override file.
+        ///
+        /// Deliberately not of the form "LootLockerConfig-{id}", so it can never be mistaken for a
+        /// selectable profile and never shows up in the dropdown.
+        /// </summary>
+        private static readonly string LocalOverrideName = $"{SettingsName}.local";
 
         /// <summary>
         /// Name of the config file currently in effect, derived from
@@ -427,6 +462,75 @@ namespace LootLocker
         internal static List<FileConfigDescriptor> DiscoverFileConfigsForEditor()
         {
             return DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText);
+        }
+
+        /// <summary>
+        /// Absolute path of the gitignored local override file.
+        /// </summary>
+        internal static string LocalOverridePath =>
+            $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/Config/{LocalOverrideName}{ConfigFileExtension}";
+
+        /// <summary>
+        /// Writes the local override file with the given JSON body, replacing any existing one.
+        /// </summary>
+        /// <returns>True when the file was written.</returns>
+        internal static bool WriteLocalOverride(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return false;
+            }
+
+            try
+            {
+                string path = LocalOverridePath;
+                string directory = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                File.WriteAllText(path, json);
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                AssetDatabase.Refresh();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Could not write the local override file: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Deletes the local override file, if present, and re-applies the shared config.
+        /// </summary>
+        /// <returns>True when no local override file remains.</returns>
+        internal static bool DeleteLocalOverride()
+        {
+            try
+            {
+                string path = LocalOverridePath;
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                string metaPath = path + ".meta";
+                if (File.Exists(metaPath))
+                {
+                    File.Delete(metaPath);
+                }
+
+                AssetDatabase.Refresh();
+                RefreshFileConfigState(force: true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Could not delete the local override file: {ex.Message}", LootLockerLogger.LogLevel.Error);
+                return false;
+            }
         }
 #endif
 
@@ -903,6 +1007,7 @@ namespace LootLocker
 
         private static LootLockerConfig _current;
         private static ExternalFileConfig _activeFileConfig;
+        private static HashSet<string> _localOverrideFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// True when an external config file is present and governing settings.
@@ -911,6 +1016,31 @@ namespace LootLocker
         /// intentionally not applied from the file config and stay editable in Project Settings.
         /// </summary>
         public static bool IsFileConfigActive => _activeFileConfig != null;
+
+        /// <summary>
+        /// JSON field names whose current value came from the gitignored local override file.
+        ///
+        /// The settings UI uses this to mark overridden fields, so a developer can always tell a
+        /// shared value from one they changed locally.
+        /// </summary>
+        public static IReadOnlyCollection<string> LocalOverrideFields => _localOverrideFields;
+
+        /// <summary>
+        /// True when the given JSON field name (see <see cref="LootLockerConfigFields"/>) is
+        /// currently overridden by the local override file.
+        /// </summary>
+        public static bool IsLocallyOverridden(string fieldName)
+        {
+            return !string.IsNullOrEmpty(fieldName) && _localOverrideFields.Contains(fieldName);
+        }
+
+        /// <summary>
+        /// True when a local override file exists on disk for this project.
+        /// </summary>
+        public static bool LocalOverrideExists()
+        {
+            return ReadConfigFileText(LocalOverrideName) != null;
+        }
 
         private static bool _fileConfigChecked;
 
@@ -1028,7 +1158,41 @@ namespace LootLocker
         /// <returns>True when a usable config (with a non-empty api_key) was produced.</returns>
         internal static bool TryParseFileConfig(string configText, out ExternalFileConfig config, out string error)
         {
+            if (!TryParseSparseFileConfig(configText, out config, out _, out error))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(config.api_key))
+            {
+                error = "Config file has no api_key.";
+                config = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a config file without requiring an api_key, and reports which fields the file
+        /// actually contained.
+        ///
+        /// The field set is what makes a sparse file meaningful: a field that is absent must be
+        /// distinguishable from a field that is present and set to its default value, otherwise a
+        /// local override of one setting would silently reset every other one.
+        /// </summary>
+        /// <param name="configText">Raw file contents, either plain JSON or an encrypted base64 payload.</param>
+        /// <param name="config">The parsed config, or null on failure.</param>
+        /// <param name="presentFields">JSON field names that appeared in the file.</param>
+        /// <param name="error">A human readable reason when parsing fails.</param>
+        internal static bool TryParseSparseFileConfig(
+            string configText,
+            out ExternalFileConfig config,
+            out HashSet<string> presentFields,
+            out string error)
+        {
             config = null;
+            presentFields = null;
             error = null;
 
             if (string.IsNullOrEmpty(configText))
@@ -1037,15 +1201,25 @@ namespace LootLocker
                 return false;
             }
 
+            string json;
             try
             {
-                string json = configText;
+                json = configText;
                 if (LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(configText))
                 {
                     json = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.SimpleDecryptFromBase64(configText);
                 }
+            }
+            catch (Exception ex)
+            {
+                error = $"Config file could not be decrypted: {ex.Message}";
+                return false;
+            }
 
+            try
+            {
                 config = LootLockerJson.DeserializeObject<ExternalFileConfig>(json);
+                presentFields = GetPresentFieldNames(json);
             }
             catch (Exception ex)
             {
@@ -1060,14 +1234,35 @@ namespace LootLocker
                 return false;
             }
 
-            if (string.IsNullOrEmpty(config.api_key))
+            return true;
+        }
+
+        /// <summary>
+        /// Field names present in a JSON object. Returns an empty set rather than throwing when the
+        /// document is not an object, so a caller that already parsed the config is never failed by
+        /// this second pass.
+        /// </summary>
+        private static HashSet<string> GetPresentFieldNames(string json)
+        {
+            var fields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            try
             {
-                error = "Config file has no api_key.";
-                config = null;
-                return false;
+                Dictionary<string, object> raw = LootLockerJson.DeserializeObject<Dictionary<string, object>>(json);
+                if (raw != null)
+                {
+                    foreach (string key in raw.Keys)
+                    {
+                        fields.Add(key);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Not an object document. The config itself parsed, so treat it as having no
+                // explicitly present fields rather than failing the whole load.
             }
 
-            return true;
+            return fields;
         }
 
         /// <summary>
@@ -1228,16 +1423,132 @@ namespace LootLocker
                 _warnedConfigIds.Clear();
             }
 
+            _localOverrideFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             ExternalFileConfig fileConfig = CheckForFileConfig();
             if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
             {
                 _activeFileConfig = fileConfig;
-                ApplyFileConfig(fileConfig);
+                ApplyFileConfig(fileConfig, null);
             }
             else
             {
                 _activeFileConfig = null;
             }
+
+            // The local override is layered on top of whatever the shared config produced, so it
+            // applies even when no shared config is in effect.
+            ApplyLocalOverride();
+        }
+
+        /// <summary>
+        /// Applies the gitignored local override file, if one exists.
+        ///
+        /// The file is sparse: only the fields it contains are applied, so a developer can flip one
+        /// setting for an afternoon without forking the shared config. A file that cannot be read
+        /// or parsed is reported once and otherwise ignored - it must never break loading.
+        /// </summary>
+        private static void ApplyLocalOverride()
+        {
+            string text = ReadConfigFileText(LocalOverrideName);
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            if (!TryParseSparseFileConfig(text, out ExternalFileConfig localConfig, out HashSet<string> presentFields, out string error))
+            {
+                WarnOnceForMissingConfig(LocalOverrideName,
+                    $"Local override file '{LocalOverrideName}{ConfigFileExtension}' is not usable ({error}). Ignoring it.");
+                return;
+            }
+
+            _localOverrideFields = ApplyFileConfig(localConfig, presentFields);
+        }
+
+        /// <summary>
+        /// Copies the fields of a file config onto the live config.
+        /// </summary>
+        /// <param name="fileConfig">The parsed config to apply.</param>
+        /// <param name="onlyFields">
+        /// When non-null, only these JSON field names are applied. Used for the sparse local
+        /// override file. When null every field is applied, which is the shared config behaviour.
+        /// </param>
+        /// <returns>The JSON field names that were actually applied.</returns>
+        private static HashSet<string> ApplyFileConfig(ExternalFileConfig fileConfig, HashSet<string> onlyFields)
+        {
+            var applied = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            bool Applies(string fieldName)
+            {
+                return onlyFields == null || onlyFields.Contains(fieldName);
+            }
+
+            if (Applies(LootLockerConfigFields.SdkVersion))
+            {
+                _current.sdk_version = fileConfig.sdk_version;
+                applied.Add(LootLockerConfigFields.SdkVersion);
+            }
+            if (Applies(LootLockerConfigFields.ApiKey))
+            {
+                _current.apiKey = fileConfig.api_key;
+                applied.Add(LootLockerConfigFields.ApiKey);
+            }
+            if (Applies(LootLockerConfigFields.DomainKey))
+            {
+                _current.domainKey = fileConfig.domain_key;
+                applied.Add(LootLockerConfigFields.DomainKey);
+            }
+            if (Applies(LootLockerConfigFields.EnablePresence))
+            {
+                _current.enablePresence = fileConfig.enable_presence;
+                applied.Add(LootLockerConfigFields.EnablePresence);
+            }
+            if (Applies(LootLockerConfigFields.EnablePresenceAutoConnect))
+            {
+                _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
+                applied.Add(LootLockerConfigFields.EnablePresenceAutoConnect);
+            }
+            if (Applies(LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange))
+            {
+                _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
+                applied.Add(LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange);
+            }
+            if (Applies(LootLockerConfigFields.EnablePresenceInEditor))
+            {
+                _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
+                applied.Add(LootLockerConfigFields.EnablePresenceInEditor);
+            }
+            if (Applies(LootLockerConfigFields.AllowTokenRefresh))
+            {
+                _current.allowTokenRefresh = fileConfig.allow_token_refresh;
+                applied.Add(LootLockerConfigFields.AllowTokenRefresh);
+            }
+            if (Applies(LootLockerConfigFields.PrettifyJson))
+            {
+                _current.prettifyJson = fileConfig.prettify_json;
+                applied.Add(LootLockerConfigFields.PrettifyJson);
+            }
+            if (Applies(LootLockerConfigFields.ObfuscateLogs))
+            {
+                _current.obfuscateLogs = fileConfig.obfuscate_logs;
+                applied.Add(LootLockerConfigFields.ObfuscateLogs);
+            }
+            if (Applies(LootLockerConfigFields.MultiUserSessionMode)
+                && fileConfig.multi_user_session_mode != LootLockerMultiUserSessionMode.NotSet)
+            {
+                _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
+                applied.Add(LootLockerConfigFields.MultiUserSessionMode);
+            }
+            if (Applies(LootLockerConfigFields.EnableEditorAdminExtension))
+            {
+                _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
+                applied.Add(LootLockerConfigFields.EnableEditorAdminExtension);
+            }
+#if UNITY_EDITOR
+            _current.adminToken = null;
+#endif
+            return applied;
         }
 
         /// <summary>
