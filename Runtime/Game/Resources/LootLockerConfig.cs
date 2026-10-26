@@ -265,8 +265,23 @@ namespace LootLocker
         /// Reads a config file's text, trying Resources first and falling back to the AssetDatabase
         /// and then a direct disk read in the editor.
         /// </summary>
+        /// <param name="fileName">
+        /// File name with or without the config file extension. Discovery works with real file
+        /// names (including the extension) while the load path works with bare names, so both are
+        /// accepted here rather than forcing every caller to agree.
+        /// </param>
         private static string ReadConfigFileText(string fileName)
         {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
+
+            if (fileName.EndsWith(ConfigFileExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = fileName.Substring(0, fileName.Length - ConfigFileExtension.Length);
+            }
+
             // 1. Primary: Resources.Load — works in any install location in both editor and builds.
             //    The .bytes file must be inside a Resources/ folder for this to work.
             TextAsset resourcesTextAsset = Resources.Load<TextAsset>($"Config/{fileName}");
