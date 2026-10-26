@@ -84,15 +84,13 @@ namespace LootLocker.Admin
             }
 #pragma warning restore 0162
 
-            DrawFileConfigSelection();
+            DrawFileConfigRow();
 
             if (LootLockerConfig.IsFileConfigActive)
             {
                 EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Game version and log settings remain editable. Edit the config file to change the other values.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
-
-            DrawValidation();
 
             EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
@@ -190,40 +188,38 @@ namespace LootLocker.Admin
         private const string NoneOption = "(None — use Project Settings)";
 
         /// <summary>
-        /// Draws the file config dropdown. Only shown when there is something to choose between:
-        /// with zero or one config file the selection is unambiguous and a dropdown would be noise.
+        /// Draws the config file selection, refresh and validate controls on a single row.
+        ///
+        /// The dropdown is only interactive when there is something to choose between: with zero
+        /// or one config file the selection is unambiguous, so a plain label is shown instead.
         /// </summary>
-        private void DrawFileConfigSelection()
+        private void DrawFileConfigRow()
         {
             List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigsForEditor();
             string selectedId = gameSettings.selectedFileConfigId;
-
-            if (discovered.Count == 0)
-            {
-                EditorGUILayout.LabelField("Config File", "No file config in use — settings below apply.");
-                EditorGUILayout.Space();
-                return;
-            }
-
-            if (discovered.Count == 1 && selectedId == null)
-            {
-                LootLockerConfig.FileConfigDescriptor only = discovered[0];
-                EditorGUILayout.LabelField("Config File", $"Using {DescribeId(only.Id)}");
-                EditorGUILayout.Space();
-                return;
-            }
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField("Config File", GUILayout.Width(EditorGUIUtility.labelWidth));
 
-                string currentLabel = DescribeSelection(selectedId, discovered);
-
-                // A Popup cannot disable individual entries, so use a menu: invalid configs are
-                // shown greyed out and unclickable rather than being selectable-but-broken.
-                if (EditorGUILayout.DropdownButton(new GUIContent(currentLabel), FocusType.Keyboard))
+                if (discovered.Count == 0)
                 {
-                    ShowFileConfigMenu(selectedId, discovered);
+                    EditorGUILayout.LabelField("No file config in use — settings below apply.");
+                }
+                else if (discovered.Count == 1 && selectedId == null)
+                {
+                    EditorGUILayout.LabelField($"Using {DescribeId(discovered[0].Id)}");
+                }
+                else
+                {
+                    string currentLabel = DescribeSelection(selectedId, discovered);
+
+                    // A Popup cannot disable individual entries, so use a menu: invalid configs
+                    // are shown greyed out and unclickable rather than selectable-but-broken.
+                    if (EditorGUILayout.DropdownButton(new GUIContent(currentLabel), FocusType.Keyboard))
+                    {
+                        ShowFileConfigMenu(selectedId, discovered);
+                    }
                 }
 
                 if (GUILayout.Button("Refresh", GUILayout.Width(70)))
@@ -231,21 +227,23 @@ namespace LootLocker.Admin
                     ClearValidationResult();
                     LootLockerConfig.RefreshFileConfigState(force: true);
                 }
+
+                using (new EditorGUI.DisabledScope(validationInProgress || string.IsNullOrEmpty(gameSettings?.apiKey)))
+                {
+                    if (GUILayout.Button(validationInProgress ? "Validating..." : "Validate", GUILayout.Width(90)))
+                    {
+                        ValidateCurrentConfig();
+                    }
+                }
+
+                DrawValidationResult();
             }
 
-            if (!string.IsNullOrEmpty(selectedId))
+            if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
             {
-                bool found = discovered.Exists(d => d.Id == selectedId);
-                if (!found)
-                {
-                    EditorGUILayout.HelpBox(
-                        $"The selected config '{selectedId}' was not found. Expected Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes.",
-                        MessageType.Error);
-                }
-                else
-                {
-                    EditorGUILayout.LabelField("", $"Using Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes", EditorStyles.miniLabel);
-                }
+                EditorGUILayout.HelpBox(
+                    $"The selected config '{selectedId}' was not found. Expected Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes.",
+                    MessageType.Error);
             }
 
             EditorGUILayout.Space();
@@ -353,32 +351,8 @@ namespace LootLocker.Admin
         }
 
         /// <summary>
-        /// Draws the "Validate" affordance, which proves the currently effective API key works and
-        /// shows which game it belongs to.
-        ///
-        /// This validates whatever is currently applied (LootLockerConfig.current.apiKey), not an
-        /// arbitrary unselected config.
+        /// Draws the outcome of the last validation inline, next to the Validate button.
         /// </summary>
-        private void DrawValidation()
-        {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField("Connection", GUILayout.Width(EditorGUIUtility.labelWidth));
-
-                using (new EditorGUI.DisabledScope(validationInProgress || string.IsNullOrEmpty(gameSettings?.apiKey)))
-                {
-                    if (GUILayout.Button(validationInProgress ? "Validating..." : "Validate", GUILayout.Width(100)))
-                    {
-                        ValidateCurrentConfig();
-                    }
-                }
-
-                DrawValidationResult();
-            }
-
-            EditorGUILayout.Space();
-        }
-
         private static void DrawValidationResult()
         {
             if (!validationResult.HasValue)
