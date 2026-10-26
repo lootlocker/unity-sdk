@@ -50,6 +50,57 @@ For a full walkthrough of how to configure the SDK, please see our [Guide to Con
 - Open `Edit > Project Settings` in the Unity Editor and find the `LootLocker SDK` tab.
 - Input Api Key using the Game Key from the LootLocker console page
 
+### Multiple configurations
+
+You can keep several named config files in one project and switch between them without
+recompiling. This is how you keep, for example, a `dev` config with verbose logging and a `prod`
+config with logging off, or one config per platform.
+
+**Naming.** Put the files next to the config asset, in
+`Assets/LootLockerSDK/Resources/Config/`, and name them `LootLockerConfig-<id>.bytes`. The `<id>` may
+contain letters, digits, `.`, `_` and `-`, and must start with a letter or digit. The unsuffixed
+`LootLockerConfig.bytes` keeps working exactly as before and is shown as `Default`.
+
+**Selecting.** Open `Edit > Project Settings > LootLocker SDK`. When more than one config file is
+present a `Config File` dropdown appears. Files that cannot be parsed, or that have no `api_key`,
+are listed greyed out with the reason, so a broken file is visible but cannot be selected. With a
+single config file there is nothing to choose and no dropdown is shown.
+
+**Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
+change. `Local Overrides > Create` writes a gitignored
+`Resources/Config/LootLockerConfig.local.bytes` that is layered on top of the selected config. The
+file is sparse: only the fields it contains are applied, so overriding `log_level` leaves every
+other setting shared. Overridden settings are marked `(local override)` in Project Settings, and
+`Reset` deletes the file. Switching config file also clears it, because an override written against
+one config does not apply to another.
+
+**CI.** Select a config without touching the editor:
+
+```
+Unity.exe -batchmode -quit -lootlockerconfig prod-ps5
+Unity.exe -batchmode -quit -lootlockerconfig none
+```
+
+An invalid identifier is logged as an error and treated as `none` rather than guessed at.
+
+**Precedence**, highest first:
+
+1. An explicit `LootLockerSDKManager.Init(...)` call. Process lifetime only; never written to disk.
+2. `-lootlockerconfig` on the command line.
+3. The local override file.
+4. The selected config file.
+5. The legacy `LootLockerConfig.bytes`.
+6. The values stored in the config asset.
+
+**Three limitations worth knowing:**
+
+1. Every config file under `Resources/Config/` is included in every build. Selecting a config
+   chooses which one is *used*, not which ones are *shipped*.
+2. The selection is a single committed value, so it is shared by everyone on the project. Per-build
+   target selection is not implemented yet.
+3. **API keys in config files are not secrets.** They are readable by anyone with the build. This
+   feature improves key hygiene — keeping the right key on the right target — not secrecy.
+
 ## Updating
 If you have installed the SDK from Open UPM then all you have to do in Package Manager is press the Update button when that tells you there's a new version.
 
