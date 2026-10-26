@@ -128,5 +128,38 @@ namespace LootLockerTests.EditMode
             Assert.IsFalse(LootLockerConfig.IsLocallyOverridden(null));
             Assert.IsFalse(LootLockerConfig.IsLocallyOverridden(""));
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void SparseParse_EnumValueIsReadFromItsName()
+        {
+            // Given: the override file format the UI writes for an enum
+            const string text = @"{ ""log_level"": ""Verbose"" }";
+
+            // When
+            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
+
+            // Then: enums are written by name so the file stays hand-editable
+            Assert.IsTrue(parsed, error);
+            Assert.AreEqual(LootLockerLogger.LogLevel.Verbose, config.log_level);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void SparseParse_UnknownFieldDoesNotBreakParsing()
+        {
+            // Given: a file written by a newer SDK that has a field this version does not know
+            const string text = @"{
+  ""log_level"": ""Verbose"",
+  ""some_future_setting"": 42
+}";
+
+            // When
+            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out HashSet<string> fields, out string error);
+
+            // Then: forward compatibility - an unknown field must not fail the whole file
+            Assert.IsTrue(parsed, error);
+            Assert.AreEqual(LootLockerLogger.LogLevel.Verbose, config.log_level);
+            Assert.IsTrue(fields.Contains("some_future_setting"),
+                "Unknown fields must still be reported so they survive a round trip");
+        }
     }
 }
