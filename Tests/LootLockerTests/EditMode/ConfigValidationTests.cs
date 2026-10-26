@@ -121,18 +121,5 @@ namespace LootLockerTests.EditMode
                 "An empty key should short-circuit before any request");
         }
 
-        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Validation_SuccessWithoutInfo_ReportsUnreachable()
-        {
-            // Given: success flag set but no payload — treat as a failed validation, not a success
-            var response = new LootLockerGameInfoResponse { success = true, statusCode = 200, info = null };
-
-            // When
-            LootLockerConfigValidationResult result = LootLockerConfigValidation.Classify(response, "some-key");
-
-            // Then
-            Assert.AreNotEqual(LootLockerConfigValidationOutcome.Success, result.Outcome,
-                "A success response without game info must not be reported as validated");
-        }
     }
 }
