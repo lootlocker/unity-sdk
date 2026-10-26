@@ -217,44 +217,18 @@ namespace LootLocker.Admin
             {
                 EditorGUILayout.LabelField("Config File", GUILayout.Width(EditorGUIUtility.labelWidth));
 
-                var options = new List<string> { NoneOption };
-                var ids = new List<string> { "" };
-                int currentIndex = 0;
+                string currentLabel = DescribeSelection(selectedId, discovered);
 
-                foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+                // A Popup cannot disable individual entries, so use a menu: invalid configs are
+                // shown greyed out and unclickable rather than being selectable-but-broken.
+                if (EditorGUILayout.DropdownButton(new GUIContent(currentLabel), FocusType.Keyboard))
                 {
-                    string label = DescribeId(descriptor.Id);
-                    if (descriptor.State != LootLockerConfig.FileConfigState.Valid)
-                    {
-                        label += $" — {descriptor.Reason}";
-                    }
-
-                    options.Add(label);
-                    ids.Add(descriptor.Id);
-
-                    if (descriptor.Id == selectedId)
-                    {
-                        currentIndex = options.Count - 1;
-                    }
-                }
-
-                // A selection that is no longer on disk must be visible, not silently dropped.
-                bool selectionMissing = !string.IsNullOrEmpty(selectedId) && !ids.Contains(selectedId);
-                if (selectionMissing)
-                {
-                    options.Add($"Missing: {selectedId}");
-                    ids.Add(selectedId);
-                    currentIndex = options.Count - 1;
-                }
-
-                int newIndex = EditorGUILayout.Popup(currentIndex, options.ToArray());
-                if (newIndex != currentIndex)
-                {
-                    ApplyFileConfigSelection(ids[newIndex]);
+                    ShowFileConfigMenu(selectedId, discovered);
                 }
 
                 if (GUILayout.Button("Refresh", GUILayout.Width(70)))
                 {
+                    ClearValidationResult();
                     LootLockerConfig.RefreshFileConfigState(force: true);
                 }
             }
@@ -277,6 +251,67 @@ namespace LootLocker.Admin
             EditorGUILayout.Space();
         }
 
+        /// <summary>
+        /// Builds the dropdown menu. Invalid entries are added disabled, with the reason appended,
+        /// so a broken file is visible but cannot be selected.
+        /// </summary>
+        private void ShowFileConfigMenu(string selectedId, List<LootLockerConfig.FileConfigDescriptor> discovered)
+        {
+            var menu = new GenericMenu();
+
+            menu.AddItem(new GUIContent(NoneOption), string.IsNullOrEmpty(selectedId),
+                () => ApplyFileConfigSelection(""));
+
+            foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+            {
+                bool isValid = descriptor.State == LootLockerConfig.FileConfigState.Valid;
+                string label = DescribeId(descriptor.Id);
+                if (!isValid)
+                {
+                    label += $" — {descriptor.Reason}";
+                }
+
+                var content = new GUIContent(label);
+                bool isSelected = descriptor.Id == selectedId;
+
+                if (isValid)
+                {
+                    string id = descriptor.Id;
+                    menu.AddItem(content, isSelected, () => ApplyFileConfigSelection(id));
+                }
+                else
+                {
+                    menu.AddDisabledItem(content, isSelected);
+                }
+            }
+
+            // A selection that is no longer on disk must be visible, not silently dropped.
+            if (!string.IsNullOrEmpty(selectedId) && !discovered.Exists(d => d.Id == selectedId))
+            {
+                menu.AddDisabledItem(new GUIContent($"Missing: {selectedId}"), true);
+            }
+
+            menu.ShowAsContext();
+        }
+
+        private static string DescribeSelection(string selectedId, List<LootLockerConfig.FileConfigDescriptor> discovered)
+        {
+            if (string.IsNullOrEmpty(selectedId))
+            {
+                return NoneOption;
+            }
+
+            foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+            {
+                if (descriptor.Id == selectedId)
+                {
+                    return DescribeId(descriptor.Id);
+                }
+            }
+
+            return $"Missing: {selectedId}";
+        }
+
         private static string DescribeId(string id)
         {
             return string.IsNullOrEmpty(id) ? "Default (LootLockerConfig.bytes)" : id;
@@ -287,6 +322,9 @@ namespace LootLocker.Admin
             gameSettings.selectedFileConfigId = id;
             EditorUtility.SetDirty(gameSettings);
             AssetDatabase.SaveAssets();
+
+            // The previous validation result described a different key, so it is now meaningless.
+            ClearValidationResult();
 
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
@@ -303,6 +341,16 @@ namespace LootLocker.Admin
 
         private static LootLockerConfigValidationResult? validationResult;
         private static bool validationInProgress;
+
+        /// <summary>
+        /// Discards the last validation result. Called whenever the effective configuration
+        /// changes, because a result describing the previous key is misleading.
+        /// </summary>
+        private static void ClearValidationResult()
+        {
+            validationResult = null;
+            validationInProgress = false;
+        }
 
         /// <summary>
         /// Draws the "Validate" affordance, which proves the currently effective API key works and
