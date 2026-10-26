@@ -90,7 +90,8 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Click the closed padlock next to a setting to override it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);                EditorGUILayout.Space();
+                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Click the closed padlock next to a setting to override it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);
+                EditorGUILayout.Space();
             }
 
             DrawValidation();
@@ -217,10 +218,20 @@ namespace LootLocker.Admin
                         {
                             PersistLocalOverrideField(fieldName, m_CustomSettings.FindProperty(propertyName));
                         }
+                        else
+                        {
+                            // The developer just authored this value. Record it in the snapshot, or
+                            // the next reload would write the old value back over it.
+                            LootLockerConfig.CommitAuthoredValue(fieldName);
+                        }
                     }
                 }
 
-                if (LootLockerConfig.IsFileConfigActive)
+                // Shown when a shared config governs the field (so it can be overridden) and when the
+                // field is already overridden (so the override can be reset). Without the second
+                // case, an override whose shared config has since disappeared would show
+                // "(local override)" with no way to clear it.
+                if (LootLockerConfig.IsFileConfigActive || overridden)
                 {
                     if (GUILayout.Button(LockToggleContent(overridden), GUILayout.Width(24), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
                     {
@@ -475,9 +486,21 @@ namespace LootLocker.Admin
 
         private static string DescribeSelection(string selectedId, List<LootLockerConfig.FileConfigDescriptor> discovered)
         {
-            if (string.IsNullOrEmpty(selectedId))
+            // Only "" is explicit none. null means auto-detect, which may well have resolved to the
+            // legacy file - showing "(None)" there would misdescribe what is in effect.
+            if (selectedId == "")
             {
                 return NoneOption;
+            }
+
+            if (selectedId == null)
+            {
+                // Auto-detect. Report what it actually resolved to, so the label matches the
+                // settings below it.
+                string resolved = LootLockerConfig.GetResolvedFileConfigId();
+                return string.IsNullOrEmpty(resolved)
+                    ? "Auto-detect (no config file)"
+                    : $"Auto-detect ({DescribeId(resolved)})";
             }
 
             foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
