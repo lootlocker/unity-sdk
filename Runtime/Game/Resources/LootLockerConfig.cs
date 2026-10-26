@@ -338,15 +338,24 @@ namespace LootLocker
 
         /// <summary>
         /// File names present in the config folder, used by discovery.
+        ///
+        /// Two locations are searched because the SDK can be installed either as a package
+        /// (read-only, under Packages/) or as an asset folder. The config asset is always created
+        /// in the writable location, so that is where user-supplied config files live; the package
+        /// location is still checked so a config shipped inside the package keeps working.
         /// </summary>
         private static IEnumerable<string> ListConfigFileNames()
         {
             var names = new List<string>();
 
 #if UNITY_EDITOR
-            string folder = $"{GetSdkRootAssetsPath()}/Resources/Config";
-            if (Directory.Exists(folder))
+            foreach (string folder in ConfigFolderCandidates())
             {
+                if (!Directory.Exists(folder))
+                {
+                    continue;
+                }
+
                 foreach (string path in Directory.GetFiles(folder))
                 {
                     names.Add(Path.GetFileName(path));
@@ -358,6 +367,27 @@ namespace LootLocker
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Folders that may contain config files, most specific first. The writable location comes
+        /// first because that is where the config asset and user-supplied files live.
+        /// </summary>
+        private static IEnumerable<string> ConfigFolderCandidates()
+        {
+            var folders = new List<string>();
+
+            string writable = $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/Config";
+            folders.Add(writable);
+
+            string packageRoot = GetSdkRootAssetsPath();
+            string packageFolder = $"{packageRoot}/Resources/Config";
+            if (!string.Equals(packageFolder, writable, StringComparison.OrdinalIgnoreCase))
+            {
+                folders.Add(packageFolder);
+            }
+
+            return folders;
+        }
+
         /// <summary>
         /// Discovers the config files available in this project, for the Project Settings dropdown.
         /// </summary>
