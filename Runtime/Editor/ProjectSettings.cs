@@ -89,7 +89,7 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Game version and log settings remain editable. Edit the config file to change the other values.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Edit the config file to change them, or use Local Overrides to change one for this machine only.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
 
@@ -554,6 +554,10 @@ namespace LootLocker.Admin
             if (!logSettingsFoldout) return;
             EditorGUILayout.Space();
 
+            // Log settings are applied from the file config, so they are read-only while one is
+            // active. Use the local override file to change them for one machine.
+            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
+
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("logLevel"), Label("Log Level", LootLockerConfigFields.LogLevel));
 
@@ -580,7 +584,6 @@ namespace LootLocker.Admin
                 gameSettings.logInBuilds = m_CustomSettings.FindProperty("logInBuilds").boolValue;
             }
             EditorGUILayout.Space();
-            EditorGUI.BeginDisabledGroup(LootLockerConfig.IsFileConfigActive);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_CustomSettings.FindProperty("prettifyJson"), Label("Log JSON Formatted", LootLockerConfigFields.PrettifyJson));
