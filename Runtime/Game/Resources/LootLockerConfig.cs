@@ -255,7 +255,7 @@ namespace LootLocker
             {
                 string id = ResolveFileConfigId(
                     _current != null ? _current.selectedFileConfigId : null,
-                    commandLineId: null,
+                    commandLineId: CommandLineConfigId,
                     buildPointerId: null,
                     legacyFilePresent: LegacyConfigFileExists(),
                     availableIds: DiscoverAvailableIds());
@@ -686,6 +686,63 @@ namespace LootLocker
             }
 #endif
         }
+
+        /// <summary>
+        /// Extracts the <c>-lootlockerconfig</c> value from a command line.
+        ///
+        /// Pure: the caller supplies the arguments, so this can be unit tested without a real
+        /// process command line.
+        /// </summary>
+        /// <param name="args">The process arguments.</param>
+        /// <returns>
+        /// The requested identifier, <c>"none"</c> to disable file config, or null when the switch
+        /// was not supplied at all. An invalid identifier is reported and treated as
+        /// <c>"none"</c> rather than being guessed at.
+        /// </returns>
+        internal static string GetCommandLineConfigId(string[] args)
+        {
+            if (args == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                if (!string.Equals(args[i], "-lootlockerconfig", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string value = args[i + 1];
+                if (string.IsNullOrEmpty(value))
+                {
+                    return null;
+                }
+
+                if (string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+                {
+                    return "none";
+                }
+
+                if (IsValidFileConfigId(value))
+                {
+                    return value;
+                }
+
+                LootLockerLogger.Log(
+                    $"Ignoring -lootlockerconfig '{value}': not a valid config identifier. No file config will be used.",
+                    LootLockerLogger.LogLevel.Error);
+                return "none";
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// The <c>-lootlockerconfig</c> value for this process, or null when the switch was not
+        /// supplied.
+        /// </summary>
+        private static string CommandLineConfigId => GetCommandLineConfigId(Environment.GetCommandLineArgs());
 
         private static bool IsSemverString(string str)
         {
