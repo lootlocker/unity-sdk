@@ -105,6 +105,12 @@ namespace LootLocker
         private static readonly string LocalOverrideName = $"{SettingsName}.local";
 
         /// <summary>
+        /// Folder, next to the config asset's Resources folder, holding the local override file.
+        /// Outside Resources/ so the file is never packed into a build. See LocalOverrideFolder.
+        /// </summary>
+        private const string LocalOverrideFolderName = "LocalOverrides";
+
+        /// <summary>
         /// Name of the config file currently in effect, derived from
         /// <see cref="selectedFileConfigId"/>. The empty identifier maps to the legacy unsuffixed
         /// name, which is what keeps existing projects working unchanged.
@@ -410,7 +416,14 @@ namespace LootLocker
             var ids = new List<string>();
             foreach (FileConfigDescriptor descriptor in DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText))
             {
-                ids.Add(descriptor.Id);
+                // Only usable files. A lone broken config must not be picked on the developer's
+                // behalf by the single-file auto-detect step: the UI says a broken file is shown
+                // but cannot be selected, and auto-selecting it would contradict that and log a
+                // "not usable" warning on every load.
+                if (descriptor.State == FileConfigState.Valid)
+                {
+                    ids.Add(descriptor.Id);
+                }
             }
             return ids;
         }
@@ -492,10 +505,41 @@ namespace LootLocker
         }
 
         /// <summary>
+        /// Folder that holds the gitignored local override file.
+        ///
+        /// Deliberately outside Resources/. Anything under Resources/ is packed into every build
+        /// made on this machine, and guarding the read path with UNITY_EDITOR only stops the SDK
+        /// from *using* it - the bytes would still be in the build data for anyone to extract. The
+        /// file is a developer convenience, so it must not ship at all.
+        /// </summary>
+        internal static string LocalOverrideFolder =>
+            $"{GetSdkRootAssetsPath(requireWritable: true)}/{LocalOverrideFolderName}";
+
+        /// <summary>
         /// Absolute path of the gitignored local override file.
         /// </summary>
         internal static string LocalOverridePath =>
-            $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/Config/{LocalOverrideName}{ConfigFileExtension}";
+            $"{LocalOverrideFolder}/{LocalOverrideName}{ConfigFileExtension}";
+
+        /// <summary>
+        /// Reads the local override file's text straight from disk.
+        ///
+        /// Not Resources.Load: the file is outside Resources/ by design, and it is a plain file
+        /// rather than a TextAsset the AssetDatabase imports.
+        /// </summary>
+        private static string ReadLocalOverrideText()
+        {
+            try
+            {
+                string path = LocalOverridePath;
+                return File.Exists(path) ? File.ReadAllText(path) : null;
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Could not read the local override file: {ex.Message}", LootLockerLogger.LogLevel.Warning);
+                return null;
+            }
+        }
 
         /// <summary>
         /// Writes the local override file with the given JSON body, replacing any existing one.
@@ -517,9 +561,9 @@ namespace LootLocker
                     Directory.CreateDirectory(directory);
                 }
 
+                // No AssetDatabase import: the file is outside Resources/ and is read straight from
+                // disk, so importing it would add it to the build for no benefit.
                 File.WriteAllText(path, json);
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
-                AssetDatabase.Refresh();
                 return true;
             }
             catch (Exception ex)
@@ -543,13 +587,6 @@ namespace LootLocker
                     File.Delete(path);
                 }
 
-                string metaPath = path + ".meta";
-                if (File.Exists(metaPath))
-                {
-                    File.Delete(metaPath);
-                }
-
-                AssetDatabase.Refresh();
                 RefreshFileConfigState(force: true);
                 return true;
             }
@@ -570,7 +607,7 @@ namespace LootLocker
         {
             var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            string text = ReadConfigFileText(LocalOverrideName);
+            string text = ReadLocalOverrideText();
             if (string.IsNullOrEmpty(text))
             {
                 return fields;
@@ -1077,6 +1114,17 @@ namespace LootLocker
             // An explicit Init(...) call is the most specific instruction the SDK can receive, so
             // it wins over every file-based source. It is deliberately not persisted: it applies
             // for the lifetime of the process and cannot rewrite the committed config asset.
+            //
+            // Recorded as well as applied, because a later forced refresh restores the authored
+            // snapshot and would otherwise discard these values.
+            RecordInitValues(overrides =>
+            {
+                overrides.apiKey = apiKey;
+                overrides.game_version = gameVersion;
+                overrides.domainKey = domainKey;
+                overrides.logLevel = logLevel;
+            });
+
             _current.apiKey = apiKey;
             _current.game_version = gameVersion;
             _current.domainKey = domainKey;
@@ -1238,12 +1286,41 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// True when a local override file exists on disk for this project.
+        /// The identifier that resolution currently selects, or null when no file config applies.
+        ///
+        /// The settings UI needs this to show what "auto-detect" resolved to, rather than
+        /// displaying a selection state that does not match the settings below it.
         /// </summary>
-        public static bool LocalOverrideExists()
+        internal static string GetResolvedFileConfigId()
         {
-            return ReadConfigFileText(LocalOverrideName) != null;
+            return ResolveFileConfigId(
+                _current != null ? _current.selectedFileConfigId : null,
+                commandLineId: CommandLineConfigId,
+                buildPointerId: null,
+                legacyFilePresent: LegacyConfigFileExists(),
+                availableIds: DiscoverAvailableIds());
         }
+
+        /// <summary>
+        /// True when a local override file exists on disk for this project.
+        ///
+        /// Editor only: the file lives outside Resources/, so it is never present in a build, and
+        /// callers are all editor-side anyway. A plain File.Exists rather than reading and parsing
+        /// the file, because this is called from the admin request path and from every repaint.
+        /// </summary>
+#if UNITY_EDITOR
+        internal static bool LocalOverrideExists()
+        {
+            try
+            {
+                return File.Exists(LocalOverridePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+#endif
 
         private static bool _fileConfigChecked;
 
@@ -1654,10 +1731,8 @@ namespace LootLocker
             // The local override is layered on top of whatever the shared config produced, so it
             // applies even when no shared config is in effect.
             //
-            // Editor only, deliberately. The override file lives under Resources/Config, so Unity
-            // would pack it into every build made on this machine and ReadConfigFileText would
-            // read it at runtime - a local api_key or log_in_builds would ship to players. It is a
-            // developer convenience, not a build input.
+            // Editor only, deliberately. The override file lives outside Resources/ so it never
+            // ships, and it is a developer convenience rather than a build input.
             //
             // Skipped when the command line explicitly asked for no file config: "-lootlockerconfig
             // none" is documented as disabling file config, and silently layering a local override
@@ -1668,6 +1743,11 @@ namespace LootLocker
                 ApplyLocalOverride();
             }
 #endif
+
+            // An explicit Init call outranks every file layer, so put it back after the layers have
+            // run. Without this, any forced refresh would restore the authored snapshot and quietly
+            // drop the caller's values.
+            ReapplyInitValues();
         }
 
         /// <summary>
@@ -1691,7 +1771,7 @@ namespace LootLocker
 #if UNITY_EDITOR
         private static void ApplyLocalOverride()
         {
-            string text = ReadConfigFileText(LocalOverrideName);
+            string text = ReadLocalOverrideText();
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -1797,8 +1877,15 @@ namespace LootLocker
                 _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
                 applied.Add(LootLockerConfigFields.EnableEditorAdminExtension);
             }
+
 #if UNITY_EDITOR
-            _current.adminToken = null;
+            // Only a full shared config invalidates the admin session. The sparse local override
+            // path calls this too, and clearing the token there would sign the developer out just
+            // for toggling one field.
+            if (onlyFields == null)
+            {
+                _current.adminToken = null;
+            }
 #endif
             return applied;
         }
@@ -1825,6 +1912,84 @@ namespace LootLocker
             _assetSnapshot = ScriptableObject.CreateInstance<LootLockerConfig>();
             _assetSnapshot.hideFlags = HideFlags.HideAndDontSave;
             CopyConfigValues(_current, _assetSnapshot);
+        }
+
+        /// <summary>
+        /// Records a single value the developer just authored in the settings UI into the snapshot,
+        /// so a later restore does not revert it.
+        ///
+        /// Needed because the UI edits the live asset directly. Without this the snapshot keeps
+        /// whatever the asset held at load, and every reload - a Refresh, an override change, or
+        /// selecting a config file - writes the stale value back over the fresh edit.
+        /// </summary>
+        /// <param name="fieldName">JSON field name, see <see cref="LootLockerConfigFields"/>.</param>
+        internal static void CommitAuthoredValue(string fieldName)
+        {
+            if (string.IsNullOrEmpty(fieldName) || !IsFileConfigField(fieldName))
+            {
+                return;
+            }
+
+            CaptureAssetSnapshot();
+            if (_assetSnapshot == null || _current == null)
+            {
+                return;
+            }
+
+            CopyOneConfigValue(_current, _assetSnapshot, fieldName);
+        }
+
+        /// <summary>
+        /// Copies one governed field between configs, by JSON field name.
+        /// </summary>
+        private static void CopyOneConfigValue(LootLockerConfig from, LootLockerConfig to, string fieldName)
+        {
+            switch (fieldName)
+            {
+                case LootLockerConfigFields.ApiKey: to.apiKey = from.apiKey; break;
+                case LootLockerConfigFields.DomainKey: to.domainKey = from.domainKey; break;
+                case LootLockerConfigFields.GameVersion: to.game_version = from.game_version; break;
+                case LootLockerConfigFields.LogLevel: to.logLevel = from.logLevel; break;
+                case LootLockerConfigFields.LogErrorsAsWarnings: to.logErrorsAsWarnings = from.logErrorsAsWarnings; break;
+                case LootLockerConfigFields.LogInBuilds: to.logInBuilds = from.logInBuilds; break;
+                case LootLockerConfigFields.EnablePresence: to.enablePresence = from.enablePresence; break;
+                case LootLockerConfigFields.EnablePresenceAutoConnect: to.enablePresenceAutoConnect = from.enablePresenceAutoConnect; break;
+                case LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange: to.enablePresenceAutoDisconnectOnFocusChange = from.enablePresenceAutoDisconnectOnFocusChange; break;
+                case LootLockerConfigFields.EnablePresenceInEditor: to.enablePresenceInEditor = from.enablePresenceInEditor; break;
+                case LootLockerConfigFields.AllowTokenRefresh: to.allowTokenRefresh = from.allowTokenRefresh; break;
+                case LootLockerConfigFields.PrettifyJson: to.prettifyJson = from.prettifyJson; break;
+                case LootLockerConfigFields.ObfuscateLogs: to.obfuscateLogs = from.obfuscateLogs; break;
+                case LootLockerConfigFields.MultiUserSessionMode: to.multiUserSessionMode = from.multiUserSessionMode; break;
+                case LootLockerConfigFields.EnableEditorAdminExtension: to.enableEditorAdminExtension = from.enableEditorAdminExtension; break;
+            }
+        }
+
+        /// <summary>
+        /// True when the field is one a config file or the settings UI can govern.
+        /// </summary>
+        private static bool IsFileConfigField(string fieldName)
+        {
+            switch (fieldName)
+            {
+                case LootLockerConfigFields.ApiKey:
+                case LootLockerConfigFields.DomainKey:
+                case LootLockerConfigFields.GameVersion:
+                case LootLockerConfigFields.LogLevel:
+                case LootLockerConfigFields.LogErrorsAsWarnings:
+                case LootLockerConfigFields.LogInBuilds:
+                case LootLockerConfigFields.EnablePresence:
+                case LootLockerConfigFields.EnablePresenceAutoConnect:
+                case LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange:
+                case LootLockerConfigFields.EnablePresenceInEditor:
+                case LootLockerConfigFields.AllowTokenRefresh:
+                case LootLockerConfigFields.PrettifyJson:
+                case LootLockerConfigFields.ObfuscateLogs:
+                case LootLockerConfigFields.MultiUserSessionMode:
+                case LootLockerConfigFields.EnableEditorAdminExtension:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -1855,6 +2020,53 @@ namespace LootLocker
 
             CopyConfigValues(_assetSnapshot, _current);
         }
+
+        /// <summary>
+        /// Values supplied by an explicit <c>Init(...)</c> call, or null when none was made.
+        ///
+        /// Init outranks every file-based source, but it writes onto the same live object the file
+        /// layers are applied to. Without keeping the values here, any forced refresh - which
+        /// restores the authored snapshot - would silently discard them.
+        /// </summary>
+        private static LootLockerConfig _initOverrides;
+
+        /// <summary>
+        /// Records the values from an explicit Init call so they survive a reload.
+        /// </summary>
+        private static void RecordInitValues(Action<LootLockerConfig> record)
+        {
+            if (record == null)
+            {
+                return;
+            }
+
+            if (_initOverrides == null)
+            {
+                _initOverrides = ScriptableObject.CreateInstance<LootLockerConfig>();
+                _initOverrides.hideFlags = HideFlags.HideAndDontSave;
+            }
+
+            record(_initOverrides);
+        }
+
+        /// <summary>
+        /// Re-applies Init values over whatever the file layers produced.
+        /// </summary>
+        private static void ReapplyInitValues()
+        {
+            if (_initOverrides == null || _current == null)
+            {
+                return;
+            }
+
+            CopyConfigValues(_initOverrides, _current);
+        }
+
+        /// <summary>
+        /// True when an explicit Init call is in effect, meaning the live values are not the ones
+        /// stored in the asset and must not be saved back to it.
+        /// </summary>
+        internal static bool HasInitOverrides => _initOverrides != null;
 
         /// <summary>
         /// Copies every field a file config may govern from one config to another.
