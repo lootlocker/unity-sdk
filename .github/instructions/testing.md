@@ -16,13 +16,35 @@ Tests/
   LootLockerTests/
     PlayMode/           ← integration tests (one file per feature)
       PlayModeTests.asmdef
+    EditMode/           ← editor-only unit tests (no game provisioning)
+      EditModeTests.asmdef
   LootLockerTestUtils/  ← admin-API helpers consumed by tests
       LootLockerTestUtils.asmdef
 ```
 
-All tests are **Unity PlayMode tests** under `LootLockerTests/PlayMode/`. There are no
-EditMode tests in this folder (except `BroadcastTests.cs`, which is intentionally `[Test]`
-not `[UnityTest]` because it tests pure C# logic).
+Most tests are **Unity PlayMode tests** under `LootLockerTests/PlayMode/`. A few are plain
+`[Test]` methods rather than `[UnityTest]` because they test pure C# logic (e.g.
+`BroadcastTests.cs`, `JsonTests.cs`).
+
+`LootLockerTests/EditMode/` holds tests that need `UnityEditor` APIs (`AssetDatabase`,
+`EditorUserBuildSettings`, …) and must not run in a player. Its assembly sets
+`includePlatforms: ["Editor"]`, so it only compiles in the editor.
+
+### Choosing PlayMode vs EditMode
+
+| Use EditMode when | Use PlayMode when |
+|---|---|
+| The code under test is pure logic or editor-only | The code needs a running player loop, coroutines, or `MonoBehaviour` lifecycle |
+| You need `AssetDatabase`, `EditorPrefs`, `EditorUserBuildSettings` | You need a real LootLocker game / session |
+| The test must not create or delete games | The test exercises an API call end to end |
+
+EditMode tests are much cheaper — no game provisioning, no network — so prefer them whenever the
+behaviour allows it.
+
+> **Rule for EditMode tests:** never read from or write to the project's real
+> `Resources/Config/` folder. Use the temp-folder fixture in `FileConfigTestBase` instead.
+> Touching the real folder would silently change the active configuration of whoever runs the
+> tests.
 
 ---
 
@@ -98,6 +120,9 @@ Use the PowerShell script `.github/scripts/run-tests.ps1`:
 # Run fast subset (LootLockerCIFast)
 .github\scripts\run-tests.ps1 -TestCategory LootLockerCIFast
 
+# Run the editor-only unit tests
+.github\scripts\run-tests.ps1 -TestMode EditMode -TestCategory LootLockerCIFast
+
 # Run a specific test class by name
 .github\scripts\run-tests.ps1 -TestFilter "LeaderboardTest"
 
@@ -117,10 +142,12 @@ See `.github/instructions/verification.md` for setup instructions.
 
 Push to a work branch — the **`Run Tests`** workflow
 (`.github/workflows/run-tests.yml`) can be triggered manually via `workflow_dispatch`
-from the **Actions** tab with optional `testCategory` and `testFilter` inputs.
+from the **Actions** tab with optional `testCategory`, `testFilter` and `testMode`
+(`playmode` / `editmode`) inputs.
 
 The full integration test suite (`LootLockerCI`) runs automatically on PRs to `dev` and
-`main` via the existing `run-tests-and-package.yml` workflow.
+`main` via the existing `run-tests-and-package.yml` workflow. The `sdk-editmode-tests` job in
+`run-tests-ci.yml` runs the EditMode suite on every PR.
 
 ---
 
