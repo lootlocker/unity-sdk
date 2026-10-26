@@ -67,12 +67,16 @@ are listed greyed out with the reason, so a broken file is visible but cannot be
 single config file there is nothing to choose and no dropdown is shown.
 
 **Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
-change. `Local Overrides > Create` writes a gitignored
+change. Click the closed padlock next to a setting to write a gitignored
 `Resources/Config/LootLockerConfig.local.bytes` that is layered on top of the selected config. The
 file is sparse: only the fields it contains are applied, so overriding `log_level` leaves every
-other setting shared. Overridden settings are marked `(local override)` in Project Settings, and
-`Reset` deletes the file. Switching config file also clears it, because an override written against
-one config does not apply to another.
+other setting shared. Overridden settings are marked `(local override)` in Project Settings, and the
+open padlock resets them. Switching config file also clears the file, because an override written
+against one config does not apply to another.
+
+The override file is **editor only**. It lives under `Resources/`, so Unity would otherwise pack it
+into every build made on that machine and the SDK would read it at runtime — a local `api_key` or
+`log_in_builds` would ship to players. It is a developer convenience, not a build input.
 
 **CI.** Select a config without touching the editor:
 
@@ -87,10 +91,12 @@ An invalid identifier is logged as an error and treated as `none` rather than gu
 
 1. An explicit `LootLockerSDKManager.Init(...)` call. Process lifetime only; never written to disk.
 2. `-lootlockerconfig` on the command line.
-3. The local override file.
+3. The local override file (editor only).
 4. The selected config file.
 5. The legacy `LootLockerConfig.bytes`.
 6. The values stored in the config asset.
+
+`-lootlockerconfig none` disables file config entirely, including the local override.
 
 **Three limitations worth knowing:**
 
