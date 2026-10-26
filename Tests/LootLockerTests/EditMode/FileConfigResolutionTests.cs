@@ -206,6 +206,37 @@ namespace LootLockerTests.EditMode
                 "An invalid asset selection must not reach the filesystem");
         }
 
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Resolve_StaleSelectionStillResolvesSoTheCallerCanReportIt()
+        {
+            // A selection that is no longer on disk must still resolve, so the load path can warn
+            // about it by name instead of silently behaving as if nothing was ever selected.
+            string resolved = LootLockerConfig.ResolveFileConfigId(
+                selectedId: "deleted",
+                commandLineId: null,
+                buildPointerId: null,
+                legacyFilePresent: false,
+                availableIds: new[] { "prod" });
+
+            Assert.AreEqual("deleted", resolved,
+                "A stale selection must resolve so the caller can report which config is missing");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Resolve_AllConfigsRemovedBehavesLikeNoConfigEverExisted()
+        {
+            // The user moved every config file away. With no selection and nothing on disk the
+            // result must be "no file config", i.e. the asset values, exactly as a fresh project.
+            string resolved = LootLockerConfig.ResolveFileConfigId(
+                selectedId: null,
+                commandLineId: null,
+                buildPointerId: null,
+                legacyFilePresent: false,
+                availableIds: NoIds);
+
+            Assert.IsNull(resolved, "With no config files at all the SDK must use the asset values");
+        }
+
         #endregion
 
         #region Parsing
