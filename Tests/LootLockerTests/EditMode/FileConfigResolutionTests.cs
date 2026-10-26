@@ -51,6 +51,16 @@ namespace LootLockerTests.EditMode
             Assert.IsTrue(LootLockerConfig.IsValidFileConfigId(new string('a', 64)), "64 chars is the limit");
         }
 
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void IsValidFileConfigId_RejectsTrailingNewline()
+        {
+            // In .NET, $ also matches before a trailing newline, so a pattern anchored with $ would
+            // accept "prod\n" and let it reach the file name and the Resources lookup.
+            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod\n"), "A trailing newline must be rejected");
+            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod\r\n"), "A trailing CRLF must be rejected");
+            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod "), "A trailing space must be rejected");
+        }
+
         #endregion
 
         #region File name derivation
