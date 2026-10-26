@@ -84,6 +84,8 @@ namespace LootLocker.Admin
             }
 #pragma warning restore 0162
 
+            DrawFileConfigSelection();
+
             if (LootLockerConfig.IsFileConfigActive)
             {
                 EditorGUILayout.HelpBox("Most settings are controlled by the external config file and cannot be edited here. Game version and log settings remain editable. Edit the config file to change the other values.", MessageType.Warning);
@@ -182,6 +184,114 @@ namespace LootLocker.Admin
 
             EditorGUI.EndDisabledGroup();
         }
+
+        #region File config selection
+
+        private const string NoneOption = "(None — use Project Settings)";
+
+        /// <summary>
+        /// Draws the file config dropdown. Only shown when there is something to choose between:
+        /// with zero or one config file the selection is unambiguous and a dropdown would be noise.
+        /// </summary>
+        private void DrawFileConfigSelection()
+        {
+            List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigsForEditor();
+            string selectedId = gameSettings.selectedFileConfigId;
+
+            if (discovered.Count == 0)
+            {
+                EditorGUILayout.LabelField("Config File", "No file config in use — settings below apply.");
+                EditorGUILayout.Space();
+                return;
+            }
+
+            if (discovered.Count == 1 && selectedId == null)
+            {
+                LootLockerConfig.FileConfigDescriptor only = discovered[0];
+                EditorGUILayout.LabelField("Config File", $"Using {DescribeId(only.Id)}");
+                EditorGUILayout.Space();
+                return;
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("Config File", GUILayout.Width(EditorGUIUtility.labelWidth));
+
+                var options = new List<string> { NoneOption };
+                var ids = new List<string> { "" };
+                int currentIndex = 0;
+
+                foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+                {
+                    string label = DescribeId(descriptor.Id);
+                    if (descriptor.State != LootLockerConfig.FileConfigState.Valid)
+                    {
+                        label += $" — {descriptor.Reason}";
+                    }
+
+                    options.Add(label);
+                    ids.Add(descriptor.Id);
+
+                    if (descriptor.Id == selectedId)
+                    {
+                        currentIndex = options.Count - 1;
+                    }
+                }
+
+                // A selection that is no longer on disk must be visible, not silently dropped.
+                bool selectionMissing = !string.IsNullOrEmpty(selectedId) && !ids.Contains(selectedId);
+                if (selectionMissing)
+                {
+                    options.Add($"Missing: {selectedId}");
+                    ids.Add(selectedId);
+                    currentIndex = options.Count - 1;
+                }
+
+                int newIndex = EditorGUILayout.Popup(currentIndex, options.ToArray());
+                if (newIndex != currentIndex)
+                {
+                    ApplyFileConfigSelection(ids[newIndex]);
+                }
+
+                if (GUILayout.Button("Refresh", GUILayout.Width(70)))
+                {
+                    LootLockerConfig.RefreshFileConfigState(force: true);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(selectedId))
+            {
+                bool found = discovered.Exists(d => d.Id == selectedId);
+                if (!found)
+                {
+                    EditorGUILayout.HelpBox(
+                        $"The selected config '{selectedId}' was not found. Expected Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes.",
+                        MessageType.Error);
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("", $"Using Resources/Config/{LootLockerConfig.GetConfigFileNameForId(selectedId)}.bytes", EditorStyles.miniLabel);
+                }
+            }
+
+            EditorGUILayout.Space();
+        }
+
+        private static string DescribeId(string id)
+        {
+            return string.IsNullOrEmpty(id) ? "Default (LootLockerConfig.bytes)" : id;
+        }
+
+        private static void ApplyFileConfigSelection(string id)
+        {
+            gameSettings.selectedFileConfigId = id;
+            EditorUtility.SetDirty(gameSettings);
+            AssetDatabase.SaveAssets();
+
+            LootLockerConfig.RefreshFileConfigState(force: true);
+        }
+
+        #endregion
 
         private static bool IsSemverString(string str)
         {
