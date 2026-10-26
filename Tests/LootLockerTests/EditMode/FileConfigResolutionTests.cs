@@ -254,6 +254,34 @@ namespace LootLockerTests.EditMode
             Assert.IsNotEmpty(error);
         }
 
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void TryParseFileConfig_TruncatedJsonFails()
+        {
+            // A truncated file is the realistic failure (interrupted download, bad merge).
+            const string truncated = "{\n  \"api_key\": \"key123\",\n  \"log_level\": \"Verbose\"\n";
+
+            bool ok = LootLockerConfig.TryParseFileConfig(truncated, out ExternalFileConfig config, out string error);
+
+            Assert.IsFalse(ok, "Truncated JSON must not parse");
+            Assert.IsNull(config);
+            Assert.IsNotEmpty(error);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void TryParseFileConfig_MissingCommaIsAcceptedByTheParser()
+        {
+            // Documents a real property of the bundled parser: ReadDictionary treats ',' as a
+            // no-op, so a missing separator is tolerated. This is asserted rather than assumed so
+            // that a future parser change is noticed, and so nobody relies on "missing comma" as a
+            // way to produce an invalid config.
+            const string missingComma = "{\n  \"api_key\": \"key123\"\n  \"log_level\": \"Verbose\"\n}";
+
+            bool ok = LootLockerConfig.TryParseFileConfig(missingComma, out ExternalFileConfig config, out string error);
+
+            Assert.IsTrue(ok, $"The bundled parser tolerates a missing comma; got: {error}");
+            Assert.AreEqual("key123", config.api_key);
+        }
+
         #endregion
     }
 }
