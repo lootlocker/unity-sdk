@@ -68,15 +68,16 @@ single config file there is nothing to choose and no dropdown is shown.
 
 **Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
 change. Click the closed padlock next to a setting to write a gitignored
-`Resources/Config/LootLockerConfig.local.bytes` that is layered on top of the selected config. The
-file is sparse: only the fields it contains are applied, so overriding `log_level` leaves every
-other setting shared. Overridden settings are marked `(local override)` in Project Settings, and the
-open padlock resets them. Switching config file also clears the file, because an override written
-against one config does not apply to another.
+`Assets/LootLockerSDK/LocalOverrides/LootLockerConfig.local.bytes` that is layered on top of the
+selected config. The file is sparse: only the fields it contains are applied, so overriding
+`log_level` leaves every other setting shared. Overridden settings are marked `(local override)` in
+Project Settings, and the open padlock resets them. Switching config file also clears the file,
+because an override written against one config does not apply to another.
 
-The override file is **editor only**. It lives under `Resources/`, so Unity would otherwise pack it
-into every build made on that machine and the SDK would read it at runtime — a local `api_key` or
-`log_in_builds` would ship to players. It is a developer convenience, not a build input.
+The override file is **editor only**, and deliberately outside `Resources/`. Anything under
+`Resources/` is packed into every build made on that machine, so an override stored there would ship
+a local `api_key` or `log_in_builds` value to players even if the SDK never read it. It is a
+developer convenience, not a build input.
 
 **CI.** Select a config without touching the editor:
 
