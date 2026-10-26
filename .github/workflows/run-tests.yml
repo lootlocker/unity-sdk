@@ -1,15 +1,15 @@
 name: Run Tests
-run-name: "Run Tests on ${{ github.ref_name }} (category: ${{ inputs.testCategory || 'LootLockerCIFast' }}, filter: ${{ inputs.testFilter || '(none)' }})"
+run-name: "Run Tests on ${{ github.ref_name }} (${{ inputs.testMode || 'playmode' }}, category: ${{ inputs.testCategory || 'LootLockerCIFast' }}, filter: ${{ inputs.testFilter || '(none)' }})"
 
-# Runs the SDK's PlayMode integration tests.
+# Runs the SDK's tests (PlayMode integration tests by default, EditMode unit tests on request).
 #
 # Triggered:
 #   - Manually via workflow_dispatch (primary use-case for agents and developers).
 #   - Automatically on push to test/** branches (for iterating on test work).
 #
-# The tests create real LootLocker games via the admin API; they handle their own
+# PlayMode tests create real LootLocker games via the admin API; they handle their own
 # authentication using time-scoped auto-generated credentials, so no pre-provisioned
-# admin secrets are needed for stage environments.
+# admin secrets are needed for stage environments. EditMode tests need no provisioning.
 #
 # See .github/instructions/testing.md for full documentation.
 on:
@@ -32,6 +32,15 @@ on:
           Combined with testCategory using AND logic when both are supplied.
         type: string
         default: ""
+      testMode:
+        description: >
+          Unity test platform to run: playmode (default) or editmode.
+          EditMode runs the config/editor unit tests and needs no game provisioning.
+        type: choice
+        options:
+          - playmode
+          - editmode
+        default: playmode
       unityVersion:
         description: "Unity version to use (leave empty to use AGENT_CHECK_UNITY_VERSION variable)"
         type: string
@@ -39,13 +48,14 @@ on:
 
 jobs:
   run-tests:
-    name: Run SDK PlayMode tests
+    name: Run SDK ${{ github.event.inputs.testMode || 'playmode' }} tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       UNITY_VERSION: ${{ github.event.inputs.unityVersion || vars.AGENT_CHECK_UNITY_VERSION || '2022.3.22f1' }}
       TEST_CATEGORY: ${{ github.event.inputs.testCategory || 'LootLockerCIFast' }}
       TEST_FILTER: ${{ github.event.inputs.testFilter || '' }}
+      TEST_MODE: ${{ github.event.inputs.testMode || 'playmode' }}
 
     steps:
       - name: Checkout SDK
@@ -94,7 +104,7 @@ jobs:
           fi
           echo "custom_params=$PARAMS" >> "$GITHUB_OUTPUT"
 
-      - name: Run PlayMode tests
+      - name: Run ${{ env.TEST_MODE }} tests
         id: tests
         continue-on-error: true
         uses: game-ci/unity-test-runner@v4.3.1
@@ -105,9 +115,9 @@ jobs:
         with:
           projectPath: TestProject
           unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: playmode
+          testMode: ${{ env.TEST_MODE }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: "Run Tests (${{ env.UNITY_VERSION }}) — ${{ env.TEST_CATEGORY }}"
+          checkName: "Run Tests (${{ env.UNITY_VERSION }}) — ${{ env.TEST_MODE }} — ${{ env.TEST_CATEGORY }}"
           customParameters: ${{ steps.params.outputs.custom_params }}
 
       - name: Upload test results
