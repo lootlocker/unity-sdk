@@ -532,6 +532,140 @@ namespace LootLocker
                 return false;
             }
         }
+
+        /// <summary>
+        /// Reads the local override file as a mutable field map, or an empty map when there is none.
+        ///
+        /// Values are kept as raw JSON text so a field can be written back without knowing its
+        /// type, and so a field this SDK version does not understand survives a round trip.
+        /// </summary>
+        internal static Dictionary<string, string> ReadLocalOverrideFields()
+        {
+            var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            string text = ReadConfigFileText(LocalOverrideName);
+            if (string.IsNullOrEmpty(text))
+            {
+                return fields;
+            }
+
+            try
+            {
+                string json = text;
+                if (LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.IsValidBase64String(text))
+                {
+                    json = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities.SimpleDecryptFromBase64(text);
+                }
+
+                Dictionary<string, object> raw = LootLockerJson.DeserializeObject<Dictionary<string, object>>(json);
+                if (raw == null)
+                {
+                    return fields;
+                }
+
+                foreach (KeyValuePair<string, object> pair in raw)
+                {
+                    fields[pair.Key] = SerializeOverrideValue(pair.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log(
+                    $"Local override file could not be read ({ex.Message}). Treating it as empty.",
+                    LootLockerLogger.LogLevel.Warning);
+            }
+
+            return fields;
+        }
+
+        /// <summary>
+        /// Writes a field map back to the local override file, deleting the file when the map is
+        /// empty so an empty override never lingers on disk.
+        /// </summary>
+        internal static bool WriteLocalOverrideFields(Dictionary<string, string> fields)
+        {
+            if (fields == null || fields.Count == 0)
+            {
+                return DeleteLocalOverride();
+            }
+
+            var builder = new System.Text.StringBuilder();
+            builder.Append("{\n");
+            int index = 0;
+            foreach (KeyValuePair<string, string> pair in fields)
+            {
+                builder.Append("  \"").Append(pair.Key).Append("\": ").Append(pair.Value);
+                if (++index < fields.Count)
+                {
+                    builder.Append(',');
+                }
+                builder.Append('\n');
+            }
+            builder.Append("}\n");
+
+            return WriteLocalOverride(builder.ToString());
+        }
+
+        /// <summary>
+        /// Adds or replaces one field in the local override file.
+        /// </summary>
+        /// <param name="fieldName">JSON field name, see <see cref="LootLockerConfigFields"/>.</param>
+        /// <param name="jsonValue">The value as JSON text, e.g. <c>"Verbose"</c> or <c>true</c>.</param>
+        internal static bool SetLocalOverrideField(string fieldName, string jsonValue)
+        {
+            if (string.IsNullOrEmpty(fieldName) || jsonValue == null)
+            {
+                return false;
+            }
+
+            Dictionary<string, string> fields = ReadLocalOverrideFields();
+            fields[fieldName] = jsonValue;
+            return WriteLocalOverrideFields(fields);
+        }
+
+        /// <summary>
+        /// Removes one field from the local override file, deleting the file when it was the last
+        /// one. Removing a field that is not overridden is a no-op.
+        /// </summary>
+        internal static bool RemoveLocalOverrideField(string fieldName)
+        {
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                return false;
+            }
+
+            Dictionary<string, string> fields = ReadLocalOverrideFields();
+            if (!fields.Remove(fieldName))
+            {
+                return true;
+            }
+
+            return WriteLocalOverrideFields(fields);
+        }
+
+        /// <summary>
+        /// Serializes a value read from the override file back to JSON text.
+        /// </summary>
+        private static string SerializeOverrideValue(object value)
+        {
+            if (value == null)
+            {
+                return "null";
+            }
+
+            if (value is string text)
+            {
+                return LootLockerJson.SerializeObject(text);
+            }
+
+            if (value is bool flag)
+            {
+                return flag ? "true" : "false";
+            }
+
+            // Numbers and anything else round trip through the serializer unchanged.
+            return LootLockerJson.SerializeObject(value);
+        }
 #endif
 
 #if UNITY_EDITOR
