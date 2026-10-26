@@ -58,10 +58,10 @@ namespace LootLocker.Extension
                             LootLockerConfig.current.logLevel = savedLogLevel.Value;
                             savedLogLevel = null;
 #if UNITY_EDITOR
-                            // Only persist when the value came from the asset. When a file config is
-                            // active the restored value came from that file, and marking the asset
-                            // dirty would copy it into the committed config.
-                            if (!LootLockerConfig.IsFileConfigActive)
+                            // Only persist when the value came from the asset. When a file config or
+                            // a local override is active the restored value came from a file, and
+                            // marking the asset dirty would copy it into the committed config.
+                            if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists())
                             {
                                 UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
                             }
@@ -81,8 +81,9 @@ namespace LootLocker.Extension
                     LootLockerConfig.current.logLevel = savedLogLevel.Value;
                     savedLogLevel = null;
 #if UNITY_EDITOR
-                    // See the success path: never persist a value that came from a file config.
-                    if (!LootLockerConfig.IsFileConfigActive)
+                    // See the success path: never persist a value that came from a file config or
+                    // a local override.
+                    if (!LootLockerConfig.IsFileConfigActive && !LootLockerConfig.LocalOverrideExists())
                     {
                         UnityEditor.EditorUtility.SetDirty(LootLockerConfig.current);
                     }
