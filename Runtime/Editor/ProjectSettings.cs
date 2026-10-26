@@ -89,7 +89,7 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.IsFileConfigActive)
             {
-                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Use Override on a setting to change it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Settings are controlled by the external config file. Click the closed padlock next to a setting to override it for this machine only, or edit the config file to change it for everyone.", MessageType.Warning);
                 EditorGUILayout.Space();
             }
 
@@ -164,6 +164,9 @@ namespace LootLocker.Admin
 
         private const string NoneOption = "(None — use Project Settings)";
 
+        private static GUIContent _lockedIcon;
+        private static GUIContent _unlockedIcon;
+
         /// <summary>
         /// Builds a label for a setting, appending a marker when the current value came from the
         /// gitignored local override file.
@@ -179,7 +182,7 @@ namespace LootLocker.Admin
             }
 
             return new GUIContent($"{text} (local override)",
-                "This value comes from the gitignored local override file, not from the shared config. Use Reset to remove it.");
+                "This value comes from the gitignored local override file, not from the shared config. Click the open padlock to reset it.");
         }
 
         /// <summary>
@@ -217,21 +220,65 @@ namespace LootLocker.Admin
                     }
                 }
 
-                if (overridden)
+                if (LootLockerConfig.IsFileConfigActive)
                 {
-                    if (GUILayout.Button("Reset", GUILayout.Width(56)))
+                    if (GUILayout.Button(LockToggleContent(overridden), GUILayout.Width(24), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
                     {
-                        ResetLocalOverrideField(fieldName);
-                    }
-                }
-                else if (LootLockerConfig.IsFileConfigActive)
-                {
-                    if (GUILayout.Button("Override", GUILayout.Width(70)))
-                    {
-                        OverrideField(fieldName, m_CustomSettings.FindProperty(propertyName));
+                        if (overridden)
+                        {
+                            ResetLocalOverrideField(fieldName);
+                        }
+                        else
+                        {
+                            OverrideField(fieldName, m_CustomSettings.FindProperty(propertyName));
+                        }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Content for the per-field local override toggle.
+        ///
+        /// The padlock shows the state rather than the action - closed while the shared value is
+        /// in effect, open once this machine has its own value - so a single compact button both
+        /// explains why a field is read-only and toggles it. Text buttons were used before but
+        /// they cost 56-70px on every governed setting, which is a lot of width for a rarely used
+        /// affordance.
+        /// </summary>
+        private static GUIContent LockToggleContent(bool overridden)
+        {
+            if (overridden)
+            {
+                if (_unlockedIcon == null)
+                {
+                    _unlockedIcon = BuildIconContent("LockIcon", "Reset", "Reset to the shared value");
+                }
+
+                return _unlockedIcon;
+            }
+
+            if (_lockedIcon == null)
+            {
+                _lockedIcon = BuildIconContent("LockIcon-On", "Override", "Override this setting for this machine only");
+            }
+
+            return _lockedIcon;
+        }
+
+        /// <summary>
+        /// Resolves a built-in editor icon, falling back to text when the icon is unavailable so
+        /// the control never renders as an empty button.
+        /// </summary>
+        private static GUIContent BuildIconContent(string iconName, string fallbackText, string tooltip)
+        {
+            GUIContent icon = EditorGUIUtility.IconContent(iconName);
+            if (icon == null || icon.image == null)
+            {
+                return new GUIContent(fallbackText, tooltip);
+            }
+
+            return new GUIContent(icon.image, tooltip);
         }
 
         /// <summary>
