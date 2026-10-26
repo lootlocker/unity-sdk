@@ -57,18 +57,19 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void GameVersion_IsAppliedFromFileConfig()
+        public void GameVersion_IsNotAppliedFromFileConfig()
         {
-            // Given: a config that pins a game version
+            // Given: a config that claims a game version
             const string text = @"{ ""api_key"": ""key"", ""game_version"": ""9.9.9"" }";
 
             // When
             bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
 
-            // Then
+            // Then: the field parses, but game version stays a Project Settings concern
             Assert.IsTrue(parsed, error);
             Assert.AreEqual("9.9.9", config.game_version);
-            Assert.IsTrue(IsAppliedByFileConfig(LootLockerConfigFields.GameVersion));
+            Assert.IsFalse(IsAppliedByFileConfig(LootLockerConfigFields.GameVersion),
+                "Game version must stay editable in Project Settings");
         }
 
         /// <summary>
@@ -82,7 +83,6 @@ namespace LootLockerTests.EditMode
             {
                 case LootLockerConfigFields.ApiKey:
                 case LootLockerConfigFields.DomainKey:
-                case LootLockerConfigFields.GameVersion:
                 case LootLockerConfigFields.EnablePresence:
                 case LootLockerConfigFields.EnablePresenceAutoConnect:
                 case LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange:
