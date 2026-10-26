@@ -204,6 +204,26 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_EmptyIdSuffix_Ignored()
+        {
+            // Given: "LootLockerConfig-.bytes". The prefix check passes and the extracted id is
+            // empty, which IsValidFileConfigId accepts because "" is the legacy file's identifier.
+            // Without an explicit guard this stray file is classified as the legacy config and can
+            // collide with the real LootLockerConfig.bytes during dedupe.
+            var contents = new Dictionary<string, string>
+            {
+                ["LootLockerConfig-.bytes"] = ValidJson,
+            };
+
+            // When
+            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+                Listing(contents.Keys.ToArray()), Reader(contents));
+
+            // Then
+            Assert.IsEmpty(found, "A file with an empty id suffix must not be listed as the legacy config");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Discovery_ReaderReceivesTheSameNameThatWasListed()
         {
             // Regression: discovery lists real file names (with the .bytes extension) while the

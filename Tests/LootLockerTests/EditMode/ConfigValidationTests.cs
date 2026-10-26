@@ -42,6 +42,23 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Validation_SuccessWithoutPayload_ReportsEmptyResponse()
+        {
+            // Given: the server answered and accepted the request, but sent no game information
+            var response = new LootLockerGameInfoResponse { success = true, statusCode = 200, info = null };
+
+            // When
+            LootLockerConfigValidationResult result =
+                LootLockerConfigValidation.Classify(response, "some-key");
+
+            // Then: this is not a connectivity problem, and reporting it as one sends developers
+            // after the wrong issue
+            Assert.AreEqual(LootLockerConfigValidationOutcome.EmptyResponse, result.Outcome,
+                "A successful response with no payload must not be reported as unreachable");
+            Assert.IsFalse(result.IsSuccess);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Validation_Unauthorized_ReportsKeyRejected()
         {
             // Given
