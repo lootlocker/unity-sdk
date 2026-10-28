@@ -40,6 +40,12 @@ namespace LootLocker.Extension.DataTypes
         public string logo_url { get; set; }
         public DevelopmentGame development { get; set; }
         public string organisation_name { get; set; }
+
+        /// <summary>
+        /// Organisation this game belongs to. Populated during processing of the user information
+        /// response so the x-org-id header can be sent for admin requests about this game.
+        /// </summary>
+        public int organisation_id { get; set; }
     }
 
     public class DevelopmentGame

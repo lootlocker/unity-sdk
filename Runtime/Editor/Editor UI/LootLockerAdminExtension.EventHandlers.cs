@@ -64,6 +64,7 @@ namespace LootLocker.Extension
             var selectedGameData = gameData[int.Parse(target.name)];
 
             LootLockerEditorData.SetSelectedGameName(selectedGameData.name);
+            LootLockerEditorData.SetSelectedOrganisation(selectedGameData.organisation_id);
             gameName.text = selectedGameData.name;
             UpdateLicenseCountdownUI();
 

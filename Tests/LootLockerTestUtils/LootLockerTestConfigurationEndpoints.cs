@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using LootLocker;
 using LootLocker.LootLockerEnums;
 using UnityEngine;
@@ -11,8 +12,32 @@ namespace LootLockerTestConfigurationUtils
     public class LootLockerAdminRequest
     {
         public static int ActiveGameId;
+
+        /// <summary>
+        /// Organisation the signed in test admin user is acting as.
+        ///
+        /// The admin API takes its acting organisation from the x-org-id header rather than from
+        /// the session token, so every admin request driven by the tests has to carry it. Set on
+        /// sign in, from the user's first organisation.
+        /// </summary>
+        public static int ActiveOrganisationId;
+
         private static int _retries = 0;
         private static readonly int MaxRetries = 10;
+
+        /// <summary>
+        /// Builds the x-org-id header, or null while no organisation is known (during sign in,
+        /// before the user record comes back).
+        /// </summary>
+        private static Dictionary<string, string> OrganisationHeader()
+        {
+            if (ActiveOrganisationId <= 0)
+            {
+                return null;
+            }
+
+            return new Dictionary<string, string> { { "x-org-id", ActiveOrganisationId.ToString() } };
+        }
 
         public static void Send(string endPoint, LootLockerHTTPMethod httpMethod, string json, Action<LootLockerResponse> onComplete, bool useAuthToken)
         {
@@ -40,7 +65,8 @@ namespace LootLockerTestConfigurationUtils
                     LootLockerConfig.current.logLevel = logLevelSavedState;
                 },
                 useAuthToken: useAuthToken,
-                callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin);
+                callerRole: LootLocker.LootLockerEnums.LootLockerCallerRole.Admin,
+                additionalHeaders: OrganisationHeader());
         }
     }
 

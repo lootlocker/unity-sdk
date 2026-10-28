@@ -125,6 +125,7 @@ namespace LootLocker.Extension
                         LootLockerEditorData.SetSelectedGameName(game.name);
                     }
                     game.organisation_name = org.name;
+                    game.organisation_id = org.id;
                     gameData.Add(game.id, game);
                 }
             }
