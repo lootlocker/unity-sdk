@@ -139,6 +139,14 @@ namespace LootLockerTestConfigurationUtils
             {
                 LootLockerConfig.current.adminToken = token;
             }
+
+            // The admin API takes its acting organisation from x-org-id, so every admin request
+            // needs to know which organisation the test user belongs to. A CI user is created with
+            // one organisation, so the first is the one to act as.
+            if (user?.organisations != null && user.organisations.Length > 0)
+            {
+                LootLockerAdminRequest.ActiveOrganisationId = user.organisations[0].id;
+            }
             _activeUser.userName = userName;
             _activeUser.userEmail = userEmail;
             _activeUser.userPassword = password;

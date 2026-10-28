@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !LOOTLOCKER_DISABLE_EDITOR_EXTENSION
@@ -12,6 +13,26 @@ namespace LootLocker.Extension
         private static LootLockerLogger.LogLevel? savedLogLevel = null;
         private static int activeAdminRequestCount = 0;
         
+        /// <summary>
+        /// Builds the x-org-id header for admin requests.
+        ///
+        /// The admin API takes its acting organisation from this header rather than from the
+        /// session token, so every admin call has to carry it. Returns null while no organisation
+        /// is known yet - during login and user information, before a game has been selected -
+        /// because those routes do not require it and sending an empty value would be worse than
+        /// omitting it.
+        /// </summary>
+        private static Dictionary<string, string> AdminOrganisationHeader()
+        {
+            int organisationId = LootLocker.Extension.LootLockerEditorData.GetSelectedOrganisation();
+            if (organisationId <= 0)
+            {
+                return null;
+            }
+
+            return new Dictionary<string, string> { { "x-org-id", organisationId.ToString() } };
+        }
+
         public static void SendAdminRequest(string endPoint, LootLockerHTTPMethod httpMethod, string json, Action<LootLockerResponse> onComplete, bool useAuthToken)
         {
             // Only save the log level if this is the first admin request
@@ -43,7 +64,8 @@ namespace LootLocker.Extension
                     }
                 },
                     useAuthToken: useAuthToken,
-                    callerRole: LootLockerEnums.LootLockerCallerRole.Admin);
+                    callerRole: LootLockerEnums.LootLockerCallerRole.Admin,
+                    additionalHeaders: AdminOrganisationHeader());
             } catch
             {
                 // If CallAPI itself throws an exception, restore the log level
