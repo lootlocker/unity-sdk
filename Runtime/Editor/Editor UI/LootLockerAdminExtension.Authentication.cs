@@ -123,6 +123,12 @@ namespace LootLocker.Extension
                     if (game.id == LootLockerEditorData.GetSelectedGame() || game.development.id == LootLockerEditorData.GetSelectedGame())
                     {
                         LootLockerEditorData.SetSelectedGameName(game.name);
+
+                        // The organisation has to be restored alongside the game. A reopened window
+                        // with a persisted selected game - including a project upgraded from before
+                        // organisations were tracked - would otherwise run its next admin request
+                        // with organisation 0 and omit x-org-id entirely.
+                        LootLockerEditorData.SetSelectedOrganisation(org.id);
                     }
                     game.organisation_name = org.name;
                     game.organisation_id = org.id;
