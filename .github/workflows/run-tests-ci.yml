@@ -111,6 +111,61 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}
           githubToken: ${{ SECRETS.GITHUB_TOKEN }}
           customParameters: -apikey ${{ ENV.JOB_API_KEY }} -domainkey ${{ ENV.JOB_DOMAIN_KEY }}
+  sdk-editmode-tests:
+    name: Run SDK EditMode tests
+    runs-on: [ubuntu-latest]
+    needs: []
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion: ${{ fromJson(VARS.CI_UNITY_VERSIONS) }}
+    steps:
+      - name: Checkout unity-sdk repository
+        uses: actions/checkout@v5
+        with:
+          path: sdk
+      - name: Create minimal test project
+        run: |
+          mkdir -p TestProject/Assets TestProject/Packages TestProject/ProjectSettings
+
+          # Local SDK reference + testables so Unity imports the SDK's test assemblies
+          cat > TestProject/Packages/manifest.json <<'EOF'
+          {
+            "dependencies": {
+              "com.unity.test-framework": "1.1.33",
+              "com.lootlocker.lootlockersdk": "file:../../sdk"
+            },
+            "testables": [
+              "com.lootlocker.lootlockersdk"
+            ]
+          }
+          EOF
+
+          printf '%%YAML 1.1\n%%TAG !u! tag:unity3d.com,2011:\n--- !u!129 &1\nPlayerSettings:\n  companyName: LootLockerSDKVerification\n  productName: LootLockerSDKVerification\n' \
+            > TestProject/ProjectSettings/ProjectSettings.asset
+      - uses: actions/cache@v4
+        with:
+          path: TestProject/Library
+          key: Library-sdk-editmode-${{ matrix.unityVersion }}
+          restore-keys: |
+            Library-sdk-editmode-
+            Library-compile-check-
+      - name: Run EditMode tests ${{ matrix.unityVersion }}
+        id: sdk-editmode-tests
+        uses: game-ci/unity-test-runner@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ SECRETS.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ SECRETS.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ SECRETS.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          checkName: SDK EditMode Tests (${{ matrix.unityVersion }}) Results
+          artifactsPath: sdk-editmode-tests-${{ matrix.unityVersion }}-artifacts
+          projectPath: TestProject
+          unityVersion: ${{ matrix.unityVersion }}
+          githubToken: ${{ SECRETS.GITHUB_TOKEN }}
+          customParameters: -testCategory LootLockerCIFast
   linux-build-smoke-test:
     name: Test SDK in StandaloneLinux64 build
     runs-on: [ubuntu-latest]

@@ -16,7 +16,6 @@ namespace LootLocker.LootLockerEnums
 
 namespace LootLocker.HTTP
 {
-    [Serializable]
     public class LootLockerHTTPRequestData
     {
         /// <summary>

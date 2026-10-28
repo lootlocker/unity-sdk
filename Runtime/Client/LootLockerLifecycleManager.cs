@@ -169,7 +169,9 @@ namespace LootLocker
 
         public static IEnumerator CleanUpOldInstances()
         {
-#if UNITY_2020_1_OR_NEWER
+#if UNITY_6000_5_OR_NEWER
+            LootLockerLifecycleManager[] managers = GameObject.FindObjectsByType<LootLockerLifecycleManager>(FindObjectsInactive.Include);
+#elif UNITY_2020_1_OR_NEWER
             LootLockerLifecycleManager[] managers = GameObject.FindObjectsByType<LootLockerLifecycleManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 #else
             LootLockerLifecycleManager[] managers = GameObject.FindObjectsOfType<LootLockerLifecycleManager>();

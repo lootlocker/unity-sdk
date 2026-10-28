@@ -42,6 +42,11 @@ namespace LootLocker.Requests
         /// @ingroup Init
         /// <summary>
         /// Manually initialize the SDK.
+        ///
+        /// Values passed here take precedence over every file-based configuration source,
+        /// including a selected file config and the local override file. They are applied for the
+        /// lifetime of the process only and are never written back to the config asset, so calling
+        /// this cannot change what other developers or builds use.
         /// </summary>
         /// <param name="apiKey">Find the Game API-key at https://console.lootlocker.com/settings/api-keys and click on the API-tab</param>
         /// <param name="gameVersion">The current version of the game in the format 1.2.3.4 (the 3 and 4 being optional but recommended)</param>
@@ -53,7 +58,7 @@ namespace LootLocker.Requests
         /// <param name="prettifyJson">If true, JSON logs will be prettified.</param>
         /// <param name="obfuscateLogs">If true, sensitive information in logs will be obfuscated.</param>
         /// <param name="enablePresence">If true, presence features will be enabled.</param>
-        /// <param name="enablePresenceAutoConnect">If true, presence will auto-connect.</param>
+        /// <param name="enablePresenceAutoConnect">If true, presence will auto-connect. This only controls whether connections are initiated automatically; once connected (automatically or manually), presence is maintained until explicitly disconnected.</param>
         /// <param name="enablePresenceAutoDisconnectOnFocusChange">If true, presence will auto-disconnect on focus change.</param>
         /// <param name="enablePresenceInEditor">If true, presence will be enabled in the editor.</param>
         /// <param name="multiUserSessionMode">Optional : Controls how the SDK handles multiple player sessions when a new authentication succeeds. If not supplied (or set to NotSet), the mode already stored in the config is preserved.</param>

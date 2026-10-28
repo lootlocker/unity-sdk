@@ -50,6 +50,77 @@ For a full walkthrough of how to configure the SDK, please see our [Guide to Con
 - Open `Edit > Project Settings` in the Unity Editor and find the `LootLocker SDK` tab.
 - Input Api Key using the Game Key from the LootLocker console page
 
+### Multiple configurations
+
+You can keep several named config files in one project and switch between them without
+recompiling. This is how you keep, for example, a `dev` config with verbose logging and a `prod`
+config with logging off, or one config per platform.
+
+**Naming.** Put the files next to the config asset, in
+`Assets/LootLockerSDK/Resources/Config/`, and name them `LootLockerConfig-<id>.bytes`. The `<id>` may
+contain letters, digits, `.`, `_` and `-`, and must start with a letter or digit. The unsuffixed
+`LootLockerConfig.bytes` keeps working exactly as before and is shown as `Default`.
+
+**Selecting.** Open `Edit > Project Settings > LootLocker SDK`. When more than one config file is
+present a `Config File` dropdown appears. Files that cannot be parsed, or that have no `api_key`,
+are listed greyed out with the reason, so a broken file is visible but cannot be selected. With a
+single config file there is nothing to choose and no dropdown is shown.
+
+**Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
+change. Click the closed padlock next to a setting to write a gitignored
+`Assets/LootLockerSDK/LocalOverrides/LootLockerConfig.local.bytes` that is layered on top of the
+selected config. The file is sparse: only the fields it contains are applied, so overriding
+`log_level` leaves every other setting shared. Overridden settings are marked `(local override)` in
+Project Settings, and the open padlock resets them. Switching config file also clears the file,
+because an override written against one config does not apply to another.
+
+The override file is **editor only**, and deliberately outside `Resources/`. Anything under
+`Resources/` is packed into every build made on that machine, so an override stored there would ship
+a local `api_key` or `log_in_builds` value to players even if the SDK never read it. It is a
+developer convenience, not a build input.
+
+**CI.** Select a config without touching the editor:
+
+```
+Unity.exe -batchmode -quit -lootlockerconfig prod-ps5
+Unity.exe -batchmode -quit -lootlockerconfig none
+```
+
+An invalid identifier is logged as an error and treated as `none` rather than guessed at.
+
+**Precedence**, highest first:
+
+1. An explicit `LootLockerSDKManager.Init(...)` call. Process lifetime only; never written to disk.
+2. `-lootlockerconfig` on the command line.
+3. The local override file (editor only).
+4. The selected config file.
+5. The legacy `LootLockerConfig.bytes`.
+6. The values stored in the config asset.
+
+`-lootlockerconfig none` disables file config entirely, including the local override.
+
+**Only the selected config ships.** Files under `Resources/` are packed into the build and are
+trivially readable from a shipped game, so "the SDK only reads one of them" is not key hygiene — the
+others would still be in the build data. Before a build, every config file except the one in effect is
+renamed with a trailing `~`, which Unity ignores at import, and restored afterwards. The player reads
+the surviving config through a generated `LootLockerConfig.build.bytes` pointer.
+
+So a `dev` key on disk cannot end up in a `prod` build. What gets stripped is decided by the same
+precedence as above, so `-lootlockerconfig prod` on a CI build strips everything else.
+
+Two things to know:
+
+- During a build, `git status` briefly shows the other configs as renamed. Restore is automatic.
+- If the editor is killed mid-build, the files stay hidden until the next editor start, which
+  restores them automatically. Nothing is lost — the files are renamed, not deleted.
+
+**Two limitations worth knowing:**
+
+1. The selection is a single committed value, so it is shared by everyone on the project. Per-build
+   target selection is not implemented yet.
+3. **API keys in config files are not secrets.** They are readable by anyone with the build. This
+   feature improves key hygiene — keeping the right key on the right target — not secrecy.
+
 ## Updating
 If you have installed the SDK from Open UPM then all you have to do in Package Manager is press the Update button when that tells you there's a new version.
 
