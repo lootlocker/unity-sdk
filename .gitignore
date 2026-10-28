@@ -85,3 +85,8 @@ docs/html/
 LootLockerConfig.local.bytes
 LootLockerConfig.local.bytes.meta
 LocalOverrides/
+
+# Generated per-build: records which config file the build targeted, so the player can read the
+# one that survived. Build output, never authored.
+LootLockerConfig.build.bytes
+LootLockerConfig.build.bytes.meta

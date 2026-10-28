@@ -99,11 +99,24 @@ An invalid identifier is logged as an error and treated as `none` rather than gu
 
 `-lootlockerconfig none` disables file config entirely, including the local override.
 
-**Three limitations worth knowing:**
+**Only the selected config ships.** Files under `Resources/` are packed into the build and are
+trivially readable from a shipped game, so "the SDK only reads one of them" is not key hygiene — the
+others would still be in the build data. Before a build, every config file except the one in effect is
+renamed with a trailing `~`, which Unity ignores at import, and restored afterwards. The player reads
+the surviving config through a generated `LootLockerConfig.build.bytes` pointer.
 
-1. Every config file under `Resources/Config/` is included in every build. Selecting a config
-   chooses which one is *used*, not which ones are *shipped*.
-2. The selection is a single committed value, so it is shared by everyone on the project. Per-build
+So a `dev` key on disk cannot end up in a `prod` build. What gets stripped is decided by the same
+precedence as above, so `-lootlockerconfig prod` on a CI build strips everything else.
+
+Two things to know:
+
+- During a build, `git status` briefly shows the other configs as renamed. Restore is automatic.
+- If the editor is killed mid-build, the files stay hidden until the next editor start, which
+  restores them automatically. Nothing is lost — the files are renamed, not deleted.
+
+**Two limitations worth knowing:**
+
+1. The selection is a single committed value, so it is shared by everyone on the project. Per-build
    target selection is not implemented yet.
 3. **API keys in config files are not secrets.** They are readable by anyone with the build. This
    feature improves key hygiene — keeping the right key on the right target — not secrecy.

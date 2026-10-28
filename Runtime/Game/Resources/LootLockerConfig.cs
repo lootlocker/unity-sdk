@@ -111,6 +111,46 @@ namespace LootLocker
         private const string LocalOverrideFolderName = "LocalOverrides";
 
         /// <summary>
+        /// Name of the generated file a build writes to record which config it chose.
+        ///
+        /// Lives next to the config files so the player can read it with the same Resources call,
+        /// but is never hand-authored and is gitignored. The build processor writes it before the
+        /// build and deletes it afterwards.
+        /// </summary>
+        internal const string BuildPointerName = "LootLockerConfig.build";
+
+        /// <summary>
+        /// Suffix used to hide a config file from the build.
+        ///
+        /// Unity ignores files ending in '~' at import, so a renamed config is never packed into a
+        /// build and never gets a .meta. Verified against a real project: a tilde-suffixed .bytes
+        /// inside Resources/Config is absent from both Resources.LoadAll and AssetDatabase.
+        /// </summary>
+        internal const string BuildExcludeSuffix = "~";
+
+        /// <summary>
+        /// The config file extension, for the build processor, which lives in another assembly.
+        /// </summary>
+        internal static string ConfigFileExtensionForBuild => ConfigFileExtension;
+
+        /// <summary>
+        /// Identifier of the legacy unsuffixed config file.
+        /// </summary>
+        internal static string ConfigFileNameForLegacy => SettingsName;
+
+        /// <summary>
+        /// Project-relative folder holding the config files, for the build processor.
+        /// </summary>
+        internal static string ConfigFolderAssetsPathForBuild
+        {
+#if UNITY_EDITOR
+            get { return $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/{ConfigResourcesFolder}"; }
+#else
+            get { return null; }
+#endif
+        }
+
+        /// <summary>
         /// Name of the config file currently in effect, derived from
         /// <see cref="selectedFileConfigId"/>. The empty identifier maps to the legacy unsuffixed
         /// name, which is what keeps existing projects working unchanged.
@@ -1299,9 +1339,59 @@ namespace LootLocker
             return ResolveFileConfigId(
                 _current != null ? _current.selectedFileConfigId : null,
                 commandLineId: CommandLineConfigId,
-                buildPointerId: null,
+                buildPointerId: BuildPointerConfigId,
                 legacyFilePresent: LegacyConfigFileExists(),
                 availableIds: DiscoverAvailableIds());
+        }
+
+        /// <summary>
+        /// The identifier a build recorded, or null when this is not a build or none was written.
+        ///
+        /// This is how a config chosen at build time reaches the player: the build strips every
+        /// other config file, so the player could not auto-detect the survivor on its own without
+        /// guessing. Read once per domain.
+        /// </summary>
+        private static string BuildPointerConfigId
+        {
+            get
+            {
+                if (_buildPointerRead)
+                {
+                    return _buildPointerConfigId;
+                }
+
+                _buildPointerRead = true;
+                _buildPointerConfigId = ReadBuildPointer();
+
+                return _buildPointerConfigId;
+            }
+        }
+
+        private static bool _buildPointerRead;
+        private static string _buildPointerConfigId;
+
+        /// <summary>
+        /// Reads and validates the build pointer file, returning null when absent or unusable.
+        /// </summary>
+        private static string ReadBuildPointer()
+        {
+            string text = ReadConfigFileText(BuildPointerName);
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
+
+            try
+            {
+                ExternalFileConfig pointer = LootLockerJson.DeserializeObject<ExternalFileConfig>(text);
+                string id = pointer == null ? null : pointer.selected_file_config_id;
+                return IsValidFileConfigId(id) ? id : null;
+            }
+            catch (Exception ex)
+            {
+                LootLockerLogger.Log($"Could not read the build config pointer: {ex.Message}", LootLockerLogger.LogLevel.Warning);
+                return null;
+            }
         }
 
         /// <summary>
@@ -1604,6 +1694,13 @@ namespace LootLocker
             if (string.Equals(withoutExtension, SettingsName, StringComparison.OrdinalIgnoreCase))
             {
                 return string.Empty;
+            }
+
+            // The build pointer is generated, never hand-authored, and must not be offered as a
+            // selectable profile.
+            if (string.Equals(withoutExtension, BuildPointerName, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
             }
 
             string prefix = SettingsName + "-";

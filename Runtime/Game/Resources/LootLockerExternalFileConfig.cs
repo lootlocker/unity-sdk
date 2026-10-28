@@ -25,5 +25,10 @@ public class ExternalFileConfig
     public bool allow_token_refresh { get; set; }
     public LootLockerMultiUserSessionMode multi_user_session_mode { get; set; }
     public bool enable_editor_admin_extension { get; set; } = true;
+    /// <summary>
+    /// Identifier of the config a build selected. Only ever set in the generated build pointer
+    /// file, never in a hand-authored config.
+    /// </summary>
+    public string selected_file_config_id { get; set; }
 }
 }
