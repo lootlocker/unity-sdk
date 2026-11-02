@@ -82,6 +82,7 @@ namespace LootLocker
         public static EndPointClass getPlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}", LootLockerHTTPMethod.GET);
         public static EndPointClass promotePlayerFileRevisionByKey = new EndPointClass("player/files/key/{0}/revisions/{1}/current", LootLockerHTTPMethod.POST);
         public static EndPointClass deletePlayerFileByKey = new EndPointClass("player/files/key/{0}", LootLockerHTTPMethod.DELETE);
+        public static EndPointClass createPlayerFileDownloadLink = new EndPointClass("player/files/{0}/download-link/v1", LootLockerHTTPMethod.POST);
 
         // Player Progressions
         [Header("Player Progressions")]

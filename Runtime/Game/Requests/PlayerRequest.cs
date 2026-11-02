@@ -398,6 +398,12 @@ namespace LootLocker.Requests
         public string url { get; set; }
         /// <summary>When the signed URL expires.</summary>
         public DateTime url_expires_at { get; set; }
+        /// <summary>
+        /// True for a gated file (such as a private file reward). <see cref="url"/> is intentionally empty and
+        /// <see cref="url_expires_at"/> is the zero time; call <c>LootLockerSDKManager.CreatePlayerFileDownloadLink</c>
+        /// to mint a short-lived link.
+        /// </summary>
+        public bool requires_download_link { get; set; }
         /// <summary>When this file was created.</summary>
         public DateTime created_at { get; set; }
     }
@@ -432,6 +438,11 @@ namespace LootLocker.Requests
         public int id { get; set; }
         /// <summary>Whether this file is publicly accessible.</summary>
         public bool is_public { get; set; }
+        /// <summary>
+        /// True for a gated file (such as a private file reward). The file's download URL is intentionally empty and
+        /// must be minted with <c>LootLockerSDKManager.CreatePlayerFileDownloadLink</c>.
+        /// </summary>
+        public bool requires_download_link { get; set; }
     }
 
     /// <summary>
@@ -447,6 +458,11 @@ namespace LootLocker.Requests
         public int size { get; set; }
         /// <summary>When this revision was created.</summary>
         public DateTime created_at { get; set; }
+        /// <summary>
+        /// True for a gated file (such as a private file reward). <see cref="url"/> is intentionally empty and
+        /// must be minted with <c>LootLockerSDKManager.CreatePlayerFileDownloadLink</c>.
+        /// </summary>
+        public bool requires_download_link { get; set; }
     }
 
     /// <summary>
@@ -566,6 +582,12 @@ namespace LootLocker
         {
             var endpoint = LootLockerEndPoints.deletePlayerFileByKey.WithPathParameter(key);
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.DELETE, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        public static void CreatePlayerFileDownloadLink(string forPlayerWithUlid, int fileId, Action<LootLockerPlayerFile> onComplete)
+        {
+            var endpoint = LootLockerEndPoints.createPlayerFileDownloadLink.WithPathParameter(fileId);
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endpoint, LootLockerHTTPMethod.POST, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
     }
 }
