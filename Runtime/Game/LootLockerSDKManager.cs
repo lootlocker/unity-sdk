@@ -4796,6 +4796,32 @@ namespace LootLocker.Requests
 
             LootLockerAPIManager.DeletePlayerFileByKey(forPlayerWithUlid, key, onComplete);
         }
+
+        /// @ingroup PlayerFiles
+        /// <summary>
+        /// Mints a short-lived signed download URL for a file the player owns.
+        ///
+        /// This is the only way to obtain a link for a gated file - one whose listing reports
+        /// <c>requires_download_link</c> as true, which is how a private file reward is granted.
+        /// The endpoint is not restricted to gated files: any file the player owns can be minted,
+        /// so you can always ask for a fresh link instead of caching one.
+        ///
+        /// The link lives for 60 seconds and is a bearer credential: anyone holding it can download
+        /// until it expires. Re-mint rather than cache or forward it. The link is not single-use.
+        /// </summary>
+        /// <param name="fileId">Id of the file, can be retrieved with GetAllPlayerFiles() or when the file is uploaded</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlayerFile</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CreatePlayerFileDownloadLink(int fileId, Action<LootLockerPlayerFile> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlayerFile>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.CreatePlayerFileDownloadLink(forPlayerWithUlid, fileId, onComplete);
+        }
         #endregion
 
         #region Player progressions

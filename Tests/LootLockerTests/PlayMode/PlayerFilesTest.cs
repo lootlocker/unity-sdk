@@ -1003,5 +1003,61 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(fetchedFile.id, revisionsResponse.file.id, "File metadata ID should match");
             Assert.IsFalse(string.IsNullOrEmpty(revisionsResponse.file.name), "File metadata should have a name");
         }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator PlayerFiles_CreateDownloadLink_ReturnsUrl()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            string path = CreateTempFile("Download link content");
+
+            LootLockerPlayerFile upload = new LootLockerPlayerFile();
+            bool uploadDone = false;
+            LootLockerSDKManager.UploadPlayerFile(path, "test", false, response =>
+            {
+                upload = response;
+                uploadDone = true;
+            });
+            yield return new WaitUntil(() => uploadDone);
+            Assert.IsTrue(upload.success, "File upload failed");
+
+            // When
+            LootLockerPlayerFile linkResponse = new LootLockerPlayerFile();
+            bool linkDone = false;
+            LootLockerSDKManager.CreatePlayerFileDownloadLink(upload.id, response =>
+            {
+                linkResponse = response;
+                linkDone = true;
+            });
+            yield return new WaitUntil(() => linkDone);
+
+            // Then
+            Assert.IsTrue(linkResponse.success, "CreatePlayerFileDownloadLink failed");
+            Assert.AreEqual(upload.id, linkResponse.id, "Download link response should describe the requested file");
+            Assert.IsFalse(string.IsNullOrEmpty(linkResponse.url), "Download link response should contain a url");
+            Assert.IsFalse(linkResponse.requires_download_link, "A freshly minted link should not require another download link");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator PlayerFiles_CreateDownloadLink_NonExistentFile_Fails()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+            // Given
+            int nonExistentFileId = 999999999;
+
+            // When
+            LootLockerPlayerFile linkResponse = new LootLockerPlayerFile();
+            bool linkDone = false;
+            LootLockerSDKManager.CreatePlayerFileDownloadLink(nonExistentFileId, response =>
+            {
+                linkResponse = response;
+                linkDone = true;
+            });
+            yield return new WaitUntil(() => linkDone);
+
+            // Then
+            Assert.IsFalse(linkResponse.success, "Creating a download link for a non-existent file should fail");
+            Assert.AreEqual(404, linkResponse.statusCode, "Expected a 404 for a non-existent file");
+        }
     }
 }
