@@ -114,19 +114,10 @@ namespace LootLocker
         /// Name of the generated file a build writes to record which config it chose.
         ///
         /// Lives next to the config files so the player can read it with the same Resources call,
-        /// but is never hand-authored and is gitignored. The build processor writes it before the
-        /// build and deletes it afterwards.
+        /// but is never hand-authored and is excluded from version control. The build processor
+        /// writes it before the build and deletes it afterwards.
         /// </summary>
         internal const string BuildPointerName = "LootLockerConfig.build";
-
-        /// <summary>
-        /// Suffix used to hide a config file from the build.
-        ///
-        /// Unity ignores files ending in '~' at import, so a renamed config is never packed into a
-        /// build and never gets a .meta. Verified against a real project: a tilde-suffixed .bytes
-        /// inside Resources/Config is absent from both Resources.LoadAll and AssetDatabase.
-        /// </summary>
-        internal const string BuildExcludeSuffix = "~";
 
         /// <summary>
         /// The config file extension, for the build processor, which lives in another assembly.

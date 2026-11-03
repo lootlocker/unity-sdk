@@ -39,6 +39,18 @@ namespace LootLocker.Admin
         public int callbackOrder => 1000;
 
         /// <summary>
+        /// Suffix used to hide a config file from the build.
+        ///
+        /// Unity ignores files ending in '~' at import, so a renamed config is never packed into a
+        /// build and never gets a .meta. Verified against a real project: a tilde-suffixed .bytes
+        /// inside Resources/Config is absent from both Resources.LoadAll and AssetDatabase.
+        ///
+        /// Lives here rather than on LootLockerConfig because only the build processor uses it;
+        /// the runtime never needs to know how a file was hidden.
+        /// </summary>
+        internal const string BuildExcludeSuffix = "~";
+
+        /// <summary>
         /// Records what was renamed, so a restore can be driven from disk after a crash.
         ///
         /// Kept in Library/ because it is transient, machine-local, and already gitignored.
@@ -154,22 +166,24 @@ namespace LootLocker.Admin
         }
 
         /// <summary>
-        /// Hides a file from the build by suffixing it with '~' and moving its .meta alongside as
-        /// plain data, so the GUID survives the round trip.
+        /// Hides a file from the build by suffixing it with '~', and hides its .meta the same way.
+        ///
+        /// The .meta is suffixed as <c>name.bytes.meta~</c>, not <c>name.bytes~.meta</c>. The
+        /// latter looks equivalent but is not: Unity sees an orphaned .meta for a file that no
+        /// longer exists and deletes it on the next refresh, so the GUID is lost and every asset
+        /// reference to the config breaks. Suffixing the whole .meta file name keeps it out of
+        /// Unity's sight entirely, so it survives untouched.
         /// </summary>
         private static void HideFile(string path)
         {
-            string suffixed = path + LootLockerConfig.BuildExcludeSuffix;
             string meta = path + ".meta";
-
-            string suffixedMeta = suffixed + ".meta";
 
             if (File.Exists(meta))
             {
-                File.Move(meta, suffixedMeta);
+                File.Move(meta, meta + BuildExcludeSuffix);
             }
 
-            File.Move(path, suffixed);
+            File.Move(path, path + BuildExcludeSuffix);
         }
 
         /// <summary>
@@ -177,20 +191,14 @@ namespace LootLocker.Admin
         /// </summary>
         private static void UnhideFile(string suffixed)
         {
-            string original = suffixed.Substring(0, suffixed.Length - LootLockerConfig.BuildExcludeSuffix.Length);
-            string suffixedMeta = suffixed + ".meta";
+            string original = suffixed.Substring(0, suffixed.Length - BuildExcludeSuffix.Length);
             string meta = original + ".meta";
-
-            if (File.Exists(meta))
-            {
-                File.Delete(meta);
-            }
 
             File.Move(suffixed, original);
 
-            if (File.Exists(suffixedMeta))
+            if (File.Exists(meta + BuildExcludeSuffix))
             {
-                File.Move(suffixedMeta, meta);
+                File.Move(meta + BuildExcludeSuffix, meta);
             }
         }
 
@@ -211,7 +219,7 @@ namespace LootLocker.Admin
         {
             foreach (string original in ReadMarker())
             {
-                string suffixed = original + LootLockerConfig.BuildExcludeSuffix;
+                string suffixed = original + BuildExcludeSuffix;
 
                 if (!File.Exists(suffixed))
                 {
@@ -271,7 +279,7 @@ namespace LootLocker.Admin
             foreach (string path in Directory.GetFiles(folder, "*" + LootLockerConfig.ConfigFileExtensionForBuild))
             {
                 // Already-hidden leftovers belong to a crashed run and were restored above.
-                if (Path.GetFileName(path).EndsWith(LootLockerConfig.BuildExcludeSuffix, StringComparison.Ordinal))
+                if (Path.GetFileName(path).EndsWith(BuildExcludeSuffix, StringComparison.Ordinal))
                 {
                     continue;
                 }
