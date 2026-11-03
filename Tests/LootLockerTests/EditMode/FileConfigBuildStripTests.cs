@@ -83,7 +83,7 @@ namespace LootLockerTests.EditMode
             LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
 
             // Then: stripping must hide, never delete - a cancelled build must not lose a key
-            string suffixed = devPath + LootLockerConfig.BuildExcludeSuffix;
+            string suffixed = devPath + LootLockerConfigBuildProcessor.BuildExcludeSuffix;
             Assert.IsTrue(File.Exists(suffixed), "The excluded config must still exist on disk");
             Assert.AreEqual(ValidJson, File.ReadAllText(suffixed), "Contents must be untouched");
 
@@ -232,21 +232,34 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void BuildStrip_MetaAndGuidSurviveTheRoundTrip()
         {
-            // Regression: AssetDatabase.MoveAsset cannot move a file back from a '~' path and
-            // discards its .meta, which would change the asset GUID on every build. The processor
-            // moves the file directly and carries the .meta as data instead.
+            // Regression: the .meta must be hidden as "name.bytes.meta~", not "name.bytes~.meta".
+            // The latter leaves an orphaned .meta for a file that no longer exists, which Unity
+            // deletes on the next refresh - losing the GUID and breaking every reference to the
+            // config. This test refreshes between hide and restore so Unity's reaction is actually
+            // exercised; without the refresh it would only be testing our own file moves.
             WriteConfig("dev");
+            WriteConfig("prod");
             string devPath = Path.Combine(AbsoluteTempFolder, "LootLockerConfig-dev.bytes");
             string metaPath = devPath + ".meta";
-            File.WriteAllText(metaPath, "guid: 0123456789abcdef0123456789abcdef\n");
+            const string guid = "0123456789abcdef0123456789abcdef";
+            File.WriteAllText(metaPath, $"fileFormatVersion: 2\nguid: {guid}\n");
 
             try
             {
-                LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "dev");
+                // Target prod, so dev is the one that gets hidden.
+                LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+
+                // Let Unity see the hidden state, which is what deletes an orphaned .meta.
+                AssetDatabase.Refresh();
+
+                Assert.IsTrue(File.Exists(metaPath + LootLockerConfigBuildProcessor.BuildExcludeSuffix),
+                    "The .meta must be hidden as name.bytes.meta~ so Unity never sees it as orphaned");
+
                 LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+                AssetDatabase.Refresh();
 
                 Assert.IsTrue(File.Exists(metaPath), "The .meta must be restored alongside the config");
-                StringAssert.Contains("0123456789abcdef0123456789abcdef", File.ReadAllText(metaPath),
+                StringAssert.Contains(guid, File.ReadAllText(metaPath),
                     "The GUID must be preserved so asset references survive a build");
             }
             finally
