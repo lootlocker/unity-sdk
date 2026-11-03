@@ -54,7 +54,7 @@ namespace LootLockerTests.EditMode
 
             // Then: "none" is a sentinel, not an identifier
             Assert.AreEqual("none", id);
-            Assert.IsNull(LootLockerConfig.ResolveFileConfigId("prod", id, null, true, new[] { "prod" }),
+            Assert.IsNull(LootLockerConfigFileResolution.ResolveFileConfigId("prod", id, null, true, new[] { "prod" }),
                 "none must opt out of file config entirely");
         }
 
@@ -74,7 +74,7 @@ namespace LootLockerTests.EditMode
 
             // Then: never guess, and never fall back to a different config
             Assert.AreEqual("none", id);
-            Assert.IsNull(LootLockerConfig.ResolveFileConfigId("prod", id, null, true, new[] { "prod" }));
+            Assert.IsNull(LootLockerConfigFileResolution.ResolveFileConfigId("prod", id, null, true, new[] { "prod" }));
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -82,7 +82,7 @@ namespace LootLockerTests.EditMode
         {
             // Given: a selection in the asset and a different one on the command line
             // When
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "dev",
                 commandLineId: "prod-ps5",
                 buildPointerId: null,
