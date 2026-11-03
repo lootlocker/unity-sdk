@@ -105,6 +105,43 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Selection_BuildPointerBeatsTheCommittedSelection()
+        {
+            // Regression: CheckForFileConfig passed buildPointerId: null, so the pointer a build
+            // writes was never consulted at runtime. A CI build with "-lootlockerconfig prod"
+            // stripped everything except prod and wrote a pointer, but the committed asset still
+            // selected dev - so the player looked for the missing dev file and fell back to the
+            // asset values instead of loading the prod file that had actually shipped.
+            //
+            // This asserts the precedence rule the wiring depends on. The wiring itself is a single
+            // argument in a private method that reads from Resources, so it is not reachable from a
+            // test without a real build; the rule is what would silently regress.
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
+                selectedId: "dev",
+                commandLineId: null,
+                buildPointerId: "prod",
+                legacyFilePresent: false,
+                availableIds: new[] { "prod" });
+
+            Assert.AreEqual("prod", resolved,
+                "The profile recorded for the artifact must win over the committed selection");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Selection_CommandLineBeatsTheBuildPointer()
+        {
+            // Precedence must stay: an explicit command line is the most specific instruction.
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
+                selectedId: "dev",
+                commandLineId: "staging",
+                buildPointerId: "prod",
+                legacyFilePresent: false,
+                availableIds: new[] { "prod", "staging" });
+
+            Assert.AreEqual("staging", resolved, "The command line must outrank the build pointer");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void RestoreAssetValues_DiscardsAppliedFileConfigValues()
         {
             // Regression: ReloadConfigAsset used to call Resources.Load, which returns the already
