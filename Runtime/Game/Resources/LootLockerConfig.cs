@@ -137,14 +137,28 @@ namespace LootLocker
         internal static string ConfigFileNameForLegacy => SettingsName;
 
         /// <summary>
-        /// Project-relative folder holding the config files, for the build processor.
+        /// Project-relative folders that may hold config files, for the build processor.
+        ///
+        /// Plural on purpose: the SDK can be installed as a package (read-only, under Packages/)
+        /// or as an asset folder, and discovery already searches both. The build processor must
+        /// strip in every folder discovery reads from, or a config in the package folder would be
+        /// read but never stripped - and would therefore ship.
         /// </summary>
-        internal static string ConfigFolderAssetsPathForBuild
+        internal static string[] ConfigFolderAssetsPathsForBuild
         {
 #if UNITY_EDITOR
-            get { return $"{GetSdkRootAssetsPath(requireWritable: true)}/Resources/{ConfigResourcesFolder}"; }
+            get
+            {
+                var paths = new List<string>();
+                foreach (string folder in ConfigFolderCandidates())
+                {
+                    paths.Add(folder);
+                }
+
+                return paths.ToArray();
+            }
 #else
-            get { return null; }
+            get { return new string[0]; }
 #endif
         }
 

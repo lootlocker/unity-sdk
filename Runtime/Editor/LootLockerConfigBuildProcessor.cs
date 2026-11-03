@@ -91,53 +91,65 @@ namespace LootLocker.Admin
         /// </summary>
         internal static List<string> Prepare()
         {
-            return Prepare(ConfigFolderAbsolutePath(), overrideResolvedId: null);
+            return Prepare(ConfigFolderAbsolutePaths(), overrideResolvedId: null);
         }
 
         /// <summary>
-        /// Strips every config file in <paramref name="folder"/> except the resolved one.
+        /// Strips every config file in <paramref name="folders"/> except the resolved one.
         ///
         /// Separated from the build callback so tests can drive it against a throwaway folder:
         /// the tilde-rename behaviour is worth pinning without ever running a build, and a test
         /// must never touch the project's real config folder.
         /// </summary>
-        /// <param name="folder">Absolute path of the folder holding the config files.</param>
+        /// <param name="folders">
+        /// Absolute paths of the folders holding config files. All of them are searched, because
+        /// discovery reads from every one - a config that is read but not stripped would ship.
+        /// </param>
         /// <param name="overrideResolvedId">
         /// Forces a resolved id instead of resolving one, so tests do not depend on the state of
         /// the config asset. null means resolve normally.
         /// </param>
-        internal static List<string> Prepare(string folder, string overrideResolvedId)
+        internal static List<string> Prepare(string[] folders, string overrideResolvedId)
         {
             var renamed = new List<string>();
 
             // A previous crash may have left files suffixed. Recover before doing anything else so
             // the enumeration below sees the real set of files.
-            RestoreAll(folder);
+            RestoreAll(folders);
 
-            if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))
+            if (folders == null || folders.Length == 0)
             {
                 return renamed;
             }
 
-            List<string> available = ListConfigFiles(folder);
+            // Resolve across every folder: the id space is shared, so a config in either location
+            // is a candidate.
+            var available = new List<string>();
+            foreach (string folder in folders)
+            {
+                if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
+                {
+                    available.AddRange(ListConfigFiles(folder));
+                }
+            }
+
             string resolvedId = overrideResolvedId ?? LootLockerConfig.ResolveFileConfigId(
                 selectedId: LootLockerConfig.current != null ? LootLockerConfig.current.selectedFileConfigId : null,
                 commandLineId: LootLockerConfig.GetCommandLineConfigId(Environment.GetCommandLineArgs()),
                 buildPointerId: null,
-                legacyFilePresent: File.Exists(Path.Combine(folder, $"{LootLockerConfig.ConfigFileNameForLegacy}{LootLockerConfig.ConfigFileExtensionForBuild}")),
+                legacyFilePresent: LegacyFileExists(folders),
                 availableIds: IdsOf(available));
 
             // Nothing to strip when no config file is in effect, and nothing to read either.
             if (resolvedId == null)
             {
-                DeleteBuildPointer(folder);
+                DeleteBuildPointer(folders);
                 return renamed;
             }
 
             string keepFileName = LootLockerConfig.GetConfigFileNameForId(resolvedId) + LootLockerConfig.ConfigFileExtensionForBuild;
-            string keepPath = Path.Combine(folder, keepFileName);
 
-            if (!File.Exists(keepPath))
+            if (!available.Exists(p => string.Equals(Path.GetFileName(p), keepFileName, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new BuildFailedException(
                     $"LootLocker: the selected file config '{resolvedId}' does not exist (expected {keepFileName}). Refusing to build with no usable config.");
@@ -160,9 +172,23 @@ namespace LootLocker.Admin
 
             AssetDatabase.Refresh();
 
-            WriteBuildPointer(folder, resolvedId);
+            WriteBuildPointer(folders, resolvedId);
 
             return renamed;
+        }
+
+        private static bool LegacyFileExists(string[] folders)
+        {
+            string legacyName = LootLockerConfig.ConfigFileNameForLegacy + LootLockerConfig.ConfigFileExtensionForBuild;
+            foreach (string folder in folders)
+            {
+                if (!string.IsNullOrEmpty(folder) && File.Exists(Path.Combine(folder, legacyName)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -209,13 +235,13 @@ namespace LootLocker.Admin
         /// </summary>
         internal static void RestoreAll()
         {
-            RestoreAll(ConfigFolderAbsolutePath());
+            RestoreAll(ConfigFolderAbsolutePaths());
         }
 
         /// <summary>
-        /// Reverts every rename recorded in the marker for <paramref name="folder"/>.
+        /// Reverts every rename recorded in the marker for <paramref name="folders"/>.
         /// </summary>
-        internal static void RestoreAll(string folder)
+        internal static void RestoreAll(string[] folders)
         {
             foreach (string original in ReadMarker())
             {
@@ -239,38 +265,76 @@ namespace LootLocker.Admin
 
             DeleteMarker();
 
-            if (!string.IsNullOrEmpty(folder))
-            {
-                DeleteBuildPointer(folder);
-            }
+            DeleteBuildPointer(folders);
 
-            if (folder != null)
+            if (folders != null && folders.Length > 0)
             {
                 AssetDatabase.Refresh();
             }
         }
 
-        private static void WriteBuildPointer(string folder, string id)
+        private static void WriteBuildPointer(string[] folders, string id)
         {
+            string folder = WritableFolder(folders);
+            if (folder == null)
+            {
+                return;
+            }
+
             string path = Path.Combine(folder, LootLockerConfig.BuildPointerName + LootLockerConfig.ConfigFileExtensionForBuild);
             string json = "{\n  \"selected_file_config_id\": " + LootLockerJson.SerializeObject(id) + "\n}\n";
             File.WriteAllText(path, json);
             AssetDatabase.ImportAsset(ToAssetPath(path), ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
         }
 
-        private static void DeleteBuildPointer(string folder)
+        private static void DeleteBuildPointer(string[] folders)
         {
-            string path = Path.Combine(folder, LootLockerConfig.BuildPointerName + LootLockerConfig.ConfigFileExtensionForBuild);
-            if (File.Exists(path))
+            if (folders == null)
             {
-                File.Delete(path);
+                return;
             }
 
-            string meta = path + ".meta";
-            if (File.Exists(meta))
+            foreach (string folder in folders)
             {
-                File.Delete(meta);
+                if (string.IsNullOrEmpty(folder))
+                {
+                    continue;
+                }
+
+                string path = Path.Combine(folder, LootLockerConfig.BuildPointerName + LootLockerConfig.ConfigFileExtensionForBuild);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                string meta = path + ".meta";
+                if (File.Exists(meta))
+                {
+                    File.Delete(meta);
+                }
             }
+        }
+
+        /// <summary>
+        /// The folder the pointer is written to: the first one that exists, which is the writable
+        /// location because discovery lists it first.
+        /// </summary>
+        private static string WritableFolder(string[] folders)
+        {
+            if (folders == null)
+            {
+                return null;
+            }
+
+            foreach (string folder in folders)
+            {
+                if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
+                {
+                    return folder;
+                }
+            }
+
+            return null;
         }
 
         private static List<string> ListConfigFiles(string folder)
@@ -361,16 +425,22 @@ namespace LootLocker.Admin
             }
         }
 
-        private static string ConfigFolderAbsolutePath()
+        private static string[] ConfigFolderAbsolutePaths()
         {
             string projectRoot = Directory.GetParent(Application.dataPath).FullName;
-            string relative = LootLockerConfig.ConfigFolderAssetsPathForBuild;
-            if (string.IsNullOrEmpty(relative))
+            var folders = new List<string>();
+
+            foreach (string relative in LootLockerConfig.ConfigFolderAssetsPathsForBuild)
             {
-                return null;
+                if (string.IsNullOrEmpty(relative))
+                {
+                    continue;
+                }
+
+                folders.Add(Path.Combine(projectRoot, relative.Replace('/', Path.DirectorySeparatorChar)));
             }
 
-            return Path.Combine(projectRoot, relative.Replace('/', Path.DirectorySeparatorChar));
+            return folders.ToArray();
         }
 
         private static string ToAssetPath(string absolutePath)
