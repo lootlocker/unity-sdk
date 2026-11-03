@@ -220,6 +220,12 @@ namespace LootLocker.Admin
                     {
                         onChanged?.Invoke();
 
+                        // The effective configuration just changed, so any validation result on
+                        // screen describes the previous key and is now misleading. This matters
+                        // most for the API and domain keys, which have no override toggle and so
+                        // would otherwise never invalidate a result.
+                        ClearValidationResult();
+
                         // An overridden field is written straight back to the override file, so the
                         // value survives a domain reload and stays in effect for this machine only.
                         if (overridden)
