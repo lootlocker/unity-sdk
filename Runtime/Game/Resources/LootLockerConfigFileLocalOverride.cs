@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using UnityEngine;
 
 namespace LootLocker
 {
+#if UNITY_EDITOR
     /// <summary>
     /// The local, per-machine override layer.
     ///
-    /// Part of <see cref="LootLockerConfig"/>; split out to keep the asset class readable.
+    /// Split out of <see cref="LootLockerConfig"/> to keep the asset class readable.
+    ///
+    /// Editor only: the file lives outside Resources/ so it never ships, and it is a developer
+    /// convenience rather than a build input.
     /// </summary>
-    public partial class LootLockerConfig
+    internal static class LootLockerConfigFileLocalOverride
     {
-#if UNITY_EDITOR
         /// <summary>
         /// Folder that holds the local override file (excluded from version control).
         ///
@@ -25,13 +24,13 @@ namespace LootLocker
         /// file is a developer convenience, so it must not ship at all.
         /// </summary>
         internal static string LocalOverrideFolder =>
-            $"{GetSdkRootAssetsPath(requireWritable: true)}/{LocalOverrideFolderName}";
+            $"{LootLockerConfig.GetSdkRootAssetsPath(requireWritable: true)}/{LootLockerConfig.LocalOverrideFolderName}";
 
         /// <summary>
         /// Absolute path of the local override file (excluded from version control).
         /// </summary>
         internal static string LocalOverridePath =>
-            $"{LocalOverrideFolder}/{LocalOverrideName}{ConfigFileExtension}";
+            $"{LocalOverrideFolder}/{LootLockerConfig.LocalOverrideName}{LootLockerConfig.ConfigFileExtension}";
 
         /// <summary>
         /// Reads the local override file's text straight from disk.
@@ -39,7 +38,7 @@ namespace LootLocker
         /// Not Resources.Load: the file is outside Resources/ by design, and it is a plain file
         /// rather than a TextAsset the AssetDatabase imports.
         /// </summary>
-        private static string ReadLocalOverrideText()
+        internal static string ReadLocalOverrideText()
         {
             try
             {
@@ -99,7 +98,7 @@ namespace LootLocker
                     File.Delete(path);
                 }
 
-                RefreshFileConfigState(force: true);
+                LootLockerConfig.RefreshFileConfigState(force: true);
                 return true;
             }
             catch (Exception ex)
@@ -242,7 +241,6 @@ namespace LootLocker
             // Numbers and anything else round trip through the serializer unchanged.
             return LootLockerJson.SerializeObject(value);
         }
-#endif
-
     }
+#endif
 }

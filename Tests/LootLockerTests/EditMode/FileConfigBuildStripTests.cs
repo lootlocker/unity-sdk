@@ -230,7 +230,7 @@ namespace LootLockerTests.EditMode
         {
             // The pointer lives in Resources/Config so the player can read it, which means
             // discovery would otherwise offer it as a selectable config.
-            Assert.IsNull(LootLockerConfig.GetIdFromConfigFileName("LootLockerConfig.build.bytes"),
+            Assert.IsNull(LootLockerConfigFileResolution.GetIdFromConfigFileName("LootLockerConfig.build.bytes"),
                 "The generated build pointer must never appear as a config profile");
         }
 
