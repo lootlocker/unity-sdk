@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -97,7 +97,8 @@ namespace LootLocker.Admin
             DrawValidation();
 
             DrawOverridableField("apiKey", "API Key", LootLockerConfigFields.ApiKey,
-                () => gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue);
+                () => gameSettings.apiKey = m_CustomSettings.FindProperty("apiKey").stringValue,
+                allowOverride: false);
 
             var content = new GUIContent();
             content.text = "API key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
@@ -126,7 +127,7 @@ namespace LootLocker.Admin
                     gameSettings.domainKey = domainkey;
                     m_CustomSettings.FindProperty("domainKey").stringValue = domainkey;
                 }
-            });
+            }, allowOverride: false);
             var domainContent = new GUIContent();
             domainContent.text = "Domain key can be found in `Settings > API Keys` in the Web Console: https://console.lootlocker.com/settings/api-keys";
             EditorGUILayout.HelpBox(domainContent, false);
@@ -170,7 +171,7 @@ namespace LootLocker.Admin
 
         /// <summary>
         /// Builds a label for a setting, appending a marker when the current value came from the
-        /// gitignored local override file.
+        /// local override file (excluded from version control).
         ///
         /// Without this marker a developer cannot tell a shared value from one they changed
         /// locally, which is exactly the confusion the override file would otherwise introduce.
@@ -183,7 +184,7 @@ namespace LootLocker.Admin
             }
 
             return new GUIContent($"{text} (local override)",
-                "This value comes from the gitignored local override file, not from the shared config. Click the open padlock to reset it.");
+                "This value comes from the local override file (excluded from version control), not from the shared config. Click the open padlock to reset it.");
         }
 
         /// <summary>
@@ -197,9 +198,16 @@ namespace LootLocker.Admin
         /// <param name="label">Label text.</param>
         /// <param name="fieldName">JSON field name, see <see cref="LootLockerConfigFields"/>.</param>
         /// <param name="onChanged">Applies the edited value to the live config.</param>
-        private void DrawOverridableField(string propertyName, string label, string fieldName, Action onChanged)
+        /// <param name="allowOverride">
+        /// Whether this setting may be overridden locally. False for the API and domain keys: they
+        /// identify which game the project talks to, so a silent per-machine override is a
+        /// debugging trap rather than a convenience - the settings would say one game and the
+        /// build would talk to another. Changing them is a deliberate act, done in the shared
+        /// config or in Project Settings.
+        /// </param>
+        private void DrawOverridableField(string propertyName, string label, string fieldName, Action onChanged, bool allowOverride = true)
         {
-            bool overridden = LootLockerConfig.IsLocallyOverridden(fieldName);
+            bool overridden = allowOverride && LootLockerConfig.IsLocallyOverridden(fieldName);
             bool locked = LootLockerConfig.IsFileConfigActive && !overridden;
 
             using (new EditorGUILayout.HorizontalScope())
@@ -231,7 +239,7 @@ namespace LootLocker.Admin
                 // field is already overridden (so the override can be reset). Without the second
                 // case, an override whose shared config has since disappeared would show
                 // "(local override)" with no way to clear it.
-                if (LootLockerConfig.IsFileConfigActive || overridden)
+                if (allowOverride && (LootLockerConfig.IsFileConfigActive || overridden))
                 {
                     if (GUILayout.Button(LockToggleContent(overridden), GUILayout.Width(24), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
                     {
@@ -527,7 +535,7 @@ namespace LootLocker.Admin
             if (LootLockerConfig.LocalOverrideExists()
                 && !EditorUtility.DisplayDialog(
                     "Switch config and reset local overrides?",
-                    "Switching config file deletes the gitignored local override file, because an override written for one config does not apply to another.",
+                    "Switching config file deletes the local override file (excluded from version control), because an override written for one config does not apply to another.",
                     "Switch and reset", "Cancel"))
             {
                 return;
