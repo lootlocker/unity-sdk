@@ -120,13 +120,14 @@ namespace LootLockerTests.PlayMode
 
         // Revision created_at has second granularity and is stamped by two different clocks
         // (the app server for uploads, MySQL for updates), so two revisions created close
-        // together can share a timestamp. Wait until the wall clock has moved into a new
-        // second so the revisions are distinguishable, rather than sleeping a fixed amount
-        // that can still land both revisions in the same second.
+        // together can share a timestamp. Wait for a full elapsed second so the revisions are
+        // guaranteed to be distinguishable. Comparing only the Second component is not enough:
+        // called at ...999ms it would return almost immediately and both revisions could still
+        // land in the same second.
         private static IEnumerator WaitForNextSecond()
         {
-            int startSecond = DateTime.UtcNow.Second;
-            while (DateTime.UtcNow.Second == startSecond)
+            DateTime start = DateTime.UtcNow;
+            while ((DateTime.UtcNow - start).TotalSeconds < 1.0)
             {
                 yield return null;
             }
