@@ -30,8 +30,8 @@ namespace LootLockerTests.EditMode
         public void Discovery_EmptyFolder_ReturnsNoProfiles()
         {
             // Given / When
-            List<LootLockerConfig.FileConfigDescriptor> found =
-                LootLockerConfig.DiscoverFileConfigs(Listing(), Reader(new Dictionary<string, string>()));
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found =
+                LootLockerConfigFileResolution.DiscoverFileConfigs(Listing(), Reader(new Dictionary<string, string>()));
 
             // Then
             Assert.IsEmpty(found, "An empty folder must yield no profiles");
@@ -49,13 +49,13 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
             CollectionAssert.AreEqual(new[] { "alpha", "debug", "prod" }, found.Select(d => d.Id).ToArray(),
                 "Profiles must be listed in a stable, sorted order");
-            Assert.IsTrue(found.All(d => d.State == LootLockerConfig.FileConfigState.Valid), "All should be valid");
+            Assert.IsTrue(found.All(d => d.State == LootLockerConfigFileResolution.FileConfigState.Valid), "All should be valid");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -71,7 +71,7 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -90,7 +90,7 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -105,7 +105,7 @@ namespace LootLockerTests.EditMode
             var contents = new Dictionary<string, string> { ["LootLockerConfig.bytes"] = ValidJson };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -124,13 +124,13 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then: shown, not hidden - a broken file the developer needs to know about
             Assert.AreEqual(2, found.Count, "A broken file must still be listed");
-            LootLockerConfig.FileConfigDescriptor broken = found.Single(d => d.Id == "broken");
-            Assert.AreEqual(LootLockerConfig.FileConfigState.Invalid, broken.State);
+            LootLockerConfigFileResolution.FileConfigDescriptor broken = found.Single(d => d.Id == "broken");
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Invalid, broken.State);
             Assert.IsNotEmpty(broken.Reason, "The reason must be surfaced");
         }
 
@@ -144,11 +144,11 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
-            Assert.AreEqual(LootLockerConfig.FileConfigState.Invalid, found.Single().State,
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Invalid, found.Single().State,
                 "A parseable file without an api_key is still unusable");
         }
 
@@ -159,11 +159,11 @@ namespace LootLockerTests.EditMode
             var contents = new Dictionary<string, string>();
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing("LootLockerConfig-locked.bytes"), Reader(contents));
 
             // Then
-            Assert.AreEqual(LootLockerConfig.FileConfigState.Unreadable, found.Single().State,
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Unreadable, found.Single().State,
                 "An unreadable file must be classified, not thrown");
         }
 
@@ -179,7 +179,7 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -196,7 +196,7 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -216,7 +216,7 @@ namespace LootLockerTests.EditMode
             };
 
             // When
-            List<LootLockerConfig.FileConfigDescriptor> found = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 Listing(contents.Keys.ToArray()), Reader(contents));
 
             // Then
@@ -232,7 +232,7 @@ namespace LootLockerTests.EditMode
             var listed = new List<string>();
             var read = new List<string>();
 
-            LootLockerConfig.DiscoverFileConfigs(
+            LootLockerConfigFileResolution.DiscoverFileConfigs(
                 () => { listed.Add("LootLockerConfig-prod.bytes"); return listed; },
                 name => { read.Add(name); return ValidJson; });
 

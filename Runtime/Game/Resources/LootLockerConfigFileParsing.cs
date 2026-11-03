@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace LootLocker
 {
     /// <summary>
     /// Parsing of config file text into <see cref="ExternalFileConfig"/>.
     ///
-    /// Part of <see cref="LootLockerConfig"/>; split out to keep the asset class readable.
+    /// Split out of <see cref="LootLockerConfig"/> to keep the asset class readable.
     /// </summary>
-    public partial class LootLockerConfig
+    internal static class LootLockerConfigFileParsing
     {
         /// <summary>
         /// Parses the contents of a config file into an <see cref="ExternalFileConfig"/>.

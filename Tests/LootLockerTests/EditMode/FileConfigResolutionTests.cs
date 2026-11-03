@@ -19,36 +19,36 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void IsValidFileConfigId_EmptyIsValid()
         {
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId(""), "Empty id means the legacy file and must be valid");
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId(null), "Null id means auto-detect and must be valid");
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId(""), "Empty id means the legacy file and must be valid");
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId(null), "Null id means auto-detect and must be valid");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void IsValidFileConfigId_AcceptsOrdinaryIdentifiers()
         {
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId("prod"));
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId("prod-ps5"));
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId("debug.v2"));
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId("Release_2024"));
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId("prod"));
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId("prod-ps5"));
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId("debug.v2"));
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId("Release_2024"));
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void IsValidFileConfigId_RejectsPathTraversal()
         {
             // The identifier becomes part of a filename, so these must never reach the filesystem.
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("../evil"), "Path traversal must be rejected");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("a/b"), "Path separators must be rejected");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("a\\b"), "Backslashes must be rejected");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId(".."), "Dot-dot must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("../evil"), "Path traversal must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("a/b"), "Path separators must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("a\\b"), "Backslashes must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId(".."), "Dot-dot must be rejected");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void IsValidFileConfigId_RejectsLeadingPunctuationAndOverlongIds()
         {
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("-leading"), "Must start alphanumeric");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId(".leading"), "Must start alphanumeric");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId(new string('a', 65)), "65 chars exceeds the limit");
-            Assert.IsTrue(LootLockerConfig.IsValidFileConfigId(new string('a', 64)), "64 chars is the limit");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("-leading"), "Must start alphanumeric");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId(".leading"), "Must start alphanumeric");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId(new string('a', 65)), "65 chars exceeds the limit");
+            Assert.IsTrue(LootLockerConfigFileResolution.IsValidFileConfigId(new string('a', 64)), "64 chars is the limit");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -56,9 +56,9 @@ namespace LootLockerTests.EditMode
         {
             // In .NET, $ also matches before a trailing newline, so a pattern anchored with $ would
             // accept "prod\n" and let it reach the file name and the Resources lookup.
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod\n"), "A trailing newline must be rejected");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod\r\n"), "A trailing CRLF must be rejected");
-            Assert.IsFalse(LootLockerConfig.IsValidFileConfigId("prod "), "A trailing space must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("prod\n"), "A trailing newline must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("prod\r\n"), "A trailing CRLF must be rejected");
+            Assert.IsFalse(LootLockerConfigFileResolution.IsValidFileConfigId("prod "), "A trailing space must be rejected");
         }
 
         #endregion
@@ -68,17 +68,17 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void GetConfigFileNameForId_EmptyIdYieldsLegacyName()
         {
-            Assert.AreEqual("LootLockerConfig", LootLockerConfig.GetConfigFileNameForId(""),
+            Assert.AreEqual("LootLockerConfig", LootLockerConfigFileResolution.GetConfigFileNameForId(""),
                 "The empty id must map to the legacy unsuffixed file");
-            Assert.AreEqual("LootLockerConfig", LootLockerConfig.GetConfigFileNameForId(null),
+            Assert.AreEqual("LootLockerConfig", LootLockerConfigFileResolution.GetConfigFileNameForId(null),
                 "A null id must map to the legacy unsuffixed file");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void GetConfigFileNameForId_SuffixesIdentifiers()
         {
-            Assert.AreEqual("LootLockerConfig-prod", LootLockerConfig.GetConfigFileNameForId("prod"));
-            Assert.AreEqual("LootLockerConfig-prod-ps5", LootLockerConfig.GetConfigFileNameForId("prod-ps5"));
+            Assert.AreEqual("LootLockerConfig-prod", LootLockerConfigFileResolution.GetConfigFileNameForId("prod"));
+            Assert.AreEqual("LootLockerConfig-prod-ps5", LootLockerConfigFileResolution.GetConfigFileNameForId("prod-ps5"));
         }
 
         #endregion
@@ -88,7 +88,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_CommandLineBeatsEverything()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "from-asset",
                 commandLineId: "from-cli",
                 buildPointerId: "from-build",
@@ -101,7 +101,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_CommandLineNoneDisablesFileConfig()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "from-asset",
                 commandLineId: "none",
                 buildPointerId: null,
@@ -114,7 +114,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_BuildPointerBeatsAssetSelection()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "from-asset",
                 commandLineId: null,
                 buildPointerId: "from-build",
@@ -127,7 +127,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_AssetSelectionBeatsLegacyAutoDetect()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "from-asset",
                 commandLineId: null,
                 buildPointerId: null,
@@ -140,7 +140,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_ExplicitEmptySelectionDisablesFileConfig()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "",
                 commandLineId: null,
                 buildPointerId: null,
@@ -153,7 +153,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_LegacyFileIsAutoDetectedWhenNothingSelected()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -166,7 +166,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_SingleDiscoveredProfileIsUsedWhenNothingSelected()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -179,7 +179,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_MultipleDiscoveredProfilesAreNotGuessed()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -192,7 +192,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Resolve_NothingConfiguredYieldsNoFileConfig()
         {
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -206,13 +206,13 @@ namespace LootLockerTests.EditMode
         public void Resolve_InvalidIdentifierIsRejected()
         {
             Assert.IsNull(
-                LootLockerConfig.ResolveFileConfigId(null, "../evil", null, false, NoIds),
+                LootLockerConfigFileResolution.ResolveFileConfigId(null, "../evil", null, false, NoIds),
                 "An invalid command line id must not reach the filesystem");
             Assert.IsNull(
-                LootLockerConfig.ResolveFileConfigId(null, null, "../evil", false, NoIds),
+                LootLockerConfigFileResolution.ResolveFileConfigId(null, null, "../evil", false, NoIds),
                 "An invalid build pointer id must not reach the filesystem");
             Assert.IsNull(
-                LootLockerConfig.ResolveFileConfigId("../evil", null, null, false, NoIds),
+                LootLockerConfigFileResolution.ResolveFileConfigId("../evil", null, null, false, NoIds),
                 "An invalid asset selection must not reach the filesystem");
         }
 
@@ -221,7 +221,7 @@ namespace LootLockerTests.EditMode
         {
             // A selection that is no longer on disk must still resolve, so the load path can warn
             // about it by name instead of silently behaving as if nothing was ever selected.
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "deleted",
                 commandLineId: null,
                 buildPointerId: null,
@@ -237,7 +237,7 @@ namespace LootLockerTests.EditMode
         {
             // The user moved every config file away. With no selection and nothing on disk the
             // result must be "no file config", i.e. the asset values, exactly as a fresh project.
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -256,7 +256,7 @@ namespace LootLockerTests.EditMode
         {
             const string json = "{\"api_key\":\"key123\",\"domain_key\":\"domain123\"}";
 
-            bool ok = LootLockerConfig.TryParseFileConfig(json, out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig(json, out ExternalFileConfig config, out string error);
 
             Assert.IsTrue(ok, $"Expected parse to succeed but got: {error}");
             Assert.AreEqual("key123", config.api_key);
@@ -266,7 +266,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void TryParseFileConfig_EmptyTextFails()
         {
-            bool ok = LootLockerConfig.TryParseFileConfig("", out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig("", out ExternalFileConfig config, out string error);
 
             Assert.IsFalse(ok, "Empty text must not parse");
             Assert.IsNull(config);
@@ -278,7 +278,7 @@ namespace LootLockerTests.EditMode
         {
             const string json = "{\"domain_key\":\"domain123\"}";
 
-            bool ok = LootLockerConfig.TryParseFileConfig(json, out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig(json, out ExternalFileConfig config, out string error);
 
             Assert.IsFalse(ok, "A config without an api_key is unusable");
             Assert.IsNull(config);
@@ -288,7 +288,7 @@ namespace LootLockerTests.EditMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void TryParseFileConfig_MalformedJsonFails()
         {
-            bool ok = LootLockerConfig.TryParseFileConfig("{not json", out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig("{not json", out ExternalFileConfig config, out string error);
 
             Assert.IsFalse(ok, "Malformed JSON must not parse");
             Assert.IsNull(config);
@@ -301,7 +301,7 @@ namespace LootLockerTests.EditMode
             // A truncated file is the realistic failure (interrupted download, bad merge).
             const string truncated = "{\n  \"api_key\": \"key123\",\n  \"log_level\": \"Verbose\"\n";
 
-            bool ok = LootLockerConfig.TryParseFileConfig(truncated, out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig(truncated, out ExternalFileConfig config, out string error);
 
             Assert.IsFalse(ok, "Truncated JSON must not parse");
             Assert.IsNull(config);
@@ -321,7 +321,7 @@ namespace LootLockerTests.EditMode
             // than merely that no exception is thrown.
             const string missingComma = "{\n  \"api_key\": \"key123\"\n  \"log_level\": \"Verbose\"\n  \"log_in_builds\": true\n}";
 
-            bool ok = LootLockerConfig.TryParseFileConfig(missingComma, out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig(missingComma, out ExternalFileConfig config, out string error);
 
             Assert.IsTrue(ok, $"The bundled parser tolerates a missing comma; got: {error}");
             Assert.AreEqual("key123", config.api_key);
@@ -337,7 +337,7 @@ namespace LootLockerTests.EditMode
             // half-configured SDK.
             const string unterminatedString = "{\n  \"api_key\": \"key123\n}";
 
-            bool ok = LootLockerConfig.TryParseFileConfig(unterminatedString, out ExternalFileConfig config, out string error);
+            bool ok = LootLockerConfigFileParsing.TryParseFileConfig(unterminatedString, out ExternalFileConfig config, out string error);
 
             Assert.IsFalse(ok, "Input that cannot be resolved to values must still be rejected");
             Assert.IsNull(config);

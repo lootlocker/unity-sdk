@@ -230,7 +230,7 @@ namespace LootLocker.Admin
                         {
                             // The developer just authored this value. Record it in the snapshot, or
                             // the next reload would write the old value back over it.
-                            LootLockerConfig.CommitAuthoredValue(fieldName);
+                            LootLockerConfigFileLayering.CommitAuthoredValue(fieldName);
                         }
                     }
                 }
@@ -306,7 +306,7 @@ namespace LootLocker.Admin
         /// </summary>
         private static void OverrideField(string fieldName, SerializedProperty property)
         {
-            if (!LootLockerConfig.SetLocalOverrideField(fieldName, SerializePropertyValue(property)))
+            if (!LootLockerConfigFileLocalOverride.SetLocalOverrideField(fieldName, SerializePropertyValue(property)))
             {
                 return;
             }
@@ -321,7 +321,7 @@ namespace LootLocker.Admin
         /// </summary>
         private static void ResetLocalOverrideField(string fieldName)
         {
-            if (!LootLockerConfig.RemoveLocalOverrideField(fieldName))
+            if (!LootLockerConfigFileLocalOverride.RemoveLocalOverrideField(fieldName))
             {
                 return;
             }
@@ -336,7 +336,7 @@ namespace LootLocker.Admin
         /// </summary>
         private static void PersistLocalOverrideField(string fieldName, SerializedProperty property)
         {
-            LootLockerConfig.SetLocalOverrideField(fieldName, SerializePropertyValue(property));
+            LootLockerConfigFileLocalOverride.SetLocalOverrideField(fieldName, SerializePropertyValue(property));
             LootLockerConfig.RefreshFileConfigState(force: true);
         }
 
@@ -367,9 +367,9 @@ namespace LootLocker.Admin
         /// repaint is far too expensive. Invalidated explicitly whenever something could have
         /// changed: activation, the Refresh button, a selection change, and override edits.
         /// </summary>
-        private static List<LootLockerConfig.FileConfigDescriptor> _discoveredConfigs;
+        private static List<LootLockerConfigFileResolution.FileConfigDescriptor> _discoveredConfigs;
 
-        private static List<LootLockerConfig.FileConfigDescriptor> GetDiscoveredConfigs()
+        private static List<LootLockerConfigFileResolution.FileConfigDescriptor> GetDiscoveredConfigs()
         {
             if (_discoveredConfigs == null)
             {
@@ -397,7 +397,7 @@ namespace LootLocker.Admin
         /// </summary>
         private void DrawFileConfigSection()
         {
-            List<LootLockerConfig.FileConfigDescriptor> discovered = GetDiscoveredConfigs();
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> discovered = GetDiscoveredConfigs();
             if (discovered.Count == 0)
             {
                 return;
@@ -450,7 +450,7 @@ namespace LootLocker.Admin
         /// Builds the dropdown menu. Invalid entries are added disabled, with the reason appended,
         /// so a broken file is visible but cannot be selected.
         /// </summary>
-        private void ShowFileConfigMenu(string selectedId, List<LootLockerConfig.FileConfigDescriptor> discovered)
+        private void ShowFileConfigMenu(string selectedId, List<LootLockerConfigFileResolution.FileConfigDescriptor> discovered)
         {
             var menu = new GenericMenu();
 
@@ -460,9 +460,9 @@ namespace LootLocker.Admin
             menu.AddItem(new GUIContent(NoneOption), selectedId == "",
                 () => ApplyFileConfigSelection(""));
 
-            foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+            foreach (LootLockerConfigFileResolution.FileConfigDescriptor descriptor in discovered)
             {
-                bool isValid = descriptor.State == LootLockerConfig.FileConfigState.Valid;
+                bool isValid = descriptor.State == LootLockerConfigFileResolution.FileConfigState.Valid;
                 string label = DescribeId(descriptor.Id);
                 if (!isValid)
                 {
@@ -492,7 +492,7 @@ namespace LootLocker.Admin
             menu.ShowAsContext();
         }
 
-        private static string DescribeSelection(string selectedId, List<LootLockerConfig.FileConfigDescriptor> discovered)
+        private static string DescribeSelection(string selectedId, List<LootLockerConfigFileResolution.FileConfigDescriptor> discovered)
         {
             // Only "" is explicit none. null means auto-detect, which may well have resolved to the
             // legacy file - showing "(None)" there would misdescribe what is in effect.
@@ -511,7 +511,7 @@ namespace LootLocker.Admin
                     : $"Auto-detect ({DescribeId(resolved)})";
             }
 
-            foreach (LootLockerConfig.FileConfigDescriptor descriptor in discovered)
+            foreach (LootLockerConfigFileResolution.FileConfigDescriptor descriptor in discovered)
             {
                 if (descriptor.Id == selectedId)
                 {
@@ -543,13 +543,13 @@ namespace LootLocker.Admin
 
             if (LootLockerConfig.LocalOverrideExists())
             {
-                LootLockerConfig.DeleteLocalOverride();
+                LootLockerConfigFileLocalOverride.DeleteLocalOverride();
             }
 
             // Save only the selection. gameSettings is the live asset and already holds the values
             // applied from the previous config, so marking it dirty here would write those values
             // into the committed config. Restore the authored values first, then persist the id.
-            LootLockerConfig.RestoreAssetValues();
+            LootLockerConfigFileLayering.RestoreAssetValues();
             gameSettings.selectedFileConfigId = id;
             EditorUtility.SetDirty(gameSettings);
             AssetDatabase.SaveAssets();
