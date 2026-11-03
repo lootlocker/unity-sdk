@@ -131,13 +131,15 @@ namespace LootLockerTests.PlayMode
             string playerUlid = sessionResponse.player_ulid;
             LootLockerStateData.ClearAllSavedStates();
 
+            const string banDetail = "Banned by the integration test";
+
             bool banCompleted = false;
             LootLockerResponse banResponse = null;
             LootLockerTestPlayerBan.BanPlayer(playerUlid, response =>
             {
                 banResponse = response;
                 banCompleted = true;
-            });
+            }, banDetail);
             yield return new WaitUntil(() => banCompleted);
             Assert.IsTrue(banResponse?.success, "Failed to ban player via admin API");
 
@@ -157,6 +159,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("player_banned", bannedSessionResponse.errorData?.code, "Expected player_banned error code");
             Assert.IsNotNull(bannedSessionResponse.errorData?.ban, "Expected ban info to be present in the error data");
             Assert.IsFalse(string.IsNullOrEmpty(bannedSessionResponse.errorData?.ban?.ban_reason), "Expected ban_reason to be populated");
+            Assert.AreEqual(banDetail, bannedSessionResponse.errorData?.ban?.ban_detail, "Expected ban_detail to round-trip through the session start error data");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
@@ -178,13 +181,15 @@ namespace LootLockerTests.PlayMode
             string playerUlid = sessionResponse.player_ulid;
             LootLockerStateData.ClearAllSavedStates();
 
+            const string banDetail = "Banned by the integration test";
+
             bool banCompleted = false;
             LootLockerResponse banResponse = null;
             LootLockerTestPlayerBan.BanPlayer(playerUlid, response =>
             {
                 banResponse = response;
                 banCompleted = true;
-            });
+            }, banDetail);
             yield return new WaitUntil(() => banCompleted);
             Assert.IsTrue(banResponse?.success, "Failed to ban player via admin API");
 
@@ -203,6 +208,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(banStatusResponse.is_banned, "Expected player to be banned");
             Assert.IsNotNull(banStatusResponse.ban, "Expected ban details to be populated");
             Assert.IsFalse(string.IsNullOrEmpty(banStatusResponse.ban?.ban_reason), "Expected ban_reason to be populated");
+            Assert.AreEqual(banDetail, banStatusResponse.ban?.ban_detail, "Expected ban_detail to round-trip through the ban status response");
             Assert.IsFalse(string.IsNullOrEmpty(banStatusResponse.ban?.banned_on), "Expected banned_on to be populated");
             Assert.IsTrue(banStatusResponse.ban?.permanent ?? false, "Expected permanent ban (no banned_until)");
         }
