@@ -67,12 +67,18 @@ are listed greyed out with the reason, so a broken file is visible but cannot be
 single config file there is nothing to choose and no dropdown is shown.
 
 **Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
-change. Click the closed padlock next to a setting to write a gitignored
+change. Click the closed padlock next to a setting to write a local
 `Assets/LootLockerSDK/LocalOverrides/LootLockerConfig.local.bytes` that is layered on top of the
 selected config. The file is sparse: only the fields it contains are applied, so overriding
 `log_level` leaves every other setting shared. Overridden settings are marked `(local override)` in
 Project Settings, and the open padlock resets them. Switching config file also clears the file,
 because an override written against one config does not apply to another.
+
+The file is local and must not be committed. It is listed in the SDK's `.gitignore`, but the same
+applies under any version control — add it to whatever ignore mechanism your team uses (Perforce,
+Plastic SCM, SVN, and so on). The API and domain keys are deliberately **not** overridable: they
+identify which game the project talks to, so a silent per-machine override would mean the settings
+say one game and the build talks to another.
 
 The override file is **editor only**, and deliberately outside `Resources/`. Anything under
 `Resources/` is packed into every build made on that machine, so an override stored there would ship
@@ -110,7 +116,8 @@ precedence as above, so `-lootlockerconfig prod` on a CI build strips everything
 
 Two things to know:
 
-- During a build, `git status` briefly shows the other configs as renamed. Restore is automatic.
+- During a build, your version control client briefly shows the other configs as renamed. Restore is
+  automatic.
 - If the editor is killed mid-build, the files stay hidden until the next editor start, which
   restores them automatically. Nothing is lost — the files are renamed, not deleted.
 

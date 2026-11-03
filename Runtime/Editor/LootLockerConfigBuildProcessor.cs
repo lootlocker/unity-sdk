@@ -53,7 +53,7 @@ namespace LootLocker.Admin
         /// <summary>
         /// Records what was renamed, so a restore can be driven from disk after a crash.
         ///
-        /// Kept in Library/ because it is transient, machine-local, and already gitignored.
+        /// Kept in Library/ because it is transient, machine-local, and already excluded from version control.
         /// </summary>
         private static string MarkerPath
         {
