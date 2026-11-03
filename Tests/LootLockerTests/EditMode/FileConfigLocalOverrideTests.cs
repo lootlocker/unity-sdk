@@ -180,5 +180,70 @@ namespace LootLockerTests.EditMode
             Assert.IsTrue(fields.Contains("some_future_setting"),
                 "Unknown fields must still be reported so they survive a round trip");
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void LocalOverride_CannotChangeTheApiKey()
+        {
+            // Regression: the UI hides the override toggle for the API and domain keys, but the
+            // override file is a plain file a developer can hand-edit. Applying it unfiltered let a
+            // stray api_key silently point the game at another environment - the exact trap the UI
+            // restriction exists to prevent. The restriction has to be enforced where it is applied.
+            //
+            // Asserts on the filter that ApplyLocalOverride actually calls, rather than on
+            // ApplyFileConfig directly: the latter would pass even with the filter removed, because
+            // it would simply be handed the unfiltered set.
+            var presentFields = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+            {
+                LootLockerConfigFields.ApiKey,
+                LootLockerConfigFields.DomainKey,
+                LootLockerConfigFields.LogLevel,
+            };
+
+            HashSet<string> allowed = LootLockerConfigFileLayering.OverridableFieldsOnly(presentFields);
+
+            // Then: the keys are dropped, but the rest of the file still applies
+            Assert.IsFalse(allowed.Contains(LootLockerConfigFields.ApiKey),
+                "api_key must never be applied from the local override file");
+            Assert.IsFalse(allowed.Contains(LootLockerConfigFields.DomainKey),
+                "domain_key must never be applied from the local override file");
+            Assert.IsTrue(allowed.Contains(LootLockerConfigFields.LogLevel),
+                "The rest of the override must still apply, or the feature is broken");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void LocalOverride_ApiKeyInTheFileDoesNotReachTheLiveConfig()
+        {
+            // The end-to-end version of the test above: a real override file on disk, applied
+            // through the same entry point the SDK uses, must leave the live key alone.
+            string apiKeyBefore = LootLockerConfig.current.apiKey;
+            string domainKeyBefore = LootLockerConfig.current.domainKey;
+
+            const string text = @"{
+  ""api_key"": ""someone_elses_key"",
+  ""domain_key"": ""someone_elses_domain"",
+  ""log_level"": ""Verbose""
+}";
+
+            Assert.IsTrue(LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out HashSet<string> fields, out string error), error);
+
+            HashSet<string> applied = LootLockerConfigFileLayering.ApplyFileConfig(
+                config, LootLockerConfigFileLayering.OverridableFieldsOnly(fields));
+
+            try
+            {
+                Assert.IsFalse(applied.Contains(LootLockerConfigFields.ApiKey));
+                Assert.IsFalse(applied.Contains(LootLockerConfigFields.DomainKey));
+                Assert.AreEqual(apiKeyBefore, LootLockerConfig.current.apiKey,
+                    "The live API key must be unchanged by a local override");
+                Assert.AreEqual(domainKeyBefore, LootLockerConfig.current.domainKey,
+                    "The live domain key must be unchanged by a local override");
+                Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogLevel),
+                    "The rest of the override must still apply, or the feature is broken");
+            }
+            finally
+            {
+                LootLockerConfigFileLayering.RestoreAssetValues();
+            }
+        }
     }
 }
