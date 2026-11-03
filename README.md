@@ -125,7 +125,7 @@ Two things to know:
 
 1. The selection is a single committed value, so it is shared by everyone on the project. Per-build
    target selection is not implemented yet.
-3. **API keys in config files are not secrets.** They are readable by anyone with the build. This
+2. **API keys in config files are not secrets.** They are readable by anyone with the build. This
    feature improves key hygiene — keeping the right key on the right target — not secrecy.
 
 ## Updating

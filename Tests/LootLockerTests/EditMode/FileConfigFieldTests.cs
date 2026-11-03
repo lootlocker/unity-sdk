@@ -55,6 +55,10 @@ namespace LootLockerTests.EditMode
                 Object.DestroyImmediate(_original);
                 _original = null;
             }
+
+            // CreateNewSettings records an Init override, which outlives the test class and would
+            // be re-applied over every later refresh. Clear it so this fixture leaves no trace.
+            LootLockerConfigFileLayering.ClearInitValues();
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
