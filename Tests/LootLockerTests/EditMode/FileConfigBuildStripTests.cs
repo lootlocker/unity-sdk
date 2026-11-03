@@ -5,6 +5,7 @@ using LootLocker;
 using LootLocker.Admin;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace LootLockerTests.EditMode
@@ -299,6 +300,68 @@ namespace LootLockerTests.EditMode
                 Assert.IsTrue(File.Exists(metaPath), "The .meta must be restored alongside the config");
                 StringAssert.Contains(guid, File.ReadAllText(metaPath),
                     "The GUID must be preserved so asset references survive a build");
+            }
+            finally
+            {
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
+            }
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void BuildStrip_NoResolvedConfig_StripsEveryConfig()
+        {
+            // Regression: a null resolution - including an explicit "-lootlockerconfig none" - used
+            // to return early without hiding anything, so every profile and every API key in them
+            // still shipped. "No config selected" must mean "no config ships", not "all of them do".
+            WriteConfig("dev");
+            WriteConfig("prod");
+
+            try
+            {
+                // An invalid id resolves to null, which is the same path as "none".
+                LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: null);
+
+                Assert.IsEmpty(VisibleConfigFiles(),
+                    "When no config is in effect, no config file may remain visible to the build");
+            }
+            finally
+            {
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
+            }
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void BuildStrip_UnusableSelectedConfig_FailsTheBuild()
+        {
+            // Regression: only the file name was checked, so a malformed or keyless profile built
+            // successfully, shipped, and then fell back to the asset values at runtime - a build
+            // that silently differs from the profile that was requested.
+            WriteConfig("dev");
+            WriteTempFile("LootLockerConfig-prod.bytes", "{ \"log_level\": \"Verbose\" }");
+
+            try
+            {
+                Assert.Throws<BuildFailedException>(
+                    () => LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod"),
+                    "A selected config with no api_key must fail the build rather than ship");
+            }
+            finally
+            {
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
+            }
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void BuildStrip_MalformedSelectedConfig_FailsTheBuild()
+        {
+            WriteConfig("dev");
+            WriteTempFile("LootLockerConfig-prod.bytes", "this is not json at all {{{");
+
+            try
+            {
+                Assert.Throws<BuildFailedException>(
+                    () => LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod"),
+                    "A selected config that does not parse must fail the build rather than ship");
             }
             finally
             {

@@ -141,18 +141,53 @@ namespace LootLocker.Admin
                 availableIds: IdsOf(available));
 
             // Nothing to strip when no config file is in effect, and nothing to read either.
+            // No config file is in effect: either none was ever selected, or the command line
+            // explicitly disabled file config with "-lootlockerconfig none". Either way nothing
+            // may ship, so every discovered config is hidden and no pointer is written. Returning
+            // early here would leave every profile - and every API key in them - in the build.
             if (resolvedId == null)
             {
                 DeleteBuildPointer(folders);
+
+                WriteMarker(renamed);
+                foreach (string path in available)
+                {
+                    HideFile(path);
+                    renamed.Add(path);
+                    WriteMarker(renamed);
+                }
+
+                AssetDatabase.Refresh();
                 return renamed;
             }
 
             string keepFileName = LootLockerConfigFileResolution.GetConfigFileNameForId(resolvedId) + LootLockerConfig.ConfigFileExtensionForBuild;
 
-            if (!available.Exists(p => string.Equals(Path.GetFileName(p), keepFileName, StringComparison.OrdinalIgnoreCase)))
+            string keepPath = available.Find(p => string.Equals(Path.GetFileName(p), keepFileName, StringComparison.OrdinalIgnoreCase));
+            if (keepPath == null)
             {
                 throw new BuildFailedException(
                     $"LootLocker: the selected file config '{resolvedId}' does not exist (expected {keepFileName}). Refusing to build with no usable config.");
+            }
+
+            // Existence is not enough. A malformed or keyless file would ship and then be rejected
+            // at runtime, so the build would silently fall back to the asset values and differ from
+            // the profile that was asked for. Fail here, where the mistake is cheap to fix.
+            string keepText;
+            try
+            {
+                keepText = File.ReadAllText(keepPath);
+            }
+            catch (Exception ex)
+            {
+                throw new BuildFailedException(
+                    $"LootLocker: the selected file config '{resolvedId}' could not be read ({ex.Message}). Refusing to build.");
+            }
+
+            if (!LootLockerConfigFileParsing.TryParseFileConfig(keepText, out _, out string parseError))
+            {
+                throw new BuildFailedException(
+                    $"LootLocker: the selected file config '{resolvedId}' is not usable ({parseError}). Refusing to build.");
             }
 
             // Record intent before mutating, so a crash is recoverable from disk alone.
