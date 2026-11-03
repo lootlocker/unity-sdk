@@ -36,7 +36,28 @@ namespace LootLocker
                 return;
             }
 
-            LootLockerConfig.SetLocalOverrideFields(ApplyFileConfig(localConfig, presentFields));
+            LootLockerConfig.SetLocalOverrideFields(ApplyFileConfig(localConfig, OverridableFieldsOnly(presentFields)));
+        }
+
+        /// <summary>
+        /// Removes the fields that may never be overridden locally from a sparse field set.
+        ///
+        /// The settings UI hides the override toggle for these, but the override file is a plain
+        /// file a developer can hand-edit, so the restriction has to be enforced where the file is
+        /// applied. Otherwise a stray <c>api_key</c> in the local file would silently point the
+        /// game at another environment - exactly the trap the UI restriction exists to prevent.
+        /// </summary>
+        internal static HashSet<string> OverridableFieldsOnly(HashSet<string> fields)
+        {
+            if (fields == null)
+            {
+                return null;
+            }
+
+            var allowed = new HashSet<string>(fields, StringComparer.OrdinalIgnoreCase);
+            allowed.Remove(LootLockerConfigFields.ApiKey);
+            allowed.Remove(LootLockerConfigFields.DomainKey);
+            return allowed;
         }
 #endif
 
