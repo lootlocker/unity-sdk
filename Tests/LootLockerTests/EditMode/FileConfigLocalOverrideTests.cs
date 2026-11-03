@@ -27,7 +27,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""log_level"": ""Verbose"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out _, out HashSet<string> fields, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out _, out HashSet<string> fields, out string error);
 
             // Then
             Assert.IsTrue(parsed, error);
@@ -42,7 +42,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""log_level"": ""Verbose"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
 
             // Then: a local override must not need a key, or it could never be sparse
             Assert.IsTrue(parsed, error);
@@ -57,7 +57,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""log_level"": ""Verbose""";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out _, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out _, out _, out string error);
 
             // Then
             Assert.IsFalse(parsed, "A broken override file must be rejected, not silently ignored");
@@ -71,7 +71,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""log_level"": ""Verbose"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseFileConfig(text, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseFileConfig(text, out _, out string error);
 
             // Then: the shared config contract is unchanged by the sparse parser
             Assert.IsFalse(parsed);
@@ -83,7 +83,7 @@ namespace LootLockerTests.EditMode
         {
             // Given: a file that sets several fields
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(SharedConfig, out _, out HashSet<string> fields, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(SharedConfig, out _, out HashSet<string> fields, out string error);
 
             // Then
             Assert.IsTrue(parsed, error);
@@ -99,7 +99,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""Log_Level"": ""Verbose"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out _, out HashSet<string> fields, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out _, out HashSet<string> fields, out string error);
 
             // Then: the field set must match the constants used by the applier
             Assert.IsTrue(parsed, error);
@@ -112,7 +112,7 @@ namespace LootLockerTests.EditMode
         {
             // Given: the local override file name
             // When
-            string id = LootLockerConfig.GetIdFromConfigFileName("LootLockerConfig.local.bytes");
+            string id = LootLockerConfigFileResolution.GetIdFromConfigFileName("LootLockerConfig.local.bytes");
 
             // Then: it must never appear in the dropdown as a selectable profile
             Assert.IsNull(id, "The local override file must not be discoverable as a config profile");
@@ -125,7 +125,7 @@ namespace LootLockerTests.EditMode
             // every build made on that machine. Guarding the read path with UNITY_EDITOR stopped
             // the SDK from using it, but the bytes - including a local api_key - still shipped in
             // the build data. The file must not be inside any Resources folder at all.
-            string path = LootLockerConfig.LocalOverridePath.Replace('\\', '/');
+            string path = LootLockerConfigFileLocalOverride.LocalOverridePath.Replace('\\', '/');
 
             Assert.IsFalse(path.Contains("/Resources/"),
                 $"The local override must not live under Resources, but was: {path}");
@@ -155,7 +155,7 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""log_level"": ""Verbose"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
 
             // Then: enums are written by name so the file stays hand-editable
             Assert.IsTrue(parsed, error);
@@ -172,7 +172,7 @@ namespace LootLockerTests.EditMode
 }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out HashSet<string> fields, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out HashSet<string> fields, out string error);
 
             // Then: forward compatibility - an unknown field must not fail the whole file
             Assert.IsTrue(parsed, error);

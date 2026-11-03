@@ -89,14 +89,14 @@ namespace LootLocker
     // deserialize in builds.
     [Preserve]
     [Serializable]
-    public partial class LootLockerConfig : ScriptableObject
+    public class LootLockerConfig : ScriptableObject
     {
         public static readonly string PackageShortName = "LL"; // Standard is LL
         public const string PackageName = "LootLocker"; // Standard is LootLocker
         private static readonly string SettingsName = $"{PackageName}Config";
         private static readonly string ConfigFolderName = $"{PackageName}SDK";
         private static readonly string ConfigAssetName = $"{SettingsName}.asset";
-        private static readonly string ConfigFileExtension = ".bytes";
+        internal static readonly string ConfigFileExtension = ".bytes";
 
         /// <summary>
         /// Resources-relative folder that holds the config asset and any config files.
@@ -109,13 +109,13 @@ namespace LootLocker
         /// Deliberately not of the form "LootLockerConfig-{id}", so it can never be mistaken for a
         /// selectable profile and never shows up in the dropdown.
         /// </summary>
-        private static readonly string LocalOverrideName = $"{SettingsName}.local";
+        internal static readonly string LocalOverrideName = $"{SettingsName}.local";
 
         /// <summary>
         /// Folder, next to the config asset's Resources folder, holding the local override file.
         /// Outside Resources/ so the file is never packed into a build. See LocalOverrideFolder.
         /// </summary>
-        private const string LocalOverrideFolderName = "LocalOverrides";
+        internal const string LocalOverrideFolderName = "LocalOverrides";
 
         /// <summary>
         /// Name of the generated file a build writes to record which config it chose.
@@ -167,7 +167,7 @@ namespace LootLocker
         /// <see cref="selectedFileConfigId"/>. The empty identifier maps to the legacy unsuffixed
         /// name, which is what keeps existing projects working unchanged.
         /// </summary>
-        private static string ConfigFileName => GetConfigFileNameForId(_current != null ? _current.selectedFileConfigId : null);
+        private static string ConfigFileName => LootLockerConfigFileResolution.GetConfigFileNameForId(_current != null ? _current.selectedFileConfigId : null);
 
 #if UNITY_EDITOR
         private static string _cachedSdkRootPath = null;
@@ -176,7 +176,7 @@ namespace LootLocker
         // directory levels: LootLockerConfig.cs -> Resources/ -> Game/ -> Runtime/ -> SDK root.
         // This works regardless of install location (Assets/, Packages/, or any custom path).
         // But it only works in the editor
-        private static string GetSdkRootAssetsPath(bool requireWritable = false)
+        internal static string GetSdkRootAssetsPath(bool requireWritable = false)
         {
             if (_cachedSdkRootPath == null)
             {
@@ -305,7 +305,7 @@ namespace LootLocker
 
             // Capture the authored values before anything is applied, so a later reload can get
             // back to them. Must happen before RefreshFileConfigState.
-            CaptureAssetSnapshot();
+            LootLockerConfigFileLayering.CaptureAssetSnapshot();
 
             RefreshFileConfigState();
 
@@ -320,7 +320,7 @@ namespace LootLocker
         {
             try
             {
-                string id = ResolveFileConfigId(
+                string id = LootLockerConfigFileResolution.ResolveFileConfigId(
                     _current != null ? _current.selectedFileConfigId : null,
                     commandLineId: CommandLineConfigId,
                     buildPointerId: null,
@@ -332,7 +332,7 @@ namespace LootLocker
                     return null;
                 }
 
-                string fileName = GetConfigFileNameForId(id);
+                string fileName = LootLockerConfigFileResolution.GetConfigFileNameForId(id);
                 string configText = ReadConfigFileText(fileName);
 
                 if (string.IsNullOrEmpty(configText))
@@ -349,7 +349,7 @@ namespace LootLocker
                     return null;
                 }
 
-                if (!TryParseFileConfig(configText, out ExternalFileConfig fileConfig, out string error))
+                if (!LootLockerConfigFileParsing.TryParseFileConfig(configText, out ExternalFileConfig fileConfig, out string error))
                 {
                     WarnOnceForMissingConfig(id,
                         $"File config '{fileName}' is not usable ({error}). Falling back to the settings stored in the config asset.");
@@ -371,7 +371,7 @@ namespace LootLocker
         /// </summary>
         private static readonly HashSet<string> _warnedConfigIds = new HashSet<string>();
 
-        private static void WarnOnceForMissingConfig(string id, string message)
+        internal static void WarnOnceForMissingConfig(string id, string message)
         {
             // Only null is excluded. The empty string is the legacy unsuffixed config file, which
             // must be reported like any other when it is unusable.
@@ -466,13 +466,13 @@ namespace LootLocker
         private static List<string> DiscoverAvailableIds()
         {
             var ids = new List<string>();
-            foreach (FileConfigDescriptor descriptor in DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText))
+            foreach (LootLockerConfigFileResolution.FileConfigDescriptor descriptor in LootLockerConfigFileResolution.DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText))
             {
                 // Only usable files. A lone broken config must not be picked on the developer's
                 // behalf by the single-file auto-detect step: the UI says a broken file is shown
                 // but cannot be selected, and auto-selecting it would contradict that and log a
                 // "not usable" warning on every load.
-                if (descriptor.State == FileConfigState.Valid)
+                if (descriptor.State == LootLockerConfigFileResolution.FileConfigState.Valid)
                 {
                     ids.Add(descriptor.Id);
                 }
@@ -551,9 +551,9 @@ namespace LootLocker
         /// <summary>
         /// Discovers the config files available in this project, for the Project Settings dropdown.
         /// </summary>
-        internal static List<FileConfigDescriptor> DiscoverFileConfigsForEditor()
+        internal static List<LootLockerConfigFileResolution.FileConfigDescriptor> DiscoverFileConfigsForEditor()
         {
-            return DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText);
+            return LootLockerConfigFileResolution.DiscoverFileConfigs(ListConfigFileNames, ReadConfigFileText);
         }
 #endif
 
@@ -747,7 +747,7 @@ namespace LootLocker
                     return "none";
                 }
 
-                if (IsValidFileConfigId(value))
+                if (LootLockerConfigFileResolution.IsValidFileConfigId(value))
                 {
                     return value;
                 }
@@ -942,7 +942,7 @@ namespace LootLocker
             //
             // Recorded as well as applied, because a later forced refresh restores the authored
             // snapshot and would otherwise discard these values.
-            RecordInitValues(overrides =>
+            LootLockerConfigFileLayering.RecordInitValues(overrides =>
             {
                 overrides.apiKey = apiKey;
                 overrides.game_version = gameVersion;
@@ -994,7 +994,7 @@ namespace LootLocker
 
             // See the string overload: an explicit Init(...) call outranks every file-based source,
             // and is recorded so a later forced refresh does not discard it.
-            RecordInitValues(overrides => CopyConfigValues(newConfig, overrides));
+            LootLockerConfigFileLayering.RecordInitValues(overrides => LootLockerConfigFileLayering.CopyConfigValues(newConfig, overrides));
 
             _current.apiKey = newConfig.apiKey;
             _current.game_version = newConfig.game_version;
@@ -1089,6 +1089,20 @@ namespace LootLocker
         private static HashSet<string> _localOverrideFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
+        /// The live config instance, or null when it has not been loaded yet.
+        ///
+        /// Deliberately not <see cref="current"/>: that property lazily calls <see cref="Get"/>,
+        /// and the layering code runs *during* loading, so using it there would re-enter
+        /// <see cref="Get"/>. This is a plain read of the backing field.
+        ///
+        /// Named for its one caller rather than for what it returns, because "the config" is
+        /// already <see cref="current"/> and a second, similar-sounding name would invite the
+        /// wrong choice. Read-only, so the layering code can observe the live config without
+        /// being able to replace it.
+        /// </summary>
+        internal static LootLockerConfig RawConfigForLayering => _current;
+
+        /// <summary>
         /// True when an external config file is present and governing settings.
         /// All fields applied by <see cref="ApplyFileConfig"/> are read-only while this is true.
         /// Game version is intentionally not applied from the file config and stays editable in
@@ -1103,6 +1117,18 @@ namespace LootLocker
         /// shared value from one they changed locally.
         /// </summary>
         public static IReadOnlyCollection<string> LocalOverrideFields => _localOverrideFields;
+
+        /// <summary>
+        /// Replaces the set of fields currently governed by the local override file.
+        ///
+        /// A setter rather than a mutable collection: the layering code computes the whole set in
+        /// one pass, so handing over the finished set keeps the field private and makes it
+        /// impossible for a caller to leave it half-updated.
+        /// </summary>
+        internal static void SetLocalOverrideFields(HashSet<string> fields)
+        {
+            _localOverrideFields = fields ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
 
         /// <summary>
         /// True when the given JSON field name (see <see cref="LootLockerConfigFields"/>) is
@@ -1121,7 +1147,7 @@ namespace LootLocker
         /// </summary>
         internal static string GetResolvedFileConfigId()
         {
-            return ResolveFileConfigId(
+            return LootLockerConfigFileResolution.ResolveFileConfigId(
                 _current != null ? _current.selectedFileConfigId : null,
                 commandLineId: CommandLineConfigId,
                 buildPointerId: BuildPointerConfigId,
@@ -1170,7 +1196,7 @@ namespace LootLocker
             {
                 ExternalFileConfig pointer = LootLockerJson.DeserializeObject<ExternalFileConfig>(text);
                 string id = pointer == null ? null : pointer.selected_file_config_id;
-                return IsValidFileConfigId(id) ? id : null;
+                return LootLockerConfigFileResolution.IsValidFileConfigId(id) ? id : null;
             }
             catch (Exception ex)
             {
@@ -1191,7 +1217,7 @@ namespace LootLocker
         {
             try
             {
-                return File.Exists(LocalOverridePath);
+                return File.Exists(LootLockerConfigFileLocalOverride.LocalOverridePath);
             }
             catch (Exception)
             {
@@ -1223,7 +1249,7 @@ namespace LootLocker
             // leaves the previous config's values in place for every field the new one omits.
             if (force)
             {
-                ReloadConfigAsset();
+                LootLockerConfigFileLayering.ReloadConfigAsset();
                 _warnedConfigIds.Clear();
             }
 
@@ -1233,7 +1259,7 @@ namespace LootLocker
             if (fileConfig != null && !string.IsNullOrEmpty(fileConfig.api_key))
             {
                 _activeFileConfig = fileConfig;
-                ApplyFileConfig(fileConfig, null);
+                LootLockerConfigFileLayering.ApplyFileConfig(fileConfig, null);
             }
             else
             {
@@ -1252,14 +1278,14 @@ namespace LootLocker
 #if UNITY_EDITOR
             if (!IsFileConfigExplicitlyDisabled())
             {
-                ApplyLocalOverride();
+                LootLockerConfigFileLayering.ApplyLocalOverride();
             }
 #endif
 
             // An explicit Init call outranks every file layer, so put it back after the layers have
             // run. Without this, any forced refresh would restore the authored snapshot and quietly
             // drop the caller's values.
-            ReapplyInitValues();
+            LootLockerConfigFileLayering.ReapplyInitValues();
         }
 
         /// <summary>

@@ -37,7 +37,7 @@ namespace LootLockerTests.EditMode
         {
             // Given: an untouched asset and a legacy config file on disk
             // When
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -53,8 +53,8 @@ namespace LootLockerTests.EditMode
         public void Selection_ExplicitNoneIsDistinctFromAutoDetect()
         {
             // Given: the two ways to express "no selection"
-            string autoDetect = LootLockerConfig.ResolveFileConfigId(null, null, null, true, new string[0]);
-            string explicitNone = LootLockerConfig.ResolveFileConfigId("", null, null, true, new string[0]);
+            string autoDetect = LootLockerConfigFileResolution.ResolveFileConfigId(null, null, null, true, new string[0]);
+            string explicitNone = LootLockerConfigFileResolution.ResolveFileConfigId("", null, null, true, new string[0]);
 
             // Then: null follows the legacy file, "" opts out entirely
             Assert.AreEqual("", autoDetect, "null must auto-detect the legacy file");
@@ -66,7 +66,7 @@ namespace LootLockerTests.EditMode
         {
             // Given: both a legacy file and an explicit selection
             // When
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: "prod",
                 commandLineId: null,
                 buildPointerId: null,
@@ -86,15 +86,15 @@ namespace LootLockerTests.EditMode
             //
             // Exercise the real discovery pipeline rather than a hand-built id list: one broken
             // file must yield no auto-detectable ids at all.
-            List<LootLockerConfig.FileConfigDescriptor> discovered = LootLockerConfig.DiscoverFileConfigs(
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> discovered = LootLockerConfigFileResolution.DiscoverFileConfigs(
                 () => new[] { "LootLockerConfig-broken.bytes" },
                 _ => "{ \"api_key\": ");
 
             Assert.AreEqual(1, discovered.Count, "Precondition: the broken file is discovered");
-            Assert.AreEqual(LootLockerConfig.FileConfigState.Invalid, discovered[0].State,
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Invalid, discovered[0].State,
                 "Precondition: the broken file is classified as invalid");
 
-            string resolved = LootLockerConfig.ResolveFileConfigId(
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
                 buildPointerId: null,
@@ -117,7 +117,7 @@ namespace LootLockerTests.EditMode
                 Assert.Ignore("No config asset available in this project");
             }
 
-            LootLockerConfig.RestoreAssetValues();
+            LootLockerConfigFileLayering.RestoreAssetValues();
             string authoredKey = config.apiKey;
             string authoredDomain = config.domainKey;
 
@@ -129,11 +129,11 @@ namespace LootLockerTests.EditMode
                     api_key = "applied_key",
                     domain_key = "applied_domain",
                 };
-                LootLockerConfig.ApplyFileConfig(fileConfig, null);
+                LootLockerConfigFileLayering.ApplyFileConfig(fileConfig, null);
                 Assert.AreEqual("applied_key", config.apiKey, "Precondition: the value was applied");
 
                 // When
-                LootLockerConfig.RestoreAssetValues();
+                LootLockerConfigFileLayering.RestoreAssetValues();
 
                 // Then: the authored values are back
                 Assert.AreEqual(authoredKey, config.apiKey, "Restoring must discard the applied api_key");
@@ -141,7 +141,7 @@ namespace LootLockerTests.EditMode
             }
             finally
             {
-                LootLockerConfig.RestoreAssetValues();
+                LootLockerConfigFileLayering.RestoreAssetValues();
             }
         }
     }

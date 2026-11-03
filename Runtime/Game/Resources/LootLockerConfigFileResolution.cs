@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using UnityEngine;
 
 namespace LootLocker
 {
     /// <summary>
     /// Deciding which config file applies, and where config files live.
     ///
-    /// Part of <see cref="LootLockerConfig"/>; split out to keep the asset class readable.
+    /// Split out of <see cref="LootLockerConfig"/> to keep the asset class readable.
     /// </summary>
-    public partial class LootLockerConfig
+    internal static class LootLockerConfigFileResolution
     {
         /// <summary>
         /// Allowed characters for a file config identifier. The identifier becomes part of a
@@ -46,7 +41,7 @@ namespace LootLocker
         /// </summary>
         internal static string GetConfigFileNameForId(string id)
         {
-            return string.IsNullOrEmpty(id) ? SettingsName : $"{SettingsName}-{id}";
+            return string.IsNullOrEmpty(id) ? LootLockerConfig.ConfigFileNameForLegacy : $"{LootLockerConfig.ConfigFileNameForLegacy}-{id}";
         }
 
         /// <summary>
@@ -157,12 +152,12 @@ namespace LootLocker
                 return null;
             }
 
-            if (!fileName.EndsWith(ConfigFileExtension, StringComparison.OrdinalIgnoreCase))
+            if (!fileName.EndsWith(LootLockerConfig.ConfigFileExtension, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
-            string withoutExtension = fileName.Substring(0, fileName.Length - ConfigFileExtension.Length);
+            string withoutExtension = fileName.Substring(0, fileName.Length - LootLockerConfig.ConfigFileExtension.Length);
 
             // Files ending in '~' are excluded from the build by the preprocess step; never list them.
             if (withoutExtension.EndsWith("~", StringComparison.Ordinal))
@@ -170,19 +165,19 @@ namespace LootLocker
                 return null;
             }
 
-            if (string.Equals(withoutExtension, SettingsName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(withoutExtension, LootLockerConfig.ConfigFileNameForLegacy, StringComparison.OrdinalIgnoreCase))
             {
                 return string.Empty;
             }
 
             // The build pointer is generated, never hand-authored, and must not be offered as a
             // selectable profile.
-            if (string.Equals(withoutExtension, BuildPointerName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(withoutExtension, LootLockerConfig.BuildPointerName, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
-            string prefix = SettingsName + "-";
+            string prefix = LootLockerConfig.ConfigFileNameForLegacy + "-";
             if (!withoutExtension.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
@@ -255,7 +250,7 @@ namespace LootLocker
                     descriptor.State = FileConfigState.Unreadable;
                     descriptor.Reason = "File could not be read.";
                 }
-                else if (!TryParseFileConfig(text, out _, out string error))
+                else if (!LootLockerConfigFileParsing.TryParseFileConfig(text, out _, out string error))
                 {
                     descriptor.State = FileConfigState.Invalid;
                     descriptor.Reason = error;

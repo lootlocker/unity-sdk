@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace LootLocker
@@ -10,9 +7,9 @@ namespace LootLocker
     /// <summary>
     /// Applying config layers onto the asset, and restoring the authored values.
     ///
-    /// Part of <see cref="LootLockerConfig"/>; split out to keep the asset class readable.
+    /// Split out of <see cref="LootLockerConfig"/> to keep the asset class readable.
     /// </summary>
-    public partial class LootLockerConfig
+    internal static class LootLockerConfigFileLayering
     {
         /// <summary>
         /// Applies the local override file (excluded from version control), if one exists.
@@ -24,22 +21,22 @@ namespace LootLocker
         /// Editor only. See the call site in <see cref="RefreshFileConfigState"/> for why.
         /// </summary>
 #if UNITY_EDITOR
-        private static void ApplyLocalOverride()
+        internal static void ApplyLocalOverride()
         {
-            string text = ReadLocalOverrideText();
+            string text = LootLockerConfigFileLocalOverride.ReadLocalOverrideText();
             if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
-            if (!TryParseSparseFileConfig(text, out ExternalFileConfig localConfig, out HashSet<string> presentFields, out string error))
+            if (!LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig localConfig, out HashSet<string> presentFields, out string error))
             {
-                WarnOnceForMissingConfig(LocalOverrideName,
-                    $"Local override file '{LocalOverrideName}{ConfigFileExtension}' is not usable ({error}). Ignoring it.");
+                LootLockerConfig.WarnOnceForMissingConfig(LootLockerConfig.LocalOverrideName,
+                    $"Local override file '{LootLockerConfig.LocalOverrideName}{LootLockerConfig.ConfigFileExtension}' is not usable ({error}). Ignoring it.");
                 return;
             }
 
-            _localOverrideFields = ApplyFileConfig(localConfig, presentFields);
+            LootLockerConfig.SetLocalOverrideFields(ApplyFileConfig(localConfig, presentFields));
         }
 #endif
 
@@ -63,73 +60,73 @@ namespace LootLocker
 
             if (Applies(LootLockerConfigFields.ApiKey))
             {
-                _current.apiKey = fileConfig.api_key;
+                LootLockerConfig.RawConfigForLayering.apiKey = fileConfig.api_key;
                 applied.Add(LootLockerConfigFields.ApiKey);
             }
             if (Applies(LootLockerConfigFields.DomainKey))
             {
-                _current.domainKey = fileConfig.domain_key;
+                LootLockerConfig.RawConfigForLayering.domainKey = fileConfig.domain_key;
                 applied.Add(LootLockerConfigFields.DomainKey);
             }
             if (Applies(LootLockerConfigFields.LogLevel))
             {
-                _current.logLevel = fileConfig.log_level;
+                LootLockerConfig.RawConfigForLayering.logLevel = fileConfig.log_level;
                 applied.Add(LootLockerConfigFields.LogLevel);
             }
             if (Applies(LootLockerConfigFields.LogErrorsAsWarnings))
             {
-                _current.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
+                LootLockerConfig.RawConfigForLayering.logErrorsAsWarnings = fileConfig.log_errors_as_warnings;
                 applied.Add(LootLockerConfigFields.LogErrorsAsWarnings);
             }
             if (Applies(LootLockerConfigFields.LogInBuilds))
             {
-                _current.logInBuilds = fileConfig.log_in_builds;
+                LootLockerConfig.RawConfigForLayering.logInBuilds = fileConfig.log_in_builds;
                 applied.Add(LootLockerConfigFields.LogInBuilds);
             }
             if (Applies(LootLockerConfigFields.EnablePresence))
             {
-                _current.enablePresence = fileConfig.enable_presence;
+                LootLockerConfig.RawConfigForLayering.enablePresence = fileConfig.enable_presence;
                 applied.Add(LootLockerConfigFields.EnablePresence);
             }
             if (Applies(LootLockerConfigFields.EnablePresenceAutoConnect))
             {
-                _current.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
+                LootLockerConfig.RawConfigForLayering.enablePresenceAutoConnect = fileConfig.enable_presence_autoconnect;
                 applied.Add(LootLockerConfigFields.EnablePresenceAutoConnect);
             }
             if (Applies(LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange))
             {
-                _current.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
+                LootLockerConfig.RawConfigForLayering.enablePresenceAutoDisconnectOnFocusChange = fileConfig.enable_presence_autodisconnect_on_focus_change;
                 applied.Add(LootLockerConfigFields.EnablePresenceAutoDisconnectOnFocusChange);
             }
             if (Applies(LootLockerConfigFields.EnablePresenceInEditor))
             {
-                _current.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
+                LootLockerConfig.RawConfigForLayering.enablePresenceInEditor = fileConfig.enable_presence_in_editor;
                 applied.Add(LootLockerConfigFields.EnablePresenceInEditor);
             }
             if (Applies(LootLockerConfigFields.AllowTokenRefresh))
             {
-                _current.allowTokenRefresh = fileConfig.allow_token_refresh;
+                LootLockerConfig.RawConfigForLayering.allowTokenRefresh = fileConfig.allow_token_refresh;
                 applied.Add(LootLockerConfigFields.AllowTokenRefresh);
             }
             if (Applies(LootLockerConfigFields.PrettifyJson))
             {
-                _current.prettifyJson = fileConfig.prettify_json;
+                LootLockerConfig.RawConfigForLayering.prettifyJson = fileConfig.prettify_json;
                 applied.Add(LootLockerConfigFields.PrettifyJson);
             }
             if (Applies(LootLockerConfigFields.ObfuscateLogs))
             {
-                _current.obfuscateLogs = fileConfig.obfuscate_logs;
+                LootLockerConfig.RawConfigForLayering.obfuscateLogs = fileConfig.obfuscate_logs;
                 applied.Add(LootLockerConfigFields.ObfuscateLogs);
             }
             if (Applies(LootLockerConfigFields.MultiUserSessionMode)
                 && fileConfig.multi_user_session_mode != LootLockerMultiUserSessionMode.NotSet)
             {
-                _current.multiUserSessionMode = fileConfig.multi_user_session_mode;
+                LootLockerConfig.RawConfigForLayering.multiUserSessionMode = fileConfig.multi_user_session_mode;
                 applied.Add(LootLockerConfigFields.MultiUserSessionMode);
             }
             if (Applies(LootLockerConfigFields.EnableEditorAdminExtension))
             {
-                _current.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
+                LootLockerConfig.RawConfigForLayering.enableEditorAdminExtension = fileConfig.enable_editor_admin_extension;
                 applied.Add(LootLockerConfigFields.EnableEditorAdminExtension);
             }
 
@@ -139,7 +136,7 @@ namespace LootLocker
             // for toggling one field.
             if (onlyFields == null)
             {
-                _current.adminToken = null;
+                LootLockerConfig.RawConfigForLayering.adminToken = null;
             }
 #endif
             return applied;
@@ -149,7 +146,7 @@ namespace LootLocker
         /// Values the config asset itself holds, captured before any file config is applied.
         ///
         /// <see cref="Resources.Load{T}"/> returns the already-loaded instance, which is
-        /// <see cref="_current"/> itself, so re-loading cannot undo an in-place mutation. Keeping a
+        /// <see cref="LootLockerConfig.RawConfigForLayering"/> itself, so re-loading cannot undo an in-place mutation. Keeping a
         /// snapshot is the only way to get back to the authored values when switching configs.
         /// </summary>
         private static LootLockerConfig _assetSnapshot;
@@ -157,16 +154,16 @@ namespace LootLocker
         /// <summary>
         /// Captures the authored values of the config asset, once per domain.
         /// </summary>
-        private static void CaptureAssetSnapshot()
+        internal static void CaptureAssetSnapshot()
         {
-            if (_assetSnapshot != null || _current == null)
+            if (_assetSnapshot != null || LootLockerConfig.RawConfigForLayering == null)
             {
                 return;
             }
 
             _assetSnapshot = ScriptableObject.CreateInstance<LootLockerConfig>();
             _assetSnapshot.hideFlags = HideFlags.HideAndDontSave;
-            CopyConfigValues(_current, _assetSnapshot);
+            CopyConfigValues(LootLockerConfig.RawConfigForLayering, _assetSnapshot);
         }
 
         /// <summary>
@@ -186,12 +183,12 @@ namespace LootLocker
             }
 
             CaptureAssetSnapshot();
-            if (_assetSnapshot == null || _current == null)
+            if (_assetSnapshot == null || LootLockerConfig.RawConfigForLayering == null)
             {
                 return;
             }
 
-            CopyOneConfigValue(_current, _assetSnapshot, fieldName);
+            CopyOneConfigValue(LootLockerConfig.RawConfigForLayering, _assetSnapshot, fieldName);
         }
 
         /// <summary>
@@ -265,15 +262,15 @@ namespace LootLocker
         /// earlier are discarded. Without this, switching configs cannot revert fields the new
         /// config omits.
         /// </summary>
-        private static void ReloadConfigAsset()
+        internal static void ReloadConfigAsset()
         {
             CaptureAssetSnapshot();
-            if (_assetSnapshot == null || _current == null)
+            if (_assetSnapshot == null || LootLockerConfig.RawConfigForLayering == null)
             {
                 return;
             }
 
-            CopyConfigValues(_assetSnapshot, _current);
+            CopyConfigValues(_assetSnapshot, LootLockerConfig.RawConfigForLayering);
         }
 
         /// <summary>
@@ -288,7 +285,7 @@ namespace LootLocker
         /// <summary>
         /// Records the values from an explicit Init call so they survive a reload.
         /// </summary>
-        private static void RecordInitValues(Action<LootLockerConfig> record)
+        internal static void RecordInitValues(Action<LootLockerConfig> record)
         {
             if (record == null)
             {
@@ -307,14 +304,14 @@ namespace LootLocker
         /// <summary>
         /// Re-applies Init values over whatever the file layers produced.
         /// </summary>
-        private static void ReapplyInitValues()
+        internal static void ReapplyInitValues()
         {
-            if (_initOverrides == null || _current == null)
+            if (_initOverrides == null || LootLockerConfig.RawConfigForLayering == null)
             {
                 return;
             }
 
-            CopyConfigValues(_initOverrides, _current);
+            CopyConfigValues(_initOverrides, LootLockerConfig.RawConfigForLayering);
         }
 
         /// <summary>
@@ -347,7 +344,7 @@ namespace LootLocker
         /// Deliberately field-by-field rather than a blanket copy: the asset also holds editor-only
         /// state (the admin token) and the saved selection, which must survive a reload.
         /// </summary>
-        private static void CopyConfigValues(LootLockerConfig from, LootLockerConfig to)
+        internal static void CopyConfigValues(LootLockerConfig from, LootLockerConfig to)
         {
             to.apiKey = from.apiKey;
             to.domainKey = from.domainKey;
