@@ -62,13 +62,13 @@ namespace LootLockerTests.EditMode
             WriteConfig("prod-ps5");
 
             // When: a build targets "prod"
-            LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+            LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
 
             // Then: only the targeted file is still visible to Unity
             Assert.AreEqual(new[] { "LootLockerConfig-prod.bytes" }, VisibleConfigFiles(),
                 "Every config except the targeted one must be excluded from the build");
 
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -80,14 +80,14 @@ namespace LootLockerTests.EditMode
             string devPath = Path.Combine(AbsoluteTempFolder, "LootLockerConfig-dev.bytes");
 
             // When
-            LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+            LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
 
             // Then: stripping must hide, never delete - a cancelled build must not lose a key
             string suffixed = devPath + LootLockerConfigBuildProcessor.BuildExcludeSuffix;
             Assert.IsTrue(File.Exists(suffixed), "The excluded config must still exist on disk");
             Assert.AreEqual(ValidJson, File.ReadAllText(suffixed), "Contents must be untouched");
 
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -103,8 +103,8 @@ namespace LootLockerTests.EditMode
                 .ToDictionary(p => Path.GetFileName(p), File.ReadAllBytes);
 
             // When
-            LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
 
             // Then: the folder is exactly as it was, with no leftover pointer or hidden files
             var after = Directory.GetFiles(AbsoluteTempFolder, "*" + BuildExtension)
@@ -123,11 +123,11 @@ namespace LootLockerTests.EditMode
             // Given: a completed strip
             WriteConfig("dev");
             WriteConfig("prod");
-            LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+            LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
 
             // When: restore runs twice, which happens if postprocess follows startup recovery
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
 
             // Then: both files are present and intact
             Assert.AreEqual(
@@ -143,13 +143,13 @@ namespace LootLockerTests.EditMode
             WriteConfig("dev");
 
             // When
-            List<string> renamed = LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "dev");
+            List<string> renamed = LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "dev");
 
             // Then: nothing was renamed
             Assert.IsEmpty(renamed, "A single-config project must take on no stripping");
             Assert.AreEqual(new[] { "LootLockerConfig-dev.bytes" }, VisibleConfigFiles());
 
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -160,7 +160,7 @@ namespace LootLockerTests.EditMode
 
             // When / Then: shipping with no usable config is worse than failing the build
             Assert.Throws<UnityEditor.Build.BuildFailedException>(
-                () => LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod"),
+                () => LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod"),
                 "A build must fail loudly rather than ship without the config it was told to use");
 
             // And nothing may be left stripped
@@ -177,14 +177,52 @@ namespace LootLockerTests.EditMode
             string pointerPath = Path.Combine(AbsoluteTempFolder, "LootLockerConfig.build.bytes");
 
             // When
-            LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+            LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
 
             // Then: the player needs to be told which file survived
             Assert.IsTrue(File.Exists(pointerPath), "The build must record which config it chose");
             StringAssert.Contains("prod", File.ReadAllText(pointerPath));
 
-            LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+            LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
             Assert.IsFalse(File.Exists(pointerPath), "The pointer is build output and must not survive");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void BuildStrip_StripsAcrossEveryConfigFolder()
+        {
+            // Regression: the processor used to strip in exactly one folder, while discovery reads
+            // from every candidate folder (the writable Assets/ location and the read-only
+            // Packages/ one). A config in the second folder was therefore read but never stripped,
+            // so it shipped - the exact leak this feature exists to prevent.
+            string secondFolder = $"Assets/TempFileConfigTests_{System.Guid.NewGuid():N}";
+            Directory.CreateDirectory(secondFolder);
+            string secondAbsolute = Path.Combine(
+                Directory.GetParent(Application.dataPath).FullName,
+                secondFolder.Replace('/', Path.DirectorySeparatorChar));
+
+            try
+            {
+                WriteConfig("dev");
+                File.WriteAllText(Path.Combine(secondAbsolute, "LootLockerConfig-prod.bytes"), ValidJson);
+
+                // When: a build targets dev, which lives in the first folder
+                LootLockerConfigBuildProcessor.Prepare(
+                    new[] { AbsoluteTempFolder, secondAbsolute }, overrideResolvedId: "dev");
+
+                // Then: the config in the *other* folder is stripped too
+                Assert.IsFalse(File.Exists(Path.Combine(secondAbsolute, "LootLockerConfig-prod.bytes")),
+                    "A config in any discovered folder must be stripped, not just the first one");
+                Assert.IsTrue(File.Exists(Path.Combine(secondAbsolute, "LootLockerConfig-prod.bytes" + LootLockerConfigBuildProcessor.BuildExcludeSuffix)),
+                    "It must be hidden, not deleted");
+            }
+            finally
+            {
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder, secondAbsolute });
+                if (Directory.Exists(secondFolder))
+                {
+                    Directory.Delete(secondFolder, true);
+                }
+            }
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -207,7 +245,7 @@ namespace LootLockerTests.EditMode
 
             try
             {
-                LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+                LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
                 AssetDatabase.Refresh();
 
                 string[] found = AssetDatabase.FindAssets("t:TextAsset", new[] { TempFolder })
@@ -222,7 +260,7 @@ namespace LootLockerTests.EditMode
             }
             finally
             {
-                LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
             }
 
             Assert.IsTrue(System.IO.File.Exists(Path.Combine(AbsoluteTempFolder, "LootLockerConfig-dev.bytes")),
@@ -247,7 +285,7 @@ namespace LootLockerTests.EditMode
             try
             {
                 // Target prod, so dev is the one that gets hidden.
-                LootLockerConfigBuildProcessor.Prepare(AbsoluteTempFolder, overrideResolvedId: "prod");
+                LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: "prod");
 
                 // Let Unity see the hidden state, which is what deletes an orphaned .meta.
                 AssetDatabase.Refresh();
@@ -255,7 +293,7 @@ namespace LootLockerTests.EditMode
                 Assert.IsTrue(File.Exists(metaPath + LootLockerConfigBuildProcessor.BuildExcludeSuffix),
                     "The .meta must be hidden as name.bytes.meta~ so Unity never sees it as orphaned");
 
-                LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
                 AssetDatabase.Refresh();
 
                 Assert.IsTrue(File.Exists(metaPath), "The .meta must be restored alongside the config");
@@ -264,7 +302,7 @@ namespace LootLockerTests.EditMode
             }
             finally
             {
-                LootLockerConfigBuildProcessor.RestoreAll(AbsoluteTempFolder);
+                LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
             }
         }
     }
