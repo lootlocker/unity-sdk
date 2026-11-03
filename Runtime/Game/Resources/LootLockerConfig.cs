@@ -316,7 +316,7 @@ namespace LootLocker
                 string id = LootLockerConfigFileResolution.ResolveFileConfigId(
                     _current != null ? _current.selectedFileConfigId : null,
                     commandLineId: CommandLineConfigId,
-                    buildPointerId: null,
+                    buildPointerId: BuildPointerConfigId,
                     legacyFilePresent: LegacyConfigFileExists(),
                     availableIds: DiscoverAvailableIds());
 
