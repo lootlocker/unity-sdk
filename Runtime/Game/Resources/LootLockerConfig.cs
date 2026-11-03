@@ -104,7 +104,7 @@ namespace LootLocker
         private const string ConfigResourcesFolder = "Config";
 
         /// <summary>
-        /// File name (without extension) of the gitignored local override file.
+        /// File name (without extension) of the local override file (excluded from version control).
         ///
         /// Deliberately not of the form "LootLockerConfig-{id}", so it can never be mistaken for a
         /// selectable profile and never shows up in the dropdown.
@@ -557,7 +557,7 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Folder that holds the gitignored local override file.
+        /// Folder that holds the local override file (excluded from version control).
         ///
         /// Deliberately outside Resources/. Anything under Resources/ is packed into every build
         /// made on this machine, and guarding the read path with UNITY_EDITOR only stops the SDK
@@ -568,7 +568,7 @@ namespace LootLocker
             $"{GetSdkRootAssetsPath(requireWritable: true)}/{LocalOverrideFolderName}";
 
         /// <summary>
-        /// Absolute path of the gitignored local override file.
+        /// Absolute path of the local override file (excluded from version control).
         /// </summary>
         internal static string LocalOverridePath =>
             $"{LocalOverrideFolder}/{LocalOverrideName}{ConfigFileExtension}";
@@ -1324,7 +1324,7 @@ namespace LootLocker
         public static bool IsFileConfigActive => _activeFileConfig != null;
 
         /// <summary>
-        /// JSON field names whose current value came from the gitignored local override file.
+        /// JSON field names whose current value came from the local override file (excluded from version control).
         ///
         /// The settings UI uses this to mark overridden fields, so a developer can always tell a
         /// shared value from one they changed locally.
@@ -1872,7 +1872,7 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Applies the gitignored local override file, if one exists.
+        /// Applies the local override file (excluded from version control), if one exists.
         ///
         /// The file is sparse: only the fields it contains are applied, so a developer can flip one
         /// setting for an afternoon without forking the shared config. A file that cannot be read
