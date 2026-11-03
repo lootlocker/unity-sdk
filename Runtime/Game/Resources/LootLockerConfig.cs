@@ -941,6 +941,23 @@ namespace LootLocker
                 overrides.game_version = gameVersion;
                 overrides.domainKey = domainKey;
                 overrides.logLevel = logLevel;
+                overrides.logInBuilds = logInBuilds;
+                overrides.logErrorsAsWarnings = errorsAsWarnings;
+                overrides.allowTokenRefresh = allowTokenRefresh;
+                overrides.prettifyJson = prettifyJson;
+                overrides.obfuscateLogs = obfuscateLogs;
+                overrides.enablePresence = enablePresence;
+                overrides.enablePresenceAutoConnect = enablePresenceAutoConnect;
+                overrides.enablePresenceAutoDisconnectOnFocusChange = enablePresenceAutoDisconnectOnFocusChange;
+                overrides.enablePresenceInEditor = enablePresenceInEditor;
+                overrides.enableEditorAdminExtension = enableEditorAdminExtension;
+
+                // NotSet means "leave whatever is configured", so it must not be recorded either:
+                // copying it back would overwrite a session mode set by the config file.
+                if (multiUserSessionMode != LootLockerMultiUserSessionMode.NotSet)
+                {
+                    overrides.multiUserSessionMode = multiUserSessionMode;
+                }
             });
 
             _current.apiKey = apiKey;
@@ -1336,14 +1353,31 @@ namespace LootLocker
         [HideInInspector] public string baseUrl = UrlProtocol + GetUrlCore();
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
 
-#if UNITY_EDITOR
-        [InitializeOnEnterPlayMode]
-        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        /// <summary>
+        /// Forgets every piece of cached config state, so a play session starts from the asset.
+        ///
+        /// The layering state has to be cleared too, not just <see cref="_current"/>: with domain
+        /// reload disabled the statics survive, and a stale snapshot would make the next
+        /// <see cref="Get"/> skip capturing the authored values, while a stale Init record would be
+        /// re-applied over the fresh load.
+        /// </summary>
+        internal static void ResetCachedState()
         {
             _current = null;
             _cachedSdkRootPath = null;
             _activeFileConfig = null;
             _fileConfigChecked = false;
+            _buildPointerRead = false;
+            _buildPointerConfigId = null;
+            _warnedConfigIds.Clear();
+            LootLockerConfigFileLayering.ResetState();
+        }
+
+#if UNITY_EDITOR
+        [InitializeOnEnterPlayMode]
+        static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
+        {
+            ResetCachedState();
         }
 #endif
 #endregion

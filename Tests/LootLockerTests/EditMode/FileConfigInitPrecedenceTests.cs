@@ -139,6 +139,68 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void InitCall_EveryArgumentSurvivesAForcedRefresh()
+        {
+            // Regression: only apiKey, game_version, domainKey and logLevel were recorded, while
+            // the overload applies all fourteen arguments. A forced refresh restored the snapshot
+            // and re-applied only the recorded four, so logging, presence, token refresh and the
+            // admin extension silently reverted to their authored values.
+            LootLockerConfig.CreateNewSettings(
+                apiKey: "init_key",
+                gameVersion: "1.2.3",
+                domainKey: "init_domain",
+                logLevel: LootLockerLogger.LogLevel.Verbose,
+                logInBuilds: true,
+                errorsAsWarnings: true,
+                allowTokenRefresh: true,
+                prettifyJson: true,
+                obfuscateLogs: false,
+                enablePresence: true,
+                enablePresenceAutoConnect: false,
+                enablePresenceAutoDisconnectOnFocusChange: true,
+                enablePresenceInEditor: false,
+                enableEditorAdminExtension: false);
+
+            // When
+            LootLockerConfig.RefreshFileConfigState(force: true);
+
+            // Then: every argument must still be in effect, not just the four that were recorded
+            Assert.AreEqual(LootLockerLogger.LogLevel.Verbose, LootLockerConfig.current.logLevel);
+            Assert.IsTrue(LootLockerConfig.current.logInBuilds, "logInBuilds must survive a refresh");
+            Assert.IsTrue(LootLockerConfig.current.logErrorsAsWarnings, "logErrorsAsWarnings must survive a refresh");
+            Assert.IsTrue(LootLockerConfig.current.allowTokenRefresh, "allowTokenRefresh must survive a refresh");
+            Assert.IsTrue(LootLockerConfig.current.prettifyJson, "prettifyJson must survive a refresh");
+            Assert.IsFalse(LootLockerConfig.current.obfuscateLogs, "obfuscateLogs must survive a refresh");
+            Assert.IsTrue(LootLockerConfig.current.enablePresence, "enablePresence must survive a refresh");
+            Assert.IsFalse(LootLockerConfig.current.enablePresenceAutoConnect, "enablePresenceAutoConnect must survive a refresh");
+            Assert.IsTrue(LootLockerConfig.current.enablePresenceAutoDisconnectOnFocusChange, "the focus-change setting must survive a refresh");
+            Assert.IsFalse(LootLockerConfig.current.enablePresenceInEditor, "enablePresenceInEditor must survive a refresh");
+            Assert.IsFalse(LootLockerConfig.current.enableEditorAdminExtension, "enableEditorAdminExtension must survive a refresh");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void InitCall_UnspecifiedSessionModeDoesNotResetTheConfiguredOne()
+        {
+            // NotSet means "leave whatever is configured". Recording it and copying it back would
+            // turn "unspecified" into "reset to default", silently discarding a session mode that
+            // the config file legitimately set.
+            //
+            // Recorded as an authored value too, because a forced refresh restores the snapshot:
+            // without this the test would be asserting against the snapshot, not against the
+            // Init reapply it is meant to cover.
+            LootLockerConfig.current.multiUserSessionMode = LootLockerMultiUserSessionMode.Hotseat;
+            LootLockerConfigFileLayering.CommitAuthoredValue(LootLockerConfigFields.MultiUserSessionMode);
+
+            // When: an Init call that does not mention the session mode
+            LootLockerConfig.CreateNewSettings("init_key", "1.0.0", "init_domain");
+            LootLockerConfig.RefreshFileConfigState(force: true);
+
+            // Then
+            Assert.AreEqual(LootLockerMultiUserSessionMode.Hotseat, LootLockerConfig.current.multiUserSessionMode,
+                "An unspecified session mode must not overwrite the configured one");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void InitCall_WithNullConfig_ReturnsFalse()
         {
             // Given / When
