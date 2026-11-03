@@ -1371,13 +1371,19 @@ namespace LootLocker
         internal static void ResetCachedState()
         {
             _current = null;
-            _cachedSdkRootPath = null;
             _activeFileConfig = null;
             _fileConfigChecked = false;
             _buildPointerRead = false;
             _buildPointerConfigId = null;
             _warnedConfigIds.Clear();
             LootLockerConfigFileLayering.ResetState();
+
+#if UNITY_EDITOR
+            // Editor-only field: the SDK root is located through the AssetDatabase, which does not
+            // exist in a player. Guarded here rather than around the whole method so the runtime
+            // state above is still reset in a player.
+            _cachedSdkRootPath = null;
+#endif
         }
 
 #if UNITY_EDITOR
