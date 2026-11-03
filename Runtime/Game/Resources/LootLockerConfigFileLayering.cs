@@ -311,7 +311,38 @@ namespace LootLocker
                 return;
             }
 
-            CopyConfigValues(_initOverrides, LootLockerConfig.RawConfigForLayering);
+            CopyInitValues(_initOverrides, LootLockerConfig.RawConfigForLayering);
+        }
+
+        /// <summary>
+        /// Copies recorded Init values onto the live config.
+        ///
+        /// Differs from <see cref="CopyConfigValues"/> in one place: a session mode of
+        /// <see cref="LootLockerMultiUserSessionMode.NotSet"/> means the Init call did not specify
+        /// one, so it must not be copied back. Copying it would overwrite a session mode that the
+        /// config file legitimately set, turning "unspecified" into "reset to default".
+        /// </summary>
+        private static void CopyInitValues(LootLockerConfig from, LootLockerConfig to)
+        {
+            to.apiKey = from.apiKey;
+            to.domainKey = from.domainKey;
+            to.game_version = from.game_version;
+            to.logLevel = from.logLevel;
+            to.logErrorsAsWarnings = from.logErrorsAsWarnings;
+            to.logInBuilds = from.logInBuilds;
+            to.enablePresence = from.enablePresence;
+            to.enablePresenceAutoConnect = from.enablePresenceAutoConnect;
+            to.enablePresenceAutoDisconnectOnFocusChange = from.enablePresenceAutoDisconnectOnFocusChange;
+            to.enablePresenceInEditor = from.enablePresenceInEditor;
+            to.allowTokenRefresh = from.allowTokenRefresh;
+            to.prettifyJson = from.prettifyJson;
+            to.obfuscateLogs = from.obfuscateLogs;
+            to.enableEditorAdminExtension = from.enableEditorAdminExtension;
+
+            if (from.multiUserSessionMode != LootLockerMultiUserSessionMode.NotSet)
+            {
+                to.multiUserSessionMode = from.multiUserSessionMode;
+            }
         }
 
         /// <summary>
@@ -336,6 +367,25 @@ namespace LootLocker
 
             UnityEngine.Object.DestroyImmediate(_initOverrides);
             _initOverrides = null;
+        }
+
+        /// <summary>
+        /// Forgets the snapshot and any recorded Init values.
+        ///
+        /// Called when the cached config state is reset (entering play mode with domain reload
+        /// disabled). Without it the statics outlive the reset: the next load would skip capturing
+        /// the authored values because a snapshot already exists, and a previous Init call would be
+        /// re-applied over the fresh load.
+        /// </summary>
+        internal static void ResetState()
+        {
+            if (_assetSnapshot != null)
+            {
+                UnityEngine.Object.DestroyImmediate(_assetSnapshot);
+                _assetSnapshot = null;
+            }
+
+            ClearInitValues();
         }
 
         /// <summary>
