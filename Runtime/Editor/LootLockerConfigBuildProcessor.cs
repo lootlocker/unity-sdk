@@ -133,7 +133,7 @@ namespace LootLocker.Admin
                 }
             }
 
-            string resolvedId = overrideResolvedId ?? LootLockerConfig.ResolveFileConfigId(
+            string resolvedId = overrideResolvedId ?? LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: LootLockerConfig.current != null ? LootLockerConfig.current.selectedFileConfigId : null,
                 commandLineId: LootLockerConfig.GetCommandLineConfigId(Environment.GetCommandLineArgs()),
                 buildPointerId: null,
@@ -147,7 +147,7 @@ namespace LootLocker.Admin
                 return renamed;
             }
 
-            string keepFileName = LootLockerConfig.GetConfigFileNameForId(resolvedId) + LootLockerConfig.ConfigFileExtensionForBuild;
+            string keepFileName = LootLockerConfigFileResolution.GetConfigFileNameForId(resolvedId) + LootLockerConfig.ConfigFileExtensionForBuild;
 
             if (!available.Exists(p => string.Equals(Path.GetFileName(p), keepFileName, StringComparison.OrdinalIgnoreCase)))
             {
@@ -348,7 +348,7 @@ namespace LootLocker.Admin
                     continue;
                 }
 
-                if (LootLockerConfig.GetIdFromConfigFileName(Path.GetFileName(path)) == null)
+                if (LootLockerConfigFileResolution.GetIdFromConfigFileName(Path.GetFileName(path)) == null)
                 {
                     continue;
                 }
@@ -364,7 +364,7 @@ namespace LootLocker.Admin
             var ids = new List<string>();
             foreach (string path in files)
             {
-                string id = LootLockerConfig.GetIdFromConfigFileName(Path.GetFileName(path));
+                string id = LootLockerConfigFileResolution.GetIdFromConfigFileName(Path.GetFileName(path));
                 if (id != null)
                 {
                     ids.Add(id);

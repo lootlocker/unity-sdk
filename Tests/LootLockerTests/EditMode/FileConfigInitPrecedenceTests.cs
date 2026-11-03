@@ -53,12 +53,12 @@ namespace LootLockerTests.EditMode
         {
             // Forget the recorded Init values first, otherwise CreateNewSettings just re-records
             // the restore values as Init overrides and they leak into every later test.
-            LootLockerConfig.ClearInitValues();
+            LootLockerConfigFileLayering.ClearInitValues();
 
             if (_original != null)
             {
                 LootLockerConfig.CreateNewSettings(_original);
-                LootLockerConfig.ClearInitValues();
+                LootLockerConfigFileLayering.ClearInitValues();
                 Object.DestroyImmediate(_original);
                 _original = null;
             }
@@ -119,7 +119,7 @@ namespace LootLockerTests.EditMode
         public void InitCall_AppliesToTheLiveConfigOnly()
         {
             // Given: the authored values of the asset, captured before anything is applied
-            LootLockerConfig.RestoreAssetValues();
+            LootLockerConfigFileLayering.RestoreAssetValues();
             string authoredKey = LootLockerConfig.current.apiKey;
 
             // When: an explicit call overrides it at runtime
@@ -131,7 +131,7 @@ namespace LootLockerTests.EditMode
             // ...but the authored values are untouched, so restoring them discards the Init value.
             // This is the property that matters: Init is process-lifetime only and must never
             // become the value that gets saved back to the committed asset.
-            LootLockerConfig.RestoreAssetValues();
+            LootLockerConfigFileLayering.RestoreAssetValues();
             Assert.AreEqual(authoredKey, LootLockerConfig.current.apiKey,
                 "Init must not overwrite the authored asset values");
             Assert.AreNotEqual("runtime_key", LootLockerConfig.current.apiKey,

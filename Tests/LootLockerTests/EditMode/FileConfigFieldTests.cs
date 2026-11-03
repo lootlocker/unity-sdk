@@ -67,14 +67,14 @@ namespace LootLockerTests.EditMode
 }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out var fields, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out var fields, out string error);
 
             // Then: the field still parses (existing files must keep working) but is not applied
             Assert.IsTrue(parsed, error);
             Assert.IsTrue(fields.Contains(LootLockerConfigFields.SdkVersion),
                 "The field must still be recognised so old files parse");
 
-            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            HashSet<string> applied = LootLockerConfigFileLayering.ApplyFileConfig(config, null);
             Assert.IsFalse(applied.Contains(LootLockerConfigFields.SdkVersion),
                 "sdk_version must never be applied from a config file");
         }
@@ -91,7 +91,7 @@ namespace LootLockerTests.EditMode
 }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
 
             // Then
             Assert.IsTrue(parsed, error);
@@ -99,7 +99,7 @@ namespace LootLockerTests.EditMode
             Assert.IsTrue(config.log_errors_as_warnings);
             Assert.IsTrue(config.log_in_builds);
 
-            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            HashSet<string> applied = LootLockerConfigFileLayering.ApplyFileConfig(config, null);
             Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogLevel));
             Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogErrorsAsWarnings));
             Assert.IsTrue(applied.Contains(LootLockerConfigFields.LogInBuilds));
@@ -116,14 +116,14 @@ namespace LootLockerTests.EditMode
             const string text = @"{ ""api_key"": ""key"", ""game_version"": ""9.9.9"" }";
 
             // When
-            bool parsed = LootLockerConfig.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
+            bool parsed = LootLockerConfigFileParsing.TryParseSparseFileConfig(text, out ExternalFileConfig config, out _, out string error);
 
             // Then: the field parses, but game version stays a Project Settings concern
             Assert.IsTrue(parsed, error);
             Assert.AreEqual("9.9.9", config.game_version);
 
             string before = LootLockerConfig.current.game_version;
-            HashSet<string> applied = LootLockerConfig.ApplyFileConfig(config, null);
+            HashSet<string> applied = LootLockerConfigFileLayering.ApplyFileConfig(config, null);
             Assert.IsFalse(applied.Contains(LootLockerConfigFields.GameVersion),
                 "Game version must stay editable in Project Settings");
             Assert.AreEqual(before, LootLockerConfig.current.game_version,
