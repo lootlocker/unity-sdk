@@ -172,6 +172,17 @@ namespace LootLockerTests.PlayMode
             #endif
         }
 
+        // The session response's player_created_at comes from players.created_at, while the
+        // player info response's created_at comes from game_players.created_at. Those are two
+        // different rows written at different moments, so they can legitimately differ by a
+        // second and comparing their formatted strings is not a valid assertion. Compare the
+        // instants instead, allowing for the second of skew the two writes can introduce.
+        private static void AssertCreatedAtMatches(DateTime expected, DateTime actual, string message)
+        {
+            double differenceInSeconds = Math.Abs((expected - actual).TotalSeconds);
+            Assert.LessOrEqual(differenceInSeconds, 1.0, message);
+        }
+
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator MultiUser_MakingRequestsWithoutSpecifyingUser_UsesDefaultUser()
         {
@@ -286,13 +297,13 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(LootLockerStateData.GetDefaultPlayerULID(), currentPlayerInfoResponse.info.id);
             Assert.AreEqual(firstGuestSessionResponse.player_ulid, currentPlayerInfoResponse.info.id);
             Assert.AreEqual(firstGuestSessionResponse.player_id, currentPlayerInfoResponse.info.legacy_id);
-            Assert.AreEqual(firstGuestSessionResponse.player_created_at.ToString(), currentPlayerInfoResponse.info.created_at.ToString());
+            AssertCreatedAtMatches(firstGuestSessionResponse.player_created_at, currentPlayerInfoResponse.info.created_at, "created_at was not as expected");
             Assert.AreEqual(firstGuestSessionResponse.public_uid, currentPlayerInfoResponse.info.public_uid);
             Assert.AreEqual(firstGuestSessionResponse.player_name, currentPlayerInfoResponse.info.name ?? "");
             var defaultPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(null);
             Assert.AreEqual(defaultPlayerData.ULID, currentPlayerInfoResponse.info.id);
             Assert.AreEqual(defaultPlayerData.LegacyID, currentPlayerInfoResponse.info.legacy_id);
-            Assert.AreEqual(defaultPlayerData.CreatedAt.ToString(), currentPlayerInfoResponse.info.created_at.ToString());
+            AssertCreatedAtMatches(defaultPlayerData.CreatedAt, currentPlayerInfoResponse.info.created_at, "created_at was not as expected");
             Assert.AreEqual(defaultPlayerData.PublicUID, currentPlayerInfoResponse.info.public_uid);
             Assert.AreEqual(defaultPlayerData.Name, currentPlayerInfoResponse.info.name ?? "");
         }
@@ -358,25 +369,25 @@ namespace LootLockerTests.PlayMode
 
             Assert.AreEqual(defaultGuestSessionResponse.player_ulid, currentPlayerInfoBeforeDefaultUserSwitch.info.id);
             Assert.AreEqual(defaultGuestSessionResponse.player_id, currentPlayerInfoBeforeDefaultUserSwitch.info.legacy_id);
-            Assert.AreEqual(defaultGuestSessionResponse.player_created_at.ToString(), currentPlayerInfoBeforeDefaultUserSwitch.info.created_at.ToString());
+            AssertCreatedAtMatches(defaultGuestSessionResponse.player_created_at, currentPlayerInfoBeforeDefaultUserSwitch.info.created_at, "created_at was not as expected");
             Assert.AreEqual(defaultGuestSessionResponse.public_uid, currentPlayerInfoBeforeDefaultUserSwitch.info.public_uid);
             Assert.AreEqual(defaultGuestSessionResponse.player_name, currentPlayerInfoBeforeDefaultUserSwitch.info.name ?? "");
             var defaultPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(defaultGuestSessionResponse.player_ulid);
             Assert.AreEqual(defaultPlayerData.ULID, currentPlayerInfoBeforeDefaultUserSwitch.info.id);
             Assert.AreEqual(defaultPlayerData.LegacyID, currentPlayerInfoBeforeDefaultUserSwitch.info.legacy_id);
-            Assert.AreEqual(defaultPlayerData.CreatedAt.ToString(), currentPlayerInfoBeforeDefaultUserSwitch.info.created_at.ToString());
+            AssertCreatedAtMatches(defaultPlayerData.CreatedAt, currentPlayerInfoBeforeDefaultUserSwitch.info.created_at, "created_at was not as expected");
             Assert.AreEqual(defaultPlayerData.PublicUID, currentPlayerInfoBeforeDefaultUserSwitch.info.public_uid);
             Assert.AreEqual(defaultPlayerData.Name, currentPlayerInfoBeforeDefaultUserSwitch.info.name ?? "");
 
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_ulid, currentPlayerInfoAfterDefaultUserSwitch.info.id);
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_id, currentPlayerInfoAfterDefaultUserSwitch.info.legacy_id);
-            Assert.AreEqual(nonDefaultGuestSessionResponse.player_created_at.ToString(), currentPlayerInfoAfterDefaultUserSwitch.info.created_at.ToString());
+            AssertCreatedAtMatches(nonDefaultGuestSessionResponse.player_created_at, currentPlayerInfoAfterDefaultUserSwitch.info.created_at, "created_at was not as expected");
             Assert.AreEqual(nonDefaultGuestSessionResponse.public_uid, currentPlayerInfoAfterDefaultUserSwitch.info.public_uid);
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_name, currentPlayerInfoAfterDefaultUserSwitch.info.name ?? "");
             var nonDefaultPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(nonDefaultGuestSessionResponse.player_ulid);
             Assert.AreEqual(nonDefaultPlayerData.ULID, currentPlayerInfoAfterDefaultUserSwitch.info.id);
             Assert.AreEqual(nonDefaultPlayerData.LegacyID, currentPlayerInfoAfterDefaultUserSwitch.info.legacy_id);
-            Assert.AreEqual(nonDefaultPlayerData.CreatedAt.ToString(), currentPlayerInfoAfterDefaultUserSwitch.info.created_at.ToString());
+            AssertCreatedAtMatches(nonDefaultPlayerData.CreatedAt, currentPlayerInfoAfterDefaultUserSwitch.info.created_at, "created_at was not as expected");
             Assert.AreEqual(nonDefaultPlayerData.PublicUID, currentPlayerInfoAfterDefaultUserSwitch.info.public_uid);
             Assert.AreEqual(nonDefaultPlayerData.Name, currentPlayerInfoAfterDefaultUserSwitch.info.name ?? "");
         }
@@ -422,13 +433,13 @@ namespace LootLockerTests.PlayMode
             Assert.AreNotEqual(nonDefaultGuestSessionResponse.player_ulid, LootLockerStateData.GetDefaultPlayerULID());
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_ulid, currentPlayerInfoResponse.info.id);
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_id, currentPlayerInfoResponse.info.legacy_id);
-            Assert.AreEqual(nonDefaultGuestSessionResponse.player_created_at.ToString(), currentPlayerInfoResponse.info.created_at.ToString());
+            AssertCreatedAtMatches(nonDefaultGuestSessionResponse.player_created_at, currentPlayerInfoResponse.info.created_at, "created_at was not as expected");
             Assert.AreEqual(nonDefaultGuestSessionResponse.public_uid, currentPlayerInfoResponse.info.public_uid);
             Assert.AreEqual(nonDefaultGuestSessionResponse.player_name, currentPlayerInfoResponse.info.name ?? "");
             var nonDefaultPlayerData = LootLockerStateData.GetStateForPlayerOrDefaultStateOrEmpty(nonDefaultGuestSessionResponse.player_ulid);
             Assert.AreEqual(nonDefaultPlayerData.ULID, currentPlayerInfoResponse.info.id);
             Assert.AreEqual(nonDefaultPlayerData.LegacyID, currentPlayerInfoResponse.info.legacy_id);
-            Assert.AreEqual(nonDefaultPlayerData.CreatedAt.ToString(), currentPlayerInfoResponse.info.created_at.ToString());
+            AssertCreatedAtMatches(nonDefaultPlayerData.CreatedAt, currentPlayerInfoResponse.info.created_at, "created_at was not as expected");
             Assert.AreEqual(nonDefaultPlayerData.PublicUID, currentPlayerInfoResponse.info.public_uid);
             Assert.AreEqual(nonDefaultPlayerData.Name, currentPlayerInfoResponse.info.name ?? "");
         }
