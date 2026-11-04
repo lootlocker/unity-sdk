@@ -200,7 +200,6 @@ public class NotificationTests
     // specific page have to wait for enough rows to exist before requesting it.
     private static IEnumerator ListNotificationsUntilTotal(
         int expectedTotal,
-        Action<LootLockerListNotificationsResponse> onComplete,
         float timeoutSeconds = 30f)
     {
         bool totalReached = false;
@@ -235,8 +234,6 @@ public class NotificationTests
                 yield return new WaitForSeconds(0.5f);
             }
         }
-
-        onComplete?.Invoke();
     }
 
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
@@ -407,7 +404,7 @@ public class NotificationTests
         // Wait until every notification exists before paging, otherwise an early request sees a
         // transient total and a transient last_page. A request beyond the last page succeeds with
         // no rows, so paging against a total that is still growing would time out instead of wait.
-        yield return ListNotificationsUntilTotal(CreatedTriggers.Count, null);
+        yield return ListNotificationsUntilTotal(CreatedTriggers.Count);
         int lastPage = (CreatedTriggers.Count + 4) / 5;
 
         LootLockerListNotificationsResponse paginationRequest1 = null;
