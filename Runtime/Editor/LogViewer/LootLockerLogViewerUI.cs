@@ -267,8 +267,9 @@ namespace LootLocker.LogViewer
                                 sb.AppendLine("Response Body:");
                                 sb.AppendLine(
                                     LootLockerConfig.current.obfuscateLogs ?
-                                        LootLockerObfuscator.ObfuscateJsonStringForLogging(http.Response.text) :
-                                        http.Response.text
+                                        LootLockerObfuscator.ObfuscateJsonStringForLogging(
+                                            LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(http.Response.text)) :
+                                        LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(http.Response.text)
                                 );
                             }
                             writer.Write(sb.ToString());
@@ -469,10 +470,12 @@ namespace LootLocker.LogViewer
 
         private Foldout CreateJsonFoldout(string title, string jsonContent)
         {
-            // Initially show minified JSON (obfuscated if configured)
+            // Initially show minified JSON (obfuscated if configured). Signed download URLs are always
+            // redacted since they are bearer credentials.
+            var redactedJson = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(jsonContent);
             var obfuscatedJson = LootLockerConfig.current.obfuscateLogs
-                ? LootLockerObfuscator.ObfuscateJsonStringForLogging(jsonContent)
-                : jsonContent;
+                ? LootLockerObfuscator.ObfuscateJsonStringForLogging(redactedJson)
+                : redactedJson;
             var prettifiedJson = LootLockerJson.PrettifyJsonString(obfuscatedJson);
             var collapsedTitle = $"{title}: {obfuscatedJson}";
 

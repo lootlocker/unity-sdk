@@ -199,5 +199,113 @@ namespace LootLocker
             return LootLockerJson.SerializeObject(jsonObject);
 #endif //LOOTLOCKER_USE_NEWTONSOFTJSON
         }
+
+        /// <summary>
+        /// Redacts signed download URLs from a JSON body before it is logged.
+        ///
+        /// Player file responses carry a short-lived signed URL in "url" next to "url_expires_at".
+        /// That URL is a bearer credential: anyone holding it can download the file until it expires,
+        /// so it must never reach logs or the log UI. Only objects that carry "url_expires_at" are
+        /// redacted, which leaves ordinary (non-signed) URLs in other responses intact.
+        /// </summary>
+        public static string RedactSignedDownloadUrlsForLogging(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            JToken token;
+            try
+            {
+                token = JToken.Parse(json);
+            }
+            catch (JsonReaderException)
+            {
+                return json;
+            }
+
+            bool redacted = false;
+            RedactSignedDownloadUrlsInToken(token, ref redacted);
+            return redacted ? token.ToString(Formatting.None) : json;
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+            object parsed;
+            try
+            {
+                parsed = Json.Deserialize(json);
+            }
+            catch (JsonException)
+            {
+                return json;
+            }
+
+            bool redacted = false;
+            RedactSignedDownloadUrlsInValue(parsed, ref redacted);
+            return redacted ? LootLockerJson.SerializeObject(parsed) : json;
+#endif //LOOTLOCKER_USE_NEWTONSOFTJSON
+        }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        private static void RedactSignedDownloadUrlsInToken(JToken token, ref bool redacted)
+        {
+            if (token == null)
+            {
+                return;
+            }
+
+            if (token.Type == JTokenType.Object)
+            {
+                JObject obj = (JObject)token;
+                foreach (JProperty property in obj.Properties())
+                {
+                    RedactSignedDownloadUrlsInToken(property.Value, ref redacted);
+                }
+
+                // A signed download URL is always accompanied by its expiry, so only redact "url"
+                // where "url_expires_at" is present. This leaves ordinary URLs in other responses intact.
+                JToken expiresAt = obj["url_expires_at"];
+                JToken url = obj["url"];
+                if (expiresAt != null && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
+                {
+                    obj["url"] = "[REDACTED]";
+                    redacted = true;
+                }
+            }
+            else if (token.Type == JTokenType.Array)
+            {
+                foreach (JToken element in token)
+                {
+                    RedactSignedDownloadUrlsInToken(element, ref redacted);
+                }
+            }
+        }
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+        private static void RedactSignedDownloadUrlsInValue(object value, ref bool redacted)
+        {
+            if (value is Dictionary<string, object> obj)
+            {
+                foreach (object child in obj.Values)
+                {
+                    RedactSignedDownloadUrlsInValue(child, ref redacted);
+                }
+
+                // A signed download URL is always accompanied by its expiry, so only redact "url"
+                // where "url_expires_at" is present. This leaves ordinary URLs in other responses intact.
+                if (obj.ContainsKey("url_expires_at") && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
+                {
+                    obj["url"] = "[REDACTED]";
+                    redacted = true;
+                }
+            }
+            else if (value is System.Collections.IEnumerable enumerable && !(value is string))
+            {
+                foreach (object element in enumerable)
+                {
+                    RedactSignedDownloadUrlsInValue(element, ref redacted);
+                }
+            }
+        }
+#endif //LOOTLOCKER_USE_NEWTONSOFTJSON
     }
 }
