@@ -64,7 +64,10 @@ function Initialize-TempProject {
 
     $SdkRef = $RepoRoot -replace '\\', '/'
     $nl = [char]10
-    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.unity.test-framework": "1.1.33",' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  }' + $nl + '}'
+    # "testables" makes Unity compile the package's Tests folder too. Without it the test
+    # assemblies are never built, so a compile error in Tests/ would pass this check and only
+    # surface in the full CI run.
+    $manifestContent = '{' + $nl + '  "dependencies": {' + $nl + '    "com.unity.test-framework": "1.1.33",' + $nl + '    "com.lootlocker.lootlockersdk": "file:' + $SdkRef + '"' + $nl + '  },' + $nl + '  "testables": ["com.lootlocker.lootlockersdk"]' + $nl + '}'
     [IO.File]::WriteAllText((Join-Path $TempProject 'Packages\manifest.json'), $manifestContent)
 
     $psContent = '%YAML 1.1' + $nl + '%TAG !u! tag:unity3d.com,2011:' + $nl + '--- !u!129 &1' + $nl + 'PlayerSettings:' + $nl + '  companyName: LootLockerSDKVerification' + $nl + '  productName: LootLockerSDKVerification'
