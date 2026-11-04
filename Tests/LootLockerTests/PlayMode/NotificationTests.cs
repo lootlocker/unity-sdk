@@ -133,6 +133,109 @@ public class NotificationTests
         Debug.Log($"##### End of {this.GetType().Name} test no.{TestCounter} tear down #####");
     }
 
+    // Notifications are written asynchronously by the backend's notifier worker, so a list
+    // request issued right after the call that triggers them can observe fewer rows than were
+    // created. Poll until the response satisfies the caller's expectation, or give up once the
+    // deadline passes. The helper never asserts: it hands back the last response so the caller
+    // can report the failure with its own message.
+    private static IEnumerator ListNotificationsUntil(
+        bool showRead,
+        LootLockerNotificationPriority? withPriority,
+        string ofType,
+        string withSource,
+        int perPage,
+        int page,
+        Func<LootLockerListNotificationsResponse, bool> isSatisfied,
+        Action<LootLockerListNotificationsResponse> onComplete,
+        float timeoutSeconds = 30f)
+    {
+        LootLockerListNotificationsResponse lastResponse = null;
+        float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+
+        while (true)
+        {
+            bool requestCompleted = false;
+            LootLockerSDKManager.ListNotifications(showRead, withPriority, ofType, withSource, perPage, page, response =>
+            {
+                lastResponse = response;
+                requestCompleted = true;
+            });
+
+            // Stop waiting on the request once the deadline passes: the SDK's own request timeout
+            // is minutes long, so an unbounded wait here would blow past the intended budget.
+            yield return new WaitUntil(() => requestCompleted || Time.realtimeSinceStartup >= deadline);
+            if (!requestCompleted)
+            {
+                break;
+            }
+
+            if (lastResponse != null && lastResponse.success && isSatisfied(lastResponse))
+            {
+                break;
+            }
+
+            // Retry only when the query is genuinely incomplete. Once the server reports every
+            // matching row and the caller is still not satisfied, no later response will satisfy
+            // it, so fail fast instead of burning the whole budget.
+            if (lastResponse != null && lastResponse.success &&
+                lastResponse.Notifications != null &&
+                lastResponse.Pagination != null &&
+                lastResponse.Pagination.total <= page * perPage &&
+                lastResponse.Notifications.Length <= page * perPage)
+            {
+                break;
+            }
+
+            if (Time.realtimeSinceStartup >= deadline)
+            {
+                break;
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        onComplete?.Invoke(lastResponse);
+    }
+
+    // A list request for a page beyond the last one succeeds with no rows, so callers that need a
+    // specific page have to wait for enough rows to exist before requesting it.
+    private static IEnumerator ListNotificationsUntilTotal(
+        int expectedTotal,
+        float timeoutSeconds = 30f)
+    {
+        bool totalReached = false;
+        float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+
+        while (!totalReached)
+        {
+            bool requestCompleted = false;
+            LootLockerListNotificationsResponse response = null;
+            LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, res =>
+            {
+                response = res;
+                requestCompleted = true;
+            });
+            yield return new WaitUntil(() => requestCompleted || Time.realtimeSinceStartup >= deadline);
+            if (!requestCompleted)
+            {
+                break;
+            }
+
+            totalReached = response != null
+                && response.success
+                && response.Pagination != null
+                && response.Pagination.total == expectedTotal;
+
+            if (!totalReached)
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                {
+                    break;
+                }
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+    }
+
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
     {
         string errorMessage = "";
@@ -221,14 +324,10 @@ public class NotificationTests
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
 
         // When
-        bool requestCompleted = false;
         LootLockerListNotificationsResponse response = null;
-        LootLockerSDKManager.ListNotificationsWithDefaultParameters((res) =>
-        {
-            response = res;
-            requestCompleted = true;
-        });
-        yield return new WaitUntil(() => requestCompleted);
+        yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count,
+            res => response = res);
 
         // Then
         Assert.IsTrue(response.success, "Failed to list notifications");
@@ -302,23 +401,21 @@ public class NotificationTests
         Assert.IsTrue(triggerInvocationSucceeded, "Trigger invocation did not succeed");
 
         // When
-        bool notificationsListed = false;
-        LootLockerListNotificationsResponse paginationRequest1 = null;
-        LootLockerSDKManager.ListNotifications(false, null, "", "", 5, 3, response =>
-        {
-            paginationRequest1 = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        // Wait until every notification exists before paging, otherwise an early request sees a
+        // transient total and a transient last_page. A request beyond the last page succeeds with
+        // no rows, so paging against a total that is still growing would time out instead of wait.
+        yield return ListNotificationsUntilTotal(CreatedTriggers.Count);
+        int lastPage = (CreatedTriggers.Count + 4) / 5;
 
-        notificationsListed = false;
+        LootLockerListNotificationsResponse paginationRequest1 = null;
+        yield return ListNotificationsUntil(false, null, "", "", 5, 3,
+            res => res.Notifications != null && res.Notifications.Length == 5,
+            res => paginationRequest1 = res);
+
         LootLockerListNotificationsResponse paginationRequest2 = null;
-        LootLockerSDKManager.ListNotifications(false, null, "", "", 5, paginationRequest1.Pagination.last_page, response =>
-        {
-            paginationRequest2 = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        yield return ListNotificationsUntil(false, null, "", "", 5, lastPage,
+            res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count % 5,
+            res => paginationRequest2 = res);
 
         // Then
         Assert.IsTrue(paginationRequest1.success, "Listing notifications with pagination failed");
@@ -343,14 +440,10 @@ public class NotificationTests
     public IEnumerator Notifications_MarkAllNotificationsAsRead_AllNotificationsMarkedAsRead()
     {
         // Given
-        bool notificationsListed = false;
         LootLockerListNotificationsResponse initialListResponse = null;
-        LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0,  response =>
-        {
-            initialListResponse = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count,
+            res => initialListResponse = res);
         Assert.IsTrue(initialListResponse.success, "Listing notifications before marking as read failed");
         Assert.AreEqual(CreatedTriggers.Count, initialListResponse.Notifications.Length, "Not all expected notifications were returned");
 
@@ -373,14 +466,10 @@ public class NotificationTests
         // Then
         Assert.IsTrue(markAllAsReadSuccess, "Marking all as read failed");
         
-        notificationsListed = false;
         LootLockerListNotificationsResponse listResponseAfterMarkAsRead = null;
-        LootLockerSDKManager.ListNotifications(true, null, "", "", 100, 0, response =>
-        {
-            listResponseAfterMarkAsRead = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        yield return ListNotificationsUntil(true, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count,
+            res => listResponseAfterMarkAsRead = res);
 
         Assert.IsTrue(listResponseAfterMarkAsRead.success, "Listing notifications after marking as read failed");
         Assert.AreEqual(CreatedTriggers.Count, listResponseAfterMarkAsRead.Notifications.Length, "Not all expected notifications were returned");
@@ -396,14 +485,10 @@ public class NotificationTests
         Assert.IsFalse(SetupFailed, "Setup did not succeed");
 
         // Given
-        bool notificationsListed = false;
         LootLockerListNotificationsResponse listResponse = null;
-        LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, response =>
-        {
-            listResponse = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count,
+            res => listResponse = res);
         Assert.IsTrue(listResponse.success, "Listing notifications failed");
         Assert.AreEqual(CreatedTriggers.Count, listResponse.Notifications.Length, "Not all expected notifications were returned");
 
@@ -418,22 +503,15 @@ public class NotificationTests
         yield return new WaitUntil(() => markAsReadCompleted);
 
         // Then
-        notificationsListed = false;
         LootLockerListNotificationsResponse listReadNotificationsAfterMarkAsReadResponse = null;
-        LootLockerSDKManager.ListNotifications(true, null, "", "", 100, 0, response =>
-        {
-            listReadNotificationsAfterMarkAsReadResponse = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
-        notificationsListed = false;
+        yield return ListNotificationsUntil(true, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == notificationIdsToMarkAsRead.Length,
+            res => listReadNotificationsAfterMarkAsReadResponse = res);
+
         LootLockerListNotificationsResponse listUnreadNotificationsAfterMarkAsReadResponse = null;
-        LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, response =>
-        {
-            listUnreadNotificationsAfterMarkAsReadResponse = response;
-            notificationsListed = true;
-        });
-        yield return new WaitUntil(() => notificationsListed);
+        yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+            res => res.Notifications != null && res.Notifications.Length == listResponse.Notifications.Length - notificationIdsToMarkAsRead.Length,
+            res => listUnreadNotificationsAfterMarkAsReadResponse = res);
 
         Assert.IsTrue(listReadNotificationsAfterMarkAsReadResponse.success, "Listing read notifications after marking specific as read failed");
         int nrOfMarkedFound = 0;
@@ -457,14 +535,10 @@ public class NotificationTests
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
 
             // Given
-            bool notificationsListed = false;
             LootLockerListNotificationsResponse listResponse = null;
-            LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, response =>
-            {
-                listResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
+            yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+                res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count,
+                res => listResponse = res);
             Assert.IsTrue(listResponse.success, "Listing notifications failed");
             Assert.AreEqual(CreatedTriggers.Count, listResponse.Notifications.Length, "Not all expected notifications were returned");
 
@@ -482,22 +556,15 @@ public class NotificationTests
 
             // Then
             Assert.IsTrue(markAsReadSucceeded, "Failed to mark as read");
-            notificationsListed = false;
             LootLockerListNotificationsResponse listReadNotificationsAfterMarkAsReadResponse = null;
-            LootLockerSDKManager.ListNotifications(true, null, "", "", 100, 0, response =>
-            {
-                listReadNotificationsAfterMarkAsReadResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
-            notificationsListed = false;
+            yield return ListNotificationsUntil(true, null, "", "", 100, 0,
+                res => res.Notifications != null && res.Notifications.Length == 1,
+                res => listReadNotificationsAfterMarkAsReadResponse = res);
+
             LootLockerListNotificationsResponse listUnreadNotificationsAfterMarkAsReadResponse = null;
-            LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, response =>
-            {
-                listUnreadNotificationsAfterMarkAsReadResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
+            yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+                res => res.Notifications != null && res.Notifications.Length == listResponse.Notifications.Length - 1,
+                res => listUnreadNotificationsAfterMarkAsReadResponse = res);
 
             Assert.IsTrue(listReadNotificationsAfterMarkAsReadResponse.success, "Listing read notifications after marking specific as read failed");
             Assert.AreEqual(1, listReadNotificationsAfterMarkAsReadResponse.Notifications.Length, "The number of read notifications was not as expected");
@@ -513,14 +580,10 @@ public class NotificationTests
             Assert.IsFalse(SetupFailed, "Setup did not succeed");
 
             // Given
-            bool notificationsListed = false;
             LootLockerListNotificationsResponse listResponse = null;
-            LootLockerSDKManager.ListNotifications(false, null, "", "", CreatedTriggers.Count-1, 0, response =>
-            {
-                listResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
+            yield return ListNotificationsUntil(false, null, "", "", CreatedTriggers.Count-1, 0,
+                res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count-1,
+                res => listResponse = res);
             Assert.IsTrue(listResponse.success, "Listing notifications failed");
             Assert.AreEqual(CreatedTriggers.Count-1, listResponse.Notifications.Length, "Not all expected notifications were returned");
 
@@ -538,22 +601,15 @@ public class NotificationTests
 
             // Then
             Assert.IsTrue(markAsReadSucceeded, "Failed to mark as read");
-            notificationsListed = false;
             LootLockerListNotificationsResponse listReadNotificationsAfterMarkAsReadResponse = null;
-            LootLockerSDKManager.ListNotifications(true, null, "", "", 100, 0, response =>
-            {
-                listReadNotificationsAfterMarkAsReadResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
-            notificationsListed = false;
+            yield return ListNotificationsUntil(true, null, "", "", 100, 0,
+                res => res.Notifications != null && res.Notifications.Length == notificationIdsToMarkAsRead.Length,
+                res => listReadNotificationsAfterMarkAsReadResponse = res);
+
             LootLockerListNotificationsResponse listUnreadNotificationsAfterMarkAsReadResponse = null;
-            LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, response =>
-            {
-                listUnreadNotificationsAfterMarkAsReadResponse = response;
-                notificationsListed = true;
-            });
-            yield return new WaitUntil(() => notificationsListed);
+            yield return ListNotificationsUntil(false, null, "", "", 100, 0,
+                res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count - notificationIdsToMarkAsRead.Length,
+                res => listUnreadNotificationsAfterMarkAsReadResponse = res);
 
             Assert.IsTrue(listReadNotificationsAfterMarkAsReadResponse.success, "Listing read notifications after marking specific as read failed");
             Assert.AreEqual(notificationIdsToMarkAsRead.Length, listReadNotificationsAfterMarkAsReadResponse.Notifications.Length, "The number of read notifications was not as expected");
@@ -690,14 +746,10 @@ public class NotificationTests
             yield return new WaitUntil(() => notificationSent);
 
             // When
-            bool requestCompleted = false;
             LootLockerListNotificationsResponse response = null;
-            LootLockerSDKManager.ListNotifications(false, null, null, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LootLockerAdminApi, 25, 0, (res) =>
-            {
-                response = res;
-                requestCompleted = true;
-            });
-            yield return new WaitUntil(() => requestCompleted);
+            yield return ListNotificationsUntil(false, null, null, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LootLockerAdminApi, 25, 0,
+                res => res.Notifications != null && res.Notifications.Length == 3,
+                res => response = res);
 
             // Then
             Assert.IsTrue(response.success, "Failed to list notifications");

@@ -118,6 +118,21 @@ namespace LootLockerTests.PlayMode
             return path;
         }
 
+        // Revision created_at has second granularity and is stamped by two different clocks
+        // (the app server for uploads, MySQL for updates), so two revisions created close
+        // together can share a timestamp. Wait for a full elapsed second so the revisions are
+        // guaranteed to be distinguishable. Comparing only the Second component is not enough:
+        // called at ...999ms it would return almost immediately and both revisions could still
+        // land in the same second.
+        private static IEnumerator WaitForNextSecond()
+        {
+            DateTime start = DateTime.UtcNow;
+            while ((DateTime.UtcNow - start).TotalSeconds < 1.0)
+            {
+                yield return null;
+            }
+        }
+
         // ================================================================
         // Phase 1: Core Upload & Key Tests
         // ================================================================
@@ -378,9 +393,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => uploadDone);
             Assert.IsTrue(uploadedFile.success, "Initial upload failed");
 
-            // Revision timestamps have second granularity, so revisions created within the same
-            // second are indistinguishable and their relative order is undefined.
-            yield return new WaitForSeconds(1f);
+            yield return WaitForNextSecond();
 
             // When — update the file
             LootLockerPlayerFile updatedFile = new LootLockerPlayerFile();
@@ -429,9 +442,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => uploadDone);
             Assert.IsTrue(uploadedFile.success, "Initial upload failed");
 
-            // Revision timestamps have second granularity, so revisions created within the same
-            // second are indistinguishable and their relative order is undefined.
-            yield return new WaitForSeconds(1f);
+            yield return WaitForNextSecond();
 
             // Update to create a second revision
             LootLockerPlayerFile updateResponse = new LootLockerPlayerFile();
@@ -493,9 +504,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => uploadDone);
             Assert.IsTrue(uploadedFile.success, "Initial upload failed");
 
-            // Revision timestamps have second granularity, so revisions created within the same
-            // second are indistinguishable and their relative order is undefined.
-            yield return new WaitForSeconds(1f);
+            yield return WaitForNextSecond();
 
             // Update to create revision 2
             LootLockerPlayerFile updateResponse = new LootLockerPlayerFile();
@@ -619,9 +628,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => firstDone);
             Assert.IsTrue(firstUpload.success, "First upload for get revision by key test failed");
 
-            // Revision timestamps have second granularity, so revisions created within the same
-            // second are indistinguishable and their relative order is undefined.
-            yield return new WaitForSeconds(1f);
+            yield return WaitForNextSecond();
 
             LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;
@@ -680,9 +687,7 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => firstDone);
             Assert.IsTrue(firstUpload.success, "First upload for promote by key test failed");
 
-            // Revision timestamps have second granularity, so revisions created within the same
-            // second are indistinguishable and their relative order is undefined.
-            yield return new WaitForSeconds(1f);
+            yield return WaitForNextSecond();
 
             LootLockerPlayerFile secondUpload = new LootLockerPlayerFile();
             bool secondDone = false;

@@ -24,6 +24,11 @@ namespace LootLocker.Requests
         /// Set to false if you want to ensure that a profile is not created for the player if one does not exist. In this case, the session will fail with a 404 Player Not Found error if the player does not have a profile.
         /// </summary>
         public bool auto_create_profile { get; set; } = true;
+        /// <summary>
+        /// Whether the client reports owning DLC for this player. Set to true to have LootLocker reconcile DLC ownership when the session starts.
+        /// Defaults to false, in which case DLC ownership is only reconciled if the player already has DLC entitlements.
+        /// </summary>
+        public bool check_dlc { get; set; } = false;
     }
 
     public class LootLockerSteamSessionRequest
