@@ -1064,5 +1064,52 @@ namespace LootLockerTests.PlayMode
             Assert.IsFalse(linkResponse.success, "Creating a download link for a non-existent file should fail");
             Assert.AreEqual(404, linkResponse.statusCode, "Expected a 404 for a non-existent file");
         }
+
+        // A gated file (such as a private file reward) is returned with requires_download_link set and no url.
+        // There is no admin endpoint that creates one, so the response shape is verified by deserializing the
+        // documented payloads for all three models that carry the flag.
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void PlayerFiles_GatedFileResponse_DeserializesRequiresDownloadLink()
+        {
+            // Given - a gated file as returned by list/single-file endpoints
+            const string gatedFileJson = "{\"id\":42,\"revision_id\":\"01J8Z0X9K4\",\"name\":\"reward.txt\"," +
+                "\"key\":\"reward-key\",\"size\":128,\"purpose\":\"reward\",\"public\":false," +
+                "\"url\":\"\",\"url_expires_at\":\"0001-01-01T00:00:00+00:00\"," +
+                "\"requires_download_link\":true,\"created_at\":\"2026-01-02T03:04:05+00:00\"}";
+
+            // When
+            LootLockerPlayerFile file = LootLockerJson.DeserializeObject<LootLockerPlayerFile>(gatedFileJson);
+
+            // Then
+            Assert.IsNotNull(file, "Gated file response should deserialize");
+            Assert.AreEqual(42, file.id, "File id should deserialize");
+            Assert.IsTrue(file.requires_download_link, "requires_download_link should deserialize as true for a gated file");
+            Assert.IsTrue(string.IsNullOrEmpty(file.url), "A gated file should not carry a download url");
+
+            // Given - the metadata block of a revisions response for the same gated file
+            const string gatedMetadataJson = "{\"created_at\":\"2026-01-02T03:04:05+00:00\",\"name\":\"reward.txt\"," +
+                "\"key\":\"reward-key\",\"purpose\":\"reward\",\"id\":42,\"public\":false,\"requires_download_link\":true}";
+
+            // When
+            LootLockerPlayerFileMetadata metadata = LootLockerJson.DeserializeObject<LootLockerPlayerFileMetadata>(gatedMetadataJson);
+
+            // Then
+            Assert.IsNotNull(metadata, "Gated file metadata should deserialize");
+            Assert.AreEqual(42, metadata.id, "Metadata id should deserialize");
+            Assert.IsTrue(metadata.requires_download_link, "requires_download_link should deserialize as true on metadata");
+
+            // Given - a single revision of the same gated file
+            const string gatedRevisionJson = "{\"id\":\"01J8Z0X9K4\",\"url\":\"\",\"size\":128," +
+                "\"created_at\":\"2026-01-02T03:04:05+00:00\",\"requires_download_link\":true}";
+
+            // When
+            LootLockerPlayerFileContent revision = LootLockerJson.DeserializeObject<LootLockerPlayerFileContent>(gatedRevisionJson);
+
+            // Then
+            Assert.IsNotNull(revision, "Gated file revision should deserialize");
+            Assert.AreEqual("01J8Z0X9K4", revision.id, "Revision id should deserialize");
+            Assert.IsTrue(revision.requires_download_link, "requires_download_link should deserialize as true on a revision");
+            Assert.IsTrue(string.IsNullOrEmpty(revision.url), "A gated revision should not carry a download url");
+        }
     }
 }
