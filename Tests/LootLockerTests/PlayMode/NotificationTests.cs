@@ -135,8 +135,9 @@ public class NotificationTests
 
     // Notifications are written asynchronously by the backend's notifier worker, so a list
     // request issued right after the call that triggers them can observe fewer rows than were
-    // created. Poll until the response satisfies the caller's expectation (or the timeout
-    // expires) instead of assuming the write has already landed.
+    // created. Poll until the response satisfies the caller's expectation, or give up once the
+    // deadline passes. The helper never asserts: it hands back the last response so the caller
+    // can report the failure with its own message.
     private static IEnumerator ListNotificationsUntil(
         bool showRead,
         LootLockerNotificationPriority? withPriority,
@@ -159,12 +160,32 @@ public class NotificationTests
                 lastResponse = response;
                 requestCompleted = true;
             });
-            yield return new WaitUntil(() => requestCompleted);
+
+            // Stop waiting on the request once the deadline passes: the SDK's own request timeout
+            // is minutes long, so an unbounded wait here would blow past the intended budget.
+            yield return new WaitUntil(() => requestCompleted || Time.realtimeSinceStartup >= deadline);
+            if (!requestCompleted)
+            {
+                break;
+            }
 
             if (lastResponse != null && lastResponse.success && isSatisfied(lastResponse))
             {
                 break;
             }
+
+            // Retry only when the query is genuinely incomplete. Once the server reports every
+            // matching row and the caller is still not satisfied, no later response will satisfy
+            // it, so fail fast instead of burning the whole budget.
+            if (lastResponse != null && lastResponse.success &&
+                lastResponse.Notifications != null &&
+                lastResponse.Pagination != null &&
+                lastResponse.Pagination.total <= page * perPage &&
+                lastResponse.Notifications.Length <= page * perPage)
+            {
+                break;
+            }
+
             if (Time.realtimeSinceStartup >= deadline)
             {
                 break;
@@ -173,6 +194,49 @@ public class NotificationTests
         }
 
         onComplete?.Invoke(lastResponse);
+    }
+
+    // A list request for a page beyond the last one succeeds with no rows, so callers that need a
+    // specific page have to wait for enough rows to exist before requesting it.
+    private static IEnumerator ListNotificationsUntilTotal(
+        int expectedTotal,
+        Action<LootLockerListNotificationsResponse> onComplete,
+        float timeoutSeconds = 30f)
+    {
+        bool totalReached = false;
+        float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+
+        while (!totalReached)
+        {
+            bool requestCompleted = false;
+            LootLockerListNotificationsResponse response = null;
+            LootLockerSDKManager.ListNotifications(false, null, "", "", 100, 0, res =>
+            {
+                response = res;
+                requestCompleted = true;
+            });
+            yield return new WaitUntil(() => requestCompleted || Time.realtimeSinceStartup >= deadline);
+            if (!requestCompleted)
+            {
+                break;
+            }
+
+            totalReached = response != null
+                && response.success
+                && response.Pagination != null
+                && response.Pagination.total == expectedTotal;
+
+            if (!totalReached)
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                {
+                    break;
+                }
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        onComplete?.Invoke();
     }
 
     private IEnumerator CreateTriggerWithReward(string triggerKey, string triggerName, int limit, Action<bool, string, LootLockerTestTrigger> onComplete)
@@ -340,13 +404,19 @@ public class NotificationTests
         Assert.IsTrue(triggerInvocationSucceeded, "Trigger invocation did not succeed");
 
         // When
+        // Wait until every notification exists before paging, otherwise an early request sees a
+        // transient total and a transient last_page. A request beyond the last page succeeds with
+        // no rows, so paging against a total that is still growing would time out instead of wait.
+        yield return ListNotificationsUntilTotal(CreatedTriggers.Count, null);
+        int lastPage = (CreatedTriggers.Count + 4) / 5;
+
         LootLockerListNotificationsResponse paginationRequest1 = null;
         yield return ListNotificationsUntil(false, null, "", "", 5, 3,
             res => res.Notifications != null && res.Notifications.Length == 5,
             res => paginationRequest1 = res);
 
         LootLockerListNotificationsResponse paginationRequest2 = null;
-        yield return ListNotificationsUntil(false, null, "", "", 5, paginationRequest1.Pagination.last_page,
+        yield return ListNotificationsUntil(false, null, "", "", 5, lastPage,
             res => res.Notifications != null && res.Notifications.Length == CreatedTriggers.Count % 5,
             res => paginationRequest2 = res);
 
