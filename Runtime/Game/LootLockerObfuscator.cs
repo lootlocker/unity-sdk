@@ -203,10 +203,12 @@ namespace LootLocker
         /// <summary>
         /// Redacts signed download URLs from a JSON body before it is logged.
         ///
-        /// Player file responses carry a short-lived signed URL in "url" next to "url_expires_at".
-        /// That URL is a bearer credential: anyone holding it can download the file until it expires,
-        /// so it must never reach logs or the log UI. Only objects that carry "url_expires_at" are
-        /// redacted, which leaves ordinary (non-signed) URLs in other responses intact.
+        /// Player file responses carry a short-lived signed URL in "url". That URL is a bearer
+        /// credential: anyone holding it can download the file until it expires, so it must never
+        /// reach logs or the log UI. An object is treated as carrying a signed download URL when it
+        /// has "url_expires_at" or the player file marker "requires_download_link". The marker is
+        /// needed because the file revision payload carries a signed "url" without an expiry field.
+        /// Scoping on those markers leaves ordinary URLs in other responses intact.
         /// </summary>
         public static string RedactSignedDownloadUrlsForLogging(string json)
         {
@@ -262,11 +264,11 @@ namespace LootLocker
                     RedactSignedDownloadUrlsInToken(property.Value, ref redacted);
                 }
 
-                // A signed download URL is always accompanied by its expiry, so only redact "url"
-                // where "url_expires_at" is present. This leaves ordinary URLs in other responses intact.
-                JToken expiresAt = obj["url_expires_at"];
+                // Only redact "url" on objects that carry a signed download URL marker, which leaves
+                // ordinary URLs in other responses intact.
+                bool carriesSignedDownloadUrl = obj["url_expires_at"] != null || obj["requires_download_link"] != null;
                 JToken url = obj["url"];
-                if (expiresAt != null && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
+                if (carriesSignedDownloadUrl && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
                 {
                     obj["url"] = "[REDACTED]";
                     redacted = true;
@@ -290,9 +292,10 @@ namespace LootLocker
                     RedactSignedDownloadUrlsInValue(child, ref redacted);
                 }
 
-                // A signed download URL is always accompanied by its expiry, so only redact "url"
-                // where "url_expires_at" is present. This leaves ordinary URLs in other responses intact.
-                if (obj.ContainsKey("url_expires_at") && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
+                // Only redact "url" on objects that carry a signed download URL marker, which leaves
+                // ordinary URLs in other responses intact.
+                bool carriesSignedDownloadUrl = obj.ContainsKey("url_expires_at") || obj.ContainsKey("requires_download_link");
+                if (carriesSignedDownloadUrl && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
                 {
                     obj["url"] = "[REDACTED]";
                     redacted = true;

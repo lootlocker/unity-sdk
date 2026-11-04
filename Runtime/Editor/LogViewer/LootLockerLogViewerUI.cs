@@ -584,7 +584,11 @@ namespace LootLocker.LogViewer
             var logEntriesJsonString = LootLockerJson.SerializeObjectArray(logEntriesToSave.ToArray());
             SessionState.SetString(SessionStateLogEntriesKey, logEntriesJsonString);
 
-            var httpLogEntriesJsonString = LootLockerJson.SerializeObjectArray(httpLogEntriesToSave.ToArray());
+            // Signed download URLs are bearer credentials, so redact them again on the way into
+            // SessionState. HTTP entries are already sanitized when they are logged, this keeps the
+            // persisted payload safe even if an entry reaches the log viewer by another path.
+            var httpLogEntriesJsonString = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(
+                LootLockerJson.SerializeObjectArray(httpLogEntriesToSave.ToArray()));
             SessionState.SetString(SessionStateHttpLogEntriesKey, httpLogEntriesJsonString);
             s_allLogEntries.Clear(); // Clear in-memory logs after saving to free memory during domain reload
         }
