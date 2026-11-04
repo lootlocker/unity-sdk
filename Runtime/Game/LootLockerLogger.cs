@@ -228,16 +228,22 @@ namespace LootLocker
             {
                 _instance = new LootLockerLogger();
             }
-            // Store in HTTP log backlog
-            _instance.httpLogRecords[_instance.nextHttpLogRecordWrite] = entry;
-            _instance.nextHttpLogRecordWrite = (_instance.nextHttpLogRecordWrite + 1) % HttpLogBacklogSize;
+            // Signed download URLs are bearer credentials, so the backlog and the listeners only
+            // ever see a sanitized copy. The caller's entry (and the response backing it) is left
+            // untouched so deserialization still works.
+            entry = SanitizeForLogging(entry);
 
             if( entry == null )
             {
                 Log("LootLockerLogger.LogHttpRequestResponse called with null entry", LogLevel.Warning);
                 return;
             }
-            else if (entry.Response == null)
+
+            // Store in HTTP log backlog
+            _instance.httpLogRecords[_instance.nextHttpLogRecordWrite] = entry;
+            _instance.nextHttpLogRecordWrite = (_instance.nextHttpLogRecordWrite + 1) % HttpLogBacklogSize;
+
+            if (entry.Response == null)
             {
                 Log($"LootLockerLogger.LogHttpRequestResponse called with null entry. Response for {entry.Method} {entry.Url}", LogLevel.Error);
                 return;
@@ -322,11 +328,54 @@ namespace LootLocker
             }
         }
 
-        private static string ObfuscateAndPrettifyJsonIfConfigured(string json)
+        private static LootLockerHttpLogEntry SanitizeForLogging(LootLockerHttpLogEntry entry)
         {
+            if (entry == null)
+            {
+                return null;
+            }
+
             // Signed download URLs are bearer credentials, so they are redacted regardless of the
             // obfuscateLogs setting - a usable download token must never reach logs or the log UI.
-            json = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(json);
+            var sanitized = new LootLockerHttpLogEntry
+            {
+                Method = entry.Method,
+                Url = entry.Url,
+                RequestHeaders = entry.RequestHeaders,
+                RequestBody = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(entry.RequestBody),
+                StatusCode = entry.StatusCode,
+                ResponseHeaders = entry.ResponseHeaders,
+                Response = SanitizeForLogging(entry.Response),
+                DurationSeconds = entry.DurationSeconds,
+                Timestamp = entry.Timestamp
+            };
+            return sanitized;
+        }
+
+        /// <remarks>
+        /// Returns a copy so the response handed back to the caller keeps its signed download URLs
+        /// intact for deserialization - only the logged copy is redacted.
+        /// </remarks>
+        private static LootLockerResponse SanitizeForLogging(LootLockerResponse response)
+        {
+            if (response == null)
+            {
+                return null;
+            }
+
+            return new LootLockerResponse
+            {
+                statusCode = response.statusCode,
+                success = response.success,
+                text = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(response.text),
+                requestContext = response.requestContext,
+                errorData = response.errorData,
+                EventId = response.EventId
+            };
+        }
+
+        private static string ObfuscateAndPrettifyJsonIfConfigured(string json)
+        {
             if (LootLockerConfig.current.obfuscateLogs)
             {
                 json = LootLockerObfuscator.ObfuscateJsonStringForLogging(json);
