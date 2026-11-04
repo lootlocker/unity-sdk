@@ -324,6 +324,9 @@ namespace LootLocker
 
         private static string ObfuscateAndPrettifyJsonIfConfigured(string json)
         {
+            // Signed download URLs are bearer credentials, so they are redacted regardless of the
+            // obfuscateLogs setting - a usable download token must never reach logs or the log UI.
+            json = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(json);
             if (LootLockerConfig.current.obfuscateLogs)
             {
                 json = LootLockerObfuscator.ObfuscateJsonStringForLogging(json);
