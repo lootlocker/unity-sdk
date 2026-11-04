@@ -54,8 +54,11 @@ namespace LootLocker
         ProfileSwitching = 3,
     }
 
-    // Loaded through Resources.Load, so nothing references this type directly and managed code
-    // stripping would remove it from builds, making the config asset fail to deserialize.
+    // The type is referenced directly by runtime code (e.g. LootLockerConfig.current), but the
+    // instance used at runtime is created by Unity's serialization when the asset is loaded via
+    // Resources.Load. That instantiation path is invisible to the linker, so without [Preserve]
+    // the type and its default constructor can be stripped and the config asset fails to
+    // deserialize in builds.
     [Preserve]
     [Serializable]
     public class LootLockerConfig : ScriptableObject
