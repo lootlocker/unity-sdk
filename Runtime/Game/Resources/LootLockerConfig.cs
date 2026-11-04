@@ -7,6 +7,7 @@ using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 #endif
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace LootLocker
 {
@@ -53,6 +54,9 @@ namespace LootLocker
         ProfileSwitching = 3,
     }
 
+    // Loaded through Resources.Load, so nothing references this type directly and managed code
+    // stripping would remove it from builds, making the config asset fail to deserialize.
+    [Preserve]
     [Serializable]
     public class LootLockerConfig : ScriptableObject
     {
