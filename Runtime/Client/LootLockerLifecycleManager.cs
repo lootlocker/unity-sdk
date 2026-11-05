@@ -138,22 +138,12 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Whether this component is the currently registered lifecycle manager instance.
+        /// Whether the given instance is the currently registered lifecycle manager instance.
         /// Used to make sure a replaced (destroyed) instance does not tear down its successor.
         /// </summary>
-        private bool IsCurrentInstance()
+        private static bool IsCurrentInstance(LootLockerLifecycleManager instanceToCheck)
         {
-            return ReferenceEquals(_instance, this);
-        }
-
-        /// <summary>
-        /// Whether the given service instance is the one currently registered for its type.
-        /// Used by services to avoid unregistering a successor instance during their own destruction.
-        /// </summary>
-        internal static bool IsRegisteredService<T>(T service) where T : class, ILootLockerService
-        {
-            if (_instance == null || service == null) return false;
-            return ReferenceEquals(_instance._GetService<T>(), service);
+            return ReferenceEquals(_instance, instanceToCheck);
         }
 
         private static void TeardownInstance() 
@@ -307,7 +297,8 @@ namespace LootLocker
         /// <summary>
         /// Unregister and cleanup a service from the lifecycle manager
         /// </summary>
-        public static void UnregisterService<T>() where T : class, ILootLockerService
+        /// <param name="serviceToUnregister">Optional : The exact service instance to unregister. When supplied, the request is ignored unless that instance is still the registered one, so a replaced instance cannot unregister its successor.</param>
+        public static void UnregisterService<T>(T serviceToUnregister = null) where T : class, ILootLockerService
         {
             if (_state != LifecycleManagerState.Ready || _instance == null)
             {
@@ -315,7 +306,7 @@ namespace LootLocker
                 return;
             }
             
-            _instance._UnregisterService<T>();
+            _instance._UnregisterService<T>(serviceToUnregister);
         }
 
         /// <summary>
@@ -442,7 +433,7 @@ namespace LootLocker
             }
         }
 
-        private void _UnregisterService<T>() where T : class, ILootLockerService
+        private void _UnregisterService<T>(T serviceToUnregister = null) where T : class, ILootLockerService
         {
             if(!_HasService<T>())
             {
@@ -457,6 +448,13 @@ namespace LootLocker
                     return;
                 }
                 service = svc as T;
+
+                // A replaced instance may be destroyed after its successor has been registered.
+                // Only unregister when the caller is still the registered instance.
+                if (serviceToUnregister != null && !ReferenceEquals(service, serviceToUnregister))
+                {
+                    return;
+                }
 
                 // Remove from initialization order if present
                 _initializationOrder.Remove(service);
@@ -537,7 +535,7 @@ namespace LootLocker
         private void OnApplicationQuit()
         {
             if (_state == LifecycleManagerState.Quitting) return; // Prevent multiple calls
-            if (!IsCurrentInstance()) return; // A replaced instance must not tear down its successor
+            if (!IsCurrentInstance(this)) return; // A replaced instance must not tear down its successor
             
             ILootLockerService[] serviceSnapshot;
             lock (_serviceLock)
@@ -569,7 +567,7 @@ namespace LootLocker
             // Init() tears down and re-instantiates the SDK). Only the instance that is still
             // registered may tear down the SDK, otherwise a stale instance would destroy its
             // successor and silently kill in-flight requests.
-            if (!IsCurrentInstance()) return;
+            if (!IsCurrentInstance(this)) return;
 
             TeardownInstance();
         }
