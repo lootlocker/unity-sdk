@@ -644,6 +644,20 @@ public class NotificationTests
             string appleAppStoreNotification1Id = GUID.Generate().ToString();
             string GooglePlayStoreStorePurchaseIdentifyingValue = "product_id";
             string googlePlayStoreNotification1Id = GUID.Generate().ToString();
+            string magicTriggerNotification1Id = GUID.Generate().ToString();
+            string PlaystationStorePurchaseIdentifyingValue = "playstation_transaction_id";
+            string playstationStoreNotification1Id = GUID.Generate().ToString();
+            string StripeStorePurchaseIdentifyingValue = "stripe_entitlement_id";
+            string stripeStoreNotification1Id = GUID.Generate().ToString();
+            string EpicGamesStorePurchaseIdentifyingValue = "epic_entitlement_id";
+            string epicGamesStoreNotification1Id = GUID.Generate().ToString();
+            string LeaderboardRewardIdentifyingValue = "leaderboard_id";
+            string leaderboardRewardNotification1Id = GUID.Generate().ToString();
+            string RewardCampaignIdentifyingValue = "giveaway_id";
+            string rewardCampaignNotification1Id = GUID.Generate().ToString();
+            string RewardsGrantIdentifyingValue = "item_template_id";
+            string rewardsGrantNotification1Id = GUID.Generate().ToString();
+            string unknownSourceNotification1Id = GUID.Generate().ToString();
             var fakeResponse = new LootLockerListNotificationsResponse()
             {
                 statusCode = 200,
@@ -660,7 +674,7 @@ public class NotificationTests
                     last_page = 1,
                     offset = 0,
                     per_page = 100,
-                    total = 6
+                    total = 14
                 },
                 Notifications = new LootLockerNotification[]
                 {
@@ -670,6 +684,14 @@ public class NotificationTests
                     GenerateLootLockerNotification(lootLockerVirtualStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.LootLocker, LootLockerVirtualStorePurchaseIdentifyingValue),
                     GenerateLootLockerNotification(appleAppStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.AppleAppStore, AppleAppStorePurchaseIdentifyingValue),
                     GenerateLootLockerNotification(googlePlayStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.GooglePlayStore, GooglePlayStoreStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(magicTriggerNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.MagicTriggers, LootLocker.LootLockerStaticStrings.LootLockerNotificationTypes.PullRewardAcquired),
+                    GenerateLootLockerNotification(playstationStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.PlaystationStore, PlaystationStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(stripeStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.StripeStore, StripeStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(epicGamesStoreNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.EpicGamesStore, EpicGamesStorePurchaseIdentifyingValue),
+                    GenerateLootLockerNotification(leaderboardRewardNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LeaderboardReward, LeaderboardRewardIdentifyingValue),
+                    GenerateLootLockerNotification(rewardCampaignNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.RewardCampaign, RewardCampaignIdentifyingValue),
+                    GenerateLootLockerNotification(rewardsGrantNotification1Id, LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.RewardsGrant, RewardsGrantIdentifyingValue),
+                    GenerateLootLockerNotification(unknownSourceNotification1Id, "some.future_source", "some_identifying_value"),
                 }
             };
 
@@ -680,6 +702,13 @@ public class NotificationTests
             bool lootLockerVirtualStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(LootLockerVirtualStorePurchaseIdentifyingValue, out var lootLockerVirtualStoreNotifications);
             bool appleAppStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(AppleAppStorePurchaseIdentifyingValue, out var appleAppStoreNotifications);
             bool googlePlayStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(GooglePlayStoreStorePurchaseIdentifyingValue, out var googlePlayStoreNotifications);
+            bool magicTriggerLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(LootLocker.LootLockerStaticStrings.LootLockerNotificationTypes.PullRewardAcquired, out var magicTriggerNotifications);
+            bool playstationStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(PlaystationStorePurchaseIdentifyingValue, out var playstationStoreNotifications);
+            bool stripeStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(StripeStorePurchaseIdentifyingValue, out var stripeStoreNotifications);
+            bool epicGamesStoreLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(EpicGamesStorePurchaseIdentifyingValue, out var epicGamesStoreNotifications);
+            bool leaderboardRewardLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(LeaderboardRewardIdentifyingValue, out var leaderboardRewardNotifications);
+            bool rewardCampaignLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(RewardCampaignIdentifyingValue, out var rewardCampaignNotifications);
+            bool rewardsGrantLookupSucceeded = fakeResponse.TryGetNotificationsByIdentifyingValue(RewardsGrantIdentifyingValue, out var rewardsGrantNotifications);
 
             // Then
             Assert.IsTrue(triggerLookupSucceeded, "Trigger notification lookup failed");
@@ -700,6 +729,45 @@ public class NotificationTests
             Assert.IsTrue(googlePlayStoreLookupSucceeded, "Google Play store notification lookup failed");
             Assert.IsNotEmpty(googlePlayStoreNotifications, "Google Play store notification lookup array was empty");
             Assert.AreEqual(googlePlayStoreNotification1Id, googlePlayStoreNotifications[0].Id, "The retrieved Google Play store notification id was not as expected");
+
+            Assert.IsTrue(magicTriggerLookupSucceeded, "Magic trigger notification lookup failed");
+            Assert.IsNotEmpty(magicTriggerNotifications, "Magic trigger notification lookup array was empty");
+            Assert.AreEqual(magicTriggerNotification1Id, magicTriggerNotifications[0].Id, "The retrieved magic trigger notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.magic_triggers, magicTriggerNotifications[0].SourceEnum, "The magic trigger notification source enum was not as expected");
+
+            Assert.IsTrue(playstationStoreLookupSucceeded, "PlayStation store notification lookup failed");
+            Assert.IsNotEmpty(playstationStoreNotifications, "PlayStation store notification lookup array was empty");
+            Assert.AreEqual(playstationStoreNotification1Id, playstationStoreNotifications[0].Id, "The retrieved PlayStation store notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.purchasing_playstation_store, playstationStoreNotifications[0].SourceEnum, "The PlayStation store notification source enum was not as expected");
+
+            Assert.IsTrue(stripeStoreLookupSucceeded, "Stripe store notification lookup failed");
+            Assert.IsNotEmpty(stripeStoreNotifications, "Stripe store notification lookup array was empty");
+            Assert.AreEqual(stripeStoreNotification1Id, stripeStoreNotifications[0].Id, "The retrieved Stripe store notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.purchasing_stripe_store, stripeStoreNotifications[0].SourceEnum, "The Stripe store notification source enum was not as expected");
+
+            Assert.IsTrue(epicGamesStoreLookupSucceeded, "Epic Games store notification lookup failed");
+            Assert.IsNotEmpty(epicGamesStoreNotifications, "Epic Games store notification lookup array was empty");
+            Assert.AreEqual(epicGamesStoreNotification1Id, epicGamesStoreNotifications[0].Id, "The retrieved Epic Games store notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.purchasing_epic_games_store, epicGamesStoreNotifications[0].SourceEnum, "The Epic Games store notification source enum was not as expected");
+
+            Assert.IsTrue(leaderboardRewardLookupSucceeded, "Leaderboard reward notification lookup failed");
+            Assert.IsNotEmpty(leaderboardRewardNotifications, "Leaderboard reward notification lookup array was empty");
+            Assert.AreEqual(leaderboardRewardNotification1Id, leaderboardRewardNotifications[0].Id, "The retrieved leaderboard reward notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.leaderboard_reward, leaderboardRewardNotifications[0].SourceEnum, "The leaderboard reward notification source enum was not as expected");
+
+            Assert.IsTrue(rewardCampaignLookupSucceeded, "Reward campaign notification lookup failed");
+            Assert.IsNotEmpty(rewardCampaignNotifications, "Reward campaign notification lookup array was empty");
+            Assert.AreEqual(rewardCampaignNotification1Id, rewardCampaignNotifications[0].Id, "The retrieved reward campaign notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.reward_campaign, rewardCampaignNotifications[0].SourceEnum, "The reward campaign notification source enum was not as expected");
+
+            Assert.IsTrue(rewardsGrantLookupSucceeded, "Rewards grant notification lookup failed");
+            Assert.IsNotEmpty(rewardsGrantNotifications, "Rewards grant notification lookup array was empty");
+            Assert.AreEqual(rewardsGrantNotification1Id, rewardsGrantNotifications[0].Id, "The retrieved rewards grant notification id was not as expected");
+            Assert.AreEqual(LootLockerNotificationSource.rewards_grant, rewardsGrantNotifications[0].SourceEnum, "The rewards grant notification source enum was not as expected");
+
+            var unknownSourceNotification = fakeResponse.Notifications.FirstOrDefault(notification => notification.Id == unknownSourceNotification1Id);
+            Assert.IsNotNull(unknownSourceNotification, "The unknown source notification was not found in the response");
+            Assert.AreEqual(LootLockerNotificationSource.unknown, unknownSourceNotification.SourceEnum, "The unknown source notification source enum was not as expected");
 
             yield break;
         }
@@ -865,6 +933,124 @@ public class NotificationTests
                     new LootLockerNotificationContextEntry
                     {
                         Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore.CatalogId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.MagicTriggers, StringComparison.OrdinalIgnoreCase))
+            {
+                // Magic triggers have no source specific identifying context key, only the standard reward summary keys
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = "currencies",
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.PlaystationStore, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.PlaystationStore.TransactionId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.PlaystationStore.CatalogItemId,
+                        Value = GUID.Generate().ToString(),
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.PlaystationStore.CatalogId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.StripeStore, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.StripeStore.EntitlementId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.StripeStore.CatalogItemId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.EpicGamesStore, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.EpicGamesStore.EpicEntitlementId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.EpicGamesStore.CatalogItemId,
+                        Value = GUID.Generate().ToString(),
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.EpicGamesStore.CatalogId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.LeaderboardReward, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.LeaderboardReward.LeaderboardId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.LeaderboardReward.PlayerPublicId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.RewardCampaign, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardCampaign.GiveawayId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardCampaign.RewardId,
+                        Value = GUID.Generate().ToString()
+                    }
+                };
+            }
+            else if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.RewardsGrant, StringComparison.OrdinalIgnoreCase))
+            {
+                context = new[]
+                {
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardsGrant.ItemTemplateId,
+                        Value = identifyingValue
+                    },
+                    new LootLockerNotificationContextEntry
+                    {
+                        Key = LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardsGrant.TemplateName,
                         Value = GUID.Generate().ToString()
                     }
                 };
