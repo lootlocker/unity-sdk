@@ -137,6 +137,25 @@ namespace LootLocker
             _state = LifecycleManagerState.Ready;
         }
 
+        /// <summary>
+        /// Whether this component is the currently registered lifecycle manager instance.
+        /// Used to make sure a replaced (destroyed) instance does not tear down its successor.
+        /// </summary>
+        private bool IsCurrentInstance()
+        {
+            return ReferenceEquals(_instance, this);
+        }
+
+        /// <summary>
+        /// Whether the given service instance is the one currently registered for its type.
+        /// Used by services to avoid unregistering a successor instance during their own destruction.
+        /// </summary>
+        internal static bool IsRegisteredService<T>(T service) where T : class, ILootLockerService
+        {
+            if (_instance == null || service == null) return false;
+            return ReferenceEquals(_instance._GetService<T>(), service);
+        }
+
         private static void TeardownInstance() 
         {
             if(_instance == null) return;
@@ -518,6 +537,7 @@ namespace LootLocker
         private void OnApplicationQuit()
         {
             if (_state == LifecycleManagerState.Quitting) return; // Prevent multiple calls
+            if (!IsCurrentInstance()) return; // A replaced instance must not tear down its successor
             
             ILootLockerService[] serviceSnapshot;
             lock (_serviceLock)
@@ -544,6 +564,13 @@ namespace LootLocker
 
         private void OnDestroy()
         {
+            // Unity defers Destroy() to the end of the frame, so by the time this runs the
+            // manager may already have been replaced by a newer instance (for example when
+            // Init() tears down and re-instantiates the SDK). Only the instance that is still
+            // registered may tear down the SDK, otherwise a stale instance would destroy its
+            // successor and silently kill in-flight requests.
+            if (!IsCurrentInstance()) return;
+
             TeardownInstance();
         }
 

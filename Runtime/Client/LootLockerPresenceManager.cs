@@ -1396,12 +1396,13 @@ namespace LootLocker
             // Skip lifecycle manager operations during shutdown
             if(!LootLockerLifecycleManager.IsReady) return;
 
-            // Only unregister if the LifecycleManager exists and we're actually registered
+            // Only unregister if the LifecycleManager exists and this exact instance is still the
+            // registered one. A replaced instance must not unregister its successor.
             // During application shutdown, services may already be reset
             try
             {
                 if (LootLockerLifecycleManager.Instance != null && 
-                    LootLockerLifecycleManager.HasService<LootLockerPresenceManager>())
+                    LootLockerLifecycleManager.IsRegisteredService(this))
                 {
                     LootLockerLifecycleManager.UnregisterService<LootLockerPresenceManager>();
                 }
