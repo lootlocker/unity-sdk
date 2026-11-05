@@ -69,6 +69,7 @@ namespace LootLockerTests.PlayMode
                 sessionCompleted = true;
             });
             yield return new WaitUntil(() => sessionCompleted);
+            if (SetupFailed) { yield break; }
 
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} test case #####");
         }
