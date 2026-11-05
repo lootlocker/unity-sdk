@@ -16,6 +16,9 @@ namespace LootLockerTests.PlayMode
         private static int TestCounter = 0;
         private bool SetupFailed = false;
 
+        // Bounds the request waits so a killed request coroutine fails the test instead of hanging it.
+        private const float RequestTimeoutSeconds = 30f;
+
         [UnitySetUp]
         public IEnumerator Setup()
         {
@@ -112,6 +115,7 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsTrue(LootLockerLifecycleManager.IsReady, "Destroying a replaced instance tore down the current instance");
 
+            float deadline = Time.realtimeSinceStartup + RequestTimeoutSeconds;
             bool pingRequestCompleted = false;
             LootLockerPingResponse pingResponse = null;
             LootLockerSDKManager.Ping(_pingResponse =>
@@ -119,8 +123,9 @@ namespace LootLockerTests.PlayMode
                 pingResponse = _pingResponse;
                 pingRequestCompleted = true;
             });
-            yield return new WaitUntil(() => pingRequestCompleted);
+            yield return new WaitUntil(() => pingRequestCompleted || Time.realtimeSinceStartup >= deadline);
 
+            Assert.IsTrue(pingRequestCompleted, "Ping callback was never invoked");
             Assert.IsTrue(pingResponse.success, pingResponse.errorData?.ToString());
         }
 
@@ -141,6 +146,7 @@ namespace LootLockerTests.PlayMode
             // the same frame, with the previous instance being destroyed on the following frame.
             Assert.IsTrue(gameUnderTest.InitializeLootLockerSDK(), "Failed to re-initialize LootLocker");
 
+            float deadline = Time.realtimeSinceStartup + RequestTimeoutSeconds;
             bool sessionCompleted = false;
             LootLockerGuestSessionResponse sessionResponse = null;
             LootLockerSDKManager.StartGuestSession(Guid.NewGuid().ToString(), response =>
@@ -150,10 +156,10 @@ namespace LootLockerTests.PlayMode
             });
 
             UnityEngine.Object.Destroy(staleManagerGameObject);
-            yield return new WaitUntil(() => sessionCompleted);
+            yield return new WaitUntil(() => sessionCompleted || Time.realtimeSinceStartup >= deadline);
 
             // Then - the in-flight request must still complete
-            Assert.IsNotNull(sessionResponse, "Session callback was never invoked");
+            Assert.IsTrue(sessionCompleted, "Session callback was never invoked");
             Assert.IsTrue(sessionResponse.success, sessionResponse.errorData?.ToString());
             Assert.IsTrue(LootLockerLifecycleManager.IsReady, "SDK was not ready after the request completed");
         }

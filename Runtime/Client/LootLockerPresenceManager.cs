@@ -1401,10 +1401,9 @@ namespace LootLocker
             // During application shutdown, services may already be reset
             try
             {
-                if (LootLockerLifecycleManager.Instance != null && 
-                    LootLockerLifecycleManager.IsRegisteredService(this))
+                if (LootLockerLifecycleManager.Instance != null)
                 {
-                    LootLockerLifecycleManager.UnregisterService<LootLockerPresenceManager>();
+                    LootLockerLifecycleManager.UnregisterService(this);
                 }
             }
             catch (System.Exception ex)
