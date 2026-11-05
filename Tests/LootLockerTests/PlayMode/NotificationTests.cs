@@ -768,6 +768,7 @@ public class NotificationTests
             var unknownSourceNotification = fakeResponse.Notifications.FirstOrDefault(notification => notification.Id == unknownSourceNotification1Id);
             Assert.IsNotNull(unknownSourceNotification, "The unknown source notification was not found in the response");
             Assert.AreEqual(LootLockerNotificationSource.unknown, unknownSourceNotification.SourceEnum, "The unknown source notification source enum was not as expected");
+            Assert.IsFalse(fakeResponse.TryGetNotificationsByIdentifyingValue("some_identifying_value", out _), "The unknown source notification should not be registered in the lookup table");
 
             yield break;
         }
@@ -857,7 +858,7 @@ public class NotificationTests
 
         private static LootLockerNotification GenerateLootLockerNotification(string notificationId, string source, string identifyingValue)
         {
-            LootLockerNotificationContextEntry[] context = null;
+            LootLockerNotificationContextEntry[] context = new LootLockerNotificationContextEntry[0];
             if (source.Equals(LootLocker.LootLockerStaticStrings.LootLockerNotificationSources.Triggers, StringComparison.OrdinalIgnoreCase))
             {
                 context = new[]
