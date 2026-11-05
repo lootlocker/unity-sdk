@@ -238,7 +238,12 @@ namespace LootLocker
 
             lock (_instanceLock)
             {
-                _instance = null;
+                // A replaced instance may be destroyed after its successor has been created.
+                // Only clear the shared reference if it still points at this instance.
+                if (ReferenceEquals(_instance, this))
+                {
+                    _instance = null;
+                }
             }
 
         }
