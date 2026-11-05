@@ -31,6 +31,14 @@ namespace LootLocker.LootLockerEnums
         lootlocker_console = 6,
         lootlocker_server_api = 7,
         lootlocker_admin_api = 8,
+        magic_triggers = 9,
+        purchasing_playstation_store = 10,
+        purchasing_stripe_store = 11,
+        purchasing_epic_games_store = 12,
+        leaderboard_reward = 13,
+        reward_campaign = 14,
+        rewards_grant = 15,
+        unknown = 16,
     };
 
     /// <summary>
@@ -68,11 +76,22 @@ namespace LootLocker.LootLockerStaticStrings
             public static readonly string AppleAppStore = "purchasing.apple_app_store";
             public static readonly string GooglePlayStore = "purchasing.google_play_store";
             public static readonly string LootLocker = "purchasing.lootlocker";
+            public static readonly string PlaystationStore = "purchasing.playstation_store";
+            public static readonly string StripeStore = "purchasing.stripe_store";
+            public static readonly string EpicGamesStore = "purchasing.epic_games_store";
         }
         public static readonly string TwitchDrop = "twitch_drop";
         public static readonly string LootLockerConsole = "lootlocker.console";
         public static readonly string LootLockerServerApi = "lootlocker.server_api";
         public static readonly string LootLockerAdminApi = "lootlocker.admin_api";
+        public static readonly string MagicTriggers = "magic_triggers";
+        public static readonly string LeaderboardReward = "leaderboard.reward";
+        public static readonly string RewardCampaign = "reward_campaign";
+        public static readonly string RewardsGrant = "rewards.grant";
+        /// <summary>
+        /// Not a source emitted by the backend. Used as the SourceEnum value for notifications whose source string the SDK does not recognise.
+        /// </summary>
+        public static readonly string Unknown = "unknown";
     }
 
     /// <summary>
@@ -131,6 +150,63 @@ namespace LootLocker.LootLockerStaticStrings
                 public static readonly string CatalogId = "catalog_id";
                 public static readonly string CatalogItemId = "catalog_item_id";
             }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the PlayStation store
+            /// </summary>
+            public struct PlaystationStore
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string TransactionId = "transaction_id";
+                public static readonly string EntitlementLabel = "entitlement_label";
+            }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the Stripe store
+            /// </summary>
+            public struct StripeStore
+            {
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string EntitlementId = "entitlement_id";
+            }
+            /// <summary>
+            /// Standard context keys to expect when source is purchasing from the Epic Games store
+            /// </summary>
+            public struct EpicGamesStore
+            {
+                public static readonly string CatalogId = "catalog_id";
+                public static readonly string CatalogItemId = "catalog_item_id";
+                public static readonly string EpicEntitlementId = "epic_entitlement_id";
+            }
+        }
+
+        /// <summary>
+        /// Standard context keys to expect when source is a leaderboard reward
+        /// </summary>
+        public struct LeaderboardReward
+        {
+            public static readonly string LeaderboardId = "leaderboard_id";
+            public static readonly string PlayerPublicId = "player_public_id";
+        }
+
+        /// <summary>
+        /// Standard context keys to expect when source is a reward campaign
+        /// </summary>
+        public struct RewardCampaign
+        {
+            public static readonly string GiveawayId = "giveaway_id";
+            public static readonly string RewardId = "reward_id";
+        }
+
+        /// <summary>
+        /// Standard context keys to expect when source is a rewards grant
+        /// </summary>
+        public struct RewardsGrant
+        {
+            public static readonly string ItemTemplateId = "item_template_id";
+            public static readonly string TemplateName = "template_name";
+            public static readonly string RequestedCount = "requested_count";
+            public static readonly string GrantedCount = "granted_count";
+            public static readonly string Source = "source";
         }
         
         /// <summary>
@@ -823,7 +899,15 @@ namespace LootLocker.Requests
         /// For Steam Store purchases it is the entitlement id
         /// For LootLocker virtual purchases it is the catalog item id
         /// For Twitch Drops it is the Twitch reward id
+        /// For PlayStation Store purchases it is the transaction id
+        /// For Stripe Store purchases it is the entitlement id
+        /// For Epic Games Store purchases it is the Epic entitlement id
+        /// For Leaderboard rewards it is the leaderboard id
+        /// For Reward Campaigns it is the giveaway id
+        /// For Rewards grants it is the item template id
+        /// For Magic Triggers there is no source specific identifying context key, so the identifying value is the Notification type
         /// For custom notifications(notifications with the field Custom = true and with the source being either LootLocker Console, LootLocker Admin API or LootLocker Server API) the content of the notification is defined by the sender, so the identifying value is simply the Notification type matching the pattern ^[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+$
+        /// For notifications whose source is not recognised by the SDK the SourceEnum is set to unknown and no identifying value is registered
         /// </summary>
         /// <param name="identifyingValue">The identifying value of the notification you want to fetch.</param>
         /// <param name="notifications">A list of notifications that were found for the given identifying value or null if none were found.</param>
@@ -933,6 +1017,45 @@ namespace LootLocker.Requests
                 {
                     notification.SourceEnum = LootLockerNotificationSource.lootlocker_admin_api;
                     identifyingKey = notification.Notification_type;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.MagicTriggers, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.magic_triggers;
+                    identifyingKey = notification.Notification_type;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.PlaystationStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_playstation_store;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.PlaystationStore.TransactionId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.StripeStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_stripe_store;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.StripeStore.EntitlementId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Purchasing.EpicGamesStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.purchasing_epic_games_store;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.EpicGamesStore.EpicEntitlementId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.LeaderboardReward, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.leaderboard_reward;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.LeaderboardReward.LeaderboardId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.RewardCampaign, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.reward_campaign;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.RewardCampaign.GiveawayId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.RewardsGrant, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.rewards_grant;
+                    identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.RewardsGrant.ItemTemplateId;
+                }
+                else
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.unknown;
                 }
 
                 if (identifyingKey != null && notification.Content.ContextAsDictionary.TryGetValue(identifyingKey, out var value) && value != null)
