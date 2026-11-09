@@ -37,6 +37,17 @@ namespace LootLocker.Admin
             return linkXmlPath;
         }
 
+#if !UNITY_2021_1_OR_NEWER
+        // Unity 2020.3 and earlier declare these on the interface; 2021.1 removed them.
+        public void OnBeforeRun(BuildReport report, UnityLinkerBuildPipelineData data)
+        {
+        }
+
+        public void OnAfterRun(BuildReport report, UnityLinkerBuildPipelineData data)
+        {
+        }
+#endif
+
         private static string FindLinkXml()
         {
             UnityEditor.PackageManager.PackageInfo packageInfo =
