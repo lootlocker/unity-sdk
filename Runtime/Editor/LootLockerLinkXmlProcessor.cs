@@ -1,4 +1,7 @@
-#if UNITY_EDITOR
+// IUnityLinkerProcessor and UnityLinkerBuildPipelineData were added in Unity 2019.3. The package
+// declares 2019.2 as its minimum, so the whole processor has to be gated or editor compilation
+// fails on 2019.2 before the linker fix can run.
+#if UNITY_EDITOR && UNITY_2019_3_OR_NEWER
 using System.IO;
 using UnityEditor;
 using UnityEditor.Build;
@@ -81,6 +84,73 @@ namespace LootLocker.Admin
             UnityEditor.PackageManager.PackageInfo packageInfo =
                 UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(LootLockerConfig).Assembly);
             return packageInfo != null && !string.IsNullOrEmpty(packageInfo.resolvedPath);
+        }
+    }
+}
+#elif UNITY_EDITOR
+using System.IO;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
+
+namespace LootLocker.Admin
+{
+    /// <summary>
+    /// Unity 2019.2 fallback for registering the SDK's link.xml with the Unity linker.
+    /// </summary>
+    /// <remarks>
+    /// IUnityLinkerProcessor does not exist before 2019.3, so the processor above cannot be used.
+    /// The linker only reads link.xml files under the project's Assets folder, so this copies the
+    /// package's link.xml into Assets/ before the build and removes it afterwards. The copy is
+    /// transient: it exists only for the duration of the build and is never committed.
+    /// </remarks>
+    internal class LootLockerLinkXmlProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    {
+        private const string StagedAssetPath = "Assets/LootLockerLink.xml";
+
+        public int callbackOrder => 1000;
+
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            string source = FindLinkXml();
+            if (string.IsNullOrEmpty(source))
+            {
+                return;
+            }
+
+            try
+            {
+                File.Copy(source, StagedAssetPath, true);
+                AssetDatabase.ImportAsset(StagedAssetPath, ImportAssetOptions.ForceUpdate);
+            }
+            catch (IOException e)
+            {
+                Debug.LogWarning(
+                    $"[{LootLockerConfig.PackageShortName}] Could not stage link.xml for the build. " +
+                    $"Managed code stripping may remove types the SDK deserializes through reflection. {e.Message}");
+            }
+        }
+
+        public void OnPostprocessBuild(BuildReport report)
+        {
+            if (File.Exists(StagedAssetPath))
+            {
+                AssetDatabase.DeleteAsset(StagedAssetPath);
+            }
+        }
+
+        private static string FindLinkXml()
+        {
+            UnityEditor.PackageManager.PackageInfo packageInfo =
+                UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(LootLockerConfig).Assembly);
+            if (packageInfo == null || string.IsNullOrEmpty(packageInfo.resolvedPath))
+            {
+                return null;
+            }
+
+            string candidate = Path.Combine(packageInfo.resolvedPath, "link.xml");
+            return File.Exists(candidate) ? candidate : null;
         }
     }
 }
