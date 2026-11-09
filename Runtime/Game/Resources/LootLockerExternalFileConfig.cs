@@ -1,7 +1,12 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace LootLocker
 {
+// Deserialized from a TextAsset loaded through Resources.Load, so the type is only
+// reached through reflection. link.xml preserves the members; this keeps the type and
+// its default constructor alive if the package link.xml is ever dropped.
+[Preserve]
 [Serializable]
 public class ExternalFileConfig
 {
