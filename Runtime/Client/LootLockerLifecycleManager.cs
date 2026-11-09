@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
+
+// The SDK is normally linked because the runtime assembly is auto-referenced, but a project
+// that only touches the SDK from editor tooling or a dynamically loaded assembly can have the
+// whole assembly dropped before [RuntimeInitializeOnLoadMethod] is evaluated. Force the linker
+// to run root marking on it so the preservations in link.xml are applied.
+[assembly: AlwaysLinkAssembly]
 
 namespace LootLocker
 {
