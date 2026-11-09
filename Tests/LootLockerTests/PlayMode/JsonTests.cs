@@ -582,8 +582,11 @@ namespace LootLockerTests.PlayMode
         public void Json_DeserializingNestedDto_PopulatesAllMembers()
         {
             // Given
+            // Every value here is deliberately non-default so a stripped setter cannot pass:
+            // limited=25 (not 0), item_type=stackable (not the 0-valued instanced),
+            // consumable/deletable=true (not false), metadata type=number (not the 0-valued string).
             const string response =
-                "{\"success\":true,\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":7,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"instanced\",\"consumable\":true,\"count\":3,\"source\":\"grant\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-02-02T00:00:00Z\",\"template\":{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":0,\"item_type\":\"instanced\",\"consumable\":false,\"deletable\":true},\"metadata\":[{\"key\":\"damage\",\"value\":12,\"type\":\"number\",\"access\":[\"game_api.read\"],\"tags\":[\"combat\"]}]}";
+                "{\"success\":true,\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":7,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"stackable\",\"consumable\":true,\"count\":3,\"source\":\"grant\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-02-02T00:00:00Z\",\"template\":{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":25,\"item_type\":\"stackable\",\"consumable\":false,\"deletable\":true},\"metadata\":[{\"key\":\"damage\",\"value\":12,\"type\":\"number\",\"access\":[\"game_api.read\"],\"tags\":[\"combat\"]}]}";
 
             // When
             var deserialized = LootLockerJson.DeserializeObject<LootLockerGetPlayerInventoryItemResponse>(response);
@@ -594,7 +597,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.id, "id not populated");
             Assert.AreEqual(7, deserialized.player_id, "player_id not populated");
             Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.item_template_id, "item_template_id not populated");
-            Assert.AreEqual(LootLockerItemType.instanced, deserialized.item_type, "item_type not populated");
+            Assert.AreEqual(LootLockerItemType.stackable, deserialized.item_type, "item_type not populated");
             Assert.IsTrue(deserialized.consumable, "consumable not populated");
             Assert.AreEqual(3, deserialized.count, "count not populated");
             Assert.AreEqual("grant", deserialized.source, "source not populated");
@@ -604,8 +607,8 @@ namespace LootLockerTests.PlayMode
 
             Assert.IsNotNull(deserialized.template, "template not deserialized, is null");
             Assert.AreEqual("Sword", deserialized.template.name, "template.name not populated");
-            Assert.AreEqual(0, deserialized.template.limited, "template.limited not populated");
-            Assert.AreEqual(LootLockerItemType.instanced, deserialized.template.item_type,
+            Assert.AreEqual(25, deserialized.template.limited, "template.limited not populated");
+            Assert.AreEqual(LootLockerItemType.stackable, deserialized.template.item_type,
                 "template.item_type not populated");
             Assert.IsTrue(deserialized.template.deletable, "template.deletable not populated");
 
