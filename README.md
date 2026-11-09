@@ -55,6 +55,13 @@ If you have installed the SDK from Open UPM then all you have to do in Package M
 
 For other install methods and more information, head over to our [official documentation](https://docs.lootlocker.com/the-basics/unity-quick-start/updating-sdk).
 
+## Managed code stripping
+The SDK ships a `link.xml` at the package root that preserves the types and members it reaches through reflection when deserializing server responses. The Unity linker only reads `link.xml` files that live under your project's `Assets/` folder, so the SDK registers its own file with the linker through an `IUnityLinkerProcessor` (`Runtime/Editor/LootLockerLinkXmlProcessor.cs`). This happens automatically — no setup required.
+
+If you enable **Managed Stripping Level** (Medium or High) in Player Settings, do not delete the package's `link.xml` or the processor. Without them, responses deserialize into non-null objects whose members are all default values, which fails silently rather than throwing.
+
+If you need to add preservations for your own types, put them in a separate `link.xml` under your project's `Assets/` folder. Multiple `link.xml` files are supported and are merged by the Unity linker.
+
 ## Support
 If you have any issues or just wanna chat you can reach us on our [Discord Server](https://discord.lootlocker.io/)
 
