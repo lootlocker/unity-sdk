@@ -496,6 +496,130 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
         }
 
+        /// <summary>
+        /// Guards the contract that deserialization populates every member, not just the ones
+        /// the linker happens to keep. When managed code stripping removes property setters,
+        /// deserialization still returns a non-null object but every member is left at its
+        /// default value - which is silent and easy to miss. See link.xml at the package root.
+        /// </summary>
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_RoundTrippingPlayerData_PreservesAllMembers()
+        {
+            // Given
+            var original = new LootLockerPlayerData
+            {
+                SessionToken = "session-token-value",
+                RefreshToken = "refresh-token-value",
+                ULID = "01HZZZZZZZZZZZZZZZZZZZZZZZ",
+                Identifier = "player-identifier",
+                PublicUID = "TSEYDXD8",
+                LegacyID = 4242,
+                Name = "Player Name",
+                WhiteLabelEmail = "player@example.com",
+                WhiteLabelToken = "white-label-token",
+                CurrentPlatform = new LL_AuthPlatformRepresentation
+                {
+                    Platform = LL_AuthPlatforms.Steam,
+                    PlatformString = "steam",
+                    PlatformFriendlyString = "Steam"
+                },
+                LastSignIn = new DateTime(2024, 5, 1, 12, 30, 45, DateTimeKind.Utc),
+                CreatedAt = new DateTime(2023, 1, 15, 8, 0, 0, DateTimeKind.Utc),
+                WalletID = "wallet-id-value",
+                SessionOptionals = new LootLockerSessionOptionals
+                {
+                    timezone = "Europe/Stockholm",
+                    player_name = "Optional Name",
+                    auto_create_profile = false,
+                    check_dlc = true
+                }
+            };
+
+            // When
+            string serialized = LootLockerJson.SerializeObject(original);
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerPlayerData>(serialized);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.AreEqual(original.SessionToken, deserialized.SessionToken, "SessionToken not preserved");
+            Assert.AreEqual(original.RefreshToken, deserialized.RefreshToken, "RefreshToken not preserved");
+            Assert.AreEqual(original.ULID, deserialized.ULID, "ULID not preserved");
+            Assert.AreEqual(original.Identifier, deserialized.Identifier, "Identifier not preserved");
+            Assert.AreEqual(original.PublicUID, deserialized.PublicUID, "PublicUID not preserved");
+            Assert.AreEqual(original.LegacyID, deserialized.LegacyID, "LegacyID not preserved");
+            Assert.AreEqual(original.Name, deserialized.Name, "Name not preserved");
+            Assert.AreEqual(original.WhiteLabelEmail, deserialized.WhiteLabelEmail, "WhiteLabelEmail not preserved");
+            Assert.AreEqual(original.WhiteLabelToken, deserialized.WhiteLabelToken, "WhiteLabelToken not preserved");
+            Assert.AreEqual(original.WalletID, deserialized.WalletID, "WalletID not preserved");
+            Assert.AreEqual(original.LastSignIn, deserialized.LastSignIn, "LastSignIn not preserved");
+            Assert.AreEqual(original.CreatedAt, deserialized.CreatedAt, "CreatedAt not preserved");
+
+            Assert.AreEqual(original.CurrentPlatform.Platform, deserialized.CurrentPlatform.Platform,
+                "CurrentPlatform.Platform not preserved");
+            Assert.AreEqual(original.CurrentPlatform.PlatformString, deserialized.CurrentPlatform.PlatformString,
+                "CurrentPlatform.PlatformString not preserved");
+            Assert.AreEqual(original.CurrentPlatform.PlatformFriendlyString,
+                deserialized.CurrentPlatform.PlatformFriendlyString,
+                "CurrentPlatform.PlatformFriendlyString not preserved");
+
+            Assert.IsNotNull(deserialized.SessionOptionals, "SessionOptionals not deserialized, is null");
+            Assert.AreEqual(original.SessionOptionals.timezone, deserialized.SessionOptionals.timezone,
+                "SessionOptionals.timezone not preserved");
+            Assert.AreEqual(original.SessionOptionals.player_name, deserialized.SessionOptionals.player_name,
+                "SessionOptionals.player_name not preserved");
+            Assert.AreEqual(original.SessionOptionals.auto_create_profile,
+                deserialized.SessionOptionals.auto_create_profile,
+                "SessionOptionals.auto_create_profile not preserved");
+            Assert.AreEqual(original.SessionOptionals.check_dlc, deserialized.SessionOptionals.check_dlc,
+                "SessionOptionals.check_dlc not preserved");
+        }
+
+        /// <summary>
+        /// Covers the member shapes that stripping breaks first: nested objects, arrays,
+        /// enums, DateTime and nullable values.
+        /// </summary>
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingNestedDto_PopulatesAllMembers()
+        {
+            // Given
+            const string response =
+                "{\"success\":true,\"id\":\"01HZZZZZZZZZZZZZZZZZZZZZZZ\",\"player_id\":7,\"item_template_id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"item_type\":\"instanced\",\"consumable\":true,\"count\":3,\"source\":\"grant\",\"deletable\":true,\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-02-02T00:00:00Z\",\"template\":{\"id\":\"01HAAAAAAAAAAAAAAAAAAAAAAA\",\"name\":\"Sword\",\"game_id\":42,\"limited\":0,\"item_type\":\"instanced\",\"consumable\":false,\"deletable\":true},\"metadata\":[{\"key\":\"damage\",\"value\":12,\"type\":\"number\",\"access\":[\"game_api.read\"],\"tags\":[\"combat\"]}]}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerGetPlayerInventoryItemResponse>(response);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsTrue(deserialized.success, "success not populated");
+            Assert.AreEqual("01HZZZZZZZZZZZZZZZZZZZZZZZ", deserialized.id, "id not populated");
+            Assert.AreEqual(7, deserialized.player_id, "player_id not populated");
+            Assert.AreEqual("01HAAAAAAAAAAAAAAAAAAAAAAA", deserialized.item_template_id, "item_template_id not populated");
+            Assert.AreEqual(LootLockerItemType.instanced, deserialized.item_type, "item_type not populated");
+            Assert.IsTrue(deserialized.consumable, "consumable not populated");
+            Assert.AreEqual(3, deserialized.count, "count not populated");
+            Assert.AreEqual("grant", deserialized.source, "source not populated");
+            Assert.IsTrue(deserialized.deletable, "deletable not populated");
+            Assert.AreNotEqual(default(DateTime), deserialized.created_at, "created_at not populated");
+            Assert.IsNotNull(deserialized.updated_at, "updated_at not populated");
+
+            Assert.IsNotNull(deserialized.template, "template not deserialized, is null");
+            Assert.AreEqual("Sword", deserialized.template.name, "template.name not populated");
+            Assert.AreEqual(0, deserialized.template.limited, "template.limited not populated");
+            Assert.AreEqual(LootLockerItemType.instanced, deserialized.template.item_type,
+                "template.item_type not populated");
+            Assert.IsTrue(deserialized.template.deletable, "template.deletable not populated");
+
+            Assert.IsNotNull(deserialized.metadata, "metadata not deserialized, is null");
+            Assert.AreEqual(1, deserialized.metadata.Length, "metadata not populated, wrong length");
+            Assert.AreEqual("damage", deserialized.metadata[0].key, "metadata.key not populated");
+            Assert.AreEqual(LootLockerMetadataTypes.Number, deserialized.metadata[0].type,
+                "metadata.type not populated");
+            Assert.IsNotNull(deserialized.metadata[0].access, "metadata.access not deserialized, is null");
+            Assert.AreEqual("game_api.read", deserialized.metadata[0].access[0], "metadata.access not populated");
+            Assert.IsNotNull(deserialized.metadata[0].tags, "metadata.tags not deserialized, is null");
+            Assert.AreEqual("combat", deserialized.metadata[0].tags[0], "metadata.tags not populated");
+        }
+
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Json_SimpleTypeSerialization_Succeeds()
