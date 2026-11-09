@@ -1,0 +1,79 @@
+<linker>
+  <!--
+    Managed code stripping preservation for the LootLocker Unity SDK.
+
+    The SDK deserializes server responses through reflection (see
+    Runtime/Libraries/ZeroDepJson/ZeroDepJson.cs). The Unity linker cannot see
+    those call sites, so at Medium/High stripping levels it removes the property
+    setters and default constructors that deserialization depends on. The result
+    is not a build failure: responses deserialize into non-null objects whose
+    members are all default values.
+
+    Do not delete this file. It is registered with the Unity linker by
+    Runtime/Editor/LootLockerLinkXmlProcessor.cs, because the linker only reads
+    link.xml files that live under the project's Assets folder and ignores ones
+    shipped inside a package.
+
+    If you need to add preservations for your own types, add them to a separate
+    link.xml under your project's Assets/ folder.
+  -->
+  <assembly fullname="lootlocker.lootlockersdk.runtime">
+    <!-- Reached only through Resources.Load, so no static reference exists. -->
+    <type fullname="LootLocker.LootLockerConfig" preserve="all" />
+    <type fullname="LootLocker.ExternalFileConfig" preserve="all" />
+
+    <!-- Response and request DTOs, populated by ZeroDepJson via TypeDescriptor. -->
+    <type fullname="LootLocker.Requests*" preserve="all" />
+    <type fullname="LootLocker.LootLockerEnums*" preserve="all" />
+
+    <!-- Shared response plumbing and persisted state. -->
+    <type fullname="LootLocker.LootLockerResponse" preserve="all" />
+    <type fullname="LootLocker.LootLockerErrorData" preserve="all" />
+    <type fullname="LootLocker.LootLockerRequestContext" preserve="all" />
+    <type fullname="LootLocker.LootLockerPlayerData" preserve="all" />
+    <type fullname="LootLocker.LootLockerStateMetaData" preserve="all" />
+    <type fullname="LootLocker.UniqueList`1" preserve="all" />
+
+    <!-- Generic containers constructed by Activator.CreateInstance. -->
+    <type fullname="LootLocker.LootLockerPaginationResponse`1" preserve="all" />
+    <type fullname="LootLocker.LootLockerExtendedPagination" preserve="all" />
+    <type fullname="LootLocker.LootLockerExtendedPaginationError" preserve="all" />
+    <type fullname="LootLocker.LootLockerStreamedResponse`1" preserve="all" />
+  </assembly>
+
+  <!--
+    ZeroDepJson resolves members and value conversions through
+    System.ComponentModel.TypeDescriptor (ZeroDepJson.cs:3567, :4634, :4652).
+    Without these converters preserved, TypeDescriptor falls back to a base
+    TypeConverter that cannot convert, and every non-string member silently
+    lands on its default value. This is the same set that
+    com.unity.nuget.newtonsoft-json ships for the same reason.
+  -->
+  <assembly fullname="System">
+    <type fullname="System.ComponentModel.TypeConverter" preserve="all" />
+    <type fullname="System.ComponentModel.ArrayConverter" preserve="all" />
+    <type fullname="System.ComponentModel.BaseNumberConverter" preserve="all" />
+    <type fullname="System.ComponentModel.BooleanConverter" preserve="all" />
+    <type fullname="System.ComponentModel.ByteConverter" preserve="all" />
+    <type fullname="System.ComponentModel.CharConverter" preserve="all" />
+    <type fullname="System.ComponentModel.CollectionConverter" preserve="all" />
+    <type fullname="System.ComponentModel.ComponentConverter" preserve="all" />
+    <type fullname="System.ComponentModel.CultureInfoConverter" preserve="all" />
+    <type fullname="System.ComponentModel.DateTimeConverter" preserve="all" />
+    <type fullname="System.ComponentModel.DecimalConverter" preserve="all" />
+    <type fullname="System.ComponentModel.DoubleConverter" preserve="all" />
+    <type fullname="System.ComponentModel.EnumConverter" preserve="all" />
+    <type fullname="System.ComponentModel.ExpandableObjectConverter" preserve="all" />
+    <type fullname="System.ComponentModel.Int16Converter" preserve="all" />
+    <type fullname="System.ComponentModel.Int32Converter" preserve="all" />
+    <type fullname="System.ComponentModel.Int64Converter" preserve="all" />
+    <type fullname="System.ComponentModel.NullableConverter" preserve="all" />
+    <type fullname="System.ComponentModel.SByteConverter" preserve="all" />
+    <type fullname="System.ComponentModel.SingleConverter" preserve="all" />
+    <type fullname="System.ComponentModel.StringConverter" preserve="all" />
+    <type fullname="System.ComponentModel.TimeSpanConverter" preserve="all" />
+    <type fullname="System.ComponentModel.UInt16Converter" preserve="all" />
+    <type fullname="System.ComponentModel.UInt32Converter" preserve="all" />
+    <type fullname="System.ComponentModel.UInt64Converter" preserve="all" />
+  </assembly>
+</linker>
