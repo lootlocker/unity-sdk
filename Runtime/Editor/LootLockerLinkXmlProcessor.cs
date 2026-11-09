@@ -26,15 +26,23 @@ namespace LootLocker.Admin
         public string GenerateAdditionalLinkXmlFile(BuildReport report, UnityLinkerBuildPipelineData data)
         {
             string linkXmlPath = FindLinkXml();
-            if (string.IsNullOrEmpty(linkXmlPath))
+            if (!string.IsNullOrEmpty(linkXmlPath))
             {
-                Debug.LogWarning(
-                    $"[{LootLockerConfig.PackageShortName}] Could not locate link.xml. Managed code stripping may remove " +
-                    "types the SDK deserializes through reflection, causing responses to come back with default values.");
-                return null;
+                return linkXmlPath;
             }
 
-            return linkXmlPath;
+            // No package to resolve means a .unitypackage install, where the SDK lives under
+            // Assets/ and the linker finds link.xml on its own. Only warn when the package was
+            // found but the file is missing, which means the install is broken.
+            if (IsInstalledAsPackage())
+            {
+                Debug.LogWarning(
+                    $"[{LootLockerConfig.PackageShortName}] Could not locate link.xml in the installed package. " +
+                    "Managed code stripping may remove types the SDK deserializes through reflection, causing " +
+                    "responses to come back with default values.");
+            }
+
+            return null;
         }
 
 #if !UNITY_2021_1_OR_NEWER
@@ -50,15 +58,29 @@ namespace LootLocker.Admin
 
         private static string FindLinkXml()
         {
+            // UPM install (registry, git, or local file reference): resolve the package root.
             UnityEditor.PackageManager.PackageInfo packageInfo =
                 UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(LootLockerConfig).Assembly);
-            if (packageInfo == null || string.IsNullOrEmpty(packageInfo.resolvedPath))
+            if (packageInfo != null && !string.IsNullOrEmpty(packageInfo.resolvedPath))
             {
-                return null;
+                string fromPackage = Path.Combine(packageInfo.resolvedPath, "link.xml");
+                if (File.Exists(fromPackage))
+                {
+                    return fromPackage;
+                }
             }
 
-            string candidate = Path.Combine(packageInfo.resolvedPath, "link.xml");
-            return File.Exists(candidate) ? candidate : null;
+            // .unitypackage install: the SDK is copied into Assets/, so there is no package to
+            // resolve. The linker already picks up link.xml files under Assets/ on its own, so
+            // returning null here is correct and must not warn.
+            return null;
+        }
+
+        private static bool IsInstalledAsPackage()
+        {
+            UnityEditor.PackageManager.PackageInfo packageInfo =
+                UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(LootLockerConfig).Assembly);
+            return packageInfo != null && !string.IsNullOrEmpty(packageInfo.resolvedPath);
         }
     }
 }
