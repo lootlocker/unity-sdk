@@ -206,12 +206,26 @@ namespace LootLocker
         /// Player file responses carry a short-lived signed URL in "url". That URL is a bearer
         /// credential: anyone holding it can download the file until it expires, so it must never
         /// reach logs or the log UI. An object is treated as carrying a signed download URL when it
-        /// has "url_expires_at", or when "requires_download_link" is true. The marker is needed
-        /// because the file revision payload carries a signed "url" without an expiry field; it is
-        /// only honoured when true, since ordinary file responses carry it as false. Scoping on
-        /// those markers leaves ordinary URLs in other responses intact.
+        /// has "url_expires_at", when "requires_download_link" is true, or when it is a file
+        /// revision payload (identified by "revision_id" or a ULID-shaped "id" alongside "size").
+        /// The revision case is needed because revision payloads carry a signed "url" with neither
+        /// an expiry field nor a true marker. Scoping on those markers leaves ordinary URLs in
+        /// other responses intact.
         /// </summary>
         public static string RedactSignedDownloadUrlsForLogging(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+
+            // A response body can itself be a JSON string (for example LootLockerResponse.text),
+            // so redact embedded JSON payloads as well as the outer document.
+            string redactedJson = RedactSignedDownloadUrlsInJson(json);
+            return RedactEmbeddedJsonStrings(redactedJson);
+        }
+
+        private static string RedactSignedDownloadUrlsInJson(string json)
         {
             if (string.IsNullOrEmpty(json))
             {
@@ -249,9 +263,156 @@ namespace LootLocker
 #endif //LOOTLOCKER_USE_NEWTONSOFTJSON
         }
 
-#if LOOTLOCKER_USE_NEWTONSOFTJSON
-        private static void RedactSignedDownloadUrlsInToken(JToken token, ref bool redacted)
+        /// <summary>
+        /// Walks a parsed document and redacts any string value that is itself a JSON object or
+        /// array, so a response body stored as a string cannot smuggle a signed URL past the
+        /// object-level redaction.
+        /// </summary>
+        private static string RedactEmbeddedJsonStrings(string json)
         {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            JToken token;
+            try
+            {
+                token = JToken.Parse(json);
+            }
+            catch (JsonReaderException)
+            {
+                return json;
+            }
+
+            bool redacted = false;
+            RedactEmbeddedJsonStringsInToken(token, ref redacted);
+            return redacted ? token.ToString(Formatting.None) : json;
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+            object parsed;
+            try
+            {
+                parsed = Json.Deserialize(json);
+            }
+            catch (JsonException)
+            {
+                return json;
+            }
+
+            bool redacted = false;
+            RedactEmbeddedJsonStringsInValue(parsed, ref redacted);
+            return redacted ? LootLockerJson.SerializeObject(parsed) : json;
+#endif //LOOTLOCKER_USE_NEWTONSOFTJSON
+        }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        private static void RedactEmbeddedJsonStringsInToken(JToken token, ref bool redacted)
+        {
+            if (token == null)
+            {
+                return;
+            }
+
+            if (token.Type == JTokenType.Object)
+            {
+                JObject obj = (JObject)token;
+                foreach (JProperty property in obj.Properties())
+                {
+                    RedactEmbeddedJsonStringsInToken(property.Value, ref redacted);
+                }
+            }
+            else if (token.Type == JTokenType.Array)
+            {
+                foreach (JToken element in token)
+                {
+                    RedactEmbeddedJsonStringsInToken(element, ref redacted);
+                }
+            }
+            else if (token.Type == JTokenType.String)
+            {
+                string value = token.ToString();
+                string trimmed = value.TrimStart();
+                if (trimmed.StartsWith("{") || trimmed.StartsWith("["))
+                {
+                    string redactedValue = RedactSignedDownloadUrlsInJson(value);
+                    if (!ReferenceEquals(redactedValue, value) && redactedValue != value)
+                    {
+                        token.Replace(new JValue(redactedValue));
+                        redacted = true;
+                    }
+                }
+            }
+        }
+#else //LOOTLOCKER_USE_NEWTONSOFTJSON
+        private static void RedactEmbeddedJsonStringsInValue(object value, ref bool redacted)
+        {
+            if (value is Dictionary<string, object> obj)
+            {
+                foreach (string key in new List<string>(obj.Keys))
+                {
+                    if (obj[key] is string stringValue)
+                    {
+                        string trimmed = stringValue.TrimStart();
+                        if (trimmed.StartsWith("{") || trimmed.StartsWith("["))
+                        {
+                            string redactedValue = RedactSignedDownloadUrlsInJson(stringValue);
+                            if (redactedValue != stringValue)
+                            {
+                                obj[key] = redactedValue;
+                                redacted = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RedactEmbeddedJsonStringsInValue(obj[key], ref redacted);
+                    }
+                }
+            }
+            else if (value is System.Collections.IList list)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i] is string stringValue)
+                    {
+                        string trimmed = stringValue.TrimStart();
+                        if (trimmed.StartsWith("{") || trimmed.StartsWith("["))
+                        {
+                            string redactedValue = RedactSignedDownloadUrlsInJson(stringValue);
+                            if (redactedValue != stringValue)
+                            {
+                                list[i] = redactedValue;
+                                redacted = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RedactEmbeddedJsonStringsInValue(list[i], ref redacted);
+                    }
+                }
+            }
+        }
+#endif //LOOTLOCKER_USE_NEWTONSOFTJSON
+
+        /// <summary>
+        /// Whether an object looks like a player file revision payload, which carries a signed
+        /// "url" without an expiry field or a true "requires_download_link" marker.
+        /// </summary>
+        private static bool IsFileRevisionPayload(bool hasRevisionId, object id, object size)
+        {
+            if (hasRevisionId)
+            {
+                return true;
+            }
+
+            // A revision's "id" is a ULID string, and it always carries a numeric "size".
+            return id is string idString && idString.Length == 26 && size != null;
+        }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        private static void RedactSignedDownloadUrlsInToken(JToken token, ref bool redacted)        {
             if (token == null)
             {
                 return;
@@ -267,9 +428,12 @@ namespace LootLocker
 
                 // Only redact "url" on objects that carry a signed download URL marker, which leaves
                 // ordinary URLs in other responses intact. "requires_download_link" is present (and
-                // false) on ordinary file responses, so it only counts when true.
+                // false) on ordinary file responses, so it only counts when true. Revision payloads
+                // carry a signed "url" with neither an expiry nor a true marker, so they are
+                // identified by their shape: a revision id plus a size.
                 bool carriesSignedDownloadUrl = obj["url_expires_at"] != null
-                    || (obj["requires_download_link"] != null && obj["requires_download_link"].Type == JTokenType.Boolean && obj["requires_download_link"].Value<bool>());
+                    || (obj["requires_download_link"] != null && obj["requires_download_link"].Type == JTokenType.Boolean && obj["requires_download_link"].Value<bool>())
+                    || IsFileRevisionPayload(obj["revision_id"] != null, obj["id"], obj["size"]);
                 JToken url = obj["url"];
                 if (carriesSignedDownloadUrl && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
                 {
@@ -297,9 +461,12 @@ namespace LootLocker
 
                 // Only redact "url" on objects that carry a signed download URL marker, which leaves
                 // ordinary URLs in other responses intact. "requires_download_link" is present (and
-                // false) on ordinary file responses, so it only counts when true.
+                // false) on ordinary file responses, so it only counts when true. Revision payloads
+                // carry a signed "url" with neither an expiry nor a true marker, so they are
+                // identified by their shape: a revision id plus a size.
                 bool carriesSignedDownloadUrl = obj.ContainsKey("url_expires_at")
-                    || (obj.TryGetValue("requires_download_link", out object requiresDownloadLink) && requiresDownloadLink is bool required && required);
+                    || (obj.TryGetValue("requires_download_link", out object requiresDownloadLink) && requiresDownloadLink is bool required && required)
+                    || IsFileRevisionPayload(obj.ContainsKey("revision_id"), obj.ContainsKey("id") ? obj["id"] : null, obj.ContainsKey("size") ? obj["size"] : null);
                 if (carriesSignedDownloadUrl && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
                 {
                     obj["url"] = "[REDACTED]";

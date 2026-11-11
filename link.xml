@@ -24,10 +24,12 @@
 
     <!--
       Response and request DTOs, populated by ZeroDepJson via TypeDescriptor.
-      A single LootLocker.* pattern covers both LootLocker.Requests and the DTOs that
-      live in the root LootLocker namespace (e.g. the presence payloads), so new DTOs
-      are covered automatically without having to update this file.
+
+      link.xml has no wildcard support: "LootLocker.*" is not a pattern the linker expands, so
+      every DTO namespace has to be listed explicitly. Keep this list in sync when adding a new
+      namespace that holds reflected DTOs.
     -->
+    <type fullname="LootLocker.Requests.*" preserve="all" />
     <type fullname="LootLocker.*" preserve="all" />
 
     <!-- Shared response plumbing and persisted state. -->
