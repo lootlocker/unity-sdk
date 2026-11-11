@@ -9,7 +9,10 @@ using UnityEngine.Scripting;
 // that only touches the SDK from editor tooling or a dynamically loaded assembly can have the
 // whole assembly dropped before [RuntimeInitializeOnLoadMethod] is evaluated. Force the linker
 // to run root marking on it so the preservations in link.xml are applied.
+// AlwaysLinkAssemblyAttribute only exists from 2019.3, and the package still supports 2019.2.
+#if UNITY_2019_3_OR_NEWER
 [assembly: AlwaysLinkAssembly]
+#endif
 
 namespace LootLocker
 {

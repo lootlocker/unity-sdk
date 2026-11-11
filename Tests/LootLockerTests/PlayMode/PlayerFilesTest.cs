@@ -1111,5 +1111,46 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(revision.requires_download_link, "requires_download_link should deserialize as true on a revision");
             Assert.IsTrue(string.IsNullOrEmpty(revision.url), "A gated revision should not carry a download url");
         }
+
+        // Ordinary file responses carry requires_download_link as false. Keying redaction on the
+        // presence of that field would redact usable public URLs, so only a true marker counts.
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void PlayerFiles_RedactSignedDownloadUrls_LeavesOrdinaryUrlsIntact()
+        {
+            // Given - an ordinary (non-gated) file response
+            const string ordinaryFileJson = "{\"id\":42,\"name\":\"public.txt\",\"public\":true," +
+                "\"url\":\"https://cdn.example.com/public.txt\",\"requires_download_link\":false}";
+
+            // When
+            string redacted = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(ordinaryFileJson);
+
+            // Then - the usable public url survives
+            StringAssert.Contains("https://cdn.example.com/public.txt", redacted,
+                "An ordinary public url must not be redacted");
+            StringAssert.DoesNotContain("[REDACTED]", redacted,
+                "An ordinary public url must not be redacted");
+
+            // Given - a gated file response, which carries a true marker
+            const string gatedFileJson = "{\"id\":42,\"name\":\"reward.txt\",\"public\":false," +
+                "\"url\":\"https://cdn.example.com/signed?token=abc\",\"requires_download_link\":true}";
+
+            // When
+            string gatedRedacted = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(gatedFileJson);
+
+            // Then - the signed url is redacted
+            StringAssert.Contains("[REDACTED]", gatedRedacted, "A gated signed url must be redacted");
+            StringAssert.DoesNotContain("token=abc", gatedRedacted, "A gated signed url must be redacted");
+
+            // Given - a response carrying an explicit expiry
+            const string expiringJson = "{\"url\":\"https://cdn.example.com/signed?token=xyz\"," +
+                "\"url_expires_at\":\"2026-01-02T03:04:05+00:00\"}";
+
+            // When
+            string expiringRedacted = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(expiringJson);
+
+            // Then - the signed url is redacted
+            StringAssert.Contains("[REDACTED]", expiringRedacted, "A url with an expiry must be redacted");
+            StringAssert.DoesNotContain("token=xyz", expiringRedacted, "A url with an expiry must be redacted");
+        }
     }
 }

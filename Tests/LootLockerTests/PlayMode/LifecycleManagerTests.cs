@@ -101,16 +101,17 @@ namespace LootLockerTests.PlayMode
 
             // Given
             Assert.IsTrue(LootLockerLifecycleManager.IsReady, "SDK was not ready before the test");
+            var staleInstance = LootLockerLifecycleManager.Instance;
+            Assert.IsNotNull(staleInstance, "No lifecycle manager instance to replace");
 
-            // A leftover manager from a previous instantiation. Unity defers Destroy() to the end of
-            // the frame, so a replaced instance can outlive the instance that replaced it.
-            var staleManagerGameObject = new GameObject("StaleLootLockerLifecycleManager");
-            staleManagerGameObject.AddComponent<LootLockerLifecycleManager>();
-            yield return null;
+            // When - replace the registered instance. TeardownInstance() defers Destroy() to the end
+            // of the frame, so the stale instance's OnDestroy runs after the replacement is registered.
+            LootLockerLifecycleManager.ResetInstance();
+            var currentInstance = LootLockerLifecycleManager.Instance;
+            Assert.IsNotNull(currentInstance, "ResetInstance did not create a replacement");
+            Assert.AreNotSame(staleInstance, currentInstance, "ResetInstance did not replace the instance");
 
-            // When - Destroy() is deferred to the end of the frame, which is what makes the stale
-            // instance's OnDestroy run after the current instance has already been created.
-            UnityEngine.Object.Destroy(staleManagerGameObject);
+            // Let the deferred OnDestroy of the stale instance run.
             yield return null;
 
             // Then
@@ -135,16 +136,17 @@ namespace LootLockerTests.PlayMode
         {
             Assert.IsFalse(SetupFailed, "Failed to setup game");
 
-            // Given - a leftover manager from an earlier instantiation whose destruction is deferred
+            // Given - the currently registered instance, which becomes stale once replaced
             Assert.IsTrue(LootLockerLifecycleManager.IsReady, "SDK was not ready before the test");
-            var staleManagerGameObject = new GameObject("StaleLootLockerLifecycleManager");
-            staleManagerGameObject.AddComponent<LootLockerLifecycleManager>();
-            yield return null;
+            var staleInstance = LootLockerLifecycleManager.Instance;
+            Assert.IsNotNull(staleInstance, "No lifecycle manager instance to replace");
 
-            // When - re-initialize (creating a fresh instance) and immediately send a request, then
-            // let the stale instance's deferred OnDestroy run while the request is still in flight.
-            // This mirrors a game that calls Init() from a coroutine and sends its first request in
-            // the same frame, with the previous instance being destroyed on the following frame.
+            // When - replace the instance and immediately send a request, then let the stale
+            // instance's deferred OnDestroy run while the request is still in flight. This mirrors a
+            // game that calls Init() from a coroutine and sends its first request in the same frame,
+            // with the previous instance being destroyed on the following frame.
+            LootLockerLifecycleManager.ResetInstance();
+            Assert.AreNotSame(staleInstance, LootLockerLifecycleManager.Instance, "ResetInstance did not replace the instance");
             Assert.IsTrue(gameUnderTest.InitializeLootLockerSDK(), "Failed to re-initialize LootLocker");
 
             float deadline = Time.realtimeSinceStartup + RequestTimeoutSeconds;
@@ -156,7 +158,6 @@ namespace LootLockerTests.PlayMode
                 sessionCompleted = true;
             });
 
-            UnityEngine.Object.Destroy(staleManagerGameObject);
             yield return new WaitUntil(() => sessionCompleted || Time.realtimeSinceStartup >= deadline);
 
             // Then - the in-flight request must still complete

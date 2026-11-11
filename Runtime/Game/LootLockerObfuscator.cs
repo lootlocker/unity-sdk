@@ -206,9 +206,10 @@ namespace LootLocker
         /// Player file responses carry a short-lived signed URL in "url". That URL is a bearer
         /// credential: anyone holding it can download the file until it expires, so it must never
         /// reach logs or the log UI. An object is treated as carrying a signed download URL when it
-        /// has "url_expires_at" or the player file marker "requires_download_link". The marker is
-        /// needed because the file revision payload carries a signed "url" without an expiry field.
-        /// Scoping on those markers leaves ordinary URLs in other responses intact.
+        /// has "url_expires_at", or when "requires_download_link" is true. The marker is needed
+        /// because the file revision payload carries a signed "url" without an expiry field; it is
+        /// only honoured when true, since ordinary file responses carry it as false. Scoping on
+        /// those markers leaves ordinary URLs in other responses intact.
         /// </summary>
         public static string RedactSignedDownloadUrlsForLogging(string json)
         {
@@ -265,8 +266,10 @@ namespace LootLocker
                 }
 
                 // Only redact "url" on objects that carry a signed download URL marker, which leaves
-                // ordinary URLs in other responses intact.
-                bool carriesSignedDownloadUrl = obj["url_expires_at"] != null || obj["requires_download_link"] != null;
+                // ordinary URLs in other responses intact. "requires_download_link" is present (and
+                // false) on ordinary file responses, so it only counts when true.
+                bool carriesSignedDownloadUrl = obj["url_expires_at"] != null
+                    || (obj["requires_download_link"] != null && obj["requires_download_link"].Type == JTokenType.Boolean && obj["requires_download_link"].Value<bool>());
                 JToken url = obj["url"];
                 if (carriesSignedDownloadUrl && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
                 {
@@ -293,8 +296,10 @@ namespace LootLocker
                 }
 
                 // Only redact "url" on objects that carry a signed download URL marker, which leaves
-                // ordinary URLs in other responses intact.
-                bool carriesSignedDownloadUrl = obj.ContainsKey("url_expires_at") || obj.ContainsKey("requires_download_link");
+                // ordinary URLs in other responses intact. "requires_download_link" is present (and
+                // false) on ordinary file responses, so it only counts when true.
+                bool carriesSignedDownloadUrl = obj.ContainsKey("url_expires_at")
+                    || (obj.TryGetValue("requires_download_link", out object requiresDownloadLink) && requiresDownloadLink is bool required && required);
                 if (carriesSignedDownloadUrl && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
                 {
                     obj["url"] = "[REDACTED]";
