@@ -107,7 +107,11 @@ namespace LootLocker.Admin
     /// </remarks>
     internal class LootLockerLinkXmlProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {
-        private const string StagedAssetPath = "Assets/LootLockerLink.xml";
+        private const string StagedAssetPath = "Assets/LootLockerLink.generated.xml";
+
+        // Only delete the staged asset when this processor created it, so a project that happens
+        // to own a file at the staging path is never silently stripped of it.
+        private static bool s_stagedByThisProcessor;
 
         public int callbackOrder => 1000;
 
@@ -119,10 +123,20 @@ namespace LootLocker.Admin
                 return;
             }
 
+            if (File.Exists(StagedAssetPath))
+            {
+                Debug.LogWarning(
+                    $"[{LootLockerConfig.PackageShortName}] {StagedAssetPath} already exists, so the SDK's " +
+                    "link.xml was not staged for this build. Managed code stripping may remove types the SDK " +
+                    "deserializes through reflection. Remove or rename that file to let the SDK stage its own.");
+                return;
+            }
+
             try
             {
-                File.Copy(source, StagedAssetPath, true);
+                File.Copy(source, StagedAssetPath, false);
                 AssetDatabase.ImportAsset(StagedAssetPath, ImportAssetOptions.ForceUpdate);
+                s_stagedByThisProcessor = true;
             }
             catch (IOException e)
             {
@@ -134,10 +148,11 @@ namespace LootLocker.Admin
 
         public void OnPostprocessBuild(BuildReport report)
         {
-            if (File.Exists(StagedAssetPath))
+            if (s_stagedByThisProcessor && File.Exists(StagedAssetPath))
             {
                 AssetDatabase.DeleteAsset(StagedAssetPath);
             }
+            s_stagedByThisProcessor = false;
         }
 
         private static string FindLinkXml()

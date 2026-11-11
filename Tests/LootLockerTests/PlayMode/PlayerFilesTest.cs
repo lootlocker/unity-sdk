@@ -1157,6 +1157,27 @@ namespace LootLockerTests.PlayMode
             // Then - the signed url is redacted
             StringAssert.Contains("[REDACTED]", expiringRedacted, "A url with an expiry must be redacted");
             StringAssert.DoesNotContain("token=xyz", expiringRedacted, "A url with an expiry must be redacted");
+
+            // Given - a normal (non-gated) file revision, which carries a signed url with neither
+            // an expiry nor a true requires_download_link marker
+            const string revisionJson = "{\"id\":\"01J8Z0X9K4ABCDEFGHJKMNPQRS\",\"url\":\"https://cdn.example.com/rev?token=rev\",\"size\":128," +
+                "\"created_at\":\"2026-01-02T03:04:05+00:00\",\"requires_download_link\":false}";
+
+            // When
+            string revisionRedacted = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(revisionJson);
+
+            // Then - the revision's signed url is redacted
+            StringAssert.Contains("[REDACTED]", revisionRedacted, "A file revision url must be redacted");
+            StringAssert.DoesNotContain("token=rev", revisionRedacted, "A file revision url must be redacted");
+
+            // Given - a response body stored as a JSON string, as LootLockerResponse.text is
+            const string nestedJson = "{\"text\":\"{\\\"url\\\":\\\"https://cdn.example.com/n?token=nested\\\",\\\"url_expires_at\\\":\\\"2026-01-02T03:04:05+00:00\\\"}\"}";
+
+            // When
+            string nestedRedacted = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(nestedJson);
+
+            // Then - the embedded payload is redacted too
+            StringAssert.DoesNotContain("token=nested", nestedRedacted, "A signed url inside a JSON string must be redacted");
         }
     }
 }
