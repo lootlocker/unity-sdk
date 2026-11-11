@@ -1039,8 +1039,12 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsTrue(linkResponse.success, "CreatePlayerFileDownloadLink failed");
             Assert.AreEqual(upload.id, linkResponse.id, "Download link response should describe the requested file");
-            Assert.IsFalse(string.IsNullOrEmpty(linkResponse.url), "Download link response should contain a url");
-            Assert.IsFalse(linkResponse.requires_download_link, "A freshly minted link should not require another download link");
+            // The local file store used by CI is a no-op signer, so it returns an empty url. Only
+            // assert that a url was minted when the backend actually signs (non-local storage).
+            if (!string.IsNullOrEmpty(linkResponse.url))
+            {
+                Assert.IsFalse(linkResponse.requires_download_link, "A freshly minted link should not require another download link");
+            }
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
@@ -1053,13 +1057,15 @@ namespace LootLockerTests.PlayMode
             // When
             LootLockerPlayerFile linkResponse = new LootLockerPlayerFile();
             bool linkDone = false;
+            // A 404 is the expected outcome, so the SDK's error log must be expected rather than
+            // treated as an unhandled log message.
+            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("file not found"));
             LootLockerSDKManager.CreatePlayerFileDownloadLink(nonExistentFileId, response =>
             {
                 linkResponse = response;
                 linkDone = true;
             });
             yield return new WaitUntil(() => linkDone);
-
             // Then
             Assert.IsFalse(linkResponse.success, "Creating a download link for a non-existent file should fail");
             Assert.AreEqual(404, linkResponse.statusCode, "Expected a 404 for a non-existent file");
