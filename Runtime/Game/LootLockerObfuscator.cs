@@ -201,18 +201,6 @@ namespace LootLocker
         }
 
         /// <summary>
-        /// Cheap pre-check so the JSON traversal only runs for bodies that can actually carry a
-        /// signed download URL. This is a substring scan, not a parse, and it is the reason the
-        /// redaction is affordable on every HTTP response.
-        /// </summary>
-        private static bool MayContainSignedDownloadUrl(string json)
-        {
-            return json.IndexOf("url_expires_at", StringComparison.Ordinal) >= 0
-                || json.IndexOf("requires_download_link", StringComparison.Ordinal) >= 0
-                || json.IndexOf("\"url\"", StringComparison.Ordinal) >= 0;
-        }
-
-        /// <summary>
         /// Redacts signed download URLs from a JSON body before it is logged.
         ///
         /// Player file responses carry a short-lived signed URL in "url". That URL is a bearer
@@ -224,13 +212,13 @@ namespace LootLocker
         /// an expiry field nor a true marker. Scoping on those markers leaves ordinary URLs in
         /// other responses intact.
         ///
-        /// Cost: a substring pre-check runs first and returns immediately for the overwhelming
-        /// majority of responses, which contain no "url" field at all. Only bodies that pass the
-        /// pre-check are parsed and walked.
+        /// This parses and walks the body, so it must not be called on the path every request
+        /// walks. Callers gate it on the request being one that can return a signed URL; see
+        /// LootLockerLogger.CanReturnSignedDownloadUrl.
         /// </summary>
         public static string RedactSignedDownloadUrlsForLogging(string json)
         {
-            if (string.IsNullOrEmpty(json) || !MayContainSignedDownloadUrl(json))
+            if (string.IsNullOrEmpty(json))
             {
                 return json;
             }

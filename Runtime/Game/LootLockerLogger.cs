@@ -328,11 +328,31 @@ namespace LootLocker
             }
         }
 
+        /// <summary>
+        /// Whether this request can return a signed download URL.
+        ///
+        /// Only the player-file endpoints mint signed URLs, so every other response skips the
+        /// redaction entirely. This is a single substring check on the request URL, which keeps the
+        /// cost off the path every request walks.
+        /// </summary>
+        private static bool CanReturnSignedDownloadUrl(string requestUrl)
+        {
+            return !string.IsNullOrEmpty(requestUrl)
+                && requestUrl.IndexOf("player/files", StringComparison.Ordinal) >= 0;
+        }
+
         private static LootLockerHttpLogEntry SanitizeForLogging(LootLockerHttpLogEntry entry)
         {
             if (entry == null)
             {
                 return null;
+            }
+
+            // Only player-file responses can carry a signed download URL. Everything else is
+            // returned untouched, so the common path does no copying and no JSON traversal.
+            if (!CanReturnSignedDownloadUrl(entry.Url))
+            {
+                return entry;
             }
 
             // Signed download URLs are bearer credentials, so they are redacted regardless of the
