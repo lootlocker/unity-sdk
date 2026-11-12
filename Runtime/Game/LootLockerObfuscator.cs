@@ -400,7 +400,7 @@ namespace LootLocker
         /// Whether an object looks like a player file revision payload, which carries a signed
         /// "url" without an expiry field or a true "requires_download_link" marker.
         /// </summary>
-        private static bool IsFileRevisionPayload(bool hasRevisionId, object id, object size)
+        private static bool IsFileRevisionPayload(bool hasRevisionId, string id, bool hasSize)
         {
             if (hasRevisionId)
             {
@@ -408,7 +408,7 @@ namespace LootLocker
             }
 
             // A revision's "id" is a ULID string, and it always carries a numeric "size".
-            return id is string idString && idString.Length == 26 && size != null;
+            return id != null && id.Length == 26 && hasSize;
         }
 
 #if LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -433,7 +433,7 @@ namespace LootLocker
                 // identified by their shape: a revision id plus a size.
                 bool carriesSignedDownloadUrl = obj["url_expires_at"] != null
                     || (obj["requires_download_link"] != null && obj["requires_download_link"].Type == JTokenType.Boolean && obj["requires_download_link"].Value<bool>())
-                    || IsFileRevisionPayload(obj["revision_id"] != null, obj["id"], obj["size"]);
+                    || IsFileRevisionPayload(obj["revision_id"] != null, obj["id"]?.Type == JTokenType.String ? obj["id"].ToString() : null, obj["size"] != null);
                 JToken url = obj["url"];
                 if (carriesSignedDownloadUrl && url != null && url.Type == JTokenType.String && !string.IsNullOrEmpty(url.ToString()))
                 {
@@ -466,7 +466,7 @@ namespace LootLocker
                 // identified by their shape: a revision id plus a size.
                 bool carriesSignedDownloadUrl = obj.ContainsKey("url_expires_at")
                     || (obj.TryGetValue("requires_download_link", out object requiresDownloadLink) && requiresDownloadLink is bool required && required)
-                    || IsFileRevisionPayload(obj.ContainsKey("revision_id"), obj.ContainsKey("id") ? obj["id"] : null, obj.ContainsKey("size") ? obj["size"] : null);
+                    || IsFileRevisionPayload(obj.ContainsKey("revision_id"), obj.ContainsKey("id") ? obj["id"] as string : null, obj.ContainsKey("size"));
                 if (carriesSignedDownloadUrl && obj.ContainsKey("url") && obj["url"] is string url && !string.IsNullOrEmpty(url))
                 {
                     obj["url"] = "[REDACTED]";
