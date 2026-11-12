@@ -1178,6 +1178,15 @@ namespace LootLockerTests.PlayMode
 
             // Then - the embedded payload is redacted too
             StringAssert.DoesNotContain("token=nested", nestedRedacted, "A signed url inside a JSON string must be redacted");
+
+            // Given - a body with no url field at all, which is the common case
+            const string noUrlJson = "{\"id\":42,\"name\":\"public.txt\",\"size\":128,\"public\":true}";
+
+            // When
+            string untouched = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(noUrlJson);
+
+            // Then - the pre-check short-circuits and the body is returned unchanged
+            Assert.AreEqual(noUrlJson, untouched, "A body without a url field must be returned unchanged");
         }
     }
 }

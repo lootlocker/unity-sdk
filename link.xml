@@ -18,33 +18,20 @@
     link.xml under your project's Assets/ folder.
   -->
   <assembly fullname="lootlocker.lootlockersdk.runtime">
-    <!-- Reached only through Resources.Load, so no static reference exists. -->
-    <type fullname="LootLocker.LootLockerConfig" preserve="all" />
-    <type fullname="LootLocker.ExternalFileConfig" preserve="all" />
-
     <!--
-      Response and request DTOs, populated by ZeroDepJson via TypeDescriptor.
+      Everything the SDK deserializes through reflection lives under a LootLocker* namespace:
+      LootLocker (root DTOs and config), LootLocker.Requests, LootLocker.LootLockerEnums,
+      LootLocker.Admin, LootLocker.Extension.* and LootLocker.HTTP.
 
-      link.xml has no wildcard support: "LootLocker.*" is not a pattern the linker expands, so
-      every DTO namespace has to be listed explicitly. Keep this list in sync when adding a new
-      namespace that holds reflected DTOs.
+      The wildcard form is a trailing asterisk with no dot ("Prefix*"), which matches every type
+      whose full name starts with that prefix. "LootLocker.*" is NOT a wildcard and matches
+      nothing, so it must not be used here.
+
+      This preserves the whole runtime assembly, which is the deliberate trade-off: the DTOs are
+      populated by ZeroDepJson via TypeDescriptor, so the linker cannot see the call sites and
+      would otherwise strip the setters and default constructors. Correctness over size.
     -->
-    <type fullname="LootLocker.Requests.*" preserve="all" />
-    <type fullname="LootLocker.*" preserve="all" />
-
-    <!-- Shared response plumbing and persisted state. -->
-    <type fullname="LootLocker.LootLockerResponse" preserve="all" />
-    <type fullname="LootLocker.LootLockerErrorData" preserve="all" />
-    <type fullname="LootLocker.LootLockerRequestContext" preserve="all" />
-    <type fullname="LootLocker.LootLockerPlayerData" preserve="all" />
-    <type fullname="LootLocker.LootLockerStateMetaData" preserve="all" />
-    <type fullname="LootLocker.UniqueList`1" preserve="all" />
-
-    <!-- Generic containers constructed by Activator.CreateInstance. -->
-    <type fullname="LootLocker.LootLockerPaginationResponse`1" preserve="all" />
-    <type fullname="LootLocker.LootLockerExtendedPagination" preserve="all" />
-    <type fullname="LootLocker.LootLockerExtendedPaginationError" preserve="all" />
-    <type fullname="LootLocker.LootLockerStreamedResponse`1" preserve="all" />
+    <type fullname="LootLocker*" preserve="all" />
   </assembly>
 
   <!--
