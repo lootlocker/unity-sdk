@@ -1185,7 +1185,7 @@ namespace LootLockerTests.PlayMode
             // When
             string untouched = LootLockerObfuscator.RedactSignedDownloadUrlsForLogging(noUrlJson);
 
-            // Then - the pre-check short-circuits and the body is returned unchanged
+            // Then - nothing is redacted and the body is returned unchanged
             Assert.AreEqual(noUrlJson, untouched, "A body without a url field must be returned unchanged");
         }
     }
