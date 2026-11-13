@@ -31,6 +31,7 @@ namespace LootLocker.Requests
         public string inventory_id { get; set; }
         /// <summary>
         /// Optional : The amount to equip. Defaults to the whole stack, capped by the slot's max_items.
+        /// Must be at least 1 when supplied.
         /// </summary>
         public int? count { get; set; }
         /// <summary>
@@ -38,6 +39,19 @@ namespace LootLocker.Requests
         /// Pass false to receive a conflict instead of replacing the occupant.
         /// </summary>
         public bool? replace { get; set; }
+
+        public bool ShouldSerializecount()
+        {
+            // Omit count entirely when unset so the backend equips the whole stack. This also keeps the
+            // Newtonsoft and ZeroDep JSON backends consistent, since only ZeroDep skips nulls.
+            return count.HasValue;
+        }
+
+        public bool ShouldSerializereplace()
+        {
+            // Omit replace entirely when unset so the backend applies its default of true.
+            return replace.HasValue;
+        }
     }
 
     //==================================================
@@ -300,6 +314,14 @@ namespace LootLocker
         public static void EquipItemToEquipmentSlot(string forPlayerWithUlid, LootLockerEquipmentEquipRequest request, Action<LootLockerEquipmentEquipResponse> onComplete)
         {
             if (request == null || string.IsNullOrEmpty(request.entity_type) || string.IsNullOrEmpty(request.source_id) || string.IsNullOrEmpty(request.slot_id) || string.IsNullOrEmpty(request.inventory_id))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEquipmentEquipResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            // count is omitted when unset (equip the whole stack), so a non-positive value must be
+            // rejected here rather than silently falling through to the same "whole stack" path.
+            if (request.count.HasValue && request.count.Value < 1)
             {
                 onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEquipmentEquipResponse>(forPlayerWithUlid));
                 return;
