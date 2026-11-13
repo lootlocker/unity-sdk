@@ -351,6 +351,15 @@ namespace LootLocker
         [Header("Presence")]
         public static EndPointClass presenceWebSocket = new EndPointClass("presence/v1", LootLockerHTTPMethod.GET);
 
+        // Equipment
+        [Header("Equipment")]
+        public static EndPointClass getEquipmentLoadout = new EndPointClass("player/equipment/v1", LootLockerHTTPMethod.GET);
+        public static EndPointClass getEntityEquipmentLoadout = new EndPointClass("player/equipment/v1/{0}/{1}", LootLockerHTTPMethod.GET);
+        public static EndPointClass getOtherPlayersEquipmentLoadout = new EndPointClass("player/equipment/v1/players/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass listEquipmentSlotCandidates = new EndPointClass("player/equipment/v1/slots/{0}/candidates", LootLockerHTTPMethod.GET);
+        public static EndPointClass equipToEquipmentSlot = new EndPointClass("player/equipment/v1/equip", LootLockerHTTPMethod.POST);
+        public static EndPointClass unequipFromEquipmentSlot = new EndPointClass("player/equipment/v1/equip/{0}", LootLockerHTTPMethod.DELETE);
+
         // Items
         [Header("Items")]
         public static EndPointClass listItemTemplates = new EndPointClass("player/inventory/v1", LootLockerHTTPMethod.GET);

@@ -136,6 +136,19 @@
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/overview).
 
+/// @defgroup Equipment Equipment
+/// @brief Attach inventory stacks to game-defined equipment slots and read loadouts.
+///
+/// A publisher defines equipment groups per game, each bound to one entity type
+/// (\c player today), and slots inside them. A slot carries tags and a
+/// \c max_items cap; it accepts a stack only when the item template shares at
+/// least one of the slot's tags. Equipping a stack larger than the cap splits it,
+/// and equipped stacks leave the normal inventory listing until unequipped. Every
+/// loadout read is paged over groups, and each attached stack reports \c valid and
+/// \c over_limit so config drift is visible instead of silent.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/players/equipment/overview).
+
 /// @defgroup PlayerFiles Player Files
 /// @brief CDN-backed file storage scoped to a player's profile.
 ///
