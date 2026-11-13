@@ -3,6 +3,7 @@ var hierarchy =
     [ "LootLocker.Requests.__LootLockerInternalBroadcast", "classLootLocker_1_1Requests_1_1____LootLockerInternalBroadcast.html", null ],
     [ "LootLocker.Requests.__LootLockerInternalBroadcastLanguage", "classLootLocker_1_1Requests_1_1____LootLockerInternalBroadcastLanguage.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.AppleAppStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1AppleAppStore.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.EpicGamesStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1EpicGamesStore.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.GooglePlayStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1GooglePlayStore.html", null ],
     [ "LootLocker.ILootLockerService", "interfaceLootLocker_1_1ILootLockerService.html", [
       [ "LootLocker.LootLockerEventSystem", "classLootLocker_1_1LootLockerEventSystem.html", null ],
@@ -11,6 +12,7 @@ var hierarchy =
       [ "LootLocker.RateLimiter", "classLootLocker_1_1RateLimiter.html", null ]
     ] ],
     [ "LootLocker.ILootLockerStateWriter", "interfaceLootLocker_1_1ILootLockerStateWriter.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.LeaderboardReward", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1LeaderboardReward.html", null ],
     [ "LootLocker.Requests.LookupPlayer1stPartyPlatformIDsRequest", "classLootLocker_1_1Requests_1_1LookupPlayer1stPartyPlatformIDsRequest.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.LootLocker", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1LootLocker.html", null ],
     [ "LootLocker.Requests.LootLockerAssetCandidate", "classLootLocker_1_1Requests_1_1LootLockerAssetCandidate.html", null ],
@@ -338,7 +340,7 @@ var hierarchy =
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys.html", null ],
     [ "LootLocker.Requests.LootLockerStartRemoteSessionRequest", "classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionRequest.html", null ],
     [ "LootLocker.Requests.LootLockerStorage", "classLootLocker_1_1Requests_1_1LootLockerStorage.html", null ],
-    [ "LootLocker.LootLockerStreamedResponse< T >", "structLootLocker_1_1LootLockerStreamedResponse.html", null ],
+    [ "LootLocker.LootLockerStreamedResponse&lt; T &gt;", "structLootLocker_1_1LootLockerStreamedResponse-1-g.html", null ],
     [ "LootLocker.Requests.LootLockerSubmitScoreRequest", "classLootLocker_1_1Requests_1_1LootLockerSubmitScoreRequest.html", null ],
     [ "LootLocker.Requests.LootLockerSuccessfulKey", "classLootLocker_1_1Requests_1_1LootLockerSuccessfulKey.html", null ],
     [ "LootLocker.Requests.LootLockerTransferProvidersBetweenAccountsRequest", "classLootLocker_1_1Requests_1_1LootLockerTransferProvidersBetweenAccountsRequest.html", null ],
@@ -349,8 +351,12 @@ var hierarchy =
     [ "LootLocker.Requests.PlayerNameRequest", "classLootLocker_1_1Requests_1_1PlayerNameRequest.html", null ],
     [ "LootLocker.Requests.PlayerNameWithIDs", "classLootLocker_1_1Requests_1_1PlayerNameWithIDs.html", null ],
     [ "LootLocker.Requests.PlayerWith1stPartyPlatformIDs", "classLootLocker_1_1Requests_1_1PlayerWith1stPartyPlatformIDs.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.PlaystationStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1PlaystationStore.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardCampaign", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1RewardCampaign.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.RewardsGrant", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1RewardsGrant.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.SteamStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1SteamStore.html", null ],
+    [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Purchasing.StripeStore", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1StripeStore.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.Triggers", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Triggers.html", null ],
     [ "LootLocker.LootLockerStaticStrings.LootLockerStandardContextKeys.TwitchDrop", "structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1TwitchDrop.html", null ]
 ];

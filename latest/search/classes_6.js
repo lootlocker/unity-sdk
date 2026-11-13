@@ -7,5 +7,6 @@ var searchData=
   ['playernameresponse_4',['PlayerNameResponse',['../classLootLocker_1_1Requests_1_1PlayerNameResponse.html',1,'LootLocker::Requests']]],
   ['playernamewithids_5',['PlayerNameWithIDs',['../classLootLocker_1_1Requests_1_1PlayerNameWithIDs.html',1,'LootLocker::Requests']]],
   ['playerwith1stpartyplatformids_6',['PlayerWith1stPartyPlatformIDs',['../classLootLocker_1_1Requests_1_1PlayerWith1stPartyPlatformIDs.html',1,'LootLocker::Requests']]],
-  ['purchasing_7',['Purchasing',['../structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing.html',1,'LootLocker::LootLockerStaticStrings::LootLockerStandardContextKeys']]]
+  ['playstationstore_7',['PlaystationStore',['../structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1PlaystationStore.html',1,'LootLocker::LootLockerStaticStrings::LootLockerStandardContextKeys::Purchasing']]],
+  ['purchasing_8',['Purchasing',['../structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing.html',1,'LootLocker::LootLockerStaticStrings::LootLockerStandardContextKeys']]]
 ];

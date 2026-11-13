@@ -1,5 +1,6 @@
 var group__PlayerFiles =
 [
+    [ "LootLocker.Requests.LootLockerSDKManager.CreatePlayerFileDownloadLink", "group__PlayerFiles.html#ga709a21ca3c5f503a1b263a882ee5a2e5", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.DeletePlayerFile", "group__PlayerFiles.html#ga09fbbb0a732057ab40e4a40e2ccc2a40", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.DeletePlayerFileByKey", "group__PlayerFiles.html#ga5e01aa04238d42dad065b6b2efb0b6e0", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.GetAllPlayerFiles", "group__PlayerFiles.html#gacbd308b9c40bfa82e1554536260d6005", null ],

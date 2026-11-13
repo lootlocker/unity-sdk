@@ -6,6 +6,7 @@ var classLootLocker_1_1Requests_1_1LootLockerPlayerFile =
     [ "key", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#ac716505378847bc1e295a26060fb3414", null ],
     [ "name", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#a822820986cebbe3e80a534758ef71b60", null ],
     [ "purpose", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#ad44dd4bfce09c7beeb8ec40567ce7dfa", null ],
+    [ "requires_download_link", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#a15b7edd385dcea528cd02662e9939d69", null ],
     [ "revision_id", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#a3188086cd2485ee8750845e7d164a9fc", null ],
     [ "size", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#a59f91fa22eb4446ad482fffd22c73a0b", null ],
     [ "url", "classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html#ae0c1137999bce0a18db42fe34df93ce2", null ],

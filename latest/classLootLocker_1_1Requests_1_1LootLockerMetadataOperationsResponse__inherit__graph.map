@@ -1,5 +1,5 @@
 <map id="LootLocker.Requests.LootLockerMetadataOperationsResponse" name="LootLocker.Requests.LootLockerMetadataOperationsResponse">
-<area shape="rect" id="Node000001" title="Response from a metadata operations request, indicating the source and any errors that occurred." alt="" coords="5,79,265,119"/>
-<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="58,5,213,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,44,138,79,133,79,133,44"/>
+<area shape="rect" id="Node000001" title="Response from a metadata operations request, indicating the source and any errors that occurred." alt="" coords="5,81,265,126"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="21,5,249,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,47,137,81,133,79,133,51"/>
 </map>

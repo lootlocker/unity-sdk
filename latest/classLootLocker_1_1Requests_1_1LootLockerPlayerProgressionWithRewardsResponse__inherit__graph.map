@@ -1,7 +1,7 @@
 <map id="LootLocker.Requests.LootLockerPlayerProgressionWithRewardsResponse" name="LootLocker.Requests.LootLockerPlayerProgressionWithRewardsResponse">
-<area shape="rect" id="Node000001" title="Response containing the updated player progression status along with any tiers awarded as a result of..." alt="" coords="5,167,272,221"/>
-<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html" title="Response containing the current progression status for a player on a specific progression." alt="" coords="34,79,243,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,132,141,167,136,167,136,132"/>
-<area shape="rect" id="Node000003" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="61,5,216,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="141,44,141,79,136,79,136,44"/>
+<area shape="rect" id="Node000001" title="Response containing the updated player progression status along with any tiers awarded as a result of..." alt="" coords="5,174,272,235"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html" title="Response containing the current progression status for a player on a specific progression." alt="" coords="17,81,260,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,139,141,174,136,172,137,143"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="25,5,252,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="140,46,141,81,136,80,137,51"/>
 </map>

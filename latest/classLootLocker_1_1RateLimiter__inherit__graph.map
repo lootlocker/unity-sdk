@@ -1,5 +1,5 @@
 <map id="LootLocker.RateLimiter" name="LootLocker.RateLimiter">
-<area shape="rect" id="Node000001" title="Rate limiter service for managing HTTP request rate limiting." alt="" coords="5,79,176,104"/>
-<area shape="rect" id="Node000002" href="$interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="19,5,163,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,44,93,79,88,79,88,44"/>
+<area shape="rect" id="Node000001" title="Rate limiter service for managing HTTP request rate limiting." alt="" coords="28,81,199,109"/>
+<area shape="rect" id="Node000002" href="$interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="5,5,222,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,47,116,82,111,79,112,51"/>
 </map>

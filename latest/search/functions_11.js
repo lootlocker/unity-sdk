@@ -1,7 +1,7 @@
 var searchData=
 [
   ['tokenexpirederror_3c_20t_20_3e_0',['TokenExpiredError&lt; T &gt;',['../classLootLocker_1_1LootLockerResponseFactory.html#ab7177f60dcb2e0319bacc910aac1b773',1,'LootLocker::LootLockerResponseFactory']]],
-  ['tostring_1',['tostring',['../classLootLocker_1_1LootLockerErrorData.html#a8795e0c59a40ecb4fce84dec45f2338f',1,'LootLocker.LootLockerErrorData.ToString()'],['../classLootLocker_1_1LootLockerPresenceConnectionStats.html#acfd28ec0b958c28fbc45c024ebac0e5b',1,'LootLocker.LootLockerPresenceConnectionStats.ToString()']]],
+  ['tostring_1',['ToString',['../classLootLocker_1_1LootLockerErrorData.html#a8795e0c59a40ecb4fce84dec45f2338f',1,'LootLocker.LootLockerErrorData.ToString()'],['../classLootLocker_1_1LootLockerPresenceConnectionStats.html#acfd28ec0b958c28fbc45c024ebac0e5b',1,'LootLocker.LootLockerPresenceConnectionStats.ToString()']]],
   ['transferidentityprovidersbetweenaccounts_2',['TransferIdentityProvidersBetweenAccounts',['../group__ConnectedAccounts.html#gad398456a4b359fa2788cb2c8f210f7a9',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['triggerevent_3c_20t_20_3e_3',['TriggerEvent&lt; T &gt;',['../classLootLocker_1_1LootLockerEventSystem.html#a9c19f5952b0b7cb5535ac3cbd354265f',1,'LootLocker::LootLockerEventSystem']]],
   ['triggerlocalsessionactivated_4',['TriggerLocalSessionActivated',['../classLootLocker_1_1LootLockerEventSystem.html#a74fb3f70cf68b712a92d73af32dee0e3',1,'LootLocker::LootLockerEventSystem']]],

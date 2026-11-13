@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['reference_0',['LootLocker Unity SDK — API Reference',['../index.html',1,'']]]
+  ['device_20support_0',['Multi-Player Device Support',['../index.html#mainpage_multi_player',1,'']]]
 ];
