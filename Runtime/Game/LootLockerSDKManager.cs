@@ -10526,6 +10526,150 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Equipment
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// Get the calling player's loadout: every equipment slot the game defines for the player entity, each with
+        /// the stack attached to it (or a null stack for empty slots). Paged over equipment groups.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEquipmentLoadoutResponse</param>
+        /// <param name="page">Optional : 1-based page of equipment groups. Defaults to the first page.</param>
+        /// <param name="perPage">Optional : Number of equipment groups per page. Defaults to the server default of 10.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEquipmentLoadout(Action<LootLockerEquipmentLoadoutResponse> onComplete, int page = 0, int perPage = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEquipmentLoadoutResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetEquipmentLoadout(forPlayerWithUlid, page, perPage, onComplete);
+        }
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// Get the loadout attached to one entity. Only the "player" entity type is supported, and a player may
+        /// only read their own entity. Paged over equipment groups.
+        /// </summary>
+        /// <param name="entityType">The entity type to read the loadout for. Only "player" is supported.</param>
+        /// <param name="sourceId">The ULID of the entity. For the "player" entity type this is the player ULID.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEquipmentLoadoutResponse</param>
+        /// <param name="page">Optional : 1-based page of equipment groups. Defaults to the first page.</param>
+        /// <param name="perPage">Optional : Number of equipment groups per page. Defaults to the server default of 10.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetEntityEquipmentLoadout(string entityType, string sourceId, Action<LootLockerEquipmentLoadoutResponse> onComplete, int page = 0, int perPage = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEquipmentLoadoutResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(entityType) || string.IsNullOrEmpty(sourceId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEquipmentLoadoutResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetEntityEquipmentLoadout(forPlayerWithUlid, entityType, sourceId, page, perPage, onComplete);
+        }
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// Get another player's loadout by their public UID, addressed within the caller's game. A public UID
+        /// from another game is reported as not found. Paged over equipment groups.
+        /// </summary>
+        /// <param name="playerPublicUid">The public UID of the player whose loadout to read.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEquipmentLoadoutResponse</param>
+        /// <param name="page">Optional : 1-based page of equipment groups. Defaults to the first page.</param>
+        /// <param name="perPage">Optional : Number of equipment groups per page. Defaults to the server default of 10.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetOtherPlayersEquipmentLoadout(string playerPublicUid, Action<LootLockerEquipmentLoadoutResponse> onComplete, int page = 0, int perPage = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEquipmentLoadoutResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(playerPublicUid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEquipmentLoadoutResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetOtherPlayersEquipmentLoadout(forPlayerWithUlid, playerPublicUid, page, perPage, onComplete);
+        }
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// List the calling player's unequipped inventory stacks that a slot would accept, meaning the item
+        /// template shares at least one tag with the slot. Equipped stacks are excluded. Use this to offer a
+        /// slot's valid contents without knowing item template tags.
+        /// </summary>
+        /// <param name="slotId">The ULID of the equipment slot to list candidates for.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEquipmentSlotCandidatesResponse</param>
+        /// <param name="page">Optional : 1-based page of candidates. Defaults to the first page.</param>
+        /// <param name="perPage">Optional : Number of candidates per page. Defaults to the server default of 10.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEquipmentSlotCandidates(string slotId, Action<LootLockerEquipmentSlotCandidatesResponse> onComplete, int page = 0, int perPage = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEquipmentSlotCandidatesResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(slotId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerEquipmentSlotCandidatesResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListEquipmentSlotCandidates(forPlayerWithUlid, slotId, page, perPage, onComplete);
+        }
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// Equip an inventory stack into an equipment slot. When the stack holds more than the slot accepts the
+        /// equipped amount splits off and the remainder stays in the inventory. An occupied slot is
+        /// auto-unequipped first unless <see cref="LootLockerEquipmentEquipRequest.replace"/> is set to false.
+        /// </summary>
+        /// <param name="request">The equip request. See <see cref="LootLockerEquipmentEquipRequest"/>.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerEquipmentEquipResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void EquipItemToEquipmentSlot(LootLockerEquipmentEquipRequest request, Action<LootLockerEquipmentEquipResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEquipmentEquipResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.EquipItemToEquipmentSlot(forPlayerWithUlid, request, onComplete);
+        }
+
+        /// @ingroup Equipment
+        /// <summary>
+        /// Detach an equipment entry. The stack returns to the player's inventory with its count unchanged.
+        /// </summary>
+        /// <param name="entryId">The equipment entry ULID, as reported by the loadout read or the equip response.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void UnequipItemFromEquipmentSlot(string entryId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.UnequipItemFromEquipmentSlot(forPlayerWithUlid, entryId, onComplete);
+        }
+        #endregion
+
         #region Misc
 
         /// @ingroup Misc
