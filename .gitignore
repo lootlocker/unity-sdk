@@ -78,3 +78,15 @@ temp/
 
 # Doxygen generated documentation output
 docs/html/
+
+# Local, per-developer config overrides. Never commit these: they are how a developer
+# temporarily changes a setting (e.g. log level) without forking the shared config file.
+# Kept outside Resources/ so Unity never packs them into a build.
+LootLockerConfig.local.bytes
+LootLockerConfig.local.bytes.meta
+LocalOverrides/
+
+# Generated per-build: records which config file the build targeted, so the player can read the
+# one that survived. Build output, never authored.
+LootLockerConfig.build.bytes
+LootLockerConfig.build.bytes.meta
