@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerPlayerFileRevisionsResponse" name="LootLocker.Requests.LootLockerPlayerFileRevisionsResponse">
+<area shape="rect" id="Node000001" title="Response containing a list of revisions for a player file." alt="" coords="5,81,259,126"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="18,5,246,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,47,134,81,130,79,130,51"/>
+</map>

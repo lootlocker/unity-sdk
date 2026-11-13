@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerGetCurrentLoadoutToDefaultClassResponse" name="LootLocker.Requests.LootLockerGetCurrentLoadoutToDefaultClassResponse">
+<area shape="rect" id="Node000001" title="Response containing the currently equipped loadout for the default class." alt="" coords="5,81,254,143"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="16,5,243,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,47,132,82,127,80,128,51"/>
+</map>

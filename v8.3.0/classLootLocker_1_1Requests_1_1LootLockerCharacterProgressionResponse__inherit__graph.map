@@ -1,0 +1,7 @@
+<map id="LootLocker.Requests.LootLockerCharacterProgressionResponse" name="LootLocker.Requests.LootLockerCharacterProgressionResponse">
+<area shape="rect" id="Node000001" title="Response containing the current progression status for a character on a specific progression." alt="" coords="5,81,271,126"/>
+<area shape="rect" id="Node000003" href="$classLootLocker_1_1Requests_1_1LootLockerCharacterProgressionWithRewardsResponse.html" title="Response containing the updated character progression status along with any tiers awarded as a result..." alt="" coords="22,174,254,235"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,139,140,174,136,172,136,143"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="24,5,252,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,46,141,81,135,80,137,51"/>
+</map>

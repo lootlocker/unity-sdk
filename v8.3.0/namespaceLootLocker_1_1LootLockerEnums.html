@@ -1,0 +1,623 @@
+<!-- HTML header for doxygen 1.15.0-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.15.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker.LootLockerEnums Namespace Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.3.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.15.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+</div><!-- top -->
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespaceLootLocker_1_1LootLockerEnums.html','',''); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">LootLocker.LootLockerEnums Namespace Reference</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:af7f1a9c2c35cc16fec26bd0c4588ad6f" id="r_af7f1a9c2c35cc16fec26bd0c4588ad6f"><td class="memItemLeft" align="right" valign="top"><a id="af7f1a9c2c35cc16fec26bd0c4588ad6f" name="af7f1a9c2c35cc16fec26bd0c4588ad6f"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af7f1a9c2c35cc16fec26bd0c4588ad6f">AssetFilter</a> </td></tr>
+<tr class="memdesc:af7f1a9c2c35cc16fec26bd0c4588ad6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filter criteria for listing assets based on purchasability, rentability, or popularity. <br /></td></tr>
+<tr class="memitem:aff5a9a64fba273b693b5e21f838d5fdf" id="r_aff5a9a64fba273b693b5e21f838d5fdf"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdf">OrderAssetListBy</a> { <br />
+&#160;&#160;<a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdfa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>
+, <a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdfab80bb7740288fda1f201890375a60c8f">id</a>
+, <a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdfab068931cc450442b63f5b3d276ea4297">name</a>
+, <a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdfafde81f1177b1541755b672c9dc97315a">created_at</a>
+, <br />
+&#160;&#160;<a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdfaafd1a1a8e69e4b32a11a645da8280f8a">updated_at</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:aff5a9a64fba273b693b5e21f838d5fdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">The field by which to order an asset list response.  <a href="#aff5a9a64fba273b693b5e21f838d5fdf">More...</a><br /></td></tr>
+<tr class="memitem:ac531873ad450de5f89eaa1bcda167b06" id="r_ac531873ad450de5f89eaa1bcda167b06"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac531873ad450de5f89eaa1bcda167b06">OrderAssetListDirection</a> { <a class="el" href="#ac531873ad450de5f89eaa1bcda167b06a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>
+, <a class="el" href="#ac531873ad450de5f89eaa1bcda167b06a375a52cb87b22005816fe7a418ec6660">asc</a>
+, <a class="el" href="#ac531873ad450de5f89eaa1bcda167b06a1dee80c7d5ab2c1c90aa8d2f7dd47256">desc</a>
+ }</td></tr>
+<tr class="memdesc:ac531873ad450de5f89eaa1bcda167b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">The direction in which to order an asset list response.  <a href="#ac531873ad450de5f89eaa1bcda167b06">More...</a><br /></td></tr>
+<tr class="memitem:a34be90caa9124f7a8b29a31a0f6d6979" id="r_a34be90caa9124f7a8b29a31a0f6d6979"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34be90caa9124f7a8b29a31a0f6d6979">LootLockerWalletHolderTypes</a> </td></tr>
+<tr class="memdesc:a34be90caa9124f7a8b29a31a0f6d6979"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible account linking process statuses.  <a href="#a34be90caa9124f7a8b29a31a0f6d6979">More...</a><br /></td></tr>
+<tr class="memitem:a73f1b166082ab6be0a2ff6e8a154d6f4" id="r_a73f1b166082ab6be0a2ff6e8a154d6f4"><td class="memItemLeft" align="right" valign="top"><a id="a73f1b166082ab6be0a2ff6e8a154d6f4" name="a73f1b166082ab6be0a2ff6e8a154d6f4"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73f1b166082ab6be0a2ff6e8a154d6f4">LootLockerCatalogEntryEntityKind</a> </td></tr>
+<tr class="memdesc:a73f1b166082ab6be0a2ff6e8a154d6f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible entity kinds that catalog entries can have. <br /></td></tr>
+<tr class="memitem:a8c149e412d4b7c199da1853ade741672" id="r_a8c149e412d4b7c199da1853ade741672"><td class="memItemLeft" align="right" valign="top"><a id="a8c149e412d4b7c199da1853ade741672" name="a8c149e412d4b7c199da1853ade741672"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c149e412d4b7c199da1853ade741672">LootLockerAccountProvider</a> </td></tr>
+<tr class="memdesc:a8c149e412d4b7c199da1853ade741672"><td class="mdescLeft">&#160;</td><td class="mdescRight">Account providers possible to use for connected accounts. <br /></td></tr>
+<tr class="memitem:aebef153440d7c7b8ff8dc7952e99696a" id="r_aebef153440d7c7b8ff8dc7952e99696a"><td class="memItemLeft" align="right" valign="top"><a id="aebef153440d7c7b8ff8dc7952e99696a" name="aebef153440d7c7b8ff8dc7952e99696a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebef153440d7c7b8ff8dc7952e99696a">GoogleAccountProviderPlatform</a> </td></tr>
+<tr class="memdesc:aebef153440d7c7b8ff8dc7952e99696a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Google OAuth2 Client platform. <br /></td></tr>
+<tr class="memitem:ac6b1b20624bc73c05cc8b3b2016b90a9" id="r_ac6b1b20624bc73c05cc8b3b2016b90a9"><td class="memItemLeft" align="right" valign="top"><a id="ac6b1b20624bc73c05cc8b3b2016b90a9" name="ac6b1b20624bc73c05cc8b3b2016b90a9"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6b1b20624bc73c05cc8b3b2016b90a9">LootLockerEntitlementHistoryListingStore</a> </td></tr>
+<tr class="memdesc:ac6b1b20624bc73c05cc8b3b2016b90a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum with the supported stores that can generate entitlements. <br /></td></tr>
+<tr class="memitem:a661f9e2bb3444722cdbe492fd131acbc" id="r_a661f9e2bb3444722cdbe492fd131acbc"><td class="memItemLeft" align="right" valign="top"><a id="a661f9e2bb3444722cdbe492fd131acbc" name="a661f9e2bb3444722cdbe492fd131acbc"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a661f9e2bb3444722cdbe492fd131acbc">LootLockerEntitlementHistoryListingStatus</a> </td></tr>
+<tr class="memdesc:a661f9e2bb3444722cdbe492fd131acbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status of the entitlement. <br /></td></tr>
+<tr class="memitem:a0cda66ebb8d3f52fe0b3715264acbdf7" id="r_a0cda66ebb8d3f52fe0b3715264acbdf7"><td class="memItemLeft" align="right" valign="top"><a id="a0cda66ebb8d3f52fe0b3715264acbdf7" name="a0cda66ebb8d3f52fe0b3715264acbdf7"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0cda66ebb8d3f52fe0b3715264acbdf7">LootLockerEntitlementHistoryListingType</a> </td></tr>
+<tr class="memdesc:a0cda66ebb8d3f52fe0b3715264acbdf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status of the entitlement. <br /></td></tr>
+<tr class="memitem:a96fe13079f755e5a5c09ef9e87e56172" id="r_a96fe13079f755e5a5c09ef9e87e56172"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172">LootLockerItemType</a> { <a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7">instanced</a>
+, <a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620">stackable</a>
+ }</td></tr>
+<tr class="memdesc:a96fe13079f755e5a5c09ef9e87e56172"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of an item, determining whether the item instances are stackable or individually tracked.  <a href="#a96fe13079f755e5a5c09ef9e87e56172">More...</a><br /></td></tr>
+<tr class="memitem:ab2a3741c22b09082e2551704d105f2dd" id="r_ab2a3741c22b09082e2551704d105f2dd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2a3741c22b09082e2551704d105f2dd">LootLockerItemSortField</a> { <a class="el" href="#ab2a3741c22b09082e2551704d105f2ddafde81f1177b1541755b672c9dc97315a">created_at</a>
+, <a class="el" href="#ab2a3741c22b09082e2551704d105f2ddaafd1a1a8e69e4b32a11a645da8280f8a">updated_at</a>
+, <a class="el" href="#ab2a3741c22b09082e2551704d105f2dda36cd38f49b9afa08222c0dc9ebfe35eb">source</a>
+ }</td></tr>
+<tr class="memdesc:ab2a3741c22b09082e2551704d105f2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The field by which to order a player item list response.  <a href="#ab2a3741c22b09082e2551704d105f2dd">More...</a><br /></td></tr>
+<tr class="memitem:a19684afe5d90f9fcb3daa619efc0db75" id="r_a19684afe5d90f9fcb3daa619efc0db75"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75">LootLockerRewardKind</a> { <br />
+&#160;&#160;<a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75aad921d60486366258809553a3db49a4a">unknown</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75ac04e34d445e31a2159c1bfeb882ba212">asset</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a411b9f1aeb1018a2966c3491601312eb">progression_points</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a09efb74d9914e0f320c221f00080b4f2">progression_reset</a>
+, <br />
+&#160;&#160;<a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a1af0389838508d7016a9841eb6273962">currency</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75adb0f6f37ebeb6ea09489124345af2a45">group</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75af9b11ed03ce21394fd0e5b19ae2d3873">reward</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a1e7f5afdac15b78afa83c1113a91a939">platform_key</a>
+, <br />
+&#160;&#160;<a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75ad3776ee23963f417d4b9538324a0dd80">publisher_currency</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a046ad69db921421fb15ea13bc09b344a">publisher_progression_points</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a4e988d447543c10c56680088fb87139d">player_metadata</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a8c7dd922ad47494fc02c388e12c00eac">file</a>
+, <br />
+&#160;&#160;<a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a1eac583db284a56088adb88d0cdb3ae1">discord_role</a>
+, <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75a919e14fd14d7143e0bac1742bde98b3b">item_template</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a19684afe5d90f9fcb3daa619efc0db75"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kind of reward that was granted as a result of a behaviour.  <a href="#a19684afe5d90f9fcb3daa619efc0db75">More...</a><br /></td></tr>
+<tr class="memitem:ad1cbebbc10ba27ff6bddd3131ad0489d" id="r_ad1cbebbc10ba27ff6bddd3131ad0489d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1cbebbc10ba27ff6bddd3131ad0489d">LootLockerSortOrder</a> { <a class="el" href="#ad1cbebbc10ba27ff6bddd3131ad0489dac6e421eaad140c1bc1a39980502df80c">ASC</a>
+, <a class="el" href="#ad1cbebbc10ba27ff6bddd3131ad0489da65a6d757dbb571ccc3af9706e9a5f607">DESC</a>
+ }</td></tr>
+<tr class="memdesc:ad1cbebbc10ba27ff6bddd3131ad0489d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The direction in which to order a player item list response.  <a href="#ad1cbebbc10ba27ff6bddd3131ad0489d">More...</a><br /></td></tr>
+<tr class="memitem:a36cc98be4ee5019cc92e0ff78ab7e4e1" id="r_a36cc98be4ee5019cc92e0ff78ab7e4e1"><td class="memItemLeft" align="right" valign="top"><a id="a36cc98be4ee5019cc92e0ff78ab7e4e1" name="a36cc98be4ee5019cc92e0ff78ab7e4e1"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36cc98be4ee5019cc92e0ff78ab7e4e1">LootLockerMetadataSources</a> </td></tr>
+<tr class="memdesc:a36cc98be4ee5019cc92e0ff78ab7e4e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible metadata sources. <br /></td></tr>
+<tr class="memitem:a0455b09bfb460e12fae138e3f032e87f" id="r_a0455b09bfb460e12fae138e3f032e87f"><td class="memItemLeft" align="right" valign="top"><a id="a0455b09bfb460e12fae138e3f032e87f" name="a0455b09bfb460e12fae138e3f032e87f"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0455b09bfb460e12fae138e3f032e87f">LootLockerMetadataTypes</a> </td></tr>
+<tr class="memdesc:a0455b09bfb460e12fae138e3f032e87f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible metadata types. <br /></td></tr>
+<tr class="memitem:afd13e164dc205b9074b9c9be57a65e02" id="r_afd13e164dc205b9074b9c9be57a65e02"><td class="memItemLeft" align="right" valign="top"><a id="afd13e164dc205b9074b9c9be57a65e02" name="afd13e164dc205b9074b9c9be57a65e02"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd13e164dc205b9074b9c9be57a65e02">LootLockerMetadataActions</a> </td></tr>
+<tr class="memdesc:afd13e164dc205b9074b9c9be57a65e02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible metadata actions. <br /></td></tr>
+<tr class="memitem:a597d4485bf785b44cf326dee830d9a31" id="r_a597d4485bf785b44cf326dee830d9a31"><td class="memItemLeft" align="right" valign="top"><a id="a597d4485bf785b44cf326dee830d9a31" name="a597d4485bf785b44cf326dee830d9a31"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a597d4485bf785b44cf326dee830d9a31">LootLockerNotificationPriority</a> </td></tr>
+<tr class="memdesc:a597d4485bf785b44cf326dee830d9a31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum of the different available priorities for notifications. <br /></td></tr>
+<tr class="memitem:a25b4d0663d5f8180817db62b40d69ed5" id="r_a25b4d0663d5f8180817db62b40d69ed5"><td class="memItemLeft" align="right" valign="top"><a id="a25b4d0663d5f8180817db62b40d69ed5" name="a25b4d0663d5f8180817db62b40d69ed5"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25b4d0663d5f8180817db62b40d69ed5">LootLockerNotificationSource</a> </td></tr>
+<tr class="memdesc:a25b4d0663d5f8180817db62b40d69ed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum of the different possible sources for notifications. <br /></td></tr>
+<tr class="memitem:a966bf506c6915e606606e7d9abe0c94d" id="r_a966bf506c6915e606606e7d9abe0c94d"><td class="memItemLeft" align="right" valign="top"><a id="a966bf506c6915e606606e7d9abe0c94d" name="a966bf506c6915e606606e7d9abe0c94d"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a966bf506c6915e606606e7d9abe0c94d">LootLockerNotificationContentKind</a> </td></tr>
+<tr class="memdesc:a966bf506c6915e606606e7d9abe0c94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum of the different kinds of notification bodies possible, use this to figure out how to parse the notification body. <br /></td></tr>
+<tr class="memitem:a11dc7f5aeea66ae644d4b93b1b1d9c09" id="r_a11dc7f5aeea66ae644d4b93b1b1d9c09"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a11dc7f5aeea66ae644d4b93b1b1d9c09">LootLockerAsyncPurchaseStatus</a> { <a class="el" href="#a11dc7f5aeea66ae644d4b93b1b1d9c09a7c6c2e5d48ab37a007cbf70d3ea25fa4">pending</a>
+, <a class="el" href="#a11dc7f5aeea66ae644d4b93b1b1d9c09ac76a5e84e4bdee527e274ea30c680d79">active</a>
+, <a class="el" href="#a11dc7f5aeea66ae644d4b93b1b1d9c09a26934eb377001f66e37289a5c93fe284">failed</a>
+ }</td></tr>
+<tr class="memdesc:a11dc7f5aeea66ae644d4b93b1b1d9c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible statuses of an async purchase entitlement.  <a href="#a11dc7f5aeea66ae644d4b93b1b1d9c09">More...</a><br /></td></tr>
+<tr class="memitem:abca75f1fd16f7c3ea5e96a3968cdc31e" id="r_abca75f1fd16f7c3ea5e96a3968cdc31e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abca75f1fd16f7c3ea5e96a3968cdc31e">LootLockerRefundInventoryEventAction</a> { <a class="el" href="#abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711">removed</a> = 0
+, <a class="el" href="#abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a">skipped</a> = 1
+ }</td></tr>
+<tr class="memdesc:abca75f1fd16f7c3ea5e96a3968cdc31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The action taken on a player inventory item as part of a refund.  <a href="#abca75f1fd16f7c3ea5e96a3968cdc31e">More...</a><br /></td></tr>
+<tr class="memitem:aff0d648d0103d5a0325fac91a9e1595b" id="r_aff0d648d0103d5a0325fac91a9e1595b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff0d648d0103d5a0325fac91a9e1595b">LootLockerRefundNonReversibleRewardKind</a> { <a class="el" href="#aff0d648d0103d5a0325fac91a9e1595ba411b9f1aeb1018a2966c3491601312eb">progression_points</a> = 0
+, <a class="el" href="#aff0d648d0103d5a0325fac91a9e1595ba09efb74d9914e0f320c221f00080b4f2">progression_reset</a> = 1
+ }</td></tr>
+<tr class="memdesc:aff0d648d0103d5a0325fac91a9e1595b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kind of non-reversible reward that was granted alongside an entitlement.  <a href="#aff0d648d0103d5a0325fac91a9e1595b">More...</a><br /></td></tr>
+<tr class="memitem:a0d9a5b8d1a9370beeb5b80a26a1d1f71" id="r_a0d9a5b8d1a9370beeb5b80a26a1d1f71"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71">LootLockerRefundWarningType</a> { <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71a6f3d3eb449617f1052e73d928ffc92af">non_reversible_rewards</a> = 0
+, <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71a695c9713c870681ffae14296ea6cd060">insufficient_funds</a> = 1
+, <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71aee2a58f7c0c685119d384e2e2c6e3e8c">already_refunded</a> = 2
+, <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114">refund_failed</a> = 3
+ }</td></tr>
+<tr class="memdesc:a0d9a5b8d1a9370beeb5b80a26a1d1f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">The category of a per-entitlement warning returned during a refund.  <a href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71">More...</a><br /></td></tr>
+<tr class="memitem:af4849d83fb15c46a49eccf978fd9039a" id="r_af4849d83fb15c46a49eccf978fd9039a"><td class="memItemLeft" align="right" valign="top"><a id="af4849d83fb15c46a49eccf978fd9039a" name="af4849d83fb15c46a49eccf978fd9039a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4849d83fb15c46a49eccf978fd9039a">LootLockerRemoteSessionLeaseStatus</a> </td></tr>
+<tr class="memdesc:af4849d83fb15c46a49eccf978fd9039a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status of the remote session leasing process. <br /></td></tr>
+<tr class="memitem:a57e5357e3cbd3ec3a6b452483b086dce" id="r_a57e5357e3cbd3ec3a6b452483b086dce"><td class="memItemLeft" align="right" valign="top"><a id="a57e5357e3cbd3ec3a6b452483b086dce" name="a57e5357e3cbd3ec3a6b452483b086dce"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57e5357e3cbd3ec3a6b452483b086dce">LootLockerRemoteSessionLeaseIntent</a> </td></tr>
+<tr class="memdesc:a57e5357e3cbd3ec3a6b452483b086dce"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intent for a remote session leasing process. <br /></td></tr>
+<tr class="memitem:ae029b640f70731bbe2afc8688a78eb81" id="r_ae029b640f70731bbe2afc8688a78eb81"><td class="memItemLeft" align="right" valign="top"><a id="ae029b640f70731bbe2afc8688a78eb81" name="ae029b640f70731bbe2afc8688a78eb81"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae029b640f70731bbe2afc8688a78eb81">LootLockerTriggerFailureReasons</a> </td></tr>
+<tr class="memdesc:ae029b640f70731bbe2afc8688a78eb81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible reasons for a trigger key to fail. <br /></td></tr>
+</table>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<a id="a11dc7f5aeea66ae644d4b93b1b1d9c09" name="a11dc7f5aeea66ae644d4b93b1b1d9c09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11dc7f5aeea66ae644d4b93b1b1d9c09">&#9670;&#160;</a></span>LootLockerAsyncPurchaseStatus</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a11dc7f5aeea66ae644d4b93b1b1d9c09">LootLocker.LootLockerEnums.LootLockerAsyncPurchaseStatus</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The possible statuses of an async purchase entitlement. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a11dc7f5aeea66ae644d4b93b1b1d9c09a7c6c2e5d48ab37a007cbf70d3ea25fa4" name="a11dc7f5aeea66ae644d4b93b1b1d9c09a7c6c2e5d48ab37a007cbf70d3ea25fa4"></a>pending&#160;</td><td class="fielddoc"><p>The purchase is still being processed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a11dc7f5aeea66ae644d4b93b1b1d9c09ac76a5e84e4bdee527e274ea30c680d79" name="a11dc7f5aeea66ae644d4b93b1b1d9c09ac76a5e84e4bdee527e274ea30c680d79"></a>active&#160;</td><td class="fielddoc"><p>The purchase completed successfully and items have been granted. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a11dc7f5aeea66ae644d4b93b1b1d9c09a26934eb377001f66e37289a5c93fe284" name="a11dc7f5aeea66ae644d4b93b1b1d9c09a26934eb377001f66e37289a5c93fe284"></a>failed&#160;</td><td class="fielddoc"><p>The purchase failed; see the error field for the reason. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ab2a3741c22b09082e2551704d105f2dd" name="ab2a3741c22b09082e2551704d105f2dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2a3741c22b09082e2551704d105f2dd">&#9670;&#160;</a></span>LootLockerItemSortField</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ab2a3741c22b09082e2551704d105f2dd">LootLocker.LootLockerEnums.LootLockerItemSortField</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The field by which to order a player item list response. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab2a3741c22b09082e2551704d105f2ddafde81f1177b1541755b672c9dc97315a" name="ab2a3741c22b09082e2551704d105f2ddafde81f1177b1541755b672c9dc97315a"></a>created_at&#160;</td><td class="fielddoc"><p>Order by when the item was created. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab2a3741c22b09082e2551704d105f2ddaafd1a1a8e69e4b32a11a645da8280f8a" name="ab2a3741c22b09082e2551704d105f2ddaafd1a1a8e69e4b32a11a645da8280f8a"></a>updated_at&#160;</td><td class="fielddoc"><p>Order by when the item was last updated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab2a3741c22b09082e2551704d105f2dda36cd38f49b9afa08222c0dc9ebfe35eb" name="ab2a3741c22b09082e2551704d105f2dda36cd38f49b9afa08222c0dc9ebfe35eb"></a>source&#160;</td><td class="fielddoc"><p>Order by the source that granted the item. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a96fe13079f755e5a5c09ef9e87e56172" name="a96fe13079f755e5a5c09ef9e87e56172"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96fe13079f755e5a5c09ef9e87e56172">&#9670;&#160;</a></span>LootLockerItemType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172">LootLocker.LootLockerEnums.LootLockerItemType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of an item, determining whether the item instances are stackable or individually tracked. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7" name="a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7"></a>instanced&#160;</td><td class="fielddoc"><p>Each granted item is a separate, individually tracked instance. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620" name="a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620"></a>stackable&#160;</td><td class="fielddoc"><p>The item is stored as a single entry with a count that can be incremented or decremented. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="abca75f1fd16f7c3ea5e96a3968cdc31e" name="abca75f1fd16f7c3ea5e96a3968cdc31e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abca75f1fd16f7c3ea5e96a3968cdc31e">&#9670;&#160;</a></span>LootLockerRefundInventoryEventAction</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#abca75f1fd16f7c3ea5e96a3968cdc31e">LootLocker.LootLockerEnums.LootLockerRefundInventoryEventAction</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The action taken on a player inventory item as part of a refund. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711" name="abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711"></a>removed&#160;</td><td class="fielddoc"><p>The item was successfully removed from the player's inventory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a" name="abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a"></a>skipped&#160;</td><td class="fielddoc"><p>The item could not be removed (e.g. already consumed) and was left in place. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aff0d648d0103d5a0325fac91a9e1595b" name="aff0d648d0103d5a0325fac91a9e1595b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff0d648d0103d5a0325fac91a9e1595b">&#9670;&#160;</a></span>LootLockerRefundNonReversibleRewardKind</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#aff0d648d0103d5a0325fac91a9e1595b">LootLocker.LootLockerEnums.LootLockerRefundNonReversibleRewardKind</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The kind of non-reversible reward that was granted alongside an entitlement. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aff0d648d0103d5a0325fac91a9e1595ba411b9f1aeb1018a2966c3491601312eb" name="aff0d648d0103d5a0325fac91a9e1595ba411b9f1aeb1018a2966c3491601312eb"></a>progression_points&#160;</td><td class="fielddoc"><p>Points were added to a progression and cannot be taken back. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aff0d648d0103d5a0325fac91a9e1595ba09efb74d9914e0f320c221f00080b4f2" name="aff0d648d0103d5a0325fac91a9e1595ba09efb74d9914e0f320c221f00080b4f2"></a>progression_reset&#160;</td><td class="fielddoc"><p>A progression was reset to its initial state and cannot be undone. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a0d9a5b8d1a9370beeb5b80a26a1d1f71" name="a0d9a5b8d1a9370beeb5b80a26a1d1f71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71">&#9670;&#160;</a></span>LootLockerRefundWarningType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71">LootLocker.LootLockerEnums.LootLockerRefundWarningType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The category of a per-entitlement warning returned during a refund. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a0d9a5b8d1a9370beeb5b80a26a1d1f71a6f3d3eb449617f1052e73d928ffc92af" name="a0d9a5b8d1a9370beeb5b80a26a1d1f71a6f3d3eb449617f1052e73d928ffc92af"></a>non_reversible_rewards&#160;</td><td class="fielddoc"><p>Rewards granted that cannot be automatically clawed back. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0d9a5b8d1a9370beeb5b80a26a1d1f71a695c9713c870681ffae14296ea6cd060" name="a0d9a5b8d1a9370beeb5b80a26a1d1f71a695c9713c870681ffae14296ea6cd060"></a>insufficient_funds&#160;</td><td class="fielddoc"><p>The player does not have enough currency balance to cover the clawback. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0d9a5b8d1a9370beeb5b80a26a1d1f71aee2a58f7c0c685119d384e2e2c6e3e8c" name="a0d9a5b8d1a9370beeb5b80a26a1d1f71aee2a58f7c0c685119d384e2e2c6e3e8c"></a>already_refunded&#160;</td><td class="fielddoc"><p>The entitlement was already refunded before this request. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114" name="a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114"></a>refund_failed&#160;</td><td class="fielddoc"><p>The entitlement could not be refunded due to an unexpected error. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a19684afe5d90f9fcb3daa619efc0db75" name="a19684afe5d90f9fcb3daa619efc0db75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19684afe5d90f9fcb3daa619efc0db75">&#9670;&#160;</a></span>LootLockerRewardKind</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a19684afe5d90f9fcb3daa619efc0db75">LootLocker.LootLockerEnums.LootLockerRewardKind</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The kind of reward that was granted as a result of a behaviour. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75aad921d60486366258809553a3db49a4a" name="a19684afe5d90f9fcb3daa619efc0db75aad921d60486366258809553a3db49a4a"></a>unknown&#160;</td><td class="fielddoc"><p>The reward kind could not be determined. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75ac04e34d445e31a2159c1bfeb882ba212" name="a19684afe5d90f9fcb3daa619efc0db75ac04e34d445e31a2159c1bfeb882ba212"></a>asset&#160;</td><td class="fielddoc"><p>An asset. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a411b9f1aeb1018a2966c3491601312eb" name="a19684afe5d90f9fcb3daa619efc0db75a411b9f1aeb1018a2966c3491601312eb"></a>progression_points&#160;</td><td class="fielddoc"><p>Progression points. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a09efb74d9914e0f320c221f00080b4f2" name="a19684afe5d90f9fcb3daa619efc0db75a09efb74d9914e0f320c221f00080b4f2"></a>progression_reset&#160;</td><td class="fielddoc"><p>A progression reset. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a1af0389838508d7016a9841eb6273962" name="a19684afe5d90f9fcb3daa619efc0db75a1af0389838508d7016a9841eb6273962"></a>currency&#160;</td><td class="fielddoc"><p>A currency. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75adb0f6f37ebeb6ea09489124345af2a45" name="a19684afe5d90f9fcb3daa619efc0db75adb0f6f37ebeb6ea09489124345af2a45"></a>group&#160;</td><td class="fielddoc"><p>A group. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75af9b11ed03ce21394fd0e5b19ae2d3873" name="a19684afe5d90f9fcb3daa619efc0db75af9b11ed03ce21394fd0e5b19ae2d3873"></a>reward&#160;</td><td class="fielddoc"><p>A reward. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a1e7f5afdac15b78afa83c1113a91a939" name="a19684afe5d90f9fcb3daa619efc0db75a1e7f5afdac15b78afa83c1113a91a939"></a>platform_key&#160;</td><td class="fielddoc"><p>A platform key. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75ad3776ee23963f417d4b9538324a0dd80" name="a19684afe5d90f9fcb3daa619efc0db75ad3776ee23963f417d4b9538324a0dd80"></a>publisher_currency&#160;</td><td class="fielddoc"><p>A publisher currency. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a046ad69db921421fb15ea13bc09b344a" name="a19684afe5d90f9fcb3daa619efc0db75a046ad69db921421fb15ea13bc09b344a"></a>publisher_progression_points&#160;</td><td class="fielddoc"><p>Publisher progression points. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a4e988d447543c10c56680088fb87139d" name="a19684afe5d90f9fcb3daa619efc0db75a4e988d447543c10c56680088fb87139d"></a>player_metadata&#160;</td><td class="fielddoc"><p>Player metadata. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a8c7dd922ad47494fc02c388e12c00eac" name="a19684afe5d90f9fcb3daa619efc0db75a8c7dd922ad47494fc02c388e12c00eac"></a>file&#160;</td><td class="fielddoc"><p>A file. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a1eac583db284a56088adb88d0cdb3ae1" name="a19684afe5d90f9fcb3daa619efc0db75a1eac583db284a56088adb88d0cdb3ae1"></a>discord_role&#160;</td><td class="fielddoc"><p>A Discord role. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a19684afe5d90f9fcb3daa619efc0db75a919e14fd14d7143e0bac1742bde98b3b" name="a19684afe5d90f9fcb3daa619efc0db75a919e14fd14d7143e0bac1742bde98b3b"></a>item_template&#160;</td><td class="fielddoc"><p>An item template. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ad1cbebbc10ba27ff6bddd3131ad0489d" name="ad1cbebbc10ba27ff6bddd3131ad0489d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1cbebbc10ba27ff6bddd3131ad0489d">&#9670;&#160;</a></span>LootLockerSortOrder</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ad1cbebbc10ba27ff6bddd3131ad0489d">LootLocker.LootLockerEnums.LootLockerSortOrder</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The direction in which to order a player item list response. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ad1cbebbc10ba27ff6bddd3131ad0489dac6e421eaad140c1bc1a39980502df80c" name="ad1cbebbc10ba27ff6bddd3131ad0489dac6e421eaad140c1bc1a39980502df80c"></a>ASC&#160;</td><td class="fielddoc"><p>Order ascending. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ad1cbebbc10ba27ff6bddd3131ad0489da65a6d757dbb571ccc3af9706e9a5f607" name="ad1cbebbc10ba27ff6bddd3131ad0489da65a6d757dbb571ccc3af9706e9a5f607"></a>DESC&#160;</td><td class="fielddoc"><p>Order descending. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a34be90caa9124f7a8b29a31a0f6d6979" name="a34be90caa9124f7a8b29a31a0f6d6979"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34be90caa9124f7a8b29a31a0f6d6979">&#9670;&#160;</a></span>LootLockerWalletHolderTypes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a34be90caa9124f7a8b29a31a0f6d6979">LootLocker.LootLockerEnums.LootLockerWalletHolderTypes</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Possible account linking process statuses. </p>
+<p>Undefined means that the object couldn't be constructed correctly </p>
+
+</div>
+</div>
+<a id="aff5a9a64fba273b693b5e21f838d5fdf" name="aff5a9a64fba273b693b5e21f838d5fdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff5a9a64fba273b693b5e21f838d5fdf">&#9670;&#160;</a></span>OrderAssetListBy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#aff5a9a64fba273b693b5e21f838d5fdf">LootLocker.LootLockerEnums.OrderAssetListBy</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The field by which to order an asset list response. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aff5a9a64fba273b693b5e21f838d5fdfa334c4a4c42fdb79d7ebc3e73b517e6f8" name="aff5a9a64fba273b693b5e21f838d5fdfa334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>Do not apply a specific ordering. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aff5a9a64fba273b693b5e21f838d5fdfab80bb7740288fda1f201890375a60c8f" name="aff5a9a64fba273b693b5e21f838d5fdfab80bb7740288fda1f201890375a60c8f"></a>id&#160;</td><td class="fielddoc"><p>Order by asset ID. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aff5a9a64fba273b693b5e21f838d5fdfab068931cc450442b63f5b3d276ea4297" name="aff5a9a64fba273b693b5e21f838d5fdfab068931cc450442b63f5b3d276ea4297"></a>name&#160;</td><td class="fielddoc"><p>Order by asset name. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aff5a9a64fba273b693b5e21f838d5fdfafde81f1177b1541755b672c9dc97315a" name="aff5a9a64fba273b693b5e21f838d5fdfafde81f1177b1541755b672c9dc97315a"></a>created_at&#160;</td><td class="fielddoc"><p>Order by when the asset was created. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aff5a9a64fba273b693b5e21f838d5fdfaafd1a1a8e69e4b32a11a645da8280f8a" name="aff5a9a64fba273b693b5e21f838d5fdfaafd1a1a8e69e4b32a11a645da8280f8a"></a>updated_at&#160;</td><td class="fielddoc"><p>Order by when the asset was last updated. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ac531873ad450de5f89eaa1bcda167b06" name="ac531873ad450de5f89eaa1bcda167b06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac531873ad450de5f89eaa1bcda167b06">&#9670;&#160;</a></span>OrderAssetListDirection</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ac531873ad450de5f89eaa1bcda167b06">LootLocker.LootLockerEnums.OrderAssetListDirection</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The direction in which to order an asset list response. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac531873ad450de5f89eaa1bcda167b06a334c4a4c42fdb79d7ebc3e73b517e6f8" name="ac531873ad450de5f89eaa1bcda167b06a334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>Do not apply a specific direction. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac531873ad450de5f89eaa1bcda167b06a375a52cb87b22005816fe7a418ec6660" name="ac531873ad450de5f89eaa1bcda167b06a375a52cb87b22005816fe7a418ec6660"></a>asc&#160;</td><td class="fielddoc"><p>Order ascending (lowest to highest). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac531873ad450de5f89eaa1bcda167b06a1dee80c7d5ab2c1c90aa8d2f7dd47256" name="ac531873ad450de5f89eaa1bcda167b06a1dee80c7d5ab2c1c90aa8d2f7dd47256"></a>desc&#160;</td><td class="fielddoc"><p>Order descending (highest to lowest). </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.15.0-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespaceLootLocker.html">LootLocker</a></li><li class="navelem"><a href="namespaceLootLocker_1_1LootLockerEnums.html">LootLockerEnums</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.15.0
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

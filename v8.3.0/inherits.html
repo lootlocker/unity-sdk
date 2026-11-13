@@ -1,0 +1,1609 @@
+<!-- HTML header for doxygen 1.15.0-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.15.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: Class Hierarchy</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.3.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.15.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+</div><!-- top -->
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('hierarchy.html','',''); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">Class Hierarchy</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock">
+<p><a href="hierarchy.html">Go to the textual class hierarchy</a></p>
+</div><table border="0" cellspacing="10" cellpadding="0">
+<tr><td><img src="inherit_graph_0.png" border="0" usemap="#aLootLocker_8ILootLockerService" loading="lazy" alt=""/>
+<map name="aLootLocker_8ILootLockerService" id="aLootLocker_8ILootLockerService">
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerService.html" title="Interface that all LootLocker services must implement to be managed by the LifecycleManager." alt="" coords="5,114,222,142"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerEventSystem.html" title="Centralized event system for the LootLocker SDK Manages event subscriptions, event firing,..." alt="" coords="284,5,485,50"/>
+<area shape="poly" title=" " alt="" coords="159,105,269,60,307,49,302,52,271,65,161,110"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceManager.html" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ..." alt="" coords="273,75,496,119"/>
+<area shape="poly" title=" " alt="" coords="237,111,275,109,270,110,238,116"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerStateData.html" title="Manages player state data persistence and session lifecycle." alt="" coords="270,143,499,171"/>
+<area shape="poly" title=" " alt="" coords="237,138,272,144,267,145,237,144"/>
+<area shape="rect" href="classLootLocker_1_1RateLimiter.html" title="Rate limiter service for managing HTTP request rate limiting." alt="" coords="299,195,470,223"/>
+<area shape="poly" title=" " alt="" coords="167,145,270,180,319,195,313,195,269,185,166,150"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_1.png" border="0" usemap="#aLootLocker_8ILootLockerStateWriter" loading="lazy" alt=""/>
+<map name="aLootLocker_8ILootLockerStateWriter" id="aLootLocker_8ILootLockerStateWriter">
+<area shape="rect" href="interfaceLootLocker_1_1ILootLockerStateWriter.html" title="Implement this interface to create a custom persistent state writer for saving and loading player sta..." alt="" coords="5,5,208,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_2.png" border="0" usemap="#aLootLocker_8LootLockerBanInfo" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerBanInfo" id="aLootLocker_8LootLockerBanInfo">
+<area shape="rect" href="classLootLocker_1_1LootLockerBanInfo.html" title="Details about a player&#39;s active ban." alt="" coords="5,5,220,33"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_3.png" border="0" usemap="#aLootLocker_8LootLockerErrorData" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerErrorData" id="aLootLocker_8LootLockerErrorData">
+<area shape="rect" href="classLootLocker_1_1LootLockerErrorData.html" title="Error information returned when a LootLocker API call fails." alt="" coords="5,5,232,33"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_4.png" border="0" usemap="#aLootLocker_8LootLockerEventData" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerEventData" id="aLootLocker_8LootLockerEventData">
+<area shape="rect" href="classLootLocker_1_1LootLockerEventData.html" title="Base class for all LootLocker event data." alt="" coords="5,256,238,284"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerEventSystemResetEventData.html" title="Event data for event system reset events." alt="" coords="312,5,513,50"/>
+<area shape="poly" title=" " alt="" coords="134,242,158,201,192,152,234,102,284,60,313,47,309,51,287,65,238,106,196,155,163,204,139,244"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerLocalSessionActivatedEventData.html" title="Event data for local session activated events." alt="" coords="312,75,513,119"/>
+<area shape="poly" title=" " alt="" coords="144,243,204,186,243,155,284,129,314,118,310,122,287,134,246,160,207,190,148,247"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerLocalSessionDeactivatedEventData.html" title="Event data for local session deactivated events." alt="" coords="303,144,522,189"/>
+<area shape="poly" title=" " alt="" coords="165,247,285,198,324,188,320,191,287,204,168,252"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceConnectionStateChangedEventData.html" title="Event data for presence connection state changed events." alt="" coords="286,213,539,258"/>
+<area shape="poly" title=" " alt="" coords="252,252,287,249,283,252,254,257"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerSessionEndedEventData.html" title="Event data for session ended events." alt="" coords="305,283,520,327"/>
+<area shape="poly" title=" " alt="" coords="252,283,307,291,302,293,254,289"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerSessionExpiredEventData.html" title="Event data for session expired events." alt="" coords="305,352,520,397"/>
+<area shape="poly" title=" " alt="" coords="167,288,287,337,325,351,320,352,285,342,167,294"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerSessionRefreshedEventData.html" title="Event data for session refreshed events." alt="" coords="305,421,520,466"/>
+<area shape="poly" title=" " alt="" coords="146,293,207,351,246,381,287,407,315,421,310,421,284,411,243,385,204,355,145,298"/>
+<area shape="rect" href="classLootLocker_1_1LootLockerSessionStartedEventData.html" title="Event data for session started events." alt="" coords="305,491,520,535"/>
+<area shape="poly" title=" " alt="" coords="137,295,163,337,196,386,238,435,287,476,310,491,305,490,284,481,234,438,192,389,158,340,136,301"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_5.png" border="0" usemap="#aLootLocker_8LootLockerHTTPClient_8LootLockerFailedRequestReport" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerHTTPClient_8LootLockerFailedRequestReport" id="aLootLocker_8LootLockerHTTPClient_8LootLockerFailedRequestReport">
+<area shape="rect" href="classLootLocker_1_1LootLockerHTTPClient_1_1LootLockerFailedRequestReport.html" title="Data structure for storing information about failed requests for the purpose of error reporting." alt="" coords="5,5,246,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_6.png" border="0" usemap="#aLootLocker_8LootLockerLifecycleManager" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerLifecycleManager" id="aLootLocker_8LootLockerLifecycleManager">
+<area shape="rect" href="classLootLocker_1_1LootLockerLifecycleManager.html" title="Centralized lifecycle manager for all LootLocker services that need Unity GameObject management." alt="" coords="5,5,228,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_7.png" border="0" usemap="#aLootLocker_8LootLockerPresenceAuthRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresenceAuthRequest" id="aLootLocker_8LootLockerPresenceAuthRequest">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceAuthRequest.html" title="Authentication request sent to the Presence WebSocket." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_8.png" border="0" usemap="#aLootLocker_8LootLockerPresenceClient" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresenceClient" id="aLootLocker_8LootLockerPresenceClient">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceClient.html" title="Individual WebSocket client for LootLocker Presence feature Managed internally by LootLockerPresenceM..." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_9.png" border="0" usemap="#aLootLocker_8LootLockerPresenceConnectionStats" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresenceConnectionStats" id="aLootLocker_8LootLockerPresenceConnectionStats">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceConnectionStats.html" title="Statistics about the presence connection to LootLocker." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_10.png" border="0" usemap="#aLootLocker_8LootLockerPresencePingRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresencePingRequest" id="aLootLocker_8LootLockerPresencePingRequest">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresencePingRequest.html" title="Ping message to keep the WebSocket connection alive." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_11.png" border="0" usemap="#aLootLocker_8LootLockerPresencePingResponse" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresencePingResponse" id="aLootLocker_8LootLockerPresencePingResponse">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresencePingResponse.html" title="Ping response from the server." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_12.png" border="0" usemap="#aLootLocker_8LootLockerPresenceStatusRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerPresenceStatusRequest" id="aLootLocker_8LootLockerPresenceStatusRequest">
+<area shape="rect" href="classLootLocker_1_1LootLockerPresenceStatusRequest.html" title="Status update request for Presence." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_13.png" border="0" usemap="#aLootLocker_8LootLockerRequestContext" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerRequestContext" id="aLootLocker_8LootLockerRequestContext">
+<area shape="rect" href="classLootLocker_1_1LootLockerRequestContext.html" title="Contains contextual information about a LootLocker API request." alt="" coords="5,5,223,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_14.png" border="0" usemap="#aLootLocker_8LootLockerResponse" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerResponse" id="aLootLocker_8LootLockerResponse">
+<area shape="rect" href="classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="5,3523,233,3551"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1EquipAssetToClassLoadoutResponse.html" title="Response containing the class that received the equipped asset along with its updated loadout." alt="" coords="310,5,531,50"/>
+<area shape="poly" title=" " alt="" coords="118,3507,129,2850,140,2310,156,1714,178,1127,205,614,221,404,238,237,257,120,268,83,279,61,292,48,311,38,308,43,296,52,283,64,273,85,262,121,243,238,226,405,210,614,183,1128,162,1714,145,2310,134,2850,123,3507"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1GetLootLockerCurrencyDetailsResponse.html" title="Response with details about a particular currency." alt="" coords="305,75,536,119"/>
+<area shape="poly" title=" " alt="" coords="118,3507,129,2862,141,2333,157,1749,179,1175,206,672,222,466,239,303,258,188,268,152,279,130,306,110,304,114,283,133,273,154,263,189,244,303,227,467,211,672,184,1175,163,1750,146,2333,134,2862,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAccountConnectedResponse.html" title="Response returned after successfully connecting an account provider to the current player&#39;s LootLocke..." alt="" coords="297,144,544,189"/>
+<area shape="poly" title=" " alt="" coords="118,3508,129,2874,158,1785,180,1222,207,729,222,529,239,368,258,256,268,221,279,199,297,184,295,189,283,203,273,222,263,257,245,369,228,529,212,730,185,1222,163,1785,135,2875,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerActivateRentalAssetResponse.html" title="Response containing the time remaining after activating a rental asset." alt="" coords="291,213,550,258"/>
+<area shape="poly" title=" " alt="" coords="118,3508,130,2887,159,1820,181,1269,208,787,223,591,240,434,258,324,268,289,279,269,294,256,292,261,283,272,273,291,264,326,245,435,229,591,213,788,186,1269,164,1820,135,2887,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetInstanceProgressionResponse.html" title="Response containing the current progression status for an asset instance on a specific progression." alt="" coords="305,282,536,344"/>
+<area shape="poly" title=" " alt="" coords="118,3508,131,2902,162,1864,184,1328,211,860,226,668,242,516,259,409,269,374,279,354,306,332,304,337,283,357,274,376,265,410,247,516,231,669,216,860,189,1328,167,1864,136,2902,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetRequest.html" title="Request object used internally to track pagination state for legacy asset list calls." alt="" coords="327,368,514,413"/>
+<area shape="poly" title=" " alt="" coords="118,3508,131,2914,161,1898,183,1374,210,916,225,730,242,581,259,476,269,443,279,423,300,405,328,394,325,399,303,410,283,427,274,445,264,478,247,581,231,730,215,917,189,1375,167,1898,136,2914,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetResponse.html" title="Response containing a list of assets returned by a legacy asset request." alt="" coords="327,437,514,482"/>
+<area shape="poly" title=" " alt="" coords="118,3507,131,2925,162,1932,185,1421,211,974,226,792,242,646,260,544,269,512,279,493,300,474,328,464,325,468,303,479,283,496,274,514,265,546,248,647,231,792,216,974,190,1421,168,1932,137,2925,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseInitiatedResponse.html" title="Response returned when an async purchase is successfully initiated or retried (HTTP 202)." alt="" coords="313,506,528,568"/>
+<area shape="poly" title=" " alt="" coords="118,3508,133,2941,165,1977,187,1481,214,1046,228,869,244,728,261,629,269,597,278,578,293,563,313,552,311,557,297,568,283,581,274,599,266,630,249,729,234,870,219,1047,193,1481,170,1977,138,2941,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAsyncPurchaseStatusResponse.html" title="Response returned when polling the status of an async purchase." alt="" coords="288,592,553,637"/>
+<area shape="poly" title=" " alt="" coords="118,3508,133,2952,165,2011,187,1526,213,1103,228,930,244,793,261,696,269,666,279,647,294,635,292,640,283,651,274,668,266,698,249,793,233,931,219,1103,192,1527,170,2011,138,2952,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBalanceResponse.html" title="Response containing the current player&#39;s currency balance." alt="" coords="327,661,514,706"/>
+<area shape="poly" title=" " alt="" coords="118,3508,133,2965,166,2046,188,1574,214,1161,229,993,245,858,261,765,269,735,279,717,300,699,328,688,325,692,303,703,283,720,274,736,266,766,250,859,234,993,220,1161,193,1574,171,2047,138,2965,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBanStatusResponse.html" title="Response for LootLockerSDKManager.GetPlayerBanStatus." alt="" coords="324,731,516,775"/>
+<area shape="poly" title=" " alt="" coords="118,3508,133,2977,167,2081,189,1621,215,1219,230,1055,245,924,261,833,270,803,279,786,299,769,325,758,322,762,302,773,283,789,275,805,266,834,250,925,235,1055,221,1219,195,1621,172,2081,139,2977,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCharacterProgressionResponse.html" title="Response containing the current progression status for a character on a specific progression." alt="" coords="288,800,553,845"/>
+<area shape="poly" title=" " alt="" coords="118,3508,134,2988,168,2116,190,1668,216,1276,231,1117,246,990,262,901,270,872,279,855,294,843,292,848,283,859,275,874,267,902,251,990,236,1117,222,1277,196,1668,173,2116,139,2989,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerClassLoadoutResponse.html" title="Response containing the current loadout for one or more classes belonging to the player." alt="" coords="314,869,527,914"/>
+<area shape="poly" title=" " alt="" coords="117,3508,117,3019,121,2627,132,2193,150,1763,163,1563,179,1379,199,1218,221,1086,248,986,263,950,279,925,294,911,315,901,312,905,297,915,283,928,267,953,253,988,226,1087,204,1219,185,1380,169,1563,156,1763,137,2194,127,2627,123,3019,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCommonAssetResponse.html" title="Response containing the full details of an asset, returned by the legacy common asset endpoint." alt="" coords="310,939,531,983"/>
+<area shape="poly" title=" " alt="" coords="117,3508,118,3030,123,2648,134,2226,153,1808,166,1614,181,1436,200,1279,223,1150,248,1054,263,1019,279,994,292,981,311,972,308,976,295,985,283,997,268,1021,254,1055,228,1151,206,1280,187,1436,171,1614,158,1809,139,2227,128,2648,123,3030,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectionStateResponse.html" title="Response for LootLocker.Requests.LootLockerSDKManager.CheckConnectionStatus." alt="" coords="304,1008,537,1053"/>
+<area shape="poly" title=" " alt="" coords="118,3508,119,3041,124,2670,136,2260,155,1854,168,1665,183,1492,202,1340,224,1215,249,1121,263,1087,279,1063,304,1044,302,1049,283,1067,268,1090,254,1123,229,1216,207,1341,189,1493,173,1666,160,1855,141,2261,130,2670,124,3042,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConsumeInventoryItemResponse.html" title="Response containing the result of consuming an item, including any items granted as a result." alt="" coords="281,1077,560,1122"/>
+<area shape="poly" title=" " alt="" coords="118,3508,120,3053,126,2692,138,2295,157,1900,170,1717,185,1549,204,1402,225,1280,250,1189,264,1156,279,1133,295,1120,292,1125,283,1136,269,1158,255,1191,230,1281,209,1402,191,1549,175,1717,162,1901,143,2295,131,2692,125,3053,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerContextResponse.html" title="Response containing a list of available asset contexts (categories)." alt="" coords="327,1147,514,1191"/>
+<area shape="poly" title=" " alt="" coords="118,3508,121,3065,127,2715,140,2329,159,1946,187,1606,206,1463,227,1345,251,1256,264,1225,279,1202,300,1184,328,1173,325,1177,303,1188,283,1205,269,1227,256,1258,232,1346,211,1464,193,1606,164,1947,145,2329,133,2715,126,3065,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreateStripeCheckoutSessionResponse.html" title="Response from creating a Stripe Checkout session." alt="" coords="293,1216,548,1277"/>
+<area shape="poly" title=" " alt="" coords="118,3508,123,3081,131,2743,144,2372,164,2005,192,1677,210,1539,230,1426,252,1340,265,1309,279,1287,294,1274,292,1279,283,1291,270,1312,258,1342,235,1427,215,1540,197,1677,169,2005,149,2373,136,2743,128,3081,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreateWalletResponse.html" title="Response returned after successfully creating a new wallet." alt="" coords="315,1301,526,1346"/>
+<area shape="poly" title=" " alt="" coords="118,3507,123,3091,131,2764,144,2404,164,2048,192,1732,210,1599,230,1489,252,1407,265,1378,279,1357,295,1342,316,1332,313,1337,298,1347,283,1360,270,1380,258,1409,235,1491,215,1600,197,1732,169,2049,149,2405,136,2764,128,3091,123,3507"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreditWalletResponse.html" title="Response returned after crediting an amount to a wallet, showing the resulting balance." alt="" coords="317,1371,524,1415"/>
+<area shape="poly" title=" " alt="" coords="118,3508,124,3103,132,2786,146,2439,166,2095,194,1788,211,1660,231,1554,253,1475,266,1446,279,1426,296,1411,318,1401,315,1405,299,1415,283,1429,270,1449,258,1477,236,1555,217,1661,199,1789,171,2095,151,2439,138,2787,129,3104,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDeactivatedAssetsResponse.html" title="Response containing assets that have been deactivated and their replacements, if any." alt="" coords="296,1440,544,1485"/>
+<area shape="poly" title=" " alt="" coords="118,3508,125,3116,134,2809,148,2473,168,2141,196,1845,213,1721,232,1619,254,1543,266,1515,279,1495,297,1481,295,1486,283,1499,271,1517,259,1544,237,1620,218,1722,201,1846,174,2141,153,2474,139,2810,130,3116,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDebitWalletResponse.html" title="Response returned after debiting an amount from a wallet, showing the resulting balance." alt="" coords="319,1509,522,1554"/>
+<area shape="poly" title=" " alt="" coords="118,3508,126,3128,135,2832,150,2508,170,2187,198,1902,215,1783,234,1684,255,1610,266,1584,279,1565,296,1549,320,1539,317,1543,299,1553,283,1568,271,1586,260,1612,239,1685,220,1783,203,1903,176,2187,155,2508,141,2832,131,3128,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDlcResponse.html" title="Response containing the list of DLC package identifiers owned by the current player." alt="" coords="327,1579,514,1623"/>
+<area shape="poly" title=" " alt="" coords="118,3508,127,3140,137,2854,152,2542,173,2233,200,1959,217,1844,235,1749,256,1678,267,1652,279,1634,300,1616,328,1605,325,1610,303,1621,283,1637,271,1655,261,1680,240,1750,222,1845,205,1959,178,2233,157,2542,142,2854,132,3140,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html" title="Response containing a paginated history of entitlement listings for the current player." alt="" coords="296,1648,545,1693"/>
+<area shape="poly" title=" " alt="" coords="118,3508,128,3152,138,2877,154,2576,175,2279,202,2015,218,1905,236,1814,256,1745,279,1703,297,1689,294,1694,283,1707,261,1747,241,1815,224,1906,207,2016,180,2280,159,2576,144,2877,133,3152,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFavouritesListResponse.html" title="Response containing the list of asset ids that the current player has marked as favourites." alt="" coords="312,1717,528,1762"/>
+<area shape="poly" title=" " alt="" coords="118,3507,129,3163,140,2898,156,2609,177,2325,204,2072,220,1966,238,1879,257,1813,279,1773,293,1759,313,1750,310,1754,297,1764,283,1776,262,1815,243,1880,225,1967,209,2072,182,2325,161,2610,145,2898,134,3163,124,3507"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFollowersOperationResponse.html" title="Response for follow/unfollow operations (follow, unfollow)." alt="" coords="294,1787,546,1831"/>
+<area shape="poly" title=" " alt="" coords="118,3508,130,3176,158,2645,179,2371,206,2129,222,2027,239,1944,258,1881,279,1842,295,1829,292,1834,283,1845,263,1883,244,1945,227,2028,211,2129,185,2372,163,2645,135,3176,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFriendsOperationResponse.html" title="Response for friend operations (send/accept/decline/cancel/unfriend/block/unblock)." alt="" coords="302,1856,539,1901"/>
+<area shape="poly" title=" " alt="" coords="119,3508,131,3188,160,2679,182,2417,208,2185,224,2088,240,2008,259,1948,279,1911,302,1894,300,1899,283,1915,264,1950,246,2010,229,2089,214,2186,187,2418,165,2679,136,3188,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGameInfoResponse.html" title="Represents a response from the LootLocker API containing game information." alt="" coords="325,1925,516,1970"/>
+<area shape="poly" title=" " alt="" coords="119,3508,132,3200,162,2713,184,2464,210,2242,225,2150,242,2073,259,2016,279,1981,299,1963,326,1953,323,1957,302,1968,283,1984,264,2018,247,2075,231,2151,216,2243,189,2464,167,2714,137,3200,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksResponse.html" title="Response containing all leaderboard ranks for a specific member across all leaderboards." alt="" coords="290,1995,550,2039"/>
+<area shape="poly" title=" " alt="" coords="119,3508,133,3212,164,2748,186,2510,212,2299,227,2211,243,2138,260,2084,279,2050,295,2037,293,2042,283,2053,265,2086,248,2140,232,2212,218,2300,191,2511,170,2748,139,3213,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetByListOfMembersResponse.html" title="Response containing the leaderboard entries for a list of specific member ids." alt="" coords="288,2064,553,2109"/>
+<area shape="poly" title=" " alt="" coords="119,3508,134,3225,166,2783,188,2556,214,2356,244,2203,261,2151,279,2119,295,2107,293,2112,283,2123,266,2153,250,2205,220,2357,194,2557,172,2783,140,3225,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetCurrentLoadoutToDefaultClassResponse.html" title="Response containing the currently equipped loadout for the default class." alt="" coords="296,2133,544,2194"/>
+<area shape="poly" title=" " alt="" coords="119,3508,136,3241,170,2826,192,2615,218,2427,247,2284,262,2235,279,2205,297,2190,295,2194,283,2208,267,2237,252,2285,223,2428,198,2615,175,2827,142,3241,125,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetCurrentPlayerInfoResponse.html" title="Response containing key information about the currently logged&#45;in player." alt="" coords="289,2219,552,2263"/>
+<area shape="poly" title=" " alt="" coords="119,3508,137,3253,171,2860,193,2660,219,2483,247,2348,263,2302,279,2274,295,2261,293,2266,283,2277,267,2304,253,2349,224,2484,199,2660,176,2860,142,3253,125,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetFriendResponse.html" title="Response containing details about a specific friend of the current player /summary&gt;." alt="" coords="326,2288,515,2333"/>
+<area shape="poly" title=" " alt="" coords="117,3507,119,3281,125,3113,137,2931,157,2747,185,2578,204,2504,225,2438,250,2384,279,2343,300,2326,327,2316,324,2320,302,2331,283,2347,255,2387,230,2440,209,2505,191,2579,162,2748,143,2931,131,3114,125,3281,123,3507"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetMemberRankResponse.html" title="Response containing the rank and score for a specific member on a leaderboard." alt="" coords="302,2357,538,2402"/>
+<area shape="poly" title=" " alt="" coords="118,3508,122,3293,129,3135,141,2963,161,2791,189,2633,207,2563,228,2502,252,2451,279,2413,303,2395,301,2400,283,2416,256,2454,233,2504,212,2564,195,2634,166,2792,147,2964,134,3136,127,3293,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetMetadataResponse.html" title="Response containing a single metadata entry retrieved by key." alt="" coords="315,2427,526,2471"/>
+<area shape="poly" title=" " alt="" coords="118,3507,124,3304,132,3157,145,2996,166,2835,193,2687,211,2622,231,2565,253,2518,279,2482,295,2468,315,2459,313,2463,298,2473,283,2485,258,2521,236,2567,216,2624,199,2688,171,2836,151,2996,137,3157,129,3304,123,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetMultisourceMetadataResponse.html" title="Response containing metadata entries for multiple sources, grouped by source." alt="" coords="308,2496,532,2557"/>
+<area shape="poly" title=" " alt="" coords="118,3508,128,3320,138,3185,152,3038,173,2891,200,2756,217,2696,235,2644,256,2601,279,2567,309,2545,307,2550,283,2571,260,2603,240,2646,222,2698,205,2757,178,2892,158,3039,143,3185,133,3320,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetPlayerInventoryItemResponse.html" title="Response containing the player&#39;s inventory item, returned at the top level with its template and meta..." alt="" coords="311,2581,530,2642"/>
+<area shape="poly" title=" " alt="" coords="119,3508,130,3334,142,3211,157,3078,178,2945,205,2823,238,2722,257,2683,279,2652,312,2630,309,2634,283,2656,262,2685,243,2724,210,2824,184,2946,163,3079,147,3212,136,3335,124,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListResponse.html" title="Response containing a paginated list of scores for a specific leaderboard." alt="" coords="316,2667,524,2711"/>
+<area shape="poly" title=" " alt="" coords="119,3507,132,3345,160,3109,181,2988,208,2876,240,2784,258,2749,279,2722,295,2708,317,2699,314,2703,298,2713,283,2726,263,2752,245,2787,213,2878,186,2989,165,3110,137,3346,125,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetWalletResponse.html" title="Response containing the details of a player or character wallet." alt="" coords="325,2736,516,2781"/>
+<area shape="poly" title=" " alt="" coords="120,3507,135,3358,164,3143,186,3032,212,2931,243,2848,260,2816,279,2791,300,2775,326,2765,323,2769,302,2780,283,2795,264,2819,247,2850,217,2932,191,3033,170,3144,140,3358,125,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetResponse.html" title="Response returned after granting an asset to the current player&#39;s inventory." alt="" coords="321,2805,520,2850"/>
+<area shape="poly" title=" " alt="" coords="121,3508,137,3370,169,3176,190,3077,216,2986,245,2911,261,2882,279,2860,298,2846,322,2836,319,2840,301,2850,283,2864,266,2885,250,2914,221,2987,196,3078,174,3177,143,3371,126,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInventoryResponse.html" title="Response containing the player&#39;s full inventory." alt="" coords="326,2875,514,2919"/>
+<area shape="poly" title=" " alt="" coords="121,3507,140,3383,174,3209,195,3121,220,3041,248,2975,263,2949,279,2930,300,2914,327,2904,324,2908,303,2919,283,2934,267,2952,253,2977,225,3042,200,3122,179,3210,146,3384,127,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInvokeTriggersByKeyResponse.html" title="The result of the invoked triggers." alt="" coords="290,2944,551,2989"/>
+<area shape="poly" title=" " alt="" coords="117,3508,121,3411,129,3345,142,3274,162,3200,190,3127,229,3059,252,3027,279,2999,297,2987,295,2992,282,3003,256,3031,233,3061,195,3129,167,3201,147,3275,134,3346,126,3411,122,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveDetailsResponse.html" title="Response containing the paginated entries from a specific archived leaderboard snapshot." alt="" coords="301,3013,540,3074"/>
+<area shape="poly" title=" " alt="" coords="119,3508,129,3425,139,3370,154,3311,175,3250,202,3190,236,3134,279,3084,302,3069,299,3074,282,3088,240,3137,207,3193,180,3252,159,3313,145,3371,134,3426,125,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveResponse.html" title="Response containing a list of archived (past) leaderboard snapshots." alt="" coords="292,3099,548,3143"/>
+<area shape="poly" title=" " alt="" coords="121,3507,134,3435,162,3340,182,3289,208,3239,240,3194,279,3154,299,3141,296,3146,282,3158,245,3197,213,3242,187,3291,167,3341,140,3436,126,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetailResponse.html" title="Response containing the full configuration details of a specific leaderboard, including its schedule ..." alt="" coords="297,3168,544,3213"/>
+<area shape="poly" title=" " alt="" coords="124,3507,141,3447,172,3370,192,3330,217,3290,246,3254,279,3223,300,3211,298,3216,282,3227,250,3258,221,3294,197,3332,176,3372,147,3449,129,3508"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionResponse.html" title="Response containing the lease code and redirect URL for a newly created remote session lease." alt="" coords="288,3237,553,3282"/>
+<area shape="poly" title=" " alt="" coords="128,3508,150,3460,182,3402,225,3342,251,3315,279,3292,302,3280,299,3285,282,3297,254,3319,229,3346,186,3405,154,3463,134,3509"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsResponse.html" title="Response object for listing assets from the simple asset endpoint." alt="" coords="324,3307,516,3351"/>
+<area shape="poly" title=" " alt="" coords="135,3509,193,3435,233,3395,279,3361,325,3343,322,3347,282,3366,237,3399,197,3438,140,3511"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListBalancesForWalletResponse.html" title="Response containing all currency balances in a wallet." alt="" coords="286,3376,555,3421"/>
+<area shape="poly" title=" " alt="" coords="148,3512,207,3470,280,3431,314,3419,311,3423,282,3435,210,3475,152,3515"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListBlockedPlayersResponse.html" title="Response containing the paginated list of players blocked by the current player." alt="" coords="296,3445,544,3490"/>
+<area shape="poly" title=" " alt="" coords="195,3517,322,3488,319,3493,199,3521"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListBroadcastsResponse.html" title="Response for listing broadcasts." alt="" coords="310,3515,531,3559"/>
+<area shape="poly" title=" " alt="" coords="246,3535,311,3535,307,3539,250,3539"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdResponse.html" title="Response for the GetCatalogItemsByID endpoint." alt="" coords="288,3584,553,3629"/>
+<area shape="poly" title=" " alt="" coords="196,3553,322,3582,318,3585,199,3557"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesResponse.html" title="Response containing a catalog&#39;s entries and all associated entity detail lookup maps." alt="" coords="301,3653,540,3698"/>
+<area shape="poly" title=" " alt="" coords="149,3558,210,3599,282,3639,315,3651,310,3654,280,3643,207,3604,151,3563"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesV2Response.html" title="Response (v2) containing a catalog&#39;s entries and all associated entity detail lookup maps." alt="" coords="293,3723,548,3767"/>
+<area shape="poly" title=" " alt="" coords="137,3561,197,3636,237,3675,282,3708,307,3721,302,3723,279,3713,233,3679,193,3639,138,3566"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogsResponse.html" title="Response containing a list of all catalogs available for the game." alt="" coords="317,3792,524,3837"/>
+<area shape="poly" title=" " alt="" coords="130,3563,154,3611,186,3669,229,3728,254,3755,282,3777,319,3797,314,3799,279,3782,251,3759,225,3732,182,3672,150,3614,131,3568"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListClassTypesResponse.html" title="Response containing a list of available class types for this game." alt="" coords="310,3861,531,3906"/>
+<area shape="poly" title=" " alt="" coords="126,3564,147,3625,176,3702,197,3742,221,3780,250,3816,282,3847,311,3864,307,3867,279,3851,246,3820,217,3784,192,3744,172,3704,141,3627,127,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListConnectedAccountsResponse.html" title="Response containing all account providers connected to the current player&#39;s LootLocker account." alt="" coords="282,3931,559,3975"/>
+<area shape="poly" title=" " alt="" coords="124,3564,140,3638,167,3733,187,3783,213,3832,245,3877,282,3916,300,3929,295,3931,279,3920,240,3880,208,3835,182,3785,162,3734,134,3639,124,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCurrenciesResponse.html" title="Response containing a list of all available currencies for this game." alt="" coords="311,4000,530,4045"/>
+<area shape="poly" title=" " alt="" coords="122,3564,133,3650,143,3704,158,3763,178,3824,205,3883,240,3938,282,3986,313,4005,308,4008,279,3990,235,3941,200,3886,173,3826,153,3765,138,3705,128,3650,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListDenominationsResponse.html" title="Response containing a list of all denominations for a specific currency." alt="" coords="296,4069,544,4114"/>
+<area shape="poly" title=" " alt="" coords="120,3564,128,3661,136,3724,149,3793,169,3864,197,3934,234,3999,283,4055,298,4068,294,4070,279,4059,230,4002,192,3936,164,3865,144,3794,130,3725,122,3661,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListFollowersResponse.html" title="Response containing a paginated list of followers for a player." alt="" coords="315,4139,526,4183"/>
+<area shape="poly" title=" " alt="" coords="124,3564,146,3687,180,3856,201,3941,226,4019,253,4082,268,4106,283,4124,298,4136,316,4146,312,4149,295,4141,279,4128,263,4109,248,4085,221,4021,196,3943,175,3857,141,3688,125,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListFollowingResponse.html" title="Response containing a paginated list of players that the specified player is following." alt="" coords="315,4208,526,4253"/>
+<area shape="poly" title=" " alt="" coords="123,3564,143,3700,175,3889,197,3986,222,4074,251,4146,266,4173,283,4194,298,4206,316,4216,312,4219,295,4210,279,4198,262,4176,246,4148,217,4076,192,3987,170,3890,138,3701,124,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListFriendsResponse.html" title="Response containing the current player&#39;s paginated friend list." alt="" coords="322,4277,518,4322"/>
+<area shape="poly" title=" " alt="" coords="123,3563,140,3712,171,3922,192,4030,218,4129,248,4209,265,4240,283,4263,301,4277,324,4289,319,4291,298,4282,279,4267,260,4243,243,4211,213,4130,187,4031,165,3923,135,3713,123,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListIncomingFriendRequestsResponse.html" title="Response containing paginated incoming friend requests for the current player." alt="" coords="297,4346,544,4408"/>
+<area shape="poly" title=" " alt="" coords="122,3564,139,3724,168,3955,189,4073,215,4182,246,4272,264,4306,283,4333,300,4348,295,4350,279,4336,259,4309,241,4274,210,4184,184,4075,163,3955,133,3725,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListItemTemplatesResponse.html" title="Response containing a paginated list of visible item templates." alt="" coords="297,4432,544,4477"/>
+<area shape="poly" title=" " alt="" coords="121,3564,135,3740,146,3863,161,3997,182,4129,209,4251,242,4351,261,4389,283,4418,299,4432,294,4434,279,4421,257,4392,237,4353,203,4252,177,4130,156,3997,140,3864,129,3740,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListLeaderboardsResponse.html" title="Response containing a paginated list of leaderboard definitions." alt="" coords="302,4501,539,4546"/>
+<area shape="poly" title=" " alt="" coords="121,3564,132,3752,142,3885,157,4029,177,4174,205,4306,221,4364,239,4414,260,4456,283,4487,304,4504,299,4506,279,4491,255,4459,235,4416,216,4365,199,4307,172,4175,152,4030,137,3886,127,3752,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListMetadataResponse.html" title="Response containing a paginated list of metadata entries for a source." alt="" coords="315,4571,526,4615"/>
+<area shape="poly" title=" " alt="" coords="121,3563,130,3763,139,3906,153,4062,173,4217,200,4360,217,4423,237,4478,258,4523,283,4557,298,4569,316,4580,312,4582,295,4574,279,4560,254,4525,232,4480,212,4424,195,4361,168,4218,147,4062,133,3907,125,3764,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListNotificationsResponse.html" title="Response containing a paginated list of notifications for the player." alt="" coords="305,4640,536,4685"/>
+<area shape="poly" title=" " alt="" coords="120,3564,128,3776,136,3929,149,4095,168,4262,196,4415,214,4482,234,4541,257,4589,283,4626,307,4645,302,4647,279,4630,252,4592,229,4543,209,4484,191,4416,163,4263,143,4096,130,3929,123,3776,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListOutgoingFriendRequestsResponse.html" title="Response containing paginated outgoing friend requests sent by the current player." alt="" coords="298,4709,543,4770"/>
+<area shape="poly" title=" " alt="" coords="120,3564,127,3787,134,3949,147,4126,166,4304,195,4468,212,4540,233,4603,256,4656,283,4695,300,4711,295,4713,279,4699,252,4658,228,4605,207,4542,189,4469,161,4305,141,4127,129,3950,122,3787,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListPlatformKeysResponse.html" title="Response containing all platform keys redeemed by the authenticated player." alt="" coords="302,4795,538,4839"/>
+<area shape="poly" title=" " alt="" coords="120,3564,123,3802,128,3976,139,4168,158,4360,187,4537,206,4614,228,4682,254,4738,283,4781,304,4798,299,4800,279,4784,249,4741,223,4684,201,4616,182,4538,153,4360,134,4168,123,3977,118,3802,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListPlayerInfoResponse.html" title="Response containing key information about one or more looked&#45;up players." alt="" coords="313,4864,528,4909"/>
+<area shape="poly" title=" " alt="" coords="122,3564,141,3831,175,4240,197,4449,223,4634,251,4775,267,4822,283,4850,297,4862,314,4873,310,4875,294,4867,279,4853,262,4824,246,4776,217,4635,192,4450,169,4241,136,3831,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListPlayerInventoryItemsResponse.html" title="Response containing a paginated list of the player&#39;s inventory items." alt="" coords="307,4933,534,4994"/>
+<area shape="poly" title=" " alt="" coords="122,3564,141,3843,174,4275,196,4495,222,4690,251,4839,267,4889,283,4919,309,4941,304,4943,279,4923,262,4891,246,4840,217,4691,191,4496,169,4275,136,3844,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperationsResponse.html" title="Response from a metadata operations request, indicating the source and any errors that occurred." alt="" coords="291,5019,550,5063"/>
+<area shape="poly" title=" " alt="" coords="122,3564,139,3859,170,4318,192,4553,218,4761,233,4848,248,4919,265,4973,283,5005,296,5017,291,5019,279,5008,260,4975,243,4921,228,4849,213,4762,187,4554,165,4319,133,3859,122,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse.html" title="Response containing a paginated list of an asset instance&#39;s progression statuses across multiple prog..." alt="" coords="311,5088,530,5149"/>
+<area shape="poly" title=" " alt="" coords="121,3564,138,3871,169,4352,191,4598,218,4817,232,4908,248,4984,265,5040,283,5074,296,5087,313,5098,308,5100,293,5091,279,5077,260,5042,243,4985,227,4909,212,4818,186,4599,164,4352,133,3871,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedCharacterProgressionsResponse.html" title="Response containing a paginated list of a character&#39;s progression statuses across multiple progressio..." alt="" coords="284,5173,557,5234"/>
+<area shape="poly" title=" " alt="" coords="121,3564,137,3885,167,4393,189,4655,215,4887,230,4983,247,5063,264,5123,283,5159,295,5172,290,5173,279,5163,259,5125,241,5065,225,4984,210,4887,183,4655,162,4394,132,3886,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse.html" title="Response containing a paginated list of a player&#39;s progression statuses across multiple progressions." alt="" coords="295,5258,546,5320"/>
+<area shape="poly" title=" " alt="" coords="121,3564,136,3901,164,4436,186,4712,213,4956,228,5059,245,5143,263,5206,283,5245,297,5259,292,5260,279,5248,258,5208,240,5145,223,5060,207,4957,181,4712,159,4436,131,3901,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedProgressionTiersResponse.html" title="Response containing a paginated list of tiers for a specific progression." alt="" coords="303,5344,538,5405"/>
+<area shape="poly" title=" " alt="" coords="121,3563,135,3914,146,4183,162,4477,183,4768,210,5026,226,5134,243,5223,262,5290,283,5330,305,5350,300,5352,279,5333,257,5292,238,5224,221,5135,205,5027,178,4768,157,4478,141,4184,129,3915,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedProgressionsResponse.html" title="Response containing a paginated list of progression definitions." alt="" coords="284,5429,557,5474"/>
+<area shape="poly" title=" " alt="" coords="121,3564,133,3931,143,4214,158,4522,179,4827,206,5098,222,5211,241,5304,261,5373,283,5415,296,5428,291,5430,279,5419,256,5375,235,5305,217,5212,201,5098,173,4827,153,4522,137,4214,127,3931,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerAssetNotificationsResponse.html" title="Response containing asset reward notifications for the current player." alt="" coords="309,5498,532,5560"/>
+<area shape="poly" title=" " alt="" coords="121,3564,132,3943,143,4235,158,4555,179,4871,206,5153,222,5271,240,5368,261,5441,283,5485,312,5508,307,5510,279,5488,256,5443,235,5369,217,5271,201,5153,173,4872,152,4555,137,4235,127,3943,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerClassListResponse.html" title="Response containing a list of all classes belonging to the current player." alt="" coords="308,5584,533,5629"/>
+<area shape="poly" title=" " alt="" coords="121,3564,130,3958,139,4263,153,4598,174,4929,201,5224,218,5347,238,5449,259,5524,271,5551,283,5570,310,5591,305,5593,279,5573,266,5554,254,5526,232,5450,213,5348,196,5225,168,4930,148,4598,134,4264,125,3958,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFile.html" title="A file stored on a player&#39;s account, with download URL, metadata, and expiration information." alt="" coords="327,5653,514,5698"/>
+<area shape="poly" title=" " alt="" coords="121,3564,129,3970,138,4286,151,4633,172,4976,199,5281,217,5408,236,5514,258,5592,270,5620,283,5639,303,5656,329,5668,324,5671,300,5661,279,5643,266,5622,253,5594,231,5515,211,5409,194,5281,166,4976,146,4633,132,4286,124,3970,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileContent.html" title="A single file revision with download URL and metadata." alt="" coords="327,5723,514,5767"/>
+<area shape="poly" title=" " alt="" coords="121,3564,128,3982,136,4308,149,4667,169,5022,197,5337,215,5469,235,5578,258,5660,270,5689,283,5709,303,5725,329,5737,324,5740,300,5730,279,5712,265,5691,253,5662,230,5580,210,5470,192,5338,164,5022,144,4667,131,4308,123,3982,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileRevisionsResponse.html" title="Response containing a list of revisions for a player file." alt="" coords="294,5792,547,5837"/>
+<area shape="poly" title=" " alt="" coords="120,3564,127,3993,135,4330,147,4700,167,5067,195,5394,213,5530,234,5643,257,5727,269,5757,283,5778,296,5791,291,5793,279,5781,265,5760,252,5729,228,5644,208,5531,190,5394,162,5068,142,4701,129,4330,122,3993,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFilesResponse.html" title="Response containing a list of files attached to the player&#39;s account." alt="" coords="322,5861,519,5906"/>
+<area shape="poly" title=" " alt="" coords="120,3563,126,4004,133,4352,145,4734,165,5113,193,5450,211,5592,232,5708,256,5795,269,5826,283,5847,301,5863,324,5874,319,5877,298,5867,279,5851,264,5828,251,5797,227,5709,206,5592,188,5451,160,5113,140,4734,128,4352,121,4004,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionResponse.html" title="Response containing the current progression status for a player on a specific progression." alt="" coords="299,5931,542,5975"/>
+<area shape="poly" title=" " alt="" coords="120,3563,126,4016,132,4374,144,4768,163,5159,176,5341,191,5507,210,5653,231,5773,255,5863,269,5894,283,5917,301,5933,296,5935,279,5920,264,5897,250,5864,226,5774,204,5653,186,5508,171,5341,158,5159,138,4768,126,4374,120,4016,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionResponse.html" title="Response containing details about a single progression definition." alt="" coords="319,6000,522,6045"/>
+<area shape="poly" title=" " alt="" coords="120,3564,125,4029,130,4398,142,4803,161,5206,174,5393,189,5564,208,5714,230,5838,255,5930,268,5963,283,5986,299,6001,321,6012,316,6014,296,6005,279,5989,264,5966,249,5932,224,5839,203,5715,184,5565,168,5393,155,5206,136,4803,125,4398,119,4029,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionTierResponse.html" title="Response containing details about a single progression tier." alt="" coords="307,6069,534,6114"/>
+<area shape="poly" title=" " alt="" coords="120,3564,124,4040,129,4419,140,4836,158,5251,172,5444,187,5620,206,5775,228,5903,254,5998,268,6032,283,6055,309,6076,304,6078,279,6059,263,6034,249,6000,223,5904,201,5776,182,5621,166,5444,153,5251,134,4837,123,4419,118,4040,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerReadNotificationsResponse.html" title="Response returned after marking notifications as read." alt="" coords="300,6139,541,6183"/>
+<area shape="poly" title=" " alt="" coords="120,3563,123,4052,127,4441,138,4870,156,5297,169,5495,185,5677,204,5836,227,5967,253,6066,267,6100,283,6125,302,6142,297,6143,279,6128,263,6103,248,6067,222,5969,199,5837,180,5677,164,5496,151,5297,132,4870,122,4441,117,4052,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundByEntitlementIdsResponse.html" title="Response from the refund by entitlement IDs endpoint." alt="" coords="310,6208,531,6269"/>
+<area shape="poly" title=" " alt="" coords="120,3564,123,4063,128,4462,138,4903,157,5341,170,5545,186,5732,205,5896,227,6031,253,6132,268,6169,283,6194,296,6207,312,6218,307,6220,292,6211,279,6197,263,6171,248,6134,222,6032,200,5896,181,5732,165,5545,152,5341,133,4903,122,4463,118,4063,120,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRemoteSessionStatusPollingResponse.html" title="Response from polling the status of an ongoing remote session lease process." alt="" coords="296,6293,545,6354"/>
+<area shape="poly" title=" " alt="" coords="121,3563,139,4096,173,4989,196,5448,222,5849,236,6013,251,6143,267,6235,275,6263,283,6279,298,6294,292,6296,279,6283,270,6265,262,6236,246,6144,231,6013,217,5850,191,5448,168,4989,134,4096,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryResponse.html" title="The response class for simplified inventory requests." alt="" coords="304,6379,537,6423"/>
+<area shape="poly" title=" " alt="" coords="121,3564,138,4111,171,5033,193,5507,220,5922,234,6090,250,6225,266,6319,274,6348,283,6365,306,6384,301,6386,279,6368,269,6350,261,6320,244,6226,229,6091,214,5922,188,5508,165,5033,133,4111,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSingleAssetResponse.html" title="Response containing a single asset." alt="" coords="319,6448,522,6493"/>
+<area shape="poly" title=" " alt="" coords="121,3564,138,4124,170,5069,192,5555,219,5980,233,6153,249,6291,266,6387,274,6417,283,6434,299,6449,321,6460,316,6462,296,6453,279,6437,269,6419,260,6388,244,6291,228,6153,213,5980,187,5555,164,5069,132,4124,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSingleEntitlementResponse.html" title="Response body of a single entitlement, which contains status and more information." alt="" coords="299,6517,542,6562"/>
+<area shape="poly" title=" " alt="" coords="121,3564,137,4135,169,5103,191,5602,218,6037,232,6215,248,6356,265,6455,274,6486,283,6503,301,6520,296,6522,279,6507,269,6488,260,6456,243,6357,227,6215,212,6038,186,5602,163,5103,132,4135,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSplitInventoryItemStackResponse.html" title="Response containing the id of the newly created stack after splitting an item." alt="" coords="310,6586,530,6648"/>
+<area shape="poly" title=" " alt="" coords="121,3564,137,4147,169,5138,191,5648,218,6094,233,6276,249,6421,265,6523,274,6555,283,6573,296,6586,313,6597,308,6599,292,6590,278,6576,269,6556,260,6524,243,6422,228,6277,213,6095,186,5648,164,5138,132,4148,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerStandardResponse.html" title="A base response type for operations that return no payload beyond success or error state." alt="" coords="327,6672,514,6717"/>
+<area shape="poly" title=" " alt="" coords="121,3564,136,4162,167,5182,189,5707,215,6166,230,6354,247,6503,264,6607,274,6640,283,6658,303,6675,329,6687,324,6689,300,6680,279,6661,269,6642,259,6608,242,6504,225,6354,210,6167,183,5707,161,5182,131,4163,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreResponse.html" title="Response returned after submitting a score to a leaderboard, showing the resulting rank." alt="" coords="316,6741,524,6786"/>
+<area shape="poly" title=" " alt="" coords="121,3564,136,4175,166,5217,187,5754,214,6224,230,6416,246,6569,264,6675,273,6708,283,6727,298,6741,318,6753,313,6754,295,6746,279,6731,268,6710,259,6676,241,6569,224,6416,209,6225,182,5755,160,5217,130,4175,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerXboxServiceTicketResponse.html" title="Response from a request to get an Xbox service ticket." alt="" coords="297,6811,544,6855"/>
+<area shape="poly" title=" " alt="" coords="121,3564,135,4186,165,5251,186,5801,213,6282,229,6478,245,6634,264,6743,273,6777,283,6797,300,6813,294,6813,279,6800,268,6779,258,6744,240,6635,223,6478,208,6282,181,5801,159,5251,130,4186,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1Player1stPartyPlatformIDsLookupResponse.html" title="Response containing a list of players and their linked first&#45;party platform identifiers." alt="" coords="300,6880,540,6925"/>
+<area shape="poly" title=" " alt="" coords="121,3564,135,4198,164,5286,185,5848,212,6340,228,6540,245,6700,263,6811,273,6846,283,6866,303,6884,297,6885,279,6869,268,6848,258,6812,240,6701,223,6541,207,6340,180,5848,158,5287,129,4198,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlayerNameLookupResponse.html" title="Response containing a list of players with their names and various identifier forms." alt="" coords="321,6949,520,6994"/>
+<area shape="poly" title=" " alt="" coords="121,3564,134,4211,163,5322,184,5895,211,6398,227,6602,244,6765,263,6879,273,6915,283,6935,300,6951,323,6963,318,6964,297,6955,279,6939,268,6917,258,6881,239,6766,222,6603,206,6398,179,5896,157,5322,129,4211,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlayerNameResponse.html" title="Response containing the current player&#39;s display name." alt="" coords="321,7019,520,7063"/>
+<area shape="poly" title=" " alt="" coords="121,3564,134,4223,145,4762,162,5357,183,5943,210,6455,226,6664,243,6831,263,6948,273,6984,283,7005,300,7020,323,7033,318,7033,297,7024,279,7008,268,6986,257,6949,238,6832,221,6665,205,6456,178,5943,156,5357,140,4762,129,4223,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1____LootLockerInternalListBroadcastsResponse.html" title="Response for listing broadcasts." alt="" coords="295,7088,546,7149"/>
+<area shape="poly" title=" " alt="" coords="121,3564,134,4235,146,4784,162,5391,184,5988,211,6512,227,6725,244,6896,263,7015,273,7053,283,7074,298,7090,292,7089,278,7077,268,7055,258,7016,239,6897,221,6726,206,6512,179,5989,157,5391,141,4784,129,4235,121,3569"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetInstanceProgressionWithRewardsResponse.html" title="Response containing the updated asset instance progression status along with any tiers awarded as a r..." alt="" coords="626,282,856,344"/>
+<area shape="poly" title=" " alt="" coords="549,311,627,311,623,315,553,315"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCharacterProgressionWithRewardsResponse.html" title="Response containing the updated character progression status along with any tiers awarded as a result..." alt="" coords="625,792,857,853"/>
+<area shape="poly" title=" " alt="" coords="567,820,626,821,623,824,570,824"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerProgressionWithRewardsResponse.html" title="Response containing the updated player progression status along with any tiers awarded as a result of..." alt="" coords="608,5922,874,5984"/>
+<area shape="poly" title=" " alt="" coords="556,5951,610,5952,605,5954,559,5955"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_15.png" border="0" usemap="#aLootLocker_8LootLockerResponseFactory" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerResponseFactory" id="aLootLocker_8LootLockerResponseFactory">
+<area shape="rect" href="classLootLocker_1_1LootLockerResponseFactory.html" title="Convenience factory class for creating some responses that we use often." alt="" coords="5,5,233,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_16.png" border="0" usemap="#aLootLocker_8LootLockerServerRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerServerRequest" id="aLootLocker_8LootLockerServerRequest">
+<area shape="rect" href="structLootLocker_1_1LootLockerServerRequest.html" title="Construct a request to send to the server." alt="" coords="5,5,212,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_17.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationSources" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationSources" id="aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationSources">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerNotificationSources.html" title="Possible sources for notifications." alt="" coords="5,5,272,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_18.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationTypes" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationTypes" id="aLootLocker_8LootLockerStaticStrings_8LootLockerNotificationTypes">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerNotificationTypes.html" title="Possible types of notifications." alt="" coords="5,5,258,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_19.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys.html" title="The standard context keys to expect for different notification sources." alt="" coords="5,5,286,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_20.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8LeaderboardReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8LeaderboardReward" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8LeaderboardReward">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1LeaderboardReward.html" title="Standard context keys to expect when source is a leaderboard reward." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_21.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing.html" title="Standard context keys to expect when source is purchasing." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_22.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8AppleAppStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8AppleAppStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8AppleAppStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1AppleAppStore.html" title="Standard context keys to expect when source is purchasing from the Apple app store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_23.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8EpicGamesStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8EpicGamesStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8EpicGamesStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1EpicGamesStore.html" title="Standard context keys to expect when source is purchasing from the Epic Games store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_24.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8GooglePlayStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8GooglePlayStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8GooglePlayStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1GooglePlayStore.html" title="Standard context keys to expect when source is purchasing from the GooglePlay store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_25.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8LootLocker" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8LootLocker" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8LootLocker">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1LootLocker.html" title="Standard context keys to expect when source is purchasing from LootLocker." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_26.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8PlaystationStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8PlaystationStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8PlaystationStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1PlaystationStore.html" title="Standard context keys to expect when source is purchasing from the PlayStation store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_27.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8SteamStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8SteamStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8SteamStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1SteamStore.html" title="Standard context keys to expect when source is purchasing from the Steam store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_28.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8StripeStore" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8StripeStore" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Purchasing_8StripeStore">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Purchasing_1_1StripeStore.html" title="Standard context keys to expect when source is purchasing from the Stripe store." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_29.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardCampaign" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardCampaign" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardCampaign">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1RewardCampaign.html" title="Standard context keys to expect when source is a reward campaign." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_30.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardsGrant" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardsGrant" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8RewardsGrant">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1RewardsGrant.html" title="Standard context keys to expect when source is a rewards grant." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_31.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Triggers" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Triggers" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8Triggers">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1Triggers.html" title="Standard context keys to expect when source is triggers." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_32.png" border="0" usemap="#aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8TwitchDrop" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8TwitchDrop" id="aLootLocker_8LootLockerStaticStrings_8LootLockerStandardContextKeys_8TwitchDrop">
+<area shape="rect" href="structLootLocker_1_1LootLockerStaticStrings_1_1LootLockerStandardContextKeys_1_1TwitchDrop.html" title="Standard context keys to expect when source is twitch drop." alt="" coords="5,5,255,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_33.png" border="0" usemap="#aLootLocker_8LootLockerStreamedResponse_3_01T_01_4" loading="lazy" alt=""/>
+<map name="aLootLocker_8LootLockerStreamedResponse_3_01T_01_4" id="aLootLocker_8LootLockerStreamedResponse_3_01T_01_4">
+<area shape="rect" href="structLootLocker_1_1LootLockerStreamedResponse-1-g.html" title="Generic result structure for streamed JSON responses." alt="" coords="5,5,233,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_34.png" border="0" usemap="#aLootLocker_8Requests_8____LootLockerInternalBroadcast" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8____LootLockerInternalBroadcast" id="aLootLocker_8Requests_8____LootLockerInternalBroadcast">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1____LootLockerInternalBroadcast.html" title="Represents a broadcast message." alt="" coords="5,5,226,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_35.png" border="0" usemap="#aLootLocker_8Requests_8____LootLockerInternalBroadcastLanguage" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8____LootLockerInternalBroadcastLanguage" id="aLootLocker_8Requests_8____LootLockerInternalBroadcastLanguage">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1____LootLockerInternalBroadcastLanguage.html" title="Represents a localised version of a broadcast message." alt="" coords="5,5,226,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_36.png" border="0" usemap="#aLootLocker_8Requests_8LookupPlayer1stPartyPlatformIDsRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LookupPlayer1stPartyPlatformIDsRequest" id="aLootLocker_8Requests_8LookupPlayer1stPartyPlatformIDsRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LookupPlayer1stPartyPlatformIDsRequest.html" title="Request to look up the first&#45;party platform ids for multiple players identified by their legacy ids o..." alt="" coords="5,5,251,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_37.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetCandidate" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetCandidate" id="aLootLocker_8Requests_8LootLockerAssetCandidate">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetCandidate.html" title="Information about the player who submitted an asset as a user&#45;generated content (UGC) candidate." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_38.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetClass" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetClass" id="aLootLocker_8Requests_8LootLockerAssetClass">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetClass.html" title="A helper class used internally to represent an asset class name." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_39.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetDetails" id="aLootLocker_8Requests_8LootLockerAssetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetDetails.html" title="Details about an asset entity referenced by a catalog entry." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_40.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetExcludes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetExcludes" id="aLootLocker_8Requests_8LootLockerAssetExcludes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetExcludes.html" title="Fields to exclude from the asset response." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_41.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetFilters" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetFilters" id="aLootLocker_8Requests_8LootLockerAssetFilters">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetFilters.html" title="Filters to apply to the asset listing." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_42.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetIncludes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetIncludes" id="aLootLocker_8Requests_8LootLockerAssetIncludes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetIncludes.html" title="Fields to include in the asset response." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_43.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetItemDetailsKey" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetItemDetailsKey" id="aLootLocker_8Requests_8LootLockerAssetItemDetailsKey">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetItemDetailsKey.html" title="Class to help getting asset item details including variation and rental option IDs." alt="" coords="5,5,205,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_44.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAssetReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAssetReward" id="aLootLocker_8Requests_8LootLockerAssetReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAssetReward.html" title="An asset reward attached to a progression tier, describing which asset (and optionally which variatio..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_45.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerAwardedTier" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerAwardedTier" id="aLootLocker_8Requests_8LootLockerAwardedTier">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAwardedTier.html" title="A progression tier that was awarded to a player, character, or asset instance as a result of earning ..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_46.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBalance" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBalance" id="aLootLocker_8Requests_8LootLockerBalance">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBalance.html" title="The current balance of a specific currency held by a wallet." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_47.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBalanceModifiers" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBalanceModifiers" id="aLootLocker_8Requests_8LootLockerBalanceModifiers">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBalanceModifiers.html" title="A currency modifier applied to a wallet that adjusts the effective value of a currency." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_48.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBlockedPlayer" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBlockedPlayer" id="aLootLocker_8Requests_8LootLockerBlockedPlayer">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBlockedPlayer.html" title="Represents a player that has been blocked /summary&gt;." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_49.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBroadcast" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBroadcast" id="aLootLocker_8Requests_8LootLockerBroadcast">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBroadcast.html" title="Represents a broadcast message." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_50.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBroadcastGame" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBroadcastGame" id="aLootLocker_8Requests_8LootLockerBroadcastGame">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBroadcastGame.html" title="Indicates which games are allowed to see this broadcast." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_51.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBroadcastLanguage" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBroadcastLanguage" id="aLootLocker_8Requests_8LootLockerBroadcastLanguage">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html" title="Represents a localised version of a broadcast message." alt="" coords="5,5,197,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_52.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerBroadcastPublicationSetting" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerBroadcastPublicationSetting" id="aLootLocker_8Requests_8LootLockerBroadcastPublicationSetting">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerBroadcastPublicationSetting.html" title="Represents a publication setting for a broadcast message." alt="" coords="5,5,252,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_53.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalog" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalog" id="aLootLocker_8Requests_8LootLockerCatalog">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalog.html" title="A LootLocker catalog listing, containing entries with prices and entity details." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_54.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogAppleAppStoreListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogAppleAppStoreListing" id="aLootLocker_8Requests_8LootLockerCatalogAppleAppStoreListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogAppleAppStoreListing.html" title="Apple App Store listing information for a catalog entry." alt="" coords="5,5,258,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_55.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogEntry" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogEntry" id="aLootLocker_8Requests_8LootLockerCatalogEntry">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogEntry.html" title="A single entry in a LootLocker catalog, combining entity metadata with prices and store listings." alt="" coords="5,83,192,127"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdEntry.html" title="A catalog entry with entity details inlined directly." alt="" coords="251,5,488,50"/>
+<area shape="poly" title=" " alt="" coords="187,75,239,60,284,49,279,52,240,65,189,80"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesResponse_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="248,74,490,136"/>
+<area shape="poly" title=" " alt="" coords="207,102,250,104,245,106,208,108"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogPricesV2Response_1_1LootLockerInlinedCatalogEntry.html" title="A catalog entry with all relevant entity details inlined for convenient access without separate looku..." alt="" coords="240,160,499,221"/>
+<area shape="poly" title=" " alt="" coords="187,130,272,158,267,160,186,135"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_56.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogEntryListings" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogEntryListings" id="aLootLocker_8Requests_8LootLockerCatalogEntryListings">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogEntryListings.html" title="All store&#45;specific listing information for a catalog entry across supported platforms." alt="" coords="5,5,203,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_57.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogEntryPrice" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogEntryPrice" id="aLootLocker_8Requests_8LootLockerCatalogEntryPrice">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogEntryPrice.html" title="A price entry for a catalog item, specifying the currency amount and display value." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_58.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogGooglePlayStoreListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogGooglePlayStoreListing" id="aLootLocker_8Requests_8LootLockerCatalogGooglePlayStoreListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogGooglePlayStoreListing.html" title="Google Play Store listing information for a catalog entry." alt="" coords="5,5,227,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_59.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogItemsIncludes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogItemsIncludes" id="aLootLocker_8Requests_8LootLockerCatalogItemsIncludes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogItemsIncludes.html" title="Optional includes configuration for catalog items lookup." alt="" coords="5,5,210,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_60.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogSteamStoreListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogSteamStoreListing" id="aLootLocker_8Requests_8LootLockerCatalogSteamStoreListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogSteamStoreListing.html" title="Steam Store listing information for a catalog entry." alt="" coords="5,5,238,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_61.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogSteamStoreListingPrice" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogSteamStoreListingPrice" id="aLootLocker_8Requests_8LootLockerCatalogSteamStoreListingPrice">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogSteamStoreListingPrice.html" title="A Steam Store price entry specifying currency code and amount for a catalog listing." alt="" coords="5,5,270,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_62.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogStripeStoreListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogStripeStoreListing" id="aLootLocker_8Requests_8LootLockerCatalogStripeStoreListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogStripeStoreListing.html" title="Stripe Store listing information for a catalog entry." alt="" coords="5,5,234,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_63.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCatalogXboxStoreListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCatalogXboxStoreListing" id="aLootLocker_8Requests_8LootLockerCatalogXboxStoreListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCatalogXboxStoreListing.html" title="Xbox Store listing information for a catalog entry." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_64.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerClass" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerClass" id="aLootLocker_8Requests_8LootLockerClass">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerClass.html" title="Identifies a class belonging to a player, including its type and whether it is the default." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_65.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerClassLoadout" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerClassLoadout" id="aLootLocker_8Requests_8LootLockerClassLoadout">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerClassLoadout.html" title="A class and its associated equipped loadout items, as returned from class loadout endpoints." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_66.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerClassTypeDefaultLoadout" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerClassTypeDefaultLoadout" id="aLootLocker_8Requests_8LootLockerClassTypeDefaultLoadout">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerClassTypeDefaultLoadout.html" title="A default loadout entry for a class type, pairing an asset with its expected id and variation." alt="" coords="5,5,234,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_67.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerClassTypes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerClassTypes" id="aLootLocker_8Requests_8LootLockerClassTypes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerClassTypes.html" title="Describes a class type, including its identifier, name, default storage, and default loadout." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_68.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCommonAsset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCommonAsset" id="aLootLocker_8Requests_8LootLockerCommonAsset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCommonAsset.html" title="A full asset object containing all properties of a LootLocker asset, including variations,..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_69.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectAppleRestProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectAppleRestProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectAppleRestProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectAppleRestProviderToAccountRequest.html" title="Request to link an Apple account to the current player&#39;s LootLocker account using an authorization co..." alt="" coords="5,5,242,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_70.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectDiscordProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectDiscordProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectDiscordProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectDiscordProviderToAccountRequest.html" title="Request to link a Discord account to the current player&#39;s LootLocker account." alt="" coords="5,5,225,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_71.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectedAccountProvider" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectedAccountProvider" id="aLootLocker_8Requests_8LootLockerConnectedAccountProvider">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectedAccountProvider.html" title="An account provider linked to the current player&#39;s LootLocker account." alt="" coords="5,5,244,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_72.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectEpicProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectEpicProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectEpicProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectEpicProviderToAccountRequest.html" title="Request to link an Epic Games account to the current player&#39;s LootLocker account." alt="" coords="5,5,269,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_73.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectGooglePlayGamesProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectGooglePlayGamesProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectGooglePlayGamesProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectGooglePlayGamesProviderToAccountRequest.html" title="Request to link a Google Play Games account to the current player&#39;s LootLocker account using an auth ..." alt="" coords="5,5,242,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_74.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectGoogleProviderToAccountRequest.html" title="Request to link a Google account to the current player&#39;s LootLocker account using an id token." alt="" coords="5,5,236,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_75.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountWithPlatformRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountWithPlatformRequest" id="aLootLocker_8Requests_8LootLockerConnectGoogleProviderToAccountWithPlatformRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectGoogleProviderToAccountWithPlatformRequest.html" title="Request to link a Google account to the current player&#39;s LootLocker account, specifying the OAuth2 cl..." alt="" coords="5,5,236,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_76.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectNintendoProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectNintendoProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectNintendoProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectNintendoProviderToAccountRequest.html" title="Request to link a Nintendo Switch account to the current player&#39;s LootLocker account using an NSA ID ..." alt="" coords="5,5,235,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_77.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectPlaystationProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectPlaystationProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectPlaystationProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectPlaystationProviderToAccountRequest.html" title="Request to link a PlayStation account to the current player&#39;s LootLocker account." alt="" coords="5,5,249,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_78.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectRemoteSessionToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectRemoteSessionToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectRemoteSessionToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectRemoteSessionToAccountRequest.html" title="Request to link a remote session to the current player&#39;s LootLocker account using a lease code and no..." alt="" coords="5,5,237,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_79.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectSteamProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectSteamProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectSteamProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectSteamProviderToAccountRequest.html" title="Request to link a Steam account to the current player&#39;s LootLocker account using a steam session tick..." alt="" coords="5,5,232,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_80.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectTwitchProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectTwitchProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectTwitchProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectTwitchProviderToAccountRequest.html" title="Request to link a Twitch account to the current player&#39;s LootLocker account using an authorization co..." alt="" coords="5,5,231,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_81.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConnectXboxProviderToAccountRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConnectXboxProviderToAccountRequest" id="aLootLocker_8Requests_8LootLockerConnectXboxProviderToAccountRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConnectXboxProviderToAccountRequest.html" title="Request to link an Xbox account to the current player&#39;s LootLocker account using an Xbox user token." alt="" coords="5,5,275,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_82.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerConsumeInventoryItemRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerConsumeInventoryItemRequest" id="aLootLocker_8Requests_8LootLockerConsumeInventoryItemRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerConsumeInventoryItemRequest.html" title="Request to consume a stackable item from the player&#39;s inventory." alt="" coords="5,5,275,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_83.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerContext" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerContext" id="aLootLocker_8Requests_8LootLockerContext">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerContext.html" title="An asset context (category) that defines a slot or grouping in which assets can be equipped." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_84.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCreateClassRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCreateClassRequest" id="aLootLocker_8Requests_8LootLockerCreateClassRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreateClassRequest.html" title="Request to create a new class for the current player." alt="" coords="5,5,200,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_85.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCreateStripeCheckoutSessionRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCreateStripeCheckoutSessionRequest" id="aLootLocker_8Requests_8LootLockerCreateStripeCheckoutSessionRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreateStripeCheckoutSessionRequest.html" title="Request to create a Stripe Checkout session for a catalog item." alt="" coords="5,5,260,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_86.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCreateWalletRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCreateWalletRequest" id="aLootLocker_8Requests_8LootLockerCreateWalletRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreateWalletRequest.html" title="Request to create a new wallet for a player or character." alt="" coords="5,5,206,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_87.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCreditRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCreditRequest" id="aLootLocker_8Requests_8LootLockerCreditRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCreditRequest.html" title="Request to credit (add) an amount of currency to a wallet." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_88.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCurrency" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCurrency" id="aLootLocker_8Requests_8LootLockerCurrency">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCurrency.html" title="Details about a particular currency." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_89.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCurrencyDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCurrencyDetails" id="aLootLocker_8Requests_8LootLockerCurrencyDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCurrencyDetails.html" title="Details about a currency entity referenced by a catalog entry." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_90.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerCurrencyReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerCurrencyReward" id="aLootLocker_8Requests_8LootLockerCurrencyReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerCurrencyReward.html" title="A currency reward attached to a progression tier, describing how much of a given currency is granted ..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_91.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDeactivatedObjects" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDeactivatedObjects" id="aLootLocker_8Requests_8LootLockerDeactivatedObjects">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDeactivatedObjects.html" title="A deactivated asset and its replacement, used to notify the player that an asset they own has been re..." alt="" coords="5,5,197,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_92.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDebitRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDebitRequest" id="aLootLocker_8Requests_8LootLockerDebitRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDebitRequest.html" title="Request to debit (remove) an amount of currency from a wallet." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_93.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDefault__Loadouts" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDefault__Loadouts" id="aLootLocker_8Requests_8LootLockerDefault__Loadouts">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDefault__Loadouts.html" title="Indicates whether a legacy asset entry is part of the player&#39;s default loadout." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_94.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDefault__Loadouts__Info" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDefault__Loadouts__Info" id="aLootLocker_8Requests_8LootLockerDefault__Loadouts__Info">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDefault__Loadouts__Info.html" title="Indicates whether an asset is part of the default loadout configuration." alt="" coords="5,5,215,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_95.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDefaultClassLoadout" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDefaultClassLoadout" id="aLootLocker_8Requests_8LootLockerDefaultClassLoadout">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDefaultClassLoadout.html" title="A single loadout slot on the default class, combining asset details with equip metadata." alt="" coords="5,5,204,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_96.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerDenomination" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerDenomination" id="aLootLocker_8Requests_8LootLockerDenomination">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerDenomination.html" title="Represents a denomination of a currency." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_97.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEntitlementHistoryItem" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEntitlementHistoryItem" id="aLootLocker_8Requests_8LootLockerEntitlementHistoryItem">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryItem.html" title="An individual item within an entitlement listing, referencing a catalog item." alt="" coords="5,5,222,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_98.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEntitlementHistoryMetadata" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEntitlementHistoryMetadata" id="aLootLocker_8Requests_8LootLockerEntitlementHistoryMetadata">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryMetadata.html" title="A metadata key&#45;value pair attached to an entitlement listing, carrying additional context about the e..." alt="" coords="5,5,254,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_99.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEntitlementHistoryReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEntitlementHistoryReward" id="aLootLocker_8Requests_8LootLockerEntitlementHistoryReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryReward.html" title="A reward (such as a leaderboard or progression reward) included in an entitlement listing." alt="" coords="5,5,241,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_100.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEntitlementListing" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEntitlementListing" id="aLootLocker_8Requests_8LootLockerEntitlementListing">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementListing.html" title="A complete entitlement listing, grouping items, rewards, and metadata for a single entitlement event." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_101.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEquipByAssetRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEquipByAssetRequest" id="aLootLocker_8Requests_8LootLockerEquipByAssetRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEquipByAssetRequest.html" title="Request to equip an asset to a class by specifying the asset id and variation." alt="" coords="5,5,211,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_102.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerEquipByIDRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerEquipByIDRequest" id="aLootLocker_8Requests_8LootLockerEquipByIDRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerEquipByIDRequest.html" title="Request to equip an asset to a class by its inventory instance id." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_103.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerErrorReportBody" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerErrorReportBody" id="aLootLocker_8Requests_8LootLockerErrorReportBody">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerErrorReportBody.html" title="Internal DTO mapping LootLockerFailedRequestReport to snake_case field names for the error&#45;report API..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_104.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerFailedKey" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerFailedKey" id="aLootLocker_8Requests_8LootLockerFailedKey">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFailedKey.html" title="A trigger key that failed to invoke, including the reason for failure." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_105.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerFile" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerFile" id="aLootLocker_8Requests_8LootLockerFile">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFile.html" title="A file associated with an asset, described by a URL and an optional set of tags." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_106.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerFilter" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerFilter" id="aLootLocker_8Requests_8LootLockerFilter">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFilter.html" title="A filter applied to an asset, consisting of a name&#45;value pair used to categorise or tag the asset." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_107.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerFollower" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerFollower" id="aLootLocker_8Requests_8LootLockerFollower">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFollower.html" title="/summary&gt;" alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_108.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerFriend" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerFriend" id="aLootLocker_8Requests_8LootLockerFriend">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerFriend.html" title="Represents a friend in the friend list /summary&gt;." alt="" coords="5,5,192,50"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerAcceptedFriend.html" title="Represents an accepted friend with additional friend request metadata /summary&gt;." alt="" coords="240,5,426,50"/>
+<area shape="poly" title=" " alt="" coords="207,25,242,27,237,28,207,30"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_109.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGameInfo" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGameInfo" id="aLootLocker_8Requests_8LootLockerGameInfo">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGameInfo.html" title="Information about the currently configured game in LootLocker." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_110.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGameInfoRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGameInfoRequest" id="aLootLocker_8Requests_8LootLockerGameInfoRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGameInfoRequest.html" title="Represents a request to get game information from the LootLocker API." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_111.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGetByListMembersRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGetByListMembersRequest" id="aLootLocker_8Requests_8LootLockerGetByListMembersRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetByListMembersRequest.html" title="Request to retrieve leaderboard scores for a list of specific member ids." alt="" coords="5,5,246,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_112.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGetMemberRankRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGetMemberRankRequest" id="aLootLocker_8Requests_8LootLockerGetMemberRankRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetMemberRankRequest.html" title="Request to fetch the rank of a specific member on a leaderboard." alt="" coords="5,5,232,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_113.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGetMultisourceMetadataRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGetMultisourceMetadataRequest" id="aLootLocker_8Requests_8LootLockerGetMultisourceMetadataRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetMultisourceMetadataRequest.html" title="Request to retrieve metadata from multiple sources at once." alt="" coords="5,5,230,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_114.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGetRequests" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGetRequests" id="aLootLocker_8Requests_8LootLockerGetRequests">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetRequests.html" title="Pagination parameters for requesting a range of leaderboard entries." alt="" coords="5,40,192,85"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetAllMemberRanksRequest.html" title="Request to retrieve leaderboard ranks for all leaderboards a specific member appears on." alt="" coords="240,5,490,50"/>
+<area shape="poly" title=" " alt="" coords="206,46,242,43,237,45,208,51"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGetScoreListRequest.html" title="Request to retrieve a paginated score list for a specific leaderboard, with cursor&#45;based pagination s..." alt="" coords="266,75,464,119"/>
+<area shape="poly" title=" " alt="" coords="207,74,268,84,262,84,207,79"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_115.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGrantAssetRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGrantAssetRequest" id="aLootLocker_8Requests_8LootLockerGrantAssetRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGrantAssetRequest.html" title="Request to grant an asset to the current player&#39;s inventory." alt="" coords="5,5,194,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_116.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerGrantedItem" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerGrantedItem" id="aLootLocker_8Requests_8LootLockerGrantedItem">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerGrantedItem.html" title="An item granted to a player as the result of consuming another item (or via an on&#45;grant behaviour)." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_117.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerIncrementScoreRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerIncrementScoreRequest" id="aLootLocker_8Requests_8LootLockerIncrementScoreRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerIncrementScoreRequest.html" title="Request to increment a member&#39;s score on a leaderboard by the given amount." alt="" coords="5,5,224,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_118.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInlinedGroupAssociation" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInlinedGroupAssociation" id="aLootLocker_8Requests_8LootLockerInlinedGroupAssociation">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInlinedGroupAssociation.html" title="A group association with the entity detail inlined directly." alt="" coords="5,5,227,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_119.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInlinedGroupDetailsWithAssociations" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInlinedGroupDetailsWithAssociations" id="aLootLocker_8Requests_8LootLockerInlinedGroupDetailsWithAssociations">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInlinedGroupDetailsWithAssociations.html" title="Group detail used by the ListCatalogItemsById endpoint, where association details are inlined directl..." alt="" coords="5,5,228,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_120.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInternalMetadataOperationRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInternalMetadataOperationRequest" id="aLootLocker_8Requests_8LootLockerInternalMetadataOperationRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInternalMetadataOperationRequest.html" title="Internal request object for a batch of metadata operations on a specific source." alt="" coords="5,5,245,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_121.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInventory" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInventory" id="aLootLocker_8Requests_8LootLockerInventory">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInventory.html" title="A single item in a player&#39;s inventory, combining asset details with instance&#45;specific metadata." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_122.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInventoryItem" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInventoryItem" id="aLootLocker_8Requests_8LootLockerInventoryItem">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInventoryItem.html" title="An item instance held in a player&#39;s inventory." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_123.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerInvokeTriggersByKeyRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerInvokeTriggersByKeyRequest" id="aLootLocker_8Requests_8LootLockerInvokeTriggersByKeyRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInvokeTriggersByKeyRequest.html" title="Request to invoke one or more triggers by their keys." alt="" coords="5,5,257,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_124.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerItemDetailsKey" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerItemDetailsKey" id="aLootLocker_8Requests_8LootLockerItemDetailsKey">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerItemDetailsKey.html" title="Class to help simply getting item details." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_125.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerItemTemplate" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerItemTemplate" id="aLootLocker_8Requests_8LootLockerItemTemplate">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerItemTemplate.html" title="An item template defines a type of item that can be granted to players." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_126.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboard" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboard" id="aLootLocker_8Requests_8LootLockerLeaderboard">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboard.html" title="A player&#39;s rank entry across a specific leaderboard, linking the rank details to the leaderboard iden..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_127.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardArchiveRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardArchiveRequest" id="aLootLocker_8Requests_8LootLockerLeaderboardArchiveRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardArchiveRequest.html" title="Request to retrieve entries from an archived (past) leaderboard." alt="" coords="5,5,252,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_128.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardDetails" id="aLootLocker_8Requests_8LootLockerLeaderboardDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardDetails.html" title="Details about a leaderboard&#39;s configuration, schedule, and rewards." alt="" coords="5,5,196,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_129.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardGroupRewardAssociations" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardGroupRewardAssociations" id="aLootLocker_8Requests_8LootLockerLeaderboardGroupRewardAssociations">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardGroupRewardAssociations.html" title="A single reward entry within a leaderboard reward group, specifying the kind and the associated rewar..." alt="" coords="5,5,238,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_130.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardMember" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardMember" id="aLootLocker_8Requests_8LootLockerLeaderboardMember">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardMember.html" title="A single member&#39;s entry on a leaderboard, including their rank, score, metadata, and player informati..." alt="" coords="5,5,204,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_131.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardReward" id="aLootLocker_8Requests_8LootLockerLeaderboardReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardReward.html" title="A reward attached to a leaderboard." alt="" coords="5,5,199,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_132.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardAsset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardAsset" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardAsset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardAsset.html" title="An asset reward attached to a leaderboard, granting a specific asset (or variation or rental) when tr..." alt="" coords="5,5,235,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_133.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardAssetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardAssetDetails" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardAssetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardAssetDetails.html" title="Details about the asset associated with a leaderboard asset reward." alt="" coords="5,5,235,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_134.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrency" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrency" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrency">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardCurrency.html" title="A currency reward attached to a leaderboard, describing the currency and amount to grant when the rew..." alt="" coords="5,5,257,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_135.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrencyDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrencyDetails" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardCurrencyDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardCurrencyDetails.html" title="Details about the currency associated with a leaderboard currency reward." alt="" coords="5,5,257,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_136.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardGroup" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardGroup" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardGroup">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardGroup.html" title="A group reward attached to a leaderboard, bundling multiple rewards of different types into a single ..." alt="" coords="5,5,238,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_137.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicates" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicates" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicates">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardPredicates.html" title="Rank range predicates determining which players receive a specific leaderboard reward." alt="" coords="5,5,267,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_138.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicatesArgs" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicatesArgs" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardPredicatesArgs">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardPredicatesArgs.html" title="The rank range arguments for a leaderboard reward predicate, defining the min/max rank boundaries and..." alt="" coords="5,5,296,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_139.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgression" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgression.html" title="A progression points reward attached to a leaderboard, granting points to a specific progression when..." alt="" coords="5,5,275,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_140.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionDetails" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgressionDetails.html" title="Details about the progression associated with a leaderboard progression points reward." alt="" coords="5,5,275,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_141.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionReset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionReset" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionReset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgressionReset.html" title="A progression reset reward attached to a leaderboard, resetting a specific progression when triggered..." alt="" coords="5,5,312,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_142.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionResetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionResetDetails" id="aLootLocker_8Requests_8LootLockerLeaderboardRewardProgressionResetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardProgressionResetDetails.html" title="Details about the progression associated with a leaderboard progression reset reward." alt="" coords="5,5,275,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_143.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardSchedule" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardSchedule" id="aLootLocker_8Requests_8LootLockerLeaderboardSchedule">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardSchedule.html" title="The reset schedule configuration for a leaderboard, including a cron expression and the next and last..." alt="" coords="5,5,209,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_144.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaderboardUpcomingReset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaderboardUpcomingReset" id="aLootLocker_8Requests_8LootLockerLeaderboardUpcomingReset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaderboardUpcomingReset.html" title="A pending manual reset for a leaderboard that has been requested but not yet processed." alt="" coords="5,5,253,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_145.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLeaseRemoteSessionRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLeaseRemoteSessionRequest" id="aLootLocker_8Requests_8LootLockerLeaseRemoteSessionRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLeaseRemoteSessionRequest.html" title="Request to initiate a remote session lease process." alt="" coords="5,5,261,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_146.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLinks" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLinks" id="aLootLocker_8Requests_8LootLockerLinks">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLinks.html" title="A dictionary of named links (URLs) associated with an asset, with a convenience accessor for the thum..." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_147.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListAssetsRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListAssetsRequest" id="aLootLocker_8Requests_8LootLockerListAssetsRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListAssetsRequest.html" title="Request object for listing assets with settings for what to include, exclude, and filter." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_148.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListCatalogItemsByIdError" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListCatalogItemsByIdError" id="aLootLocker_8Requests_8LootLockerListCatalogItemsByIdError">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdError.html" title="Describes why a specific catalog_listing_id could not be resolved." alt="" coords="5,5,239,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_149.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListCatalogItemsByIdRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListCatalogItemsByIdRequest" id="aLootLocker_8Requests_8LootLockerListCatalogItemsByIdRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListCatalogItemsByIdRequest.html" title="Request body for looking up catalog items by their catalog_listing_ids." alt="" coords="5,5,261,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_150.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListPlayerInfoRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListPlayerInfoRequest" id="aLootLocker_8Requests_8LootLockerListPlayerInfoRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListPlayerInfoRequest.html" title="Request to look up basic info for multiple players identified by their ULID, legacy id,..." alt="" coords="5,5,211,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_151.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListSimplifiedFilters" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListSimplifiedFilters" id="aLootLocker_8Requests_8LootLockerListSimplifiedFilters">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedFilters.html" title="Request to list a player&#39;s simplified inventory with the given filters." alt="" coords="5,5,197,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_152.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListSimplifiedInventoryIncludes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryIncludes" id="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryIncludes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryIncludes.html" title="Includes to add extra data to simplified inventory responses." alt="" coords="5,5,219,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_153.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListSimplifiedInventoryMetadataIncludes" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryMetadataIncludes" id="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryMetadataIncludes">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryMetadataIncludes.html" title="What metadata to include in simplified inventory responses when requested by the client." alt="" coords="5,5,219,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_154.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerListSimplifiedInventoryRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryRequest" id="aLootLocker_8Requests_8LootLockerListSimplifiedInventoryRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerListSimplifiedInventoryRequest.html" title="Request to list a player&#39;s simplified inventory with the given filters." alt="" coords="5,5,219,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_155.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerLoadouts" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerLoadouts" id="aLootLocker_8Requests_8LootLockerLoadouts">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerLoadouts.html" title="A single item in a class&#39;s equipped loadout, pairing an asset with its equip slot metadata." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_156.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMergeInventoryItemStacksRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMergeInventoryItemStacksRequest" id="aLootLocker_8Requests_8LootLockerMergeInventoryItemStacksRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMergeInventoryItemStacksRequest.html" title="Request to merge two stacks of the same item into one." alt="" coords="5,5,245,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_157.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataBase64Value" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataBase64Value" id="aLootLocker_8Requests_8LootLockerMetadataBase64Value">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataBase64Value.html" title="/summary&gt;" alt="" coords="5,5,215,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_158.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataEntry" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataEntry" id="aLootLocker_8Requests_8LootLockerMetadataEntry">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataEntry.html" title="/summary&gt;" alt="" coords="5,14,192,58"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperation.html" title="A metadata entry combined with the action to perform on it (create, update, delete)." alt="" coords="240,14,429,58"/>
+<area shape="poly" title=" " alt="" coords="207,34,242,36,236,36,208,39"/>
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerInternalMetadataOperationWithStringEnums.html" title="An internal representation of a metadata operation with string&#45;typed enum fields, used for serializin..." alt="" coords="477,5,716,67"/>
+<area shape="poly" title=" " alt="" coords="445,34,479,36,474,36,445,39"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_159.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataInclude" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataInclude" id="aLootLocker_8Requests_8LootLockerMetadataInclude">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataInclude.html" title="Metadata include configuration." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_160.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataOperationError" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataOperationError" id="aLootLocker_8Requests_8LootLockerMetadataOperationError">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataOperationError.html" title="An error that occurred while performing a metadata operation, identifying the action,..." alt="" coords="5,5,226,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_161.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataSourceAndEntries" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataSourceAndEntries" id="aLootLocker_8Requests_8LootLockerMetadataSourceAndEntries">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataSourceAndEntries.html" title="A source identifier paired with its retrieved metadata entries." alt="" coords="5,5,245,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_162.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerMetadataSourceAndKeys" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerMetadataSourceAndKeys" id="aLootLocker_8Requests_8LootLockerMetadataSourceAndKeys">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerMetadataSourceAndKeys.html" title="A source identifier paired with a list of metadata keys, used to specify which keys to retrieve from ..." alt="" coords="5,5,231,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_163.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotification" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotification" id="aLootLocker_8Requests_8LootLockerNotification">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotification.html" title="A single notification for the player, including type, source, priority, content, and read status." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_164.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationContent" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationContent" id="aLootLocker_8Requests_8LootLockerNotificationContent">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationContent.html" title="The content of a notification, including context key&#45;value pairs and the reward body." alt="" coords="5,5,195,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_165.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationContentRewardBody" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationContentRewardBody" id="aLootLocker_8Requests_8LootLockerNotificationContentRewardBody">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationContentRewardBody.html" title="The reward body of a notification." alt="" coords="5,5,277,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_166.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationContextEntry" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationContextEntry" id="aLootLocker_8Requests_8LootLockerNotificationContextEntry">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationContextEntry.html" title="A key&#45;value pair providing additional context for a notification." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_167.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationGroupRewardAssociations" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationGroupRewardAssociations" id="aLootLocker_8Requests_8LootLockerNotificationGroupRewardAssociations">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationGroupRewardAssociations.html" title="An individual reward association within a notification group reward." alt="" coords="5,5,232,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_168.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardAsset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardAsset" id="aLootLocker_8Requests_8LootLockerNotificationRewardAsset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardAsset.html" title="An asset reward attached to a notification." alt="" coords="5,5,229,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_169.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardAssetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardAssetDetails" id="aLootLocker_8Requests_8LootLockerNotificationRewardAssetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardAssetDetails.html" title="Details about the asset included in a notification reward." alt="" coords="5,5,229,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_170.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardCurrency" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardCurrency" id="aLootLocker_8Requests_8LootLockerNotificationRewardCurrency">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardCurrency.html" title="A currency reward attached to a notification." alt="" coords="5,5,251,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_171.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardCurrencyDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardCurrencyDetails" id="aLootLocker_8Requests_8LootLockerNotificationRewardCurrencyDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardCurrencyDetails.html" title="Details about the currency included in a notification reward." alt="" coords="5,5,251,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_172.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardGroup" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardGroup" id="aLootLocker_8Requests_8LootLockerNotificationRewardGroup">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardGroup.html" title="A group reward attached to a notification, containing multiple reward associations." alt="" coords="5,5,232,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_173.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardProgression" id="aLootLocker_8Requests_8LootLockerNotificationRewardProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgression.html" title="A progression points reward attached to a notification." alt="" coords="5,5,269,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_174.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardProgressionDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionDetails" id="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgressionDetails.html" title="Details about the progression included in a notification reward." alt="" coords="5,5,269,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_175.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardProgressionReset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionReset" id="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionReset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgressionReset.html" title="A progression reset reward attached to a notification." alt="" coords="5,5,306,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_176.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerNotificationRewardProgressionResetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionResetDetails" id="aLootLocker_8Requests_8LootLockerNotificationRewardProgressionResetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerNotificationRewardProgressionResetDetails.html" title="Details about the progression reset included in a notification reward." alt="" coords="5,5,269,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_177.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPaginatedAssetInstanceProgressionsResponse_8LootLockerAssetInstanceProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPaginatedAssetInstanceProgressionsResponse_8LootLockerAssetInstanceProgression" id="aLootLocker_8Requests_8LootLockerPaginatedAssetInstanceProgressionsResponse_8LootLockerAssetInstanceProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html" title="A single asset instance progression status within a paginated asset instance progressions list." alt="" coords="5,5,283,84"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_178.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPaginatedCharacterProgressionsResponse_8LootLockerCharacterProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPaginatedCharacterProgressionsResponse_8LootLockerCharacterProgression" id="aLootLocker_8Requests_8LootLockerPaginatedCharacterProgressionsResponse_8LootLockerCharacterProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedCharacterProgressionsResponse_1_1LootLockerCharacterProgression.html" title="A single character progression status within a paginated character progressions list." alt="" coords="5,5,303,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_179.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPaginatedPlayerProgressionsResponse_8LootLockerPlayerProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPaginatedPlayerProgressionsResponse_8LootLockerPlayerProgression" id="aLootLocker_8Requests_8LootLockerPaginatedPlayerProgressionsResponse_8LootLockerPlayerProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedPlayerProgressionsResponse_1_1LootLockerPlayerProgression.html" title="A single player progression status within a paginated player progressions list." alt="" coords="5,5,281,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_180.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPaginatedProgressionsResponse_8LootLockerProgression" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPaginatedProgressionsResponse_8LootLockerProgression" id="aLootLocker_8Requests_8LootLockerPaginatedProgressionsResponse_8LootLockerProgression">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedProgressionsResponse_1_1LootLockerProgression.html" title="A single progression definition within a paginated progressions list." alt="" coords="5,5,283,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_181.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPaginatedProgressionTiersResponse_8LootLockerProgressionTier" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPaginatedProgressionTiersResponse_8LootLockerProgressionTier" id="aLootLocker_8Requests_8LootLockerPaginatedProgressionTiersResponse_8LootLockerProgressionTier">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPaginatedProgressionTiersResponse_1_1LootLockerProgressionTier.html" title="A single tier definition within a paginated progression tiers list." alt="" coords="5,5,265,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_182.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPagination" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPagination" id="aLootLocker_8Requests_8LootLockerPagination">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPagination.html" title="Pagination state for leaderboard cursor&#45;based pagination." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_183.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPlatformKey" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPlatformKey" id="aLootLocker_8Requests_8LootLockerPlatformKey">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlatformKey.html" title="A platform key redeemed by the player." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_184.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPlatformKeyCampaign" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPlatformKeyCampaign" id="aLootLocker_8Requests_8LootLockerPlatformKeyCampaign">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlatformKeyCampaign.html" title="Information about the campaign associated with a platform key." alt="" coords="5,5,215,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_185.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPlayer" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPlayer" id="aLootLocker_8Requests_8LootLockerPlayer">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayer.html" title="Basic player information as returned in leaderboard entries." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_186.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPlayerFileMetadata" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPlayerFileMetadata" id="aLootLocker_8Requests_8LootLockerPlayerFileMetadata">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerFileMetadata.html" title="Metadata about a player file, returned as part of the revisions response." alt="" coords="5,5,195,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_187.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerPlayerInfo" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerPlayerInfo" id="aLootLocker_8Requests_8LootLockerPlayerInfo">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerPlayerInfo.html" title="A set of important information about a player." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_188.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerProgressionPointDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerProgressionPointDetails" id="aLootLocker_8Requests_8LootLockerProgressionPointDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionPointDetails.html" title="Details about a progression points entity referenced by a catalog entry." alt="" coords="5,5,224,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_189.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerProgressionPointsReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerProgressionPointsReward" id="aLootLocker_8Requests_8LootLockerProgressionPointsReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionPointsReward.html" title="A progression points reward attached to a progression tier, describing how many points are added to a..." alt="" coords="5,5,234,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_190.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerProgressionResetDetails" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerProgressionResetDetails" id="aLootLocker_8Requests_8LootLockerProgressionResetDetails">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionResetDetails.html" title="Details about a progression reset entity referenced by a catalog entry." alt="" coords="5,5,228,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_191.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerProgressionResetReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerProgressionResetReward" id="aLootLocker_8Requests_8LootLockerProgressionResetReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerProgressionResetReward.html" title="A progression reset reward attached to a progression tier, causing another progression to be reset wh..." alt="" coords="5,5,231,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_192.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerQueryScoreRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerQueryScoreRequest" id="aLootLocker_8Requests_8LootLockerQueryScoreRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerQueryScoreRequest.html" title="Request to query the theoretical rank a given score would achieve on a leaderboard." alt="" coords="5,5,197,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_193.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRarity" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRarity" id="aLootLocker_8Requests_8LootLockerRarity">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRarity.html" title="Rarity information for an asset, describing its name, short code, and display color." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_194.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerReadNotificationsRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerReadNotificationsRequest" id="aLootLocker_8Requests_8LootLockerReadNotificationsRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerReadNotificationsRequest.html" title="Request to mark one or more notifications as read." alt="" coords="5,5,237,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_195.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefreshRemoteSessionRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefreshRemoteSessionRequest" id="aLootLocker_8Requests_8LootLockerRefreshRemoteSessionRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefreshRemoteSessionRequest.html" title="Request to refresh an existing remote session using a refresh token." alt="" coords="5,5,273,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_196.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundByEntitlementIdsRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundByEntitlementIdsRequest" id="aLootLocker_8Requests_8LootLockerRefundByEntitlementIdsRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundByEntitlementIdsRequest.html" title="Request to refund one or more entitlements by their IDs." alt="" coords="5,5,227,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_197.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundCurrencyEntry" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundCurrencyEntry" id="aLootLocker_8Requests_8LootLockerRefundCurrencyEntry">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundCurrencyEntry.html" title="Represents a currency entry (amount credited or debited) as part of a refund." alt="" coords="5,5,207,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_198.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundNonReversibleReward" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundNonReversibleReward" id="aLootLocker_8Requests_8LootLockerRefundNonReversibleReward">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundNonReversibleReward.html" title="Represents a non&#45;reversible reward that was granted alongside an entitlement and could not be clawed ..." alt="" coords="5,5,259,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_199.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundPlayerInventoryEvent" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundPlayerInventoryEvent" id="aLootLocker_8Requests_8LootLockerRefundPlayerInventoryEvent">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundPlayerInventoryEvent.html" title="Represents the action taken on a player inventory item during a refund." alt="" coords="5,5,255,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_200.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundWarning" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundWarning" id="aLootLocker_8Requests_8LootLockerRefundWarning">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundWarning.html" title="Warnings for a specific entitlement during refund processing." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_201.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRefundWarningDetail" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRefundWarningDetail" id="aLootLocker_8Requests_8LootLockerRefundWarningDetail">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRefundWarningDetail.html" title="Represents a single warning detail for a refund." alt="" coords="5,5,207,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_202.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRental" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRental" id="aLootLocker_8Requests_8LootLockerRental">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRental.html" title="Rental status information for an inventory item that was acquired as a rental." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_203.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRental__Options" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRental__Options" id="aLootLocker_8Requests_8LootLockerRental__Options">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRental__Options.html" title="A rental option available for an asset, defining duration, price, and related links." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_204.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRewardObject" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRewardObject" id="aLootLocker_8Requests_8LootLockerRewardObject">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRewardObject.html" title="A reward object linking an inventory instance to the underlying asset details." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_205.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerRewards" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerRewards" id="aLootLocker_8Requests_8LootLockerRewards">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerRewards.html" title="The full set of rewards attached to a progression tier, across all reward types." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_206.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSessionOptionals" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSessionOptionals" id="aLootLocker_8Requests_8LootLockerSessionOptionals">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSessionOptionals.html" title="Optional parameters that can be sent when starting a session." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_207.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleAsset" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleAsset" id="aLootLocker_8Requests_8LootLockerSimpleAsset">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAsset.html" title="A simplified asset object to improve performance by including only the fields most commonly needed." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_208.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleAssetAuthor" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleAssetAuthor" id="aLootLocker_8Requests_8LootLockerSimpleAssetAuthor">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetAuthor.html" title="Authorship information for a user&#45;generated content (UGC) asset." alt="" coords="5,5,193,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_209.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleAssetDataEntity" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleAssetDataEntity" id="aLootLocker_8Requests_8LootLockerSimpleAssetDataEntity">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetDataEntity.html" title="A named data entity attached to a simplified asset." alt="" coords="5,5,219,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_210.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleAssetFile" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleAssetFile" id="aLootLocker_8Requests_8LootLockerSimpleAssetFile">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetFile.html" title="A file associated with a simplified asset, providing the size, name, URL, and optional tags." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_211.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleAssetFilter" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleAssetFilter" id="aLootLocker_8Requests_8LootLockerSimpleAssetFilter">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleAssetFilter.html" title="Filters to apply to the asset listing based on key&#45;value pairs." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_212.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSimpleInventoryItem" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSimpleInventoryItem" id="aLootLocker_8Requests_8LootLockerSimpleInventoryItem">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSimpleInventoryItem.html" title="A simplified view of an inventory item." alt="" coords="5,5,206,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_213.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSplitInventoryItemStackRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSplitInventoryItemStackRequest" id="aLootLocker_8Requests_8LootLockerSplitInventoryItemStackRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSplitInventoryItemStackRequest.html" title="Request to split a stackable item in the player&#39;s inventory into two stacks." alt="" coords="5,5,226,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_214.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerStartRemoteSessionRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerStartRemoteSessionRequest" id="aLootLocker_8Requests_8LootLockerStartRemoteSessionRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerStartRemoteSessionRequest.html" title="Request to start an authorized remote session using the lease code from a completed lease process." alt="" coords="5,5,254,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_215.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerStorage" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerStorage" id="aLootLocker_8Requests_8LootLockerStorage">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerStorage.html" title="A key&#45;value pair used to store arbitrary data on a player or asset." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_216.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSubmitScoreRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSubmitScoreRequest" id="aLootLocker_8Requests_8LootLockerSubmitScoreRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSubmitScoreRequest.html" title="Request to submit or update a score on a leaderboard." alt="" coords="5,5,204,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_217.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerSuccessfulKey" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerSuccessfulKey" id="aLootLocker_8Requests_8LootLockerSuccessfulKey">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerSuccessfulKey.html" title="A trigger key that was successfully invoked." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_218.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerTransferProvidersBetweenAccountsRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerTransferProvidersBetweenAccountsRequest" id="aLootLocker_8Requests_8LootLockerTransferProvidersBetweenAccountsRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerTransferProvidersBetweenAccountsRequest.html" title="Request to transfer connected account providers from one LootLocker player account to another." alt="" coords="5,5,239,67"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_219.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerUpdateClassRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerUpdateClassRequest" id="aLootLocker_8Requests_8LootLockerUpdateClassRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerUpdateClassRequest.html" title="Request to update an existing class for the current player." alt="" coords="5,5,204,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_220.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerVariation" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerVariation" id="aLootLocker_8Requests_8LootLockerVariation">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerVariation.html" title="A named variation of an asset with optional color information and associated links." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_221.png" border="0" usemap="#aLootLocker_8Requests_8LootLockerVariation__Info" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8LootLockerVariation__Info" id="aLootLocker_8Requests_8LootLockerVariation__Info">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1LootLockerVariation__Info.html" title="Variation information for a legacy asset, containing the id, name, colors, and links." alt="" coords="5,5,192,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_222.png" border="0" usemap="#aLootLocker_8Requests_8PlatformIDs" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8PlatformIDs" id="aLootLocker_8Requests_8PlatformIDs">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlatformIDs.html" title="First&#45;party platform identifiers (Steam, Xbox, PSN) linked to a player&#39;s account." alt="" coords="5,5,241,33"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_223.png" border="0" usemap="#aLootLocker_8Requests_8PlayerNameRequest" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8PlayerNameRequest" id="aLootLocker_8Requests_8PlayerNameRequest">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlayerNameRequest.html" title="Request to set or update the name of the current player." alt="" coords="5,5,205,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_224.png" border="0" usemap="#aLootLocker_8Requests_8PlayerNameWithIDs" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8PlayerNameWithIDs" id="aLootLocker_8Requests_8PlayerNameWithIDs">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlayerNameWithIDs.html" title="Player name and various identifier forms used for player lookup operations." alt="" coords="5,5,205,50"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_225.png" border="0" usemap="#aLootLocker_8Requests_8PlayerWith1stPartyPlatformIDs" loading="lazy" alt=""/>
+<map name="aLootLocker_8Requests_8PlayerWith1stPartyPlatformIDs" id="aLootLocker_8Requests_8PlayerWith1stPartyPlatformIDs">
+<area shape="rect" href="classLootLocker_1_1Requests_1_1PlayerWith1stPartyPlatformIDs.html" title="Player information combined with all linked first&#45;party platform identifiers." alt="" coords="5,5,205,50"/>
+</map>
+</td></tr>
+</table>
+</div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.15.0-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.15.0
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>

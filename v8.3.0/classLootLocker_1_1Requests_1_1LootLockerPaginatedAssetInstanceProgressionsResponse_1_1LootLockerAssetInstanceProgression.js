@@ -1,0 +1,12 @@
+var classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression =
+[
+    [ "id", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#ae99a4841f47de495705319b96b2072ea", null ],
+    [ "last_level_up", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#ae8b40be5c8dd1c8f63300629752a84eb", null ],
+    [ "next_threshold", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a5b224503062382e2d484bd70c677f2f4", null ],
+    [ "points", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a5c57057b1ef770c983deafbcb74fc50c", null ],
+    [ "previous_threshold", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a0bc34df81dc80443cf16bd990a678aaa", null ],
+    [ "progression_id", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a13e746d1a5cdc4cc27155545318e515e", null ],
+    [ "progression_key", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a0d99ab401d4f53d14a577b0b9a82dcbf", null ],
+    [ "progression_name", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#aeb185e7441cc1dd0afe53469438c9fe7", null ],
+    [ "step", "classLootLocker_1_1Requests_1_1LootLockerPaginatedAssetInstanceProgressionsResponse_1_1LootLockerAssetInstanceProgression.html#a291006aa0a4fbec1ad86329bc62beaa8", null ]
+];

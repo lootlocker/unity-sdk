@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerSplitInventoryItemStackResponse" name="LootLocker.Requests.LootLockerSplitInventoryItemStackResponse">
+<area shape="rect" id="Node000001" title="Response containing the id of the newly created stack after splitting an item." alt="" coords="9,81,229,143"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="5,5,233,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,47,121,81,117,80,117,51"/>
+</map>

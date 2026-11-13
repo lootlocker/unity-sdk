@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerConnectionStateResponse" name="LootLocker.Requests.LootLockerConnectionStateResponse">
+<area shape="rect" id="Node000001" title="Response for LootLocker.Requests.LootLockerSDKManager.CheckConnectionStatus." alt="" coords="5,81,239,126"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="8,5,236,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,47,124,81,120,79,120,51"/>
+</map>

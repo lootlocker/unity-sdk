@@ -1,0 +1,393 @@
+<!-- HTML header for doxygen 1.15.0-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.15.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LootLocker Unity SDK: LootLocker Namespace Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="custom-layout-fixes.css" rel="stylesheet" type="text/css"/>
+<link href="lootlocker-theme.css" rel="stylesheet" type="text/css"/>
+<!-- Apply saved color scheme before first paint to prevent flash -->
+<script type="text/javascript">
+(function () {
+  try {
+    var saved = localStorage.getItem('ll-colorscheme');
+    var html = document.documentElement;
+    if (saved === 'dark') {
+      html.classList.remove('light-mode');
+      html.classList.add('dark-mode');
+    } else if (saved === 'light') {
+      html.classList.remove('dark-mode');
+      html.classList.add('light-mode');
+    }
+    // No saved pref: OS preference handled by CSS media query
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<!-- ================================================================
+     LootLocker top navigation bar
+     ================================================================ -->
+<nav id="ll-topnav" role="navigation" aria-label="LootLocker navigation">
+  <div id="ll-topnav-inner">
+    <!-- Left: logo + product name + section tabs -->
+    <div id="ll-topnav-left">
+      <a href="index.html" id="ll-topnav-logo-link"
+         aria-label="LootLocker Unity SDK — home">
+        <img src="lootlocker-logo.png" alt="LootLocker" id="ll-topnav-logo-img"/>
+      </a>
+      <span id="ll-topnav-divider" aria-hidden="true"></span>
+      <a href="index.html" id="ll-topnav-product">Unity SDK</a>
+      <span id="ll-topnav-version">v8.3.0</span>
+      <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
+         rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <div id="ll-topnav-links">
+        <a href="https://ref.lootlocker.com/game" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Game API &#8599;</a>
+        <a href="https://console.lootlocker.com" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Console &#8599;</a>
+        <a href="https://docs.lootlocker.com/" target="_blank"
+           rel="noopener noreferrer" class="ll-topnav-tab">Docs &#8599;</a>
+      </div>
+    </div>
+    <!-- Right: sign-up CTA + dark mode toggle -->
+    <div id="ll-topnav-right">
+      <a href="https://lootlocker.com/sign-up" target="_blank"
+         rel="noopener noreferrer" class="ll-topnav-signup">Sign Up</a>
+      <button id="ll-dark-toggle" type="button"
+              aria-label="Toggle dark mode" title="Toggle dark/light mode"
+              onclick="llToggleDark()">
+        <!-- Sun icon — shown in dark mode -->
+        <svg id="ll-icon-sun" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon — shown in light mode -->
+        <svg id="ll-icon-moon" xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<script type="text/javascript">
+function llToggleDark() {
+  var html = document.documentElement;
+  var isDark = html.classList.contains('dark-mode') ||
+               (!html.classList.contains('light-mode') &&
+                window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark-mode');
+    html.classList.add('light-mode');
+    try { localStorage.setItem('ll-colorscheme', 'light'); } catch (e) {}
+  } else {
+    html.classList.remove('light-mode');
+    html.classList.add('dark-mode');
+    try { localStorage.setItem('ll-colorscheme', 'dark'); } catch (e) {}
+  }
+}
+</script>
+<script type="text/javascript" src="version-picker.js" defer="defer"></script>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   </div>
+   <div id="projectbrief">Game backend SDK for Unity</div>
+  </td>
+ </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.15.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+</div><!-- top -->
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespaceLootLocker.html','',''); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">LootLocker Namespace Reference</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:ILootLockerService" id="r_ILootLockerService"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerService.html">ILootLockerService</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface that all <a class="el" href="namespaceLootLocker.html">LootLocker</a> services must implement to be managed by the LifecycleManager.  <a href="interfaceLootLocker_1_1ILootLockerService.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerErrorData" id="r_LootLockerErrorData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerErrorData.html">LootLockerErrorData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error information returned when a <a class="el" href="namespaceLootLocker.html">LootLocker</a> API call fails.  <a href="classLootLocker_1_1LootLockerErrorData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerEventData" id="r_LootLockerEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventData.html">LootLockerEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for all <a class="el" href="namespaceLootLocker.html">LootLocker</a> event data.  <a href="classLootLocker_1_1LootLockerEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerSessionStartedEventData" id="r_LootLockerSessionStartedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerSessionStartedEventData.html">LootLockerSessionStartedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for session started events.  <a href="classLootLocker_1_1LootLockerSessionStartedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerSessionRefreshedEventData" id="r_LootLockerSessionRefreshedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerSessionRefreshedEventData.html">LootLockerSessionRefreshedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for session refreshed events.  <a href="classLootLocker_1_1LootLockerSessionRefreshedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerSessionEndedEventData" id="r_LootLockerSessionEndedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerSessionEndedEventData.html">LootLockerSessionEndedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for session ended events.  <a href="classLootLocker_1_1LootLockerSessionEndedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerSessionExpiredEventData" id="r_LootLockerSessionExpiredEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerSessionExpiredEventData.html">LootLockerSessionExpiredEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for session expired events.  <a href="classLootLocker_1_1LootLockerSessionExpiredEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerLocalSessionDeactivatedEventData" id="r_LootLockerLocalSessionDeactivatedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerLocalSessionDeactivatedEventData.html">LootLockerLocalSessionDeactivatedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for local session deactivated events.  <a href="classLootLocker_1_1LootLockerLocalSessionDeactivatedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerLocalSessionActivatedEventData" id="r_LootLockerLocalSessionActivatedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerLocalSessionActivatedEventData.html">LootLockerLocalSessionActivatedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for local session activated events.  <a href="classLootLocker_1_1LootLockerLocalSessionActivatedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceConnectionStateChangedEventData" id="r_LootLockerPresenceConnectionStateChangedEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceConnectionStateChangedEventData.html">LootLockerPresenceConnectionStateChangedEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for presence connection state changed events.  <a href="classLootLocker_1_1LootLockerPresenceConnectionStateChangedEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerEventSystemResetEventData" id="r_LootLockerEventSystemResetEventData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventSystemResetEventData.html">LootLockerEventSystemResetEventData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event data for event system reset events.  <a href="classLootLocker_1_1LootLockerEventSystemResetEventData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerEventSystem" id="r_LootLockerEventSystem"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerEventSystem.html">LootLockerEventSystem</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Centralized event system for the <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK Manages event subscriptions, event firing, and event data.  <a href="classLootLocker_1_1LootLockerEventSystem.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerServerRequest" id="r_LootLockerServerRequest"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLootLocker_1_1LootLockerServerRequest.html">LootLockerServerRequest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a request to send to the server.  <a href="structLootLocker_1_1LootLockerServerRequest.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerStreamedResponse_3C_20T_20_3E" id="r_LootLockerStreamedResponse_3C_20T_20_3E"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLootLocker_1_1LootLockerStreamedResponse-1-g.html">LootLockerStreamedResponse&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic result structure for streamed JSON responses.  <a href="structLootLocker_1_1LootLockerStreamedResponse-1-g.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerLifecycleManager" id="r_LootLockerLifecycleManager"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerLifecycleManager.html">LootLockerLifecycleManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Centralized lifecycle manager for all <a class="el" href="namespaceLootLocker.html">LootLocker</a> services that need Unity GameObject management.  <a href="classLootLocker_1_1LootLockerLifecycleManager.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceAuthRequest" id="r_LootLockerPresenceAuthRequest"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceAuthRequest.html">LootLockerPresenceAuthRequest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Authentication request sent to the Presence WebSocket.  <a href="classLootLocker_1_1LootLockerPresenceAuthRequest.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceStatusRequest" id="r_LootLockerPresenceStatusRequest"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceStatusRequest.html">LootLockerPresenceStatusRequest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status update request for Presence.  <a href="classLootLocker_1_1LootLockerPresenceStatusRequest.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresencePingRequest" id="r_LootLockerPresencePingRequest"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresencePingRequest.html">LootLockerPresencePingRequest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ping message to keep the WebSocket connection alive.  <a href="classLootLocker_1_1LootLockerPresencePingRequest.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresencePingResponse" id="r_LootLockerPresencePingResponse"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresencePingResponse.html">LootLockerPresencePingResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ping response from the server.  <a href="classLootLocker_1_1LootLockerPresencePingResponse.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceConnectionStats" id="r_LootLockerPresenceConnectionStats"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceConnectionStats.html">LootLockerPresenceConnectionStats</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics about the presence connection to <a class="el" href="namespaceLootLocker.html">LootLocker</a>.  <a href="classLootLocker_1_1LootLockerPresenceConnectionStats.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceClient" id="r_LootLockerPresenceClient"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceClient.html">LootLockerPresenceClient</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Individual WebSocket client for <a class="el" href="namespaceLootLocker.html">LootLocker</a> Presence feature Managed internally by <a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html" title="Manager for all LootLocker Presence functionality Automatically manages presence connections for all ...">LootLockerPresenceManager</a>.  <a href="classLootLocker_1_1LootLockerPresenceClient.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerPresenceManager" id="r_LootLockerPresenceManager"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerPresenceManager.html">LootLockerPresenceManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manager for all <a class="el" href="namespaceLootLocker.html">LootLocker</a> Presence functionality Automatically manages presence connections for all active sessions.  <a href="classLootLocker_1_1LootLockerPresenceManager.html#details">More...</a><br /></td></tr>
+<tr class="memitem:RateLimiter" id="r_RateLimiter"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1RateLimiter.html">RateLimiter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rate limiter service for managing <a class="el" href="namespaceLootLocker_1_1HTTP.html">HTTP</a> request rate limiting.  <a href="classLootLocker_1_1RateLimiter.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerRequestContext" id="r_LootLockerRequestContext"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerRequestContext.html">LootLockerRequestContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains contextual information about a <a class="el" href="namespaceLootLocker.html">LootLocker</a> API request.  <a href="classLootLocker_1_1LootLockerRequestContext.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerResponse" id="r_LootLockerResponse"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerResponse.html">LootLockerResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easier handling in client code.  <a href="classLootLocker_1_1LootLockerResponse.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerResponseFactory" id="r_LootLockerResponseFactory"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerResponseFactory.html">LootLockerResponseFactory</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience factory class for creating some responses that we use often.  <a href="classLootLocker_1_1LootLockerResponseFactory.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerStateData" id="r_LootLockerStateData"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerStateData.html">LootLockerStateData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manages player state data persistence and session lifecycle.  <a href="classLootLocker_1_1LootLockerStateData.html#details">More...</a><br /></td></tr>
+<tr class="memitem:ILootLockerStateWriter" id="r_ILootLockerStateWriter"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceLootLocker_1_1ILootLockerStateWriter.html">ILootLockerStateWriter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement this interface to create a custom persistent state writer for saving and loading player state data.  <a href="interfaceLootLocker_1_1ILootLockerStateWriter.html#details">More...</a><br /></td></tr>
+<tr class="memitem:LootLockerBanInfo" id="r_LootLockerBanInfo"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLootLocker_1_1LootLockerBanInfo.html">LootLockerBanInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Details about a player's active ban.  <a href="classLootLocker_1_1LootLockerBanInfo.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:af5aabea4bfde74719c58ed963f4fca74" id="r_af5aabea4bfde74719c58ed963f4fca74"><td class="memItemLeft" align="right" valign="top"><a id="af5aabea4bfde74719c58ed963f4fca74" name="af5aabea4bfde74719c58ed963f4fca74"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5aabea4bfde74719c58ed963f4fca74">LootLockerEventType</a> </td></tr>
+<tr class="memdesc:af5aabea4bfde74719c58ed963f4fca74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Predefined event types for the <a class="el" href="namespaceLootLocker.html">LootLocker</a> SDK. <br /></td></tr>
+<tr class="memitem:a63da08fa74f1f1e5dc9dead4be729e81" id="r_a63da08fa74f1f1e5dc9dead4be729e81"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81">LifecycleManagerState</a> { <br />
+&#160;&#160;<a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81af704f57ea420275ad51bf55b7dec2c96">Uninitialized</a>
+, <a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81ae7d31fc0602fb2ede144d18cdffd816b">Ready</a>
+, <a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81a32b169f72b293ef80d35435e9894f8e2">Initializing</a>
+, <a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81a84ba6b6de6447541f9cdfa184d1d2792">Resetting</a>
+, <br />
+&#160;&#160;<a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81a9ccfee4c47009600237ea2b0145db1ec">Quitting</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a63da08fa74f1f1e5dc9dead4be729e81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lifecycle state of the LifecycleManager.  <a href="#a63da08fa74f1f1e5dc9dead4be729e81">More...</a><br /></td></tr>
+<tr class="memitem:a7e68587eb85188bc45ee7b7cdacf1862" id="r_a7e68587eb85188bc45ee7b7cdacf1862"><td class="memItemLeft" align="right" valign="top"><a id="a7e68587eb85188bc45ee7b7cdacf1862" name="a7e68587eb85188bc45ee7b7cdacf1862"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e68587eb85188bc45ee7b7cdacf1862">LootLockerPresenceConnectionState</a> </td></tr>
+<tr class="memdesc:a7e68587eb85188bc45ee7b7cdacf1862"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible WebSocket connection states. <br /></td></tr>
+<tr class="memitem:a5dc94b8d36ab5c4f5648a39bfd14a204" id="r_a5dc94b8d36ab5c4f5648a39bfd14a204"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204">LootLockerMultiUserSessionMode</a> { <a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204afaf396cbd83927b72a84d2616fac76ff">NotSet</a> = 0
+, <a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204aaca41c16b1e459f6897b49bc9e212d8e">Hotseat</a> = 1
+, <a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204a7f38d7b441417b213701c616f7641745">SingleSession</a> = 2
+, <a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204a3546c7aab79502bed91131c4ca4df08c">ProfileSwitching</a> = 3
+ }</td></tr>
+<tr class="memdesc:a5dc94b8d36ab5c4f5648a39bfd14a204"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls how the SDK handles multiple player sessions when a new authentication succeeds.  <a href="#a5dc94b8d36ab5c4f5648a39bfd14a204">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a64e4af2aaee14c2ecc2285d30591ea49" id="r_a64e4af2aaee14c2ecc2285d30591ea49"><td class="memItemLeft" align="right" valign="top"><a id="a64e4af2aaee14c2ecc2285d30591ea49" name="a64e4af2aaee14c2ecc2285d30591ea49"></a>
+delegate void&#160;</td><td class="memItemRight" valign="bottom"><b>LootLockerEventHandler&lt; T &gt;</b> (T eventData)</td></tr>
+<tr class="memdesc:a64e4af2aaee14c2ecc2285d30591ea49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delegate for <a class="el" href="namespaceLootLocker.html">LootLocker</a> events. <br /></td></tr>
+<tr class="memitem:a21e897e83c6ff935e2c77003a986d21b" id="r_a21e897e83c6ff935e2c77003a986d21b"><td class="memItemLeft" align="right" valign="top"><a id="a21e897e83c6ff935e2c77003a986d21b" name="a21e897e83c6ff935e2c77003a986d21b"></a>
+delegate void&#160;</td><td class="memItemRight" valign="bottom"><b>LootLockerPresenceCallback</b> (bool success, string error=null)</td></tr>
+<tr class="memdesc:a21e897e83c6ff935e2c77003a986d21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback for presence operations. <br /></td></tr>
+</table>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<a id="a63da08fa74f1f1e5dc9dead4be729e81" name="a63da08fa74f1f1e5dc9dead4be729e81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63da08fa74f1f1e5dc9dead4be729e81">&#9670;&#160;</a></span>LifecycleManagerState</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a63da08fa74f1f1e5dc9dead4be729e81">LootLocker.LifecycleManagerState</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Lifecycle state of the LifecycleManager. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a63da08fa74f1f1e5dc9dead4be729e81af704f57ea420275ad51bf55b7dec2c96" name="a63da08fa74f1f1e5dc9dead4be729e81af704f57ea420275ad51bf55b7dec2c96"></a>Uninitialized&#160;</td><td class="fielddoc"><p>Manager is not initialized or has been destroyed - can be recreated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a63da08fa74f1f1e5dc9dead4be729e81ae7d31fc0602fb2ede144d18cdffd816b" name="a63da08fa74f1f1e5dc9dead4be729e81ae7d31fc0602fb2ede144d18cdffd816b"></a>Ready&#160;</td><td class="fielddoc"><p>Normal operation - services can be accessed and managed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a63da08fa74f1f1e5dc9dead4be729e81a32b169f72b293ef80d35435e9894f8e2" name="a63da08fa74f1f1e5dc9dead4be729e81a32b169f72b293ef80d35435e9894f8e2"></a>Initializing&#160;</td><td class="fielddoc"><p>Currently initializing services - prevent circular GetService calls. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a63da08fa74f1f1e5dc9dead4be729e81a84ba6b6de6447541f9cdfa184d1d2792" name="a63da08fa74f1f1e5dc9dead4be729e81a84ba6b6de6447541f9cdfa184d1d2792"></a>Resetting&#160;</td><td class="fielddoc"><p>Currently resetting services - prevent circular reset calls. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a63da08fa74f1f1e5dc9dead4be729e81a9ccfee4c47009600237ea2b0145db1ec" name="a63da08fa74f1f1e5dc9dead4be729e81a9ccfee4c47009600237ea2b0145db1ec"></a>Quitting&#160;</td><td class="fielddoc"><p>Application is shutting down - prevent new service access. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a5dc94b8d36ab5c4f5648a39bfd14a204" name="a5dc94b8d36ab5c4f5648a39bfd14a204"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dc94b8d36ab5c4f5648a39bfd14a204">&#9670;&#160;</a></span>LootLockerMultiUserSessionMode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a5dc94b8d36ab5c4f5648a39bfd14a204">LootLocker.LootLockerMultiUserSessionMode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Controls how the SDK handles multiple player sessions when a new authentication succeeds. </p>
+<p>This determines which player is the "default" for API calls that do not explicitly specify a player ULID. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5dc94b8d36ab5c4f5648a39bfd14a204afaf396cbd83927b72a84d2616fac76ff" name="a5dc94b8d36ab5c4f5648a39bfd14a204afaf396cbd83927b72a84d2616fac76ff"></a>NotSet&#160;</td><td class="fielddoc"><p>[Not yet configured] The SDK automatically sets this to SingleSession on new installs or Hotseat on existing installs the first time the Unity Editor loads this project. </p>
+<p>This value should never be set manually — it exists solely for pre-migration compatibility. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5dc94b8d36ab5c4f5648a39bfd14a204aaca41c16b1e459f6897b49bc9e212d8e" name="a5dc94b8d36ab5c4f5648a39bfd14a204aaca41c16b1e459f6897b49bc9e212d8e"></a>Hotseat&#160;</td><td class="fielddoc"><p>Multiple active sessions are allowed simultaneously. </p>
+<p>The first player to authenticate in a game session becomes the default player. Subsequent authentications are additive: they join the active pool but do not change the default. All player data is retained in persistent cache between sessions. Best for: local multiplayer, couch co-op, or any game where multiple players share a device at the same time. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5dc94b8d36ab5c4f5648a39bfd14a204a7f38d7b441417b213701c616f7641745" name="a5dc94b8d36ab5c4f5648a39bfd14a204a7f38d7b441417b213701c616f7641745"></a>SingleSession&#160;</td><td class="fielddoc"><p>Only one player session exists at any given time. </p>
+<p>Each new authentication completely wipes all previous session data before saving the new player as the sole active default. There is always exactly one player in the system; no historical data is kept. Best for: standard single-player games where only one account should ever exist on the device. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5dc94b8d36ab5c4f5648a39bfd14a204a3546c7aab79502bed91131c4ca4df08c" name="a5dc94b8d36ab5c4f5648a39bfd14a204a3546c7aab79502bed91131c4ca4df08c"></a>ProfileSwitching&#160;</td><td class="fielddoc"><p>Only one player is active at a time, but historical player sessions are retained in a cold cache. </p>
+<p>Each new authentication makes that player the sole active and default player while all previously active players are deactivated — but their session data remains on-device. Developers can switch back to a previously-authenticated player without re-authenticating. Best for: games with an account selection screen, or games where players switch between accounts. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.15.0-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespaceLootLocker.html">LootLocker</a></li>
+    <li class="footer">
+      Generated by <a href="https://www.doxygen.org/index.html">Doxygen</a> 1.15.0
+      &nbsp;&mdash;&nbsp;
+      <a href="https://lootlocker.com" target="_blank" rel="noopener noreferrer">LootLocker</a>
+    </li>
+  </ul>
+</div>
+<script src="nav-customization.js" type="text/javascript"></script>
+</body>
+</html>
