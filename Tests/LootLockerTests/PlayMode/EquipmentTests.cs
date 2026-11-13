@@ -93,7 +93,8 @@ namespace LootLockerTests.PlayMode
         public void Equipment_SerializingEquipRequest_OmitsUnsetOptionalFields()
         {
             // Given: count and replace are optional on the server, and an explicit 0/false would be
-            // rejected or would override the server default. They must not be sent as values.
+            // rejected or would override the server default. They must not be sent at all, under
+            // either JSON backend.
             var request = new LootLockerEquipmentEquipRequest
             {
                 entity_type = "player",
@@ -108,8 +109,30 @@ namespace LootLockerTests.PlayMode
             // Then
             StringAssert.Contains("\"entity_type\":\"player\"", json);
             StringAssert.Contains("\"inventory_id\":\"01K9DDDDDDDDDDDDDDDDDDDDDD\"", json);
-            StringAssert.DoesNotContain("\"count\":0", json, "An unset count must not be sent as 0");
-            StringAssert.DoesNotContain("\"replace\":false", json, "An unset replace must not be sent as false");
+            StringAssert.DoesNotContain("\"count\"", json, "An unset count must not be sent at all");
+            StringAssert.DoesNotContain("\"replace\"", json, "An unset replace must not be sent at all");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Equipment_SerializingEquipRequest_IncludesSetOptionalFields()
+        {
+            // Given
+            var request = new LootLockerEquipmentEquipRequest
+            {
+                entity_type = "player",
+                source_id = "01K9AAAAAAAAAAAAAAAAAAAAAA",
+                slot_id = "01K9BBBBBBBBBBBBBBBBBBBBBB",
+                inventory_id = "01K9DDDDDDDDDDDDDDDDDDDDDD",
+                count = 3,
+                replace = false
+            };
+
+            // When
+            var json = LootLockerJson.SerializeObject(request).Replace(" ", "");
+
+            // Then
+            StringAssert.Contains("\"count\":3", json);
+            StringAssert.Contains("\"replace\":false", json);
         }
     }
 }
