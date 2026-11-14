@@ -2743,6 +2743,156 @@ namespace LootLocker.Requests
 
         #endregion
 
+                #region Identity
+
+                /// @ingroup Identity
+                /// <summary>
+                /// Get the identity the current session is linked to, including the publisher it belongs to and, when
+                /// populated, the games it has been active in.
+                ///
+                /// The session must be linked to an identity; a session that is not is answered with 403.
+                /// </summary>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void GetIdentity(Action<LootLockerIdentityResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.GetIdentity(forPlayerWithUlid, onComplete);
+                }
+
+                /// @ingroup Identity
+                /// <summary>
+                /// Look up identities by id and/or by the games they have been active in. At least one of the two
+                /// filters must be supplied. Results are always scoped to the caller's publisher.
+                /// </summary>
+                /// <param name="request">The lookup request. See <see cref="LootLockerIdentityLookupRequest"/>.</param>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityLookupResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void LookupIdentities(LootLockerIdentityLookupRequest request, Action<LootLockerIdentityLookupResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityLookupResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    if (request == null || ((request.identity_ids == null || request.identity_ids.Length == 0) && (request.game_ids == null || request.game_ids.Length == 0)))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerIdentityLookupResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.LookupIdentities(forPlayerWithUlid, request, onComplete);
+                }
+
+                /// @ingroup Identity
+                /// <summary>
+                /// Record a provider credential against the identity of the current session, so a later session
+                /// presenting the same credential resolves to this identity instead of minting a second one.
+                ///
+                /// Linking is idempotent: a credential this identity already owns answers <c>created = false</c>. When
+                /// another identity in the publisher owns the credential the call answers 409 and links nothing; the
+                /// merge offer is surfaced on <see cref="LootLockerIdentityLinkResponse.conflict"/> and can be resolved
+                /// with <see cref="MergeIdentities"/>. LootLocker never links a credential across identities on the
+                /// player's behalf.
+                /// </summary>
+                /// <param name="request">The link request. See <see cref="LootLockerIdentityLinkRequest"/>.</param>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityLinkResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void LinkProvider(LootLockerIdentityLinkRequest request, Action<LootLockerIdentityLinkResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityLinkResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.LinkProvider(forPlayerWithUlid, request, onComplete);
+                }
+
+                /// @ingroup Identity
+                /// <summary>
+                /// Remove a provider credential from the current identity.
+                ///
+                /// The last remaining credential cannot be removed, because the identity would become unreachable; that
+                /// case is answered with 422.
+                /// </summary>
+                /// <param name="credentialId">The ULID of the credential to remove.</param>
+                /// <param name="onComplete">onComplete Action for handling the response</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void UnlinkProvider(string credentialId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.UnlinkProvider(forPlayerWithUlid, credentialId, onComplete);
+                }
+
+                /// @ingroup Identity
+                /// <summary>
+                /// See what merging another identity into the current one would resolve, without executing anything.
+                ///
+                /// Use it to show the player the games in which both identities have a live player before calling
+                /// <see cref="MergeIdentities"/>. An empty <c>player_conflicts</c> array means the merge needs no
+                /// choice. Both identities must belong to the same publisher.
+                /// </summary>
+                /// <param name="mergeIdentityId">The ULID of the identity to merge into the authenticated identity.</param>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityMergePreviewResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void PreviewIdentityMerge(string mergeIdentityId, Action<LootLockerIdentityMergePreviewResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityMergePreviewResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    if (string.IsNullOrEmpty(mergeIdentityId))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerIdentityMergePreviewResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.PreviewIdentityMerge(forPlayerWithUlid, new LootLockerIdentityMergePreviewRequest { merge_identity_id = mergeIdentityId }, onComplete);
+                }
+
+                /// @ingroup Identity
+                /// <summary>
+                /// Merge another identity into the current one, keeping the current identity.
+                ///
+                /// The merged identity is tombstoned, its credentials and player links move to the kept identity, and
+                /// its sessions are revoked. Every game in which both identities have a live player must carry a
+                /// resolution naming the player to keep; the other player of that game is soft-deleted. A missing or
+                /// invalid resolution answers 400 and writes nothing.
+                ///
+                /// This is destructive and never runs automatically. Get the conflicts from
+                /// <see cref="PreviewIdentityMerge"/> (or from the conflict of <see cref="LinkProvider"/>) and let the
+                /// player choose.
+                /// </summary>
+                /// <param name="request">The merge request. See <see cref="LootLockerIdentityMergeRequest"/>.</param>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityMergeResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void MergeIdentities(LootLockerIdentityMergeRequest request, Action<LootLockerIdentityMergeResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityMergeResponse>(forPlayerWithUlid));
+                        return;
+                    }
+
+                    LootLockerAPIManager.MergeIdentities(forPlayerWithUlid, request, onComplete);
+                }
+
+                #endregion
+
         #region Remote Sessions
 
         /// @ingroup RemoteSessions
