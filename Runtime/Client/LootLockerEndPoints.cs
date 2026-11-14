@@ -34,6 +34,16 @@ namespace LootLocker
         public static EndPointClass attachRemoteSessionToAccount = new EndPointClass("v1/connected-accounts/attach", LootLockerHTTPMethod.PUT);
         public static EndPointClass transferProvidersBetweenAccountsEndpoint = new EndPointClass("v1/connected-accounts/transfer-providers", LootLockerHTTPMethod.PUT);
 
+                // Identity
+                // The identity surface is served from the domain root, not from /game, so these use the Base role.
+                [Header("Identity")]
+                public static EndPointClass getIdentity = new EndPointClass("identity/v1", LootLockerHTTPMethod.GET, LootLockerEnums.LootLockerCallerRole.Base);
+                public static EndPointClass lookupIdentities = new EndPointClass("identity/v1/lookup", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+                public static EndPointClass linkIdentityProvider = new EndPointClass("identity/v1/link", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+                public static EndPointClass unlinkIdentityProvider = new EndPointClass("identity/v1/link/{0}", LootLockerHTTPMethod.DELETE, LootLockerEnums.LootLockerCallerRole.Base);
+                public static EndPointClass previewIdentityMerge = new EndPointClass("identity/v1/merge/preview", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+                public static EndPointClass mergeIdentities = new EndPointClass("identity/v1/merge", LootLockerHTTPMethod.POST, LootLockerEnums.LootLockerCallerRole.Base);
+
         // Remote Sessions
         [Header("Remote Sessions")]
         public static EndPointClass leaseRemoteSession = new EndPointClass("session/remote/lease", LootLockerHTTPMethod.POST);
