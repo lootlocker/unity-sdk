@@ -91,6 +91,19 @@
 // Top-level: Presence & Social
 // ---------------------------------------------------------------------------
 
+/// @defgroup Identity Identity
+/// @brief Work with the cross-game identity behind a player's sessions.
+///
+/// An identity is the human behind one or more player accounts in a publisher, shared
+/// across every game that publisher owns. Use the identity methods to read the identity a
+/// session is linked to, look identities up, record a provider credential against an
+/// identity, and preview or execute a merge of two identities that turn out to belong to
+/// the same person.
+///
+/// Merging is destructive and never happens automatically: LootLocker returns the games in
+/// which both identities have a live player and the calling code must choose which player
+/// to keep in each.
+
 /// @defgroup Presence Presence
 /// @brief Track when and how players are active across all platforms in real time.
 ///
