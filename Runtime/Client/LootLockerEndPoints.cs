@@ -381,6 +381,12 @@ namespace LootLocker
         public static EndPointClass completePlaytestOnboarding = new EndPointClass("playtests/{0}/complete", LootLockerHTTPMethod.POST);
         public static EndPointClass acknowledgePlaytestDocument = new EndPointClass("playtests/{0}/documents/{1}/acknowledge", LootLockerHTTPMethod.POST);
 
+        // Surveys
+        [Header("Surveys")]
+        public static EndPointClass listSurveys = new EndPointClass("surveys/v1", LootLockerHTTPMethod.GET);
+        public static EndPointClass getSurvey = new EndPointClass("surveys/v1/{0}", LootLockerHTTPMethod.GET);
+        public static EndPointClass completeSurvey = new EndPointClass("surveys/v1/{0}/complete", LootLockerHTTPMethod.POST);
+
         // Items
         [Header("Items")]
         public static EndPointClass listItemTemplates = new EndPointClass("player/inventory/v1", LootLockerHTTPMethod.GET);
