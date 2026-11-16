@@ -187,6 +187,19 @@ namespace LootLocker.Requests
             // Omit the flag entirely when false so the server default applies under both JSON backends.
             return include_game_activity;
         }
+
+        public bool ShouldSerializeidentity_ids()
+        {
+            // Omit the array entirely when unset. Only ZeroDep skips nulls, so without this Newtonsoft would
+            // send "identity_ids": null, which the request contract says is unset.
+            return identity_ids != null;
+        }
+
+        public bool ShouldSerializegame_ids()
+        {
+            // Omit the array entirely when unset, for the same reason as identity_ids.
+            return game_ids != null;
+        }
     }
 
     /// <summary>
@@ -378,24 +391,30 @@ namespace LootLocker
             var endPoint = LootLockerEndPoints.lookupIdentities;
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, LootLockerJson.SerializeObject(request), (serverResponse) =>
             {
-                // The lookup answers with a bare JSON array of identities on success, which cannot be mapped onto
-                // a response object, so the array is deserialized separately and carried on the response.
+                // The lookup answers with a bare JSON array of identities, which cannot be deserialized into a
+                // response object: Newtonsoft throws and ZeroDep rejects the shape. The response is therefore
+                // built from the transport metadata and only the array is parsed from the body.
                 if (serverResponse == null)
                 {
                     onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerIdentityLookupResponse>("Unknown error, please check your internet connection.", forPlayerWithUlid));
                     return;
                 }
 
-                if (!serverResponse.success)
+                var response = new LootLockerIdentityLookupResponse
                 {
-                    onComplete?.Invoke(LootLockerResponse.Deserialize<LootLockerIdentityLookupResponse>(serverResponse));
-                    return;
-                }
+                    success = serverResponse.success,
+                    statusCode = serverResponse.statusCode,
+                    text = serverResponse.text,
+                    errorData = serverResponse.errorData,
+                    requestContext = serverResponse.requestContext,
+                    EventId = serverResponse.EventId,
+                    identities = new LootLockerIdentity[0]
+                };
 
-                var response = LootLockerResponse.Deserialize<LootLockerIdentityLookupResponse>(serverResponse);
-                response.identities = string.IsNullOrEmpty(serverResponse.text)
-                    ? new LootLockerIdentity[0]
-                    : LootLockerJson.DeserializeObjectArray<LootLockerIdentity>(serverResponse.text);
+                if (response.success && !string.IsNullOrEmpty(serverResponse.text))
+                {
+                    response.identities = LootLockerJson.DeserializeObjectArray<LootLockerIdentity>(serverResponse.text);
+                }
 
                 onComplete?.Invoke(response);
             }, callerRole: endPoint.callerRole);

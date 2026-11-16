@@ -136,6 +136,37 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingLookupArray_MapsIdentities()
+        {
+            // Given: the lookup answers with a bare JSON array, not an object, so it must be parsed as an array.
+            const string json = "[{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[]},{\"id\":\"01K8Q3V6ZC9S2W4G7K3M8X0BQR\",\"publisher_id\":42,\"created_at\":\"2026-10-20T08:15:00Z\",\"game_activity\":[]}]";
+
+            // When
+            var identities = LootLockerJson.DeserializeObjectArray<LootLockerIdentity>(json);
+
+            // Then
+            Assert.IsNotNull(identities);
+            Assert.AreEqual(2, identities.Length);
+            Assert.AreEqual("01K8Q3KH8N4R2V6W3Z0P5M9XDT", identities[0].id);
+            Assert.AreEqual(42, identities[0].publisher_id);
+            Assert.AreEqual("01K8Q3V6ZC9S2W4G7K3M8X0BQR", identities[1].id);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingLookupArray_HandlesEmptyArray()
+        {
+            // Given
+            const string json = "[]";
+
+            // When
+            var identities = LootLockerJson.DeserializeObjectArray<LootLockerIdentity>(json);
+
+            // Then
+            Assert.IsNotNull(identities);
+            Assert.AreEqual(0, identities.Length);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Identity_ProviderEnumMemberNames_MatchBackendPlatformSlugs()
         {
             // Given/When/Then: the enum member name is the wire value, so these must not drift from the
