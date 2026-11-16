@@ -10092,6 +10092,21 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListEntitlements(int count, string after, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
+            ListEntitlements(count, after, (string[])null, onComplete, forPlayerWithUlid);
+        }
+
+        /// @ingroup Entitlements
+        /// <summary>
+        /// List this player's historical entitlements, optionally limited to entitlements that contain any of the given catalog listings
+        /// Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards)
+        /// </summary>
+        /// <param name="count">Optional: Amount of historical entries to fetch</param>
+        /// <param name="after">Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</param>
+        /// <param name="catalogListingIds">Optional: Only return entitlements that contain an item belonging to any of these catalog listings. Pass null or an empty array to return entitlements regardless of catalog listing.</param>
+        /// <param name="onComplete">onComplete Action for handling the response</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListEntitlements(int count, string after, string[] catalogListingIds, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
+        {
             if (!CheckInitialized(false, forPlayerWithUlid))
             {
                 onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerEntitlementHistoryResponse>(forPlayerWithUlid));
@@ -10105,6 +10120,13 @@ namespace LootLocker.Requests
                 queryParams.Add("per_page", count);
             if (!string.IsNullOrEmpty(after))
                 queryParams.Add("cursor", after);
+            if (catalogListingIds != null)
+            {
+                foreach (string catalogListingId in catalogListingIds)
+                {
+                    queryParams.Add("catalog_listing_id", catalogListingId);
+                }
+            }
 
             endpoint += queryParams.Build();
 
@@ -10127,7 +10149,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListEntitlements(int count, Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListEntitlements(count, null, onComplete, forPlayerWithUlid);
+            ListEntitlements(count, (string)null, onComplete, forPlayerWithUlid);
         }
 
         /// @ingroup Entitlements
@@ -10152,7 +10174,7 @@ namespace LootLocker.Requests
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void ListEntitlements(Action<LootLockerEntitlementHistoryResponse> onComplete, string forPlayerWithUlid = null)
         {
-            ListEntitlements(-1, null, onComplete, forPlayerWithUlid);
+            ListEntitlements(-1, (string)null, onComplete, forPlayerWithUlid);
         }
 
         /// @ingroup Entitlements
