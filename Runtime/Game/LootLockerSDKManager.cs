@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9320,6 +9320,67 @@ namespace LootLocker.Requests
             }
 
             PerformMetadataOperations(LootLockerMetadataSources.self, "self", operations, onComplete, forPlayerWithUlid);
+        }
+
+        #endregion
+
+        #region Surveys
+
+        /// @ingroup Surveys
+        /// <summary>
+        /// Lists the standalone surveys the current player can see, filtered by each survey's segments.
+        /// Non-standalone surveys are playtest-only and are never returned here.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListSurveysResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListSurveys(Action<LootLockerListSurveysResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerListSurveysResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListSurveys(forPlayerWithUlid, onComplete);
+        }
+
+        /// @ingroup Surveys
+        /// <summary>
+        /// Returns a single standalone survey and its questions, if the current player meets the survey's segments.
+        /// </summary>
+        /// <param name="surveyId">The ULID of the survey to fetch</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetSurveyResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetSurvey(string surveyId, Action<LootLockerGetSurveyResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerGetSurveyResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetSurvey(forPlayerWithUlid, surveyId, onComplete);
+        }
+
+        /// @ingroup Surveys
+        /// <summary>
+        /// Records a completion of the given survey for the current player.
+        ///
+        /// Answers are submitted separately through the player metadata API using each question's metadata_key.
+        /// The request fails when a required question has no stored answer.
+        /// </summary>
+        /// <param name="surveyId">The ULID of the survey to complete</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCompleteSurveyResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CompleteSurvey(string surveyId, Action<LootLockerCompleteSurveyResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCompleteSurveyResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.CompleteSurvey(forPlayerWithUlid, surveyId, onComplete);
         }
 
         #endregion
