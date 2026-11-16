@@ -594,5 +594,54 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(LootLockerRefundInventoryEventAction.removed, assetEvent.action,
                 "Expected the asset to be removed from inventory as part of the refund");
         }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Entitlements_ListFilteredByCatalogListingId_ReturnsOnlyMatchingEntitlements()
+        {
+            Assert.IsFalse(SetupFailed, "Setup failed, see logs for details");
+
+            // Given: a completed purchase of the asset catalog listing only
+            LootLockerAsyncPurchaseStatusResponse purchaseCompleted = null;
+            LootLockerSDKManager.InitiateAndPollAsyncPurchaseSingleCatalogItem(
+                walletId,
+                assetCatalogListingId,
+                1,
+                onStatusUpdate: null,
+                onComplete: r => purchaseCompleted = r);
+            yield return new WaitUntil(() => purchaseCompleted != null);
+
+            Assert.IsTrue(purchaseCompleted.success,
+                $"Purchase polling failed: {purchaseCompleted.errorData?.message}");
+            Assert.AreEqual(LootLockerAsyncPurchaseStatus.active, purchaseCompleted.status,
+                $"Expected purchase to be 'active', got '{purchaseCompleted.status}': {purchaseCompleted.error}");
+
+            // When: listing entitlements filtered by the purchased catalog listing
+            LootLockerEntitlementHistoryResponse filteredResponse = null;
+            LootLockerSDKManager.ListEntitlements(-1, null, new[] { assetCatalogListingId }, r => filteredResponse = r);
+            yield return new WaitUntil(() => filteredResponse != null);
+
+            // Then: the purchase is returned
+            Assert.IsTrue(filteredResponse.success,
+                $"ListEntitlements with catalog_listing_id failed: {filteredResponse.errorData?.message}");
+            Assert.IsNotNull(filteredResponse.Listings, "Expected listings to be present");
+            Assert.IsTrue(
+                filteredResponse.Listings.Any(l => l.Id == purchaseCompleted.entitlement_id),
+                "Expected the entitlement for the purchased catalog listing to be returned");
+
+            // When: listing entitlements filtered by a catalog listing that was never purchased
+            LootLockerEntitlementHistoryResponse unmatchedResponse = null;
+            LootLockerSDKManager.ListEntitlements(-1, null, new[] { currencyCatalogListingId }, r => unmatchedResponse = r);
+            yield return new WaitUntil(() => unmatchedResponse != null);
+
+            // Then: the asset purchase is not returned. The endpoint answers 404 when nothing matches.
+            Assert.IsFalse(
+                unmatchedResponse.Listings?.Any(l => l.Id == purchaseCompleted.entitlement_id) == true,
+                "Expected the asset entitlement to be excluded when filtering by an unrelated catalog listing");
+            if (!unmatchedResponse.success)
+            {
+                Assert.AreEqual(404, unmatchedResponse.statusCode,
+                    $"Expected 404 when no entitlements match the filter, got {unmatchedResponse.statusCode}: {unmatchedResponse.errorData?.message}");
+            }
+        }
     }
 }
