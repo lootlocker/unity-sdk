@@ -98,6 +98,8 @@ namespace LootLockerTests.PlayMode
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Surveys_ListSurveys_ReturnsStandaloneSurveyWithQuestions()
         {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
             // Given
             bool signInCompleted = false;
             LootLockerSDKManager.StartGuestSession("Survey-Player-1", response => { signInCompleted = true; });
@@ -141,6 +143,8 @@ namespace LootLockerTests.PlayMode
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Surveys_GetSurvey_ReturnsSurveyWithQuestions()
         {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
             // Given
             bool signInCompleted = false;
             LootLockerSDKManager.StartGuestSession("Survey-Player-2", response => { signInCompleted = true; });
@@ -177,6 +181,8 @@ namespace LootLockerTests.PlayMode
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Surveys_CompleteSurvey_WithoutRequiredAnswer_Fails()
         {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
             // Given
             bool signInCompleted = false;
             LootLockerSDKManager.StartGuestSession("Survey-Player-3", response => { signInCompleted = true; });
@@ -209,6 +215,8 @@ namespace LootLockerTests.PlayMode
         [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public IEnumerator Surveys_CompleteSurvey_WithRequiredAnswer_SucceedsAndMarksCompleted()
         {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
             // Given
             bool signInCompleted = false;
             string playerUlid = null;
