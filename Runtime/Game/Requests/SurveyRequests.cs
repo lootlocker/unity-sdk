@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
