@@ -149,6 +149,20 @@
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/players/equipment/overview).
 
+/// @defgroup Referrals Referrals
+/// @brief Invite friends with a referral code and track the referrals you have made.
+///
+/// A publisher defines referral programs in the Web Console, each with a
+/// qualifying action and a reward for the referrer and optionally for the
+/// referee. Every player has a referral code, which is their public UID. An
+/// invited player redeems it by supplying it as \c referral_code in the session
+/// optionals when starting their first session; returning players are ignored.
+/// The referral is then \c claimed until the qualifying action happens, at which
+/// point it becomes \c qualified and the rewards are granted. A program may cap
+/// how many referrals a single player is rewarded for.
+///
+/// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/referrals).
+
 /// @defgroup PlayerFiles Player Files
 /// @brief CDN-backed file storage scoped to a player's profile.
 ///

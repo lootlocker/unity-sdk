@@ -10548,6 +10548,49 @@ namespace LootLocker.Requests
         }
         #endregion
 
+        #region Referrals
+
+        /// @ingroup Referrals
+        /// <summary>
+        /// Get the calling player's referral code and their rewarded-referral count against each active
+        /// program's cap. Use this to render an invite-a-friend screen: share the code, and have the invited
+        /// player supply it as <see cref="LootLockerSessionOptionals.referral_code"/> when starting their
+        /// first session.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReferralInviteResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetReferralInvite(Action<LootLockerReferralInviteResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReferralInviteResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetReferralInvite(forPlayerWithUlid, onComplete);
+        }
+
+        /// @ingroup Referrals
+        /// <summary>
+        /// List the calling player's own referrals, newest first, including ones still pending their
+        /// qualifying action. Session-scoped: the player and game come from the session token.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerReferralListResponse</param>
+        /// <param name="page">Optional : 1-based page of referrals. Defaults to the first page.</param>
+        /// <param name="perPage">Optional : Number of referrals per page, 1-200. Defaults to the server default of 10.</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void ListMyReferrals(Action<LootLockerReferralListResponse> onComplete, int page = 0, int perPage = 0, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerReferralListResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.ListMyReferrals(forPlayerWithUlid, page, perPage, onComplete);
+        }
+        #endregion
+
         #region Equipment
 
         /// @ingroup Equipment
