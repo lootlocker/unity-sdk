@@ -496,6 +496,41 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, deserialized.pagination.total, "Wrong pagination total");
         }
 
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingCheckDLCsResponse_Succeeds()
+        {
+            // Given
+            const string checkDLCsResponse =
+                "{\"success\":true,\"dlcs\":[{\"catalog_item_id\":\"01JCX8Q9Z3K7M2N4P6R8T0V2WX\",\"dlc_identifier\":\"123456\",\"platform\":\"steam\",\"entitlement_id\":\"01JCX8Q9Z3K7M2N4P6R8T0V2WY\"}]}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerCheckDLCsResponse>(checkDLCsResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsNotNull(deserialized.dlcs, "Not deserialized, dlcs is null");
+            Assert.AreEqual(1, deserialized.dlcs.Length, "Not deserialized, wrong number of dlcs");
+            Assert.AreEqual("01JCX8Q9Z3K7M2N4P6R8T0V2WX", deserialized.dlcs[0].catalog_item_id, "Wrong catalog item id");
+            Assert.AreEqual("123456", deserialized.dlcs[0].dlc_identifier, "Wrong dlc identifier");
+            Assert.AreEqual("steam", deserialized.dlcs[0].platform, "Wrong platform");
+            Assert.AreEqual("01JCX8Q9Z3K7M2N4P6R8T0V2WY", deserialized.dlcs[0].entitlement_id, "Wrong entitlement id");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Json_DeserializingCheckDLCsResponseWithNoDLCs_Succeeds()
+        {
+            // Given
+            const string checkDLCsResponse = "{\"success\":true,\"dlcs\":[]}";
+
+            // When
+            var deserialized = LootLockerJson.DeserializeObject<LootLockerCheckDLCsResponse>(checkDLCsResponse);
+
+            // Then
+            Assert.IsNotNull(deserialized, "Not deserialized, is null");
+            Assert.IsNotNull(deserialized.dlcs, "Not deserialized, dlcs is null");
+            Assert.AreEqual(0, deserialized.dlcs.Length, "Wrong number of dlcs");
+        }
+
         /// <summary>
         /// Guards the contract that deserialization populates every member, not just the ones
         /// the linker happens to keep. When managed code stripping removes property setters,
