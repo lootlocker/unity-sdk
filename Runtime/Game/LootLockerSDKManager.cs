@@ -9492,8 +9492,7 @@ namespace LootLocker.Requests
 
         /// @ingroup Surveys
         /// <summary>
-        /// Lists the standalone surveys the current player can see, filtered by each survey's segments.
-        /// Non-standalone surveys are playtest-only and are never returned here.
+        /// Lists the surveys the current player can see, filtered by each survey's segments.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerListSurveysResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
@@ -9505,12 +9504,14 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ListSurveys(forPlayerWithUlid, onComplete);
+            EndPointClass endPoint = LootLockerEndPoints.listSurveys;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// @ingroup Surveys
         /// <summary>
-        /// Returns a single standalone survey and its questions, if the current player meets the survey's segments.
+        /// Returns a single survey and its questions, if the current player meets the survey's segments.
         /// </summary>
         /// <param name="surveyId">The ULID of the survey to fetch</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerGetSurveyResponse</param>
@@ -9523,15 +9524,23 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetSurvey(forPlayerWithUlid, surveyId, onComplete);
+            if (string.IsNullOrEmpty(surveyId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetSurveyResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.getSurvey;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(surveyId), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// @ingroup Surveys
         /// <summary>
         /// Records a completion of the given survey for the current player.
         ///
-        /// Answers are submitted separately through the player metadata API using each question's metadata_key.
-        /// The request fails when a required question has no stored answer.
+        /// Answers are submitted separately through SubmitSurveyAnswers (or the player metadata API) using each
+        /// question's metadata_key. The request fails when a required question has no stored answer.
         /// </summary>
         /// <param name="surveyId">The ULID of the survey to complete</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCompleteSurveyResponse</param>
@@ -9544,7 +9553,60 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.CompleteSurvey(forPlayerWithUlid, surveyId, onComplete);
+            if (string.IsNullOrEmpty(surveyId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCompleteSurveyResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.completeSurvey;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(surveyId), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// @ingroup Surveys
+        /// <summary>
+        /// Submits answers to a survey for the current player.
+        ///
+        /// Survey answers are stored as player metadata, so this writes each answer to the player's own metadata
+        /// under the question's metadata_key. Call CompleteSurvey afterwards to record the completion.
+        /// </summary>
+        /// <param name="answers">The answers to submit, one per question</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetadataOperationsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubmitSurveyAnswers(LootLockerSurveyAnswer[] answers, Action<LootLockerMetadataOperationsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (answers == null || answers.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerMetadataOperationsResponse>("No survey answers were supplied", forPlayerWithUlid));
+                return;
+            }
+
+            var operations = new List<LootLockerMetadataOperation>(answers.Length);
+            foreach (var answer in answers)
+            {
+                if (answer == null || string.IsNullOrEmpty(answer.metadata_key))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerMetadataOperationsResponse>("Every survey answer needs a metadata_key", forPlayerWithUlid));
+                    return;
+                }
+
+                operations.Add(new LootLockerMetadataOperation
+                {
+                    key = answer.metadata_key,
+                    value = answer.value,
+                    type = answer.type,
+                    action = LootLockerMetadataActions.create_or_update
+                });
+            }
+
+            PerformMetadataOperations(LootLockerMetadataSources.self, "self", operations, onComplete, forPlayerWithUlid);
         }
 
         #endregion

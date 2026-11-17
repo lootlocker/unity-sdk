@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using LootLocker.Requests;
 
 namespace LootLocker.Requests
 {
@@ -57,7 +55,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// When the question was created
         /// </summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
         /// <summary>
         /// When true, answers for this question's metadata_key are masked in game metadata reads.
@@ -76,25 +74,14 @@ namespace LootLocker.Requests
         public string id { get; set; }
 
         /// <summary>
-        /// The legacy id of the game this survey belongs to
-        /// </summary>
-        public long game_id { get; set; }
-
-        /// <summary>
         /// The name of the survey
         /// </summary>
         public string name { get; set; }
 
         /// <summary>
-        /// Whether this survey is standalone (listed and completable through the Game API).
-        /// Non-standalone surveys are playtest-only and never returned by these endpoints.
-        /// </summary>
-        public bool standalone { get; set; }
-
-        /// <summary>
         /// When the survey was created
         /// </summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
         /// <summary>
         /// Whether the current player has already completed this survey.
@@ -103,15 +90,37 @@ namespace LootLocker.Requests
         public bool completed { get; set; }
 
         /// <summary>
-        /// When the current player completed this survey, as an RFC 3339 timestamp.
-        /// Empty when the survey has not been completed. Only populated by ListSurveys.
+        /// When the current player completed this survey.
+        /// Default (DateTime.MinValue) when the survey has not been completed.
+        /// Only populated by ListSurveys.
         /// </summary>
-        public string completed_at { get; set; }
+        public DateTime completed_at { get; set; }
 
         /// <summary>
         /// The questions in this survey, ordered by sort_order
         /// </summary>
         public LootLockerSurveyQuestion[] questions { get; set; }
+    }
+
+    /// <summary>
+    /// A single answer to a survey question, submitted through SubmitSurveyAnswers.
+    /// </summary>
+    public class LootLockerSurveyAnswer
+    {
+        /// <summary>
+        /// The metadata_key of the question this answers
+        /// </summary>
+        public string metadata_key { get; set; }
+
+        /// <summary>
+        /// The answer value. Pass it as its native C# type (string, int, bool, etc.) and set type to match.
+        /// </summary>
+        public object value { get; set; }
+
+        /// <summary>
+        /// The metadata type of the value. Defaults to String.
+        /// </summary>
+        public LootLockerMetadataTypes type { get; set; } = LootLockerMetadataTypes.String;
     }
 
     //==================================================
@@ -140,24 +149,14 @@ namespace LootLocker.Requests
         public string id { get; set; }
 
         /// <summary>
-        /// The legacy id of the game this survey belongs to
-        /// </summary>
-        public long game_id { get; set; }
-
-        /// <summary>
         /// The name of the survey
         /// </summary>
         public string name { get; set; }
 
         /// <summary>
-        /// Whether this survey is standalone (listed and completable through the Game API)
-        /// </summary>
-        public bool standalone { get; set; }
-
-        /// <summary>
         /// When the survey was created
         /// </summary>
-        public string created_at { get; set; }
+        public DateTime created_at { get; set; }
 
         /// <summary>
         /// The questions in this survey, ordered by sort_order
@@ -171,57 +170,19 @@ namespace LootLocker.Requests
     public class LootLockerCompleteSurveyResponse : LootLockerResponse
     {
         /// <summary>
-        /// Whether the survey is now completed
+        /// Whether the survey is now completed. A successful response always reports true;
+        /// failures (for example an unanswered required question) are returned as an error response instead.
         /// </summary>
         public bool complete { get; set; }
 
         /// <summary>
-        /// When the survey was completed, as an RFC 3339 timestamp
+        /// When the survey was completed
         /// </summary>
-        public string completed_at { get; set; }
+        public DateTime completed_at { get; set; }
 
         /// <summary>
         /// The unique identifier of the completed survey
         /// </summary>
         public string survey_id { get; set; }
-    }
-}
-
-namespace LootLocker
-{
-    public partial class LootLockerAPIManager
-    {
-        public static void ListSurveys(string forPlayerWithUlid, Action<LootLockerListSurveysResponse> onComplete)
-        {
-            EndPointClass endPoint = LootLockerEndPoints.listSurveys;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void GetSurvey(string forPlayerWithUlid, string surveyId, Action<LootLockerGetSurveyResponse> onComplete)
-        {
-            if (string.IsNullOrEmpty(surveyId))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerGetSurveyResponse>(forPlayerWithUlid));
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.getSurvey;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(surveyId), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void CompleteSurvey(string forPlayerWithUlid, string surveyId, Action<LootLockerCompleteSurveyResponse> onComplete)
-        {
-            if (string.IsNullOrEmpty(surveyId))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCompleteSurveyResponse>(forPlayerWithUlid));
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.completeSurvey;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(surveyId), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
     }
 }
