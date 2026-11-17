@@ -3734,6 +3734,31 @@ namespace LootLocker.Requests
 
         /// @ingroup Player
         /// <summary>
+        /// Reconciles the player's platform-owned DLCs and returns the DLCs they currently hold.
+        ///
+        /// Ownership is verified server-side against the player's linked platform account (Meta or Steam), so the client cannot grant itself DLCs. Missing DLCs are granted and DLCs the player no longer owns are revoked.
+        ///
+        /// Reconciliation is serialized per player. If another reconciliation for the same player is already in flight this call does not reconcile and returns the player's current DLC list as-is, which may be slightly stale. Call it again shortly afterwards for an up-to-date list.
+        ///
+        /// Only Meta or Steam accounts support DLC checks. If the player has no linked account for the session's platform, or the platform is not supported, the request fails with a 400 status code.
+        /// </summary>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCheckDLCsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CheckDLCs(Action<LootLockerCheckDLCsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCheckDLCsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            var endPoint = LootLockerEndPoints.checkDLCs;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// @ingroup Player
+        /// <summary>
         /// Set the players profile to be private. This means that their inventory will not be displayed publicly on Steam and other places.
         /// </summary>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerStandardResponse</param>
