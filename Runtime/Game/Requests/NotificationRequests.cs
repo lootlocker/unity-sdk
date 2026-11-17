@@ -38,7 +38,8 @@ namespace LootLocker.LootLockerEnums
         leaderboard_reward = 13,
         reward_campaign = 14,
         rewards_grant = 15,
-        unknown = 16,
+        referral = 16,
+        unknown = 17,
     };
 
     /// <summary>
@@ -88,6 +89,7 @@ namespace LootLocker.LootLockerStaticStrings
         public static readonly string LeaderboardReward = "leaderboard.reward";
         public static readonly string RewardCampaign = "reward_campaign";
         public static readonly string RewardsGrant = "rewards.grant";
+        public static readonly string Referral = "referral";
         /// <summary>
         /// Not a source emitted by the backend. Used as the SourceEnum value for notifications whose source string the SDK does not recognise.
         /// </summary>
@@ -1052,6 +1054,11 @@ namespace LootLocker.Requests
                 {
                     notification.SourceEnum = LootLockerNotificationSource.rewards_grant;
                     identifyingKey = LootLockerStaticStrings.LootLockerStandardContextKeys.RewardsGrant.ItemTemplateId;
+                }
+                else if (notification.Source.Equals(LootLockerStaticStrings.LootLockerNotificationSources.Referral, StringComparison.OrdinalIgnoreCase))
+                {
+                    notification.SourceEnum = LootLockerNotificationSource.referral;
+                    identifyingKey = notification.Notification_type;
                 }
                 else
                 {

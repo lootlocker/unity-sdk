@@ -29,6 +29,15 @@ namespace LootLocker.Requests
         /// Defaults to false, in which case DLC ownership is only reconciled if the player already has DLC entitlements.
         /// </summary>
         public bool check_dlc { get; set; } = false;
+        /// <summary>
+        /// The referral code of the player who invited this player, which is the referrer's public UID.
+        /// Supply this when starting a first session to attribute the referral. Ignored for returning players.
+        /// </summary>
+        public string referral_code { get; set; } = null;
+        /// <summary>
+        /// The key of the referral program the code redeems. Omit when the game has a single active program.
+        /// </summary>
+        public string referral_program_key { get; set; } = null;
     }
 
     public class LootLockerSteamSessionRequest
