@@ -351,6 +351,11 @@ namespace LootLocker
         [Header("Presence")]
         public static EndPointClass presenceWebSocket = new EndPointClass("presence/v1", LootLockerHTTPMethod.GET);
 
+        // Referrals
+        [Header("Referrals")]
+        public static EndPointClass getReferralInvite = new EndPointClass("referrals/v1", LootLockerHTTPMethod.GET);
+        public static EndPointClass listMyReferrals = new EndPointClass("referrals/v1/referrals", LootLockerHTTPMethod.GET);
+
         // Equipment
         [Header("Equipment")]
         public static EndPointClass getEquipmentLoadout = new EndPointClass("player/equipment/v1", LootLockerHTTPMethod.GET);
