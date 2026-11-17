@@ -369,6 +369,10 @@ namespace LootLocker
         public static EndPointClass consumePlayerInventoryItem = new EndPointClass("player/inventory/v1/{0}/consume", LootLockerHTTPMethod.POST);
         public static EndPointClass splitPlayerInventoryItemStack = new EndPointClass("player/inventory/v1/{0}/split", LootLockerHTTPMethod.POST);
         public static EndPointClass mergePlayerInventoryItemStacks = new EndPointClass("player/inventory/v1/merge", LootLockerHTTPMethod.POST);
+
+        // DLCs
+        [Header("DLCs")]
+        public static EndPointClass checkDLCs = new EndPointClass("dlcs/v1/check", LootLockerHTTPMethod.POST);
     }
 
     [Serializable]
