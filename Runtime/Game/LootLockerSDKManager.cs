@@ -9154,6 +9154,74 @@ namespace LootLocker.Requests
 
         #endregion
 
+        #region Playtests
+
+        /// @ingroup Playtests
+        /// <summary>
+        /// Get the calling player's onboarding progress for an active playtest: whether they completed it,
+        /// the documents they acknowledged, and the answers stored to player metadata.
+        /// </summary>
+        /// <param name="subdomain">The playtest's public subdomain.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerPlaytestOnboardingStatusResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void GetPlaytestOnboardingStatus(string subdomain, Action<LootLockerPlaytestOnboardingStatusResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerPlaytestOnboardingStatusResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.GetPlaytestOnboardingStatus(forPlayerWithUlid, subdomain, onComplete);
+        }
+
+        /// @ingroup Playtests
+        /// <summary>
+        /// Complete onboarding for the calling player.
+        ///
+        /// Answers are submitted separately through the player metadata API using each question's
+        /// metadata_key. The request fails when a required answer is missing or a required document is
+        /// not acknowledged at its current content hash.
+        /// </summary>
+        /// <param name="subdomain">The playtest's public subdomain.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCompletePlaytestOnboardingResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void CompletePlaytestOnboarding(string subdomain, Action<LootLockerCompletePlaytestOnboardingResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerCompletePlaytestOnboardingResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.CompletePlaytestOnboarding(forPlayerWithUlid, subdomain, onComplete);
+        }
+
+        /// @ingroup Playtests
+        /// <summary>
+        /// Record that the calling player acknowledged a playtest document at its current content hash.
+        ///
+        /// When the document has statements, send every statement id. Pass null for the request for
+        /// documents without statements, where the body is optional.
+        /// </summary>
+        /// <param name="subdomain">The playtest's public subdomain.</param>
+        /// <param name="documentId">The ULID of the document to acknowledge.</param>
+        /// <param name="request">The acknowledge request, or null for a document without statements. See <see cref="LootLockerAcknowledgePlaytestDocumentRequest"/>.</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAcknowledgePlaytestDocumentResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void AcknowledgePlaytestDocument(string subdomain, string documentId, LootLockerAcknowledgePlaytestDocumentRequest request, Action<LootLockerAcknowledgePlaytestDocumentResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerAcknowledgePlaytestDocumentResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            LootLockerAPIManager.AcknowledgePlaytestDocument(forPlayerWithUlid, subdomain, documentId, request, onComplete);
+        }
+
+        #endregion
+
         #region Friends
         /// @ingroup Friends
         /// <summary>

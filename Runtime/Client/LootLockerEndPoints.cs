@@ -360,6 +360,12 @@ namespace LootLocker
         public static EndPointClass equipToEquipmentSlot = new EndPointClass("player/equipment/v1/equip", LootLockerHTTPMethod.POST);
         public static EndPointClass unequipFromEquipmentSlot = new EndPointClass("player/equipment/v1/equip/{0}", LootLockerHTTPMethod.DELETE);
 
+        // Playtests
+        [Header("Playtests")]
+        public static EndPointClass getPlaytestOnboardingStatus = new EndPointClass("playtests/{0}/status", LootLockerHTTPMethod.GET);
+        public static EndPointClass completePlaytestOnboarding = new EndPointClass("playtests/{0}/complete", LootLockerHTTPMethod.POST);
+        public static EndPointClass acknowledgePlaytestDocument = new EndPointClass("playtests/{0}/documents/{1}/acknowledge", LootLockerHTTPMethod.POST);
+
         // Items
         [Header("Items")]
         public static EndPointClass listItemTemplates = new EndPointClass("player/inventory/v1", LootLockerHTTPMethod.GET);
