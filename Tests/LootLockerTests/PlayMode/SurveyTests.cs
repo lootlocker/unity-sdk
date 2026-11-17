@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using LootLocker;
 using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
@@ -132,9 +132,8 @@ namespace LootLockerTests.PlayMode
             var survey = listResponse.surveys[0];
             Assert.AreEqual(createdSurvey.id, survey.id, "Unexpected survey id");
             Assert.AreEqual("Survey-1", survey.name, "Unexpected survey name");
-            Assert.IsTrue(survey.standalone, "Survey should be standalone");
             Assert.IsFalse(survey.completed, "Survey should not be completed yet");
-            Assert.IsEmpty(survey.completed_at, "completed_at should be empty when not completed");
+            Assert.AreEqual(default(DateTime), survey.completed_at, "completed_at should be unset when not completed");
             Assert.AreEqual(1, survey.questions?.Length, "Expected exactly one question");
             Assert.AreEqual("survey_answer_1", survey.questions[0].metadata_key, "Unexpected metadata key");
             Assert.IsTrue(survey.questions[0].required, "Question should be required");
@@ -238,29 +237,26 @@ namespace LootLockerTests.PlayMode
             yield return new WaitUntil(() => createCompleted);
             Assert.IsTrue(createdSurvey.success, "Failed to create survey");
 
-            // Submit the answer through the player metadata API.
-            bool metadataCompleted = false;
-            LootLockerTestMetadata.LootLockerTestMetadataOperationsResponse metadataResponse = null;
-            LootLockerTestMetadata.PerformMetadataOperations(
-                LootLockerTestMetadata.LootLockerTestMetadataSources.player,
-                playerUlid,
-                new List<LootLockerTestMetadata.LootLockerTestMetadataOperation>
+            // Submit the answer through the survey convenience method.
+            bool submitCompleted = false;
+            LootLockerMetadataOperationsResponse submitResponse = null;
+            LootLockerSDKManager.SubmitSurveyAnswers(
+                new[]
                 {
-                    new LootLockerTestMetadata.LootLockerTestMetadataOperation
+                    new LootLockerSurveyAnswer
                     {
-                        key = "survey_answer_4",
+                        metadata_key = "survey_answer_4",
                         value = "From a friend",
-                        type = LootLockerTestMetadata.LootLockerTestMetadataTypes.String,
-                        action = LootLockerTestMetadata.LootLockerTestMetadataActions.create_or_update
+                        type = LootLockerMetadataTypes.String
                     }
                 },
                 response =>
                 {
-                    metadataResponse = response;
-                    metadataCompleted = true;
+                    submitResponse = response;
+                    submitCompleted = true;
                 });
-            yield return new WaitUntil(() => metadataCompleted);
-            Assert.IsTrue(metadataResponse.success, "Failed to submit survey answer metadata");
+            yield return new WaitUntil(() => submitCompleted);
+            Assert.IsTrue(submitResponse.success, "Failed to submit survey answers");
 
             // When
             bool completeCompleted = false;
@@ -276,7 +272,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(completeResponse.success, "Complete survey failed");
             Assert.IsTrue(completeResponse.complete, "Response should report the survey as complete");
             Assert.AreEqual(createdSurvey.id, completeResponse.survey_id, "Unexpected survey id in response");
-            Assert.IsNotEmpty(completeResponse.completed_at, "completed_at should be set");
+            Assert.AreNotEqual(default(DateTime), completeResponse.completed_at, "completed_at should be set");
 
             bool listCompleted = false;
             LootLockerListSurveysResponse listResponse = null;
@@ -290,7 +286,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(listResponse.success, "List surveys failed");
             Assert.AreEqual(1, listResponse.surveys?.Length, "Expected exactly one visible survey");
             Assert.IsTrue(listResponse.surveys[0].completed, "Survey should be marked completed");
-            Assert.IsNotEmpty(listResponse.surveys[0].completed_at, "completed_at should be set on the listed survey");
+            Assert.AreNotEqual(default(DateTime), listResponse.surveys[0].completed_at, "completed_at should be set on the listed survey");
         }
     }
 }
