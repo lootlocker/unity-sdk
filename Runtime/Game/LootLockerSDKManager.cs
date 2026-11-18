@@ -9197,16 +9197,24 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetPlaytestOnboardingStatus(forPlayerWithUlid, subdomain, onComplete);
+            if (string.IsNullOrEmpty(subdomain))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerPlaytestOnboardingStatusResponse>("A playtest subdomain is required", forPlayerWithUlid));
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.getPlaytestOnboardingStatus;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(subdomain), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// @ingroup Playtests
         /// <summary>
         /// Complete onboarding for the calling player.
         ///
-        /// Answers are submitted separately through the player metadata API using each question's
-        /// metadata_key. The request fails when a required answer is missing or a required document is
-        /// not acknowledged at its current content hash.
+        /// Answers are submitted separately through SubmitPlaytestAnswers (or the player metadata API) using
+        /// each question's metadata_key. The request fails when a required answer is missing or a required
+        /// document is not acknowledged at its current content hash.
         /// </summary>
         /// <param name="subdomain">The playtest's public subdomain.</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerCompletePlaytestOnboardingResponse</param>
@@ -9219,7 +9227,15 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.CompletePlaytestOnboarding(forPlayerWithUlid, subdomain, onComplete);
+            if (string.IsNullOrEmpty(subdomain))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerCompletePlaytestOnboardingResponse>("A playtest subdomain is required", forPlayerWithUlid));
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.completePlaytestOnboarding;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(subdomain), endPoint.httpMethod, null, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// @ingroup Playtests
@@ -9242,7 +9258,67 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.AcknowledgePlaytestDocument(forPlayerWithUlid, subdomain, documentId, request, onComplete);
+            if (string.IsNullOrEmpty(subdomain) || string.IsNullOrEmpty(documentId))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerAcknowledgePlaytestDocumentResponse>("A playtest subdomain and a document id are required", forPlayerWithUlid));
+                return;
+            }
+
+            EndPointClass endPoint = LootLockerEndPoints.acknowledgePlaytestDocument;
+
+            // The body is optional for documents without statements, so only serialize it when
+            // statement ids were supplied. An empty body is what those documents expect.
+            string json = request?.statement_ids != null && request.statement_ids.Length > 0
+                ? LootLockerJson.SerializeObject(request)
+                : null;
+
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameters(subdomain, documentId), endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
+        }
+
+        /// @ingroup Playtests
+        /// <summary>
+        /// Submits answers to a playtest for the current player.
+        ///
+        /// Playtest answers are stored as player metadata, so this writes each answer to the player's own
+        /// metadata under the question's metadata_key. Call CompletePlaytestOnboarding afterwards to record
+        /// the completion.
+        /// </summary>
+        /// <param name="answers">The answers to submit, one per question</param>
+        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerMetadataOperationsResponse</param>
+        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+        public static void SubmitPlaytestAnswers(LootLockerPlaytestAnswerSubmission[] answers, Action<LootLockerMetadataOperationsResponse> onComplete, string forPlayerWithUlid = null)
+        {
+            if (!CheckInitialized(false, forPlayerWithUlid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerMetadataOperationsResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            if (answers == null || answers.Length == 0)
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerMetadataOperationsResponse>("No playtest answers were supplied", forPlayerWithUlid));
+                return;
+            }
+
+            var operations = new List<LootLockerMetadataOperation>(answers.Length);
+            foreach (var answer in answers)
+            {
+                if (answer == null || string.IsNullOrEmpty(answer.metadata_key))
+                {
+                    onComplete?.Invoke(LootLockerResponseFactory.ClientError<LootLockerMetadataOperationsResponse>("Every playtest answer needs a metadata_key", forPlayerWithUlid));
+                    return;
+                }
+
+                operations.Add(new LootLockerMetadataOperation
+                {
+                    key = answer.metadata_key,
+                    value = answer.value,
+                    type = answer.type,
+                    action = LootLockerMetadataActions.create_or_update
+                });
+            }
+
+            PerformMetadataOperations(LootLockerMetadataSources.self, "self", operations, onComplete, forPlayerWithUlid);
         }
 
         #endregion

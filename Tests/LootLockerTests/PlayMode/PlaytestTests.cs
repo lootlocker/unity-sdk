@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using LootLocker;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
 using NUnit.Framework;
@@ -173,7 +174,7 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsTrue(actualResponse.success, "Expected call to succeed");
             Assert.IsFalse(actualResponse.completed, "Expected onboarding to not be completed");
-            Assert.IsNull(actualResponse.completed_at, "Expected completed_at to be omitted");
+            Assert.AreEqual(default(DateTime), actualResponse.completed_at, "Expected completed_at to be unset");
             Assert.IsNotNull(actualResponse.documents, "Expected documents to be an array");
             Assert.AreEqual(0, actualResponse.documents.Length, "Expected no acknowledged documents");
             Assert.IsNotNull(actualResponse.answers, "Expected answers to be an array");
@@ -244,7 +245,7 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsTrue(actualResponse.success, "Expected completion to succeed");
             Assert.IsTrue(actualResponse.complete, "Expected complete to be true");
-            Assert.IsFalse(string.IsNullOrEmpty(actualResponse.completed_at), "Expected completed_at to be set");
+            Assert.AreNotEqual(default(DateTime), actualResponse.completed_at, "Expected completed_at to be set");
             Assert.AreEqual(playtestId, actualResponse.playtest_id, "Expected the completed playtest id");
         }
 
@@ -321,6 +322,99 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(documentId, actualResponse.documents[0].document_id, "Expected the acknowledged document id");
             Assert.AreEqual(1, actualResponse.documents[0].statement_ids.Length, "Expected one acknowledged statement");
             Assert.AreEqual(statementId, actualResponse.documents[0].statement_ids[0], "Expected the acknowledged statement id");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Playtest_SubmitAnswersThenCompleteOnboarding_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // Given: a playtest whose required question comes from a linked survey.
+            string playtestId = null;
+            yield return CreatePlaytest(id => playtestId = id);
+            if (SetupFailed) { Assert.Fail("Failed to create playtest"); }
+
+            string surveyId = null;
+            bool surveyCreated = false;
+            LootLockerTestPlaytest.CreateSurveyWithRequiredQuestion("CI Playtest Survey", "ci_playtest_answer", response =>
+            {
+                if (!response.success)
+                {
+                    Debug.LogError($"Failed to create survey: {response.errorData?.message}");
+                    SetupFailed = true;
+                }
+                surveyId = response.id;
+                surveyCreated = true;
+            });
+            yield return new WaitUntil(() => surveyCreated);
+            if (SetupFailed) { Assert.Fail("Failed to create survey"); }
+
+            bool playtestUpdated = false;
+            LootLockerTestPlaytest.LinkSurveyToPlaytest(playtestId, "CI Playtest", surveyId, response =>
+            {
+                if (!response.success)
+                {
+                    Debug.LogError($"Failed to link survey to playtest: {response.errorData?.message}");
+                    SetupFailed = true;
+                }
+                playtestUpdated = true;
+            });
+            yield return new WaitUntil(() => playtestUpdated);
+            if (SetupFailed) { Assert.Fail("Failed to link survey to playtest"); }
+
+            // When: the required answer is submitted through the convenience method.
+            LootLockerMetadataOperationsResponse submitResponse = null;
+            bool submitCompleted = false;
+            LootLockerSDKManager.SubmitPlaytestAnswers(
+                new[]
+                {
+                    new LootLockerPlaytestAnswerSubmission
+                    {
+                        metadata_key = "ci_playtest_answer",
+                        value = "From a friend",
+                        type = LootLockerMetadataTypes.String
+                    }
+                },
+                response =>
+                {
+                    submitResponse = response;
+                    submitCompleted = true;
+                });
+            yield return new WaitUntil(() => submitCompleted);
+
+            // Then
+            Assert.IsTrue(submitResponse.success, "Expected submitting the answer to succeed");
+
+            LootLockerCompletePlaytestOnboardingResponse completeResponse = null;
+            bool completeCompleted = false;
+            LootLockerSDKManager.CompletePlaytestOnboarding(PlaytestSubdomain, response =>
+            {
+                completeResponse = response;
+                completeCompleted = true;
+            });
+            yield return new WaitUntil(() => completeCompleted);
+
+            Assert.IsTrue(completeResponse.success, "Expected completion to succeed once the required answer is stored");
+            Assert.IsTrue(completeResponse.complete, "Expected complete to be true");
+        }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI")]
+        public IEnumerator Playtest_SubmitAnswersWithNoAnswers_Fails()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // When
+            LootLockerMetadataOperationsResponse actualResponse = null;
+            bool callCompleted = false;
+            LootLockerSDKManager.SubmitPlaytestAnswers(new LootLockerPlaytestAnswerSubmission[0], response =>
+            {
+                actualResponse = response;
+                callCompleted = true;
+            });
+            yield return new WaitUntil(() => callCompleted);
+
+            // Then
+            Assert.IsFalse(actualResponse.success, "Expected an empty answer list to be rejected client side");
         }
 
         [UnityTest, Category("LootLocker"), Category("LootLockerCI")]

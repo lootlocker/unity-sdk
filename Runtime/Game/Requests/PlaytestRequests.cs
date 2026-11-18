@@ -1,5 +1,5 @@
 using System;
-using LootLocker.Requests;
+using LootLocker.LootLockerEnums;
 
 namespace LootLocker.Requests
 {
@@ -44,7 +44,7 @@ namespace LootLocker.Requests
         /// <summary>
         /// When the document was acknowledged.
         /// </summary>
-        public string acknowledged_at { get; set; }
+        public DateTime acknowledged_at { get; set; }
     }
 
     /// <summary>
@@ -62,6 +62,25 @@ namespace LootLocker.Requests
         public string value { get; set; }
     }
 
+    /// <summary>
+    /// A single answer to a playtest question, submitted through SubmitPlaytestAnswers.
+    /// </summary>
+    public class LootLockerPlaytestAnswerSubmission
+    {
+        /// <summary>
+        /// The metadata_key of the question this answers.
+        /// </summary>
+        public string metadata_key { get; set; }
+        /// <summary>
+        /// The answer value. Pass it as its native C# type (string, int, bool, etc.) and set type to match.
+        /// </summary>
+        public object value { get; set; }
+        /// <summary>
+        /// The metadata type of the value. Defaults to String.
+        /// </summary>
+        public LootLockerMetadataTypes type { get; set; } = LootLockerMetadataTypes.String;
+    }
+
     //==================================================
     // Response Definitions
     //==================================================
@@ -76,9 +95,10 @@ namespace LootLocker.Requests
         /// </summary>
         public bool completed { get; set; }
         /// <summary>
-        /// When the player completed onboarding. Null until the player completes it.
+        /// When the player completed onboarding.
+        /// Default (DateTime.MinValue) until the player completes it.
         /// </summary>
-        public string completed_at { get; set; }
+        public DateTime completed_at { get; set; }
         /// <summary>
         /// The documents the player has acknowledged.
         /// </summary>
@@ -95,13 +115,14 @@ namespace LootLocker.Requests
     public class LootLockerCompletePlaytestOnboardingResponse : LootLockerResponse
     {
         /// <summary>
-        /// Whether onboarding is now complete.
+        /// Whether onboarding is now complete. A successful response always reports true;
+        /// failures (for example an unacknowledged required document) are returned as an error response instead.
         /// </summary>
         public bool complete { get; set; }
         /// <summary>
         /// When onboarding was completed.
         /// </summary>
-        public string completed_at { get; set; }
+        public DateTime completed_at { get; set; }
         /// <summary>
         /// The ULID of the playtest that was completed.
         /// </summary>
@@ -124,56 +145,3 @@ namespace LootLocker.Requests
     }
 }
 
-//==================================================
-// API Class Definition
-//==================================================
-namespace LootLocker
-{
-    public partial class LootLockerAPIManager
-    {
-        public static void GetPlaytestOnboardingStatus(string forPlayerWithUlid, string subdomain, Action<LootLockerPlaytestOnboardingStatusResponse> onComplete)
-        {
-            if (string.IsNullOrEmpty(subdomain))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerPlaytestOnboardingStatusResponse>(forPlayerWithUlid));
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.getPlaytestOnboardingStatus;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(subdomain), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void CompletePlaytestOnboarding(string forPlayerWithUlid, string subdomain, Action<LootLockerCompletePlaytestOnboardingResponse> onComplete)
-        {
-            if (string.IsNullOrEmpty(subdomain))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerCompletePlaytestOnboardingResponse>(forPlayerWithUlid));
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.completePlaytestOnboarding;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameter(subdomain), endPoint.httpMethod, null, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void AcknowledgePlaytestDocument(string forPlayerWithUlid, string subdomain, string documentId, LootLockerAcknowledgePlaytestDocumentRequest request, Action<LootLockerAcknowledgePlaytestDocumentResponse> onComplete)
-        {
-            if (string.IsNullOrEmpty(subdomain) || string.IsNullOrEmpty(documentId))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerAcknowledgePlaytestDocumentResponse>(forPlayerWithUlid));
-                return;
-            }
-
-            EndPointClass endPoint = LootLockerEndPoints.acknowledgePlaytestDocument;
-
-            // The body is optional for documents without statements, so only serialize it when
-            // statement ids were supplied. Sending an empty object would be rejected.
-            string json = request?.statement_ids != null && request.statement_ids.Length > 0
-                ? LootLockerJson.SerializeObject(request)
-                : null;
-
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameters(subdomain, documentId), endPoint.httpMethod, json, (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-    }
-}
