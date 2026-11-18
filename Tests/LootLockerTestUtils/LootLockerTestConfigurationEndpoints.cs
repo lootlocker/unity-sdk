@@ -180,7 +180,11 @@ namespace LootLockerTestConfigurationUtils
 
         [Header("LootLocker Admin API Playtest Operations")]
         public static EndPointClass createPlaytest = new EndPointClass("game/#GAMEID#/playtests", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+        public static EndPointClass updatePlaytest = new EndPointClass("game/#GAMEID#/playtests/{0}", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
         public static EndPointClass createPlaytestDocument = new EndPointClass("game/#GAMEID#/playtests/{0}/documents", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
+
+        [Header("LootLocker Admin API Survey Operations")]
+        public static EndPointClass createSurvey = new EndPointClass("game/#GAMEID#/surveys/v1", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
     }
     #endregion
 }

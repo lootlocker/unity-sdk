@@ -1,3 +1,4 @@
+using System;
 using LootLocker;
 using LootLocker.Requests;
 using NUnit.Framework;
@@ -18,7 +19,7 @@ namespace LootLockerTests.PlayMode
             // Then
             Assert.IsNotNull(response);
             Assert.IsTrue(response.completed);
-            Assert.AreEqual("2026-01-02T03:04:05Z", response.completed_at);
+            Assert.AreEqual(new DateTime(2026, 1, 2, 3, 4, 5, DateTimeKind.Utc), response.completed_at);
             Assert.AreEqual(1, response.documents.Length);
             Assert.AreEqual("01K9AAAAAAAAAAAAAAAAAAAAAA", response.documents[0].document_id);
             Assert.AreEqual("abc123", response.documents[0].content_hash);
@@ -30,7 +31,7 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Playtest_DeserializingOnboardingStatusWithoutCompletion_LeavesCompletedAtNull()
+        public void Playtest_DeserializingOnboardingStatusWithoutCompletion_LeavesCompletedAtUnset()
         {
             // Given: completed_at is omitted until the player completes onboarding.
             const string json = "{\"completed\":false,\"documents\":[],\"answers\":[]}";
@@ -40,7 +41,7 @@ namespace LootLockerTests.PlayMode
 
             // Then
             Assert.IsFalse(response.completed);
-            Assert.IsNull(response.completed_at);
+            Assert.AreEqual(default(DateTime), response.completed_at, "completed_at is unset when not completed");
             Assert.AreEqual(0, response.documents.Length);
             Assert.AreEqual(0, response.answers.Length);
         }
@@ -56,7 +57,7 @@ namespace LootLockerTests.PlayMode
 
             // Then
             Assert.IsTrue(response.complete);
-            Assert.AreEqual("2026-01-02T03:04:05Z", response.completed_at);
+            Assert.AreEqual(new DateTime(2026, 1, 2, 3, 4, 5, DateTimeKind.Utc), response.completed_at);
             Assert.AreEqual("01K9BBBBBBBBBBBBBBBBBBBBBB", response.playtest_id);
         }
 
