@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using LootLocker;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 using LootLockerTestConfigurationUtils;
 using NUnit.Framework;
