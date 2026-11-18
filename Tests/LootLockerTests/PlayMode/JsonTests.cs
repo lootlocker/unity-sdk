@@ -512,7 +512,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(1, deserialized.dlcs.Length, "Not deserialized, wrong number of dlcs");
             Assert.AreEqual("01JCX8Q9Z3K7M2N4P6R8T0V2WX", deserialized.dlcs[0].catalog_item_id, "Wrong catalog item id");
             Assert.AreEqual("123456", deserialized.dlcs[0].dlc_identifier, "Wrong dlc identifier");
-            Assert.AreEqual("steam", deserialized.dlcs[0].platform, "Wrong platform");
+            Assert.AreEqual(LL_AuthPlatforms.Steam, deserialized.dlcs[0].platform, "Wrong platform");
             Assert.AreEqual("01JCX8Q9Z3K7M2N4P6R8T0V2WY", deserialized.dlcs[0].entitlement_id, "Wrong entitlement id");
         }
 
