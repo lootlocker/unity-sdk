@@ -1,4 +1,5 @@
 using System;
+using LootLocker.LootLockerEnums;
 
 namespace LootLocker.Requests
 {
