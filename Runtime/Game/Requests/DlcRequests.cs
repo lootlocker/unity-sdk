@@ -18,8 +18,8 @@ namespace LootLocker.Requests
         /// <summary>The DLC's identifier on the platform (for example a Steam app id or a Meta product id). Always a string, even when numeric.</summary>
         public string dlc_identifier { get; set; }
 
-        /// <summary>The platform the DLC was granted for.</summary>
-        public string platform { get; set; }
+        /// <summary>The platform the DLC was granted for. Only <see cref="LL_AuthPlatforms.Steam"/> and <see cref="LL_AuthPlatforms.Meta"/> support DLC checks.</summary>
+        public LL_AuthPlatforms platform { get; set; }
 
         /// <summary>The ULID of the active DLC entitlement granting this DLC.</summary>
         public string entitlement_id { get; set; }
