@@ -456,6 +456,19 @@
 ///
 /// See the [LootLocker documentation](https://docs.lootlocker.com/game-systems/feedback).
 
+/// @defgroup Surveys Surveys
+/// @brief Show in-game surveys to players and record their completion.
+///
+/// Surveys are authored in the Web Console as a set of typed questions. A
+/// survey without segments is visible to every player; with segments it is
+/// only returned to players that match them. List the surveys a player can see
+/// with \c ListSurveys(), render the questions, submit the answers with
+/// \c SubmitSurveyAnswers(), then record the completion with
+/// \c CompleteSurvey(). Answers are stored as player metadata, keyed by each
+/// question's \c metadata_key, and the completion is stored separately, so
+/// \c completed and \c completed_at tell you whether a player has already
+/// responded.
+
 // ---------------------------------------------------------------------------
 // Top-level: Utilities
 // ---------------------------------------------------------------------------
