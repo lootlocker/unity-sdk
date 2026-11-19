@@ -177,6 +177,7 @@ namespace LootLockerTestConfigurationUtils
         [Header("LootLocker Admin API Player Ban Operations")]
         public static EndPointClass banPlayer = new EndPointClass("game/#GAMEID#/player/{0}/bans", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
         public static EndPointClass unbanPlayer = new EndPointClass("game/#GAMEID#/player/{0}/bans", LootLockerHTTPMethod.DELETE, LootLockerCallerRole.Admin);
+
         [Header("LootLocker Admin API Playtest Operations")]
         public static EndPointClass createPlaytest = new EndPointClass("game/#GAMEID#/playtests", LootLockerHTTPMethod.POST, LootLockerCallerRole.Admin);
         public static EndPointClass updatePlaytest = new EndPointClass("game/#GAMEID#/playtests/{0}", LootLockerHTTPMethod.PATCH, LootLockerCallerRole.Admin);
