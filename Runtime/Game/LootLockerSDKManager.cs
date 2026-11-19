@@ -10737,7 +10737,9 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.GetReferralInvite(forPlayerWithUlid, onComplete);
+            var endPoint = LootLockerEndPoints.getReferralInvite;
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod,
+                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
 
         /// @ingroup Referrals
@@ -10757,7 +10759,19 @@ namespace LootLocker.Requests
                 return;
             }
 
-            LootLockerAPIManager.ListMyReferrals(forPlayerWithUlid, page, perPage, onComplete);
+            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
+            if (page > 0)
+            {
+                queryParams.Add("page", page);
+            }
+            if (perPage > 0)
+            {
+                queryParams.Add("per_page", perPage);
+            }
+
+            var endPoint = LootLockerEndPoints.listMyReferrals;
+            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + queryParams.Build(), endPoint.httpMethod,
+                onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
         #endregion
 

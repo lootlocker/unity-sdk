@@ -24,10 +24,11 @@ namespace LootLockerTests.PlayMode
             var capped = response.programs[0];
             Assert.AreEqual("invite_a_friend", capped.program_key);
             Assert.AreEqual("Invite a friend", capped.name);
-            Assert.AreEqual("session_started", capped.qualifier);
+            Assert.AreEqual(LootLockerReferralQualifier.session_started, capped.qualifier);
             Assert.AreEqual(3, capped.referral_count);
             Assert.AreEqual(10, capped.referrer_cap);
 
+            Assert.AreEqual(LootLockerReferralQualifier.game_asserted, response.programs[1].qualifier);
             Assert.IsNull(response.programs[1].referrer_cap, "An uncapped program must deserialize referrer_cap to null");
         }
 
@@ -48,16 +49,30 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual("01K9AAAAAAAAAAAAAAAAAAAAAA", qualified.id);
             Assert.AreEqual("invite_a_friend", qualified.program_key);
             Assert.AreEqual("FRIEND-UID", qualified.referee_public_uid);
-            Assert.AreEqual("qualified", qualified.status);
+            Assert.AreEqual(LootLockerReferralStatus.qualified, qualified.status);
             Assert.IsNotNull(qualified.qualified_at);
 
             var pending = response.referrals[1];
-            Assert.AreEqual("claimed", pending.status);
+            Assert.AreEqual(LootLockerReferralStatus.claimed, pending.status);
             Assert.IsNull(pending.qualified_at, "A pending referral must deserialize qualified_at to null");
             Assert.IsNull(pending.referee_public_uid, "A removed referee must deserialize referee_public_uid to null");
 
             Assert.IsNotNull(response.pagination);
             Assert.AreEqual(2, response.pagination.total);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Referral_DeserializingVoidedReferral_MapsVoidStatus()
+        {
+            // Given: the backend sends "void", which is a reserved word in some languages and is mapped to
+            // the @void enum member here.
+            const string json = "{\"referrals\":[{\"id\":\"01K9AAAAAAAAAAAAAAAAAAAAAA\",\"program_key\":\"invite_a_friend\",\"program_name\":\"Invite a friend\",\"referee_public_uid\":\"FRIEND-UID\",\"status\":\"void\",\"claimed_at\":\"2026-10-19T20:27:03Z\",\"qualified_at\":null}],\"pagination\":{\"errors\":[],\"per_page\":10,\"offset\":0,\"total\":1,\"last_page\":1,\"current_page\":1,\"next_page\":null,\"prev_page\":null}}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerReferralListResponse>(json);
+
+            // Then
+            Assert.AreEqual(LootLockerReferralStatus.@void, response.referrals[0].status);
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
