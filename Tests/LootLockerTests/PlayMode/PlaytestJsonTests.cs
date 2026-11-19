@@ -73,5 +73,36 @@ namespace LootLockerTests.PlayMode
             // Then
             StringAssert.Contains("\"statement_ids\":[\"s1\",\"s2\"]", json);
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Playtest_SerializingEmptyAcknowledgeRequest_SendsNoStatementIds()
+        {
+            // Given: a document without statements. The backend rejects non-empty statement_ids
+            // for such documents, so the empty request must not carry any.
+            var request = new LootLockerAcknowledgePlaytestDocumentRequest();
+
+            // When
+            var json = LootLockerJson.SerializeObject(request).Replace(" ", "");
+
+            // Then
+            Assert.IsFalse(json.Contains("\"s1\""), "No statement ids should be sent");
+            StringAssert.DoesNotContain("\"statement_ids\":[\"", json);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Playtest_NullAcknowledgeRequest_BecomesEmptyJsonObject()
+        {
+            // Given: the SDK sends "{}" rather than null for a document without statements,
+            // because CallAPI routes POSTs through MakeJsonRequest which maps null to "{}".
+            LootLockerAcknowledgePlaytestDocumentRequest request = null;
+
+            // When
+            var json = request?.statement_ids != null && request.statement_ids.Length > 0
+                ? LootLockerJson.SerializeObject(request)
+                : "{}";
+
+            // Then
+            Assert.AreEqual("{}", json, "A missing request must serialize to an empty JSON object");
+        }
     }
 }

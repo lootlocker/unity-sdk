@@ -9218,11 +9218,11 @@ namespace LootLocker.Requests
         /// Record that the calling player acknowledged a playtest document at its current content hash.
         ///
         /// When the document has statements, send every statement id. Pass null for the request for
-        /// documents without statements, where the body is optional.
+        /// documents without statements, where no statement ids are expected.
         /// </summary>
         /// <param name="subdomain">The playtest's public subdomain.</param>
         /// <param name="documentId">The ULID of the document to acknowledge.</param>
-        /// <param name="request">The acknowledge request, or null for a document without statements. See <see cref="LootLockerAcknowledgePlaytestDocumentRequest"/>.</param>
+        /// <param name="request">The acknowledge request, or null for a document without statements, in which case an empty body is sent. See <see cref="LootLockerAcknowledgePlaytestDocumentRequest"/>.</param>
         /// <param name="onComplete">onComplete Action for handling the response of type LootLockerAcknowledgePlaytestDocumentResponse</param>
         /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
         public static void AcknowledgePlaytestDocument(string subdomain, string documentId, LootLockerAcknowledgePlaytestDocumentRequest request, Action<LootLockerAcknowledgePlaytestDocumentResponse> onComplete, string forPlayerWithUlid = null)
@@ -9242,10 +9242,11 @@ namespace LootLocker.Requests
             EndPointClass endPoint = LootLockerEndPoints.acknowledgePlaytestDocument;
 
             // The body is optional for documents without statements, so only serialize it when
-            // statement ids were supplied. An empty body is what those documents expect.
+            // statement ids were supplied. Passing null would not work here: CallAPI routes every
+            // POST through MakeJsonRequest, which turns a null body into "{}".
             string json = request?.statement_ids != null && request.statement_ids.Length > 0
                 ? LootLockerJson.SerializeObject(request)
-                : null;
+                : "{}";
 
             LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.WithPathParameters(subdomain, documentId), endPoint.httpMethod, json, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
         }
