@@ -2745,22 +2745,27 @@ namespace LootLocker.Requests
 
         #region Identity
 
-        /// @ingroup Identity
-        /// <summary>
-        /// Get the identity the current session is linked to, including the publisher it belongs to and, when
-        /// populated, the games it has been active in.
-        ///
-        /// The session must be linked to an identity; a session that is not is answered with 403.
-        /// </summary>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void GetIdentity(Action<LootLockerIdentityResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityResponse>(forPlayerWithUlid));
-                return;
-            }
+                /// @ingroup Identity
+                /// <summary>
+                /// Get the identity the current session is linked to, including the publisher it belongs to, the
+                /// provider credentials linked to it, and per game the first and last session times and the session
+                /// count.
+                ///
+                /// The identity is taken from the session token, so a caller can only ever read their own identity.
+                /// Use <see cref="LootLockerIdentityResponse.providers"/> to discover the credential ids that
+                /// <see cref="UnlinkProvider"/> takes.
+                ///
+                /// The session must be linked to an identity; a session that is not is answered with 403.
+                /// </summary>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void GetIdentity(Action<LootLockerIdentityResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityResponse>(forPlayerWithUlid));
+                        return;
+                    }
 
             LootLockerAPIManager.GetIdentity(forPlayerWithUlid, onComplete);
         }
@@ -2790,48 +2795,57 @@ namespace LootLocker.Requests
             LootLockerAPIManager.LookupIdentities(forPlayerWithUlid, request, onComplete);
         }
 
-        /// @ingroup Identity
-        /// <summary>
-        /// Record a provider credential against the identity of the current session, so a later session
-        /// presenting the same credential resolves to this identity instead of minting a second one.
-        ///
-        /// Linking is idempotent: a credential this identity already owns answers <c>created = false</c>. When
-        /// another identity in the publisher owns the credential the call answers 409 and links nothing; the
-        /// merge offer is surfaced on <see cref="LootLockerIdentityLinkResponse.conflict"/> and can be resolved
-        /// with <see cref="MergeIdentities"/>. LootLocker never links a credential across identities on the
-        /// player's behalf.
-        /// </summary>
-        /// <param name="request">The link request. See <see cref="LootLockerIdentityLinkRequest"/>.</param>
-        /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityLinkResponse</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void LinkProvider(LootLockerIdentityLinkRequest request, Action<LootLockerIdentityLinkResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityLinkResponse>(forPlayerWithUlid));
-                return;
-            }
+                /// @ingroup Identity
+                /// <summary>
+                /// Record a provider credential against the identity of the current session, so a later session
+                /// presenting the same credential resolves to this identity instead of minting a second one.
+                ///
+                /// Linking is idempotent: a credential this identity already owns answers <c>created = false</c>. When
+                /// another identity in the publisher owns the credential the call answers 409 and links nothing; the
+                /// merge offer is surfaced on <see cref="LootLockerIdentityLinkResponse.conflict"/> and can be resolved
+                /// with <see cref="MergeIdentities"/>. LootLocker never links a credential across identities on the
+                /// player's behalf.
+                ///
+                /// The backend stores the provider slug exactly as it is sent, so always send the canonical enum member;
+                /// sending an alias would make the stored slug differ from what <c>GetIdentity</c> reports for other
+                /// credentials of the same provider.
+                /// </summary>
+                /// <param name="request">The link request. See <see cref="LootLockerIdentityLinkRequest"/>.</param>
+                /// <param name="onComplete">onComplete Action for handling the response of type LootLockerIdentityLinkResponse</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void LinkProvider(LootLockerIdentityLinkRequest request, Action<LootLockerIdentityLinkResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerIdentityLinkResponse>(forPlayerWithUlid));
+                        return;
+                    }
 
             LootLockerAPIManager.LinkProvider(forPlayerWithUlid, request, onComplete);
         }
 
-        /// @ingroup Identity
-        /// <summary>
-        /// Remove a provider credential from the current identity.
-        ///
-        /// The last remaining credential cannot be removed, because the identity would become unreachable; that
-        /// case is answered with 422.
-        /// </summary>
-        /// <param name="credentialId">The ULID of the credential to remove.</param>
-        /// <param name="onComplete">onComplete Action for handling the response</param>
-        /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
-        public static void UnlinkProvider(string credentialId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
-        {
-            if (!CheckInitialized(false, forPlayerWithUlid))
-            {
-                onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
-                return;
-            }
+                /// @ingroup Identity
+                /// <summary>
+                /// Remove a provider credential from the current identity.
+                ///
+                /// Get the credential id from <see cref="LootLockerIdentityResponse.providers"/> (or
+                /// <see cref="LootLockerIdentity.GetProviderCredentialId"/>) after a call to <see cref="GetIdentity"/>.
+                /// The provider's own user identifier is never returned by GetIdentity, so the id is the only reference
+                /// available to a game client.
+                ///
+                /// The last remaining credential cannot be removed, because the identity would become unreachable; that
+                /// case is answered with 422.
+                /// </summary>
+                /// <param name="credentialId">The ULID of the credential to remove, as reported in <see cref="LootLockerIdentityResponse.providers"/>.</param>
+                /// <param name="onComplete">onComplete Action for handling the response</param>
+                /// <param name="forPlayerWithUlid">Optional : Execute the request for the specified player. If not supplied, the default player will be used.</param>
+                public static void UnlinkProvider(string credentialId, Action<LootLockerResponse> onComplete, string forPlayerWithUlid = null)
+                {
+                    if (!CheckInitialized(false, forPlayerWithUlid))
+                    {
+                        onComplete?.Invoke(LootLockerResponseFactory.SDKNotInitializedError<LootLockerResponse>(forPlayerWithUlid));
+                        return;
+                    }
 
             LootLockerAPIManager.UnlinkProvider(forPlayerWithUlid, credentialId, onComplete);
         }

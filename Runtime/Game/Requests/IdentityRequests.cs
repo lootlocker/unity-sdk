@@ -68,6 +68,29 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
+    /// A provider credential linked to an identity.
+    ///
+    /// <see cref="id"/> is the value to pass to <c>UnlinkProvider</c>. The provider's own user identifier is
+    /// deliberately not returned: identity-scoped reads span every game the identity has played, so exposing
+    /// it would leak account identifiers from credentials linked through other games.
+    /// </summary>
+    public class LootLockerIdentityProviderInfo
+    {
+        /// <summary>
+        /// The ULID of the platform credential. Pass this to <c>UnlinkProvider</c>.
+        /// </summary>
+        public string id { get; set; }
+        /// <summary>
+        /// The provider slug, for example <c>steam</c>, <c>psn</c> or <c>xbox_one</c>.
+        /// </summary>
+        public string provider { get; set; }
+        /// <summary>
+        /// When the credential was linked to the identity.
+        /// </summary>
+        public DateTime created_at { get; set; }
+    }
+
+    /// <summary>
     /// A cross-game identity: the human behind one or more player accounts in the publisher.
     /// </summary>
     public class LootLockerIdentity
@@ -89,6 +112,39 @@ namespace LootLocker.Requests
         /// activity; otherwise an empty array.
         /// </summary>
         public LootLockerIdentityGameActivity[] game_activity { get; set; }
+        /// <summary>
+        /// The provider credentials linked to this identity.
+        ///
+        /// Only <c>GetIdentity</c> loads these. Lookup and merge share this shape but have no reason to carry
+        /// them, so expect <c>null</c> there, which is distinguishable from an identity with no credentials
+        /// linked (<c>[]</c>).
+        /// </summary>
+        public LootLockerIdentityProviderInfo[] providers { get; set; }
+
+        /// <summary>
+        /// The credential id for a provider, or null when no credential for that provider is linked.
+        ///
+        /// Pass the result to <c>UnlinkProvider</c>. Returns null when <see cref="providers"/> is null, which is
+        /// the case for identities returned by lookup and merge.
+        /// </summary>
+        /// <param name="provider">The provider to find the credential id for.</param>
+        public string GetProviderCredentialId(LootLockerIdentityProvider provider)
+        {
+            if (providers == null)
+            {
+                return null;
+            }
+
+            foreach (var linked in providers)
+            {
+                if (linked != null && LootLockerIdentityProviderSlugs.Matches(provider, linked.provider))
+                {
+                    return linked.id;
+                }
+            }
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -295,6 +351,79 @@ namespace LootLocker.Requests
         /// The games this identity has been active in.
         /// </summary>
         public LootLockerIdentityGameActivity[] game_activity { get; set; }
+        /// <summary>
+        /// The provider credentials linked to this identity. Each entry's <see cref="LootLockerIdentityProviderInfo.id"/>
+        /// is the value to pass to <c>UnlinkProvider</c>.
+        /// </summary>
+        public LootLockerIdentityProviderInfo[] providers { get; set; }
+
+        /// <summary>
+        /// The credential id for a provider, or null when no credential for that provider is linked.
+        ///
+        /// Pass the result to <c>UnlinkProvider</c>. Returns null when <see cref="providers"/> is null, which is
+        /// the case for identities returned by lookup and merge.
+        ///
+        /// The match accepts the platform alias as well as the canonical slug, because the backend accepts
+        /// either when a credential is linked and stores whatever the client sent.
+        /// </summary>
+        /// <param name="provider">The provider to find the credential id for.</param>
+        public string GetProviderCredentialId(LootLockerIdentityProvider provider)
+        {
+            if (providers == null)
+            {
+                return null;
+            }
+
+            foreach (var linked in providers)
+            {
+                if (linked != null && LootLockerIdentityProviderSlugs.Matches(provider, linked.provider))
+                {
+                    return linked.id;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Helpers for comparing a provider enum member against the slug the backend stored.
+    /// </summary>
+    public static class LootLockerIdentityProviderSlugs
+    {
+        /// <summary>
+        /// The alias the backend accepts and may therefore have stored for a provider, or null when the
+        /// provider has none.
+        /// </summary>
+        public static string AliasFor(LootLockerIdentityProvider provider)
+        {
+            switch (provider)
+            {
+                case LootLockerIdentityProvider.apple_app_store: return "ios";
+                case LootLockerIdentityProvider.google_play_store: return "android";
+                case LootLockerIdentityProvider.amazon_luna: return "luna";
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether a stored slug refers to the given provider, accepting either the canonical slug or its alias.
+        /// </summary>
+        public static bool Matches(LootLockerIdentityProvider provider, string storedSlug)
+        {
+            if (string.IsNullOrEmpty(storedSlug))
+            {
+                return false;
+            }
+
+            if (storedSlug == provider.ToString())
+            {
+                return true;
+            }
+
+            var alias = AliasFor(provider);
+            return alias != null && storedSlug == alias;
+        }
     }
 
     /// <summary>
@@ -364,6 +493,13 @@ namespace LootLocker.Requests
         /// The games the surviving identity has been active in.
         /// </summary>
         public LootLockerIdentityGameActivity[] game_activity { get; set; }
+        /// <summary>
+        /// The provider credentials linked to the surviving identity.
+        ///
+        /// Merge does not load these, so this is <c>null</c> rather than an empty array. Call
+        /// <c>GetIdentity</c> after a merge if the caller needs the current credential list.
+        /// </summary>
+        public LootLockerIdentityProviderInfo[] providers { get; set; }
     }
 }
 
