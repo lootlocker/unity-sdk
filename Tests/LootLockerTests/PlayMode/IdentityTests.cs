@@ -136,6 +136,80 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingIdentity_MapsProviders()
+        {
+            // Given: the providers list carries the credential id a client needs for UnlinkProvider, and
+            // deliberately omits the provider's own user identifier.
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"steam\",\"created_at\":\"2026-10-19T20:27:03Z\"},{\"id\":\"01K9DDDDDDDDDDDDDDDDDDDDDD\",\"provider\":\"xbox_one\",\"created_at\":\"2026-10-20T08:15:00Z\"}]}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // Then
+            Assert.IsNotNull(response.providers);
+            Assert.AreEqual(2, response.providers.Length);
+            Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.providers[0].id);
+            Assert.AreEqual("steam", response.providers[0].provider);
+            Assert.AreEqual("01K9DDDDDDDDDDDDDDDDDDDDDD", response.providers[1].id);
+            Assert.AreEqual("xbox_one", response.providers[1].provider);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingIdentityWithEmptyProviders_LeavesEmptyArray()
+        {
+            // Given: an identity with no credentials linked answers [], which is distinguishable from null.
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[]}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // Then
+            Assert.IsNotNull(response.providers, "An identity with no credentials answers [], not null");
+            Assert.AreEqual(0, response.providers.Length);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_GetProviderCredentialId_ReturnsIdForLinkedProvider()
+        {
+            // Given
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"steam\",\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // When/Then
+            Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.GetProviderCredentialId(LootLockerIdentityProvider.steam));
+            Assert.IsNull(response.GetProviderCredentialId(LootLockerIdentityProvider.xbox_one), "An unlinked provider has no credential id");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingLookupIdentity_LeavesProvidersNull()
+        {
+            // Given: lookup does not load credentials, so providers is null rather than [].
+            const string json = "[{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":null}]";
+
+            // When
+            var identities = LootLockerJson.DeserializeObjectArray<LootLockerIdentity>(json);
+
+            // Then
+            Assert.AreEqual(1, identities.Length);
+            Assert.IsNull(identities[0].providers, "Lookup does not load credentials");
+            Assert.IsNull(identities[0].GetProviderCredentialId(LootLockerIdentityProvider.steam), "A null providers list yields no credential id");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_GetProviderCredentialId_AcceptsStoredAlias()
+        {
+            // Given: the backend accepts the aliases ios/android/luna when linking and stores whatever the client
+            // sent, so a credential recorded through an alias carries the alias as its provider slug.
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"ios\",\"created_at\":\"2026-10-19T20:27:03Z\"},{\"id\":\"01K9DDDDDDDDDDDDDDDDDDDDDD\",\"provider\":\"android\",\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // When/Then
+            Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.GetProviderCredentialId(LootLockerIdentityProvider.apple_app_store));
+            Assert.AreEqual("01K9DDDDDDDDDDDDDDDDDDDDDD", response.GetProviderCredentialId(LootLockerIdentityProvider.google_play_store));
+            Assert.IsNull(response.GetProviderCredentialId(LootLockerIdentityProvider.amazon_luna), "luna is not linked here");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Identity_DeserializingLookupArray_MapsIdentities()
         {
             // Given: the lookup answers with a bare JSON array, not an object, so it must be parsed as an array.
