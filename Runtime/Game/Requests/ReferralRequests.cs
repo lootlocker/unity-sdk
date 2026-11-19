@@ -1,5 +1,37 @@
 using System;
+using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
+
+namespace LootLocker.LootLockerEnums
+{
+    /// <summary>
+    /// The action that turns a claimed referral into a payout.
+    /// </summary>
+    public enum LootLockerReferralQualifier
+    {
+        /// <summary>The referee qualified by starting their first session with the code.</summary>
+        session_started,
+        /// <summary>The referee qualified by owning one of the program's configured catalog items.</summary>
+        entitlement_owned,
+        /// <summary>The referee qualified because the game server asserted it.</summary>
+        game_asserted,
+        /// <summary>The referee qualified by earning a configured publisher currency.</summary>
+        publisher_currency_earned
+    }
+
+    /// <summary>
+    /// The state of a referral relation.
+    /// </summary>
+    public enum LootLockerReferralStatus
+    {
+        /// <summary>The referral is claimed and waiting for its qualifying action.</summary>
+        claimed,
+        /// <summary>The qualifying action happened and both sides were rewarded.</summary>
+        qualified,
+        /// <summary>The referral was voided, for example because a party was banned.</summary>
+        @void
+    }
+}
 
 namespace LootLocker.Requests
 {
@@ -22,10 +54,9 @@ namespace LootLocker.Requests
         /// </summary>
         public string name { get; set; }
         /// <summary>
-        /// The action that turns a claimed referral into a payout. One of "session_started",
-        /// "entitlement_owned", "game_asserted" or "publisher_currency_earned".
+        /// The action that turns a claimed referral into a payout.
         /// </summary>
-        public string qualifier { get; set; }
+        public LootLockerReferralQualifier qualifier { get; set; }
         /// <summary>
         /// How many rewarded referrals the player has made under this program.
         /// </summary>
@@ -60,10 +91,9 @@ namespace LootLocker.Requests
         /// </summary>
         public string referee_public_uid { get; set; }
         /// <summary>
-        /// The state of the referral: "claimed" (pending the qualifying action), "qualified" (rewarded) or
-        /// "void" (voided).
+        /// The state of the referral.
         /// </summary>
-        public string status { get; set; }
+        public LootLockerReferralStatus status { get; set; }
         /// <summary>
         /// When the referral was claimed.
         /// </summary>
@@ -109,40 +139,5 @@ namespace LootLocker.Requests
         /// Pagination information for the referrals.
         /// </summary>
         public LootLockerExtendedPagination pagination { get; set; }
-    }
-}
-
-//==================================================
-// API Class Definition
-//==================================================
-namespace LootLocker
-{
-    public partial class LootLockerAPIManager
-    {
-        public static void GetReferralInvite(string forPlayerWithUlid, Action<LootLockerReferralInviteResponse> onComplete)
-        {
-            var endPoint = LootLockerEndPoints.getReferralInvite;
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint, endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        public static void ListMyReferrals(string forPlayerWithUlid, int page, int perPage, Action<LootLockerReferralListResponse> onComplete)
-        {
-            var endPoint = LootLockerEndPoints.listMyReferrals;
-            LootLockerServerRequest.CallAPI(forPlayerWithUlid, endPoint.endPoint + BuildReferralPageQuery(page, perPage), endPoint.httpMethod, onComplete: (serverResponse) => { LootLockerResponse.Deserialize(onComplete, serverResponse); });
-        }
-
-        private static string BuildReferralPageQuery(int page, int perPage)
-        {
-            var queryParams = new LootLocker.Utilities.HTTP.QueryParamaterBuilder();
-            if (page > 0)
-            {
-                queryParams.Add("page", page);
-            }
-            if (perPage > 0)
-            {
-                queryParams.Add("per_page", perPage);
-            }
-            return queryParams.Build();
-        }
     }
 }
