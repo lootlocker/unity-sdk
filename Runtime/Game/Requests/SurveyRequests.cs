@@ -92,10 +92,10 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// When the current player completed this survey.
-        /// Default (DateTime.MinValue) when the survey has not been completed.
+        /// Null when the survey has not been completed.
         /// Only populated by ListSurveys.
         /// </summary>
-        public DateTime completed_at { get; set; }
+        public DateTime? completed_at { get; set; }
 
         /// <summary>
         /// The questions in this survey, ordered by sort_order

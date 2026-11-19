@@ -134,7 +134,7 @@ namespace LootLockerTests.PlayMode
             Assert.AreEqual(createdSurvey.id, survey.id, "Unexpected survey id");
             Assert.AreEqual("Survey-1", survey.name, "Unexpected survey name");
             Assert.IsFalse(survey.completed, "Survey should not be completed yet");
-            Assert.AreEqual(default(DateTime), survey.completed_at, "completed_at should be unset when not completed");
+            Assert.IsTrue(survey.completed_at == null || survey.completed_at == default(DateTime), "completed_at should be unset when not completed");
             Assert.AreEqual(1, survey.questions?.Length, "Expected exactly one question");
             Assert.AreEqual("survey_answer_1", survey.questions[0].metadata_key, "Unexpected metadata key");
             Assert.IsTrue(survey.questions[0].required, "Question should be required");
@@ -273,7 +273,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(completeResponse.success, "Complete survey failed");
             Assert.IsTrue(completeResponse.complete, "Response should report the survey as complete");
             Assert.AreEqual(createdSurvey.id, completeResponse.survey_id, "Unexpected survey id in response");
-            Assert.AreNotEqual(default(DateTime), completeResponse.completed_at, "completed_at should be set");
+            Assert.IsTrue(completeResponse.completed_at != null && completeResponse.completed_at != default(DateTime), "completed_at should be set");
 
             bool listCompleted = false;
             LootLockerListSurveysResponse listResponse = null;
@@ -287,7 +287,7 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(listResponse.success, "List surveys failed");
             Assert.AreEqual(1, listResponse.surveys?.Length, "Expected exactly one visible survey");
             Assert.IsTrue(listResponse.surveys[0].completed, "Survey should be marked completed");
-            Assert.AreNotEqual(default(DateTime), listResponse.surveys[0].completed_at, "completed_at should be set on the listed survey");
+            Assert.IsTrue(listResponse.surveys[0].completed_at != null && listResponse.surveys[0].completed_at != default(DateTime), "completed_at should be set on the listed survey");
         }
     }
 }
