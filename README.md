@@ -66,6 +66,19 @@ present a `Config File` dropdown appears. Files that cannot be parsed, or that h
 are listed greyed out with the reason, so a broken file is visible but cannot be selected. With a
 single config file there is nothing to choose and no dropdown is shown.
 
+If you add config files and never pick one, the SDK uses the first in lexicographical order rather
+than leaving file config unset. Adding files is an expression of intent, and a silent "no config"
+is a confusing result. The choice is stable regardless of file system enumeration order, and the
+dropdown reports which file auto-detect resolved to. Pick a specific file, or `(None)`, to override
+it.
+
+**Obfuscated configs.** A config file may be plain JSON or an obfuscated payload — base64 of an
+AES-encrypted JSON document, produced by `LootLockerEncryptionUtilities.SimpleEncryptToBase64`.
+Discovery, the dropdown, and the load path all decrypt before parsing, so an obfuscated file is
+classified and selectable exactly like a plain one, and plain and obfuscated profiles can be mixed
+in the same project. A file that is valid base64 but not a payload this SDK produced is reported as
+invalid with the decryption error, not as unreadable.
+
 **Local overrides.** A shared config is the right place for team-wide values, but not for a one-off
 change. Click the closed padlock next to a setting to write a local
 `Assets/LootLockerSDK/LocalOverrides/LootLockerConfig.local.bytes` that is layered on top of the
