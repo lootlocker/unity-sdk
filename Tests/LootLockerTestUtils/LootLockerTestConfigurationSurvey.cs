@@ -47,6 +47,14 @@ namespace LootLockerTestConfigurationUtils
         /// <param name="onComplete">Called with the created survey when the request completes.</param>
         public static void CreateSurveyWithRequiredQuestion(string name, string metadataKey, Action<LootLockerTestCreateSurveyResponse> onComplete)
         {
+            CreateSurveyWithRequiredQuestion(name, metadataKey, "short_text", onComplete);
+        }
+
+        /// <summary>
+        /// Creates a standalone survey with a single required question of the given field type.
+        /// </summary>
+        public static void CreateSurveyWithRequiredQuestion(string name, string metadataKey, string fieldType, Action<LootLockerTestCreateSurveyResponse> onComplete)
+        {
             if (string.IsNullOrEmpty(LootLockerConfig.current.adminToken))
             {
                 onComplete?.Invoke(new LootLockerTestCreateSurveyResponse { success = false, errorData = new LootLockerErrorData { message = "Not logged in" } });
@@ -63,7 +71,7 @@ namespace LootLockerTestConfigurationUtils
                     {
                         question_text = "How did you hear about us?",
                         metadata_key = metadataKey,
-                        field_type = "short_text",
+                        field_type = fieldType,
                         required = true,
                         sort_order = 0
                     }
