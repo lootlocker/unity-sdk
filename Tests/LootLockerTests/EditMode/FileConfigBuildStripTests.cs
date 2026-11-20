@@ -313,12 +313,24 @@ namespace LootLockerTests.EditMode
             // Regression: a null resolution - including an explicit "-lootlockerconfig none" - used
             // to return early without hiding anything, so every profile and every API key in them
             // still shipped. "No config selected" must mean "no config ships", not "all of them do".
+            //
+            // Note: leaving the selection at null no longer reaches this path. Auto-detect now
+            // picks the first profile lexicographically, so a null resolution requires an explicit
+            // opt-out. That is what this test drives.
             WriteConfig("dev");
             WriteConfig("prod");
 
+            LootLockerConfig config = LootLockerConfig.current;
+            if (config == null)
+            {
+                Assert.Ignore("No config asset available in this project");
+            }
+
+            string previousSelection = config.selectedFileConfigId;
             try
             {
-                // An invalid id resolves to null, which is the same path as "none".
+                // "" is explicit none, which is the same resolution path as "-lootlockerconfig none".
+                config.selectedFileConfigId = "";
                 LootLockerConfigBuildProcessor.Prepare(new[] { AbsoluteTempFolder }, overrideResolvedId: null);
 
                 Assert.IsEmpty(VisibleConfigFiles(),
@@ -326,6 +338,7 @@ namespace LootLockerTests.EditMode
             }
             finally
             {
+                config.selectedFileConfigId = previousSelection;
                 LootLockerConfigBuildProcessor.RestoreAll(new[] { AbsoluteTempFolder });
             }
         }
