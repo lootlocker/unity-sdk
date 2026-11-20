@@ -177,8 +177,11 @@ namespace LootLockerTests.EditMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Resolve_MultipleDiscoveredProfilesAreNotGuessed()
+        public void Resolve_MultipleDiscoveredProfilesPickTheFirstLexicographically()
         {
+            // Adding config files and having nothing selected is surprising: the developer has
+            // expressed intent by adding them. Pick the first in lexicographical order so the
+            // choice is stable regardless of file system enumeration order.
             string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
                 selectedId: null,
                 commandLineId: null,
@@ -186,7 +189,47 @@ namespace LootLockerTests.EditMode
                 legacyFilePresent: false,
                 availableIds: new[] { "prod", "debug" });
 
-            Assert.IsNull(resolved, "With several profiles and no selection the SDK must not guess");
+            Assert.AreEqual("debug", resolved,
+                "With several profiles and no selection the first lexicographically must be used");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Resolve_LexicographicalPickIsIndependentOfEnumerationOrder()
+        {
+            // Discovery order comes from the file system, which is not guaranteed. The pick must
+            // not depend on it.
+            string[][] orders =
+            {
+                new[] { "prod", "debug", "staging" },
+                new[] { "staging", "prod", "debug" },
+                new[] { "debug", "staging", "prod" },
+            };
+
+            foreach (string[] availableIds in orders)
+            {
+                string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
+                    selectedId: null,
+                    commandLineId: null,
+                    buildPointerId: null,
+                    legacyFilePresent: false,
+                    availableIds: availableIds);
+
+                Assert.AreEqual("debug", resolved,
+                    $"Enumeration order [{string.Join(", ", availableIds)}] must still pick 'debug'");
+            }
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Resolve_LexicographicalPickIsCaseInsensitive()
+        {
+            string resolved = LootLockerConfigFileResolution.ResolveFileConfigId(
+                selectedId: null,
+                commandLineId: null,
+                buildPointerId: null,
+                legacyFilePresent: false,
+                availableIds: new[] { "Prod", "alpha", "Beta" });
+
+            Assert.AreEqual("alpha", resolved, "Comparison must be case insensitive, so 'alpha' wins");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
