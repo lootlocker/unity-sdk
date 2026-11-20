@@ -115,7 +115,7 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// The answer value. Pass it as its native C# type (string, int, bool, etc.) and set type to match.
-        /// For multiselect answers pass a string array.
+        /// For multiselect answers pass a string array. Prefer the From* helpers, which set both for you.
         /// </summary>
         public object value { get; set; }
 
@@ -126,6 +126,38 @@ namespace LootLocker.Requests
         /// must be declared Bool and given a bool value, not the string "true".
         /// </summary>
         public LootLockerMetadataTypes type { get; set; } = LootLockerMetadataTypes.String;
+
+        /// <summary>
+        /// Build a String answer, for short_text, long_text, date and select questions.
+        /// </summary>
+        public static LootLockerSurveyAnswer FromText(string metadataKey, string value)
+        {
+            return new LootLockerSurveyAnswer { metadata_key = metadataKey, value = value, type = LootLockerMetadataTypes.String };
+        }
+
+        /// <summary>
+        /// Build a Number answer, for number questions.
+        /// </summary>
+        public static LootLockerSurveyAnswer FromNumber(string metadataKey, double value)
+        {
+            return new LootLockerSurveyAnswer { metadata_key = metadataKey, value = value, type = LootLockerMetadataTypes.Number };
+        }
+
+        /// <summary>
+        /// Build a Bool answer, for checkbox questions.
+        /// </summary>
+        public static LootLockerSurveyAnswer FromBool(string metadataKey, bool value)
+        {
+            return new LootLockerSurveyAnswer { metadata_key = metadataKey, value = value, type = LootLockerMetadataTypes.Bool };
+        }
+
+        /// <summary>
+        /// Build a Json answer, for multiselect questions.
+        /// </summary>
+        public static LootLockerSurveyAnswer FromMultiSelect(string metadataKey, string[] selectedValues)
+        {
+            return new LootLockerSurveyAnswer { metadata_key = metadataKey, value = selectedValues, type = LootLockerMetadataTypes.Json };
+        }
     }
 
     //==================================================
