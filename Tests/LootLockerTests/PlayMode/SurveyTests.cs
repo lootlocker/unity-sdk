@@ -289,5 +289,60 @@ namespace LootLockerTests.PlayMode
             Assert.IsTrue(listResponse.surveys[0].completed, "Survey should be marked completed");
             Assert.IsTrue(listResponse.surveys[0].completed_at != null && listResponse.surveys[0].completed_at != default(DateTime), "completed_at should be set on the listed survey");
         }
+
+        [UnityTest, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public IEnumerator Surveys_SubmitSurveyAnswers_WithNonStringAnswerType_Succeeds()
+        {
+            Assert.IsFalse(SetupFailed, "Failed to setup game");
+
+            // Given
+            bool signInCompleted = false;
+            LootLockerSDKManager.StartGuestSession("Survey-Player-5", response => { signInCompleted = true; });
+            yield return new WaitUntil(() => signInCompleted);
+
+            bool createCompleted = false;
+            LootLockerTestSurvey.LootLockerTestCreateSurveyResponse createdSurvey = null;
+            LootLockerTestSurvey.CreateSurveyWithRequiredQuestion("Survey-5", "survey_answer_5", "checkbox", response =>
+            {
+                createdSurvey = response;
+                createCompleted = true;
+            });
+            yield return new WaitUntil(() => createCompleted);
+            Assert.IsTrue(createdSurvey.success, "Failed to create survey");
+
+            // A checkbox answer must be declared Bool. The metadata API validates the declared type,
+            // so sending it as a string would be rejected.
+            bool submitCompleted = false;
+            LootLockerMetadataOperationsResponse submitResponse = null;
+            LootLockerSDKManager.SubmitSurveyAnswers(
+                new[]
+                {
+                    new LootLockerSurveyAnswer
+                    {
+                        metadata_key = "survey_answer_5",
+                        value = true,
+                        type = LootLockerMetadataTypes.Bool
+                    }
+                },
+                response =>
+                {
+                    submitResponse = response;
+                    submitCompleted = true;
+                });
+            yield return new WaitUntil(() => submitCompleted);
+            Assert.IsTrue(submitResponse.success, "Submitting a Bool answer should succeed");
+            Assert.IsTrue(submitResponse.errors == null || submitResponse.errors.Length == 0, "Submitting a Bool answer should not report entry errors");
+
+            bool completeCompleted = false;
+            LootLockerCompleteSurveyResponse completeResponse = null;
+            LootLockerSDKManager.CompleteSurvey(createdSurvey.id, response =>
+            {
+                completeResponse = response;
+                completeCompleted = true;
+            });
+            yield return new WaitUntil(() => completeCompleted);
+
+            Assert.IsTrue(completeResponse.success, "Completing the survey should succeed after a Bool answer was stored");
+        }
     }
 }

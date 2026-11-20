@@ -115,11 +115,15 @@ namespace LootLocker.Requests
 
         /// <summary>
         /// The answer value. Pass it as its native C# type (string, int, bool, etc.) and set type to match.
+        /// For multiselect answers pass a string array.
         /// </summary>
         public object value { get; set; }
 
         /// <summary>
-        /// The metadata type of the value. Defaults to String.
+        /// The metadata type of the value. Must match the question's field_type:
+        /// short_text/long_text/date/select -> String, number -> Number, checkbox -> Bool,
+        /// multiselect -> Json. The metadata API validates the declared type, so a checkbox answer
+        /// must be declared Bool and given a bool value, not the string "true".
         /// </summary>
         public LootLockerMetadataTypes type { get; set; } = LootLockerMetadataTypes.String;
     }
