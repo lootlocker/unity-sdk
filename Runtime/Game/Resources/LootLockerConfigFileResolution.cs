@@ -102,13 +102,24 @@ namespace LootLocker
                 return string.Empty;
             }
 
-            // 5. A single discovered profile is unambiguous, so use it.
-            if (availableIds != null && availableIds.Count == 1)
+            // 5. Auto-detect: pick the first profile in lexicographical order.
+            //
+            // Adding config files and having nothing selected is surprising - the developer has
+            // clearly expressed intent by adding them, so use the first one rather than leaving
+            // the SDK with no file config at all. Lexicographical order makes the choice stable
+            // and predictable regardless of file system enumeration order.
+            if (availableIds != null && availableIds.Count > 0)
             {
+                string first = null;
                 foreach (string id in availableIds)
                 {
-                    return id;
+                    if (first == null || string.Compare(id, first, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        first = id;
+                    }
                 }
+
+                return first;
             }
 
             return null;
