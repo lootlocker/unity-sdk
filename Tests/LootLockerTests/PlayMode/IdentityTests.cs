@@ -149,9 +149,9 @@ namespace LootLockerTests.PlayMode
             Assert.IsNotNull(response.providers);
             Assert.AreEqual(2, response.providers.Length);
             Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.providers[0].id);
-            Assert.AreEqual("steam", response.providers[0].provider);
+            Assert.AreEqual(LootLockerIdentityProvider.steam, response.providers[0].provider);
             Assert.AreEqual("01K9DDDDDDDDDDDDDDDDDDDDDD", response.providers[1].id);
-            Assert.AreEqual("xbox_one", response.providers[1].provider);
+            Assert.AreEqual(LootLockerIdentityProvider.xbox_one, response.providers[1].provider);
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -169,6 +169,48 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingPublisherAccountProvider_MapsToEnum()
+        {
+            // Given: every identity created through publisher sign-in carries a publisher_account credential.
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"publisher_account\",\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // Then
+            Assert.AreEqual(LootLockerIdentityProvider.publisher_account, response.providers[0].provider);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingUnknownProvider_DegradesToUnknown()
+        {
+            // Given: a provider the SDK does not map must not throw and must not land on a real provider, on
+            // either JSON backend. Newtonsoft throws on an unmapped enum name without the field converter.
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"some_future_provider\",\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // Then
+            Assert.AreEqual(1, response.providers.Length);
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, response.providers[0].provider);
+            Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.providers[0].id, "The credential id is still usable");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_DeserializingNullProvider_DegradesToUnknown()
+        {
+            // Given
+            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":null,\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
+
+            // When
+            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
+
+            // Then
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, response.providers[0].provider);
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Identity_GetProviderCredentialId_ReturnsIdForLinkedProvider()
         {
             // Given
@@ -178,6 +220,7 @@ namespace LootLockerTests.PlayMode
             // When/Then
             Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.GetProviderCredentialId(LootLockerIdentityProvider.steam));
             Assert.IsNull(response.GetProviderCredentialId(LootLockerIdentityProvider.xbox_one), "An unlinked provider has no credential id");
+            Assert.IsNull(response.GetProviderCredentialId(LootLockerIdentityProvider.unknown), "unknown must never match a credential");
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -196,17 +239,16 @@ namespace LootLockerTests.PlayMode
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
-        public void Identity_GetProviderCredentialId_AcceptsStoredAlias()
+        public void Identity_ProviderSlugs_ResolveCanonicalMemberNames()
         {
-            // Given: the backend accepts the aliases ios/android/luna when linking and stores whatever the client
-            // sent, so a credential recorded through an alias carries the alias as its provider slug.
-            const string json = "{\"id\":\"01K8Q3KH8N4R2V6W3Z0P5M9XDT\",\"publisher_id\":42,\"created_at\":\"2026-10-19T20:27:03Z\",\"game_activity\":[],\"providers\":[{\"id\":\"01K9CCCCCCCCCCCCCCCCCCCCCC\",\"provider\":\"ios\",\"created_at\":\"2026-10-19T20:27:03Z\"},{\"id\":\"01K9DDDDDDDDDDDDDDDDDDDDDD\",\"provider\":\"android\",\"created_at\":\"2026-10-19T20:27:03Z\"}]}";
-            var response = LootLockerJson.DeserializeObject<LootLockerIdentityResponse>(json);
-
-            // When/Then
-            Assert.AreEqual("01K9CCCCCCCCCCCCCCCCCCCCCC", response.GetProviderCredentialId(LootLockerIdentityProvider.apple_app_store));
-            Assert.AreEqual("01K9DDDDDDDDDDDDDDDDDDDDDD", response.GetProviderCredentialId(LootLockerIdentityProvider.google_play_store));
-            Assert.IsNull(response.GetProviderCredentialId(LootLockerIdentityProvider.amazon_luna), "luna is not linked here");
+            // Given/When/Then: the enum member name is the wire value, and the resolver must agree with what
+            // both JSON backends do natively.
+            Assert.AreEqual(LootLockerIdentityProvider.steam, LootLockerIdentityProviderSlugs.FromString("steam"));
+            Assert.AreEqual(LootLockerIdentityProvider.publisher_account, LootLockerIdentityProviderSlugs.FromString("publisher_account"));
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, LootLockerIdentityProviderSlugs.FromString("ios"), "Aliases are not canonical slugs");
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, LootLockerIdentityProviderSlugs.FromString(null));
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, LootLockerIdentityProviderSlugs.FromString(""));
+            Assert.AreEqual("steam", LootLockerIdentityProviderSlugs.ToSlug(LootLockerIdentityProvider.steam));
         }
 
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
@@ -243,14 +285,26 @@ namespace LootLockerTests.PlayMode
         [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
         public void Identity_ProviderEnumMemberNames_MatchBackendPlatformSlugs()
         {
-            // Given/When/Then: the enum member name is the wire value, so these must not drift from the
-            // backend platform catalog. Enum.GetName avoids a cast through the numeric value.
+            // Given/When/Then: the enum member name is the wire value, so these must not drift from the backend
+            // platform catalog (common/platforms).
             Assert.AreEqual("steam", nameof(LootLockerIdentityProvider.steam));
             Assert.AreEqual("psn", nameof(LootLockerIdentityProvider.psn));
             Assert.AreEqual("white_label_login", nameof(LootLockerIdentityProvider.white_label_login));
             Assert.AreEqual("apple_app_store", nameof(LootLockerIdentityProvider.apple_app_store));
             Assert.AreEqual("nintendo_switch", nameof(LootLockerIdentityProvider.nintendo_switch));
             Assert.AreEqual("google_play_games", nameof(LootLockerIdentityProvider.google_play_games));
+            Assert.AreEqual("lootlocker_delegation", nameof(LootLockerIdentityProvider.lootlocker_delegation));
+            Assert.AreEqual("publisher_account", nameof(LootLockerIdentityProvider.publisher_account));
+            Assert.AreEqual("unknown", nameof(LootLockerIdentityProvider.unknown));
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Identity_ProviderEnum_UnknownIsZeroSoUnpopulatedValuesAreSafe()
+        {
+            // Given/When/Then: a default-initialised enum must be unknown, not a real provider, so an omitted or
+            // unparseable wire value cannot be attributed to steam.
+            Assert.AreEqual(0, (int)LootLockerIdentityProvider.unknown, "unknown must be the default value");
+            Assert.AreEqual(LootLockerIdentityProvider.unknown, default(LootLockerIdentityProvider));
         }
     }
 }

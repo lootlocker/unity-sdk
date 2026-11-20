@@ -1,41 +1,98 @@
 using System;
 using System.Collections.Generic;
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+using Newtonsoft.Json;
+#else
+using LLlibs.ZeroDepJson;
+#endif
 using LootLocker.LootLockerEnums;
 using LootLocker.Requests;
 
 namespace LootLocker.LootLockerEnums
 {
     /// <summary>
-    /// Platforms that can be presented as a credential when linking a provider to an identity.
+    /// Platforms that can be presented as a credential when linking a provider to an identity, and that can
+    /// therefore appear in an identity's provider list.
     ///
     /// Member names are the wire values the backend accepts, so they are sent as-is. The values are the
     /// platform catalog slugs used by LootLocker, which are not the same catalogue as
     /// <see cref="LootLockerAccountProvider"/>.
-        ///
-        /// The backend additionally accepts the aliases <c>ios</c> (apple_app_store), <c>android</c>
-        /// (google_play_store) and <c>luna</c> (amazon_luna) for these members.
+    ///
+    /// Always send the canonical member when linking. The backend accepts the aliases <c>ios</c>,
+    /// <c>android</c> and <c>luna</c>, and stores whichever form was sent, but a stored alias is reported as
+    /// <see cref="unknown"/> because this SDK only maps canonical slugs.
     /// </summary>
     public enum LootLockerIdentityProvider
     {
-        steam = 0,
-        psn = 1,
-        apple_app_store = 2,
-        google_play_store = 3,
-        xbox_one = 4,
-        nintendo_switch = 5,
-        amazon_luna = 6,
-        white_label_login = 7,
-        guest = 8,
-        apple_sign_in = 9,
-        google_sign_in = 10,
-        epic_games = 11,
-        apple_game_center = 12,
-        meta = 13,
-        twitch = 14,
-        google_play_games = 15,
-            discord = 16,
-            lootlocker_delegation = 17
+        /// <summary>
+        /// A provider this SDK does not recognise, or one the response did not populate.
+        ///
+        /// Zero on purpose: an unpopulated or unparseable value must not land on a real provider. Both JSON
+        /// backends resolve an unrecognised slug to this member.
+        /// </summary>
+        unknown = 0,
+        steam = 1,
+        psn = 2,
+        apple_app_store = 3,
+        google_play_store = 4,
+        xbox_one = 5,
+        nintendo_switch = 6,
+        amazon_luna = 7,
+        white_label_login = 8,
+        guest = 9,
+        apple_sign_in = 10,
+        google_sign_in = 11,
+        epic_games = 12,
+        apple_game_center = 13,
+        meta = 14,
+        lootlocker_delegation = 15,
+        twitch = 16,
+        google_play_games = 17,
+        discord = 18,
+        /// <summary>
+        /// A publisher account credential (email). Every identity created through publisher sign-in carries one,
+        /// so it appears in the provider list. It is not linkable through the link endpoint.
+        /// </summary>
+        publisher_account = 19
     }
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+    /// <summary>
+    /// Maps a provider slug to <see cref="LootLockerIdentityProvider"/> without throwing on a value the enum
+    /// does not know.
+    ///
+    /// Newtonsoft's StringEnumConverter throws on an unrecognised name, which would fail the whole response.
+    /// The ZeroDep backend resolves enums itself and already degrades to <see cref="LootLockerIdentityProvider.unknown"/>,
+    /// so this converter exists only to give Newtonsoft the same behaviour.
+    /// </summary>
+    internal sealed class LootLockerIdentityProviderConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(LootLockerIdentityProvider);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return LootLockerIdentityProvider.unknown;
+            }
+
+            if (reader.TokenType != JsonToken.String)
+            {
+                return LootLockerIdentityProvider.unknown;
+            }
+
+            return LootLockerIdentityProviderSlugs.FromString((string)reader.Value);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteValue(((LootLockerIdentityProvider)value).ToString());
+        }
+    }
+#endif
 }
 
 namespace LootLocker.Requests
@@ -81,9 +138,16 @@ namespace LootLocker.Requests
         /// </summary>
         public string id { get; set; }
         /// <summary>
-        /// The provider slug, for example <c>steam</c>, <c>psn</c> or <c>xbox_one</c>.
+        /// The provider this credential belongs to.
+        ///
+        /// <see cref="LootLockerIdentityProvider.unknown"/> when the backend reported a slug this SDK does not
+        /// map. A credential linked through a platform alias (<c>ios</c>, <c>android</c>, <c>luna</c>) also
+        /// reports unknown, because this SDK only maps canonical slugs.
         /// </summary>
-        public string provider { get; set; }
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+        [JsonConverter(typeof(LootLockerIdentityProviderConverter))]
+#endif
+        public LootLockerIdentityProvider provider { get; set; }
         /// <summary>
         /// When the credential was linked to the identity.
         /// </summary>
@@ -130,14 +194,14 @@ namespace LootLocker.Requests
         /// <param name="provider">The provider to find the credential id for.</param>
         public string GetProviderCredentialId(LootLockerIdentityProvider provider)
         {
-            if (providers == null)
+            if (providers == null || provider == LootLockerIdentityProvider.unknown)
             {
                 return null;
             }
 
             foreach (var linked in providers)
             {
-                if (linked != null && LootLockerIdentityProviderSlugs.Matches(provider, linked.provider))
+                if (linked != null && linked.provider == provider)
                 {
                     return linked.id;
                 }
@@ -362,21 +426,18 @@ namespace LootLocker.Requests
         ///
         /// Pass the result to <c>UnlinkProvider</c>. Returns null when <see cref="providers"/> is null, which is
         /// the case for identities returned by lookup and merge.
-        ///
-        /// The match accepts the platform alias as well as the canonical slug, because the backend accepts
-        /// either when a credential is linked and stores whatever the client sent.
         /// </summary>
         /// <param name="provider">The provider to find the credential id for.</param>
         public string GetProviderCredentialId(LootLockerIdentityProvider provider)
         {
-            if (providers == null)
+            if (providers == null || provider == LootLockerIdentityProvider.unknown)
             {
                 return null;
             }
 
             foreach (var linked in providers)
             {
-                if (linked != null && LootLockerIdentityProviderSlugs.Matches(provider, linked.provider))
+                if (linked != null && linked.provider == provider)
                 {
                     return linked.id;
                 }
@@ -387,42 +448,46 @@ namespace LootLocker.Requests
     }
 
     /// <summary>
-    /// Helpers for comparing a provider enum member against the slug the backend stored.
+    /// Helpers for converting between <see cref="LootLockerIdentityProvider"/> and the slug the backend reports.
+    ///
+    /// Both JSON backends resolve a provider slug by exact member name and fall back to
+    /// <see cref="LootLockerIdentityProvider.unknown"/>, which is also what these helpers do.
     /// </summary>
     public static class LootLockerIdentityProviderSlugs
     {
         /// <summary>
-        /// The alias the backend accepts and may therefore have stored for a provider, or null when the
-        /// provider has none.
+        /// Resolves a provider slug to a provider, matching the member name exactly.
+        ///
+        /// Returns <see cref="LootLockerIdentityProvider.unknown"/> for any value this SDK does not map, so a
+        /// provider added to the platform catalog later degrades instead of throwing or being misattributed.
         /// </summary>
-        public static string AliasFor(LootLockerIdentityProvider provider)
-        {
-            switch (provider)
-            {
-                case LootLockerIdentityProvider.apple_app_store: return "ios";
-                case LootLockerIdentityProvider.google_play_store: return "android";
-                case LootLockerIdentityProvider.amazon_luna: return "luna";
-                default: return null;
-            }
-        }
-
-        /// <summary>
-        /// Whether a stored slug refers to the given provider, accepting either the canonical slug or its alias.
-        /// </summary>
-        public static bool Matches(LootLockerIdentityProvider provider, string storedSlug)
+        /// <param name="storedSlug">The provider slug as reported by the backend.</param>
+        public static LootLockerIdentityProvider FromString(string storedSlug)
         {
             if (string.IsNullOrEmpty(storedSlug))
             {
-                return false;
+                return LootLockerIdentityProvider.unknown;
             }
 
-            if (storedSlug == provider.ToString())
+            foreach (LootLockerIdentityProvider provider in Enum.GetValues(typeof(LootLockerIdentityProvider)))
             {
-                return true;
+                if (provider != LootLockerIdentityProvider.unknown &&
+                    string.Equals(provider.ToString(), storedSlug, StringComparison.Ordinal))
+                {
+                    return provider;
+                }
             }
 
-            var alias = AliasFor(provider);
-            return alias != null && storedSlug == alias;
+            return LootLockerIdentityProvider.unknown;
+        }
+
+        /// <summary>
+        /// The wire slug for a provider, which is the enumerator name.
+        /// </summary>
+        /// <param name="provider">The provider to get the slug for.</param>
+        public static string ToSlug(LootLockerIdentityProvider provider)
+        {
+            return provider.ToString();
         }
     }
 
@@ -559,6 +624,13 @@ namespace LootLocker
         public static void LinkProvider(string forPlayerWithUlid, LootLockerIdentityLinkRequest request, Action<LootLockerIdentityLinkResponse> onComplete)
         {
             if (request == null || string.IsNullOrEmpty(request.provider_uid))
+            {
+                onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerIdentityLinkResponse>(forPlayerWithUlid));
+                return;
+            }
+
+            // unknown is not a provider; sending it would fail the backend's platform catalog check with a 400.
+            if (request.provider == LootLockerIdentityProvider.unknown)
             {
                 onComplete?.Invoke(LootLockerResponseFactory.InputUnserializableError<LootLockerIdentityLinkResponse>(forPlayerWithUlid));
                 return;
