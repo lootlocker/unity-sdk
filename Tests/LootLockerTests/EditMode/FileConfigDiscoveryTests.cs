@@ -239,5 +239,93 @@ namespace LootLockerTests.EditMode
             CollectionAssert.AreEqual(listed, read,
                 "The reader must be given exactly the names that were listed");
         }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_EncryptedConfigIsClassifiedValid()
+        {
+            // Obfuscated configs are base64 of an AES payload, not JSON. Discovery must decrypt
+            // before parsing, otherwise an encrypted profile shows up as invalid and cannot be
+            // selected - which would make the obfuscation feature unusable.
+            string encrypted = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities
+                .SimpleEncryptToBase64(ValidJson);
+
+            var contents = new Dictionary<string, string>
+            {
+                ["LootLockerConfig-prod.bytes"] = encrypted,
+            };
+
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found =
+                LootLockerConfigFileResolution.DiscoverFileConfigs(
+                    Listing(contents.Keys.ToArray()), Reader(contents));
+
+            Assert.AreEqual(1, found.Count, "The encrypted file must be discovered");
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Valid, found[0].State,
+                "An encrypted config with an api_key must be classified valid");
+            Assert.IsNull(found[0].Reason, "A valid encrypted config must carry no error reason");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_EncryptedConfigWithoutApiKeyIsInvalid()
+        {
+            // Decryption succeeding is not enough: the payload still has to be a usable config.
+            string encrypted = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities
+                .SimpleEncryptToBase64("{\"game_version\":\"1.0.0\"}");
+
+            var contents = new Dictionary<string, string>
+            {
+                ["LootLockerConfig-prod.bytes"] = encrypted,
+            };
+
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found =
+                LootLockerConfigFileResolution.DiscoverFileConfigs(
+                    Listing(contents.Keys.ToArray()), Reader(contents));
+
+            Assert.AreEqual(1, found.Count, "The encrypted file must be discovered");
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Invalid, found[0].State,
+                "An encrypted config without an api_key must be classified invalid");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_Base64ThatIsNotOurCiphertextIsInvalidNotUnreadable()
+        {
+            // Valid base64 that is not an AES payload we produced: decryption throws. That must
+            // surface as Invalid (a bad file) rather than Unreadable (an I/O problem), so the UI
+            // reports the right thing.
+            var contents = new Dictionary<string, string>
+            {
+                ["LootLockerConfig-prod.bytes"] = "bm90IG91ciBjaXBoZXJ0ZXh0",
+            };
+
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found =
+                LootLockerConfigFileResolution.DiscoverFileConfigs(
+                    Listing(contents.Keys.ToArray()), Reader(contents));
+
+            Assert.AreEqual(1, found.Count, "The file must be discovered");
+            Assert.AreEqual(LootLockerConfigFileResolution.FileConfigState.Invalid, found[0].State,
+                "Undecryptable base64 must be classified invalid, not unreadable");
+        }
+
+        [Test, Category("LootLocker"), Category("LootLockerCI"), Category("LootLockerCIFast")]
+        public void Discovery_MixedPlainAndEncryptedProfilesAreBothValid()
+        {
+            // A project may keep some profiles plain for readability and others obfuscated for
+            // shipping. Both must be selectable side by side.
+            string encrypted = LootLocker.Utilities.Encryption.LootLockerEncryptionUtilities
+                .SimpleEncryptToBase64("{\"api_key\":\"encrypted-key\"}");
+
+            var contents = new Dictionary<string, string>
+            {
+                ["LootLockerConfig-plain.bytes"] = ValidJson,
+                ["LootLockerConfig-secret.bytes"] = encrypted,
+            };
+
+            List<LootLockerConfigFileResolution.FileConfigDescriptor> found =
+                LootLockerConfigFileResolution.DiscoverFileConfigs(
+                    Listing(contents.Keys.ToArray()), Reader(contents));
+
+            Assert.AreEqual(2, found.Count, "Both profiles must be discovered");
+            Assert.IsTrue(found.All(d => d.State == LootLockerConfigFileResolution.FileConfigState.Valid),
+                "Plain and encrypted profiles must both be valid");
+        }
     }
 }
