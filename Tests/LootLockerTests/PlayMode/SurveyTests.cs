@@ -244,12 +244,7 @@ namespace LootLockerTests.PlayMode
             LootLockerSDKManager.SubmitSurveyAnswers(
                 new[]
                 {
-                    new LootLockerSurveyAnswer
-                    {
-                        metadata_key = "survey_answer_4",
-                        value = "From a friend",
-                        type = LootLockerMetadataTypes.String
-                    }
+                    LootLockerSurveyAnswer.FromText("survey_answer_4", "From a friend")
                 },
                 response =>
                 {
@@ -317,12 +312,7 @@ namespace LootLockerTests.PlayMode
             LootLockerSDKManager.SubmitSurveyAnswers(
                 new[]
                 {
-                    new LootLockerSurveyAnswer
-                    {
-                        metadata_key = "survey_answer_5",
-                        value = true,
-                        type = LootLockerMetadataTypes.Bool
-                    }
+                    LootLockerSurveyAnswer.FromBool("survey_answer_5", true)
                 },
                 response =>
                 {
