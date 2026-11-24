@@ -24,6 +24,11 @@ permissions:
   contents: write
   pull-requests: write
 
+# Serialize release runs so two dispatches cannot race on the dev branch.
+concurrency:
+  group: open-release-pr
+  cancel-in-progress: false
+
 jobs:
   open-pr:
     name: Create release candidate PR
@@ -49,7 +54,7 @@ jobs:
           echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Current version: ${VERSION}"
 
-      - name: Check for an existing release PR
+      - name: Check for an existing release PR or pending bump
         id: existing-pr
         run: |
           PR_NUMBER=$(gh pr list \
@@ -59,6 +64,25 @@ jobs:
             --json number,labels \
             --jq '[.[] | select([.labels[].name | ascii_downcase] | index("release candidate"))][0].number // ""')
           echo "PR_NUMBER=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+
+          # A previous run may have pushed the bump to dev and then failed before
+          # opening the PR. Reuse that version instead of bumping again.
+          PENDING_VERSION=""
+          if [ -z "$PR_NUMBER" ]; then
+            PENDING_VERSION=$(git log -1 --format=%s origin/dev | sed -n 's/^Bump version to v\{0,1\}\([0-9][0-9.]*\)$/\1/p')
+            if [ "$PENDING_VERSION" = "${{ steps.current.outputs.VERSION }}" ]; then
+              PENDING_VERSION=""
+            fi
+            # A bump that already has a release tag was released, not left pending.
+            if [ -n "$PENDING_VERSION" ] && git rev-parse -q --verify "refs/tags/v${PENDING_VERSION}" >/dev/null; then
+              PENDING_VERSION=""
+            fi
+            if [ -n "$PENDING_VERSION" ]; then
+              echo "PENDING_VERSION=${PENDING_VERSION}" >> "$GITHUB_OUTPUT"
+              echo "::warning::dev already carries an unreleased bump to ${PENDING_VERSION} with no release PR. Reusing it instead of bumping again."
+            fi
+          fi
+
           if [ -n "$PR_NUMBER" ]; then
             echo "Release PR #${PR_NUMBER} is already open. It will be updated instead of opening a new one."
             echo "::notice::Release PR #${PR_NUMBER} already exists; the version bump inputs are ignored. Close that PR first to bump again."
@@ -86,7 +110,7 @@ jobs:
 
       - name: Calculate new version
         id: new-version
-        if: steps.existing-pr.outputs.PR_NUMBER == ''
+        if: steps.existing-pr.outputs.PR_NUMBER == '' && steps.existing-pr.outputs.PENDING_VERSION == ''
         run: |
           CURRENT="${{ steps.current.outputs.VERSION }}"
           CUSTOM="${{ inputs.custom_version }}"
@@ -144,6 +168,8 @@ jobs:
         run: |
           if [ -n "${{ steps.existing-pr.outputs.PR_NUMBER }}" ]; then
             VERSION="${{ steps.current.outputs.VERSION }}"
+          elif [ -n "${{ steps.existing-pr.outputs.PENDING_VERSION }}" ]; then
+            VERSION="${{ steps.existing-pr.outputs.PENDING_VERSION }}"
           else
             VERSION="${{ steps.new-version.outputs.VERSION }}"
           fi
@@ -151,29 +177,37 @@ jobs:
           echo "TAG=v${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Release version: ${VERSION}"
 
-      - name: Update version in package.json
-        if: steps.existing-pr.outputs.PR_NUMBER == ''
-        run: |
-          NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
-          jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
-          mv package.json.tmp package.json
-          echo "Updated package.json version to ${NEW_VERSION}"
-
       - name: Commit version bump to dev
-        if: steps.existing-pr.outputs.PR_NUMBER == ''
+        if: steps.existing-pr.outputs.PR_NUMBER == '' && steps.existing-pr.outputs.PENDING_VERSION == ''
         run: |
           NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
 
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          git add package.json
-          if git diff --cached --quiet; then
-            echo "Version is already ${NEW_VERSION}; nothing to commit."
-          else
+          # dev may have moved since checkout, so re-apply the bump on top of the
+          # latest dev and retry rather than failing on a non-fast-forward push.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin dev
+            git reset --hard origin/dev
+            jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
+            mv package.json.tmp package.json
+            git add package.json
+            if git diff --cached --quiet; then
+              echo "Version is already ${NEW_VERSION}; nothing to commit."
+              exit 0
+            fi
             git commit -m "Bump version to ${NEW_VERSION}"
-            git push origin HEAD:dev
-          fi
+            if git push origin HEAD:dev; then
+              echo "Pushed version bump to dev."
+              exit 0
+            fi
+            echo "::warning::Push to dev failed (attempt ${attempt}); retrying against the latest dev."
+            sleep $((attempt * 5))
+          done
+
+          echo "::error::Could not push the version bump to dev after 5 attempts."
+          exit 1
 
       - name: Generate release notes
         run: |
