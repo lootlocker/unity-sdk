@@ -36,6 +36,7 @@ jobs:
         with:
           ref: dev
           fetch-depth: 0
+          token: ${{ secrets.LL_PERSONAL_ACCESS_TOKEN }}
 
       - name: Read current version
         id: current
@@ -47,6 +48,23 @@ jobs:
           fi
           echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Current version: ${VERSION}"
+
+      - name: Check for an existing release PR
+        id: existing-pr
+        run: |
+          PR_NUMBER=$(gh pr list \
+            --base main \
+            --head dev \
+            --state open \
+            --json number,labels \
+            --jq '[.[] | select([.labels[].name | ascii_downcase] | index("release candidate"))][0].number // ""')
+          echo "PR_NUMBER=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Release PR #${PR_NUMBER} is already open. It will be updated instead of opening a new one."
+            echo "::notice::Release PR #${PR_NUMBER} already exists; the version bump inputs are ignored. Close that PR first to bump again."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Get previous release tag and commit log
         id: prev-tag
@@ -68,6 +86,7 @@ jobs:
 
       - name: Calculate new version
         id: new-version
+        if: steps.existing-pr.outputs.PR_NUMBER == ''
         run: |
           CURRENT="${{ steps.current.outputs.VERSION }}"
           CUSTOM="${{ inputs.custom_version }}"
@@ -120,34 +139,47 @@ jobs:
           echo "TAG=v${NEW}" >> "$GITHUB_OUTPUT"
           echo "VERSION=${NEW}" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve release version
+        id: release-version
+        run: |
+          if [ -n "${{ steps.existing-pr.outputs.PR_NUMBER }}" ]; then
+            VERSION="${{ steps.current.outputs.VERSION }}"
+          else
+            VERSION="${{ steps.new-version.outputs.VERSION }}"
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "TAG=v${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Release version: ${VERSION}"
 
       - name: Update version in package.json
+        if: steps.existing-pr.outputs.PR_NUMBER == ''
         run: |
-          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
           jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
           mv package.json.tmp package.json
           echo "Updated package.json version to ${NEW_VERSION}"
 
-      - name: Create branch and commit
+      - name: Commit version bump to dev
+        if: steps.existing-pr.outputs.PR_NUMBER == ''
         run: |
-          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
-          BRANCH="release/v${NEW_VERSION}"
+          NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
 
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          git checkout -b "$BRANCH"
           git add package.json
-          git commit -m "Bump version to ${NEW_VERSION}"
-          git push origin "$BRANCH"
-
-          echo "BRANCH=${BRANCH}" >> "$GITHUB_ENV"
+          if git diff --cached --quiet; then
+            echo "Version is already ${NEW_VERSION}; nothing to commit."
+          else
+            git commit -m "Bump version to ${NEW_VERSION}"
+            git push origin HEAD:dev
+          fi
 
       - name: Generate release notes
         run: |
           PREV="${{ steps.prev-tag.outputs.TAG }}"
-          NEW_TAG="${{ steps.new-version.outputs.TAG }}"
-          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          NEW_TAG="${{ steps.release-version.outputs.TAG }}"
+          NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
           COMMITS=$(cat /tmp/commits.log)
 
           echo "::group::Commits since ${PREV:-beginning}"
@@ -178,17 +210,24 @@ jobs:
 
           echo "Release notes generated."
 
-      - name: Create PR
+      - name: Create or update PR
         run: |
-          NEW_VERSION="${{ steps.new-version.outputs.VERSION }}"
+          NEW_VERSION="${{ steps.release-version.outputs.VERSION }}"
           TITLE="Release v${NEW_VERSION}"
+          PR_NUMBER="${{ steps.existing-pr.outputs.PR_NUMBER }}"
 
-          gh pr create \
-            --title "$TITLE" \
-            --body "$(cat /tmp/release-notes.md)" \
-            --base main \
-            --head "$BRANCH" \
-            --label "release candidate" \
-            --reviewer "kirre-bylund"
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" \
+              --title "$TITLE" \
+              --body-file /tmp/release-notes.md
+          else
+            gh pr create \
+              --title "$TITLE" \
+              --body-file /tmp/release-notes.md \
+              --base main \
+              --head dev \
+              --label "release candidate" \
+              --reviewer "kirre-bylund"
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
