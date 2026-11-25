@@ -59,7 +59,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.3.0</span>
+      <span id="ll-topnav-version">v8.4.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.4.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -343,6 +343,7 @@ $(function() {
 </div><div class="memdoc">
 
 <p>Manually initialize the SDK. </p>
+<p>Values passed here take precedence over every file-based configuration source, including a selected file config and the local override file. They are applied for the lifetime of the process only and are never written back to the config asset, so calling this cannot change what other developers or builds use.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">apiKey</td><td>Find the Game API-key at <a href="https://console.lootlocker.com/settings/api-keys">https://console.lootlocker.com/settings/api-keys</a> and click on the API-tab</td></tr>
@@ -355,7 +356,7 @@ $(function() {
     <tr><td class="paramname">prettifyJson</td><td>If true, JSON logs will be prettified.</td></tr>
     <tr><td class="paramname">obfuscateLogs</td><td>If true, sensitive information in logs will be obfuscated.</td></tr>
     <tr><td class="paramname">enablePresence</td><td>If true, presence features will be enabled.</td></tr>
-    <tr><td class="paramname">enablePresenceAutoConnect</td><td>If true, presence will auto-connect.</td></tr>
+    <tr><td class="paramname">enablePresenceAutoConnect</td><td>If true, presence will auto-connect. This only controls whether connections are initiated automatically; once connected (automatically or manually), presence is maintained until explicitly disconnected.</td></tr>
     <tr><td class="paramname">enablePresenceAutoDisconnectOnFocusChange</td><td>If true, presence will auto-disconnect on focus change.</td></tr>
     <tr><td class="paramname">enablePresenceInEditor</td><td>If true, presence will be enabled in the editor.</td></tr>
     <tr><td class="paramname">multiUserSessionMode</td><td>Optional : Controls how the SDK handles multiple player sessions when a new authentication succeeds. If not supplied (or set to NotSet), the mode already stored in the config is preserved.</td></tr>

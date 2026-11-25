@@ -7,10 +7,13 @@ var topics =
     [ "White Label Login", "group__WhiteLabel.html", "group__WhiteLabel" ],
     [ "Remote Sessions", "group__RemoteSessions.html", "group__RemoteSessions" ],
     [ "Connected Accounts", "group__ConnectedAccounts.html", "group__ConnectedAccounts" ],
+    [ "Identity", "group__Identity.html", "group__Identity" ],
     [ "Presence", "group__Presence.html", "group__Presence" ],
     [ "Friends", "group__Friends.html", "group__Friends" ],
     [ "Followers", "group__Followers.html", "group__Followers" ],
     [ "Player", "group__Player.html", "group__Player" ],
+    [ "Equipment", "group__Equipment.html", "group__Equipment" ],
+    [ "Referrals", "group__Referrals.html", "group__Referrals" ],
     [ "Player Files", "group__PlayerFiles.html", "group__PlayerFiles" ],
     [ "Player Progressions", "group__PlayerProgressions.html", "group__PlayerProgressions" ],
     [ "Player Storage", "group__PlayerStorage.html", "group__PlayerStorage" ],
@@ -39,6 +42,7 @@ var topics =
     [ "Broadcasts", "group__Broadcasts.html", "group__Broadcasts" ],
     [ "Reports", "group__Reports.html", "group__Reports" ],
     [ "Feedback", "group__Feedback.html", "group__Feedback" ],
+    [ "Surveys", "group__Surveys.html", "group__Surveys" ],
     [ "Miscellaneous Utilities", "group__Misc.html", "group__Misc" ],
     [ "Event System", "group__EventSystem.html", "group__EventSystem" ]
 ];

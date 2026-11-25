@@ -59,7 +59,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.3.0</span>
+      <span id="ll-topnav-version">v8.4.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.4.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -262,7 +262,7 @@ $(function() {
 </div>
 </div>
 <a id="ga62a8eabd040e03b4c46afc36ba83a846" name="ga62a8eabd040e03b4c46afc36ba83a846"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga62a8eabd040e03b4c46afc36ba83a846">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga62a8eabd040e03b4c46afc36ba83a846">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +300,7 @@ $(function() {
 </div>
 </div>
 <a id="gacd22ca5c72b338ee33ea8d0fad6fe9b7" name="gacd22ca5c72b338ee33ea8d0fad6fe9b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacd22ca5c72b338ee33ea8d0fad6fe9b7">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#gacd22ca5c72b338ee33ea8d0fad6fe9b7">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -344,7 +344,7 @@ $(function() {
 </div>
 </div>
 <a id="ga1e814d96c5efbe9f9cbdbdaa7f2509bd" name="ga1e814d96c5efbe9f9cbdbdaa7f2509bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1e814d96c5efbe9f9cbdbdaa7f2509bd">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[3/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e814d96c5efbe9f9cbdbdaa7f2509bd">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -393,8 +393,64 @@ $(function() {
 
 </div>
 </div>
+<a id="gaf8f86506247908fd1d45eebaf0adfd3c" name="gaf8f86506247908fd1d45eebaf0adfd3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf8f86506247908fd1d45eebaf0adfd3c">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LootLocker.Requests.LootLockerSDKManager.ListEntitlements </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string</td>          <td class="paramname"><span class="paramname"><em>after</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string[]</td>          <td class="paramname"><span class="paramname"><em>catalogListingIds</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html">LootLockerEntitlementHistoryResponse</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>onComplete</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string</td>          <td class="paramname"><span class="paramname"><em>forPlayerWithUlid</em></span><span class="paramdefsep"> = </span><span class="paramdefval">null</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>List this player's historical entitlements, optionally limited to entitlements that contain any of the given catalog listings Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Optional: Amount of historical entries to fetch</td></tr>
+    <tr><td class="paramname">after</td><td>Optional: Used for pagination, this is the cursor to start getting entries from. Use null or use an overload without the parameter to get entries from the beginning. Use the cursor from a previous call to get the next count of entries in the list.</td></tr>
+    <tr><td class="paramname">catalogListingIds</td><td>Optional: Only return entitlements that contain an item belonging to any of these catalog listings. Pass null or an empty array to return entitlements regardless of catalog listing.</td></tr>
+    <tr><td class="paramname">onComplete</td><td>onComplete Action for handling the response</td></tr>
+    <tr><td class="paramname">forPlayerWithUlid</td><td>Optional : Execute the request for the specified player. If not supplied, the default player will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ga5a9b13c59cd410e7d256ff3533790cf9" name="ga5a9b13c59cd410e7d256ff3533790cf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5a9b13c59cd410e7d256ff3533790cf9">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[4/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5a9b13c59cd410e7d256ff3533790cf9">&#9670;&#160;</a></span>ListEntitlements() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -442,6 +498,8 @@ $(function() {
 Functions</h2></td></tr>
 <tr class="memitem:ga1e814d96c5efbe9f9cbdbdaa7f2509bd" id="r_ga1e814d96c5efbe9f9cbdbdaa7f2509bd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1e814d96c5efbe9f9cbdbdaa7f2509bd">LootLocker.Requests.LootLockerSDKManager.ListEntitlements</a> (int count, string after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html">LootLockerEntitlementHistoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:ga1e814d96c5efbe9f9cbdbdaa7f2509bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">List this player's historical entitlements Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards).  <br /></td></tr>
+<tr class="memitem:gaf8f86506247908fd1d45eebaf0adfd3c" id="r_gaf8f86506247908fd1d45eebaf0adfd3c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaf8f86506247908fd1d45eebaf0adfd3c">LootLocker.Requests.LootLockerSDKManager.ListEntitlements</a> (int count, string after, string[] catalogListingIds, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html">LootLockerEntitlementHistoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
+<tr class="memdesc:gaf8f86506247908fd1d45eebaf0adfd3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">List this player's historical entitlements, optionally limited to entitlements that contain any of the given catalog listings Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards).  <br /></td></tr>
 <tr class="memitem:gacd22ca5c72b338ee33ea8d0fad6fe9b7" id="r_gacd22ca5c72b338ee33ea8d0fad6fe9b7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gacd22ca5c72b338ee33ea8d0fad6fe9b7">LootLocker.Requests.LootLockerSDKManager.ListEntitlements</a> (int count, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html">LootLockerEntitlementHistoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>
 <tr class="memdesc:gacd22ca5c72b338ee33ea8d0fad6fe9b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">List this player's historical entitlements Use this to retrieve information on entitlements the player has received regardless of their origin (for example as an effect of progression, purchases, or leaderboard rewards).  <br /></td></tr>
 <tr class="memitem:ga5a9b13c59cd410e7d256ff3533790cf9" id="r_ga5a9b13c59cd410e7d256ff3533790cf9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga5a9b13c59cd410e7d256ff3533790cf9">LootLocker.Requests.LootLockerSDKManager.ListEntitlements</a> (string after, Action&lt; <a class="el" href="classLootLocker_1_1Requests_1_1LootLockerEntitlementHistoryResponse.html">LootLockerEntitlementHistoryResponse</a> &gt; onComplete, string forPlayerWithUlid=null)</td></tr>

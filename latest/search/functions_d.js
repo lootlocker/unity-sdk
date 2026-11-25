@@ -5,6 +5,7 @@ var searchData=
   ['ping_2',['Ping',['../group__Misc.html#gafbfd78f07f4dc4870c0f6a44f6fe9a18',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['pollorderstatus_3',['PollOrderStatus',['../group__Purchasing.html#ga4b7d3d5194a0cdefa9f34b3aede28ca7',1,'LootLocker::Requests::LootLockerSDKManager']]],
   ['populateconveniencestructures_4',['PopulateConvenienceStructures',['../classLootLocker_1_1Requests_1_1LootLockerListNotificationsResponse.html#a646298803a38bdd0fa2715301dc0af0c',1,'LootLocker::Requests::LootLockerListNotificationsResponse']]],
-  ['promoteplayerfilerevision_5',['PromotePlayerFileRevision',['../group__PlayerFiles.html#ga10407b71c8c9bd1b4390d6a7b91ed568',1,'LootLocker::Requests::LootLockerSDKManager']]],
-  ['promoteplayerfilerevisionbykey_6',['PromotePlayerFileRevisionByKey',['../group__PlayerFiles.html#gaa57c3916eab8aaa9b11a6ac6ddb4f273',1,'LootLocker::Requests::LootLockerSDKManager']]]
+  ['previewidentitymerge_5',['PreviewIdentityMerge',['../group__Identity.html#ga16052f4be76ce1078b7be85eb8ea7753',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['promoteplayerfilerevision_6',['PromotePlayerFileRevision',['../group__PlayerFiles.html#ga10407b71c8c9bd1b4390d6a7b91ed568',1,'LootLocker::Requests::LootLockerSDKManager']]],
+  ['promoteplayerfilerevisionbykey_7',['PromotePlayerFileRevisionByKey',['../group__PlayerFiles.html#gaa57c3916eab8aaa9b11a6ac6ddb4f273',1,'LootLocker::Requests::LootLockerSDKManager']]]
 ];

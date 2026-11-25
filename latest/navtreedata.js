@@ -50,6 +50,10 @@ var NAVTREE =
     [ "LootLockerEntitlementHistoryListingStatus", "namespaceLootLocker_1_1LootLockerEnums.html#a661f9e2bb3444722cdbe492fd131acbc", null ],
     [ "LootLockerEntitlementHistoryListingStore", "namespaceLootLocker_1_1LootLockerEnums.html#ac6b1b20624bc73c05cc8b3b2016b90a9", null ],
     [ "LootLockerEntitlementHistoryListingType", "namespaceLootLocker_1_1LootLockerEnums.html#a0cda66ebb8d3f52fe0b3715264acbdf7", null ],
+    [ "LootLockerIdentityProvider", "namespaceLootLocker_1_1LootLockerEnums.html#a3c91dea2ea78a915e06abd213db67815", [
+      [ "unknown", "namespaceLootLocker_1_1LootLockerEnums.html#a3c91dea2ea78a915e06abd213db67815aad921d60486366258809553a3db49a4a", null ],
+      [ "publisher_account", "namespaceLootLocker_1_1LootLockerEnums.html#a3c91dea2ea78a915e06abd213db67815a88f9b69ddaa763562bcb1a5a7f6127ab", null ]
+    ] ],
     [ "LootLockerItemSortField", "namespaceLootLocker_1_1LootLockerEnums.html#ab2a3741c22b09082e2551704d105f2dd", [
       [ "created_at", "namespaceLootLocker_1_1LootLockerEnums.html#ab2a3741c22b09082e2551704d105f2ddafde81f1177b1541755b672c9dc97315a", null ],
       [ "updated_at", "namespaceLootLocker_1_1LootLockerEnums.html#ab2a3741c22b09082e2551704d105f2ddaafd1a1a8e69e4b32a11a645da8280f8a", null ],
@@ -65,6 +69,17 @@ var NAVTREE =
     [ "LootLockerNotificationContentKind", "namespaceLootLocker_1_1LootLockerEnums.html#a966bf506c6915e606606e7d9abe0c94d", null ],
     [ "LootLockerNotificationPriority", "namespaceLootLocker_1_1LootLockerEnums.html#a597d4485bf785b44cf326dee830d9a31", null ],
     [ "LootLockerNotificationSource", "namespaceLootLocker_1_1LootLockerEnums.html#a25b4d0663d5f8180817db62b40d69ed5", null ],
+    [ "LootLockerReferralQualifier", "namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85", [
+      [ "session_started", "namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85a5287f0377ae6fbd3ce08f19f03b77b3d", null ],
+      [ "entitlement_owned", "namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85a1a838cef42cb29276f0b6f9313a2bcdd", null ],
+      [ "game_asserted", "namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85a7bf3b8b6cc24120b183bf34b628658d4", null ],
+      [ "publisher_currency_earned", "namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85ae5218cb8bc30d66d7a1742087642d7d2", null ]
+    ] ],
+    [ "LootLockerReferralStatus", "namespaceLootLocker_1_1LootLockerEnums.html#aefd45c82a4f971b1ca44d3a0be253ee2", [
+      [ "claimed", "namespaceLootLocker_1_1LootLockerEnums.html#aefd45c82a4f971b1ca44d3a0be253ee2a8d817f5603c24017d353707ffd611b92", null ],
+      [ "qualified", "namespaceLootLocker_1_1LootLockerEnums.html#aefd45c82a4f971b1ca44d3a0be253ee2a4003642ceae88aacbb03d7c5ccdbe820", null ],
+      [ "void", "namespaceLootLocker_1_1LootLockerEnums.html#aefd45c82a4f971b1ca44d3a0be253ee2acab8111fd0b710a336c898e539090e34", null ]
+    ] ],
     [ "LootLockerRefundInventoryEventAction", "namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31e", [
       [ "removed", "namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eab07286ebbb5bc7aa91cc3eaa8bc19711", null ],
       [ "skipped", "namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a", null ]
@@ -149,14 +164,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classLootLocker_1_1Requests_1_1LootLockerBroadcastLanguage.html#a20d7ae6c9915834d728807642f77648e",
-"classLootLocker_1_1Requests_1_1LootLockerDeactivatedAssetsResponse.html#a5e3951d0db4272c5deab4795ffe369aa",
-"classLootLocker_1_1Requests_1_1LootLockerItemTemplate.html#a1a91e24ef830bd5ac0a4c2ae57db8e1d",
-"classLootLocker_1_1Requests_1_1LootLockerListLeaderboardsResponse.html#ae213ae525bb4c5e5c39f106e9e8cef07",
-"classLootLocker_1_1Requests_1_1LootLockerPlayer.html#a0df3c6a073c5b325a3620fabe9ade0eb",
-"classLootLocker_1_1Requests_1_1LootLockerVariation.html#a411e4705999104c0f6db4b6bb815dcc8",
-"group__Followers.html#gad7fdb6b4c99b76e9920ea43696b89183",
-"group__SDKCustomization.html"
+"classLootLocker_1_1Requests_1_1LootLockerBroadcastGame.html",
+"classLootLocker_1_1Requests_1_1LootLockerCurrency.html#acbbd534edb91994edf4cd11eb426bfb1",
+"classLootLocker_1_1Requests_1_1LootLockerGetWalletResponse.html",
+"classLootLocker_1_1Requests_1_1LootLockerLeaderboardRewardGroup.html#a7033491016b1d45511501856e6335809",
+"classLootLocker_1_1Requests_1_1LootLockerNotificationContent.html#a472d38e913de70769070b030d345350f",
+"classLootLocker_1_1Requests_1_1LootLockerProgressionResponse.html#a12dbd1eb86abeb1141935413de78edfe",
+"classLootLocker_1_1Requests_1_1PlayerWith1stPartyPlatformIDs.html#a7ca2328529c24b135c379c8ec5af6e22",
+"group__Hero.html#ga6dca52cb768bc62cdf318ef6b58c8395",
+"group__UserGeneratedContent.html#ga8a0646d74f27a08da671b6741b0a5702"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

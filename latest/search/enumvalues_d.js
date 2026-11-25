@@ -1,6 +1,12 @@
 var searchData=
 [
-  ['uninitialized_0',['Uninitialized',['../namespaceLootLocker.html#a63da08fa74f1f1e5dc9dead4be729e81af704f57ea420275ad51bf55b7dec2c96',1,'LootLocker']]],
-  ['unknown_1',['unknown',['../namespaceLootLocker_1_1LootLockerEnums.html#a19684afe5d90f9fcb3daa619efc0db75aad921d60486366258809553a3db49a4a',1,'LootLocker::LootLockerEnums']]],
-  ['updated_5fat_2',['updated_at',['../namespaceLootLocker_1_1LootLockerEnums.html#aff5a9a64fba273b693b5e21f838d5fdfaafd1a1a8e69e4b32a11a645da8280f8a',1,'LootLocker.LootLockerEnums.updated_at'],['../namespaceLootLocker_1_1LootLockerEnums.html#ab2a3741c22b09082e2551704d105f2ddaafd1a1a8e69e4b32a11a645da8280f8a',1,'LootLocker.LootLockerEnums.updated_at']]]
+  ['savedbutinactive_0',['SavedButInactive',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830afc8e5ea09d47efb2edfa091d8f782a63',1,'LootLocker::Requests']]],
+  ['servererror_1',['ServerError',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830a7d65c64901711bc2cd2a33ff2641fbe9',1,'LootLocker::Requests']]],
+  ['session_5fstarted_2',['session_started',['../namespaceLootLocker_1_1LootLockerEnums.html#aa922de6f2201c1995f957493141f7c85a5287f0377ae6fbd3ce08f19f03b77b3d',1,'LootLocker::LootLockerEnums']]],
+  ['sessionexpired_3',['SessionExpired',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830a6dce5c5e5103a68c8b614613db57b3a5',1,'LootLocker::Requests']]],
+  ['signedinandconnected_4',['SignedInAndConnected',['../namespaceLootLocker_1_1Requests.html#ac7bc3cd80fb2e042f6c0632450e73830ae20c79275fac9a3dca35cfdfef95a4ec',1,'LootLocker::Requests']]],
+  ['singlesession_5',['SingleSession',['../namespaceLootLocker.html#a5dc94b8d36ab5c4f5648a39bfd14a204a7f38d7b441417b213701c616f7641745',1,'LootLocker']]],
+  ['skipped_6',['skipped',['../namespaceLootLocker_1_1LootLockerEnums.html#abca75f1fd16f7c3ea5e96a3968cdc31eae52e279299e912838f689d4380c81f4a',1,'LootLocker::LootLockerEnums']]],
+  ['source_7',['source',['../namespaceLootLocker_1_1LootLockerEnums.html#ab2a3741c22b09082e2551704d105f2dda36cd38f49b9afa08222c0dc9ebfe35eb',1,'LootLocker::LootLockerEnums']]],
+  ['stackable_8',['stackable',['../namespaceLootLocker_1_1LootLockerEnums.html#a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620',1,'LootLocker::LootLockerEnums']]]
 ];

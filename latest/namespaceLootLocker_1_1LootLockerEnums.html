@@ -59,7 +59,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.3.0</span>
+      <span id="ll-topnav-version">v8.4.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.4.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -246,6 +246,28 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a661f9e2bb3444722cdbe492fd131acbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status of the entitlement. <br /></td></tr>
 <tr class="memitem:a0cda66ebb8d3f52fe0b3715264acbdf7" id="r_a0cda66ebb8d3f52fe0b3715264acbdf7"><td class="memItemLeft" align="right" valign="top"><a id="a0cda66ebb8d3f52fe0b3715264acbdf7" name="a0cda66ebb8d3f52fe0b3715264acbdf7"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0cda66ebb8d3f52fe0b3715264acbdf7">LootLockerEntitlementHistoryListingType</a> </td></tr>
 <tr class="memdesc:a0cda66ebb8d3f52fe0b3715264acbdf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status of the entitlement. <br /></td></tr>
+<tr class="memitem:a3c91dea2ea78a915e06abd213db67815" id="r_a3c91dea2ea78a915e06abd213db67815"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c91dea2ea78a915e06abd213db67815">LootLockerIdentityProvider</a> { <a class="el" href="#a3c91dea2ea78a915e06abd213db67815aad921d60486366258809553a3db49a4a">unknown</a> = 0
+, <b>steam</b> = 1
+, <b>psn</b> = 2
+, <b>apple_app_store</b> = 3
+, <b>google_play_store</b> = 4
+, <b>xbox_one</b> = 5
+, <b>nintendo_switch</b> = 6
+, <b>amazon_luna</b> = 7
+, <b>white_label_login</b> = 8
+, <b>guest</b> = 9
+, <b>apple_sign_in</b> = 10
+, <b>google_sign_in</b> = 11
+, <b>epic_games</b> = 12
+, <b>apple_game_center</b> = 13
+, <b>meta</b> = 14
+, <b>lootlocker_delegation</b> = 15
+, <b>twitch</b> = 16
+, <b>google_play_games</b> = 17
+, <b>discord</b> = 18
+, <a class="el" href="#a3c91dea2ea78a915e06abd213db67815a88f9b69ddaa763562bcb1a5a7f6127ab">publisher_account</a> = 19
+ }</td></tr>
+<tr class="memdesc:a3c91dea2ea78a915e06abd213db67815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Platforms that can be presented as a credential when linking a provider to an identity, and that can therefore appear in an identity's provider list.  <a href="#a3c91dea2ea78a915e06abd213db67815">More...</a><br /></td></tr>
 <tr class="memitem:a96fe13079f755e5a5c09ef9e87e56172" id="r_a96fe13079f755e5a5c09ef9e87e56172"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172">LootLockerItemType</a> { <a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7">instanced</a>
 , <a class="el" href="#a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620">stackable</a>
  }</td></tr>
@@ -311,6 +333,17 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71a153dc3973f152526a16472cb67d4c114">refund_failed</a> = 3
  }</td></tr>
 <tr class="memdesc:a0d9a5b8d1a9370beeb5b80a26a1d1f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">The category of a per-entitlement warning returned during a refund.  <a href="#a0d9a5b8d1a9370beeb5b80a26a1d1f71">More...</a><br /></td></tr>
+<tr class="memitem:aa922de6f2201c1995f957493141f7c85" id="r_aa922de6f2201c1995f957493141f7c85"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa922de6f2201c1995f957493141f7c85">LootLockerReferralQualifier</a> { <a class="el" href="#aa922de6f2201c1995f957493141f7c85a5287f0377ae6fbd3ce08f19f03b77b3d">session_started</a>
+, <a class="el" href="#aa922de6f2201c1995f957493141f7c85a1a838cef42cb29276f0b6f9313a2bcdd">entitlement_owned</a>
+, <a class="el" href="#aa922de6f2201c1995f957493141f7c85a7bf3b8b6cc24120b183bf34b628658d4">game_asserted</a>
+, <a class="el" href="#aa922de6f2201c1995f957493141f7c85ae5218cb8bc30d66d7a1742087642d7d2">publisher_currency_earned</a>
+ }</td></tr>
+<tr class="memdesc:aa922de6f2201c1995f957493141f7c85"><td class="mdescLeft">&#160;</td><td class="mdescRight">The action that turns a claimed referral into a payout.  <a href="#aa922de6f2201c1995f957493141f7c85">More...</a><br /></td></tr>
+<tr class="memitem:aefd45c82a4f971b1ca44d3a0be253ee2" id="r_aefd45c82a4f971b1ca44d3a0be253ee2"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefd45c82a4f971b1ca44d3a0be253ee2">LootLockerReferralStatus</a> { <a class="el" href="#aefd45c82a4f971b1ca44d3a0be253ee2a8d817f5603c24017d353707ffd611b92">claimed</a>
+, <a class="el" href="#aefd45c82a4f971b1ca44d3a0be253ee2a4003642ceae88aacbb03d7c5ccdbe820">qualified</a>
+, <a class="el" href="#aefd45c82a4f971b1ca44d3a0be253ee2acab8111fd0b710a336c898e539090e34">void</a>
+ }</td></tr>
+<tr class="memdesc:aefd45c82a4f971b1ca44d3a0be253ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of a referral relation.  <a href="#aefd45c82a4f971b1ca44d3a0be253ee2">More...</a><br /></td></tr>
 <tr class="memitem:af4849d83fb15c46a49eccf978fd9039a" id="r_af4849d83fb15c46a49eccf978fd9039a"><td class="memItemLeft" align="right" valign="top"><a id="af4849d83fb15c46a49eccf978fd9039a" name="af4849d83fb15c46a49eccf978fd9039a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4849d83fb15c46a49eccf978fd9039a">LootLockerRemoteSessionLeaseStatus</a> </td></tr>
 <tr class="memdesc:af4849d83fb15c46a49eccf978fd9039a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status of the remote session leasing process. <br /></td></tr>
 <tr class="memitem:a57e5357e3cbd3ec3a6b452483b086dce" id="r_a57e5357e3cbd3ec3a6b452483b086dce"><td class="memItemLeft" align="right" valign="top"><a id="a57e5357e3cbd3ec3a6b452483b086dce" name="a57e5357e3cbd3ec3a6b452483b086dce"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57e5357e3cbd3ec3a6b452483b086dce">LootLockerRemoteSessionLeaseIntent</a> </td></tr>
@@ -338,6 +371,32 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="a11dc7f5aeea66ae644d4b93b1b1d9c09ac76a5e84e4bdee527e274ea30c680d79" name="a11dc7f5aeea66ae644d4b93b1b1d9c09ac76a5e84e4bdee527e274ea30c680d79"></a>active&#160;</td><td class="fielddoc"><p>The purchase completed successfully and items have been granted. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a11dc7f5aeea66ae644d4b93b1b1d9c09a26934eb377001f66e37289a5c93fe284" name="a11dc7f5aeea66ae644d4b93b1b1d9c09a26934eb377001f66e37289a5c93fe284"></a>failed&#160;</td><td class="fielddoc"><p>The purchase failed; see the error field for the reason. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a3c91dea2ea78a915e06abd213db67815" name="a3c91dea2ea78a915e06abd213db67815"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c91dea2ea78a915e06abd213db67815">&#9670;&#160;</a></span>LootLockerIdentityProvider</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a3c91dea2ea78a915e06abd213db67815">LootLocker.LootLockerEnums.LootLockerIdentityProvider</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Platforms that can be presented as a credential when linking a provider to an identity, and that can therefore appear in an identity's provider list. </p>
+<p>Member names are the wire values the backend accepts, so they are sent as-is. The values are the platform catalog slugs used by <a class="el" href="namespaceLootLocker.html">LootLocker</a>, which are not the same catalogue as <a class="el" href="#a8c149e412d4b7c199da1853ade741672" title="Account providers possible to use for connected accounts.">LootLockerAccountProvider</a>.</p>
+<p>Always send the canonical member when linking. The backend accepts the aliases <code>ios</code>, <code>android</code> and <code>luna</code>, and stores whichever form was sent, but a stored alias is reported as unknown because this SDK only maps canonical slugs. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3c91dea2ea78a915e06abd213db67815aad921d60486366258809553a3db49a4a" name="a3c91dea2ea78a915e06abd213db67815aad921d60486366258809553a3db49a4a"></a>unknown&#160;</td><td class="fielddoc"><p>A provider this SDK does not recognise, or one the response did not populate. </p>
+<p>Zero on purpose: an unpopulated or unparseable value must not land on a real provider. Both JSON backends resolve an unrecognised slug to this member. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3c91dea2ea78a915e06abd213db67815a88f9b69ddaa763562bcb1a5a7f6127ab" name="a3c91dea2ea78a915e06abd213db67815a88f9b69ddaa763562bcb1a5a7f6127ab"></a>publisher_account&#160;</td><td class="fielddoc"><p>A publisher account credential (email). </p>
+<p>Every identity created through publisher sign-in carries one, so it appears in the provider list. It is not linkable through the link endpoint. </p>
 </td></tr>
 </table>
 
@@ -384,6 +443,56 @@ Enumerations</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7" name="a96fe13079f755e5a5c09ef9e87e56172a54edb311f62aac48f032409eb8d560d7"></a>instanced&#160;</td><td class="fielddoc"><p>Each granted item is a separate, individually tracked instance. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620" name="a96fe13079f755e5a5c09ef9e87e56172a09c236a23f71299fa41ce69cd3182620"></a>stackable&#160;</td><td class="fielddoc"><p>The item is stored as a single entry with a count that can be incremented or decremented. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aa922de6f2201c1995f957493141f7c85" name="aa922de6f2201c1995f957493141f7c85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa922de6f2201c1995f957493141f7c85">&#9670;&#160;</a></span>LootLockerReferralQualifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#aa922de6f2201c1995f957493141f7c85">LootLocker.LootLockerEnums.LootLockerReferralQualifier</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The action that turns a claimed referral into a payout. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa922de6f2201c1995f957493141f7c85a5287f0377ae6fbd3ce08f19f03b77b3d" name="aa922de6f2201c1995f957493141f7c85a5287f0377ae6fbd3ce08f19f03b77b3d"></a>session_started&#160;</td><td class="fielddoc"><p>The referee qualified by starting their first session with the code. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa922de6f2201c1995f957493141f7c85a1a838cef42cb29276f0b6f9313a2bcdd" name="aa922de6f2201c1995f957493141f7c85a1a838cef42cb29276f0b6f9313a2bcdd"></a>entitlement_owned&#160;</td><td class="fielddoc"><p>The referee qualified by owning one of the program's configured catalog items. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa922de6f2201c1995f957493141f7c85a7bf3b8b6cc24120b183bf34b628658d4" name="aa922de6f2201c1995f957493141f7c85a7bf3b8b6cc24120b183bf34b628658d4"></a>game_asserted&#160;</td><td class="fielddoc"><p>The referee qualified because the game server asserted it. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa922de6f2201c1995f957493141f7c85ae5218cb8bc30d66d7a1742087642d7d2" name="aa922de6f2201c1995f957493141f7c85ae5218cb8bc30d66d7a1742087642d7d2"></a>publisher_currency_earned&#160;</td><td class="fielddoc"><p>The referee qualified by earning a configured publisher currency. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aefd45c82a4f971b1ca44d3a0be253ee2" name="aefd45c82a4f971b1ca44d3a0be253ee2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefd45c82a4f971b1ca44d3a0be253ee2">&#9670;&#160;</a></span>LootLockerReferralStatus</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#aefd45c82a4f971b1ca44d3a0be253ee2">LootLocker.LootLockerEnums.LootLockerReferralStatus</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The state of a referral relation. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aefd45c82a4f971b1ca44d3a0be253ee2a8d817f5603c24017d353707ffd611b92" name="aefd45c82a4f971b1ca44d3a0be253ee2a8d817f5603c24017d353707ffd611b92"></a>claimed&#160;</td><td class="fielddoc"><p>The referral is claimed and waiting for its qualifying action. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aefd45c82a4f971b1ca44d3a0be253ee2a4003642ceae88aacbb03d7c5ccdbe820" name="aefd45c82a4f971b1ca44d3a0be253ee2a4003642ceae88aacbb03d7c5ccdbe820"></a>qualified&#160;</td><td class="fielddoc"><p>The qualifying action happened and both sides were rewarded. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aefd45c82a4f971b1ca44d3a0be253ee2acab8111fd0b710a336c898e539090e34" name="aefd45c82a4f971b1ca44d3a0be253ee2acab8111fd0b710a336c898e539090e34"></a>void&#160;</td><td class="fielddoc"><p>The referral was voided, for example because a party was banned. </p>
 </td></tr>
 </table>
 

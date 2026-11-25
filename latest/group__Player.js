@@ -1,5 +1,6 @@
 var group__Player =
 [
+    [ "LootLocker.Requests.LootLockerSDKManager.CheckDLCs", "group__Player.html#ga9bab7902edce704b5c56ccf6c2778378", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.DeletePlayer", "group__Player.html#ga973ec828fd87841c4fb01b2ed53cd3f6", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.GetAssetNotification", "group__Player.html#ga4735767123bab5946e2a17f4c6dd0c19", null ],
     [ "LootLocker.Requests.LootLockerSDKManager.GetBalance", "group__Player.html#ga536b3950f4c78015d5658eaf4715f3b5", null ],

@@ -59,7 +59,7 @@
       </a>
       <span id="ll-topnav-divider" aria-hidden="true"></span>
       <a href="index.html" id="ll-topnav-product">Unity SDK</a>
-      <span id="ll-topnav-version">v8.3.0</span>
+      <span id="ll-topnav-version">v8.4.0</span>
       <a href="https://github.com/lootlocker/unity-sdk" target="_blank"
          rel="noopener noreferrer" id="ll-topnav-github" aria-label="GitHub repository">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ function llToggleDark() {
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lootlocker-logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.3.0</span>
+   <div id="projectname">LootLocker Unity SDK<span id="projectnumber">&#160;8.4.0</span>
    </div>
    <div id="projectbrief">Game backend SDK for Unity</div>
   </td>
@@ -226,6 +226,10 @@ Properties</h2></td></tr>
 <tr class="memdesc:a560b91d84911557f6a1416d8637b08b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to automatically create a profile for the player if one does not exist.  <br /></td></tr>
 <tr class="memitem:a093c1cb670c6c7454bdf592aa10b110a" id="r_a093c1cb670c6c7454bdf592aa10b110a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a093c1cb670c6c7454bdf592aa10b110a">check_dlc</a> = false<code> [get, set]</code></td></tr>
 <tr class="memdesc:a093c1cb670c6c7454bdf592aa10b110a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the client reports owning DLC for this player.  <br /></td></tr>
+<tr class="memitem:ac932335b65fe18068d3706e2e44df145" id="r_ac932335b65fe18068d3706e2e44df145"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac932335b65fe18068d3706e2e44df145">referral_code</a> = null<code> [get, set]</code></td></tr>
+<tr class="memdesc:ac932335b65fe18068d3706e2e44df145"><td class="mdescLeft">&#160;</td><td class="mdescRight">The referral code of the player who invited this player, which is the referrer's public UID.  <br /></td></tr>
+<tr class="memitem:a43cd8be8780c52d6ec32a8a76cb537dc" id="r_a43cd8be8780c52d6ec32a8a76cb537dc"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43cd8be8780c52d6ec32a8a76cb537dc">referral_program_key</a> = null<code> [get, set]</code></td></tr>
+<tr class="memdesc:a43cd8be8780c52d6ec32a8a76cb537dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The key of the referral program the code redeems.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Optional parameters that can be sent when starting a session. </p>
@@ -303,6 +307,56 @@ Properties</h2></td></tr>
 
 <p>The name of the player (same as set by SetPlayerName). </p>
 <p>If not supplied, will be left blank. </p>
+
+</div>
+</div>
+<a id="ac932335b65fe18068d3706e2e44df145" name="ac932335b65fe18068d3706e2e44df145"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac932335b65fe18068d3706e2e44df145">&#9670;&#160;</a></span>referral_code</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string LootLocker.Requests.LootLockerSessionOptionals.referral_code = null</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel get">get</span><span class="mlabel set">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The referral code of the player who invited this player, which is the referrer's public UID. </p>
+<p>Supply this when starting a first session to attribute the referral. Ignored for returning players. </p>
+
+</div>
+</div>
+<a id="a43cd8be8780c52d6ec32a8a76cb537dc" name="a43cd8be8780c52d6ec32a8a76cb537dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43cd8be8780c52d6ec32a8a76cb537dc">&#9670;&#160;</a></span>referral_program_key</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string LootLocker.Requests.LootLockerSessionOptionals.referral_program_key = null</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel get">get</span><span class="mlabel set">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The key of the referral program the code redeems. </p>
+<p>Omit when the game has a single active program. </p>
 
 </div>
 </div>
