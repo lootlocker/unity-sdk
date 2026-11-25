@@ -17,12 +17,15 @@ namespace LootLockerTests.PlayMode
         private static int TestCounter = 0;
         private bool SetupFailed = false;
 
-        private const string PlaytestSubdomain = "ci-playtest";
+        // Playtest subdomains are unique across all games, so every test needs its own.
+        private string PlaytestSubdomain = null;
 
         [UnitySetUp]
         public IEnumerator Setup()
         {
             TestCounter++;
+            SetupFailed = false;
+            PlaytestSubdomain = "ci-playtest-" + TestCounter + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
             configCopy = LootLockerConfig.current;
             Debug.Log($"##### Start of {this.GetType().Name} test no.{TestCounter} setup #####");
 
