@@ -428,6 +428,9 @@ namespace LootLockerTests.PlayMode
             // When
             LootLockerPlaytestOnboardingStatusResponse actualResponse = null;
             bool callCompleted = false;
+            // A 404 is the expected outcome, so the SDK's error log must be expected rather than
+            // treated as an unhandled log message.
+            LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("playtest not found"));
             LootLockerSDKManager.GetPlaytestOnboardingStatus("this-playtest-does-not-exist", response =>
             {
                 actualResponse = response;
