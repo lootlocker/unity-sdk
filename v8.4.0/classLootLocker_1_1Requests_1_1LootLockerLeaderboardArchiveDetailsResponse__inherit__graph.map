@@ -1,0 +1,5 @@
+<map id="LootLocker.Requests.LootLockerLeaderboardArchiveDetailsResponse" name="LootLocker.Requests.LootLockerLeaderboardArchiveDetailsResponse">
+<area shape="rect" id="Node000001" title="Response containing the paginated entries from a specific archived leaderboard snapshot." alt="" coords="5,81,245,143"/>
+<area shape="rect" id="Node000002" href="$classLootLocker_1_1LootLockerResponse.html" title="All ServerAPI.SendRequest responses will invoke the callback using an instance of this class for easi..." alt="" coords="11,5,239,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,47,127,82,123,80,123,51"/>
+</map>
