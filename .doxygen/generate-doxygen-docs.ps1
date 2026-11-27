@@ -2,6 +2,8 @@
 # 1. Syncs the mainpage navigation table from groups.dox
 # 2. Reads the SDK version from package.json
 # 3. Runs Doxygen
+# 4. Makes the generated HTML SEO compliant (canonical URLs, unique titles,
+#    meta descriptions, <h1> headings, sitemap.xml)
 # Run from the repo root:  pwsh .doxygen/generate-doxygen-docs.ps1
 param(
     [string]$GroupsFile  = ".doxygen/groups.dox",
@@ -9,6 +11,14 @@ param(
 )
 
 Push-Location (Join-Path $PSScriptRoot "..")
+
+# Windows ships `python`; CI and macOS/Linux usually only have `python3`. The
+# Microsoft Store alias for `python3` exists but fails when run, so probe it.
+$python = "python"
+if (Get-Command python3 -ErrorAction SilentlyContinue) {
+    & python3 --version *> $null
+    if ($LASTEXITCODE -eq 0) { $python = "python3" }
+}
 
 # ── 1. Sync navigation table ──────────────────────────────────────────
 $pythonScript = @'
@@ -45,7 +55,7 @@ with open(mainpage_file, 'w') as f:
 print(f"sync-nav: updated {mainpage_file} with {len(matches)} groups")
 '@
 
-python3 -c $pythonScript $GroupsFile $MainpageFile
+& $python -c $pythonScript $GroupsFile $MainpageFile
 
 # ── 2. Extract version ────────────────────────────────────────────────
 $env:LL_SDK_VERSION = (Get-Content "package.json" | ConvertFrom-Json).version
@@ -53,6 +63,13 @@ Write-Host "generate-doxygen-docs: version=$($env:LL_SDK_VERSION)"
 
 # ── 3. Run Doxygen ────────────────────────────────────────────────────
 doxygen .doxygen/Doxyfile
+
+# ── 4. Make the output SEO compliant ──────────────────────────────────
+# Canonical URLs point at latest/, which is the version we want indexed.
+& $python .doxygen/seo-postprocess.py `
+    --html-dir docs/html `
+    --base-url https://ref.lootlocker.com/unity `
+    --project "LootLocker Unity SDK"
 
 $env:LL_SDK_VERSION = $null
 Pop-Location
