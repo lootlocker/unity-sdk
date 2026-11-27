@@ -38,6 +38,16 @@ jobs:
       - name: Generate docs
         run: bash .doxygen/generate-doxygen-docs.sh
 
+      - name: Mark branch previews as non-indexable
+        # Branch previews duplicate latest/, so keep them out of the index.
+        if: github.event_name == 'workflow_dispatch' && github.ref_name != 'main'
+        run: |
+          python3 .doxygen/seo-postprocess.py \
+            --html-dir docs/html \
+            --base-url https://ref.lootlocker.com/unity \
+            --project "LootLocker Unity SDK" \
+            --noindex
+
       - name: Upload docs artifact
         uses: actions/upload-artifact@v4
         with:
@@ -167,6 +177,7 @@ jobs:
           <head>
             <meta charset="UTF-8"/>
             <meta http-equiv="refresh" content="0;url=latest/"/>
+            <link rel="canonical" href="https://ref.lootlocker.com/unity/latest/"/>
             <title>LootLocker Unity SDK — Reference Docs</title>
           </head>
           <body>
@@ -174,6 +185,15 @@ jobs:
           </body>
           </html>
           EOF
+
+      - name: Publish sitemap at site root
+        # Crawlers look for /unity/sitemap.xml, which maps to the gh-pages root.
+        # The sitemap lists latest/ URLs, so it is only meaningful there, and
+        # branch previews are noindex so they must not advertise one at all.
+        run: |
+          if [ "${{ steps.targets.outputs.is_release }}" = "true" ] || [ "${{ steps.targets.outputs.target_dir }}" = "latest" ]; then
+            cp site/sitemap.xml site-root/sitemap.xml
+          fi
 
       - name: Deploy to target directory
         uses: peaceiris/actions-gh-pages@v4

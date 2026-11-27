@@ -3,14 +3,17 @@
 # 1. Syncs the mainpage navigation table from groups.dox
 # 2. Reads the SDK version from package.json
 # 3. Runs Doxygen
+# 4. Makes the generated HTML SEO compliant (canonical URLs, unique titles,
+#    meta descriptions, <h1> headings, sitemap.xml)
 # Run from the repo root:  bash .doxygen/generate-doxygen-docs.sh
 set -euo pipefail
 
 GROUPS_FILE="${1:-.doxygen/groups.dox}"
 MAINPAGE_FILE="${2:-.doxygen/mainpage.md}"
+PYTHON="${PYTHON:-python3}"
 
 # ── 1. Sync navigation table ──────────────────────────────────────────
-python3 - "$GROUPS_FILE" "$MAINPAGE_FILE" << 'EOF'
+"$PYTHON" - "$GROUPS_FILE" "$MAINPAGE_FILE" << 'EOF'
 import re, sys
 
 groups_file = sys.argv[1]
@@ -51,3 +54,10 @@ echo "generate-doxygen-docs: version=${LL_SDK_VERSION}"
 
 # ── 3. Run Doxygen ────────────────────────────────────────────────────
 doxygen .doxygen/Doxyfile
+
+# ── 4. Make the output SEO compliant ──────────────────────────────────
+# Canonical URLs point at latest/, which is the version we want indexed.
+"$PYTHON" .doxygen/seo-postprocess.py \
+  --html-dir docs/html \
+  --base-url https://ref.lootlocker.com/unity \
+  --project "LootLocker Unity SDK"
